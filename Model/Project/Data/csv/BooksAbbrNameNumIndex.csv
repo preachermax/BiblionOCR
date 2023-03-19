@@ -1,0 +1,28 @@
+bookabbr,bookname,booknumber,bookindex
+Mat,Matthew,40,0
+Mar,Mark,41,1
+Luk,Luke,42,2
+Joh,John,43,3
+Act,Acts,44,4
+Rom,Romans,45,5
+1Co,1 Corinthians,46,6
+2Co,2 Corinthians,47,7
+Gal,Galatians,48,8
+Eph,Ephesians,49,9
+Php,Philippians,50,10
+Col,Colossians,51,11
+1Th,1 Thessalonians,52,12
+2Th,2 Thessalonians,53,13
+1Ti,1 Timothy,54,14
+2Ti,2 Timothy,55,15
+Tit,Titus,56,16
+Phm,Philemon,57,17
+Heb,Hebrews,58,18
+Jas,James,59,19
+1Pe,1 Peter,60,20
+2Pe,2 Peter,61,21
+1Jn,1 John,62,22
+2Jn,2 John,63,23
+3Jn,3 John,64,24
+Jud,Jude,65,25
+Rev,Revelation,66,26

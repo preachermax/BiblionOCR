@@ -1,0 +1,137 @@
+[
+    {
+        "bookabbr": "Mat",
+        "bookname": "Matthew",
+        "booknumber": "40"
+    },
+    {
+        "bookabbr": "Mar",
+        "bookname": "Mark",
+        "booknumber": "41"
+    },
+    {
+        "bookabbr": "Luk",
+        "bookname": "Luke",
+        "booknumber": "42"
+    },
+    {
+        "bookabbr": "Joh",
+        "bookname": "John",
+        "booknumber": "43"
+    },
+    {
+        "bookabbr": "Act",
+        "bookname": "Acts",
+        "booknumber": "44"
+    },
+    {
+        "bookabbr": "Rom",
+        "bookname": "Romans",
+        "booknumber": "45"
+    },
+    {
+        "bookabbr": "1Co",
+        "bookname": "1 Corinthians",
+        "booknumber": "46"
+    },
+    {
+        "bookabbr": "2Co",
+        "bookname": "2 Corinthians",
+        "booknumber": "47"
+    },
+    {
+        "bookabbr": "Gal",
+        "bookname": "Galatians",
+        "booknumber": "48"
+    },
+    {
+        "bookabbr": "Eph",
+        "bookname": "Ephesians",
+        "booknumber": "49"
+    },
+    {
+        "bookabbr": "Php",
+        "bookname": "Philippians",
+        "booknumber": "50"
+    },
+    {
+        "bookabbr": "Col",
+        "bookname": "Colossians",
+        "booknumber": "51"
+    },
+    {
+        "bookabbr": "1Th",
+        "bookname": "1 Thessalonians",
+        "booknumber": "52"
+    },
+    {
+        "bookabbr": "2Th",
+        "bookname": "2 Thessalonians",
+        "booknumber": "53"
+    },
+    {
+        "bookabbr": "1Ti",
+        "bookname": "1 Timothy",
+        "booknumber": "54"
+    },
+    {
+        "bookabbr": "2Ti",
+        "bookname": "2 Timothy",
+        "booknumber": "55"
+    },
+    {
+        "bookabbr": "Tit",
+        "bookname": "Titus",
+        "booknumber": "56"
+    },
+    {
+        "bookabbr": "Phm",
+        "bookname": "Philemon",
+        "booknumber": "57"
+    },
+    {
+        "bookabbr": "Heb",
+        "bookname": "Hebrews",
+        "booknumber": "58"
+    },
+    {
+        "bookabbr": "Jas",
+        "bookname": "James",
+        "booknumber": "59"
+    },
+    {
+        "bookabbr": "1Pe",
+        "bookname": "1 Peter",
+        "booknumber": "60"
+    },
+    {
+        "bookabbr": "2Pe",
+        "bookname": "2 Peter",
+        "booknumber": "61"
+    },
+    {
+        "bookabbr": "1Jn",
+        "bookname": "1 John",
+        "booknumber": "62"
+    },
+    {
+        "bookabbr": "2Jn",
+        "bookname": "2 John",
+        "booknumber": "63"
+    },
+    {
+        "bookabbr": "3Jn",
+        "bookname": "3 John",
+        "booknumber": "64"
+    },
+    {
+        "bookabbr": "Jud",
+        "bookname": "Jude",
+        "booknumber": "65"
+    },
+    {
+        "bookabbr": "Rev",
+        "bookname": "Revelation",
+        "booknumber": "66"
+    }
+]

@@ -1,0 +1,25 @@
+Setting,CurrentValue,DefaultValue
+self.ocrlang,Middle Greek,Middle Greek
+self.ocrmodel,feg,feg
+self.bookabbr,Joh,Mat
+self.chapter,1,1
+self.verse,1,1
+self.word,1,1
+self.chr,1,1
+self.font,FROMVS(MAXR),FROMVS(MAXR)
+self.fontsize,20,20
+self.fontinstallpath,c:/Windows/fonts/FROMVS,
+self.homefontinstallpath,c:/Windows/fonts/FROMVS,
+self.usrfontinstallpath,c:/Windows/fonts/FROMVS,
+self.linespacing,150,150
+self.verselinespacing,105,105
+self.reflinespacing,105,105
+self.sourcebookmarkdown,source_book_43_John,source_book_40_Matthew
+self.greekbookmarkdown,greek_book_43_John,greek_book_40_Matthew
+self.latinbookmarkdown,latin_book_43_John,latin_book_40_Matthew
+self.txtpath,,
+self.txtdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages
+self.txtfileList,[],[]
+self.reftxtpath,,
+self.reftxtdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR
+self.reftxtfileList,[],[]

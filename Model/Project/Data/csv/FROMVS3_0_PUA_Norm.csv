@@ -1,0 +1,156 @@
+HexName2_1,Name2_1,Hex2_1,Glyph2_1,Norm3_0,Glyph3_0,Hex3_0,HexName3_0,Name3_0,SwapCheck
+0xE822,omega_perispomeni_nu,E822,,ῶν,,E86F,0xE86F,omega_perispomeni_nu,Replace
+0xE823,,E823,,ων,,E86E,0xE86E,omega_nu_2,Replace
+0xE839,omicron_sigma_2,E839,,οσ,,E86C,0xE86C,omicron_sigma_2,Replace
+0xE83A,omicron_iota_perispomeni_sigma2,E83A,,οῖσ,,E86B,0xE86B,omicron_iota_perispomeni_sigma,Replace
+0xE825,iota_sigma,E825,,ισ,,E86A,0xE86A,iota_sigma,Replace
+0xE834,alpha_perispomeni_fin_sigma,E834,,ας,,E868,0xE868,alpha_perispomeni_fin_sigma,Replace
+0xE83D,epsilon_nu_2,E83D,,εν,,E867,0xE867,epsilon_nu_2,Replace
+0xE83C,epsilon_nu,E83C,,εν,,E866,0xE866,epsilon_nu,Replace
+0xE82B,epsilon_iota_sigma,E82B,,εισ,,E865,0xE865,epsilon_iota_sigma,Replace
+0xE835,alpha_nu_3,E835,,αν,,E864,0xE864,alpha_nu_3,Replace
+0xE83B,alpha_sigma_2,E83B,,ασ,,E863,0xE863,alpha_sigma_2,Replace
+0xE838,alpha_iota_perispomeni_sigma,E838,,αῖσ,,E862,0xE862,alpha_iota_perispomeni_sigma,Replace
+0xE837,alpha_nu_2,E837,,αν,,E861,0xE861,alpha_nu_2,Replace
+0xE824,alpha_nu_1,E824,,αν,,E860,0xE860,alpha_nu,Replace
+0xE821,slant_2,E821,,,,E841,0xE841,slant_2,Replace
+0xE820,slant_1,E820,,,,E840,0xE840,slant_1,Replace
+0xE830,omega_perispomeni_sigma,E830,,ῶσ,,E820,0xE820,omega_perispomeni_sigma,Replace
+0xE810,chi_rho,E810,,χρ,,E811,0xE811,chi_rho,Replace
+0xE82F,chi_psili,E82F,,χʼ,,E810,0xE810,chi_psili,Replace
+0xE7F5,upsilon_psili_perispomeni_nu,E7F5,,ὖν,,E7FC,0xE7FC,upsilon_psili_perispomeni_nu,Replace
+0xE7F3,upsilon_perispomeni_nu,E7F3,,ῦν,,E7FB,0xE7FB,upsilon_perispomeni,Replace
+0xE832,upsilon_varia_nu,E832,,ὺν,,E7FA,0xE7FA,upsilon_varia_nu,Replace
+0xE7F2,upsilon_oxia_nu,E7F2,,ύν,,E7F9,0xE7F9,upsilon_tonos_nu,Replace
+0xE7F1,upsilon_nu,E7F1,,υν,,E7F8,0xE7F8,upsilon_nu,Replace
+0xE7F4,upsilon_perispomeni,E7F4,,ῦ,,E7F2,0xE7F2,upsilon_perispomeni,Replace
+0xE836,upsilon_tonos,E836,,ύ,,E7F1,0xE7F1,upsilon_tonos,Replace
+0xE7F0,upsilon_dasia_iota,E7F0,,υἱ,,E7F0,0xE7F0,upsilon_dasia_iota,Match
+0xE7ED,tau_rho_omicron_final_sigma,E7ED,,τρος,,E7ED,0xE7ED,tau_rho_omicron_final_sigma,Match
+0xE7EC,tau_tall_omicron_final_sigma,E7EC,,τος,,E7EC,0xE7EC,tau_tall_omicron_final_sigma,Match
+0xE7EB,tau_omicron_final_sigma,E7EB,,τος,,E7EB,0xE7EB,tau_omicron_final_sigma,Match
+0xE7E7,tau_omega_perispomeni_nu_2,E7E7,,τῶν,,E7EA,0xE7EA,tau_omega_perispomeni_nu_2,Replace
+0xE7E6,tau_omega_perispomeni_nu_1,E7E6,,τῶν,,E7E9,0xE7E9,tau_omega_perispomeni_nu,Replace
+0xE7E5,tau_omega_perispomeni_prosgegrammeni,E7E5,,τῷ,,E7E8,0xE7E8,tau_omega_perispomeni_prosgegrammeni,Replace
+0xE7E4,tau_tall_tau,E7E4,,ττ,,E7E7,0xE7E7,tau_tall_tau,Replace
+0xE7E3,tau_rho_2,E7E3,,τρ,,E7E6,0xE7E6,tau_rho_2,Replace
+0xE7E2,tau_rho_1,E7E2,,τρ,,E7E5,0xE7E5,tau_rho,Replace
+0xE7E1,tau_omicron_upsilon_perispomeni_2,E7E1,,τοῦ,,E7E4,0xE7E4,tau_omicron_upsilon_perispomeni_2,Replace
+0xE7E0,tau_omicron_upsilon_perispomeni_1,E7E0,,τοῦ,,E7E3,0xE7E3,tau_omicron_upsilon_perispomeni,Replace
+0xE7DF,tau_tall_omicron_sigma,E7DF,,τοσ,,E7E2,0xE7E2,tau_tall_omicron_sigma,Replace
+0xE7DE,tau_omicron_varia_nu,E7DE,,τὸν,,E7E1,0xE7E1,tau_omicron_varia_nu,Replace
+0xE7DD,tau_omicron_4_varia,E7DD,,τὸ,,E7E0,0xE7E0,tau_omicron_varia_4,Replace
+0xE7DC,tau_omicron_3_varia,E7DC,,τὸ,,E7DF,0xE7DF,tau_omicron_varia_3,Replace
+0xE7DB,tau_omicron_2_varia,E7DB,,τὸ,,E7DE,0xE7DE,tau_omicron_varia_2,Replace
+0xE7DA,tau_omicron_1_varia,E7DA,,τὸ,,E7DD,0xE7DD,tau_omicron_varia,Replace
+0xE831,tau_omicron_2,E831,,το,,E7DC,0xE7DC,tau_omicron_2,Replace
+0xE7D9,tau_omicron_1,E7D9,,το,,E7DB,0xE7DB,tau_omicron,Replace
+0xE7D8,tau_iota,E7D8,,τι,,E7DA,0xE7DA,tau_iota,Replace
+0xE7D7,tau_eta_perispomeni_sigma_2,E7D7,,τι,,E7D9,0xE7D9,tau_eta_perispomeni_sigma_2,Replace
+0xE7D6,tau_eta_perispomeni_sigma_1,E7D6,,τῆς,,E7D8,0xE7D8,tau_eta_perispomeni_sigma,Replace
+0xE7D5,tau_eta_nu_varia_2,E7D5,,τῆς,,E7D7,0xE7D7,tau_eta_varia2_nu,Replace
+0xE7D4,tau_eta_nu_varia_1,E7D4,,τὴν,,E7D6,0xE7D6,tau_eta_varia_nu,Replace
+0xE7D3,tau_epsilon,E7D3,,τὴν,,E7D5,0xE7D5,tau_epsilon,Replace
+0xE828,tau_alpha_iota_2,E828,,ται,,E7D4,0xE7D4,tau_alpha_iota_2,Replace
+0xE7D2,tau_alpha_iota,E7D2,,ται,,E7D3,0xE7D3,tau_alpha_iota,Replace
+0xE7D1,tau_psili,E7D1,,τʼ,,E7D2,0xE7D2,tau_psili,Replace
+0xE83E,tau_tall_psili,E83E,,τʼ,,E7D1,0xE7D1,tau_tall_psili,Replace
+0xE7D0,tau_tall,E7D0,,τ,,E7D0,0xE7D0,tau_tall,Match
+0xE7C7,sigma_chi,E7C7,,σχ,,E7C7,0xE7C7,sigma_chi,Match
+0xE7C6,sigma_tau_rho,E7C6,,στρ,,E7C6,0xE7C6,sigma_tau_rho,Match
+0xE7C5,sigma_tau,E7C5,,στ,,E7C5,0xE7C5,sigma_tau,Match
+0xE7C4,sigma_sigma,E7C4,,σσ,,E7C4,0xE7C4,sigma_sigma,Match
+0xE7C3,sigma_pi,E7C3,,σπ,,E7C3,0xE7C3,sigma_pi,Match
+0xE7C2,sigma_theta_alpha_iota,E7C2,,σθαι,,E7C2,0xE7C2,sigma_theta_alpha_iota,Match
+0xE7C1,sigma_theta,E7C1,,σθ,,E7C1,0xE7C1,sigma_theta,Match
+0xE7C0,sigma_1,E7C0,,σ,,E7C0,0xE7C0,sigma_2,Match
+0xE7A6,pi_tau,E7A6,,πτ,,E7A8,0xE7A8,pi_tau,Replace
+0xE7A0,pi_symbol,E7A0,,π,ϖ,3D6,0x3D6,pi_symbol,Replace
+0xE7A7,Pi_1,E7A7,,Π,,E7A0,0xE7A0,Pi_2,Replace
+0xE7A5,pi_rho,E7A5,,πρ,,E7A7,0xE7A7,pi_rho,Replace
+0xE7A4,pi_omicron_varia,E7A4,,πὸ,,E7A6,0xE7A6,pi_omicron_varia,Replace
+0xE7A3,pi_omicron,E7A3,,πο,,E7A5,0xE7A5,pi_omicron,Replace
+0xE7A2,pi_epsilon_rho,E7A2,,περ,,E7A4,0xE7A4,pi_epsilon_rho,Replace
+0xE7A1,pi_alpha_rho,E7A1,,παρ,,E7A3,0xE7A3,pi_alpha_rho,Replace
+0xE829,pisymbol_psili,E829,,ϖʼ,,E7A2,0xE7A2,pisymbol_psili,Replace
+0xE82D,pi_psili,E82D,,πʼ,,E7A1,0xE7A1,pi_psili,Replace
+0xE796,omicron_sigma,E796,,οσ,,E79D,0xE79D,omicron_sigma,Replace
+0xE795,omicron_upsilon_persipomeni,E795,,oῦ,,E79C,0xE79C,omicron_upsilon_persipomeni,Replace
+0xE794,omicron_upsilon_oxia,E794,,oύ,,E79B,0xE79B,omicron_upsilon_tonos,Replace
+0xE793,omicron_upsilon,E793,,ου,,E79A,0xE79A,omicron_upsilon,Replace
+0xE790,omicron_perispomeni,E790,,,,E799,0xE799,omicron_perispomeni,Replace
+0xE792,omicron_dasia_perispomeni,E792,,,,E798,0xE798,omicron_dasia_perispomeni,Replace
+0xE791,omicron_psili_perispomeni,E791,,,,E797,0xE797,omicron_psili_perispomeni,Replace
+0xE780,xi_1,E780,,ξ,,E780,0xE780,xi_2,Match
+0xE770,nu_final,E770,,ν,,E770,0xE770,nu_final,Match
+0xE765,mu_epsilon_nu_1_oxia,E765,,μέν,,E765,0xE765,mu_epsilon_tonos_nu,Match
+0xE764,mu_epsilon_nu_3_varia,E764,,μὲν,,E764,0xE764,mu_epsilon_varia_2_nu,Match
+0xE763,mu_epsilon_nu_4_varia,E763,,μὲν,,E763,0xE763,mu_epsilon_varia_nu,Match
+0xE762,mu_epsilon_nu_3,E762,,μεν,,E762,0xE762,mu_epsilon_nu_3,Match
+0xE761,mu_epsilon_nu_2,E761,,μεν,,E761,0xE761,mu_epsilon_nu_2,Match
+0xE760,mu_epsilon_nu_1,E760,,μεν,,E760,0xE760,mu_epsilon_nu,Match
+0xE750,lambda_lambda,E750,,λλ,,E751,0xE751,lambda_lambda,Replace
+0xE82C,lambda_psili,E82C,,λʼ,,E750,0xE750,lambda_psili,Replace
+0xE744,kappa_alpha_tau_alpha,E744,,κατα,,E744,0xE744,kappa_alpha_tau_alpha,Match
+0xE743,kappa_alpha_iota_4_varia,E743,,καὶ,,E743,0xE743,kappa_alpha_iota_5_varia,Match
+0xE742,kappa_alpha_iota_3_varia,E742,,καὶ,,E742,0xE742,kappa_alpha_iota_4_varia,Match
+0xE741,kappa_alpha_iota_2_varia,E741,,καὶ,,E741,0xE741,kappa_alpha_iota_3_varia,Match
+0xE740,kappa_alpha_iota_1_varia,E740,,καὶ,,E740,0xE740,kappa_alpha_iota_2_varia,Match
+0xE722,phi_iota_oxia,E722,,φί,,E723,0xE723,phi_iota_tonos,Replace
+0xE721,phi_iota,E721,,φι,,E722,0xE722,phi_iota,Replace
+0xE82E,phi_psili,E82E,,φʼ,,E721,0xE721,phi_psili,Replace
+0xE715,eta_nu_perispomeni,E715,,ῆν,,E718,0xE718,eta_perispomeni_nu,Replace
+0xE716,eta_nu_varia_2,E716,,ὴν,,E717,0xE717,eta_varia_nu_2,Replace
+0xE714,eta_nu_varia,E714,,ὴν,,E714,0xE714,eta_varia_nu,Match
+0xE713,eta_nu_oxia,E713,,ήν,,E713,0xE713,eta_tonos_nu,Match
+0xE712,eta_nu,E712,,ην,,E712,0xE712,eta_nu,Match
+0xE711,eta_1_perispomeni,E711,,ῆ,,E711,0xE711,eta_2_perispomeni,Match
+0xE710,eta_1,E710,,η,,E710,0xE710,eta_2,Match
+0xE701,zeta_2,E701,,ζ,,E701,0xE701,zeta_3,Match
+0xE700,zeta_1,E700,,ζ,,E700,0xE700,zeta_2,Match
+0xE82A,epsilon_upsilon2,E82A,,ευ,,E6FF,0xE6FF,epsilon_upsilon_2,Replace
+0xE6FE,epsilon_upsilon,E6FE,,ευ,,E6FE,0xE6FE,epsilon_upsilon,Match
+0xE6FD,epsilon_psili_stigma_iota_varia,E6FD,,ἐστὶ,,E6FD,0xE6FD,epsilon_psili_stigma_iota_varia,Match
+0xE6FC,epsilon_psili_stigma_iota,E6FC,,ἐστι,,E6FC,0xE6FC,epsilon_psili_stigma_iota,Match
+0xE6FB,epsilon_stigma_iota,E6FB,,εστι,,E6FB,0xE6FB,epsilon_stigma_iota,Match
+0xE6FA,epsilon_rho_2,E6FA,,ερ,,E6FA,0xE6FA,epsilon_rho_2,Match
+0xE6F9,epsilon_rho_1,E6F9,,ερ,,E6F9,0xE6F9,epsilon_rho,Match
+0xE6F8,epsilon_psili_xi,E6F8,,ἐξ,,E6F8,0xE6F8,epsilon_psili_xi,Match
+0xE6F7,epsilon_psili_nu,E6F7,,ἐν,,E6F7,0xE6F7,epsilon_psili_nu,Match
+0xE6F6,epsilon_iota_1_perispomeni_prosgegrammeni,E6F6,,εῖ,,E6F6,0xE6F6,epsilon_iota_perispomeni_prosgegrammeni,Match
+0xE6F5,epsion_iota_2_perispomeni,E6F5,,εῖ,,E6F5,0xE6F5,epsion_iota_2_perispomeni,Match
+0xE6F4,epsilon_iota_1_perispomeni,E6F4,,εῖ,,E6F4,0xE6F4,epsilon_iota_perispomeni,Match
+0xE6F3,epsilon_iota_2,E6F3,,ει,,E6F3,0xE6F3,epsilon_iota_2,Match
+0xE6F2,epsilon_iota_1,E6F2,,ει,,E6F2,0xE6F2,epsilon_iota,Match
+0xE6F1,epsilon_dasia_perispomeni,E6F1,,,,E6F1,0xE6F1,epsilon_dasia_perispomeni,Match
+0xE6F0,epsilon_psili_perispomeni,E6F0,,,,E6F0,0xE6F0,epsilon_psili_perispomeni,Match
+0xE6E3,delta_epsilon_varia_2,E6E3,,δὲ,,E6E3,0xE6E3,delta_epsilon_varia_2,Match
+0xE6E2,delta_epsilon_varia_1,E6E2,,δὲ,,E6E2,0xE6E2,delta_epsilon_varia,Match
+0xE6E1,delta_epsilon,E6E1,,δε,,E6E1,0xE6E1,delta_epsilon,Match
+0xE6E0,delta_curly,E6E0,,δ,,E6E0,0xE6E0,delta_curly,Match
+0xE6DA,gamma_rho,E6DA,,γρ,,E6DB,0xE6DB,gamma_rho,Replace
+0xE826,gamma_omicron_2,E826,,γο,,E6DA,0xE6DA,gamma_omicron_2,Replace
+0xE6D9,gamma_omicron,E6D9,,γο,,E6D9,0xE6D9,gamma_omicron,Match
+0xE6D8,gamma_epsilon_nu_oxia,E6D8,,γέν,,E6D8,0xE6D8,gamma_epsilon_nu_oxia,Match
+0xE6D7,gamma_gamma,E6D7,,γγ,,E6D7,0xE6D7,gamma_gamma,Match
+0xE6D6,gamma_alpha_varia_rho_5,E6D6,,γὰρ,,E6D6,0xE6D6,gamma_alpha_varia_rho_5,Match
+0xE6D5,gamma_alpha_varia_rho_4,E6D5,,γὰρ,,E6D5,0xE6D5,gamma_alpha_varia_rho_4,Match
+0xE6D4,gamma_alpha_varia_rho_3,E6D4,,γὰρ,,E6D4,0xE6D4,gamma_alpha_varia_rho_3,Match
+0xE6D3,gamma_alpha_varia_rho_2,E6D3,,γὰρ,,E6D3,0xE6D3,gamma_alpha_varia_rho_2,Match
+0xE6D2,gamma_alpha_varia_rho_1,E6D2,,γὰρ,,E6D2,0xE6D2,gamma_alpha_varia_rho,Match
+0xE6D1,gamma_tall,E6D1,,γ,,E6D1,0xE6D1,gamma_tall,Match
+0xE6D0,gamma_short,E6D0,,γ,,E6D0,0xE6D0,gamma_short,Match
+0xE6B8,alpha_psili_sigma_tau,E6B8,,ἀστ,,E6B9,0xE6B9,alpha_psili_sigma_tau,Replace
+0xE6B7,alpha_sigma_tau,E6B7,,αστ,,E6B8,0xE6B8,alpha_sigma_tau,Replace
+0xE833,alpha_rho,E833,,αρ,,E6B7,0xE6B7,alpha_rho,Replace
+0xE6B6,alpha_nu,E6B6,,αν,,E6B6,0xE6B6,alpha_nu,Match
+0xE6B5,alpha_iota_perispomeni,E6B5,,αῖ,,E6B5,0xE6B5,alpha_iota_perispomeni,Match
+0xE6B4,alpha_iota_psili_oxia,E6B4,,αἴ,,E6B4,0xE6B4,alpha_iota_psili_oxia,Match
+0xE6B3,alpha_iota_oxia,E6B3,,αί,,E6B3,0xE6B3,alpha_iota_tonos,Match
+0xE6B2,alpha_iota_psili,E6B2,,αἰ,,E6B2,0xE6B2,alpha_iota_psili,Match
+0xE6B1,alpha_iota,E6B1,,αι,,E6B1,0xE6B1,alpha_iota,Match
+0xE6B0,alpha_curly,E6B0,,α,,E6B0,0xE6B0,alpha_curly,Match
+0xE720,theta_1,E720,,θ,ϑ,3D1,0x3D1,theta_symbol,Replace
+0xE6C0,beta_curly,E6C0,,β,ϐ,3D0,0x3D0,beta_symbol,Replace
+,,,,οσ,,E870,,omicron_sigma_3,
+,,,,ὸσ,,E871,,omicron_varia_sigma,

@@ -1,0 +1,120 @@
+0xE003	alpha_iota_oxia		αί	αί		0xE6B3	alpha_iota_oxia	59059	57347
+0xE004	alpha_iota_psili_oxia		αἴ	αἴ		0xE6B4	alpha_iota_psili_oxia	59060	57348
+0xE005	alpha_iota_perispomeni		αῖ	αῖ		0xE6B5	alpha_iota_perispomeni	59061	57349
+0xE006	alpha_sigma_tau		αστ	αν		0xE6B6	alpha_nu	59062	57350
+0xE007	alpha_psili_sigma_tau		ἀστ	αστ		0xE6B7	alpha_sigma_tau	59063	57351
+0xE008	alpha_nu		αν	ἀστ		0xE6B8	alpha_psili_sigma_tau	59064	57352
+0xE010	beta_curly		β	β		0xE6C0	beta_curly	59072	57360
+0xE020	gamma_short		γ	γ		0xE6D0	gamma_short	59088	57376
+0xE021	gamma_tall		γ	γ		0xE6D1	gamma_tall	59089	57377
+0xE022	gamma_alpha_varia_rho_1		γὰρ	γὰρ		0xE6D2	gamma_alpha_varia_rho_1	59090	57378
+0xE023	gamma_alpha_varia_rho_2		γὰρ	γὰρ		0xE6D3	gamma_alpha_varia_rho_2	59091	57379
+0xE024	gamma_epsilon_nu_oxia		γέν	γὰρ		0xE6D4	gamma_alpha_varia_rho_3	59092	57380
+0xE025	gamma_gamma		γγ	γὰρ		0xE6D5	gamma_alpha_varia_rho_4	59093	57381
+0xE026	gamma_omicron		γο	γὰρ		0xE6D6	gamma_alpha_varia_rho_5	59094	57382
+0xE027	gamma_rho		γρ	γγ		0xE6D7	gamma_gamma	59095	57383
+0xE028	gamma_alpha_varia_rho_3		γὰρ	γέν		0xE6D8	gamma_epsilon_nu_oxia	59096	57384
+0xE029	gamma_alpha_varia_rho_4		γὰρ	γο		0xE6D9	gamma_omicron	59097	57385
+0xE02A	gamma_alpha_varia_rho_5		γὰρ	γρ		0xE6DA	gamma_rho	59098	57386
+0xE030	delta_curly		δ	δ		0xE6E0	delta_curly	59104	57392
+0xE031	delta_epsilon_varia_1		δὲ	δε		0xE6E1	delta_epsilon	59105	57393
+0xE032	delta_epsilon_varia_2		δὲ	δὲ		0xE6E2	delta_epsilon_varia_1	59106	57394
+0xE033	delta_epsilon		δε	δὲ		0xE6E3	delta_epsilon_varia_2	59107	57395
+0xE040	epsilon_psili_perispomeni					0xE6F0	epsilon_psili_perispomeni	59120	57408
+0xE041	epsilon_dasia_perispomeni					0xE6F1	epsilon_dasia_perispomeni	59121	57409
+0xE042	epsilon_iota_1		ει	ει		0xE6F2	epsilon_iota_1	59122	57410
+0xE043	epsilon_iota_1_perispomeni		εῖ	ει		0xE6F3	epsilon_iota_2	59123	57411
+0xE044	epsilon_iota_2		ει	εῖ		0xE6F4	epsilon_iota_1_perispomeni	59124	57412
+0xE045	epsion_iota_2_perispomeni		εῖ	εῖ		0xE6F5	epsion_iota_2_perispomeni	59125	57413
+0xE046	epsilon_upsilon		ευ	εῖ		0xE6F6	epsilon_iota_1_perispomeni_prosgegrammeni	59126	57414
+0xE047	epsilon_psili_nu		ἐν	ἐν		0xE6F7	epsilon_psili_nu	59127	57415
+0xE048	epsilon_psili_xi		ἐξ	ἐξ		0xE6F8	epsilon_psili_xi	59128	57416
+0xE049	epsilon_rho_1		ερ	ερ		0xE6F9	epsilon_rho_1	59129	57417
+0xE04A	epsilon_rho_2		ερ	ερ		0xE6FA	epsilon_rho_2	59130	57418
+0xE04B	epsilon_iota_1_perispomeni_prosgegrammeni		εῖ	εστι		0xE6FB	epsilon_stigma_iota	59131	57419
+0xE04C	epsilon_psili_stigma_iota_varia		ἐστὶ	ἐστι		0xE6FC	epsilon_psili_stigma_iota	59132	57420
+0xE04D	epsilon_psili_stigma_iota		ἐστι	ἐστὶ		0xE6FD	epsilon_psili_stigma_iota_varia	59133	57421
+0xE04E	epsilon_stigma_iota		εστι	ευ		0xE6FE	epsilon_upsilon	59134	57422
+0xE050	zeta_1		ζ	ζ		0xE700	zeta_1	59136	57424
+0xE051	zeta_2		ζ	ζ		0xE701	zeta_2	59137	57425
+0xE060	eta_1		η	η		0xE710	eta_1	59152	57440
+0xE061	eta_1_perispomeni		ῆ	ῆ		0xE711	eta_1_perispomeni	59153	57441
+0xE062	eta_nu		ην	ην		0xE712	eta_nu	59154	57442
+0xE063	eta_nu_oxia		ήν	ήν		0xE713	eta_nu_oxia	59155	57443
+0xE064	eta_nu_varia		ὴν	ὴν		0xE714	eta_nu_varia	59156	57444
+0xE065	eta_nu_perispomeni		ῆν	ῆν		0xE715	eta_nu_perispomeni	59157	57445
+0xE070	theta_1		θ	θ		0xE720	theta_1	59168	57456
+0xE071	phi_iota_oxia		φί	φι		0xE721	phi_iota	59169	57457
+0xE072	phi_iota		φι	φί		0xE722	phi_iota_oxia	59170	57458
+0xE090	kappa_alpha_iota_1_varia		καὶ	καὶ		0xE740	kappa_alpha_iota_1_varia	59200	57488
+0xE091	kappa_alpha_iota_2_varia		καὶ	καὶ		0xE741	kappa_alpha_iota_2_varia	59201	57489
+0xE092	kappa_alpha_iota_3_varia		καὶ	καὶ		0xE742	kappa_alpha_iota_3_varia	59202	57490
+0xE093	kappa_alpha_iota_4_varia		καὶ	καὶ		0xE743	kappa_alpha_iota_4_varia	59203	57491
+0xE094	kappa_alpha_tau_alpha		κατα	κατα		0xE744	kappa_alpha_tau_alpha	59204	57492
+0xE0A0	lambda_lambda		λλ	λλ		0xE750	lambda_lambda	59216	57504
+0xE0B0	mu_epsilon_nu_1		μεν	μεν		0xE760	mu_epsilon_nu_1	59232	57520
+0xE0B1	mu_epsilon_nu_1_oxia		μέν	μεν		0xE761	mu_epsilon_nu_2	59233	57521
+0xE0B2	mu_epsilon_nu_2		μεν	μεν		0xE762	mu_epsilon_nu_3	59234	57522
+0xE0B3	mu_epsilon_nu_3		μεν	μὲν		0xE763	mu_epsilon_nu_4_varia	59235	57523
+0xE0B4	mu_epsilon_nu_3_varia		μὲν	μὲν		0xE764	mu_epsilon_nu_3_varia	59236	57524
+0xE0B5	mu_epsilon_nu_4_varia		μὲν	μέν		0xE765	mu_epsilon_nu_1_oxia	59237	57525
+0xE0C0	nu_final		ν			0xE770	nu_final	59248	57536
+0xE0D0	xi_1		ξ			0xE780	xi_1	59264	57552
+0xE0E0	omicron_psili_perispomeni					0xE790	omicron_perispomeni	59280	57568
+0xE0E1	omicron_upsilon		ου			0xE791	omicron_psili_perispomeni	59281	57569
+0xE0E2	omicron_upsilon_oxia		οὺ			0xE792	omicron_dasia_perispomeni	59282	57570
+0xE0E3	omicron_upsilon_persipomeni		οῦ	ου		0xE793	omicron_upsilon	59283	57571
+0xE0E4	omicron_sigma		οσ	οὺ		0xE794	omicron_upsilon_oxia	59284	57572
+0xE0E5	omicron_dasia_perispomeni			οῦ		0xE795	omicron_upsilon_persipomeni	59285	57573
+0xE0E6	omicron_perispomeni		ο	οσ		0xE796	omicron_sigma	59286	57574
+0xE0F0	pi_1		π	π		0xE7A0	pi_1	59296	57584
+0xE0F1	pi_alpha_rho		παρ	παρ		0xE7A1	pi_alpha_rho	59297	57585
+0xE0F2	pi_epsilon_rho		περ	περ		0xE7A2	pi_epsilon_rho	59298	57586
+0xE0F3	pi_omicron		πο	πο		0xE7A3	pi_omicron	59299	57587
+0xE0F4	pi_omicron_varia		πὸ	πὸ		0xE7A4	pi_omicron_varia	59300	57588
+0xE0F5	pi_rho		πρ	πρ		0xE7A5	pi_rho	59301	57589
+0xE0F6	pi_tau		πτ	πτ		0xE7A6	pi_tau	59302	57590
+0xE0F7	Pi_1		Π	Π		0xE7A7	Pi_1	59303	57591
+0xE110	sigma_1		σ	σ		0xE7C0	sigma_1	59328	57616
+0xE111	sigma_theta		σθ	σθ		0xE7C1	sigma_theta	59329	57617
+0xE112	sigma_sigma		σσ	σθαι		0xE7C2	sigma_theta_alpha_iota	59330	57618
+0xE113	sigma_tau		στ	σπ		0xE7C3	sigma_pi	59331	57619
+0xE114	sigma_tau_rho		στρ	σσ		0xE7C4	sigma_sigma	59332	57620
+0xE115	sigma_chi		σχ	στ		0xE7C5	sigma_tau	59333	57621
+0xE116	sigma_theta_alpha_iota		σθαι	στρ		0xE7C6	sigma_tau_rho	59334	57622
+0xE117	sigma_pi		σπ	σχ		0xE7C7	sigma_chi	59335	57623
+0xE120	tau_tall		τ	τ᾽		0xE7D0	tau_tall	59344	57632
+0xE121	tau_alpha_iota		ται	τ		0xE7D1	tau_psili	59345	57633
+0xE122	tau_eta_nu_varia_1		τὴν	ται		0xE7D2	tau_alpha_iota	59346	57634
+0xE123	tau_eta_nu_varia_2		τὴν	τε		0xE7D3	tau_epsilon	59347	57635
+0xE124	tau_eta_perispomeni_sigma_1		τῆς	τὴν		0xE7D4	tau_eta_nu_varia_1	59348	57636
+0xE125	tau_eta_perispomeni_sigma_2		τῆς	τὴν		0xE7D5	tau_eta_nu_varia_2	59349	57637
+0xE126	tau_iota		τι	τῆς		0xE7D6	tau_eta_perispomeni_sigma_1	59350	57638
+0xE127	tau_omicron_1		το	τῆς		0xE7D7	tau_eta_perispomeni_sigma_2	59351	57639
+0xE128	tau_omicron_1_varia		τὸ	τι		0xE7D8	tau_iota	59352	57640
+0xE129	tau_omicron_2_varia		τὸ	το		0xE7D9	tau_omicron_1	59353	57641
+0xE12A	tau_omicron_3_varia		τὸ	τὸ		0xE7DA	tau_omicron_1_varia	59354	57642
+0xE12B	tau_omicron_varia_nu		τὸν	τὸ		0xE7DB	tau_omicron_2_varia	59355	57643
+0xE12C	tau_omicron_upsilon_perispomeni		τοῦ	τὸ		0xE7DC	tau_omicron_3_varia	59356	57644
+0xE12D	tau_rho		τρ	τὸ		0xE7DD	tau_omicron_4_varia	59357	57645
+0xE12E	tau_omicron_nu_perispomeni		τοῦ	τὸν		0xE7DE	tau_omicron_varia_nu	59358	57646
+0xE12F	tau_omicron_4_varia		τὸ	τοσ		0xE7DF	tau_tall_omicron_sigma	59359	57647
+0xE130	tau_omega_perispomeni_prosgegrammeni		τῷ	τοῦ		0xE7E0	tau_omicron_upsilon_perispomeni_1	59360	57648
+0xE131	tau_omega_perispomeni_nu_1		τῶν	τοῦ		0xE7E1	tau_omicron_upsilon_perispomeni_2	59361	57649
+0xE132	tau_omega_perispomeni_nu_2		τῶν	τρ		0xE7E2	tau_rho_1	59362	57650
+0xE133	tau_psili		τ᾽	τρ		0xE7E3	tau_rho_2	59363	57651
+0xE134	tau_epsilon		τε	τῷ		0xE7E4	tau_tall_tau	59364	57652
+0xE135	tau_omega_sigma		τρ	τῶν		0xE7E5	tau_omega_perispomeni_prosgegrammeni	59365	57653
+0xE136	tau_tall_omega_sigma		τοσ	τῶν		0xE7E6	tau_omega_perispomeni_nu_1	59366	57654
+0xE137	tau_tall_tau		ττ	ττ		0xE7E7	tau_omega_perispomeni_nu_2	59367	57655
+0xE140	upsilon_dasia_iota		υἱ	υἱ		0xE7F0	upsilon_dasia_iota	59376	57664
+0xE141	upsilon_nu		υν	υν		0xE7F1	upsilon_nu	59377	57665
+0xE142	upsilon_oxia_nu		ύν	ύν		0xE7F2	upsilon_oxia_nu	59378	57666
+0xE143	upsilon_perispomeni_nu		ῦν	ῦν		0xE7F3	upsilon_perispomeni_nu	59380	57667
+0xE144	upsilon_perispomeni		ῦ	ῦ		0xE7F4	upsilon_perispomeni	59379	57668
+0xE145	upsilon_psili_perispomeni_nu		ὖν	ὖν		0xE7F5	upsilon_psili_perispomeni_nu	59381	57669
+0xE160	chi_rho		χρ	χρ		0xE810	chi_rho	59381	57696
+0xE170	slant_1		-	-		0xE820	slant_1	59408	57712
+0xE171	slant_2		-	-		0xE821	slant_2	59424	57713
+0xE172	omega_perispomeni_nu		ῶν	ῶν		0xE822	omega_perispomeni_nu	59425	57714
+						0xE823		59426	

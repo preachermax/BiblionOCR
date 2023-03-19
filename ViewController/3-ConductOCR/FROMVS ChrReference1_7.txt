@@ -1,0 +1,154 @@
+﻿Lowercase Alphabet
+α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω ϐ ϑ ϕ ϖ ϗ 
+ά έ ή ί ό ύ ώ ϊ ϋ ΰ
+
+Lowercase Alphabet Extended
+ἀ ἁ ἂ ἃ ἄ ἅ ἆ ἇ ὰ ά ᾀ ᾁ ᾂ ᾃ ᾄ ᾅ ᾆ ᾇ ᾰ ᾱ ᾲ ᾳ ᾴ ᾶ ᾷ
+ἐ ἑ ἒ ἓ ἔ ἕ ὲ έ ἖
+ἠ ἡ ἢ ἣ ἤ ἥ ἦ ἧ ὴ ή ᾐ ᾑ ᾒ ᾓ ᾔ ᾕ ᾖ ᾗ ῇ ῆ ῂ ῃ ῄ
+ἰ ἱ ἲ ἳ ἴ ἵ ἶ ἷ ὶ ί ῐ ῑ ῒ ΐ ῖ ῗ 
+ὀ ὁ ὂ ὃ ὄ ὅ ὸ ό 
+ὐ ὑ ὒ ὓ ὔ ὕ ὖ ὗ ὺ ύ ῠ ῡ ῢ ΰ ῦ ῧ ῢ ΰ ῤ ῥ 
+ώ ὼ ὠ ὡ ὢ ὣ ὤ ὥ ὦ ὧ ᾠ ᾡ ᾢ ᾣ ᾤ ᾥ ᾦ ᾧ ῲ ῳ ῴ ῶ ῷ
+
+Uppercase Alphabet
+Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω Ϊ Ϋ
+
+Uppercase Alphabet Extended
+ἈἉἊἋἌἍἎἏ ᾈᾉᾊᾋᾌᾍᾎᾏ
+ἘἙἚἛἜἝῈΈ
+ἨἩἪἫἬἭἮἯ ᾘᾙᾚᾛᾜᾝ
+Ἰ Ἱ Ἲ Ἳ Ἴ Ἵ Ἶ Ἷ Ῐ Ῑ Ὶ Ί
+Ὀ Ὁ Ὂ Ὃ Ὄ Ὅ
+ ὨὩὪὫὬὭὮὯᾨᾩᾪᾫᾬᾭᾮᾯῺΏῼ
+Ὑ Ὓ Ὕ Ὗ Ῥ
+
+Ligatures
+﻿        
+            
+                 
+          
+           
+                
+       
+                       
+      
+   ʼ  ͗
+	alpha_curly
+	alpha_iota
+	alpha_iota_psili
+	alpha_iota_oxia
+	alpha_iota_psili_oxia
+	alpha_iota_perispomeni
+	alpha_sigma_tau
+	alpha_psili_sigma_tau
+	alpha_nu
+	beta_curly
+	gamma_short
+	gamma_tall
+	gamma_alpha_varia_rho_1
+	gamma_alpha_varia_rho_2
+	gamma_epsilon_nu_oxia
+	gamma_gamma
+	gamma_omicron
+	gamma_rho
+	gamma_alpha_varia_rho_3
+	gamma_alpha_varia_rho_4
+	gamma_alpha_varia_rho_5
+	delta_curly
+	delta_epsilon_varia_1
+	delta_epsilon_varia_2
+	epsilon_psili_perispomeni
+	epsilon_dasia_perispomeni
+	epsilon_iota_1
+	epsilon_iota_1_perispomeni
+	epsilon_iota_2
+	epsion_iota_2_perispomeni
+	epsilon_nu
+	epsilon_psili_nu
+	epsilon_psili_xi
+	epsilon_rho_1
+	epsilon_rho_2
+	epsilon_iota_1_perispomeni_prosgegrammeni
+	epsilon_psili_stigma_iota_varia
+	epsilon_psili_stigma_iota
+	epsilon_stigma_iota
+	zeta_1
+	zeta_2
+	eta_1
+	eta_1_perispomeni
+	eta_nu
+	eta_nu_oxia
+	eta_nu_varia
+	eta_nu_perispomeni
+	theta_1
+	phi_iota_oxia
+	phi_iota
+	kappa_alpha_iota_1_varia
+	kappa_alpha_iota_2_varia
+	kappa_alpha_iota_3_varia
+	kappa_alpha_iota_4_varia
+	kappa_alpha_tau_alpha
+	lambda_lambda
+	mu_epsilon_nu_1
+	mu_epsilon_nu_1_oxia
+	mu_epsilon_nu_2
+	mu_epsilon_nu_3
+	mu_epsilon_nu_3_varia
+	nu_final
+	xi_1
+	omicron_psili_perispomeni
+	omicron_upsilon
+	omicron_upsilon_oxia
+	omicron_upsilon_persipomeni
+	omicron_sigma
+	omicron_dasia_perispomeni
+	pi_1
+	pi_alpha_rho
+	pi_epsilon_rho
+	pi_omicron
+	pi_omicron_varia
+	pi_rho
+	pi_tau
+	Pi_1
+	sigma_1
+	sigma_theta
+	sigma_sigma
+	sigma_tau
+	sigma_tau_rho
+	sigma_chi
+	sigma_theta_alpha_iota
+	sigma_pi
+	tau_tall
+	tau_alpha_iota
+	tau_eta_nu_varia_1
+	tau_eta_nu_varia_2
+	tau_eta_perispomeni_sigma_1
+	tau_eta_perispomeni_sigma_2
+	tau_iota
+	tau_omicron_1
+	tau_omicron_1_varia
+	tau_omicron_2_varia
+	tau_omicron_3_varia
+	tau_omicron_varia_nu
+	tau_omicron_upsilon_perispomeni
+	tau_rho
+	tau_omicron_nu_perispomeni
+	tau_omicron_4_varia
+	tau_omega_perispomeni_prosgegrammeni
+	tau_omega_perispomeni_nu_1
+	tau_omega_perispomeni_nu_2
+	tau_psili
+	tau_epsilon
+	tau_omega_sigma
+	tau_tall_omega_sigma
+	upsilon_dasia_iota
+	upsilon_nu
+	upsilon_oxia_nu
+	upsilon_perispomeni_nu
+	upsilon_perispomeni
+	upsilon_psili_perispomeni_nu
+	chi_rho
+	slant_1
+	slant_2
+

@@ -1,0 +1,194 @@
+[
+    {
+        "Setting": "self.ocrlang",
+        "CurrentValue": "Middle Greek",
+        "DefaultValue": "Middle Greek",
+        "UI": "MainUI",
+        "Widget": "OCR",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.ocrmodel",
+        "CurrentValue": "feg",
+        "DefaultValue": "feg",
+        "UI": "MainUI",
+        "Widget": "OCR",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.bookabbr",
+        "CurrentValue": "Joh",
+        "DefaultValue": "Mat",
+        "UI": "MainUI",
+        "Widget": "Session",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.chapter",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "UI": "MainUI",
+        "Widget": "Session",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.verse",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "UI": "MainUI",
+        "Widget": "Session",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.word",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "UI": "MainUI",
+        "Widget": "Session",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.chr",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "UI": "MainUI",
+        "Widget": "Session",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.font",
+        "CurrentValue": "FROMVS(MAXR)",
+        "DefaultValue": "FROMVS(MAXR)",
+        "UI": "MainUI",
+        "Widget": "Text",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.fontsize",
+        "CurrentValue": "20",
+        "DefaultValue": "20",
+        "UI": "MainUI",
+        "Widget": "Text",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.fontinstallpath",
+        "CurrentValue": "/home/max/.fonts",
+        "DefaultValue": "",
+        "UI": "",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.homefontinstallpath",
+        "CurrentValue": "/home/max/.local/share/fonts",
+        "DefaultValue": "",
+        "UI": "",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.usrfontinstallpath",
+        "CurrentValue": "/usr/share/fonts/truetype/FROMVS",
+        "DefaultValue": "",
+        "UI": "",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.linespacing",
+        "CurrentValue": "150",
+        "DefaultValue": "150",
+        "UI": "MainUI",
+        "Widget": "Text",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.verselinespacing",
+        "CurrentValue": "105",
+        "DefaultValue": "105",
+        "UI": "Versifier",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.reflinespacing",
+        "CurrentValue": "105",
+        "DefaultValue": "105",
+        "UI": "Versifier",
+        "Widget": "Text",
+        "WidgetClass": "GroupBox"
+    },
+    {
+        "Setting": "self.sourcebookmarkdown",
+        "CurrentValue": "source_book_43_John",
+        "DefaultValue": "source_book_40_Matthew",
+        "UI": "MainUI",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.greekbookmarkdown",
+        "CurrentValue": "greek_book_43_John",
+        "DefaultValue": "greek_book_40_Matthew",
+        "UI": "MainUI",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.latinbookmarkdown",
+        "CurrentValue": "latin_book_43_John",
+        "DefaultValue": "latin_book_40_Matthew",
+        "UI": "MainUI",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.txtpath",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "UI": "Writer",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.txtdir",
+        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "UI": "Writer",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.txtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "UI": "Writer",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.reftxtpath",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "UI": "Writer",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.reftxtdir",
+        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "UI": "Writer",
+        "Widget": "",
+        "WidgetClass": ""
+    },
+    {
+        "Setting": "self.reftxtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "UI": "Writer",
+        "Widget": "",
+        "WidgetClass": ""
+    }
+]

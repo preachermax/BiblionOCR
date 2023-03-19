@@ -1,0 +1,128 @@
+,pixerrefimgpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerrefimgpath_key:
+self.pixerrefimgpath,,, = Setting[‘CurrentValue’],    self.pixerrefimgpath = Setting[‘CurrentValue’]
+,pixerrefimgpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerrefimgpixmap_key:
+self.pixerrefimgpixmap,,, = Setting[‘CurrentValue’],    self.pixerrefimgpixmap = Setting[‘CurrentValue’]
+,pixerrefimgqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerrefimgqimage_key:
+self.pixerrefimgqimage,,, = Setting[‘CurrentValue’],    self.pixerrefimgqimage = Setting[‘CurrentValue’]
+,pixerrefimgdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerrefimgdir_key:
+self.pixerrefimgdir,,, = Setting[‘CurrentValue’],    self.pixerrefimgdir = Setting[‘CurrentValue’]
+,pixerpagesboxfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesboxfileList_key:
+self.pixerpagesboxfileList,,, = Setting[‘CurrentValue’],    self.pixerpagesboxfileList = Setting[‘CurrentValue’]
+,pixerpagesboxpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesboxpixmap_key:
+self.pixerpagesboxpixmap,,, = Setting[‘CurrentValue’],    self.pixerpagesboxpixmap = Setting[‘CurrentValue’]
+,pixerpagesboxqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesboxqimage_key:
+self.pixerpagesboxqimage,,, = Setting[‘CurrentValue’],    self.pixerpagesboxqimage = Setting[‘CurrentValue’]
+,pixerpagesboxpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesboxpath_key:
+self.pixerpagesboxpath,,, = Setting[‘CurrentValue’],    self.pixerpagesboxpath = Setting[‘CurrentValue’]
+,pixerpagesboxdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesboxdir_key:
+self.pixerpagesboxdir,,, = Setting[‘CurrentValue’],    self.pixerpagesboxdir = Setting[‘CurrentValue’]
+,pixerpagescropfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescropfileList_key:
+self.pixerpagescropfileList,,, = Setting[‘CurrentValue’],    self.pixerpagescropfileList = Setting[‘CurrentValue’]
+,pixerpagescroppixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescroppixmap_key:
+self.pixerpagescroppixmap,,, = Setting[‘CurrentValue’],    self.pixerpagescroppixmap = Setting[‘CurrentValue’]
+,pixerpagescropqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescropqimage_key:
+self.pixerpagescropqimage,,, = Setting[‘CurrentValue’],    self.pixerpagescropqimage = Setting[‘CurrentValue’]
+,pixerpagescroppath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescroppath_key:
+self.pixerpagescroppath,,, = Setting[‘CurrentValue’],    self.pixerpagescroppath = Setting[‘CurrentValue’]
+,pixerpagescropdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescropdir_key:
+self.pixerpagescropdir,,, = Setting[‘CurrentValue’],    self.pixerpagescropdir = Setting[‘CurrentValue’]
+,pixerpagesdeskewfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdeskewfileList_key:
+self.pixerpagesdeskewfileList,,, = Setting[‘CurrentValue’],    self.pixerpagesdeskewfileList = Setting[‘CurrentValue’]
+,pixerpagesdeskewpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdeskewpixmap_key:
+self.pixerpagesdeskewpixmap,,, = Setting[‘CurrentValue’],    self.pixerpagesdeskewpixmap = Setting[‘CurrentValue’]
+,pixerpagesdeskewqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdeskewqimage_key:
+self.pixerpagesdeskewqimage,,, = Setting[‘CurrentValue’],    self.pixerpagesdeskewqimage = Setting[‘CurrentValue’]
+,pixerpagesdeskewpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdeskewpath_key:
+self.pixerpagesdeskewpath,,, = Setting[‘CurrentValue’],    self.pixerpagesdeskewpath = Setting[‘CurrentValue’]
+,pixerpagesdeskewdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdeskewdir_key:
+self.pixerpagesdeskewdir,,, = Setting[‘CurrentValue’],    self.pixerpagesdeskewdir = Setting[‘CurrentValue’]
+,pixerpagesdenoisefileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdenoisefileList_key:
+self.pixerpagesdenoisefileList,,, = Setting[‘CurrentValue’],    self.pixerpagesdenoisefileList = Setting[‘CurrentValue’]
+,pixerpagesdenoisepixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdenoisepixmap_key:
+self.pixerpagesdenoisepixmap,,, = Setting[‘CurrentValue’],    self.pixerpagesdenoisepixmap = Setting[‘CurrentValue’]
+,pixerpagesdenoiseqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdenoiseqimage_key:
+self.pixerpagesdenoiseqimage,,, = Setting[‘CurrentValue’],    self.pixerpagesdenoiseqimage = Setting[‘CurrentValue’]
+,pixerpagesdenoisepath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdenoisepath_key:
+self.pixerpagesdenoisepath,,, = Setting[‘CurrentValue’],    self.pixerpagesdenoisepath = Setting[‘CurrentValue’]
+,pixerpagesdenoisedir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesdenoisedir_key:
+self.pixerpagesdenoisedir,,, = Setting[‘CurrentValue’],    self.pixerpagesdenoisedir = Setting[‘CurrentValue’]
+,pixerpagesrotatefileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesrotatefileList_key:
+self.pixerpagesrotatefileList,,, = Setting[‘CurrentValue’],    self.pixerpagesrotatefileList = Setting[‘CurrentValue’]
+,pixerpagesrotatepixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesrotatepixmap_key:
+self.pixerpagesrotatepixmap,,, = Setting[‘CurrentValue’],    self.pixerpagesrotatepixmap = Setting[‘CurrentValue’]
+,pixerpagesrotateqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesrotateqimage_key:
+self.pixerpagesrotateqimage,,, = Setting[‘CurrentValue’],    self.pixerpagesrotateqimage = Setting[‘CurrentValue’]
+,pixerpagesrotatepath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesrotatepath_key:
+self.pixerpagesrotatepath,,, = Setting[‘CurrentValue’],    self.pixerpagesrotatepath = Setting[‘CurrentValue’]
+,pixerpagesrotatedir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagesrotatedir_key:
+self.pixerpagesrotatedir,,, = Setting[‘CurrentValue’],    self.pixerpagesrotatedir = Setting[‘CurrentValue’]
+,pixerpagescleanfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescleanfileList_key:
+self.pixerpagescleanfileList,,, = Setting[‘CurrentValue’],    self.pixerpagescleanfileList = Setting[‘CurrentValue’]
+,pixerpagescleanpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescleanpixmap_key:
+self.pixerpagescleanpixmap,,, = Setting[‘CurrentValue’],    self.pixerpagescleanpixmap = Setting[‘CurrentValue’]
+,pixerpagescleanqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescleanqimage_key:
+self.pixerpagescleanqimage,,, = Setting[‘CurrentValue’],    self.pixerpagescleanqimage = Setting[‘CurrentValue’]
+,pixerpagescleanpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescleanpath_key:
+self.pixerpagescleanpath,,, = Setting[‘CurrentValue’],    self.pixerpagescleanpath = Setting[‘CurrentValue’]
+,pixerpagescleandir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerpagescleandir_key:
+self.pixerpagescleandir,,, = Setting[‘CurrentValue’],    self.pixerpagescleandir = Setting[‘CurrentValue’]
+,pixerlinesboxfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesboxfileList_key:
+self.pixerlinesboxfileList,,, = Setting[‘CurrentValue’],    self.pixerlinesboxfileList = Setting[‘CurrentValue’]
+,pixerlinesboxpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesboxpixmap_key:
+self.pixerlinesboxpixmap,,, = Setting[‘CurrentValue’],    self.pixerlinesboxpixmap = Setting[‘CurrentValue’]
+,pixerlinesboxqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesboxqimage_key:
+self.pixerlinesboxqimage,,, = Setting[‘CurrentValue’],    self.pixerlinesboxqimage = Setting[‘CurrentValue’]
+,pixerlinesboxpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesboxpath_key:
+self.pixerlinesboxpath,,, = Setting[‘CurrentValue’],    self.pixerlinesboxpath = Setting[‘CurrentValue’]
+,pixerlinesboxdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesboxdir_key:
+self.pixerlinesboxdir,,, = Setting[‘CurrentValue’],    self.pixerlinesboxdir = Setting[‘CurrentValue’]
+,pixerlinescropfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescropfileList_key:
+self.pixerlinescropfileList,,, = Setting[‘CurrentValue’],    self.pixerlinescropfileList = Setting[‘CurrentValue’]
+,pixerlinescroppixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescroppixmap_key:
+self.pixerlinescroppixmap,,, = Setting[‘CurrentValue’],    self.pixerlinescroppixmap = Setting[‘CurrentValue’]
+,pixerlinescropqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescropqimage_key:
+self.pixerlinescropqimage,,, = Setting[‘CurrentValue’],    self.pixerlinescropqimage = Setting[‘CurrentValue’]
+,pixerlinescroppath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescroppath_key:
+self.pixerlinescroppath,,, = Setting[‘CurrentValue’],    self.pixerlinescroppath = Setting[‘CurrentValue’]
+,pixerlinescropdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescropdir_key:
+self.pixerlinescropdir,,, = Setting[‘CurrentValue’],    self.pixerlinescropdir = Setting[‘CurrentValue’]
+,pixerlinesdeskewfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdeskewfileList_key:
+self.pixerlinesdeskewfileList,,, = Setting[‘CurrentValue’],    self.pixerlinesdeskewfileList = Setting[‘CurrentValue’]
+,pixerlinesdeskewpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdeskewpixmap_key:
+self.pixerlinesdeskewpixmap,,, = Setting[‘CurrentValue’],    self.pixerlinesdeskewpixmap = Setting[‘CurrentValue’]
+,pixerlinesdeskewqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdeskewqimage_key:
+self.pixerlinesdeskewqimage,,, = Setting[‘CurrentValue’],    self.pixerlinesdeskewqimage = Setting[‘CurrentValue’]
+,pixerlinesdeskewpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdeskewpath_key:
+self.pixerlinesdeskewpath,,, = Setting[‘CurrentValue’],    self.pixerlinesdeskewpath = Setting[‘CurrentValue’]
+,pixerlinesdeskewdir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdeskewdir_key:
+self.pixerlinesdeskewdir,,, = Setting[‘CurrentValue’],    self.pixerlinesdeskewdir = Setting[‘CurrentValue’]
+,pixerlinesdenoisefileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdenoisefileList_key:
+self.pixerlinesdenoisefileList,,, = Setting[‘CurrentValue’],    self.pixerlinesdenoisefileList = Setting[‘CurrentValue’]
+,pixerlinesdenoisepixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdenoisepixmap_key:
+self.pixerlinesdenoisepixmap,,, = Setting[‘CurrentValue’],    self.pixerlinesdenoisepixmap = Setting[‘CurrentValue’]
+,pixerlinesdenoiseqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdenoiseqimage_key:
+self.pixerlinesdenoiseqimage,,, = Setting[‘CurrentValue’],    self.pixerlinesdenoiseqimage = Setting[‘CurrentValue’]
+,pixerlinesdenoisepath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdenoisepath_key:
+self.pixerlinesdenoisepath,,, = Setting[‘CurrentValue’],    self.pixerlinesdenoisepath = Setting[‘CurrentValue’]
+,pixerlinesdenoisedir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesdenoisedir_key:
+self.pixerlinesdenoisedir,,, = Setting[‘CurrentValue’],    self.pixerlinesdenoisedir = Setting[‘CurrentValue’]
+,pixerlinesrotatefileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesrotatefileList_key:
+self.pixerlinesrotatefileList,,, = Setting[‘CurrentValue’],    self.pixerlinesrotatefileList = Setting[‘CurrentValue’]
+,pixerlinesrotatepixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesrotatepixmap_key:
+self.pixerlinesrotatepixmap,,, = Setting[‘CurrentValue’],    self.pixerlinesrotatepixmap = Setting[‘CurrentValue’]
+,pixerlinesrotateqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesrotateqimage_key:
+self.pixerlinesrotateqimage,,, = Setting[‘CurrentValue’],    self.pixerlinesrotateqimage = Setting[‘CurrentValue’]
+,pixerlinesrotatepath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesrotatepath_key:
+self.pixerlinesrotatepath,,, = Setting[‘CurrentValue’],    self.pixerlinesrotatepath = Setting[‘CurrentValue’]
+,pixerlinesrotatedir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinesrotatedir_key:
+self.pixerlinesrotatedir,,, = Setting[‘CurrentValue’],    self.pixerlinesrotatedir = Setting[‘CurrentValue’]
+,pixerlinescleanfileList,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescleanfileList_key:
+self.pixerlinescleanfileList,,, = Setting[‘CurrentValue’],    self.pixerlinescleanfileList = Setting[‘CurrentValue’]
+,pixerlinescleanpixmap,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescleanpixmap_key:
+self.pixerlinescleanpixmap,,, = Setting[‘CurrentValue’],    self.pixerlinescleanpixmap = Setting[‘CurrentValue’]
+,pixerlinescleanqimage,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescleanqimage_key:
+self.pixerlinescleanqimage,,, = Setting[‘CurrentValue’],    self.pixerlinescleanqimage = Setting[‘CurrentValue’]
+,pixerlinescleanpath,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescleanpath_key:
+self.pixerlinescleanpath,,, = Setting[‘CurrentValue’],    self.pixerlinescleanpath = Setting[‘CurrentValue’]
+,pixerlinescleandir,elif Setting['Setting'] == ,,elif Setting['Setting'] == pixerlinescleandir_key:
+self.pixerlinescleandir,,, = Setting[‘CurrentValue’],    self.pixerlinescleandir = Setting[‘CurrentValue’]

@@ -1,0 +1,77 @@
+Setting,CurrentValue,DefaultValue
+self.ocrlang,Middle Greek,Middle Greek
+self.ocrmodel,feg,feg
+self.tessdatadir,c:/Program Files/Tesseract-OCR/tessdata,c:/Program Files/Tesseract-OCR/tessdata
+self.tesseract,c:/Program Files/Tesseract-OCR,c:/Program Files/Tesseract-OCR
+self.tesstrain,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels,c:/Program Files/Tesseract-OCR/tesstrain
+self.bookabbr,Mar,Mat
+self.chr,1,1
+self.font,FROMVS,FROMVS
+self.fontsize,28,20
+self.tessfont,c:/users/max/tesseract/tesstrain-raw-Gospels/fonts/FROMVS,
+self.tessdir,c:/users/max/tesseract/tesstrain-raw-Gospels/fonts,
+self.sourcebookmarkdown,source_book_42_Luke,source_book_40_Matthew
+self.greekbookmarkdown,greek_book_42_Luke,greek_book_40_Matthew
+self.latinbookmarkdown,latin_book_42_Luke,latin_book_40_Matthew
+self.sourcefile,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf
+self.firstpage,100,1
+self.lastpage,110,10
+self.imagedir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages
+self.imagepath,,
+self.imagefileList,[],[]
+self.imagezoom,25 %,25
+self.imagezoomslidervalue,25,25
+self.dirIterator,None,None
+self.imgfileList,[],[]
+self.imagepage,1,1
+self.imageline,1,1
+self.pixmap,,
+self.qimage,,
+self.zoom,25 %,25
+self.zoomslidervalue,25,25
+self.textpath,,
+self.textdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit
+self.textfileList,[],[]
+self.greekpages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages
+self.greeklinescropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped
+self.greeklinescleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned
+self.greeklinesautosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit
+self.greeklinesrenamed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed
+self.greeklinesrenumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renumbered
+self.greeklines4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth
+self.greeklines2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_2groundtruth
+self.greektextlinesautosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit
+self.greektextlinesrenamed,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renamed,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renamed
+self.greektextlinesrenumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renumbered
+self.greektextlines4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth
+self.greektextlines2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth
+self.latinpages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages
+self.latinlinescropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped
+self.latinlinescleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned
+self.latinlinesbox,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box
+self.latinlinesautosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit
+self.latinlinesrenamed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed
+self.latinlinesrenumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renumbered
+self.latinlines4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth
+self.latinlines2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_2groundtruth
+self.latintextlinesautosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit
+self.latintextlinesrenamed,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renamed,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renamed
+self.latintextlinesrenumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renumbered,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renumbered
+self.latintextlines4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth
+self.latintextlines2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth
+self.PagelastStart,0,-1
+self.pagetextpath,,
+self.pagetextdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages
+self.pagetextfileList,[],[]
+self.pagetextpage,1,1
+self.VerseStart,0,0
+self.VerseLastEnd,0,0
+self.versetextpath,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_verses/Erasmus1516NT_Verses.txt,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_verses/Erasmus1516NT_Verses.txt
+self.versetextdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_verses,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_verses
+self.startbookabbr,Mat,Mat
+self.startchapter,1,1
+self.startverse,1,1
+self.startverseline,1,1
+self.ocraccuracy,,
+self.gtvalid,FALSE,FALSE
+self.gtreview,FALSE,FALSE

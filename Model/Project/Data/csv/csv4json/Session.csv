@@ -1,0 +1,15 @@
+Setting,CurrentValue,UI
+self.bookabbr,Mar,MainWindow
+self.chapter,1,MainWindow
+self.word,,MainWindow
+self.chr,,MainWindow
+self.glyph,,MainWindow
+self.glyphname,,MainWindow
+self.glyphencode,,MainWindow
+self.imgpath,,OpenImageFileDialog
+self.imgdir,,OpenImageFileDialog
+self.txtpath,,OpenTextFileDialog
+self.txtdir,,OpenTextFileDialog
+self.sourcefile,/home/max/Projects/BiblicalOCR/Model/Images/Complete/Source/pdf_source/1516.pdf,ExtractDialog
+self.firstpage,100,ExtractDialog
+self.lastpage,110,ExtractDialog

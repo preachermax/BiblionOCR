@@ -1,0 +1,2 @@
+LineImageFile,ImgPageNum,ImgPageLineNum,LineTextFile,LineText,Valid,ReviewComplete,StartBook,StartChapter,StartVerse,StartVerseLine,EndBook,EndChapter,EndVerse,EndVerseLine,OCRAccuracy
+self.imgpath,self.imagepage,self.imageline,self.txtpath,self.ui.TextFileEdit.displayText(),self.gtvalid,self.gtreview,self.startbookabbr,self.startchapter,self.startverse,self.startverseline,self.endbookabbr,self.endchapter,self.endverse,self.endverseline,self.ocraccuracy

@@ -1,0 +1,8 @@
+MANIFEST
+.project
+.pydevproject
+.settings
+dist
+__pycache__
+*.png
+*.sfd

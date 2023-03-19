@@ -1,0 +1,646 @@
+[
+    {
+        "Setting": "self.homedir",
+        "CurrentValue": "/home",
+        "DefaultValue": "/home",
+        "CurrentValueWindows": "c:/users",
+        "DefaultValueWindows": "c:/users"
+    },
+    {
+        "Setting": "self.user",
+        "CurrentValue": "/jetson",
+        "DefaultValue": "/jetson",
+        "CurrentValueWindows": "/max",
+        "DefaultValueWindows": "/max"
+    },
+    {
+        "Setting": "self.userdir",
+        "CurrentValue": "/home/jetson",
+        "DefaultValue": "/home/jetson",
+        "CurrentValueWindows": "c:/users/max",
+        "DefaultValueWindows": "c:/users/max"
+    },
+    {
+        "Setting": "self.projectsdir",
+        "CurrentValue": "/home/jetson/Projects",
+        "DefaultValue": "/home/jetson/Projects",
+        "CurrentValueWindows": "c:/users/max/Projects",
+        "DefaultValueWindows": "c:/users/max/Projects"
+    },
+    {
+        "Setting": "self.projectname",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.ocrlang",
+        "CurrentValue": "Middle Greek",
+        "DefaultValue": "Middle Greek",
+        "CurrentValueWindows": "Middle Greek",
+        "DefaultValueWindows": "Middle Greek"
+    },
+    {
+        "Setting": "self.ocrmodel",
+        "CurrentValue": "feg",
+        "DefaultValue": "feg",
+        "CurrentValueWindows": "feg",
+        "DefaultValueWindows": "feg"
+    },
+    {
+        "Setting": "self.tessdatadir",
+        "CurrentValue": "/home/jetson/tesseract/tessdata",
+        "DefaultValue": "/home/jetson/tesseract/tessdata",
+        "CurrentValueWindows": "c:/Program Files/Tesseract-OCR/tessdata",
+        "DefaultValueWindows": "c:/Program Files/Tesseract-OCR/tessdata"
+    },
+    {
+        "Setting": "self.tesseract",
+        "CurrentValue": "/home/jetson/tesseract",
+        "DefaultValue": "/home/jetson/tesseract",
+        "CurrentValueWindows": "c:/Program Files/Tesseract-OCR",
+        "DefaultValueWindows": "c:/Program Files/Tesseract-OCR"
+    },
+    {
+        "Setting": "self.tesstrain",
+        "CurrentValue": "/home/jetson/tesseract/tesstrain-raw-Gospels",
+        "DefaultValue": "/home/jetson/tesseract/tesstrain",
+        "CurrentValueWindows": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels",
+        "DefaultValueWindows": "c:/Program Files/Tesseract-OCR/tesstrain"
+    },
+    {
+        "Setting": "self.bookabbr",
+        "CurrentValue": "Joh",
+        "DefaultValue": "Mat",
+        "CurrentValueWindows": "Joh",
+        "DefaultValueWindows": "Mat"
+    },
+    {
+        "Setting": "self.chapter",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "CurrentValueWindows": "1",
+        "DefaultValueWindows": "1"
+    },
+    {
+        "Setting": "self.verse",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "CurrentValueWindows": "1",
+        "DefaultValueWindows": "1"
+    },
+    {
+        "Setting": "self.word",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "CurrentValueWindows": "1",
+        "DefaultValueWindows": "1"
+    },
+    {
+        "Setting": "self.chr",
+        "CurrentValue": "1",
+        "DefaultValue": "1",
+        "CurrentValueWindows": "1",
+        "DefaultValueWindows": "1"
+    },
+    {
+        "Setting": "self.font",
+        "CurrentValue": "FROMVS",
+        "DefaultValue": "FROMVS",
+        "CurrentValueWindows": "FROMVS",
+        "DefaultValueWindows": "FROMVS"
+    },
+    {
+        "Setting": "self.fontsize",
+        "CurrentValue": "16",
+        "DefaultValue": "16",
+        "CurrentValueWindows": "16",
+        "DefaultValueWindows": "16"
+    },
+    {
+        "Setting": "self.forgedir",
+        "CurrentValue": "/home/jetson/Documents/MyForge/",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.homefontdir",
+        "CurrentValue": "/home/jetson/.fonts",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.localfontdir",
+        "CurrentValue": "/home/jetson/.local/share/fonts",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.localsharefontdir",
+        "CurrentValue": "/usr/local/share/fonts",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.systemsharefontdir",
+        "CurrentValue": "/usr/share/fonts/truetype/FROMVS",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/Windows/fonts/FROMVS",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.tessfont",
+        "CurrentValue": "/home/jetson/tesseract/tesstrain-raw-Gospels/fonts/FROMVS",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/tesseract/tesstrain-raw-Gospels/fonts/FROMVS",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.tessdir",
+        "CurrentValue": "/home/jetson/tesseract/tesstrain-raw-Gospels/fonts",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/tesseract/tesstrain-raw-Gospels/fonts",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.sfd",
+        "CurrentValue": "/home/jetson/Documents/My Forge/FROMVS.sfd",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/Documents/My Forge/FROMVS.sfd",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.sfddir",
+        "CurrentValue": "/home/jetson/Documents/My Forge",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/Documents/My Forge",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.glyph",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.glyphname",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.glyphencode",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.glyphsourcedir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_source",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_source",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.glyphgreekdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_greek",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_greek",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.linespacing",
+        "CurrentValue": "150",
+        "DefaultValue": "150",
+        "CurrentValueWindows": "150",
+        "DefaultValueWindows": "150"
+    },
+    {
+        "Setting": "self.verselinespacing",
+        "CurrentValue": "105",
+        "DefaultValue": "105",
+        "CurrentValueWindows": "105",
+        "DefaultValueWindows": "105"
+    },
+    {
+        "Setting": "self.reflinespacing",
+        "CurrentValue": "105",
+        "DefaultValue": "105",
+        "CurrentValueWindows": "105",
+        "DefaultValueWindows": "105"
+    },
+    {
+        "Setting": "self.sourcebookmarkdown",
+        "CurrentValue": "source_book_43_John",
+        "DefaultValue": "source_book_40_Matthew",
+        "CurrentValueWindows": "source_book_43_John",
+        "DefaultValueWindows": "source_book_40_Matthew"
+    },
+    {
+        "Setting": "self.greekbookmarkdown",
+        "CurrentValue": "greek_book_43_John",
+        "DefaultValue": "greek_book_40_Matthew",
+        "CurrentValueWindows": "greek_book_43_John",
+        "DefaultValueWindows": "greek_book_40_Matthew"
+    },
+    {
+        "Setting": "self.latinbookmarkdown",
+        "CurrentValue": "latin_book_43_John",
+        "DefaultValue": "latin_book_40_Matthew",
+        "CurrentValueWindows": "latin_book_43_John",
+        "DefaultValueWindows": "latin_book_40_Matthew"
+    },
+    {
+        "Setting": "self.sourcefile",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf"
+    },
+    {
+        "Setting": "self.firstpage",
+        "CurrentValue": "100",
+        "DefaultValue": "1",
+        "CurrentValueWindows": "100",
+        "DefaultValueWindows": "1"
+    },
+    {
+        "Setting": "self.lastpage",
+        "CurrentValue": "110",
+        "DefaultValue": "10",
+        "CurrentValueWindows": "110",
+        "DefaultValueWindows": "10"
+    },
+    {
+        "Setting": "self.deltapages",
+        "CurrentValue": "10",
+        "DefaultValue": "10",
+        "CurrentValueWindows": "10",
+        "DefaultValueWindows": "10"
+    },
+    {
+        "Setting": "self.imgpath",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_247_linebox.tif",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.imgdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow"
+    },
+    {
+        "Setting": "self.dirIterator",
+        "CurrentValue": "None",
+        "DefaultValue": "None",
+        "CurrentValueWindows": "None",
+        "DefaultValueWindows": "None"
+    },
+    {
+        "Setting": "self.imgfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "CurrentValueWindows": "[]",
+        "DefaultValueWindows": "[]"
+    },
+    {
+        "Setting": "self.pixmap",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.qimage",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.bmpsourcedir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_source",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_source",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.bmpgreekdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_greek",
+        "DefaultValue": "",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_greek",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.zoom",
+        "CurrentValue": "11 %",
+        "DefaultValue": "11 %",
+        "CurrentValueWindows": "11 %",
+        "DefaultValueWindows": "11 %"
+    },
+    {
+        "Setting": "self.zoomslidervalue",
+        "CurrentValue": "11",
+        "DefaultValue": "25",
+        "CurrentValueWindows": "11",
+        "DefaultValueWindows": "25"
+    },
+    {
+        "Setting": "self.img_xoffset",
+        "CurrentValue": "20",
+        "DefaultValue": "20",
+        "CurrentValueWindows": "20",
+        "DefaultValueWindows": "20"
+    },
+    {
+        "Setting": "self.img_yoffset",
+        "CurrentValue": "70",
+        "DefaultValue": "70",
+        "CurrentValueWindows": "70",
+        "DefaultValueWindows": "70"
+    },
+    {
+        "Setting": "self.txtpath",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_247_linebox.txt",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.txtdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages"
+    },
+    {
+        "Setting": "self.txtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "CurrentValueWindows": "[]",
+        "DefaultValueWindows": "[]"
+    },
+    {
+        "Setting": "self.txtgreeklinebox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox"
+    },
+    {
+        "Setting": "self.jsongreeklinebox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/json_greek_linebox",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/json_greek_linebox",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/json_greek_linebox",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/json_greek_linebox"
+    },
+    {
+        "Setting": "self.txtlatinlinebox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box"
+    },
+    {
+        "Setting": "self.reftxtpath",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.reftxtdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR"
+    },
+    {
+        "Setting": "self.reftxtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "CurrentValueWindows": "[]",
+        "DefaultValueWindows": "[]"
+    },
+    {
+        "Setting": "self.refimgpath",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.refimgdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages"
+    },
+    {
+        "Setting": "self.refimgtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "CurrentValueWindows": "[]",
+        "DefaultValueWindows": "[]"
+    },
+    {
+        "Setting": "self.refimgzoom",
+        "CurrentValue": "25 %",
+        "DefaultValue": "25",
+        "CurrentValueWindows": "25 %",
+        "DefaultValueWindows": "25"
+    },
+    {
+        "Setting": "self.refimgzoomslidervalue",
+        "CurrentValue": "25",
+        "DefaultValue": "25",
+        "CurrentValueWindows": "25",
+        "DefaultValueWindows": "25"
+    },
+    {
+        "Setting": "self.imagepath",
+        "CurrentValue": "",
+        "DefaultValue": "",
+        "CurrentValueWindows": "",
+        "DefaultValueWindows": ""
+    },
+    {
+        "Setting": "self.imagetdir",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR"
+    },
+    {
+        "Setting": "self.imagefileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]",
+        "CurrentValueWindows": "[]",
+        "DefaultValueWindows": "[]"
+    },
+    {
+        "Setting": "self.imagezoom",
+        "CurrentValue": "25 %",
+        "DefaultValue": "25",
+        "CurrentValueWindows": "25 %",
+        "DefaultValueWindows": "25"
+    },
+    {
+        "Setting": "self.imagezoomslidervalue",
+        "CurrentValue": "25",
+        "DefaultValue": "25",
+        "CurrentValueWindows": "25",
+        "DefaultValueWindows": "25"
+    },
+    {
+        "Setting": "self.greekpages",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages"
+    },
+    {
+        "Setting": "self.greekpagesrotated",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated"
+    },
+    {
+        "Setting": "self.greekpagesdeskewed",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed"
+    },
+    {
+        "Setting": "self.greekpagescropped",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped"
+    },
+    {
+        "Setting": "self.greekpagescleaned",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned"
+    },
+    {
+        "Setting": "self.greekpagesbox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box"
+    },
+    {
+        "Setting": "self.greeklinescropped",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped"
+    },
+    {
+        "Setting": "self.greeklinescleaned",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned"
+    },
+    {
+        "Setting": "self.greeklinesbox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
+    },
+    {
+        "Setting": "self.greeklinesautosplit",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit"
+    },
+    {
+        "Setting": "self.latinpages",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages"
+    },
+    {
+        "Setting": "self.latinpagesrotated",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated"
+    },
+    {
+        "Setting": "self.latinpagesdeskewed",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed"
+    },
+    {
+        "Setting": "self.latinpagescropped",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped"
+    },
+    {
+        "Setting": "self.latinpagescleaned",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned"
+    },
+    {
+        "Setting": "self.latinpagesbox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box"
+    },
+    {
+        "Setting": "self.latinlinescropped",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped"
+    },
+    {
+        "Setting": "self.latinlinescleaned",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned"
+    },
+    {
+        "Setting": "self.latinlinesbox",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box"
+    },
+    {
+        "Setting": "self.latinlinesautosplit",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
+        "DefaultValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
+        "CurrentValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
+        "DefaultValueWindows": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit"
+    }
+]

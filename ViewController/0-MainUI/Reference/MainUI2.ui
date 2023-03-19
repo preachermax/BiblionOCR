@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainUI</class>
+ <widget class="QMainWindow" name="MainUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1405</width>
+    <height>823</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Manuscript OCR</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="UI_Icons.qrc">
+    <normaloff>:/Icons/Icons/image-sunset.png</normaloff>:/Icons/Icons/image-sunset.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="ImageAreaTitlelabel">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>0</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Image to Recognize OCR</string>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="OCRTextscrollArea">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>20</y>
+      <width>540</width>
+      <height>700</height>
+     </rect>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="OCRTextscrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>540</width>
+       <height>1700</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>540</width>
+       <height>1700</height>
+      </size>
+     </property>
+     <widget class="QPlainTextEdit" name="OCRText">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>540</width>
+        <height>1702</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>540</width>
+        <height>1702</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="OCRTextAreaTitlelabel">
+    <property name="geometry">
+     <rect>
+      <x>1050</x>
+      <y>0</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OCR Text File to Edit</string>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="ImagescrollArea">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>520</width>
+      <height>700</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>501</width>
+      <height>700</height>
+     </size>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="ImagescrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>501</width>
+       <height>1800</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>501</width>
+       <height>1800</height>
+      </size>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>520</width>
+       <height>700</height>
+      </size>
+     </property>
+     <widget class="QLabel" name="Image">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>521</width>
+        <height>1680</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>1680</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../.designer/Images/Greek/jpg_desk_greek/greek_book_40_Matthew/greek1516_Page_012.jpg</pixmap>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="ChrRefTitlelabel">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>230</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Character Reference</string>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="ChrRefscrollArea">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>250</y>
+      <width>291</width>
+      <height>400</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="ChrRefcrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>200</width>
+       <height>500</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>500</height>
+      </size>
+     </property>
+     <widget class="QPlainTextEdit" name="ChrRefplainTextEdit">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>275</width>
+        <height>401</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>18</pointsize>
+       </font>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1405</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuPre_Process">
+    <property name="title">
+     <string>Pre-Process</string>
+    </property>
+    <widget class="QMenu" name="menuExtract_pdf">
+     <property name="title">
+      <string>Prepare Source</string>
+     </property>
+     <property name="icon">
+      <iconset resource="UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+     </property>
+     <addaction name="actionextract_pdf_tb"/>
+     <addaction name="separator"/>
+     <addaction name="actionpdf_for_tiff_tb"/>
+     <addaction name="actionpdf_to_tiff_tb"/>
+     <addaction name="actiontiff_to_mono_tb"/>
+     <addaction name="actiondeskew_mono"/>
+     <addaction name="actionmono_to_png_tb"/>
+    </widget>
+    <widget class="QMenu" name="menuPrepare">
+     <property name="title">
+      <string>Prepare Languages</string>
+     </property>
+     <widget class="QMenu" name="menuGreekDR">
+      <property name="title">
+       <string>Greek</string>
+      </property>
+      <addaction name="actionDeskewGreek_tiff_tb"/>
+      <addaction name="actionResizeGreek_png_tb"/>
+     </widget>
+     <widget class="QMenu" name="menuLatinDR">
+      <property name="title">
+       <string>Latin</string>
+      </property>
+      <addaction name="actionDeskewLatin_tiff_tb"/>
+      <addaction name="actionResizeLatin_png_tb"/>
+     </widget>
+     <addaction name="menuGreekDR"/>
+     <addaction name="menuLatinDR"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="menuExtract_pdf"/>
+    <addaction name="separator"/>
+    <addaction name="actionCrop_Languages_tb"/>
+    <addaction name="separator"/>
+    <addaction name="menuPrepare"/>
+   </widget>
+   <widget class="QMenu" name="menuTraining">
+    <property name="title">
+     <string>Training</string>
+    </property>
+    <widget class="QMenu" name="menuGround_Truth">
+     <property name="title">
+      <string>Ground Truth</string>
+     </property>
+     <widget class="QMenu" name="menuGreekGT">
+      <property name="title">
+       <string>Greek</string>
+      </property>
+      <widget class="QMenu" name="menuGreek_Image_Lines">
+       <property name="title">
+        <string>Greek Image Lines</string>
+       </property>
+       <addaction name="actionCrop_Greek_to_tiff_Lines_tb"/>
+       <addaction name="actionRename_Greek_tiff_Lines_tb"/>
+       <addaction name="actionMove_Greek_tiff_Lines_tb"/>
+      </widget>
+      <widget class="QMenu" name="menuGreek_Text_Lines">
+       <property name="title">
+        <string>Greek Text Lines</string>
+       </property>
+       <addaction name="actionSplitGreek_text_lines_tb"/>
+       <addaction name="actionRenameGreek_text_lines_tb"/>
+      </widget>
+      <addaction name="menuGreek_Image_Lines"/>
+      <addaction name="menuGreek_Text_Lines"/>
+      <addaction name="actionReview_Ground_Truth_tb"/>
+      <addaction name="actionUpdate_Wordlist_tb"/>
+     </widget>
+     <widget class="QMenu" name="menuLatinGT">
+      <property name="title">
+       <string>Latin</string>
+      </property>
+      <widget class="QMenu" name="menuLatin_Image_Lines">
+       <property name="title">
+        <string>Latin Image Lines</string>
+       </property>
+       <addaction name="actionCrop_Latin_To_tiff_Lines_tb"/>
+       <addaction name="actionRename_Latin_tiff_Lines_tb"/>
+       <addaction name="actionMove_Latin_tiff_Lines_tb"/>
+      </widget>
+      <widget class="QMenu" name="menuLatin_Text_Lines">
+       <property name="title">
+        <string>Latin Text Lines</string>
+       </property>
+       <addaction name="actionSplit_Latin_Text_Lines_tb"/>
+       <addaction name="actionRename_Latin_Text_Lines_tb"/>
+      </widget>
+      <addaction name="menuLatin_Image_Lines"/>
+      <addaction name="menuLatin_Text_Lines"/>
+      <addaction name="actionReview_Ground_Truth_menu"/>
+      <addaction name="actionUpdate_Wordlist_menu"/>
+     </widget>
+     <addaction name="menuGreekGT"/>
+     <addaction name="menuLatinGT"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="menuGround_Truth"/>
+    <addaction name="actionTrain_Tesseract_tb"/>
+   </widget>
+   <widget class="QMenu" name="menuOCR">
+    <property name="title">
+     <string>OCR</string>
+    </property>
+    <widget class="QMenu" name="menuGreek_OCR">
+     <property name="title">
+      <string>Greek</string>
+     </property>
+     <addaction name="actionCorrect_OCR_tb"/>
+     <addaction name="actionVersify_Text"/>
+    </widget>
+    <addaction name="menuGreek_OCR"/>
+    <addaction name="actionLatin_OCR"/>
+   </widget>
+   <widget class="QMenu" name="menuPost_Process">
+    <property name="title">
+     <string>Post-Process</string>
+    </property>
+    <widget class="QMenu" name="menuGreek_Post">
+     <property name="title">
+      <string>Greek</string>
+     </property>
+     <addaction name="actionUpdate_Verses"/>
+     <addaction name="actionUpdate_Words_Post"/>
+     <addaction name="actionNormalize"/>
+     <addaction name="actionLower_Case"/>
+     <addaction name="actionRemove_Diacritics"/>
+     <addaction name="actionAlign_Strongs"/>
+     <addaction name="actionAlign_Lemmas"/>
+     <addaction name="actionAlign_English"/>
+     <addaction name="actionVariants"/>
+    </widget>
+    <addaction name="menuGreek_Post"/>
+    <addaction name="actionUpdate_Words"/>
+   </widget>
+   <addaction name="menuPre_Process"/>
+   <addaction name="menuTraining"/>
+   <addaction name="menuOCR"/>
+   <addaction name="menuPost_Process"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="ToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract pages from pdf source file</string>
+   </property>
+   <property name="whatsThis">
+    <string>pdf Page Extractor</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionextract_pdf_tb"/>
+   <addaction name="actionpdf_for_tiff_tb"/>
+   <addaction name="actionpdf_to_tiff_tb"/>
+   <addaction name="actiontiff_to_mono_tb"/>
+   <addaction name="actiondeskew_mono"/>
+   <addaction name="actionmono_to_png_tb"/>
+   <addaction name="separator"/>
+   <addaction name="actionCrop_Languages_tb"/>
+   <addaction name="actionDeskewGreek_tiff_tb"/>
+   <addaction name="actionResizeGreek_png_tb"/>
+   <addaction name="actionDeskewLatin_tiff_tb"/>
+   <addaction name="actionResizeLatin_png_tb"/>
+   <addaction name="separator"/>
+   <addaction name="actionCrop_Greek_to_tiff_Lines_tb"/>
+   <addaction name="actionRename_Greek_tiff_Lines_tb"/>
+   <addaction name="actionMove_Greek_tiff_Lines_tb"/>
+   <addaction name="separator"/>
+   <addaction name="actionCrop_Latin_To_tiff_Lines_tb"/>
+   <addaction name="actionRename_Latin_tiff_Lines_tb"/>
+   <addaction name="actionMove_Latin_tiff_Lines_tb"/>
+   <addaction name="separator"/>
+   <addaction name="actionSplitGreek_text_lines_tb"/>
+   <addaction name="actionRenameGreek_text_lines_tb"/>
+   <addaction name="separator"/>
+   <addaction name="actionSplit_Latin_Text_Lines_tb"/>
+   <addaction name="actionRename_Latin_Text_Lines_tb"/>
+   <addaction name="separator"/>
+   <addaction name="actionReview_Ground_Truth_tb"/>
+   <addaction name="actionUpdate_Wordlist_tb"/>
+   <addaction name="actionTrain_Tesseract_tb"/>
+   <addaction name="actionCorrect_OCR_tb"/>
+   <addaction name="separator"/>
+  </widget>
+  <action name="actionpdf_to_tiff">
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionmove_pdf_for_tiff">
+   <property name="text">
+    <string>pdf to tiff</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono">
+   <property name="text">
+    <string>tiff to mono</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png">
+   <property name="text">
+    <string>mono to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionGreek">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_2">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff">
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf4tiff.png</normaloff>:/Icons/Icons/pdf4tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf For tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage pdf pages FOR tiff conversion</string>
+   </property>
+  </action>
+  <action name="actionpdf_to_tiff_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf2tiff.png</normaloff>:/Icons/Icons/pdf2tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf To tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert pdf pages TO tiff files</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>tiff to mono</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert tiff files TO indexed monochrome</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/png-file.png</normaloff>:/Icons/Icons/png-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>mono To png</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert deskewed monochrome tiff files TO png</string>
+   </property>
+  </action>
+  <action name="actionLatin">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_3">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_4">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewGreek_tiff_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Greek tiff</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_5">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewLatin_tiff_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Latin tiff</string>
+   </property>
+  </action>
+  <action name="actionResizeGreek_png_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Greek png</string>
+   </property>
+  </action>
+  <action name="actionResizeLatin_png_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Latin png</string>
+   </property>
+  </action>
+  <action name="actionCrop_Languages_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Languages</string>
+   </property>
+   <property name="toolTip">
+    <string>Crop language sections into separate tiff files</string>
+   </property>
+  </action>
+  <action name="actionextract_pdf_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf-extract1.png</normaloff>:/Icons/Icons/pdf-extract1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Extract pdf</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract pages from pdf source document</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth">
+   <property name="text">
+    <string>tiff for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCrop">
+   <property name="text">
+    <string>Crop to tiff lines</string>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth_2">
+   <property name="text">
+    <string>Move tiff lines</string>
+   </property>
+  </action>
+  <action name="actionSplit">
+   <property name="text">
+    <string>Split text lines</string>
+   </property>
+  </action>
+  <action name="actionRename_tiff_lines">
+   <property name="text">
+    <string>Rename tiff lines</string>
+   </property>
+  </action>
+  <action name="actionRename_text_lines">
+   <property name="text">
+    <string>Rename text lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionGreek_Wordlist_2">
+   <property name="text">
+    <string>Greek Wordlist</string>
+   </property>
+  </action>
+  <action name="actionLatin_Wordlist">
+   <property name="text">
+    <string>Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionText_Lines">
+   <property name="text">
+    <string>Text Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_2">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_2">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionCorrect_OCR_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ocr1.png</normaloff>:/Icons/Icons/ocr1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Correct OCR</string>
+   </property>
+  </action>
+  <action name="actionVersify_Text">
+   <property name="text">
+    <string>Versify Text</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Verses">
+   <property name="text">
+    <string>Update Verses</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words_Post">
+   <property name="text">
+    <string>Update Words</string>
+   </property>
+  </action>
+  <action name="actionNormalize">
+   <property name="text">
+    <string>Normalize</string>
+   </property>
+  </action>
+  <action name="actionLower_Case">
+   <property name="text">
+    <string>Lower Case</string>
+   </property>
+  </action>
+  <action name="actionRemove_Diacritics">
+   <property name="text">
+    <string>Remove Diacritics</string>
+   </property>
+  </action>
+  <action name="actionAlign_Strongs">
+   <property name="text">
+    <string>Align Strongs+RMAC</string>
+   </property>
+  </action>
+  <action name="actionAlign_Lemmas">
+   <property name="text">
+    <string>Align Lemmas</string>
+   </property>
+  </action>
+  <action name="actionAlign_English">
+   <property name="text">
+    <string>Align English</string>
+   </property>
+  </action>
+  <action name="actionVariants">
+   <property name="text">
+    <string>Variants</string>
+   </property>
+  </action>
+  <action name="actionLatin_OCR">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionTrain_Tesseract_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trainOCR1.png</normaloff>:/Icons/Icons/trainOCR1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Train Tesseract</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ground-truth1.png</normaloff>:/Icons/Icons/ground-truth1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/update-greek-wordlist.png</normaloff>:/Icons/Icons/update-greek-wordlist.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Greek Wordlist</string>
+   </property>
+  </action>
+  <action name="actionCrop_Greek_to_tiff_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Greek To tiff Lines</string>
+   </property>
+  </action>
+  <action name="actionRename_Greek_tiff_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek tiff Lines</string>
+   </property>
+  </action>
+  <action name="actionMove_Greek_tiff_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Greek tiff Lines</string>
+   </property>
+  </action>
+  <action name="actionSplitGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Greek Text Lines</string>
+   </property>
+  </action>
+  <action name="actionRenameGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek Text Lines</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines_3">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_menu">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_menu">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionCrop_Latin_To_tiff_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Latin To tiff Lines</string>
+   </property>
+  </action>
+  <action name="actionRename_Latin_tiff_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin tiff Lines</string>
+   </property>
+  </action>
+  <action name="actionMove_Latin_tiff_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Greek tiff Lines</string>
+   </property>
+  </action>
+  <action name="actionSplit_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Latin Text Lines</string>
+   </property>
+  </action>
+  <action name="actionRename_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin Text Lines</string>
+   </property>
+  </action>
+  <action name="actiondeskew_mono">
+   <property name="icon">
+    <iconset resource="UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew monochrome tiff files</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

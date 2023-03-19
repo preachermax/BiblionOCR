@@ -1,0 +1,98 @@
+import sqlite3
+import re
+
+conn_TW = sqlite3.connect('/home/max/Projects/Python/SQLite/TR-Words_Esword.db')
+print ("Opened Esword database successfully")
+
+cursor_TW = conn_TW.cursor()
+
+#cursor_TW.execute("SELECT * FROM Bible ")
+
+conn_TR = sqlite3.connect('/home/max/Projects/Python/SQLite/TR.db')
+print ("Opened Textus Receptus database successfully")
+
+cursor_TR = conn_TR.cursor()
+
+#cursor_TR.execute("SELECT Line,Book,Chapter,Verse,Scripture FROM Bible WHERE Book = 'Mat'")
+cursor_TR.execute("SELECT Book,Chapter,Verse,Scripture FROM Bible")
+
+#vlines = cursor_TR.fetchone()
+#vlines = cursor_TR.fetchmany(0)
+vlines = cursor_TR.fetchall()
+#print(vlines)
+#line = vlines[0]
+
+#print(line)
+
+for vline in vlines:
+    
+    #pattern = re.compile('(<wt>)(\w+)(<)(W)(G\d+)(>)(<W)(\w+-\w+?-?\w+?)(\s)(l=)(\w+)(>)([,.;]?)')
+    #pattern = re.compile('(\d+)(,)(<wt>)(\w+)(<)(W)(G\d+)(>)(<W)(\w+-\w+?-?\w+?)(\s)(l=)(\w+)(>)([,.;]?)')
+    #pattern = re.compile('(<wt>)(\\u\d+\?)+(\s)')
+    ##pattern = re.compile(r"(\{\\f1\s)((\\\\u\d+\?)+)|((\\\'\w\d)+)")
+    
+    #pattern = re.compile(r"(\\f1\s)")
+    pattern = re.compile(r"(((?:\\)(?:\'?\w\d+\??))+([,.;]?)\s)")
+    #print(pattern)
+    #pattern = re.compile(r"(((\\)(\'?\w\d+\??))+)(\s)")
+    #pattern = re.compile(r"((?:((\\)(\w\d+\?))|(?:(\\)(\'\w\d+)))+)")
+    #pattern = re.compile(r"(\\f1\s)(((\\)(\w\d+\?))|((\\)(\'\w\d+))+)")
+    #pattern = re.compile(r"(\\f1\s)(((\\)(\'?\w\d+))+)")
+    #pattern = re.compile(r"(f1\s)((\\)(\'?\w\d+)+)(\s)")
+    #pattern = re.compile('(<wt>)(\\u\d+\?)+(\s)')
+
+    matches = pattern.finditer(str(vline[3]))
+    print(vline[3])
+    #linenum = vline[0]
+    booknum = vline[0]
+    chpt = vline[1]
+    vrse = vline[2]
+    wordnum = 1
+
+    for match in matches:
+        #print(match)
+        mstr = match.group(0)
+        #word_open = match.group(1)
+        word = match.group(0)
+        '''word_close = match.group(4)
+        strong_open = match.group(5)
+        strong = match.group(6)
+        strong_close = match.group(6)
+        rmac_open = match.group(7)
+        rmac = match.group(8)
+        rmac_close = match.group(9)
+        lemma_open = match.group(10)
+        lemma = match.group(11)
+        lemma_close = match.group(12)
+        punc = match.group(13)'''
+      
+        '''insert_parameters = ''''''INSERT INTO Bible 
+                            (BookNum,Chapter,Verse,WordNum,Word)
+                             VALUES (?,?,?,?,?)''''''
+        insert_data = (booknum,chpt,vrse,wordnum,word)
+        cursor_TW.execute(insert_parameters,insert_data)
+        conn_TW.commit()'''
+
+        # Database field search groups:
+        #print(Book,Chapter,Verse)
+        #print(str(linenum) + " " + str(book) + " " + str(chpt) + ":" + str(vrse) + ":" + str(wordnum) + " " + match.group(2) + " " + match.group(5) + " " + match.group(8) + " " + match.group(11)+ " " + match.group(13))
+        #print(str(booknum) + " " + str(chpt) + ":" + str(vrse) + ":" + str(wordnum) + " " + match.group(1) + " " + match.group(2) + " " + match.group(3))
+        
+        print(str(booknum) + " " + str(chpt) + ":" + str(vrse) + ":" + str(wordnum) + " " + match.group(0))
+        
+        #print(str(book) + str(wordnum))
+        #print(str(book) + str(wordnum))
+        wordnum += 1
+        # Database field separator groups:
+        # print(match.group(1) + " " + match.group(3) + " " + match.group(4) + " " + match.group(6) + " " + match.group(7) + " " + match.group(9) + match.group(10) + " " + match.group(12))
+    
+    #print(vline)
+
+
+
+
+
+conn_TR.commit()
+
+conn_TR.close()
+conn_TW.close()

@@ -1,0 +1,112 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file './QtDesignerUI/crop_languagesDialog.ui'
+#
+# Created by: PyQt5 UI code generator 5.10.1
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_crop_languagesDialog(object):
+    def setupUi(self, crop_languagesDialog):
+        crop_languagesDialog.setObjectName("crop_languagesDialog")
+        crop_languagesDialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        crop_languagesDialog.resize(484, 416)
+        self.buttonBox = QtWidgets.QDialogButtonBox(crop_languagesDialog)
+        self.buttonBox.setGeometry(QtCore.QRect(260, 360, 171, 32))
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName("buttonBox")
+        self.SourceLineEdit = QtWidgets.QLineEdit(crop_languagesDialog)
+        self.SourceLineEdit.setGeometry(QtCore.QRect(10, 50, 301, 25))
+        self.SourceLineEdit.setObjectName("SourceLineEdit")
+        self.SourceButton = QtWidgets.QPushButton(crop_languagesDialog)
+        self.SourceButton.setEnabled(False)
+        self.SourceButton.setGeometry(QtCore.QRect(330, 50, 101, 25))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Icons/tiff-file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.SourceButton.setIcon(icon)
+        self.SourceButton.setObjectName("SourceButton")
+        self.ElimFolderButton = QtWidgets.QPushButton(crop_languagesDialog)
+        self.ElimFolderButton.setGeometry(QtCore.QRect(330, 170, 101, 25))
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/Icons/Icons/png-file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.ElimFolderButton.setIcon(icon1)
+        self.ElimFolderButton.setObjectName("ElimFolderButton")
+        self.ElimFolderLineEdit = QtWidgets.QLineEdit(crop_languagesDialog)
+        self.ElimFolderLineEdit.setGeometry(QtCore.QRect(10, 170, 301, 25))
+        self.ElimFolderLineEdit.setObjectName("ElimFolderLineEdit")
+        self.SourceLabel = QtWidgets.QLabel(crop_languagesDialog)
+        self.SourceLabel.setGeometry(QtCore.QRect(20, 30, 211, 17))
+        self.SourceLabel.setObjectName("SourceLabel")
+        self.ElimFolderLabel = QtWidgets.QLabel(crop_languagesDialog)
+        self.ElimFolderLabel.setGeometry(QtCore.QRect(20, 150, 271, 17))
+        self.ElimFolderLabel.setObjectName("ElimFolderLabel")
+        self.BoxFolderLineEdit = QtWidgets.QLineEdit(crop_languagesDialog)
+        self.BoxFolderLineEdit.setGeometry(QtCore.QRect(10, 110, 301, 25))
+        self.BoxFolderLineEdit.setObjectName("BoxFolderLineEdit")
+        self.BoxFolderLabel = QtWidgets.QLabel(crop_languagesDialog)
+        self.BoxFolderLabel.setGeometry(QtCore.QRect(20, 90, 271, 17))
+        self.BoxFolderLabel.setObjectName("BoxFolderLabel")
+        self.BoxFolderButton = QtWidgets.QPushButton(crop_languagesDialog)
+        self.BoxFolderButton.setGeometry(QtCore.QRect(330, 110, 101, 25))
+        self.BoxFolderButton.setIcon(icon)
+        self.BoxFolderButton.setObjectName("BoxFolderButton")
+        self.DestLatinLineEdit = QtWidgets.QLineEdit(crop_languagesDialog)
+        self.DestLatinLineEdit.setGeometry(QtCore.QRect(10, 290, 301, 25))
+        self.DestLatinLineEdit.setObjectName("DestLatinLineEdit")
+        self.DestLatinLabel = QtWidgets.QLabel(crop_languagesDialog)
+        self.DestLatinLabel.setGeometry(QtCore.QRect(20, 270, 271, 17))
+        self.DestLatinLabel.setObjectName("DestLatinLabel")
+        self.DestGreekLineEdit = QtWidgets.QLineEdit(crop_languagesDialog)
+        self.DestGreekLineEdit.setGeometry(QtCore.QRect(10, 230, 301, 25))
+        self.DestGreekLineEdit.setObjectName("DestGreekLineEdit")
+        self.DestGreekButton = QtWidgets.QPushButton(crop_languagesDialog)
+        self.DestGreekButton.setGeometry(QtCore.QRect(330, 230, 101, 25))
+        self.DestGreekButton.setIcon(icon)
+        self.DestGreekButton.setObjectName("DestGreekButton")
+        self.DestLatinButton = QtWidgets.QPushButton(crop_languagesDialog)
+        self.DestLatinButton.setGeometry(QtCore.QRect(330, 290, 101, 25))
+        self.DestLatinButton.setIcon(icon1)
+        self.DestLatinButton.setObjectName("DestLatinButton")
+        self.DestGreekLabel = QtWidgets.QLabel(crop_languagesDialog)
+        self.DestGreekLabel.setGeometry(QtCore.QRect(20, 210, 271, 17))
+        self.DestGreekLabel.setObjectName("DestGreekLabel")
+        self.defaultsrcBox = QtWidgets.QCheckBox(crop_languagesDialog)
+        self.defaultsrcBox.setGeometry(QtCore.QRect(330, 20, 101, 23))
+        self.defaultsrcBox.setChecked(True)
+        self.defaultsrcBox.setObjectName("defaultsrcBox")
+
+        self.retranslateUi(crop_languagesDialog)
+        self.buttonBox.accepted.connect(crop_languagesDialog.accept)
+        self.buttonBox.rejected.connect(crop_languagesDialog.reject)
+        QtCore.QMetaObject.connectSlotsByName(crop_languagesDialog)
+
+    def retranslateUi(self, crop_languagesDialog):
+        _translate = QtCore.QCoreApplication.translate
+        crop_languagesDialog.setWindowTitle(_translate("crop_languagesDialog", "Crop mono tif files into tif language files"))
+        self.SourceLineEdit.setPlaceholderText(_translate("crop_languagesDialog", "(default) working temp folder"))
+        self.SourceButton.setText(_translate("crop_languagesDialog", "Source"))
+        self.ElimFolderButton.setText(_translate("crop_languagesDialog", "Destination"))
+        self.SourceLabel.setText(_translate("crop_languagesDialog", "Mono tif pages source folder"))
+        self.ElimFolderLabel.setText(_translate("crop_languagesDialog", "Language eliminated fragments folder"))
+        self.BoxFolderLabel.setText(_translate("crop_languagesDialog", "Language box files folder"))
+        self.BoxFolderButton.setText(_translate("crop_languagesDialog", "Destination"))
+        self.DestLatinLabel.setText(_translate("crop_languagesDialog", "Latin pages destination folder"))
+        self.DestGreekButton.setText(_translate("crop_languagesDialog", "Destination"))
+        self.DestLatinButton.setText(_translate("crop_languagesDialog", "Destination"))
+        self.DestGreekLabel.setText(_translate("crop_languagesDialog", "Greek pages destination folder"))
+        self.defaultsrcBox.setText(_translate("crop_languagesDialog", "Use default"))
+
+import UI_Icons
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    crop_languagesDialog = QtWidgets.QDialog()
+    ui = Ui_crop_languagesDialog()
+    ui.setupUi(crop_languagesDialog)
+    crop_languagesDialog.show()
+    sys.exit(app.exec_())
+
