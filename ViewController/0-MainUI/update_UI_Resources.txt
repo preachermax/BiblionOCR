@@ -1,6 +1,6 @@
 ﻿Update UI Files:
 # Linux
-pyuic5 -x /home/max/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/MainUI.ui -o /home/max/Projects/BiblionOCR/ViewController/0-MainUI/MainUI.py --resource-suffix=""
+pyuic5 -x /home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/MyBoxerUI.ui -o /home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/MyBoxerUI.py --resource-suffix=""
 # Windows
 pyuic5 -x c:/users/max/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/MyGrounderUI.ui -o c:/users/max/Projects/BiblionOCR/ViewController/0-MainUI/MyGrounderUI.py --resource-suffix=""
 
