@@ -1,4 +1,35 @@
 Setting,CurrentValue,DefaultValue
+self.linuxhomedir,/home,/home
+self.linuxuser,/jetson,/jetson
+self.linuxuserdir,/home/jetson,/home/jetson
+self.windowshomedir,c:/users,c:/users
+self.windowsuser,/max,/max
+self.windowsuserdir,c:/users/max,c:/users/max
+self.macoshomedir,,
+self.macosuser,,
+self.macosuserdir,,
+self.projectsdir,/Projects,/Projects
+self.projectname,Erasmvs1516,
+self.font,FROMVS,FROMVS
+self.fontsize,16,16
+self.forgedir,/Documents/MyForge/,/Documents/MyForge/
+self.homefontdir,/.fonts,
+self.localfontdir,/.local/share/fonts,
+self.localsharefontdir,/usr/local/share/fonts,
+self.systemsharefontdir,/usr/share/fonts/truetype/FROMVS,
+self.windowsfontdir,c:/Windows/font,
+self.sfd,/Documents/MyForge/FROMVS.sfd,/Documents/MyForge/FROMVS.sfd
+self.sfddir,/Documents/MyForge,/Documents/MyForge
+self.linuxtessdatadir,/tesseract/tessdata,/tesseract/tessdata
+self.linuxtesseract,/tesseract,/tesseract
+self.linuxtesstrain,/tesseract/tesstrain-raw-Gospels,/tesseract/tesstrain
+self.linuxtessfont,/tesseract/tesstrain-raw-Gospels/fonts/FROMVS.ttf,/tesseract/tesstrain-raw-Gospels/fonts/FROMVS.ttf
+self.linuxtessfontdir,/tesseract/tesstrain-raw-Gospels/fonts,/tesseract/tesstrain-raw-Gospels/fonts
+self.windowstessdatadir,c:/Program Files/Tesseract-OCR/tessdata,c:/Program Files/Tesseract-OCR/tessdata
+self.windowstesseract,c:/Program Files/Tesseract-OCR,c:/Program Files/Tesseract-OCR
+self.windowstesstrain,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels
+self.windowstessfont,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/FROMVS.ttf,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/FROMVS.ttf
+self.windowstessfontdir,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts
 self.ocrlang,Middle Greek,Middle Greek
 self.ocrmodel,feg,feg
 self.tessdatadir,c:/Program Files/Tesseract-OCR/tessdata,c:/Program Files/Tesseract-OCR/tessdata
@@ -9,69 +40,60 @@ self.chapter,1,1
 self.verse,1,1
 self.word,1,1
 self.chr,1,1
-self.font,FROMVS,FROMVS
-self.fontsize,20,20
-self.fontinstallpath,c:/Windows/fonts/FROMVS,
-self.homefontinstallpath,c:/Windows/fonts/FROMVS,
-self.usrfontinstallpath,c:/Windows/fonts/FROMVS,
-self.tessfont,c:/users/max/tesseract/tesstrain-raw-Gospels/fonts/FROMVS,
-self.tessdir,c:/users/max/tesseract/tesstrain-raw-Gospels/fonts,
-self.sfd,c:/users/max/Documents/My Forge/FROMVS.sfd,
-self.sfddir,c:/users/max/Documents/My Forge,
 self.glyph,,
 self.glyphname,,
 self.glyphencode,,
-self.glyphsourcedir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_source,
-self.glyphgreekdir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_greek,
+self.glyphsourcedir,Model/Project/Images/GlyphTracer/sfd_source,
+self.glyphgreekdir,Model/Project/Images/GlyphTracer/sfd_greek,
 self.linespacing,150,150
 self.verselinespacing,105,105
 self.reflinespacing,105,105
 self.sourcebookmarkdown,source_book_43_John,source_book_40_Matthew
 self.greekbookmarkdown,greek_book_43_John,greek_book_40_Matthew
 self.latinbookmarkdown,latin_book_43_John,latin_book_40_Matthew
-self.sourcefile,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf
+self.sourcefile,Model/Project/Images/Complete/Source/pdf_source/1516.pdf,Model/Project/Images/Complete/Source/pdf_source/1516.pdf
 self.firstpage,100,1
 self.lastpage,110,10
 self.deltapages,10,10
 self.imgpath,,
-self.imgdir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages
+self.imgdir,Model/Project/Images/Complete/Greek/tif_greek_pages,Model/Project/Images/Workflow/Greek/tif_greek_pages
 self.dirIterator,None,None
 self.imgfileList,[],[]
 self.pixmap,,
 self.qimage,,
-self.bmpsourcedir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_source,
-self.bmpgreekdir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_greek,
+self.bmpsourcedir,Model/Project/Images/GlyphTracer/bmp_source,
+self.bmpgreekdir,Model/Project/Images/GlyphTracer/bmp_greek,
 self.zoom,25 %,25
 self.zoomslidervalue,25,25
 self.txtpath,,
-self.txtdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages
+self.txtdir,Model/Project/Text/EstablishTruth/Greek_txt_pages,Model/Project/Text/EstablishTruth/Greek_txt_pages
 self.txtfileList,[],[]
 self.reftxtpath,,
-self.reftxtdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR
+self.reftxtdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
 self.reftxtfileList,[],[]
 self.refimgpath,,
-self.refimgdir,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages
+self.refimgdir,Model/Project/Images/Complete/Greek/tif_greek_pages,Model/Project/Images/Complete/Greek/tif_greek_pages
 self.refimgtfileList,[],[]
 self.refimgzoom,25 %,25
 self.refimgzoomslidervalue,25,25
 self.imagepath,,
-self.imagetdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR
+self.imagetdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
 self.imagefileList,[],[]
 self.imagezoom,25 %,25
 self.imagezoomslidervalue,25,25
-self.greekpagesrotated,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated
-self.greekpagesdeskewed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed
-self.greekpagescropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped
-self.greekpagescleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned
-self.greekpagesbox,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box
-self.greeklinescropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped
-self.greeklinescleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned
-self.greeklinesbox,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box
-self.latinpagesrotated,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated
-self.latinpagesdeskewed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed
-self.latinpagescropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped
-self.latinpagescleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned
-self.latinpagesbox,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box
-self.latinlinescropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped
-self.latinlinescleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned
-self.latinlinesbox,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box,c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box
+self.greekpagesrotated,Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated,Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated
+self.greekpagesdeskewed,Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed,Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed
+self.greekpagescropped,Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped,Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped
+self.greekpagescleaned,Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned,Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned
+self.greekpagesbox,Model/Project/Images/Workflow/Greek/tif_greek_pages_box,Model/Project/Images/Workflow/Greek/tif_greek_pages_box
+self.greeklinescropped,Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped,Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped
+self.greeklinescleaned,Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned,Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned
+self.greeklinesbox,Model/Project/Images/Workflow/Greek/tif_greek_lines_box,Model/Project/Images/Workflow/Greek/tif_greek_lines_box
+self.latinpagesrotated,Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated,Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated
+self.latinpagesdeskewed,Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed,Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed
+self.latinpagescropped,Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped,Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped
+self.latinpagescleaned,Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned,Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned
+self.latinpagesbox,Model/Project/Images/Workflow/Latin/tif_latin_pages_box,Model/Project/Images/Workflow/Latin/tif_latin_pages_box
+self.latinlinescropped,Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped,Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped
+self.latinlinescleaned,Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned,Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned
+self.latinlinesbox,Model/Project/Images/Workflow/Latin/tif_latin_lines_box,Model/Project/Images/Workflow/Latin/tif_latin_lines_box

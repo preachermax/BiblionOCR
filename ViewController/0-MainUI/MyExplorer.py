@@ -19,7 +19,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.populate()
 
     def populate(self):
-        dir_path = r'c:/users/max/Projects/BiblionOCR/Model/Project/'
+        dir_path = r'Model/Project/'
         self.model = QtWidgets.QFileSystemModel()
         self.model.setRootPath(dir_path)
         self.treeView.setModel(self.model)

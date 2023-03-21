@@ -3,531 +3,531 @@
         "Sequence": "SP1",
         "DialogUi": "ExtractDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "DefaultSource": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
         "FolderName": "pdf_page_files",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/pdf_page_files",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_page_files"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/pdf_page_files",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/pdf_page_files"
     },
     {
         "Sequence": "SP2",
         "DialogUi": "pdf4tifDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/pdf_page_files",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/pdf_page_files",
         "FolderName": "pdf_pages_4tif",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/pdf_pages_4tif",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_pages_4tif"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/pdf_pages_4tif",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/pdf_pages_4tif"
     },
     {
         "Sequence": "SP3",
         "DialogUi": "pdf2tifDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/pdf_pages_4tif",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/pdf_pages_4tif",
         "FolderName": "pdf_pages_2tif",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/pdf_pages_2tif",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_pages_2tif"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/pdf_pages_2tif",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/pdf_pages_2tif"
     },
     {
         "Sequence": "SP4",
         "DialogUi": "tif2monoDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/pdf_pages_2tif",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/pdf_pages_2tif",
         "FolderName": "tif_black_white",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_black_white"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/tif_black_white",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/tif_black_white"
     },
     {
         "Sequence": "SP5",
         "DialogUi": "mono2pngDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white",
         "FolderName": "png_black_white",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/png_black_white",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/png_black_white"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/png_black_white",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/png_black_white"
     },
     {
         "Sequence": "SP6",
         "DialogUi": "deskew_monoDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white",
         "FolderName": "tif_bw_deskewed",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_black_white_deskewed"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/tif_black_white_deskewed"
     },
     {
         "Sequence": "SP7",
         "DialogUi": "deskew_monoDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white",
         "FolderName": "png_bw_deskewed",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/png_black_white_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/png_black_white_deskewed"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/png_black_white_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/png_black_white_deskewed"
     },
     {
         "Sequence": "SP8",
         "DialogUi": "CropTifDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tiff_black_white_deskewed",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tiff_black_white_deskewed",
         "FolderName": "tif_bw_cropped",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_bw_cropped",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_bw_cropped"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/tif_bw_cropped",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/tif_bw_cropped"
     },
     {
         "Sequence": "SP9",
         "DialogUi": "CropTifDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/png_black_white_deskewed",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/png_black_white_deskewed",
         "FolderName": "png_bw_cropped",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/png_bw_cropped",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/png_bw_cropped"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/png_bw_cropped",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/png_bw_cropped"
     },
     {
         "Sequence": "SP10",
         "DialogUi": "crop_languagesDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
         "FolderName": "tif_box",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_box",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_box"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/tif_box",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/tif_box"
     },
     {
         "Sequence": "SP11",
         "DialogUi": "crop_languagesDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
         "FolderName": "tif_elim",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_eliminated",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_eliminated"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/tif_eliminated",
+        "CompleteFullPath": "Model/Project/Images/Complete/Source/tif_eliminated"
     },
     {
         "Sequence": "GP1",
         "DialogUi": "crop_languagesDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
         "FolderName": "tif_greek_pages_autosplit",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
         "Sequence": "GP2",
         "DialogUi": "crop_languagesDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_greek_pages_autosplit",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_greek_pages_autosplit",
         "FolderName": "tif_greek_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
         "Sequence": "GP3",
         "DialogUi": "CropTifDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "FolderName": "tif_greek_pages_cropped",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages_cropped"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_pages_cropped"
     },
     {
         "Sequence": "GP4",
         "DialogUi": "CropTifDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
         "FolderName": "tif_greek_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
         "Sequence": "GP5",
         "DialogUi": "greekmono2pngDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit",
         "FolderName": "png_greek_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/png_greek_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/png_greek_pages",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/png_greek_pages"
     },
     {
         "Sequence": "GP6",
         "DialogUi": "deskew_greekmonoDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "FolderName": "tif_greek_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
         "Sequence": "GP7",
         "DialogUi": "deskew_greekmonoDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "FolderName": "png_greek_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/png_greek_page"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/png_greek_pages_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/png_greek_page"
     },
     {
         "Sequence": "GP8",
         "DialogUi": "CropTifDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/png_greek_pages",
         "FolderName": "png_greek_pages_cropped",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages_cropped",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/png_greek_pages_cropped"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/png_greek_pages_cropped",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/png_greek_pages_cropped"
     },
     {
         "Sequence": "GP9",
         "DialogUi": "CropTifDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/png_greek_pages",
         "FolderName": "png_greek_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/png_greek_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/png_greek_pages_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/png_greek_pages"
     },
     {
         "Sequence": "GP10",
         "DialogUi": "greekresizepngDialog",
         "Category": "Greek Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/png_greek_pages",
         "FolderName": "png_greek_pages_resized",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/png_greek_pages_resized",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/png_greek_pages_resized"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/png_greek_pages_resized",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/png_greek_pages_resized"
     },
     {
         "Sequence": "LP1",
         "DialogUi": "crop_languagesDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_black_white_deskewed",
         "FolderName": "tif_latin_pages_autosplit",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_pages"
     },
     {
         "Sequence": "LP2",
         "DialogUi": "crop_languagesDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_latin_pages_autosplit",
+        "DefaultSource": "Model/Project/Images/Workflow/Source/tif_latin_pages_autosplit",
         "FolderName": "tif_latin_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_pages"
     },
     {
         "Sequence": "LP3",
         "DialogUi": "CropTifDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
         "FolderName": "tif_latin_pages_cropped",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_pages_cropped"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_pages_cropped"
     },
     {
         "Sequence": "LP4",
         "DialogUi": "CropTifDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
         "FolderName": "tif_latin_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_pages"
     },
     {
         "Sequence": "LP5",
         "DialogUi": "latinmono2pngDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit",
         "FolderName": "png_latin_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/png_latin_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/png_latin_pages",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/png_latin_pages"
     },
     {
         "Sequence": "LP6",
         "DialogUi": "deskew_latinmonoDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
         "FolderName": "tif_latin_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_pages"
     },
     {
         "Sequence": "LP7",
         "DialogUi": "deskew_latinmonoDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
         "FolderName": "png_latin_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/png_latin_page"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/png_latin_pages_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/png_latin_page"
     },
     {
         "Sequence": "LP8",
         "DialogUi": "CropTifDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/png_latin_pages",
         "FolderName": "png_latin_pages_cropped",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages_cropped",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/png_latin_pages_cropped"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/png_latin_pages_cropped",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/png_latin_pages_cropped"
     },
     {
         "Sequence": "LP9",
         "DialogUi": "CropTifDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/png_latin_pages",
         "FolderName": "png_latin_pages",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages_deskewed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/png_latin_pages"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/png_latin_pages_deskewed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/png_latin_pages"
     },
     {
         "Sequence": "LP10",
         "DialogUi": "latinresizepngDialog",
         "Category": "Latin Page Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/png_latin_pages",
         "FolderName": "png_latin_pages_resized",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/png_latin_pages_resized",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/png_latin_pages_resized"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/png_latin_pages_resized",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/png_latin_pages_resized"
     },
     {
         "Sequence": "GL1",
         "DialogUi": "crop_greek_linesDialog",
         "Category": "Greek LineBox Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "FolderName": "tif_greek_lines_box",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_box"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_box"
     },
     {
         "Sequence": "GL2",
         "DialogUi": "crop_greek_linesDialog",
         "Category": "Greek Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "FolderName": "tif_greek_lines_autosplit",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_autosplit"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_autosplit"
     },
     {
         "Sequence": "GL3",
         "DialogUi": "tifgreekrenamelinesDialog",
         "Category": "Greek Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
         "FolderName": "tif_greek_lines_renamed",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_renamed"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_renamed"
     },
     {
         "Sequence": "GL4",
         "DialogUi": "tifgreekrenumberlinesDialog",
         "Category": "Greek Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed",
         "FolderName": "tif_greek_lines_renumbered",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renumbered",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_renumbered"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_renumbered",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_renumbered"
     },
     {
         "Sequence": "GL5",
         "DialogUi": "tif_greek_lines_stageDialog",
         "Category": "Greek Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_renamed",
         "FolderName": "tif_greek_lines_4groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_4groundtruth"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_4groundtruth"
     },
     {
         "Sequence": "GL6",
         "DialogUi": "tif_greek_lines_stageDialog",
         "Category": "Greek Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_renumbered",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_renumbered",
         "FolderName": "tif_greek_lines_4groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_4groundtruth"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_4groundtruth"
     },
     {
         "Sequence": "GL7",
         "DialogUi": "move_greek_image_linesDialog",
         "Category": "Greek Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
         "FolderName": "tif_greek_lines_2groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_2groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_2groundtruth"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_2groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_2groundtruth"
     },
     {
         "Sequence": "GL8",
         "DialogUi": "split_greek_text_linesDialog",
         "Category": "Greek Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_pages",
         "FolderName": "txt_greek_lines_autosplit",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_lines_autosplit"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Greek/txt_greek_lines_autosplit"
     },
     {
         "Sequence": "GL9",
         "DialogUi": "rename_greek_text_linesDialog",
         "Category": "Greek Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit",
         "FolderName": "txt_greek_lines_renamed",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renamed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_lines_renamed"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renamed",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Greek/txt_greek_lines_renamed"
     },
     {
         "Sequence": "GL10",
         "DialogUi": "renumber_greek_text_linesDialog",
         "Category": "Greek Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renamed",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renamed",
         "FolderName": "txt_greek_lines_renumbered",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renumbered",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_lines_renumbered"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renumbered",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Greek/txt_greek_lines_renumbered"
     },
     {
         "Sequence": "GL11",
         "DialogUi": "combine_greek_text_linesDialog",
         "Category": "Greek Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renumbered",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_renumbered",
         "FolderName": "txt_greek_lines4groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_lines4groundtruth"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Greek/txt_greek_lines4groundtruth"
     },
     {
         "Sequence": "GL12",
         "DialogUi": "move_greek_text_linesDialog",
         "Category": "Greek Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth",
         "FolderName": "txt_greek_lines2groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_lines2groundtruth"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Greek/txt_greek_lines2groundtruth"
     },
     {
         "Sequence": "LL1",
         "DialogUi": "crop_latin_linesDialog",
         "Category": "Latin LineBox Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
         "FolderName": "tif_latin_lines_box",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_box"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_box"
     },
     {
         "Sequence": "LL2",
         "DialogUi": "crop_latin_linesDialog",
         "Category": "Latin Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
         "FolderName": "tif_latin_lines_autosplit",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_autosplit"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_autosplit"
     },
     {
         "Sequence": "LL3",
         "DialogUi": "tiflatinrenamelinesDialog",
         "Category": "Latin Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
         "FolderName": "tif_latin_lines_renamed",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_renamed"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_renamed"
     },
     {
         "Sequence": "LL4",
         "DialogUi": "tiflatinrenumberlinesDialog",
         "Category": "Latin Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed",
         "FolderName": "/tif_latin_lines_renumbered",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renumbered",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_renumbered"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_renumbered",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_renumbered"
     },
     {
         "Sequence": "LL5",
         "DialogUi": "tif_latin_lines_stageDialog",
         "Category": "Latin Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_lines_renamed",
         "FolderName": "tif_latin_lines_4groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_4groundtruth"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_4groundtruth"
     },
     {
         "Sequence": "LL6",
         "DialogUi": "tif_latin_lines_stageDialog",
         "Category": "Latin Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_renumbered",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_lines_renumbered",
         "FolderName": "tif_latin_lines_4groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_4groundtruth"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_4groundtruth"
     },
     {
         "Sequence": "LL7",
         "DialogUi": "move_latin_image_linesDialog",
         "Category": "Latin Line Images",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
         "FolderName": "tif_latin_lines_2groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_2groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_2groundtruth"
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_2groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Latin/tif_latin_lines_2groundtruth"
     },
     {
         "Sequence": "LL8",
         "DialogUi": "split_latin_text_linesDialog",
         "Category": "Latin Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_pages",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_pages",
         "FolderName": "txt_greek_lines_autosplit",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Latin/txt_latin_lines_autosplit"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Latin/txt_latin_lines_autosplit"
     },
     {
         "Sequence": "LL9",
         "DialogUi": "rename_latin_text_linesDialog",
         "Category": "Latin Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit",
         "FolderName": "txt_greek_lines_renamed",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renamed",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Latin/txt_latin_lines_renamed"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renamed",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Latin/txt_latin_lines_renamed"
     },
     {
         "Sequence": "LL10",
         "DialogUi": "renumber_latin_text_linesDialog",
         "Category": "Latin Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renamed",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renamed",
         "FolderName": "txt_latin_lines_renumbered",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renumbered",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Latin/txt_latin_lines_renumbered"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renumbered",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Latin/txt_latin_lines_renumbered"
     },
     {
         "Sequence": "LL11",
         "DialogUi": "combine_latin_text_linesDialog",
         "Category": "Latin Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renumbered",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_renumbered",
         "FolderName": "txt_greek_lines4groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Latin/txt_latin_lines4groundtruth"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Latin/txt_latin_lines4groundtruth"
     },
     {
         "Sequence": "LL12",
         "DialogUi": "move_latin_text_linesDialog",
         "Category": "Latin Lines Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth",
         "FolderName": "txt_greek_lines2groundtruth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Latin/txt_latin_lines2groundtruth"
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth",
+        "CompleteFullPath": "Model/Project/Text/GroundTruth/Latin/txt_latin_lines2groundtruth"
     },
     {
         "Sequence": "GT1",
         "DialogUi": "stage_greek_images_linesDialog",
         "Category": "Greek Training Image",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_2groundtruth",
+        "DefaultSource": "Model/Project/Images/Complete/Greek/tif_greek_lines_2groundtruth",
         "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth"
+        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     },
     {
         "Sequence": "GT2",
         "DialogUi": "stage_greek_text_linesDialog",
         "Category": "Greek Training Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth",
         "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth"
+        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     },
     {
         "Sequence": "LT1",
         "DialogUi": "stage_greek_images_linesDialog",
         "Category": "Latin Training Image",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Latin/tif_latin_lines_2groundtruth",
+        "DefaultSource": "Model/Project/Images/Complete/Latin/tif_latin_lines_2groundtruth",
         "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth"
+        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     },
     {
         "Sequence": "LT2",
         "DialogUi": "stage_greek_text_linesDialog",
         "Category": "Latin Training Text",
-        "DefaultSource": "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth",
         "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth",
-        "CompleteFullPath": "c:/users/max/Projects/BiblionOCR/Model/Project/Training/staged_ground_truth"
+        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     }
 ]

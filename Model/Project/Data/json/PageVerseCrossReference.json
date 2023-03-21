@@ -62393,30 +62393,30 @@
         "Page": "162",
         "PageLine": "31",
         "PageLineImageFile": "greek1516_Page_162_Line31.gt.tif",
-        "PageLineTextFile": "greek1516_Page_162_Line31.gt.txt",
+        "PageLineTextFile": "greek1516_Page_162_Line34.gt.txt",
         "StartBook": "Luk",
         "StartChapter": "14",
-        "StartVerse": "12",
+        "StartVerse": "13",
         "": ""
     },
     {
         "Page": "162",
         "PageLine": "32",
         "PageLineImageFile": "greek1516_Page_162_Line32.gt.tif",
-        "PageLineTextFile": "greek1516_Page_162_Line32.gt.txt",
+        "PageLineTextFile": "greek1516_Page_162_Line35.gt.txt",
         "StartBook": "Luk",
         "StartChapter": "14",
-        "StartVerse": "12",
+        "StartVerse": "14",
         "": ""
     },
     {
         "Page": "162",
         "PageLine": "33",
         "PageLineImageFile": "greek1516_Page_162_Line33.gt.tif",
-        "PageLineTextFile": "greek1516_Page_162_Line33.gt.txt",
+        "PageLineTextFile": "greek1516_Page_162_Line36.gt.txt",
         "StartBook": "Luk",
         "StartChapter": "14",
-        "StartVerse": "12",
+        "StartVerse": "14",
         "": ""
     },
     {
@@ -62434,7 +62434,7 @@
         "PageLine": "35",
         "PageLineImageFile": "greek1516_Page_162_Line35.gt.tif",
         "PageLineTextFile": "",
-        "StartBook": "",
+        "StartBook": "Luk",
         "StartChapter": "",
         "StartVerse": "",
         "": ""
@@ -62444,7 +62444,7 @@
         "PageLine": "36",
         "PageLineImageFile": "greek1516_Page_162_Line36.gt.tif",
         "PageLineTextFile": "",
-        "StartBook": "",
+        "StartBook": "Luk",
         "StartChapter": "",
         "StartVerse": "",
         "": ""

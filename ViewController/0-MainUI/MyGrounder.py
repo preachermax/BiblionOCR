@@ -32,6 +32,7 @@ import json
 import shutil
 from decimal import Decimal
 from tempfile import NamedTemporaryFile
+import platform
 
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
@@ -197,7 +198,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         # Reference
-        ChrRefText = open('c:/users/max/Projects/BiblionOCR/ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='utf-8').read()
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='utf-8').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 
         # Restore Session settings
@@ -250,16 +251,30 @@ class Ui_MainWindow(qtw.QMainWindow):
         # get session settings
         # Define json data        
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json') as f:
+        with open('Model/Project/Data/json/GrounderSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
             # Set json key values
+            linuxhomedir_key = r'self.linuxhomedir'
+            linuxuser_key = r'self.linuxuser'
+            linuxuserdir_key = r'self.linuxuserdir'
+            windowshomedir_key = r'self.windowshomedir'
+            windowsuser_key = r'self.windowsuser'
+            windowsuserdir_key = r'self.windowsuserdir'
+            macoshomedir_key = r'self.macoshomedir'
+            macosuser_key = r'self.macosuser'
+            macosuserdir_key = r'self.macosuserdir'
+            projectsdir_key = r'self.projectsdir'
+            projectname_key = r'self.projectname'  
             ocrlang_key = r"self.ocrlang"
             ocrmodel_key = r"self.ocrmodel"
-            tessdatadir_key = r"self.tessdatadir"
-            tesseract_key = r"self.tesserac"
-            tesstrain_key = r"self.tesstrain"
+            linuxtessdatadir_key = r"self.linuxtessdatadir"
+            linuxtesseract_key = r"self.linuxtesseract"
+            linuxtesstrain_key = r"self.linuxtesstrain"
+            windowstessdatadir_key = r"self.windowstessdatadir"
+            windowstesseract_key = r"self.windowstesseract"
+            windowstesstrain_key = r"self.windowstesstrain"
             bookabbr_key = r"self.bookabbr"
             font_key = r"self.font"
             fontsize_key = r"self.fontsize"
@@ -304,18 +319,40 @@ class Ui_MainWindow(qtw.QMainWindow):
             for Setting in data:
                 print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
                 
+                if Setting['Setting'] == linuxhomedir_key:
+                    self.linuxhomedir = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxuser_key:
+                    self.linuxuser = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxuserdir_key:
+                    self.linuxuserdir = Setting['CurrentValue']                
+                elif Setting['Setting'] == windowshomedir_key:
+                    self.windowshomedir = Setting['CurrentValue']
+                elif Setting['Setting'] == windowsuser_key:
+                    self.windowsuser = Setting['CurrentValue']
+                elif Setting['Setting'] == windowsuserdir_key:
+                    self.windowsuserdir = Setting['CurrentValue']
+                elif Setting['Setting'] == projectsdir_key:
+                    self.projectsdir = Setting['CurrentValue']
+                elif Setting['Setting'] == projectname_key:
+                    self.projectname = Setting['CurrentValue']
                 if Setting['Setting'] == ocrlang_key:
                     self.ocrlang = Setting['CurrentValue']
                     self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
                 elif Setting['Setting'] == ocrmodel_key:
                     self.ocrmodel = Setting['CurrentValue']
                     self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == tessdatadir_key:
-                    self.tessdatadir = Setting['CurrentValue']
-                elif Setting['Setting'] == tesseract_key:
-                    self.tesseract = Setting['CurrentValue']
-                elif Setting['Setting'] == tesstrain_key:
-                    self.tesstrain = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxtessdatadir_key:
+                    self.linuxtessdatadir = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxtesseract_key:
+                    self.linuxtesseract = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxtesstrain_key:
+                    self.linuxtesstrain = Setting['CurrentValue']
+                elif Setting['Setting'] == windowstessdatadir_key:
+                    self.windowstessdatadir = Setting['CurrentValue']
+                elif Setting['Setting'] == windowstesseract_key:
+                    self.windowstesseract = Setting['CurrentValue']
+                elif Setting['Setting'] == windowstesstrain_key:
+                    self.windowstesstrain = Setting['CurrentValue']
                 elif Setting['Setting'] == bookabbr_key:  
                     self.bookabbr = Setting['CurrentValue']
                 elif Setting['Setting'] == font_key:
@@ -400,11 +437,36 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.gtreview = Setting['CurrentValue']
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
+            
+            if platform.system() == 'Linux':
+                self.homedir = self.linuxhomedir
+                self.user = self.linuxuser
+                self.userdir = self.linuxuserdir
+                self.tessdatadir = self.linuxtessdatadir
+                self.tesseract = self.linuxtesseract
+                self.tesstrain = self.linuxtesstrain
+            elif platform.system() == 'Windows':
+                self.homedir = self.windowshomedir
+                self.user = self.windowsuser
+                self.userdir = self.windowsuserdir
+                self.tessdatadir = self.windowstessdatadir
+                self.tesseract = self.windowstesseract
+                self.tesstrain = self.windowstesstrain
+            elif platform.system() == 'MacOS':
+                self.homedir = self.macoshomedir
+                self.user = self.macosuser
+                self.userdir = self.macosuserdir
+            else:
+                self.homedir = r'.'
+                self.user = r'/'
+                self.userdir = r'./'
+
+            print(f'Absolute Path to User Directory: {self.userdir}') 
     
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/SQLite/json/Workflow.json') as f:
+        with open('Model/Project/SQLite/json/Workflow.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -418,9 +480,9 @@ class Ui_MainWindow(qtw.QMainWindow):
         f.close()
 
     def get_xref_last_image(self):
-        imgdir = "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
-        xrefjsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json'
-        markdownjsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+        imgdir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
+        xrefjsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
+        markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
         with open(xrefjsonfile, 'r') as f:
             data = json.load(f)
             # Iterating through the json LineImageFiles
@@ -457,7 +519,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     
 # Line image functions
     def setImageStack(self, tiffCaptureHandle):
-        """ Set the scene'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json current TIFF image stack to the input TiffCapture object.
+        """ Set the scene'Model/Project/Data/json/PageVerseCrossReference.json current TIFF image stack to the input TiffCapture object.
         Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
         :type tiffCaptureHandle: TiffCapture
         """
@@ -523,7 +585,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     
     def loadImage(self):
         self.imgpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Select Image', "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/", 'Image Files (*.png *.jpg *.jpeg *.tif *.bmp)')[0]
+            self.ui.centralwidget, 'Select Image', "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/", 'Image Files (*.png *.jpg *.jpeg *.tif *.bmp)')[0]
         self.getImage(self.imgpath)   
             
         #moved to getImage()
@@ -572,6 +634,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         #self.sortImgFiles()
         self.autoScan()
 
+    '''
     def setFwdImgDirIterator(self):
         self.imgdirIterator = iter(self.sorted_imgfilelist)
         #print(f'Image Directory Iterator: {list(self.imgdirIterator)}')
@@ -587,15 +650,30 @@ class Ui_MainWindow(qtw.QMainWindow):
             # cycle through the reverse iterator until the current file is found
             if it == self.imgpath:
                 break
-    
+    '''
+
     def sortImgFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
         self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
         
-        self.setFwdImgDirIterator()
-        self.setRevImgDirIterator()
+        #self.setFwdImgDirIterator()
+        #self.setRevImgDirIterator()
 
+    
+    def nextImage(self):
+        if self.imgpath:
+            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) + 1) % len(self.sorted_imgfilelist)]
+            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
+            self.getImage(self.imgpath)
+    
+    def prevImage(self):
+        if self.imgpath:
+            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) - 1) % len(self.sorted_imgfilelist)]
+            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
+            self.getImage(self.imgpath)
+       
+    '''
     def nextImage(self):
         if self.imgpath:    
             for it in self.imgdirIterator:
@@ -620,7 +698,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         else:
             self.loadImage()
 
-        '''if self.imgpath:
+        if self.imgpath:
             try:
                 self.imgpath = next(self.imgdirRevIterator)
                 self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
@@ -631,8 +709,8 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.setRevImgDirIterator()
                 self.nextImage()
         else:
-            self.loadImage()'''
-
+            self.loadImage()
+        '''
 # Line text Functions
     def loadDropTextEvent(self,file_path):
         self.textpath = file_path
@@ -645,7 +723,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadText(self):
 
         self.textpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Open text file', 'c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+            self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
     
         self.getText(self.textpath)
 
@@ -706,7 +784,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Update Book comboBox
         bookdirsplit = self.txtdirname.split("/")
         print(f'book directory split: {bookdirsplit}')
-        bookdir = bookdirsplit[11]
+        bookdir = bookdirsplit[6]
         print(f'Text directory path: {self.txtdirname}  book directory: {bookdir}')
         dirsplit = bookdir.split("_")
         
@@ -728,7 +806,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.verseAutoSeek()
         except:
             print("verseAutoSeek out of range error")
-
+    '''
     def setFwdTxtDirIterator(self):
         self.txtdirIterator = iter(self.sorted_txtfilelist)
         #print(f'Text Directory Iterator: {list(self.txtdirIterator)}')
@@ -745,16 +823,29 @@ class Ui_MainWindow(qtw.QMainWindow):
             # cycle through the reverse iterator until the current file is found
             #print(f'Image Directory Reverse Iterator: {list(self.txtdirRevIterator)}')
             if it == self.textpath:
-                break
+                break'''
 
     def sortTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
         self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)     
         
-        self.setFwdTxtDirIterator()
-        self.setRevTxtDirIterator()
+        #self.setFwdTxtDirIterator()
+        #self.setRevTxtDirIterator()
 
+    def nextText(self):
+        if self.textpath:
+            self.textpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.textpath) + 1) % len(self.sorted_txtfilelist)]
+            self.ui.TextFileName.setText(os.path.basename(self.textpath))
+            self.getText(self.textpath)
+
+    def prevText(self):
+        if self.textpath:
+            self.textpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.textpath) - 1) % len(self.sorted_txtfilelist)]
+            self.ui.TextFileName.setText(os.path.basename(self.textpath))
+            self.getText(self.textpath)
+    
+    '''
     def nextText(self):
         if self.textpath:
             for it in self.txtdirIterator:
@@ -773,12 +864,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.ui.TextFileName.setText(os.path.basename(self.textpath))
                     self.getText(self.textpath)
                 else:
-                    self.loadText()
+                    self.loadText()'''
    
     def syncText2Image(self):
-        imgdir = "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
-        xrefjsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json'
-        markdownjsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+        imgdir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
+        xrefjsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
+        markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
         bookAbbr = self.bookabbr
         if self.imgpath:
             filestr = os.path.basename(self.imgpath)
@@ -866,13 +957,13 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def discardImage(self):
         print('Discard Line Image File')
-        discarddir = "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_discard/"
+        discarddir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_discard/"
         imgfile = self.ui.ImageFileName.displayText()
         shutil.move(os.path.join(self.imgdirname, imgfile), discarddir)
         self.gtvalid = False
         imagefile = self.ui.ImageFileName.displayText()
         ######################## Remove json entry
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json'
+        jsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -918,7 +1009,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
                 except Exception as e:
-                    print('Failed to delete %c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json. Reason: %c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
+                    print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
             
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
@@ -968,7 +1059,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+            with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1028,7 +1119,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
                 except Exception as e:
-                    print('Failed to delete %c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json. Reason: %c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
+                    print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
             
 
             # Stage Renamed Files
@@ -1108,7 +1199,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+            with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1142,7 +1233,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+            with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1178,7 +1269,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.stagegreeklines_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def SaveImgFileDialog(self):
-        dirpath = "c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
+        dirpath = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
         imgname = os.path.basename(self.imgfilename)
         imgfilepath = os.path.join(dirpath,imgname)
         print(imgname,"\t",imgfilepath)
@@ -1205,7 +1296,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
         #defaultdir = r"c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/"
-        defaultdir = r"c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/" + self.greekbookmarkdown + "/"
+        defaultdir = r"Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/" + self.greekbookmarkdown + "/"
        
         
         defaultfile = self.ui.TextFileName.displayText()
@@ -1224,7 +1315,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def discardText(self):        
         print('Discard Line Text File')
-        discarddir = "c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_discard"
+        discarddir = "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_discard"
         txtfile = self.ui.TextFileName.displayText()
         shutil.move(os.path.join(self.txtdirname, txtfile), discarddir)
         self.gtvalid = False
@@ -1260,7 +1351,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
                 except Exception as e:
-                    print('Failed to delete %c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json. Reason: %c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
+                    print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
             
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
@@ -1313,7 +1404,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+                with open('Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1441,7 +1532,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.ui.OCRAccuracyLineEdit.clear()
             self.ui.OCRAccuracyLineEdit.setText('0.00')
 
-        '''jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json'
+        '''jsonfile = 'Model/Project/Data/json/GrounderSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1466,7 +1557,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1479,7 +1570,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(self.bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json'
+            jsonfile = 'Model/Project/Data/json/GrounderSession.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1507,7 +1598,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -1529,7 +1620,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadChapterCombo(self):
         self.ui.StartchapterComboBox.clear()
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapter.json') as f:
+        with open('Model/Project/Data/json/BookChapter.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1549,7 +1640,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.StartverseComboBox.clear()
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1586,7 +1677,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # cycle through the reverse iterator until the current file is found
             if next(self.pagedirRevIterator) == self.pagetextpath:
                 break
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json'
+        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1669,7 +1760,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.pagetextpath = self.pagetextdir + "/" + self.greekbookmarkdown + "/" + versionref + "_" + "Page" + "_" + self.pagenumstr + fileext
         print(f'Page text file path: {self.pagetextpath}')
         
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json'
+        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1800,7 +1891,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     
     def updatesession(self):
 
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json'
+        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1864,8 +1955,8 @@ class Ui_MainWindow(qtw.QMainWindow):
             print(f'Line string to find in Verse text: {linestr}')
             print(f'Length of Line string to find in Verse text: {lenstr}')
             #print(f'Find direction = {self.findirection}')
-            # Save this 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json' string for troubleshooting:
-            # c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json = "ΙΒΛΟΣ γενέ"
+            # Save this 'Model/Project/Data/json/PageVerseCrossReference.json' string for troubleshooting:
+            # Model/Project/Data/json/PageVerseCrossReference.json = "ΙΒΛΟΣ γενέ"
 
             ### FIND ENTIRE LINE
             start = versetext.find(linestr)
@@ -1997,7 +2088,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.reconnectStartComboBoxes()
             return
         
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/GrounderSession.json'
+        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2054,7 +2145,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             return sorted(data, key=alphanum_key)
             #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
-        path_of_images = r'c:/users/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_lines_renamed/'
+        path_of_images = r'Model/Project/Images/Complete/Greek/tif_greek_lines_renamed/'
 
         list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
 
@@ -2088,7 +2179,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 #print(versionref,pagenum,linestr)
                 print(f"namesplit: {namesplit} versionref: {versionref} pagestr: {pagestr} pagenum: {pagenum} linenum: {linenum}")
 
-                with open(r'c:/users/max/Projects/BiblionOCR/Model/Project/Data/csv/PageVerseCrossReference.csv', 'a', newline='') as csvfile:
+                with open(r'Model/Project/Data/csv/PageVerseCrossReference.csv', 'a', newline='') as csvfile:
                     fieldnames = ['LineImageFile','ImgPageNum','ImgPageLineNum','LineTextFile','LineText','Valid','ReviewComplete','StartBook','StartChapter','StartVerse','OCRAccuracy']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writerow({'LineImageFile':filestr,'ImgPageNum':pagenum,'ImgPageLineNum':linenum,'LineTextFile':'','LineText':'','Valid':'False','ReviewComplete':'False','StartBook':'','StartChapter':'','StartVerse':'','OCRAccuracy':'0'})
@@ -2101,7 +2192,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             return sorted(data, key=alphanum_key)
             #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
-        path_of_images = r'c:/users/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/'
+        path_of_images = r'Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/'
 
         list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
 
@@ -2156,7 +2247,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         linenum = int(linestr)
 
         print('updating page verse cross reference')
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json'
+        jsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2206,7 +2297,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             linestr = namesplit[3].replace('Line','')
             linenum = int(linestr)
             
-            XReffile = r'c:/users/max/Projects/BiblionOCR/Model/Project/Data/csv/PageVerseCrossReference.csv'
+            XReffile = r'Model/Project/Data/csv/PageVerseCrossReference.csv'
             tempfile = NamedTemporaryFile(mode='w', delete=False)
             
             fields = ['LineImageFile','ImgPageNum','ImgPageLineNum','LineTextFile','LineText','Valid','ReviewComplete','StartBook','StartChapter','StartVerse','OCRAccuracy']
@@ -2274,7 +2365,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             chapter = self.ui.StartchapterComboBox.currentText()
             verse = self.ui.StartverseComboBox.currentText()
             
-            self.xref_df = pd.read_json('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json')
+            self.xref_df = pd.read_json('Model/Project/Data/json/PageVerseCrossReference.json')
             self.xref_table_df = self.xref_df[["Page","PageLine","StartBook","StartChapter","StartVerse"]]
             
             # Initialize comboBoxes
@@ -2302,7 +2393,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             chapter = self.PVXrefDialog_ui.StartchapterComboBox.currentText()
             verse = self.PVXrefDialog_ui.StartverseComboBox.currentText()'''
         
-            #df = pd.read_json('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PageVerseCrossReference.json')
+            #df = pd.read_json('Model/Project/Data/json/PageVerseCrossReference.json')
             #table_df = df[["Page","PageLine","StartBook","StartChapter","StartVerse"]]
             
             #self.PVXrefDialog_ui.LinefindPushButton.clicked.connect(pagefilter(page))

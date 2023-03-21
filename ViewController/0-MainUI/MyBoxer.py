@@ -10,6 +10,7 @@ import sys
 #from tempfile import NamedTemporaryFile
 import pandas as pd
 import json
+import platform
 
 #from ImageQt import ImageQt  
 import cv2
@@ -225,10 +226,10 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.BoxText.setDocument(self.ui.BoxDocument)
 
-        #ChrRefText = open('/home/jetson/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        #ChrRefText = open(self.userdir + '/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 
-        #self.imgdir = r"/home/jetson/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
+        #self.imgdir = r"Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
 
         # Restore BoxerSession settings
         self.get_session_settings()
@@ -303,25 +304,38 @@ class MainWindow(qtw.QMainWindow):
 
     def get_session_settings(self):
         # get session settings
+        self.homedir = '/home'
+        self.user = '/jetson'
+        self.userdir = '/home/jetson'
+        
         # Define json data        
         print("loading session")
-        with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json') as f:
+        #with open(self.userdir + '/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json') as f:
+        with open('Model/Project/Data/json/BoxerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
             # Set json key values
+            linuxhomedir_key = r'self.linuxhomedir'
+            linuxuser_key = r'self.linuxuser'
+            linuxuserdir_key = r'self.linuxuserdir'
+            windowshomedir_key = r'self.windowshomedir'
+            windowsuser_key = r'self.windowsuser'
+            windowsuserdir_key = r'self.windowsuserdir'
+            macoshomedir_key = r'self.macoshomedir'
+            macosuser_key = r'self.macosuser'
+            macosuserdir_key = r'self.macosuserdir'
+            projectsdir_key = r'self.projectsdir'
+            projectname_key = r'self.projectname'      
+            font_key = r"self.font"
+            fontsize_key = r"self.fontsize"
             ocrlang_key = r"self.ocrlang"
             ocrmodel_key = r"self.ocrmodel"
-            tessdatadir_key = r"self.tessdatadir"
-            tesseract_key = r"self.tesserac"
-            tesstrain_key = r"self.tesstrain"
             bookabbr_key = r"self.bookabbr"
             chapter_key = r"self.chapter"
             verse_key = r"self.verse"
             word_key = r"self.word"
             chr_key = r"self.chr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
             linespacing_key = r"self.linespacing"
             source_book_markdown_key = r"self.sourcebookmarkdown"
             greek_book_markdown_key = r"self.greekbookmarkdown"
@@ -361,19 +375,34 @@ class MainWindow(qtw.QMainWindow):
             # Define session variables from json key values
             for Setting in data:
                 print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                
-                if Setting['Setting'] == ocrlang_key:
+                if Setting['Setting'] == linuxhomedir_key:
+                    self.linuxhomedir = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxuser_key:
+                    self.linuxuser = Setting['CurrentValue']
+                elif Setting['Setting'] == linuxuserdir_key:
+                    self.linuxuserdir = Setting['CurrentValue']                
+                elif Setting['Setting'] == windowshomedir_key:
+                    self.windowshomedir = Setting['CurrentValue']
+                elif Setting['Setting'] == windowsuser_key:
+                    self.windowsuser = Setting['CurrentValue']
+                elif Setting['Setting'] == windowsuserdir_key:
+                    self.windowsuserdir = Setting['CurrentValue']
+                elif Setting['Setting'] == projectsdir_key:
+                    self.projectsdir = Setting['CurrentValue']
+                elif Setting['Setting'] == projectname_key:
+                    self.projectname = Setting['CurrentValue']
+                elif Setting['Setting'] == font_key:
+                    self.font = Setting['CurrentValue']
+                    self.ui.fontComboBox.setCurrentText(self.font)
+                elif Setting['Setting'] == fontsize_key:
+                    self.fontsize = Setting['CurrentValue']
+                    self.ui.fontSizeBox.setValue(int(self.fontsize))
+                elif Setting['Setting'] == ocrlang_key:
                     self.ocrlang = Setting['CurrentValue']
                     self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
                 elif Setting['Setting'] == ocrmodel_key:
                     self.ocrmodel = Setting['CurrentValue']
                     self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == tessdatadir_key:
-                    self.tessdatadir = Setting['CurrentValue']
-                elif Setting['Setting'] == tesseract_key:
-                    self.tesseract = Setting['CurrentValue']
-                elif Setting['Setting'] == tesstrain_key:
-                    self.tesstrain = Setting['CurrentValue']
                 elif Setting['Setting'] == bookabbr_key:  
                     self.bookabbr = Setting['CurrentValue']
                     self.ui.bookComboBox.setCurrentText(self.bookabbr)            
@@ -385,12 +414,6 @@ class MainWindow(qtw.QMainWindow):
                     self.word = Setting['CurrentValue'] 
                 elif Setting['Setting'] == chr_key:
                     self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                    self.ui.fontComboBox.setCurrentText(self.font)
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']
-                    self.ui.fontSizeBox.setValue(int(self.fontsize))           
                 elif Setting['Setting'] == linespacing_key:
                     self.linespacing = Setting['CurrentValue']
                     self.ui.LHlineEdit.setText(self.linespacing)
@@ -455,11 +478,29 @@ class MainWindow(qtw.QMainWindow):
                 
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
+            if platform.system() == 'Linux':
+                self.homedir = self.linuxhomedir
+                self.user = self.linuxuser
+                self.userdir = self.linuxuserdir
+            elif platform.system() == 'Windows':
+                self.homedir = self.windowshomedir
+                self.user = self.windowsuser
+                self.userdir = self.windowsuserdir
+            elif platform.system() == 'MacOS':
+                self.homedir = self.macoshomedir
+                self.user = self.macosuser
+                self.userdir = self.macosuserdir
+            else:
+                self.homedir = r'.'
+                self.user = r'/'
+                self.userdir = r'./'
 
+            print(f'Absolute Path to User Directory: {self.userdir}')           
+    
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('/home/jetson/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
+        with open('Model/SQLite/json/Workflow.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -556,7 +597,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+                with open('Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -651,7 +692,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+            with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -839,7 +880,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+                with open('Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -945,7 +986,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+                with open('Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1031,7 +1072,7 @@ class MainWindow(qtw.QMainWindow):
         print("renaming Greek textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
         #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
-        tr.text2groundtruth(r"/home/jetson/Projects/BiblionOCR/Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/BiblionOCR/Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/")
+        tr.text2groundtruth(r"Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/", "Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/")
     
     def actionSplit_Latin_Text_Lines(self):
         print("splitting Latin textlines for ground truth")
@@ -1048,7 +1089,7 @@ class MainWindow(qtw.QMainWindow):
     def initBookCombo(self):
 
         # Opening JSON file
-        with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+        with open('Model/Project/Data/json/BooksAbbrName.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1092,7 +1133,7 @@ class MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = '/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1105,7 +1146,7 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = '/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json'
+            jsonfile = 'Model/Project/Data/json/BoxerSession.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1189,7 +1230,7 @@ class MainWindow(qtw.QMainWindow):
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
     
     def loadImage(self):
-        imgdir = "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow"     
+        imgdir = "Model/Project/Images/Workflow"     
         self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
         self.getImage(self.imgpath)
     
@@ -1232,7 +1273,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.imgdir = os.path.dirname(self.imgpath)
 
-        jsonfile = '/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json'
+        jsonfile = 'Model/Project/Data/json/BoxerSession.json'
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1409,8 +1450,8 @@ class MainWindow(qtw.QMainWindow):
     def loadText(self):
 
         self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Open text file', '/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-    
+            self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+        print(f'self.txtpath: {self.txtpath}')
         self.getText(self.txtpath)
 
     def getText(self,textpath):
@@ -1459,7 +1500,7 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = '/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json'
+        jsonfile = 'Model/Project/Data/json/BoxerSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1673,11 +1714,11 @@ class MainWindow(qtw.QMainWindow):
         file.close()
 
     def OpenProjectExplorer(self):
-        mw_cmd = "python3 /home/jetson/Projects/BiblionOCR/ViewController/Application/0-MainUI/ProjectBrowser.py"
+        mw_cmd = "python3 ViewController/Application/0-MainUI/ProjectBrowser.py"
         print(mw_cmd)
         os.system(mw_cmd)
         '''newapp = qtw.QApplication([])
-        dirPath = r'/home/jetson/Projects/BiblionOCR/'
+        dirPath = rself.userdir + '/Projects/BiblionOCR/'
         self.explorer = qtw.QMainWindow()
         self.ui = Ui_Explorer()
         self.ui.setupUi(self.explorer)
@@ -1687,13 +1728,13 @@ class MainWindow(qtw.QMainWindow):
         newapp.exec_()'''
     
     def OpenWithMyPixler(self):
-        mw_cmd = "python3 /home/jetson/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyPixler.py"
+        mw_cmd = "python3 ViewController/Application/0-MainUI/MyPixler.py"
         print(mw_cmd)
         os.system(mw_cmd)
 
     def OpenWithMyWriter(self):
         
-        mw_cmd = "python3 /home/jetson/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        mw_cmd = "python3 ViewController/Application/0-MainUI/MyWriter.py"
         print(mw_cmd)
         os.system(mw_cmd)
         '''
@@ -1727,7 +1768,7 @@ class MainWindow(qtw.QMainWindow):
         filename = filesplit[0]
         fileext = filesplit[1]
 
-        self.charboxcsvdir = "/home/jetson/Projects/BiblionOCR/Model/Project/Data/csv/"
+        self.charboxcsvdir = "Model/Project/Data/csv/"
         charboxcsvpath = self.charboxcsvdir + filename + r"_charbox.csv"
 
         '''scale_percent = 25 # percent of original size
@@ -1746,7 +1787,7 @@ class MainWindow(qtw.QMainWindow):
 
         draw = ImageDraw.Draw(pil_im)  
         # use a truetype font
-        font = ImageFont.truetype("/home/jetson/Projects/BiblionOCR/ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8) 
+        font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8) 
         #font = ImageFont.truetype("FROMVS.ttf", 20)  
 
         # Draw the text  
@@ -1779,7 +1820,7 @@ class MainWindow(qtw.QMainWindow):
             self.ui.BoxText.clear()
             self.ui.BoxText.insertPlainText(file_.read())
             self.ui.TextLE.setText(f"{filename}_charbox.txt")
-        self.charboximagepath = f"/home/jetson/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_charbox.tif"
+        self.charboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_charbox.tif"
         self.charboximage = pil_im.save(self.charboximagepath) 
         self.ui.ImageLe.setText(f"{filename}_charbox.tif")
         self.showImage(self.charboximagepath)
@@ -1802,7 +1843,7 @@ class MainWindow(qtw.QMainWindow):
         filename = filesplit[0]
         fileext = filesplit[1]
 
-        self.wordboxcsvdir = "/home/jetson/Projects/BiblionOCR/Model/Project/Data/csv/"
+        self.wordboxcsvdir = "Model/Project/Data/csv/"
         wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
 
         '''scale_percent = 25 # percent of original size
@@ -1843,7 +1884,7 @@ class MainWindow(qtw.QMainWindow):
             self.ui.BoxText.clear()
             self.ui.BoxText.insertPlainText(file_.read())
             self.ui.TextLE.setText(f"{filename}_wordbox.txt")
-        self.wordboximagepath = f"/home/jetson/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
+        self.wordboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
         self.wordboximage = pil_im.save(self.wordboximagepath) 
         self.ui.ImageLe.setText(f"{filename}_wordbox.tif")
         self.showImage(self.wordboximagepath)
@@ -1858,7 +1899,7 @@ class MainWindow(qtw.QMainWindow):
 
     def word2linebox(self):
         filename = "greek1516_Page_082"
-        self.wordboxcsvdir = "/home/jetson/Projects/BiblionOCR/Model/Project/Data/csv/"
+        self.wordboxcsvdir = "Model/Project/Data/csv/"
         wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
         with open(wordboxcsvpath, mode='r') as file_:
             self.ui.BoxText.clear()
@@ -2032,11 +2073,11 @@ class MainWindow(qtw.QMainWindow):
         insertBButton.setIcon(insertBIcon)
         deleteButton = popup.addButton('Delete Row', qtw.QMessageBox.RejectRole)
         deleteIcon = qtg.QIcon()
-        deleteIcon.addPixmap(qtg.QPixmap("/home/jetson/Projects/BiblionOCR/ViewController/Application/0-MainUI/Icons/cross-small.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        deleteIcon.addPixmap(qtg.QPixmap("ViewController/Application/0-MainUI/Icons/cross-small.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         deleteButton.setIcon(deleteIcon)
         cancelButton = popup.addButton('Cancel', qtw.QMessageBox.RejectRole)
         #cancelIcon = qtg.QIcon()
-        #cancelIcon.addPixmap(qtg.QPixmap("/home/jetson/Projects/BiblionOCR/ViewController/Application/0-MainUI/Icons/cross-small.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        #cancelIcon.addPixmap(qtg.QPixmap("ViewController/Application/0-MainUI/Icons/cross-small.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         #cancelButton.setIcon(cancelIcon)
         popup.exec()
         if popup.clickedButton() == mouseButton:
@@ -2081,6 +2122,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.ZoomComboBox.setCurrentText('11 %')        
         self.ui.BoxTable.setSortingEnabled(True)
         self.on_rowSelection()
+        self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_rowSelectionChanged)
 
     def BoxTable2csv(self):
         self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
@@ -2177,7 +2219,7 @@ class MainWindow(qtw.QMainWindow):
             if popup.clickedButton() == qtw.QMessageBox.Ok:
                 pass
         else:
-            self.on_rowSelectionChanged
+            self.on_rowSelectionChanged()
         
     def deleteRow(self):
         row = self.ui.BoxTable.currentRow()
@@ -2447,6 +2489,7 @@ class MainWindow(qtw.QMainWindow):
             #cellvalue = self.ui.BoxTable.cellWidget(row, column).value()
             #print(f'Cell SpinBox Widget Value: {cellvalue}')
             #cellvalue = self.ui.BoxTable.spinbox.value
+        #self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_rowSelectionChanged)
 
     def json2csv(self, csvFilePath, jsonFilePath):
         columns = ['Line','X','Y','W','H','X+W','Y+H']
@@ -2567,7 +2610,7 @@ class MainWindow(qtw.QMainWindow):
         # Save Line Image
         roi = self.norm[y:y+h, x:x+w]
         self.saveimgline(roi,self.line)
-        self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_rowSelectionChanged)
+        #self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_rowSelectionChanged)
 
     def drawRbLineBox(self,x,y,w,h):    
         if self.mode == "RbEdit":
@@ -2628,7 +2671,8 @@ class MainWindow(qtw.QMainWindow):
         roi = self.norm[self.yval:self.yval+self.hval, self.xval:self.xval+self.wval]
         self.saveimgline(roi,self.line)
         self.ui.BoxTable.setSortingEnabled(True)
-        self.ui.actionDraw_Table_LineBox_tb.triggered.disconnect(self.putSbLineBox())    
+        self.ui.actionDraw_Table_LineBox_tb.triggered.disconnect(self.putSbLineBox())
+        #self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_rowSelectionChanged)    
 
     def resetLineBox(self):
         # Draw/Redraw white LineBox
@@ -2773,7 +2817,7 @@ class MainWindow(qtw.QMainWindow):
                     self.currh = int(cellvalue)
             print(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh}')
             print(f'Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}')
-            self.ui.BoxTable.selectionModel().selectionChanged.connect(self.getSpinBox)
+        #self.ui.BoxTable.selectionModel().selectionChanged.connect(self.getSpinBox)
             
     # Edit LineBox Method
     def linebox_edit_split(self):
@@ -2792,6 +2836,7 @@ class MainWindow(qtw.QMainWindow):
             popup.exec()
             if popup.clickedButton() == currentButton:
                 pass
+                
             elif popup.clickedButton() == otherButton:
                 self.ui.ImageLe.clear()
                 self.ui.Image.clear()
