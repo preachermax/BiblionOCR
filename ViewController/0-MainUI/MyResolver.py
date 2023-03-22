@@ -8,7 +8,7 @@ import UI_Icons
 #import Qt5ResolveVariants as resolver
 
 app = QtWidgets.QApplication([])
-varui = uic.loadUi("c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/QtDesignerUI/MyResolverUI.ui")
+varui = uic.loadUi("ViewController/0-MainUI/QtDesignerUI/MyResolverUI.ui")
 
 def main():
     print("working")
@@ -41,7 +41,7 @@ def main():
     varui.allRadButton.clicked.connect(loadTableView)
 
 def loadTableView(rowid):
-    helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+    helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
     
     varui.VarianceTable.setRowCount(0)
     
@@ -69,7 +69,7 @@ def loadTableView(rowid):
 
 def loadVarWordsCombo():
     #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-    helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/TRiBibleWords.db")
+    helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
     varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
     #print(varwords)
 
@@ -82,7 +82,7 @@ def selectVarWordsCombo():
     
     selvarword = varui.VarWordSelCombo.currentText()
     #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-    helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/TRiBibleWords.db")
+    helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
     varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
     
     # This is only a partial solution.  It locks onto the first match only.
@@ -98,7 +98,7 @@ def selectVarWordsCombo():
     varui.LemmaLE.setText(varfields[3])
     
 def resolved():
-    conn_TR = sqlite3.connect('c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db')
+    conn_TR = sqlite3.connect('Model/Project/Data/SQLite/FROMVS.db')
     print ("Opened the database successfully")
 
     cursor_TR = conn_TR.cursor()
@@ -268,7 +268,7 @@ def updateone():
     
     rownum = getSelectedRowId() +1
 
-    helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+    helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
     # varwords = helper.select("SELECT * FROM Variants")
     
     print(varword,"\t",strong,"\t",rmac,"\t",lemma,"\t",varcode,"\t",rownum)
@@ -338,7 +338,7 @@ def updatesim():
     
     rownum = getSelectedRowId() +1
 
-    helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+    helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
     # varwords = helper.select("SELECT * FROM Variants")
     
     print(varword,"\t",strong,"\t",rmac,"\t",lemma,"\t",varcode,"\t",rownum)
@@ -353,7 +353,7 @@ def updatesim():
 
 def updatebible():
     updateone()
-    helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+    helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
     #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRiBibleWords.db")
    
     query = '''SELECT Line,WordNum,NoDiaWord,VarWord,Strong,RMAC,Lemma,VarCode FROM Variants WHERE Preserved = "1"'''

@@ -161,7 +161,7 @@ class PixlerMain(qtw.QMainWindow):
         # get session settings
         # Define json data
         print("importing Scanner session settings: imgpath and imgdir")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/ScannerSession.json') as f:
+        with open('Model/Project/Data/json/ScannerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
@@ -180,7 +180,7 @@ class PixlerMain(qtw.QMainWindow):
             f.close()
 
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PixlerSession.json') as f:
+        with open('Model/Project/Data/json/PixlerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
@@ -551,7 +551,7 @@ class PixlerMain(qtw.QMainWindow):
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
+        with open('Model/SQLite/json/Workflow.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -753,7 +753,7 @@ class PixlerMain(qtw.QMainWindow):
         
         self.refimgdir = os.path.dirname(imgfilename)
         self.ui.RefImgLE.setText(filestr)
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PixlerSession.json'
+        jsonfile = 'Model/Project/Data/json/PixlerSession.json'
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -831,7 +831,7 @@ class PixlerMain(qtw.QMainWindow):
         
         self.imagedir = os.path.dirname(imgfilename)
         self.ui.ImageLE.setText(filestr)
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/PixlerSession.json'
+        jsonfile = 'Model/Project/Data/json/PixlerSession.json'
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -952,7 +952,7 @@ class PixlerMain(qtw.QMainWindow):
             print("pdf page extraction complete")
         
 
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+            jsonfile = 'Model/Project/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1005,7 +1005,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+            with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1090,7 +1090,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1175,7 +1175,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1267,7 +1267,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1358,7 +1358,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1463,7 +1463,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1500,7 +1500,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1660,7 +1660,7 @@ class PixlerMain(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+                with open('Model/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1770,7 +1770,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1876,7 +1876,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1913,7 +1913,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -2006,7 +2006,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -2939,8 +2939,8 @@ class PixlerMain(qtw.QMainWindow):
 
     def actionGimpEdit(self):
         #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"
-        gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.refimgpath + " @@"
-        
+        #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.refimgpath + " @@"
+        gimp_cmd = "gimp " + self.imgpath
         '''if 'self.refimgpath' in locals():
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.refimgpath + " @@"
             print(self.refimgpath)

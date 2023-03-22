@@ -22,7 +22,7 @@ class Main(qtw.QMainWindow):
         self.txtpath = ""
         self.txtdir = ""
         self.filename = ""
-        self.iconsfolder = "c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/Icons"
+        self.iconsfolder = "ViewController/0-MainUI/Icons"
         self.changesSaved = True
 
         self.ui = Ui_MyWriterUI()
@@ -45,7 +45,7 @@ class Main(qtw.QMainWindow):
         # get session settings
         # Define json data        
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json') as f:
+        with open('Model/Project/Data/json/Session.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             

@@ -232,7 +232,7 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
-        ChrRefText = open('c:/users/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.initBookCombo()
@@ -329,7 +329,7 @@ class MainWindow(qtw.QMainWindow):
         # get session settings
         # Define json data        
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/ScannerSession.json') as f:
+        with open('Model/Project/Data/json/ScannerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
@@ -451,7 +451,7 @@ class MainWindow(qtw.QMainWindow):
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+        with open('Model/Project/Data/json/Workflow.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -467,7 +467,7 @@ class MainWindow(qtw.QMainWindow):
     def initBookCombo(self):
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+        with open('Model/Project/Data/json/BooksAbbrName.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -489,7 +489,7 @@ class MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -502,7 +502,7 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+            jsonfile = 'Model/Project/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -529,7 +529,7 @@ class MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -881,11 +881,11 @@ class MainWindow(qtw.QMainWindow):
                 
                 #self.get_session_settings()
                 
-                #with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/Session.json', 'w') as f:
+                #with open('Model/Data/json/Session.json', 'w') as f:
                     #json.dump(data, f, indent=2)
                 
 
-                jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+                jsonfile = 'Model/Project/Data/json/Session.json'
                 
                 with open(jsonfile, 'r') as f:
                     data = json.load(f)
@@ -957,7 +957,7 @@ class MainWindow(qtw.QMainWindow):
         
         self.imgdir = os.path.dirname(imgfilename)
         self.ui.ImageLe.setText(filestr)
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        jsonfile = 'Model/Project/Data/json/Session.json'
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1190,7 +1190,7 @@ class MainWindow(qtw.QMainWindow):
                 
                 file.close()
         
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1246,7 +1246,7 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1663,7 +1663,7 @@ class MainWindow(qtw.QMainWindow):
         
         # Uncomment below to open My Pixler in a dependent window => disables MyScanner until closed
         
-        #mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyPixler.py"
+        #mw_cmd = "python3 ViewController/0-MainUI/MyPixler.py"
         #print(mw_cmd)
         #os.system(mw_cmd)
 
@@ -1677,7 +1677,7 @@ class MainWindow(qtw.QMainWindow):
 
     def OpenWithMyWriter(self):
         # Uncomment below to open My Writer in a dependent window => disables MyScanner until closed
-        #mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        #mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
         #print(mw_cmd)
         #os.system(mw_cmd)
 

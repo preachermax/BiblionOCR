@@ -266,7 +266,7 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
-        ChrRefText = open('/home/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.initBookCombo()
@@ -344,7 +344,7 @@ class MainWindow(qtw.QMainWindow):
         # get session settings
         # Define json data        
         print("loading session")
-        with open('/home/max/Projects/BiblionOCR/Model/Data/json/Session.json') as f:
+        with open('Model/Project/Data/json/Session.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
@@ -465,7 +465,7 @@ class MainWindow(qtw.QMainWindow):
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('/home/max/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
+        with open('Model/SQLite/json/Workflow.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -481,7 +481,7 @@ class MainWindow(qtw.QMainWindow):
     def initBookCombo(self):
 
         # Opening JSON file
-        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+        with open('Model/Data/json/BooksAbbrName.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -503,7 +503,7 @@ class MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -516,7 +516,7 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+            jsonfile = 'Model/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -543,7 +543,7 @@ class MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+            '''with open('Model/Data/json/BooksAbbrName.json') as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -627,7 +627,7 @@ class MainWindow(qtw.QMainWindow):
             print("pdf page extraction complete")
         
 
-            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+            jsonfile = 'Model/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -680,7 +680,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -765,7 +765,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -850,7 +850,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -942,7 +942,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1026,7 +1026,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1135,7 +1135,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1172,7 +1172,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1332,7 +1332,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+                with open('Model/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1494,7 +1494,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1512,8 +1512,8 @@ class MainWindow(qtw.QMainWindow):
 
         rsp = self.greekmono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
+        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
 
     def actionDeskewGreek_tiff(self):
         print("deskewing Greek tiff files")
@@ -1600,7 +1600,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1637,7 +1637,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1656,8 +1656,8 @@ class MainWindow(qtw.QMainWindow):
         rsp = self.deskew_greekmonoDialog.exec_()
         
         
-        #dsk.deskewfiles("/home/max/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
-        #pp.deskewfiles("/home/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
+        #dsk.deskewfiles("/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
+        #pp.deskewfiles("/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
     
     def actionResizeGreek_png(self):
         print("resizing Greek png files")
@@ -1729,7 +1729,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1747,11 +1747,11 @@ class MainWindow(qtw.QMainWindow):
 
         rsp = self.greekresizepngDialog.exec_()
         print("completed resizing indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
+        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
 
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
+        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
+        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
 
     def actionConvert_Latin_tiff_To_png(self):
         print("creating indexed(BW) Latin png files")
@@ -1769,8 +1769,8 @@ class MainWindow(qtw.QMainWindow):
         if self.latinmono2pngDialog.Accepted:
             pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "/home/max/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
+        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
 
     def actionDeskewLatin_tiff(self):
         print("deskewing Latin tiff files")
@@ -1789,8 +1789,8 @@ class MainWindow(qtw.QMainWindow):
         if self.deskew_latinmonoDialog.Accepted:
             pp.deskewfiles(self.deskew_latinmono_ui.SourceLineEdit.text(), self.deskew_latinmono_ui.DestPngLineEdit.text(),self.deskew_latinmono_ui.DestTifLineEdit.text())
             print("completed deskewing monochrome tiff and png files")
-        #dsk.deskewfiles("/home/max/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
-        #pp.deskewfiles("/home/max/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
+        #dsk.deskewfiles("/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
+        #pp.deskewfiles("/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
     
     def actionResizeLatin_png(self):
         print("resizing Latin png files")
@@ -1808,8 +1808,8 @@ class MainWindow(qtw.QMainWindow):
         if self.latinresizepngDialog.Accepted:
             pp.resizepngs(self.latinresizepng_ui.SourceLineEdit.text(), self.latinresizepng_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
+        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
+        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
 
     def actionCropImage(self):
         print("Opening image in crop dialog")
@@ -1868,7 +1868,7 @@ class MainWindow(qtw.QMainWindow):
         self.crop_greeklines_ui = Ui_crop_greek_linesDialog()
         self.crop_greeklines_ui.setupUi(self.crop_greeklinesDialog)
         self.crop_greeklinesDialog.show()
-        #tr.sortcroplines(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
+        #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
 
         def setdefault():
             if self.crop_greeklines_ui.defaultsrcBox.isChecked():
@@ -1945,7 +1945,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+                with open('Model/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1973,7 +1973,7 @@ class MainWindow(qtw.QMainWindow):
             # disable source button (default)
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1993,7 +1993,7 @@ class MainWindow(qtw.QMainWindow):
         seq = "GL2"
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -2013,7 +2013,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -2034,7 +2034,7 @@ class MainWindow(qtw.QMainWindow):
         rsp = self.crop_greeklinesDialog.exec_()
         print("completed creating cropped language tif files")
 
-        #tr.sortcroplines(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
+        #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
         
     def actionRename_Greek_tiff_Lines(self):
         print("renaming Greek tif lines for ground truth")
@@ -2053,8 +2053,8 @@ class MainWindow(qtw.QMainWindow):
             tr.renameimages(self.greekrenamelines_ui.SourceLineEdit.text(), self.greekrenamelines_ui.DestinationLineEdit.text())
             
             print("completed renaming Greek tif lines for ground truth")
-        # tr.renameimages(r"/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.renameimages(r"/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
        
     def actionMove_Greek_tiff_Lines(self):
         print("moving Greek tif lines for ground truth")
@@ -2073,8 +2073,8 @@ class MainWindow(qtw.QMainWindow):
             tr.renameimages(self.greekmovelines_ui.SourceLineEdit.text(), self.greekmovelines_ui.DestinationLineEdit.text())
             print("completed moving Greek tif lines for ground truth")
         
-        # tr.renameimages(r"/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        #tr.renameimages("/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
+        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        #tr.renameimages("/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
         #pass
 
     def actionCrop_Latin_To_tiff_Lines(self):
@@ -2094,8 +2094,8 @@ class MainWindow(qtw.QMainWindow):
         if self.crop_latinlinesDialog.Accepted:
             tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
             print("completed creating cropped Latin tif lines")
-        #tr.sortcroplines(r"/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
-        tr.sortcroplines(r"/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
+        #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
+        tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
 
     def actionRename_Latin_tiff_Lines(self):
         print("renaming Latin tiff lines for ground truth")
@@ -2115,8 +2115,8 @@ class MainWindow(qtw.QMainWindow):
             
             print("completed renaming Greek tif lines for ground truth")
         
-        # tr.renameimages(r"/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "/home/max/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
-        #tr.renameimages(r"/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "/home/max/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
+        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
+        #tr.renameimages(r"/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
 
     def actionMove_Latin_tiff_Lines(self):
         print("moving Latin tif lines for ground truth")
@@ -2138,26 +2138,26 @@ class MainWindow(qtw.QMainWindow):
     def actionSplitGreek_text_lines(self):
         print("splitting Greek textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"/home/max/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
-        tr.splittextlines("/home/max/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
+        # tr.splittextlines(r"/home/jetson/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
+        tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
         
     def actionRenameGreek_text_lines(self):
         print("renaming Greek textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
-        tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
+        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
+        tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
     
     def actionSplit_Latin_Text_Lines(self):
         print("splitting Latin textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"/home/max/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
-        tr.splittextlines("/home/max/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+        # tr.splittextlines(r"/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+        tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
 
     def actionRename_Latin_Text_Lines(self):
         print("renaming Latin textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
-        tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+        tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
     
     def actionReview_Ground_Truth(self):
         gtr.MainWindow = qtw.QMainWindow()
@@ -2294,11 +2294,11 @@ class MainWindow(qtw.QMainWindow):
                 
                 #self.get_session_settings()
                 
-                #with open('/home/max/Projects/BiblionOCR/Model/Data/json/Session.json', 'w') as f:
+                #with open('Model/Data/json/Session.json', 'w') as f:
                     #json.dump(data, f, indent=2)
                 
 
-                jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+                jsonfile = 'Model/Data/json/Session.json'
                 
                 with open(jsonfile, 'r') as f:
                     data = json.load(f)
@@ -2370,7 +2370,7 @@ class MainWindow(qtw.QMainWindow):
         
         self.imgdir = os.path.dirname(imgfilename)
         self.ui.ImageLe.setText(filestr)
-        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        jsonfile = 'Model/Data/json/Session.json'
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2590,7 +2590,7 @@ class MainWindow(qtw.QMainWindow):
                 
                 file.close()
         
-        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        jsonfile = 'Model/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2646,7 +2646,7 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        jsonfile = 'Model/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -3171,7 +3171,7 @@ class MainWindow(qtw.QMainWindow):
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
-            #defaultdir = r"/home/max/Projects/Python/EstablishTruth/Greek_txt_pages/"
+            #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
         
         defaultdir = self.txtdir + r"/" 
         defaultfile = self.ui.TextLE.displayText()
@@ -3266,13 +3266,13 @@ class MainWindow(qtw.QMainWindow):
         os.system(lo_cmd)
 
     def OpenWithMyPixler(self):
-        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyPixler.py"
+        mw_cmd = "python3 ViewController/0-MainUI/MyPixler.py"
         print(mw_cmd)
         os.system(mw_cmd)
 
     def OpenWithMyWriter(self):
         
-        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
         print(mw_cmd)
         os.system(mw_cmd)
         '''

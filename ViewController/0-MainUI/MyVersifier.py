@@ -155,7 +155,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.RefspaceWidth = self.ReffontMetrics.width(' ')
         self.ui.RefText.setTabStopWidth(self.RefspaceWidth * 4)      
         
-        ChrRefText = open('c:/users/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         # Restore Session settings
@@ -227,7 +227,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # get session settings
         # Define json data        
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json') as f:
+        with open('Model/Project/Data/json/VersifierSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
@@ -238,32 +238,22 @@ class Ui_MainWindow(qtw.QMainWindow):
             bothbookabbr_key = r"self.bothbookabbr"
             bothchapter_key = r"self.bothchapter"
             bothverse_key = r"self.bothverse"
-            
             anchorbook_key = r"self.anchorbook"
             anchorchapter_key = r"self.anchorchapter"
             anchorverse_key = r"self.anchorverse"
             anchorline_key = r"self.anchorline"
-
-
-
             versebookabbr_key = r"self.versebookabbr"
             versechapter_key = r"self.versechapter"
             verseverse_key = r"self.verseverse"
             verseline_key = r"self.verseline"
-            
             verselastbook_key = r"self.verselastbook"
             verselastchapter_key = r"self.verselastchapter"
             verselastverse_key = r"self.verselastverse"
             verselastline_key = r"self.verselastline"
-
             refbookabbr_key = r"self.refbookabbr"
             refchapter_key = r"self.refchapter"
             refverse_key = r"self.refverse"
             refline_key = r"self.refline"
-
-            fontinstallpath_key = r"self.fontinstallpath"
-            homefontinstallpath_key = r"self.homefontinstallpath"
-            usrfontinstallpath_key = r"self.usrfontinstallpath"
             sourcebookmarkdown_key = r"self.sourcebookmarkdown"
             greekbookmarkdown_key = r"self.greekbookmarkdown"
             latinbookmarkdown_key = r"self.latinbookmarkdown"
@@ -370,12 +360,6 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.refline = Setting['CurrentValue']
                     self.ui.ReflineComboBox.setCurrentText(self.refline)
                     print('ref line: ' + str(type(self.refline)))
-                elif Setting['Setting'] == fontinstallpath_key:
-                    self.fontinstallpath = Setting['CurrentValue']                    
-                elif Setting['Setting'] == homefontinstallpath_key:
-                    self.homefontinstallpath = Setting['CurrentValue'] 
-                elif Setting['Setting'] == usrfontinstallpath_key:
-                    self.usrfontinstallpath = Setting['CurrentValue']
                 elif Setting['Setting'] == sourcebookmarkdown_key:
                     self.sourcebookmarkdown = Setting['CurrentValue']
                 elif Setting['Setting'] == greekbookmarkdown_key:
@@ -451,7 +435,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
+        with open('Model/SQLite/json/Workflow.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -492,7 +476,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Getting the anchor session settings')
         
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json') as f:
+        with open('Model/Project/Data/json/VersifierSession.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)  
@@ -520,7 +504,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionAnchor(self):
         print(f'Updating the anchor session setting')
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json'
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -605,7 +589,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Getting the last verse session setting')
         
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json') as f:
+        with open('Model/Project/Data/json/VersifierSession.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)  
@@ -633,7 +617,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionLastVerse(self):
         print(f'Updating the last verse session setting')
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json'
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -674,7 +658,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # perform checks
         
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)  
@@ -719,7 +703,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -732,7 +716,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
               
-            '''jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+            '''jsonfile = 'Model/Project/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -759,7 +743,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -789,7 +773,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadChapterCombo(self):
         self.ui.chapterComboBox.clear()
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapter.json') as f:
+        with open('Model/Project/Data/json/BookChapter.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -814,7 +798,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.verseComboBox.clear()
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -856,7 +840,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def OpenResolver(self):
         print("Starting up QT5ResolveVariants")
-        mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/Qt5ResolveVariants.py"
+        mw_cmd = "python3 ViewController/0-MainUI/Qt5ResolveVariants.py"
         print(mw_cmd)
         os.system(mw_cmd)
     '''def popupbox(self):
@@ -885,7 +869,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     
     def loadVarWordCombo(self):
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
         #print(varwords)
 
@@ -898,7 +882,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         selvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
         
         # This is only a partial solution.  It locks onto the first match only.
@@ -909,7 +893,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def loadReplaceWordCombo(self):
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         replacewords = helper.select("SELECT DISTINCT Word FROM Bible UNION SELECT DISTINCT Word FROM IntBibleWords ORDER BY Word ASC")
         #print(varwords)
 
@@ -922,7 +906,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         selrepword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
         repwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE Word =" + "'" + selrepword + "'")
         
         # This is only a partial solution.  It locks onto the first match only.
@@ -935,7 +919,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             return 
         
         print("Check if variant already exists in Resolver. If found, populate dialog.")
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
                 WHERE Line = ? and WordNum = ?"""
         data = (line,wordnum)
@@ -974,7 +958,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.stoprecorder == True:
             return
         print(f'Inserting new variant for line: {line} and word number: {wordnum}')
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         query = """SELECT Line, WordNum, Word FROM Bible
                 WHERE Line = ? and WordNum = ?"""
         data = (varline,varwordnum)
@@ -984,7 +968,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versewordnum = variant[1]
         verseword = variant[2]
                 
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         query = """SELECT Line, WordNum, Word, Strong, RMAC, Lemma FROM IntBibleWords
                 WHERE Line = ? and WordNum = ?"""
         data = (refline,refwordnum)
@@ -1008,7 +992,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         varword = self.varrecorder_ui.VarWordSelCombo.currentText()
         verseword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
 
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         query = """INSERT INTO Variants (Line, Book, Chapter, Verse, WordNum, Word, NoDiaWord, VarWord, Strong, RMAC, Lemma, ErrorCode, Preserved, Corrected) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
         data = (varline,varbook,varchapter,varverse,varwordnum,verseword,varnormword,varword,refstrong,refrmac,reflemma,errorcode,preserved,Corrected)
         #startProgressBar()
@@ -1018,7 +1002,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.stoprecorder == True:
             return
         print('Updating existing variant') 
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
                 WHERE Line = ? and WordNum = ?"""
         data = (line,wordnum)
@@ -1105,7 +1089,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.varrecorder_ui.RefWordNumlineEdit.setText(self.ui.RefWordNumlineEdit.text())
         self.varrecorder_ui.RefNormWordlineEdit.setText(self.ui.RefText.textCursor().selectedText())
         self.loadVarWordCombo()
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
         refwords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
         for word in refwords:
             refline = word[0]
@@ -1126,7 +1110,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.loadReplaceWordCombo()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("c:/users/max/Projects/BiblionOCR/Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
         versewords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
         for word in versewords:
             self.verseline = word[0]
@@ -1285,7 +1269,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.VersebookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1298,7 +1282,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+            jsonfile = 'Model/Project/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1325,7 +1309,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -1354,7 +1338,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadVerseChapterCombo(self):
         self.ui.VersechapterComboBox.clear()
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapter.json') as f:
+        with open('Model/Project/Data/json/BookChapter.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1375,7 +1359,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.VerseverseComboBox.clear()
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1392,7 +1376,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.VerselineComboBox.clear()
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1409,7 +1393,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def updateVerseLineCombo(self):
         #self.ui.VerselineComboBox.clear()
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
         
@@ -1430,7 +1414,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.RefbookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1443,7 +1427,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+            jsonfile = 'Model/Project/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1470,7 +1454,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -1495,7 +1479,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadRefChapterCombo(self):
         self.ui.RefchapterComboBox.clear()
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapter.json') as f:
+        with open('Model/Project/Data/json/BookChapter.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1516,7 +1500,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefverseComboBox.clear()
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1534,7 +1518,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.ReflineComboBox.clear()
 
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1551,7 +1535,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def updateRefLineCombo(self):
         #self.ui.ReflineComboBox.clear()
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
         
@@ -1710,7 +1694,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versechaptercount =  self.ui.VersechapterComboBox.count()
         nextversechapternum = int(self.ui.VersechapterComboBox.currentText()) + 1
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -1745,7 +1729,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versechaptercount =  self.ui.VersechapterComboBox.count()
         prevversechapternum = int(self.ui.VersechapterComboBox.currentText()) - 1
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -1915,7 +1899,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionBothVerse(self):
         print(f'Updating the both verse session settings')
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json'
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -2000,7 +1984,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionVerseVerse(self):
         print(f'Updating the verse text session settings')
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json'
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -2285,7 +2269,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refchaptercount =  self.ui.RefchapterComboBox.count()
         nextrefchapternum = int(self.ui.RefchapterComboBox.currentText()) + 1
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -2320,7 +2304,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refchaptercount =  self.ui.RefchapterComboBox.count()
         prevrefchapternum = int(self.ui.RefchapterComboBox.currentText()) - 1
         # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -2407,7 +2391,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionRefVerse(self):
         print(f'Updating the reference text session settings')
-        jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/VersifierSession.json'
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -2603,7 +2587,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'selected position: {cursor.position()} selected word: {self.refword}')
 
     def OpenWithMyWriter(self):
-        mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
         print(mw_cmd)
         os.system(mw_cmd)
 
@@ -2763,7 +2747,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
       
-        '''jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        '''jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2819,7 +2803,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
       
-        '''jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        '''jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2856,7 +2840,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.ui.VerseNormcheckBox.setChecked(False)            
 
     def VerseNormalize(self):
-        mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/NormalizeVerseText.py"
+        mw_cmd = "python3 ViewController/0-MainUI/NormalizeVerseText.py"
         print(mw_cmd)
         os.system(mw_cmd)
 
@@ -3007,7 +2991,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetRefLineSpacing()
             file.close()
       
-        '''jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        '''jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -3062,7 +3046,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetRefLineSpacing()
             file.close()
       
-        '''jsonfile = 'c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
+        '''jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -3091,7 +3075,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.sortRefTextFiles()
 
     def RefNormalize(self):
-        mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/NormalizeRefText.py"
+        mw_cmd = "python3 ViewController/0-MainUI/NormalizeRefText.py"
         print(mw_cmd)
         os.system(mw_cmd)
 

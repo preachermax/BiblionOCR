@@ -24,7 +24,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageQt
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu
+from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt
 from PyQt5.QtGui import QPainter, QPen, QBrush
 
@@ -131,6 +131,11 @@ class TqdmLoggingHandler(logging.StreamHandler):
         # from https://stackoverflow.com/questions/38543506/change-logging-print-function-to-tqdm-write-so-logging-doesnt-interfere-wit/38739634#38739634
         self.flush()
 '''
+class VLine(QFrame):
+    # a simple VLine, like the one you get from designer
+    def __init__(self):
+        super(VLine, self).__init__()
+        self.setFrameShape(self.VLine|self.Sunken)
 
 class MainWindow(qtw.QMainWindow):
 
@@ -225,7 +230,81 @@ class MainWindow(qtw.QMainWindow):
         self.ui.BoxCursor = qtg.QTextCursor(self.ui.BoxDocument)
         
         self.ui.BoxText.setDocument(self.ui.BoxDocument)
+        # Initialize statusProgressBar Widget -- invoke addWidget as needed
+        self.statusProgressBar = qtw.QProgressBar()
+        self.statusProgressBar.resize(140,22)
+        self.statusProgressBar.setProperty("value", 0)
+        self.statusProgressBar.setObjectName("statusProgressBar")
+        # statusBoxTypeLabel and statusBoxType
+        self.statusBoxTypeLabel = qtw.QLabel()
+        self.statusBoxTypeLabel.setText('Box Type: ')
+        self.statusBoxType = qtw.QLabel()
+        self.statusBoxType.resize(50,22)
+        self.statusBoxType.setStyleSheet('border: 0; color:  blue;')
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(11)
+        self.statusBoxType.setFont(font)
+        self.statusBoxType.setAlignment(qtc.Qt.AlignCenter)
+        self.statusBoxType.setText('None')
+        # statusBoxModeLabel and statusBoxMode
+        self.statusBoxModeLabel = qtw.QLabel()
+        self.statusBoxModeLabel.setText('Box Mode: ')
+        self.statusBoxMode = qtw.QLabel()
+        self.statusBoxMode.resize(50,22)
+        self.statusBoxMode.setStyleSheet('border: 0; color:  blue;')
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(11)
+        self.statusBoxMode.setFont(font)
+        self.statusBoxMode.setAlignment(qtc.Qt.AlignCenter)
+        self.statusBoxMode.setText('None')
+        # statusDrawingModeLabel and statusDrawingMode
+        self.statusDrawingModeLabel = qtw.QLabel()
+        self.statusDrawingModeLabel.setText('Drawing Mode: ')
+        self.statusDrawingMode = qtw.QLabel()
+        self.statusDrawingMode.resize(50,22)
+        self.statusDrawingMode.setStyleSheet('border: 0; color:  blue;')
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(11)
+        self.statusDrawingMode.setFont(font)
+        self.statusDrawingMode.setAlignment(qtc.Qt.AlignCenter)
+        self.statusDrawingMode.setText('None')
+        # statusSelectionModeLabel and statusSelectionMode
+        self.statusSelectionModeLabel = qtw.QLabel()
+        self.statusSelectionModeLabel.setText('Selection Mode: ')
+        self.statusSelectionMode = qtw.QLabel()
+        self.statusSelectionMode.resize(50,22)
+        self.statusSelectionMode.setStyleSheet('border: 0; color:  blue;')
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(11)
+        self.statusSelectionMode.setFont(font)
+        self.statusSelectionMode.setAlignment(qtc.Qt.AlignCenter)
+        self.statusSelectionMode.setText('None')
+        # statusSpacerLabel
+        self.statusSpacerLabel = qtw.QLabel()
+        self.statusSpacerLabel.setText('     ')
 
+        # Create Default Status Bar Permanent Widgets
+        self.ui.statusbar.addPermanentWidget(VLine())
+        self.ui.statusbar.addPermanentWidget(self.statusBoxTypeLabel)
+        self.ui.statusbar.addPermanentWidget(self.statusBoxType)
+        self.ui.statusbar.addPermanentWidget(VLine())
+        self.ui.statusbar.addPermanentWidget(self.statusBoxModeLabel)
+        self.ui.statusbar.addPermanentWidget(self.statusBoxMode)        
+        self.ui.statusbar.addPermanentWidget(VLine())
+        self.ui.statusbar.addPermanentWidget(self.statusDrawingModeLabel)
+        self.ui.statusbar.addPermanentWidget(self.statusDrawingMode)
+        self.ui.statusbar.addPermanentWidget(VLine())
+        self.ui.statusbar.addPermanentWidget(self.statusSelectionModeLabel)
+        self.ui.statusbar.addPermanentWidget(self.statusSelectionMode)
+        self.ui.statusbar.addPermanentWidget(VLine())
+        self.ui.statusbar.addPermanentWidget(self.statusSpacerLabel)
+
+        self.ui.statusbar.showMessage('Ready...')
+        
         #ChrRefText = open(self.userdir + '/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 

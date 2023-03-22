@@ -32,9 +32,6 @@ self.windowstessfont,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/
 self.windowstessfontdir,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts
 self.ocrlang,Middle Greek,Middle Greek
 self.ocrmodel,feg,feg
-self.tessdatadir,c:/Program Files/Tesseract-OCR/tessdata,c:/Program Files/Tesseract-OCR/tessdata
-self.tesseract,c:/Program Files/Tesseract-OCR,c:/Program Files/Tesseract-OCR
-self.tesstrain,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels,c:/Program Files/Tesseract-OCR/tesstrain
 self.bookabbr,Joh,Mat
 self.chapter,1,1
 self.verse,1,1

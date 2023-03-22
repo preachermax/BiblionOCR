@@ -176,12 +176,12 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_42_Luke/greek1516_Page_162_linebox.tif",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages/greek1516_Page_247.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_42_Luke",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Workflow"
     },
     {
