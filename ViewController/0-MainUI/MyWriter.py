@@ -521,7 +521,7 @@ class Main(qtw.QMainWindow):
         self.filename = qtw.QFileDialog.getOpenFileName(self, 'Open File',".","(*.txt *.csv *.writer)")[0]
 
         if self.filename:
-            with open(self.filename,"rt") as file:
+            with open(self.filename,"rt", encoding='UTF-8') as file:
                 self.ui.textEdit.setText(file.read())
         self.on_font_update()
 

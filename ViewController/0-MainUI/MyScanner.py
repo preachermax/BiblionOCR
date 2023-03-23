@@ -232,7 +232,7 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt').read()
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.initBookCombo()
@@ -1635,11 +1635,12 @@ class MainWindow(qtw.QMainWindow):
             scaled_pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImagescrollArea.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)   
             self.ui.Image.setPixmap(qtg.QPixmap(scaled_pixmap))
         else:'''
-        self.origsize = self.origpixmap.size()       
-        self.origheight = self.origpixmap.height
-        self.origwidth = self.origpixmap.width
-        scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(scaled_pixmap)
+        if self.qimage:
+            self.origsize = self.origpixmap.size()       
+            self.origheight = self.origpixmap.height
+            self.origwidth = self.origpixmap.width
+            scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.ui.Image.setPixmap(scaled_pixmap)
         
         #self.ui.ImagescrollArea.adjustsize()
 

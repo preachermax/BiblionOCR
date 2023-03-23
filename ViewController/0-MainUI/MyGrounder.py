@@ -198,7 +198,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         # Reference
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='utf-8').read()
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 
         # Restore Session settings
@@ -2302,7 +2302,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             
             fields = ['LineImageFile','ImgPageNum','ImgPageLineNum','LineTextFile','LineText','Valid','ReviewComplete','StartBook','StartChapter','StartVerse','OCRAccuracy']
 
-            with open(XReffile, 'r', encoding='utf8') as csvfile, tempfile:
+            with open(XReffile, 'r', encoding='UTF-8') as csvfile, tempfile:
                 reader = csv.DictReader(csvfile, fieldnames=fields)
                 writer = csv.DictWriter(tempfile, fieldnames=fields)
                 for row in reader:

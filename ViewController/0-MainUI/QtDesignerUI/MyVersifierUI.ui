@@ -46,6 +46,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -72,6 +75,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -98,6 +104,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -128,7 +137,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
    </widget>
@@ -180,6 +193,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -230,6 +246,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -253,7 +272,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -279,6 +302,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -327,7 +353,7 @@
      </item>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="TextLE">
+   <widget class="QLineEdit" name="VerseTextLE">
     <property name="geometry">
      <rect>
       <x>770</x>
@@ -340,7 +366,7 @@
      <string>File name</string>
     </property>
    </widget>
-   <widget class="QSlider" name="LHslider">
+   <widget class="QSlider" name="VerseLHslider">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -383,7 +409,7 @@
      <enum>QSlider::TicksBelow</enum>
     </property>
    </widget>
-   <widget class="QLineEdit" name="LHlineEdit">
+   <widget class="QLineEdit" name="VerseLHlineEdit">
     <property name="geometry">
      <rect>
       <x>970</x>
@@ -394,7 +420,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -416,7 +446,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="LHDialogtbutton">
+   <widget class="QPushButton" name="VerseLHDialogtbutton">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -432,6 +462,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -462,7 +495,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="readOnly">
@@ -515,6 +552,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -590,6 +630,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -614,7 +657,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -690,7 +737,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -712,6 +763,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -737,6 +791,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -785,7 +842,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -811,6 +872,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -836,6 +900,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -920,6 +987,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -1085,7 +1155,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1115,7 +1189,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1194,6 +1272,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1218,6 +1297,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1242,6 +1322,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1312,6 +1393,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1335,6 +1417,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1362,6 +1447,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1386,6 +1472,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1548,6 +1635,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1572,6 +1660,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -1727,7 +1816,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1752,6 +1845,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -1943,7 +2039,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -1989,7 +2089,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -2170,7 +2274,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -2218,6 +2326,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -2269,6 +2380,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -2367,6 +2481,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -2429,7 +2546,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2450,7 +2571,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2471,7 +2596,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2652,7 +2781,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2673,7 +2806,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2694,7 +2831,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2877,6 +3018,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2903,6 +3047,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -2976,6 +3123,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -3046,6 +3194,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -3116,6 +3265,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -3186,6 +3336,7 @@
       <family>FROMVS [MAXR]</family>
       <pointsize>7</pointsize>
       <weight>75</weight>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -3329,7 +3480,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -3350,7 +3505,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -3371,7 +3530,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -3391,7 +3554,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -3454,7 +3621,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -3491,7 +3662,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -3515,7 +3690,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -3539,7 +3718,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -3563,7 +3746,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -3590,6 +3777,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -3610,7 +3800,7 @@
      <x>0</x>
      <y>0</y>
      <width>1351</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -3618,6 +3808,9 @@
      <font>
       <family>Ubuntu</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -3725,7 +3918,7 @@
    <property name="minimumSize">
     <size>
      <width>400</width>
-     <height>619</height>
+     <height>625</height>
     </size>
    </property>
    <property name="baseSize">
@@ -3769,6 +3962,9 @@
       <font>
        <family>FROMVS</family>
        <pointsize>18</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="documentTitle">
