@@ -89,25 +89,25 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.PrevVerseWordButton.clicked.connect(self.findPrevVerseWord)
         self.ui.NextVerseWordButton.clicked.connect(self.findNextVerseWord)       
         
-        self.ui.LHDialogtbutton.clicked.connect(self.GetLineSpacing)
-        self.ui.LHslider.valueChanged.connect(self.SetLineSpacing)
-        self.ui.LHslider.sliderReleased.connect(self.DisableLHSlider)
-        self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
-        self.ui.LHslider.hide()
+        self.ui.VerseLHDialogtbutton.clicked.connect(self.GetVerseLineSpacing)
+        self.ui.VerseLHslider.valueChanged.connect(self.SetVerseLineSpacing)
+        self.ui.VerseLHslider.sliderReleased.connect(self.DisableVerseLHSlider)
+        self.ui.VerseLHlineEdit.textChanged.connect(self.MoveVerseLHSlider)
+        self.ui.VerseLHslider.hide()
         self.ui.VerseFindReplacebutton.clicked.connect(versefind.Find(self).show)
-        self.ui.VerseNormcheckBox.stateChanged.connect(self.showNormText)
-        self.ui.VerseNormcheckBox.stateChanged.connect(self.showText)
+        self.ui.VerseNormcheckBox.stateChanged.connect(self.showVerseNormText)
+        self.ui.VerseNormcheckBox.stateChanged.connect(self.showVerseText)
         self.ui.VerseNormButton.clicked.connect(self.VerseNormalize)
-        self.ui.VerseTextbutton.clicked.connect(self.loadText)
+        self.ui.VerseTextbutton.clicked.connect(self.loadVerseText)
         self.ui.SaveAsVerseTextbutton.clicked.connect(self.SaveAsVerseTextDialog)
         self.ui.SaveVerseTextbutton.clicked.connect(self.SaveVerseTextDialog)         
         self.ui.VerseMyWriterbutton.clicked.connect(self.OpenWithMyWriter)
-        self.ui.reloadVerseTextbutton.clicked.connect(self.ReloadText)
+        self.ui.reloadVerseTextbutton.clicked.connect(self.ReloadVerseText)
         self.ui.VersefontComboBox.currentFontChanged.connect(self.on_versefont_update)
         self.ui.VersefontSizeBox.valueChanged.connect(self.on_versefont_update)        
         self.ui.VerseDocument = qtg.QTextDocument(self.ui.VerseText)
         font = qtg.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         font.setPointSize(20)
         self.ui.VerseDocument.setDefaultFont(font)
         self.ui.VerseBlockFormat = qtg.QTextBlockFormat()
@@ -117,7 +117,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.Versefont = self.ui.VerseText.font()
         self.VersefontMetrics = qtg.QFontMetricsF(self.Versefont)
         self.VersespaceWidth = self.VersefontMetrics.width(' ')
-        self.ui.VerseText.setTabStopWidth(self.VersespaceWidth * 4)
+        self.ui.VerseText.setTabStopWidth(int(self.VersespaceWidth * 4))
 
         #Setup Reference Text
         self.ui.RefPrevBookButton.clicked.connect(self.findPrevRefBook)
@@ -143,7 +143,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.ReffontSizeBox.valueChanged.connect(self.on_reffont_update)        
         self.ui.ReferenceDocument = qtg.QTextDocument(self.ui.RefText)
         font = qtg.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         font.setPointSize(20)
         self.ui.ReferenceDocument.setDefaultFont(font)
         self.ui.ReferenceBlockFormat = qtg.QTextBlockFormat()
@@ -153,75 +153,14 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.Reffont = self.ui.RefText.font()
         self.ReffontMetrics = qtg.QFontMetricsF(self.Reffont)
         self.RefspaceWidth = self.ReffontMetrics.width(' ')
-        self.ui.RefText.setTabStopWidth(self.RefspaceWidth * 4)      
-        
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt').read()
-        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
-        
+        self.ui.RefText.setTabStopWidth(int(self.RefspaceWidth * 4))
+               
         # Restore Session settings
         self.get_session_settings()
-
-        self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
-        self.ui.chapterComboBox.setCurrentText(self.bothchapter)
-        self.ui.verseComboBox.setCurrentText(self.bothverse)
-        print(f'Book: {self.bothbookabbr} Chapter: {self.bothchapter} Verse: {self.bothverse}')
-    
-        self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
-        self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
-        self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
-        self.ui.VerselineComboBox.setCurrentText(self.verseline)
-        print(f'Book: {self.versebookabbr} Chapter: {self.versechapter} Verse: {self.verseverse} Line: {self.verseline}')
-
-        self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
-        self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
-        self.ui.RefverseComboBox.setCurrentText(self.refverse)
-        self.ui.ReflineComboBox.setCurrentText(self.refline)
-        print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')
-        
-        self.show()
-        self.showRefText(self.refpath)       
-        self.showText(self.versepath)
-
-        #self.versenum = ""
-        #self.selectRefBookCombo()
-        #self.selectVerseBookCombo()
-        
-        #self.loadChapterCombo()
-        #self.loadVerseCombo()
-        
-        self.findBothVerse()
-        
-        self.verseverse = self.ui.verseComboBox.currentText()
-        #self.verseline = self.ui.lineComboBox..currentText()
-        self.refverse = self.ui.verseComboBox.currentText()
-        #self.refline = self.ui.lineComboBox.currentText()
-        self.verseversenum = int(self.verseverse)
-        self.refversenum = int(self.refverse)
-        
-        self.verseversecount = self.ui.verseComboBox.count()
-        self.refversecount = self.ui.verseComboBox.count()      
-        
-        self.nexttextversenum = int(self.ui.verseComboBox.currentText()) + 1
-        self.nextrefversenum = int(self.ui.verseComboBox.currentText()) + 1
-
-        self.prevtextversenum = int(self.ui.verseComboBox.currentText()) - 1
-        self.prevrefversenum = int(self.ui.verseComboBox.currentText()) - 1
-
-        self.versebook = self.ui.bookComboBox.currentText()
-        self.versebookindex = self.ui.bookComboBox.currentIndex()
-        self.versebooknum = self.versebookindex + 40
-        self.versebookcount = self.ui.bookComboBox.count()        
-        
-        self.refbook = self.ui.bookComboBox.currentText()
-        self.refbookindex = self.ui.bookComboBox.currentIndex()
-        self.refbooknum = self.refbookindex + 40
-        self.refbookcount = self.ui.bookComboBox.count()
-
-        print(f'self.verseverse = {self.verseverse}')
-        print(f'self.verseversenum = {self.verseversenum}')
-        print(f'self.verseversecount = {self.verseversecount}')
-        print(f'self.prevtextversenum = {self.prevtextversenum}')
-        print(f'self.nexttextversenum = {self.nexttextversenum}')
+        #print(f'Reference File Path: {self.refpath}')
+        #self.getRefText(self.refpath)
+        # Startup
+        self.getstarted()
 
     def get_session_settings(self):
         # get session settings
@@ -380,7 +319,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.versetable = Setting['CurrentValue']
                 elif Setting['Setting'] == versepath_key:
                     self.versepath = Setting['CurrentValue']
-                    self.ui.TextLE.setText(os.path.basename(self.versepath))
+                    self.ui.VerseTextLE.setText(os.path.basename(self.versepath))
                 elif Setting['Setting'] == versedir_key:
                     self.versedir = Setting['CurrentValue']
                 elif Setting['Setting'] == versenormpathsel_key:
@@ -432,25 +371,65 @@ class Ui_MainWindow(qtw.QMainWindow):
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
 
-    def get_workflow_settings(self):
-
-        # Opening JSON file
-        with open('Model/SQLite/json/Workflow.json') as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)
+    def getstarted(self):
+        print(f'Reference File Path: {self.refpath}')
+        print(f'Verse File Path: {self.versepath}')
+        self.getRefText(self.refpath)       
+        self.getVerseText(self.versepath)
+        self.findBothVerse()
         
-        # Iterating through the json
-        # list
-        for Sequence in data:
-            print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
+        self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
+        self.ui.chapterComboBox.setCurrentText(self.bothchapter)
+        self.ui.verseComboBox.setCurrentText(self.bothverse)
+        print(f'Book: {self.bothbookabbr} Chapter: {self.bothchapter} Verse: {self.bothverse}')
+    
+        self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
+        self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
+        self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
+        self.ui.VerselineComboBox.setCurrentText(self.verseline)
+        print(f'Book: {self.versebookabbr} Chapter: {self.versechapter} Verse: {self.verseverse} Line: {self.verseline}')
+
+        self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
+        self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
+        self.ui.RefverseComboBox.setCurrentText(self.refverse)
+        self.ui.ReflineComboBox.setCurrentText(self.refline)
+
+        print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')     
+        self.verseverse = self.ui.verseComboBox.currentText()
+        #self.verseline = self.ui.lineComboBox..currentText()
+        self.refverse = self.ui.verseComboBox.currentText()
+        #self.refline = self.ui.lineComboBox.currentText()
+        self.verseversenum = int(self.verseverse)
+        self.refversenum = int(self.refverse)
         
-        # Closing file
-        f.close()
+        self.verseversecount = self.ui.verseComboBox.count()
+        self.refversecount = self.ui.verseComboBox.count()      
+        
+        self.nexttextversenum = int(self.ui.verseComboBox.currentText()) + 1
+        self.nextrefversenum = int(self.ui.verseComboBox.currentText()) + 1
 
-    def save_session_settings(self):
-        print("Saving Versifier session settings")
+        self.prevtextversenum = int(self.ui.verseComboBox.currentText()) - 1
+        self.prevrefversenum = int(self.ui.verseComboBox.currentText()) - 1
 
+        self.versebook = self.ui.bookComboBox.currentText()
+        self.versebookindex = self.ui.bookComboBox.currentIndex()
+        self.versebooknum = self.versebookindex + 40
+        self.versebookcount = self.ui.bookComboBox.count()        
+        
+        self.refbook = self.ui.bookComboBox.currentText()
+        self.refbookindex = self.ui.bookComboBox.currentIndex()
+        self.refbooknum = self.refbookindex + 40
+        self.refbookcount = self.ui.bookComboBox.count()
+
+        print(f'self.verseverse = {self.verseverse}')
+        print(f'self.verseversenum = {self.verseversenum}')
+        print(f'self.verseversecount = {self.verseversecount}')
+        print(f'self.prevtextversenum = {self.prevtextversenum}')
+        print(f'self.nexttextversenum = {self.nexttextversenum}')
+
+        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
+        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+        
     def dropAnchor(self):
         print("Drop Anchor!")
         self.ui.AnchorCkBox.setChecked(True)
@@ -843,6 +822,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         mw_cmd = "python3 ViewController/0-MainUI/Qt5ResolveVariants.py"
         print(mw_cmd)
         os.system(mw_cmd)
+    
     '''def popupbox(self):
 
         popup = qtw.QMessageBox(self)
@@ -1615,7 +1595,6 @@ class Ui_MainWindow(qtw.QMainWindow):
             pass        
         
         self.ImageTextPairDialog = qtw.QDialog()
-        self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
         self.ImageTextPairDialog.show()
 
@@ -2094,6 +2073,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     
         txtfile.close()        
     
+    '''
     def parseLinesRegEx(self):
         #***This is the original parse routine.  Keep for reference***
         # Each line is a verse => pares and label each verse
@@ -2110,7 +2090,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             scripture = match[4]
             #print(row[0])
             print(book,"\t", chapter,"\t", verse,"\t",scripture)
-
+    '''
     def wordCount(self):
 
         wc = versifiercount.WordCount(self)
@@ -2618,23 +2598,23 @@ class Ui_MainWindow(qtw.QMainWindow):
     def on_lang_select(self):
         pass
 
-    def GetLineSpacing(self):
-        self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.show()
-        self.ui.LHlineEdit.setPlaceholderText(str(self.ui.LHslider.value()))
+    def GetVerseLineSpacing(self):
+        self.ui.VerseLHslider.setEnabled(True)
+        self.ui.VerseLHslider.show()
+        self.ui.VerseLHlineEdit.setPlaceholderText(str(self.ui.VerseLHslider.value()))
 
-    def DisableLHSlider(self):
-        self.ui.LHslider.hide()
-        self.ui.LHslider.setEnabled(False)
+    def DisableVerseLHSlider(self):
+        self.ui.VerseLHslider.hide()
+        self.ui.VerseLHslider.setEnabled(False)
 
-    def MoveLHSlider(self):
-        self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+    def MoveVerseLHSlider(self):
+        self.ui.VerseLHslider.setEnabled(True)
+        self.ui.VerseLHslider.setValue(int(self.ui.VerseLHlineEdit.text()))
     
-    def SetLineSpacing(self):
+    def SetVerseLineSpacing(self):
 
-        lineSpacing = self.ui.LHslider.value()
-        self.ui.LHlineEdit.setText(str(lineSpacing))
+        lineSpacing = self.ui.VerseLHslider.value()
+        self.ui.VerseLHlineEdit.setText(str(lineSpacing))
             
         cursor = self.ui.VerseText.textCursor()
         if not cursor.hasSelection():
@@ -2704,6 +2684,105 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.TextLE.setText(filename)
         file.close()
 
+    def loadVerseText(self):
+        self.versepath = qtw.QFileDialog.getOpenFileName(
+        self.ui.centralwidget, 'Open text file',self.versedir,
+        'Text files (*.txt *.csv)')[0]
+        #self.txtpath = qtw.QFileDialog.getOpenFileName(
+            #self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+        print(f'self.versepath: {self.versepath}')
+        self.getVerseText(self.versepath)
+
+    def getVerseText(self,textpath):
+            self.versepath = textpath
+            self.versedirname = os.path.dirname(self.versepath)
+            #create file list 
+            if self.versepath:
+                #self.ui.BoxText.setText(os.path.basename(self.txtpath))       
+                self.versefile = qtc.QFile(self.versepath)
+                self.versefilename = os.path.basename(self.versepath)
+                self.versedir = os.path.dirname(self.versepath)
+                self.ui.VerseTextLE.setText(self.versefilename)
+                self.showVerseText(self.versepath)
+    
+    def showVerseText(self,textpath):        
+        self.versepath = textpath
+        if self.versepath:
+            versetext = open(self.versepath, encoding='UTF-8').read()
+            self.ui.VerseText.setPlainText(versetext)
+            self.versefilename = os.path.basename(self.versepath)
+            self.versedir = os.path.dirname(self.versepath)
+            self.ui.VerseTextLE.setText(self.versefilename)
+            '''
+            if self.versefile.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(self.versefile)
+                stream.setCodec("UTF-8")
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.versepath)
+                self.ui.VerseTextLE.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text)
+                    self.ui.VerseText.insertPlainText(text)
+                else:
+                    self.ui.VerseText.setPlainText(text)'''
+            self.on_versefont_update()
+            
+            # update line spacing
+            self.SetVerseLineSpacing()      
+            self.versefile.close()
+       
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            versepath_key = r"self.versepath"
+            versedir_key = r"self.versedir"
+            for Setting in data:
+                if Setting['Setting'] == versepath_key:
+                    Setting['CurrentValue'] = self.versepath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == versedir_key:  
+                    Setting['CurrentValue'] = self.versedir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()
+
+        self.versetxtfileList = []
+        for t in os.listdir(self.versedir):
+            tpath = os.path.join(self.versedir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.versetxtfileList.append(tpath)
+
+        self.sortVerseTextFiles()
+
+    def ReloadVerseText(self):
+        if self.versepath:
+            print("Reloading "+ self.versepath)
+            file = qtc.QFile(self.versepath)
+            filename = os.path.basename(self.versepath)
+            self.ui.TextLE.setText(filename)
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.versepath)
+                self.ui.VerseText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.VerseText.insertPlainText(text)
+                else:
+                    self.ui.VerseText.setPlainText(text)
+                
+                # update font to selection and size       
+                self.on_versefont_update()
+                
+                # update line spacing
+                self.SetLineSpacing()
+
+    '''
     def loadText(self):
         
         self.versepath = qtw.QFileDialog.getOpenFileName(
@@ -2718,7 +2797,8 @@ class Ui_MainWindow(qtw.QMainWindow):
             #self.sortTextFiles(MainWindow)
             self.showText(self.versepath)
             self.sortTextFiles()
-
+    '''
+    '''
     def showText(self, txtfilename):        
         #self.textfile = txtfilename
         if self.versepath and not self.ui.VerseNormcheckBox.isChecked():
@@ -2747,7 +2827,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
       
-        '''jsonfile = 'Model/Project/Data/json/Session.json'
+        jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2765,7 +2845,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         os.remove(jsonfile)
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
-        f.close()'''
+        f.close()
 
         self.txtfileList = []
         for t in os.listdir(self.versedir):
@@ -2774,8 +2854,9 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.txtfileList.append(tpath)
 
         self.sortTextFiles()
-
-    def showNormText(self, txtfilename):        
+    '''
+    
+    def showVerseNormText(self, txtfilename):        
         #self.textfile = txtfilename
         if self.versenormpath and self.ui.VerseNormcheckBox.isChecked():
             file = qtc.QFile(self.versenormpath)
@@ -2844,6 +2925,24 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(mw_cmd)
         os.system(mw_cmd)
 
+    def sortVerseTextFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)     
+
+    def nextVerseText(self):
+        if self.refpath:
+            self.refpath = self.sorted_reftxtfilelist[(self.sorted_reftxtfilelist.index(self.textpath) + 1) % len(self.sorted_txtfilelist)]
+            self.ui.RefTextLE.setText(os.path.basename(self.refpath))
+            self.getRefText(self.refpath)
+
+    def prevVerseText(self):
+        if self.refpath:
+            self.refpath = self.sorted_reftxtfilelist[(self.sorted_reftxtfilelist.index(self.textpath) - 1) % len(self.sorted_txtfilelist)]
+            self.ui.RefTextLE.setText(os.path.basename(self.refpath))
+            self.getRefText(self.refpath)
+
+    '''
     def sortTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
@@ -2925,30 +3024,71 @@ class Ui_MainWindow(qtw.QMainWindow):
         else:
             # no file list found, load an image
             self.loadText()      
+    '''
+    
+    def loadRefText(self):
+        self.refpath = qtw.QFileDialog.getOpenFileName(
+        self.ui.centralwidget, 'Open text file',self.refdir,
+        'Text files (*.txt *.csv)')[0]
+        #self.txtpath = qtw.QFileDialog.getOpenFileName(
+            #self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+        print(f'self.refpath: {self.refpath}')
+        self.getRefText(self.refpath)
 
-    def ReloadText(self):
-        if self.versepath:
-            print("Reloading "+ self.versepath)
-            file = qtc.QFile(self.versepath)
-            filename = os.path.basename(self.versepath)
-            self.ui.TextLE.setText(filename)
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
-                text = stream.readAll()
-                info = qtc.QFileInfo(self.versepath)
-                self.ui.VerseText.clear()
-                if info.completeSuffix() == 'txt':
-                    #self.ui.editor_text.setHtml(text
-                    self.ui.VerseText.insertPlainText(text)
-                else:
-                    self.ui.VerseText.setPlainText(text)
-                
-                # update font to selection and size       
-                self.on_versefont_update()
-                
-                # update line spacing
-                self.SetLineSpacing()
+    def getRefText(self,textpath):
+            self.refpath = textpath
+            self.refdirname = os.path.dirname(self.refpath)
+            #create file list 
+            if self.refpath:
+                #self.ui.BoxText.setText(os.path.basename(self.txtpath))       
+                self.reffile = qtc.QFile(self.refpath)
+                self.reffilename = os.path.basename(self.refpath)
+                self.refdir = os.path.dirname(self.refpath)
+                self.ui.RefTextLE.setText(self.reffilename)
+                self.showRefText(self.refpath)
+    
+    def showRefText(self,textpath):        
+        self.refpath = textpath
+        if self.refpath:
+            reftext = open(self.refpath, encoding='UTF-8').read()
+            self.ui.RefText.setPlainText(reftext)
+            self.reffilename = os.path.basename(self.refpath)
+            self.refdir = os.path.dirname(self.refpath)
+            self.ui.RefTextLE.setText(self.reffilename)
+            self.on_reffont_update()
+            # update line spacing
+            self.SetRefLineSpacing()
+            #self.reffile.close()
+       
+        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            refpath_key = r"self.refpath"
+            refdir_key = r"self.refdir"
+            for Setting in data:
+                if Setting['Setting'] == refpath_key:
+                    Setting['CurrentValue'] = self.refpath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == refdir_key:  
+                    Setting['CurrentValue'] = self.refdir
+                    print(Setting['CurrentValue'])
+        f.close()
 
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()
+
+        self.reftxtfileList = []
+        for t in os.listdir(self.refdir):
+            tpath = os.path.join(self.refdir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.reftxtfileList.append(tpath)
+
+        self.sortRefTextFiles()
+
+    '''
     def loadRefText(self):
         
         self.refpath = qtw.QFileDialog.getOpenFileName(
@@ -2961,15 +3101,19 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.versedir = os.path.dirname(self.refpath)
             self.ui.RefTextLE.setText(filename)
             #self.sortTextFiles(MainWindow)
-            self.showRefText(self.refpath)
-            self.sortRefTextFiles()
+            self.showRefText()
+            #self.sortRefTextFiles()
+    '''
+    '''
 
-    def showRefText(self, txtfilename):        
-        #self.textfile = txtfilename
+    def showRefText(self):        
+        print(f'Reference File Path: {self.refpath}') 
+        
+        #self.refpath = txtfilename
         if self.refpath and not self.ui.RefNormcheckBox.isChecked():
             file = qtc.QFile(self.refpath)
             filename = os.path.basename(self.refpath)
-            self.reftxtdir = os.path.dirname(self.refpath)
+            self.refdir = os.path.dirname(self.refpath)
             self.ui.RefTextLE.setText(filename)
         
             if file.open(qtc.QIODevice.ReadOnly):
@@ -2978,7 +3122,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 info = qtc.QFileInfo(self.refpath)
                 self.ui.RefText.clear()
                 if info.completeSuffix() == 'txt':
-                    #self.ui.editor_text.setHtml(text
+                    #self.ui.editor_text.setHtml(text)
                     self.ui.RefText.insertPlainText(text)
                 else:
                     self.ui.RefText.setPlainText(text)
@@ -2990,8 +3134,9 @@ class Ui_MainWindow(qtw.QMainWindow):
             # update line spacing
             self.SetRefLineSpacing()
             file.close()
-      
-        '''jsonfile = 'Model/Project/Data/json/Session.json'
+        
+        
+        jsonfile = 'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -3009,26 +3154,27 @@ class Ui_MainWindow(qtw.QMainWindow):
         os.remove(jsonfile)
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
-        f.close()'''
+        f.close()
 
         self.reftxtfileList = []
-        for t in os.listdir(self.reftxtdir):
-            tpath = os.path.join(self.reftxtdir, t)
+        for t in os.listdir(self.refdir):
+            tpath = os.path.join(self.refdir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
                 self.reftxtfileList.append(tpath)
 
         self.sortRefTextFiles()
-
+    '''
+    
     def showRefNormText(self, txtfilename):        
         #self.textfile = txtfilename
         if self.refnormpath and self.ui.RefNormcheckBox.isChecked():
-            file = qtc.QFile(self.refnormpath)
-            filename = os.path.basename(self.refnormpath)
+            self.refnormfile = qtc.QFile(self.refnormpath)
+            self.refnormfilename = os.path.basename(self.refnormpath)
             self.refnormdir = os.path.dirname(self.refnormpath)
-            self.ui.RefTextLE.setText(filename)
+            self.ui.RefTextLE.setText(self.refnormfilename)
         
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
+            if self.refnormfile.open(qtc.QIODevice.ReadOnly, encoding='UTF-8'):
+                stream = qtc.QTextStream(self.refnormfile)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.refnormpath)
                 self.ui.RefText.clear()
@@ -3037,14 +3183,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.ui.RefText.insertPlainText(text)
                 else:
                     self.ui.RefText.setPlainText(text)
-            #textfile.close()
-            #txtdirpath = os.path.dirname(self.textpath)
 
             self.on_reffont_update()
             
             # update line spacing
             self.SetRefLineSpacing()
-            file.close()
+            self.refnormfile.close()
       
         '''jsonfile = 'Model/Project/Data/json/Session.json'
         
@@ -3079,6 +3223,24 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(mw_cmd)
         os.system(mw_cmd)
 
+    def sortRefTextFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)     
+
+    def nextRefText(self):
+        if self.refpath:
+            self.refpath = self.sorted_reftxtfilelist[(self.sorted_reftxtfilelist.index(self.textpath) + 1) % len(self.sorted_txtfilelist)]
+            self.ui.RefTextLE.setText(os.path.basename(self.refpath))
+            self.getRefText(self.refpath)
+
+    def prevRefText(self):
+        if self.refpath:
+            self.refpath = self.sorted_reftxtfilelist[(self.sorted_reftxtfilelist.index(self.textpath) - 1) % len(self.sorted_txtfilelist)]
+            self.ui.RefTextLE.setText(os.path.basename(self.refpath))
+            self.getRefText(self.refpath)
+
+    '''
     def sortRefTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
@@ -3160,15 +3322,16 @@ class Ui_MainWindow(qtw.QMainWindow):
         else:
             # no file list found, load an image
             self.loadRefText()      
+    '''
 
     def ReloadRefText(self):
         if self.refpath:
             print("Reloading "+ self.refpath)
-            file = qtc.QFile(self.refpath)
-            filename = os.path.basename(self.refpath)
-            self.ui.TextLE.setText(filename)
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
+            self.reffile = qtc.QFile(self.refpath)
+            self.reffilename = os.path.basename(self.refpath)
+            self.ui.RefTextLE.setText(self.reffilename)
+            if self.reffile.open(qtc.QIODevice.ReadOnly, encoding = 'UTF-8'):
+                stream = qtc.QTextStream(self.reffile)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.refpath)
                 self.ui.RefText.clear()
@@ -3194,11 +3357,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(lo_cmd)
         os.system(lo_cmd)
 
-
-
 if __name__ == "__main__":
     app = qtw.QApplication(sys.argv)
     w = Ui_MainWindow()
     w.show()
     app.exec()
-
