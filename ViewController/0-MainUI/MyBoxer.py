@@ -3,6 +3,8 @@ import csv
 import json
 import os
 import re
+from pathlib import Path
+
 #import glob
 import shutil
 import sys
@@ -362,7 +364,12 @@ class MainWindow(qtw.QMainWindow):
         
         #self.show()
         self.toggleLatinToolbars()
- 
+        
+        # This should work if pyqtcss can be imported
+        '''styles = pyqtcss.available_styles()
+        print(f'Available styles: {styles}')
+        style_string = pyqtcss.get_style("dark_orange")
+        self.ui.centralwidget.setStyleSheet(style_string)'''        
  
     @qtc.pyqtSlot(str)
     def append_text(self,text):
@@ -2863,8 +2870,11 @@ class MainWindow(qtw.QMainWindow):
         self.ui.BoxTable.setSortingEnabled(True)
 
     def getSbLineBox(self):
-        self.ui.BoxTable.selectionModel().selectionChanged.disconnect(self.on_rowSelectionChanged)
+        #self.ui.BoxTable.selectionModel().selectionChanged.disconnect(self.on_rowSelectionChanged)
         self.ui.BoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectItems)
+        self.statusBoxType.setText("Line")
+        self.statusSelectionMode.setText("Item")
+        self.statusDrawingMode.setText("Table")
         print(f'Selection Mode: Select Items')
         #self.ui.actionDraw_Table_LineBox_tb.triggered.connect(self.putSbLineBox(x,y,w,h))
         #self.spinbox = QSpinBox(None) #changed parent from None to self.ui.BoxTable - could also be just self
@@ -2872,6 +2882,7 @@ class MainWindow(qtw.QMainWindow):
         #self.spinbox.valueChanged.connect(self.onValueChanged)
         self.ui.BoxTable.setSortingEnabled(False)
         if self.mode == "SbEdit":
+            self.statusBoxMode.setText("Edit")
             print('Line Box Mode: SbEdit')
             for column in range(0,7):
                 self.tableitem = self.ui.BoxTable.item(self.row_selected, column)
@@ -3161,5 +3172,10 @@ class ResizableRubberBand(QWidget):
 if __name__ == '__main__': 
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
+    print(w.txtpath)
+    #app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_orange.qss').read_text())
+    #app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_blue.qss').read_text())
+    #app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/classic.qss').read_text())
     w.show()
     app.exec()
+
