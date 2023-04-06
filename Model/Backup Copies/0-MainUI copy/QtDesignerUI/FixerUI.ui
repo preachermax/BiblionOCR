@@ -1,0 +1,2507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Fixer</class>
+ <widget class="QMainWindow" name="Fixer">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1319</width>
+    <height>933</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>FROMVS</family>
+    <pointsize>11</pointsize>
+    <weight>50</weight>
+    <italic>false</italic>
+    <bold>false</bold>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Fixer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../UI_Icons.qrc">
+    <normaloff>:/Icons/Icons/grail.png</normaloff>:/Icons/Icons/grail.png</iconset>
+  </property>
+  <property name="animated">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="SaveAsVerseTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>1240</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Save current text file as...</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SaveVerseTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>1270</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Overwrite current text file</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothNextChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next current image|text pair</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/ui-button-navigation.png</normaloff>:/Icons/Icons/ui-button-navigation.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothPrevChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous current image|text pair</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/ui-button-navigation-back.png</normaloff>:/Icons/Icons/ui-button-navigation-back.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothLoadButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Load current image|text pair</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/synchronize.png</normaloff>:/Icons/Icons/synchronize.png</iconset>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="OCRgroupBox">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>80</y>
+      <width>161</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QComboBox" name="OCRlangComboBox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>121</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR language</string>
+     </property>
+     <property name="locale">
+      <locale language="English" country="UnitedStates"/>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Ancient Greek</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Middle Greek</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Modern Greek</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hebrew</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Latin</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="OCRlanglabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>30</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string> OCR Language</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="OCRModellabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>80</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string> OCR LSTM Model</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="OCRModelComboBox">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>100</y>
+       <width>61</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR language model</string>
+     </property>
+     <property name="locale">
+      <locale language="English" country="UnitedStates"/>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>ell</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>grc</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>feg</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>heb</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>feh</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>lat</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>fel</string>
+      </property>
+     </item>
+    </widget>
+   </widget>
+   <widget class="QLineEdit" name="ImageLE">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>0</y>
+      <width>241</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="SessiongroupBox">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>30</y>
+      <width>161</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QLabel" name="booklabel">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>0</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Book</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="bookComboBox">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>20</y>
+       <width>61</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Bible book current image|text directory</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Mat</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Luk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Joh</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Act</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rom</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Co</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Co</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Gal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Eph</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Php</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Col</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Th</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Th</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Ti</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Ti</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tit</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Phm</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Heb</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jas</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Pe</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Pe</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Jn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Jn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3Jn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jud</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rev</string>
+      </property>
+     </item>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="reloadRefImgbutton">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reload current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/reload.png</normaloff>:/Icons/Icons/reload.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PrevRefImgbutton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous current image - !pair independent</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="RefImgLE">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>0</y>
+      <width>241</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Current image name</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefImgZoombutton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>0</y>
+      <width>21</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Zoom decorator</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/image-resize1.png</normaloff>:/Icons/Icons/image-resize1.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextRefImgbutton">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next current image - !pair independent</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="OpenImagebutton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="RefImgZoomComboBox">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>0</y>
+      <width>61</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select current image zoom</string>
+    </property>
+    <property name="inputMethodHints">
+     <set>Qt::ImhNone</set>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <property name="currentText">
+     <string>10 %</string>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>10 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>25 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>50 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>100 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>200 %</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QScrollArea" name="RefImgScrollArea">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>30</y>
+      <width>551</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="RefScrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>549</width>
+       <height>598</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="RefImg">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>6800</width>
+        <height>9600</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>3400</width>
+        <height>4800</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>520</width>
+        <height>700</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QSlider" name="RefImgZoomslider">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>0</y>
+        <width>21</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set current text line spacing</string>
+      </property>
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="pageStep">
+       <number>20</number>
+      </property>
+      <property name="value">
+       <number>25</number>
+      </property>
+      <property name="sliderPosition">
+       <number>25</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>true</bool>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="PrevImagebutton">
+    <property name="geometry">
+     <rect>
+      <x>990</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous current image - !pair independent</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextImagebutton">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next current image - !pair independent</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ImageZoombutton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>0</y>
+      <width>21</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Zoom decorator</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/image-resize1.png</normaloff>:/Icons/Icons/image-resize1.png</iconset>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ImageZoomComboBox">
+    <property name="geometry">
+     <rect>
+      <x>1100</x>
+      <y>0</y>
+      <width>61</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select current image zoom</string>
+    </property>
+    <property name="inputMethodHints">
+     <set>Qt::ImhNone</set>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <property name="currentText">
+     <string>10 %</string>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>10 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>25 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>50 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>100 %</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>200 %</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="reloadImagebutton">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reload current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/reload.png</normaloff>:/Icons/Icons/reload.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ImportRefImgFilebutton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Import current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/image-import.png</normaloff>:/Icons/image-import.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ExportImageFilebutton">
+    <property name="geometry">
+     <rect>
+      <x>1200</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Import current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/image-export.png</normaloff>:/Icons/image-export.png</iconset>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="ImageScrollArea">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>30</y>
+      <width>551</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="ImageScrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>549</width>
+       <height>598</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="Image">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>3400</width>
+        <height>4800</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>3400</width>
+        <height>4800</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>520</width>
+        <height>700</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+     <widget class="QSlider" name="ImageZoomslider">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>0</y>
+        <width>21</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set current text line spacing</string>
+      </property>
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="pageStep">
+       <number>20</number>
+      </property>
+      <property name="value">
+       <number>25</number>
+      </property>
+      <property name="sliderPosition">
+       <number>25</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>true</bool>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1319</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="font">
+     <font>
+      <family>Ubuntu</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_Reference_Text"/>
+    <addaction name="actionOpen_Text"/>
+    <addaction name="actionSave_Text"/>
+    <addaction name="actionSave_As_Text"/>
+    <addaction name="actionImport_Current_Image"/>
+    <addaction name="actionExport_Image"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <widget class="QMenu" name="menuMorphology">
+     <property name="title">
+      <string>Morphology</string>
+     </property>
+     <addaction name="actionThreshold"/>
+     <addaction name="actionOperator"/>
+     <addaction name="actionSE"/>
+     <addaction name="actionkernal_x"/>
+     <addaction name="actionkernel_y"/>
+     <addaction name="actionIterations"/>
+    </widget>
+    <widget class="QMenu" name="menuFill">
+     <property name="title">
+      <string>Fill</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/paint-can.png</normaloff>:/Icons/Icons/paint-can.png</iconset>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionFillTransparent"/>
+     <addaction name="actionFillSelection"/>
+     <addaction name="actionFillBackground"/>
+     <addaction name="actionFillForeground"/>
+    </widget>
+    <addaction name="actionDenoise"/>
+    <addaction name="actionErase"/>
+    <addaction name="actionCropRefImg"/>
+    <addaction name="menuFill"/>
+    <addaction name="actionFlipRefImg"/>
+    <addaction name="actionRotateRefImg_CW"/>
+    <addaction name="actionRotateRefImg_CCW"/>
+    <addaction name="actionDeskewRefImg"/>
+    <addaction name="menuMorphology"/>
+    <addaction name="actionBoxes"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuPrepare">
+    <property name="title">
+     <string>Prepflow</string>
+    </property>
+    <addaction name="actionSource_Page_Extraction"/>
+    <addaction name="actionLanguage_Segmentation"/>
+    <addaction name="actionBox_Production"/>
+    <addaction name="actionLine_Segmentation"/>
+    <addaction name="actionGlyph_Production"/>
+    <addaction name="actionFont_Production"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuPrepare"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockOutput">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>581</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>560</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="accessibleName">
+    <string/>
+   </property>
+   <property name="accessibleDescription">
+    <string/>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>     Output</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockOutputContents">
+    <widget class="QTextEdit" name="OutputText">
+     <property name="geometry">
+      <rect>
+       <x>29</x>
+       <y>0</y>
+       <width>550</width>
+       <height>200</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>520</width>
+       <height>200</height>
+      </size>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="EditToolBar">
+   <property name="windowTitle">
+    <string>Versify Text Tool Bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Versify Text Tool Bar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionDenoise"/>
+   <addaction name="actionErase"/>
+   <addaction name="actionFlipRefImg"/>
+   <addaction name="actionRotateRefImg_CW"/>
+   <addaction name="actionRotateRefImg_CCW"/>
+   <addaction name="actionCropRefImg"/>
+   <addaction name="actionFillTransparent"/>
+   <addaction name="actionDeskewRefImg"/>
+  </widget>
+  <widget class="QDockWidget" name="dockNothing">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>150</width>
+     <height>220</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>150</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string/>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockNothingContents">
+    <property name="minimumSize">
+     <size>
+      <width>150</width>
+      <height>200</height>
+     </size>
+    </property>
+    <widget class="QLabel" name="Nothing">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>155</width>
+       <height>200</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>150</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockGlyphRef">
+   <property name="minimumSize">
+    <size>
+     <width>550</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Glyph Reference</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockGlyphRefContents">
+    <property name="minimumSize">
+     <size>
+      <width>550</width>
+      <height>200</height>
+     </size>
+    </property>
+    <widget class="QLabel" name="GlyphRef">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>0</y>
+       <width>550</width>
+       <height>200</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>545</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <action name="actionpdf_to_tiff">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Icons/Icons/ocr2.png</normaloff>:/Icons/Icons/ocr2.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionmove_pdf_for_tiff">
+   <property name="text">
+    <string>pdf to tiff</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono">
+   <property name="text">
+    <string>tiff to mono</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png">
+   <property name="text">
+    <string>mono to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionGreek">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_2">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff">
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf4tiff.png</normaloff>:/Icons/Icons/pdf4tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf For tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage extracted pdf pages FOR tif conversion</string>
+   </property>
+   <property name="statusTip">
+    <string>Staging extracted pdf pages...</string>
+   </property>
+  </action>
+  <action name="actionpdf_to_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf2tiff.png</normaloff>:/Icons/Icons/pdf2tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf To tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert staged pdf pages TO tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting staged pdf pages...</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>tiff indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert tif pages TO black&amp;white indexed</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting tif pages to black&amp;white indexed...</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/png-file.png</normaloff>:/Icons/Icons/png-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>png indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert indexed tif pages TO png</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting indexed tif pages to png pages...</string>
+   </property>
+  </action>
+  <action name="actionLatin">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_3">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_4">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewGreek_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Greek tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Deskew Greek tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing Greek tif pages...</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_5">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewLatin_tiff_tb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Latin tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing Latin tif pages...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionResizeGreek_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Greek png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Resizing Greek png pages...</string>
+   </property>
+  </action>
+  <action name="actionResizeLatin_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Latin png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Resizing Latin png pages</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCrop_Languages_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Crop Languages</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto crop language pages into separate tif files</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto cropping language pages...</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionextract_pdf_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf-extract1.png</normaloff>:/Icons/Icons/pdf-extract1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Extract pdf</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract pdf pages from pdf source document</string>
+   </property>
+   <property name="statusTip">
+    <string>Extracting pdf pages...</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth">
+   <property name="text">
+    <string>tiff for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCrop">
+   <property name="text">
+    <string>Crop to tiff lines</string>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth_2">
+   <property name="text">
+    <string>Move tiff lines</string>
+   </property>
+  </action>
+  <action name="actionSplit">
+   <property name="text">
+    <string>Split text lines</string>
+   </property>
+  </action>
+  <action name="actionRename_tiff_lines">
+   <property name="text">
+    <string>Rename tiff lines</string>
+   </property>
+  </action>
+  <action name="actionRename_text_lines">
+   <property name="text">
+    <string>Rename text lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionGreek_Wordlist_2">
+   <property name="text">
+    <string>Greek Wordlist</string>
+   </property>
+  </action>
+  <action name="actionLatin_Wordlist">
+   <property name="text">
+    <string>Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionText_Lines">
+   <property name="text">
+    <string>Text Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_2">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_2">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionCorrect_OCR_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ocr3.png</normaloff>:/Icons/Icons/ocr3.png</iconset>
+   </property>
+   <property name="text">
+    <string>OCR Image</string>
+   </property>
+   <property name="toolTip">
+    <string>OCR current image</string>
+   </property>
+   <property name="statusTip">
+    <string>Performing OCR on current image...</string>
+   </property>
+  </action>
+  <action name="actionVersify_Text">
+   <property name="text">
+    <string>Versify Text</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Verses">
+   <property name="text">
+    <string>Update Verses</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words_Post">
+   <property name="text">
+    <string>Update Words</string>
+   </property>
+  </action>
+  <action name="actionNormalize">
+   <property name="text">
+    <string>Normalize</string>
+   </property>
+  </action>
+  <action name="actionLower_Case">
+   <property name="text">
+    <string>Lower Case</string>
+   </property>
+  </action>
+  <action name="actionRemove_Diacritics">
+   <property name="text">
+    <string>Remove Diacritics</string>
+   </property>
+  </action>
+  <action name="actionAlign_Strongs">
+   <property name="text">
+    <string>Align Strongs+RMAC</string>
+   </property>
+  </action>
+  <action name="actionAlign_Lemmas">
+   <property name="text">
+    <string>Align Lemmas</string>
+   </property>
+  </action>
+  <action name="actionAlign_English">
+   <property name="text">
+    <string>Align English</string>
+   </property>
+  </action>
+  <action name="actionVariants">
+   <property name="text">
+    <string>Variants</string>
+   </property>
+  </action>
+  <action name="actionTrain_Tesseract_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trainOCR4.png</normaloff>:/Icons/Icons/trainOCR4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Train Tesseract</string>
+   </property>
+   <property name="toolTip">
+    <string>Train Tesseract OCR with current Ground Truth</string>
+   </property>
+   <property name="statusTip">
+    <string>Training Tesseract OCR with current Ground Truth...</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ground-truth1.png</normaloff>:/Icons/Icons/ground-truth1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Validate Ground Truth</string>
+   </property>
+   <property name="toolTip">
+    <string>Validate current Ground Truth image|text</string>
+   </property>
+   <property name="statusTip">
+    <string>Validating current Ground Truth image|text pairs...</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/update-greek-wordlist.png</normaloff>:/Icons/Icons/update-greek-wordlist.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Greek Wordlist</string>
+   </property>
+   <property name="toolTip">
+    <string>Update Greek Wordlist for OCR Training</string>
+   </property>
+   <property name="statusTip">
+    <string>Upadting Greek wordlist...</string>
+   </property>
+  </action>
+  <action name="actionAutoCrop_Greek_to_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Greek To tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto cropping Greek tif lines....</string>
+   </property>
+  </action>
+  <action name="actionRename_Greek_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Greek tif lines...</string>
+   </property>
+  </action>
+  <action name="actionMove_Greek_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Greek tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Moving Greek tif lines...</string>
+   </property>
+  </action>
+  <action name="actionSplitGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Greek Pages To Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Splitting Greek pages to text lines...</string>
+   </property>
+  </action>
+  <action name="actionRenameGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Greek text lines...</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines_3">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_menu">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_menu">
+   <property name="text">
+    <string>Update Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionAutoCrop_Latin_To_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="iconText">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="toolTip">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto croping Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRename_Latin_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionMove_Latin_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Latin tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Moving Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionSplit_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Latin Pages To Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Splitting Latin pages to text lines...</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRename_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Latin text lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actiondeskew_mono">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Transform indexed tif pages To deskewed tif and png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing indexed tif pages...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+  </action>
+  <action name="actionVerse_Correction">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/versify.png</normaloff>:/Icons/Icons/versify.png</iconset>
+   </property>
+   <property name="text">
+    <string>Verse Correction</string>
+   </property>
+   <property name="toolTip">
+    <string>Book Chapter:Verse Text Assignment</string>
+   </property>
+   <property name="statusTip">
+    <string>Assigning Book Chapter:Verse to text lines</string>
+   </property>
+  </action>
+  <action name="actionConvert_Greek_tiff_To_png">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2png-greek.png</normaloff>:/Icons/Icons/tiff2png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Greek tif To png</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting Greek tif pages to png pages</string>
+   </property>
+  </action>
+  <action name="actionConvert_Latin_tiff_To_png">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2png-latin.png</normaloff>:/Icons/Icons/tiff2png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Latin tif To png</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert Latin tif pages To png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting Latin tif pages To png pages</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionExtract_Glyphs">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trace1.png</normaloff>:/Icons/Icons/trace1.png</iconset>
+   </property>
+   <property name="text">
+    <string>GlyphTracer</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract and trace bitmap glyphs with GlyphTracer</string>
+   </property>
+   <property name="statusTip">
+    <string>Extracting and trace bitmap glyphs with GlyphTracer...</string>
+   </property>
+  </action>
+  <action name="actionLine_tif_to_bmp">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2bmp.png</normaloff>:/Icons/Icons/tiff2bmp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert tif To bmp</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert current tif image to bmp</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting current tif image to bmp...</string>
+   </property>
+  </action>
+  <action name="actionFontForge">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+   </property>
+   <property name="text">
+    <string>FontForge</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit current GlyphTracer sfd file in FontForge</string>
+   </property>
+   <property name="statusTip">
+    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionOpen_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Text</string>
+   </property>
+  </action>
+  <action name="actionSave_Image">
+   <property name="text">
+    <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Image">
+   <property name="text">
+    <string>Save As Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save As Image</string>
+   </property>
+  </action>
+  <action name="actionConvert_Image_s">
+   <property name="text">
+    <string>Convert Image(s)</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_3">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionHebrew">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionHebrew_2">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Hebrew_Wordlist">
+   <property name="text">
+    <string>Update Hebrew Wordlist</string>
+   </property>
+  </action>
+  <action name="actionHebrew_3">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionOCR_Image">
+   <property name="text">
+    <string>OCR Image</string>
+   </property>
+  </action>
+  <action name="actionSelect_Image">
+   <property name="text">
+    <string>Select Image</string>
+   </property>
+  </action>
+  <action name="actionGreek_2">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actionHebrew_4">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionLatin_2">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionSelect_Language_Model">
+   <property name="text">
+    <string>Select Language Model</string>
+   </property>
+  </action>
+  <action name="actionSelect_Fonts">
+   <property name="text">
+    <string>Select Fonts</string>
+   </property>
+  </action>
+  <action name="actionany">
+   <property name="text">
+    <string>any</string>
+   </property>
+  </action>
+  <action name="actionAny">
+   <property name="text">
+    <string>Any</string>
+   </property>
+  </action>
+  <action name="actionStage_Ground_Truth">
+   <property name="text">
+    <string>Stage Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCreate_e_Sword_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
+   </property>
+   <property name="text">
+    <string>e-Sword Bible Module</string>
+   </property>
+  </action>
+  <action name="actionCreate_theWord_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
+   </property>
+   <property name="text">
+    <string>theWord Bible Module</string>
+   </property>
+  </action>
+  <action name="actionEnglish">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglishh">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglish_2">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglish_3">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionOnline">
+   <property name="text">
+    <string>Online</string>
+   </property>
+  </action>
+  <action name="actionManual_Crop_Image_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/image-crop.png</normaloff>:/Icons/Icons/image-crop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manual Crop</string>
+   </property>
+   <property name="toolTip">
+    <string>Manually crop current tif image</string>
+   </property>
+   <property name="statusTip">
+    <string>Manually cropping current tif image...</string>
+   </property>
+  </action>
+  <action name="actionEdit_Image_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gimp Image Editor</string>
+   </property>
+   <property name="statusTip">
+    <string>Editing image in Gimp...</string>
+   </property>
+  </action>
+  <action name="actionGimp">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gimp</string>
+   </property>
+  </action>
+  <action name="actionLibreOffice_Calc">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibreOffice Calc</string>
+   </property>
+  </action>
+  <action name="actionDB_Browser_for_SQLite">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/server.png</normaloff>:/Icons/Icons/server.png</iconset>
+   </property>
+   <property name="text">
+    <string>DB Browser for SQLite</string>
+   </property>
+  </action>
+  <action name="actionOpen_Reference_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Reference Text</string>
+   </property>
+  </action>
+  <action name="actionRotateRefImg_CW">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/layer-rotate.png</normaloff>:/Icons/Icons/layer-rotate.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate CW</string>
+   </property>
+  </action>
+  <action name="actionDeskewRefImg">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew_clear.png</normaloff>:/Icons/Icons/deskew_clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew</string>
+   </property>
+  </action>
+  <action name="actionDespeckleRefImg">
+   <property name="text">
+    <string>Despeckle</string>
+   </property>
+  </action>
+  <action name="actionFlipRefImg">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/layer-flip.png</normaloff>:/Icons/Icons/layer-flip.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip</string>
+   </property>
+  </action>
+  <action name="actionConvert">
+   <property name="text">
+    <string>Convert</string>
+   </property>
+  </action>
+  <action name="actionImport_Current_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/image-import.png</normaloff>:/Icons/image-import.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Reference Image</string>
+   </property>
+  </action>
+  <action name="actionExport_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/image-export.png</normaloff>:/Icons/image-export.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export Image As</string>
+   </property>
+  </action>
+  <action name="actionThreshold">
+   <property name="text">
+    <string>Threshold</string>
+   </property>
+  </action>
+  <action name="actionOperator">
+   <property name="text">
+    <string>Operator</string>
+   </property>
+  </action>
+  <action name="actionSE">
+   <property name="text">
+    <string>SE</string>
+   </property>
+  </action>
+  <action name="actionkernal_x">
+   <property name="text">
+    <string>kernal(x)</string>
+   </property>
+  </action>
+  <action name="actionkernel_y">
+   <property name="text">
+    <string>kernel(y)</string>
+   </property>
+  </action>
+  <action name="actionIterations">
+   <property name="text">
+    <string>Iterations</string>
+   </property>
+  </action>
+  <action name="actionBoxes">
+   <property name="text">
+    <string>Boxer</string>
+   </property>
+  </action>
+  <action name="actionGlyph_Tracer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trace1.png</normaloff>:/Icons/Icons/trace1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Glyph Tracer</string>
+   </property>
+  </action>
+  <action name="actionPage_Segmentation">
+   <property name="text">
+    <string>Page Segmentation</string>
+   </property>
+  </action>
+  <action name="actionLanguage_Segmentation">
+   <property name="text">
+    <string>Language Segmentation</string>
+   </property>
+  </action>
+  <action name="actionLine_Segmentation">
+   <property name="text">
+    <string>Line Segmentation</string>
+   </property>
+  </action>
+  <action name="actionGlyph_Production">
+   <property name="text">
+    <string>Glyph Production</string>
+   </property>
+  </action>
+  <action name="actionFont_Production">
+   <property name="text">
+    <string>Font Production</string>
+   </property>
+  </action>
+  <action name="actionSource_Page_Extraction">
+   <property name="text">
+    <string>Source Page Extraction</string>
+   </property>
+  </action>
+  <action name="actionCropRefImg">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/image-crop.png</normaloff>:/Icons/Icons/image-crop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop</string>
+   </property>
+  </action>
+  <action name="actionBox_Production">
+   <property name="text">
+    <string>Box Production</string>
+   </property>
+  </action>
+  <action name="actionErase">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/eraser.png</normaloff>:/Icons/Icons/eraser.png</iconset>
+   </property>
+   <property name="text">
+    <string>Erase</string>
+   </property>
+  </action>
+  <action name="actionFillBackground">
+   <property name="text">
+    <string>Background</string>
+   </property>
+  </action>
+  <action name="actionFillForeground">
+   <property name="text">
+    <string>Foreground</string>
+   </property>
+  </action>
+  <action name="actionFillTransparent">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/table-paint-can.png</normaloff>:/Icons/Icons/table-paint-can.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fill Transparent Areas</string>
+   </property>
+  </action>
+  <action name="actionFillSelection">
+   <property name="text">
+    <string>Selection</string>
+   </property>
+  </action>
+  <action name="actionRotateRefImg_CCW">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/layer-rotate-left.png</normaloff>:/Icons/Icons/layer-rotate-left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate CCW</string>
+   </property>
+  </action>
+  <action name="actionDenoise">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/denoise.png</normaloff>:/Icons/Icons/denoise.png</iconset>
+   </property>
+   <property name="text">
+    <string>Denoise</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

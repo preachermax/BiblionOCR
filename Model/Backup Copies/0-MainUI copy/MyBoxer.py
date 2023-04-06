@@ -1,0 +1,1586 @@
+# Python imports
+import csv
+import json
+import os
+import re
+#import glob
+import shutil
+import sys
+
+#from ImageQt import ImageQt  
+import cv2
+import numpy as np
+import pytesseract
+import qimage2ndarray
+import tiffcapture
+#from subprocess import Popen, PIPE, CalledProcessError
+from PIL import Image, ImageDraw, ImageFont, ImageQt
+# PyQt5 imports
+from PyQt5 import QtCore as qtc
+from PyQt5 import QtGui as qtg
+from PyQt5 import QtWidgets as qtw
+
+from ext import mainfind
+from MyBoxerUI import Ui_Boxer
+
+#from PyQt5.QtCore import QObject, QThread, pyqtSignal
+
+# Dialog Imports
+
+from Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
+from Dialogs.crop_latin_linesDialog import Ui_crop_latin_linesDialog
+from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
+from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
+from Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
+from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
+from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
+
+
+class MainWindow(qtw.QMainWindow):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # load the pre-compiled QtDesigner Ui_MainUI user interface
+        self.ui = Ui_Boxer()
+        self.ui.setupUi(self)
+        
+        self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
+        self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
+        self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
+        
+        self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
+        self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
+        self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
+        
+        self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
+        self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
+        
+        self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.actionSplit_Latin_Text_Lines)
+        self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.actionRename_Latin_Text_Lines)
+        
+        #self.ui.actionReview_Ground_Truth_tb.triggered.connect(self.actionReview_Ground_Truth)
+        #self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
+        #self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
+        #self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
+        self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
+        self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
+        self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
+
+        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.MyPixerbutton.clicked.connect(self.OpenWithMyPixer)
+        self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
+        self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)
+        self.ui.LineBoxImagebutton.clicked.connect(self.word2linebox)
+    
+        self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
+        self.ui.BothLoadButton.clicked.connect(self.bothLoad)
+        self.ui.BothPrevButton.clicked.connect(self.prevImage)
+        self.ui.BothPrevButton.clicked.connect(self.prevText)
+        self.ui.BothNextButton.clicked.connect(self.nextImage)
+        self.ui.BothNextButton.clicked.connect(self.nextText)
+        self.ui.PrevImgButton.clicked.connect(self.prevImage)
+        self.ui.NextImgButton.clicked.connect(self.nextImage)
+        self.ui.PrevTxtButton.clicked.connect(self.prevText)
+        self.ui.NextTxtButton.clicked.connect(self.nextText)
+
+        self.ui.Zoombutton.clicked.connect(self.get_zoom)
+        self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
+        self.ui.Zoomslider.valueChanged.connect(self.on_zoomslider)
+        self.ui.Zoomslider.sliderReleased.connect(self.DisableZoomSlider)
+        self.ui.Zoomslider.hide()
+        self.ui.LHDialogbutton.clicked.connect(self.GetLineSpacing)
+        self.ui.LHslider.valueChanged.connect(self.SetLineSpacing)
+        self.ui.LHslider.sliderReleased.connect(self.DisableLHSlider)
+        self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
+        self.ui.LHslider.hide()
+
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)         
+        
+        self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
+        self.ui.reloadImagebutton.clicked.connect(self.ReloadImage)
+        self.ui.reloadTextbutton.clicked.connect(self.ReloadText)
+        self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
+        self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
+        self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
+
+        self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
+
+        # UI and slots code ends here.
+        
+        # Show the Main user interface
+        self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(20)
+        self.ui.OCRDocument.setDefaultFont(font)
+        
+        self.ui.OCRDocument.setDefaultFont(font)
+        self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
+        self.ui.OCRTextFormat = qtg.QTextFormat()
+        self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
+        
+        self.ui.OCRText.setDocument(self.ui.OCRDocument)
+
+        ChrRefText = open('/home/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+
+        self.imgdir = r"/home/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
+
+    def actionCrop_Greek_To_tiff_Lines(self):
+        print("cropping and sorting Greek tiff lines")
+        #usage: tr.sortcroplines(source, splitdir, linebox)
+        self.crop_greeklinesDialog = qtw.QDialog()
+        self.crop_greeklines_ui = Ui_crop_greek_linesDialog()
+        self.crop_greeklines_ui.setupUi(self.crop_greeklinesDialog)
+        self.crop_greeklinesDialog.show()
+
+        self.crop_greeklines_ui.SourceButton.clicked.connect(self.CropGreekLinesDialog)
+        self.crop_greeklines_ui.BoxFolderButton.clicked.connect(self.LineBoxFolderDialog)
+        self.crop_greeklines_ui.DestGreekButton.clicked.connect(self.DestGreekLinesDialog)
+
+        rsp = self.crop_greeklinesDialog.exec_()
+        
+        if self.crop_greeklinesDialog.Accepted:
+            tr.sortcroplines(self.crop_greeklines_ui.SourceLineEdit.text(),self.crop_greeklines_ui.BoxFolderLineEdit.text(),self.crop_greeklines_ui.DestGreekLineEdit.text())
+            print("completed creating cropped language tif files")
+        #tr.sortcroplines(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
+        #tr.sortcroplines(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
+        
+    def actionRename_Greek_tiff_Lines(self):
+        print("renaming Greek tif lines for ground truth")
+        # usage: tr.renameimages(source, destination)
+        self.greekrenamelinesDialog = qtw.QDialog()
+        self.greekrenamelines_ui = Ui_tifgreekrenamelinesDialog()
+        self.greekrenamelines_ui.setupUi(self.greekrenamelinesDialog)
+        self.greekrenamelinesDialog.show()
+
+        self.greekrenamelines_ui.SourceButton.clicked.connect(self.GreekRenameLinesDialog)
+        self.greekrenamelines_ui.DestinationButton.clicked.connect(self.DestGreekRenameLinesDialog)
+
+        rsp = self.greekrenamelinesDialog.exec_()
+        
+        if self.greekrenamelinesDialog.Accepted:
+            tr.renameimages(self.greekrenamelines_ui.SourceLineEdit.text(), self.greekrenamelines_ui.DestinationLineEdit.text())
+            
+            print("completed renaming Greek tif lines for ground truth")
+        # tr.renameimages(r"/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.renameimages(r"/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+       
+    def actionMove_Greek_tiff_Lines(self):
+        print("moving Greek tif lines for ground truth")
+        # usage: tr.renameimages(source, destination)
+        self.greekmovelinesDialog = qtw.QDialog()
+        self.greekmovelines_ui = Ui_tifgreekmovelinesDialog()
+        self.greekmovelines_ui.setupUi(self.greekmovelinesDialog)
+        self.greekmovelinesDialog.show()
+
+        self.greekmovelines_ui.SourceButton.clicked.connect(self.GreekMovelinesDialog)
+        self.greekmovelines_ui.DestinationButton.clicked.connect(self.DestGreekMovelinesDialog)
+
+        rsp = self.greekmovelinesDialog.exec_()
+        
+        if self.greekmovelinesDialog.Accepted:
+            tr.renameimages(self.greekmovelines_ui.SourceLineEdit.text(), self.greekmovelines_ui.DestinationLineEdit.text())
+            print("completed moving Greek tif lines for ground truth")
+        
+        # tr.renameimages(r"/home/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        #tr.renameimages("/home/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "/home/max/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
+        #pass
+
+    def actionCrop_Latin_To_tiff_Lines(self):
+        print("cropping and sorting Latin tiff lines")
+        #usage: tr.sortcroplines(source, splitdir, linebox)
+        self.crop_latinlinesDialog = qtw.QDialog()
+        self.crop_latinlines_ui = Ui_crop_latin_linesDialog()
+        self.crop_latinlines_ui.setupUi(self.crop_latinlinesDialog)
+        self.crop_latinlinesDialog.show()
+
+        self.crop_latinlines_ui.SourceButton.clicked.connect(self.CroplatinLinesDialog)
+        self.crop_latinlines_ui.BoxFolderButton.clicked.connect(self.LineBoxFolderDialog)
+        self.crop_latinlines_ui.DestlatinButton.clicked.connect(self.DestlatinLinesDialog)
+
+        rsp = self.crop_latinlinesDialog.exec_()
+        
+        if self.crop_latinlinesDialog.Accepted:
+            tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
+            print("completed creating cropped Latin tif lines")
+        #tr.sortcroplines(r"/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
+        tr.sortcroplines(r"/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
+
+    def actionRename_Latin_tiff_Lines(self):
+        print("renaming Latin tiff lines for ground truth")
+        # usage: tr.renameimages(source, destination)
+        self.latinrenamelinesDialog = qtw.QDialog()
+        self.latinrenamelines_ui = Ui_tiflatinrenamelinesDialog()
+        self.latinrenamelines_ui.setupUi(self.latinrenamelinesDialog)
+        self.latinrenamelinesDialog.show()
+
+        self.latinrenamelines_ui.SourceButton.clicked.connect(self.LatinRenameLinesDialog)
+        self.latinrenamelines_ui.DestinationButton.clicked.connect(self.DestLatinRenameLinesDialog)
+
+        rsp = self.latinrenamelinesDialog.exec_()
+        
+        if self.latinrenamelinesDialog.Accepted:
+            tr.renameimages(self.latinrenamelines_ui.SourceLineEdit.text(), self.latinrenamelines_ui.DestinationLineEdit.text())
+            
+            print("completed renaming Greek tif lines for ground truth")
+        
+        # tr.renameimages(r"/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "/home/max/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
+        #tr.renameimages(r"/home/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "/home/max/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
+
+    def actionMove_Latin_tiff_Lines(self):
+        print("moving Latin tif lines for ground truth")
+        # usage: tr.renameimages(source, destination)
+        self.latinmovelinesDialog = qtw.QDialog()
+        self.latinmovelines_ui = Ui_tiflatinmovelinesDialog()
+        self.latinmovelines_ui.setupUi(self.latinmovelinesDialog)
+        self.latinmovelinesDialog.show()
+
+        self.latinmovelines_ui.SourceButton.clicked.connect(self.LatinMovelinesDialog)
+        self.latinmovelines_ui.DestinationButton.clicked.connect(self.DestLatinMovelinesDialog)
+
+        rsp = self.latinmovelinesDialog.exec_()
+        
+        if self.latinmovelinesDialog.Accepted:
+            tr.renameimages(self.latinmovelines_ui.SourceLineEdit.text(), self.latinmovelines_ui.DestinationLineEdit.text())
+            print("completed moving Latin tif lines for ground truth")
+
+    def actionSplitGreek_text_lines(self):
+        print("splitting Greek textlines for ground truth")
+        # usage: tr.splittextlines(source, destination)
+        # tr.splittextlines(r"/home/max/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
+        tr.splittextlines("/home/max/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
+        
+    def actionRenameGreek_text_lines(self):
+        print("renaming Greek textlines for ground truth")
+        # usage: tr.text2groundtruth(source, destination)
+        #tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
+        tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
+    
+    def actionSplit_Latin_Text_Lines(self):
+        print("splitting Latin textlines for ground truth")
+        # usage: tr.splittextlines(source, destination)
+        # tr.splittextlines(r"/home/max/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+        tr.splittextlines("/home/max/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+
+    def actionRename_Latin_Text_Lines(self):
+        print("renaming Latin textlines for ground truth")
+        # usage: tr.text2groundtruth(source, destination)
+        #tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+        tr.text2groundtruth(r"/home/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/max/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+    
+    def initBookCombo(self):
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+        
+        # Iterating through the json
+        # list
+        for booknumber in data:
+            print(booknumber['bookabbr'])
+            self.ui.bookComboBox.addItem(booknumber['bookabbr'])
+        
+        # Closing file
+        f.close()
+        
+        #self.ui.bookComboBox.setEditText(self.bookabbr)'''
+
+    def toggleGreekToolbars(self):
+
+        greekimgpagesstate = self.ui.GreekImagePagesToolBar.isVisible()
+        greekimglinesstate = self.ui.GreekImageLinesToolBar.isVisible()
+        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()        
+        
+        # Set the visibility to its inverse
+        self.ui.GreekImagePagesToolBar.setVisible(not greekimgpagesstate)
+        self.ui.GreekImageLinesToolBar.setVisible(not greekimglinesstate)
+        self.ui.GreekTextLinesToolBar.setVisible(not greektxtlinesstate)
+
+    def toggleLatinToolbars(self):
+
+        #latinimgpagesstate = self.ui.LatinImagePagesToolBar.isVisible()
+        latinimglinesstate = self.ui.LatinImageLinesToolBar.isVisible()
+        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()        
+        
+        # Set the visibility to its inverse
+        #self.ui.LatinImagePagesToolBar.setVisible(not latinimgpagesstate)
+        self.ui.LatinImageLinesToolBar.setVisible(not latinimglinesstate)
+        self.ui.LatinTextLinesToolBar.setVisible(not latintxtlinesstate)
+
+    def selectBookCombo(self):
+        oldbookabbr = self.bookabbr
+        self.bookabbr = self.ui.bookComboBox.currentText()
+        
+        if self.ui.bookComboBox.currentText() != oldbookabbr:
+                  
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/BooksMarkDown.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                for BookAbbr in data:
+                    if BookAbbr['BookAbbr'] == self.bookabbr:
+                        bookmarkdown = BookAbbr['BookMarkdown']
+                        self.sourcebookmarkdown = 'source'+bookmarkdown
+                        self.greekbookmarkdown = 'greek'+bookmarkdown
+                        self.latinbookmarkdown = 'latin'+bookmarkdown
+                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
+            f.close()
+            
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                bookabbr_key = r"self.bookabbr"
+                source_book_markdown_key = r"self.sourcebookmarkdown"
+                greek_book_markdown_key = r"self.greekbookmarkdown"
+                latin_book_markdown_key = r"self.latinbookmarkdown"
+
+                for Setting in data:
+                    if Setting['Setting'] == bookabbr_key:
+                        Setting['CurrentValue'] = self.bookabbr
+                    elif Setting['Setting'] == source_book_markdown_key:
+                        Setting['CurrentValue'] = self.sourcebookmarkdown
+                    elif Setting['Setting'] == greek_book_markdown_key:
+                        Setting['CurrentValue'] = self.greekbookmarkdown
+                    elif Setting['Setting'] == latin_book_markdown_key:
+                        Setting['CurrentValue'] = self.latinbookmarkdown
+                    print(Setting['CurrentValue'])
+            f.close()
+            
+            os.remove(jsonfile)
+            with open(jsonfile, 'w') as f:
+                json.dump(data, f, indent=4)
+            f.close()
+
+            # Opening JSON file
+            '''with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+                # returns JSON object as
+                    # a dictionary
+                data = json.load(f)'''
+            
+            #self.ui.bookComboBox.clear()
+            
+            # Iterating through the json
+            # list          
+            '''for booknumber in data:
+                print(booknumber['bookabbr'])
+                self.ui.bookComboBox.addItem(booknumber['bookabbr'])
+            
+            # Closing file
+            f.close()'''
+            
+        self.ui.bookComboBox.setCurrentText(self.bookabbr)
+
+    def setImageStack(self, tiffCaptureHandle):
+            """ Set the scene's current TIFF image stack to the input TiffCapture object.
+            Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
+            :type tiffCaptureHandle: TiffCapture
+            """
+            if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
+                raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
+            self._tiffCaptureHandle = tiffCaptureHandle
+            self.showFrame(0)
+
+    def loadImageStackFromFile(self,fileName=''):
+        """ Load an image stack from file.
+        Without any arguments, loadImageStackFromFile() will popup a file dialog to choose the image file.
+        With a fileName argument, loadImageStackFromFile(fileName) will attempt to load the specified file directly.
+        """
+        if len(fileName) == 0:
+            if QT_VERSION_STR[0] == '4':
+                fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
+            elif QT_VERSION_STR[0] == '5':
+                fileName, dummy = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
+        fileName = str(fileName)
+        if len(fileName) and os.path.isfile(fileName):
+            self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
+            
+    def numFrames(self):
+        """ Return the number of image frames in the stack.
+        """
+        if self._tiffCaptureHandle is not None:
+            # !!! tiffcapture has length=0 for a single page TIFF.
+            # If our handle is valid, we'll assume we have at least one image.
+            return max([1, self._tiffCaptureHandle.length])
+        return 0
+
+    def getFrame(self, i=None):
+        """ Return the i^th image frame as a NumPy ndarray.
+        If i is None, return the current image frame.
+        """
+        if self._tiffCaptureHandle is None:
+            return None
+        if i is None:
+            i = self.currentFrameIndex
+        if (i is None) or (i < 0) or (i >= self.numFrames()):
+            return None
+        return self._tiffCaptureHandle.find_and_read(i)
+
+    def showFrame(self, i=None):
+        """ Display the i^th frame in the viewer.
+        Also update the frame slider position and current frame text.
+        """
+        self.frame = self.getFrame(i)
+        if self.frame is None:
+            return
+        # Convert frame ndarray to a QImage.
+        self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
+    
+    def loadImage(self):     
+        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
+        if self.imgpath:
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            self.showImage(self.imgpath)
+            self.sortImgFiles()      
+        '''imgfilename, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self.ui.centralwidget, 'Select Image', '', 'Image Files (*.png *.jpg *.jpeg *.bmp *.tif)')
+        
+        if imgfilename:
+            self.ui.ImageLe.setText(os.path.basename(imgfilename))       
+            self.imgfilename = imgfilename'''
+
+    def showImage(self,imgfilename):
+        #self.imgfilename = self.imgpath
+        file = qtc.QFile(imgfilename)
+        filestr = os.path.basename(imgfilename)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if file.open(qtc.QIODevice.ReadOnly):
+            info = qtc.QFileInfo(imgfilename)
+        
+            '''if self.imgpath.endswith('.tif'):
+                self.loadImageStackFromFile(imgfilename)
+                self.showFrame(0)
+                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation) 
+            else:
+                self.pixmap = qtg.QPixmap(imgfilename).scaled(self.ui.Image.size(), 
+                    qtc.Qt.KeepAspectRatio)'''       
+
+            if fileext == '.tif':
+                self.loadImageStackFromFile(imgfilename)
+                self.showFrame(0)
+                self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
+                '''self.origsize = self.origpixmap.size()       
+                self.origheight = self.origpixmap.height
+                self.origwidth = self.origpixmap.width
+                self.pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)'''
+                
+                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
+                #self.ui.Image.setPixmap(self.pixmap) -- moved out below
+            else:
+                self.pixmap = qtg.QPixmap(self.imgpath)
+                #self.ui.Image.setPixmap(self.pixmap) -- moved out below
+        
+        file.close()
+        
+        if self.pixmap.isNull():
+            return
+        
+        self.on_zoom()
+        #self.ui.Image.setPixmap(self.pixmap)
+        
+        self.imgdir = os.path.dirname(imgfilename)
+        self.ui.ImageLe.setText(filestr)
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+                
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            imgpath_key = r"self.imgpath"
+            imgdir_key = r"self.imgdir"
+            for Setting in data:
+                if Setting['Setting'] == imgpath_key:
+                    Setting['CurrentValue'] = self.imgpath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == imgdir_key:  
+                    Setting['CurrentValue'] = self.imgdir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()
+        
+        self.imgfileList = []
+        for i in os.listdir(self.imgdir):
+            ipath = os.path.join(self.imgdir, i)
+            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                self.imgfileList.append(ipath)        
+        '''self.imgfileList = []
+        for i in os.listdir(self.imgdir):
+            ipath = os.path.join(self.imgdir, i)
+            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                self.imgfileList.append(ipath)'''
+
+        self.sortImgFiles()
+
+    def sortImgFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
+        #self.fileList.sort()
+        #print(self.sorted_imgfilelist)
+        self.imgdirIterator = iter(self.sorted_imgfilelist)
+        self.nextimage = next(self.imgdirIterator)
+        self.imgdirRevIterator = reversed(self.sorted_imgfilelist)
+        self.previmage = next(self.imgdirRevIterator)
+        while True:
+            # cycle through the iterator until the current file is found
+            if next(self.imgdirIterator) == self.imgpath:
+                break
+        while True:
+            # cycle through the reverse iterator until the current file is found
+            if next(self.imgdirRevIterator) == self.imgpath:
+                break
+    
+    def nextImage(self):      
+        # ensure that the file list has not been cleared due to missing files     
+        filestr = os.path.basename(self.imgpath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.imgfileList:
+            try:
+                imgfilename = self.imgpath
+                nextimgfilename = next(self.imgdirIterator)
+                self.ui.ImageLe.setText(os.path.basename(nextimgfilename))
+                if fileext == '.tif':
+                    print(nextimgfilename)
+                    self.loadImageStackFromFile(nextimgfilename)
+                    self.showFrame(0)
+                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
+                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+                else:
+                    pixmap = qtg.QPixmap(nextimgfilename).scaled(self.ui.Image.size(), 
+                        qtc.Qt.KeepAspectRatio)
+
+            except:
+                # the iterator has finished, restart it
+                self.imgdirIterator = iter(self.imgfileList)
+                #self.imgdirRevIterator = reversed(self.imgfileList)
+                #print(self.imgfileList)
+                self.prevImage()
+            
+            self.imgpath = nextimgfilename
+            self.showImage(nextimgfilename)            
+
+        else:
+            # no file list found, load an image
+            # self.OpenImageFileDialog()
+            self.loadImage()
+
+    def prevImage(self):
+        # ensure that the file list has not been cleared due to missing files     
+        filestr = os.path.basename(self.imgpath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.imgfileList:
+            try:
+                imgfilename = self.imgpath
+                previmgfilename = next(self.imgdirRevIterator)
+                self.ui.ImageLe.setText(os.path.basename(previmgfilename))
+                if fileext == '.tif':
+                    print(previmgfilename)
+                    self.loadImageStackFromFile(previmgfilename)
+                    self.showFrame(0)
+                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
+                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+                else:
+                    pixmap = qtg.QPixmap(previmgfilename).scaled(self.ui.Image.size(), 
+                        qtc.Qt.KeepAspectRatio)
+
+            except:
+                # the iterator has finished, restart it
+                self.imgdirRevIterator = reversed(self.imgfileList)
+                #self.imgdirIterator = iter(self.imgfileList)
+                #self.nextImage()
+            
+            self.imgpath = previmgfilename
+            self.showImage(previmgfilename)
+            
+
+        else:
+            # no file list found, load an image
+            # self.OpenImageFileDialog()
+            self.loadImage()
+
+    def ReloadImage(self):
+        if self.imgpath:
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            self.showImage(self.imgpath)
+            self.sortImgFiles()  
+        '''if self.imgpath:
+            file = qtc.QFile(self.imgpath)
+            filestr = os.path.basename(self.imgpath)
+            self.imgdir = os.path.dirname(self.imgpath)
+            self.ui.ImageLe.setText(filestr)
+            filesplit = os.path.splitext(filestr)
+            filename = filesplit[0]
+            fileext = filesplit[1]
+                        
+           if file.open(qtc.QIODevice.ReadOnly):
+                info = qtc.QFileInfo(self.imgpath)
+                #print(qtg.QImage.size(self.qimage))
+                #print(self.qimage.size())
+                #pmsize = qtg.QPixmap.fromImage(self.qimage).size()
+                #print(pmsize)
+
+                if fileext == '.tif':
+                    self.loadImageStackFromFile(str(self.imgpath))
+                    self.showFrame(0)
+                    
+                    #w,h = qtg.QImage.size(self.qimage)
+                    #print(qtg.QImage.size(self.qimage))
+                    #pmsize = qtg.QPixmap.fromImage(self.qimage).size()
+                    #print(pmsize)
+                    self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
+                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+                    #pixmap = qtg.QPixmap.fromImage(self.qimage)   
+                    self.ui.Image.setPixmap(qtg.QPixmap(pixmap))
+                else:
+                    
+                    self.ui.Image.setPixmap(qtg.QPixmap(self.imgpath))
+        
+                self.imgfileList = []
+                for i in os.listdir(self.imgdir):
+                    ipath = os.path.join(self.imgdir, i)
+                    if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                        self.imgfileList.append(ipath)
+
+                self.sortImgFiles(MainWindow)'''
+
+    def get_zoom(self):
+        self.ui.Zoomslider.setEnabled(True)
+        self.ui.Zoomslider.show()
+        zoomValue = self.ui.Zoomslider.value()
+        
+    def DisableZoomSlider(self):
+        self.ui.Zoomslider.hide()
+        self.ui.Zoomslider.setEnabled(False)
+
+    def MoveZoomSlider(self):
+        self.ui.Zoomslider.setEnabled(True)
+        self.ui.Zoomslider.setValue(int(self.ui.ZoomComboBox.currentText()[0]))
+
+    def show_combo(self):
+        self.ui.ZoomComboBox.show()
+
+    def on_zoomslider(self):
+        #if self.ui.Zoomslider.isEnabled():
+        zoomValue = self.ui.Zoomslider.value()
+        self.ui.ZoomComboBox.setCurrentText(str(zoomValue) + " %")
+        print(zoomValue)
+        self.scale = zoomValue/100
+        print(self.scale)
+    
+    def on_zoom(self):
+        seltext = self.ui.ZoomComboBox.currentText()
+        if self.ui.Zoomslider.isEnabled():
+            self.on_zoomslider()
+        #elif seltext != "Best_Fit":
+            #print("Best fit not selected")
+        selnumtext = seltext.split(" ")
+        print(selnumtext[0])
+        self.scale = float(selnumtext[0])/100
+        print(self.scale)
+        
+        self.resize_image()
+
+    def resize_image(self):
+
+        '''if self.ui.ZoomComboBox.currentText(): == "Best_Fit": 
+            print("Best fit selected")
+            
+            self.ui.Zoomslider.setEnabled(False)
+            self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
+            self.origsize = self.origpixmap.size()       
+            self.origheight = self.origpixmap.height
+            self.origwidth = self.origpixmap.width           
+            
+            bestheight = self.origheight
+            bestwidth = self.ui.ImagescrollArea.width
+            bestfit = qtc.QSize(self.origpixmap.height(),self.ui.ImagescrollArea.width())
+            
+            scaled_pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImagescrollArea.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)   
+            self.ui.Image.setPixmap(qtg.QPixmap(scaled_pixmap))
+        else:'''
+        self.origsize = self.origpixmap.size()       
+        self.origheight = self.origpixmap.height
+        self.origwidth = self.origpixmap.width
+        scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.ui.Image.setPixmap(scaled_pixmap)
+        
+        #self.ui.ImagescrollArea.adjustsize()
+
+    def GetRawOCRtext(self):
+        my_OCR_rawtext = pytesseract.image_to_string(self.imgpath,lang="feg")
+        self.ui.OCRText.insertPlainText(my_OCR_rawtext)
+        '''path = qtw.QFileDialog.getOpenFileName(
+            self.ui.centralwidget, 'Open tif image file', '',
+            'Images (*.tif)')[0]
+        if path:
+            file = qtc.QFile(path)
+            if file.open(qtc.QIODevice.ReadOnly):
+                info = qtc.QFileInfo(path)
+                my_OCR_rawtext = pytesseract.image_to_string(path,lang="feg")
+                #self.ui.OCRDocument.insertPlainText(my_OCR_rawtext)
+                self.ui.OCRText.insertPlainText(my_OCR_rawtext)
+                file.close()'''
+
+    def CropGreekLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select tif pages source folder"))
+
+        if self.directory:
+            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def GreekLineBoxFolderDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
+        
+        if self.directory:
+            self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(self.directory+r'/')
+
+    def DestGreekLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
+        
+        if self.directory:
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
+
+    def CropLatinLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select tif pages source folder"))
+
+        if self.directory:
+            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def LatinLineBoxFolderDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
+        
+        if self.directory:
+            self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
+
+    def DestLatinLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
+        
+        if self.directory:
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')            
+
+    def loadText(self):
+        '''self.textpath = QtWidgets.QFileDialog.getOpenFileName(
+            self.centralwidget, 'Open text file', '',
+            'Text files (*.txt)')[0]
+        if self.textpath:
+            self.textfile = QtCore.QFile(self.textpath)
+            self.txtfilename = os.path.basename(self.textpath)
+            self.showText(MainWindow,self.txtfilename)'''
+        
+        self.txtpath = qtw.QFileDialog.getOpenFileName(
+        self.ui.centralwidget, 'Open text file',self.txtdir,
+        'Text files (*.txt *.csv)')[0]
+        
+        if self.txtpath:
+            file = qtc.QFile(self.txtpath)
+            filename = os.path.basename(self.txtpath)
+            self.txtdir = os.path.dirname(self.txtpath)
+            self.ui.TextLE.setText(filename)
+            #self.sortTextFiles(MainWindow)
+            self.showText(self.txtpath)
+            self.sortTextFiles()
+
+    def showText(self, txtfilename):        
+        #self.textfile = txtfilename
+        if self.txtpath:
+            file = qtc.QFile(self.txtpath)
+            filename = os.path.basename(self.txtpath)
+            self.txtdir = os.path.dirname(self.txtpath)
+            self.ui.TextLE.setText(filename)
+        
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.txtpath)
+                self.ui.OCRText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.OCRText.insertPlainText(text)
+                else:
+                    self.ui.OCRText.setPlainText(text)
+            #textfile.close()
+            #txtdirpath = os.path.dirname(self.textpath)
+
+            # update font to selection and size       
+            self.on_font_update()
+            
+            # update line spacing
+            self.SetLineSpacing()
+            file.close()
+       
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            txtpath_key = r"self.txtpath"
+            txtdir_key = r"self.txtdir"
+            for Setting in data:
+                if Setting['Setting'] == txtpath_key:
+                    Setting['CurrentValue'] = self.txtpath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == txtdir_key:  
+                    Setting['CurrentValue'] = self.txtdir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()
+
+        self.txtfileList = []
+        for t in os.listdir(self.txtdir):
+            tpath = os.path.join(self.txtdir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.txtfileList.append(tpath)
+
+        self.sortTextFiles()
+
+    def sortTextFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)
+        #self.fileList.sort()
+        #print(self.sorted_txtfilelist)
+        self.txtdirIterator = iter(self.sorted_txtfilelist)
+        self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
+        while True:
+            # cycle through the iterator until the current file is found
+            if next(self.txtdirIterator) == self.txtpath:
+                break
+        while True:
+            # cycle through the reverse iterator until the current file is found
+            if next(self.txtdirRevIterator) == self.txtpath:
+                break
+
+    def nextText(self):
+        # ensure that the file list has not been cleared due to missing files
+        filestr = os.path.basename(self.txtpath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.txtfileList:
+            try:
+                txtfile = next(self.txtdirIterator)
+                self.ui.TextLE.setText(os.path.basename(txtfile))
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                    #QtCore.Qt.KeepAspectRatio)
+                self.txtfile = qtc.QFile(txtfile)
+                self.txtfilename = os.path.basename(txtfile)
+                self.dirname = os.path.dirname(self.txtpath)
+                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
+                self.txtpath = txtfile
+                print(txtfile,"\t",self.txtpath,"\t",self.txtfile,"\t",self.txtfilename)
+                #print(self.txtfilename)
+                self.showText(self.txtfilename)
+            except:
+                # the iterator has finished, restart it
+                self.txtdirIterator = iter(self.sorted_txtfilelist)
+                self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
+                self.prevText()
+            self.txtpath = txtfile
+            self.showText(txtfile)
+        else:
+            # no file list found, load an image
+            self.loadText()
+    
+    def prevText(self):
+        # ensure that the file list has not been cleared due to missing files
+        filestr = os.path.basename(self.txtpath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.txtfileList:
+            try:
+                #txtfile = self.textfile
+                txtfile = next(self.txtdirRevIterator)
+                self.ui.TextLE.setText(os.path.basename(txtfile))
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                    #QtCore.Qt.KeepAspectRatio)
+                self.txtfile = qtc.QFile(txtfile)
+                self.txtfilename = os.path.basename(txtfile)
+                self.dirname = os.path.dirname(self.txtpath)
+                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
+                self.txtpath = txtfile
+                print(txtfile,"\t",self.txtpath,"\t",self.txtfile,"\t",self.txtfilename)
+                #print(self.txtfilename)
+                self.showText(self.txtfilename)
+            except:
+                # the iterator has finished, restart it
+                self.txtdirRevIterator = reversed(sorted_txtfilelist)
+                self.txtdirIterator = iter(sorted_txtfilelist)
+                self.nextText()
+            self.txtpath = txtfile
+            self.showText(txtfile)    
+        else:
+            # no file list found, load an image
+            self.loadText()      
+
+    def ReloadText(self):
+        if self.txtpath:
+            print("Reloading "+ self.txtpath)
+            file = qtc.QFile(self.txtpath)
+            filename = os.path.basename(self.txtpath)
+            self.ui.TextLE.setText(filename)
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.txtpath)
+                self.ui.OCRText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.OCRText.insertPlainText(text)
+                else:
+                    self.ui.OCRText.setPlainText(text)
+                
+                # update font to selection and size       
+                self.on_font_update()
+                
+                # update line spacing
+                self.SetLineSpacing()
+
+    def bothLoad(self):
+        ''' load the matching file for either the current image or the current text '''
+        def accept():
+            #if self.ImageTextPairDialog.Accepted:
+            if self.ImageTextPairDialog_ui.MatchTxt2Imgbutton.isChecked():
+                print("matching text file to current image file")
+                print(self.imgpath)
+                if self.imgpath:
+                    print("finding matched text file for " + self.imgpath)
+                    imgfilename = self.imgpath
+                    file = qtc.QFile(imgfilename)
+                    filestr = os.path.basename(imgfilename)           
+                    filedir = os.path.dirname(imgfilename)
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]                    
+                    namesplit = filename.split("_")                    
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
+                else:
+                    print(self.imgpath + " does not exist")
+                
+                self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
+                if self.trytxtpath:
+                    print("opening " + self.trytxtpath)
+                    self.txtpath = self.trytxtpath
+                    self.showText(self.txtpath)
+                    #self.ReloadText()
+                else:
+                    print(self.trytxtpath + " does not exist")
+
+            elif self.ImageTextPairDialog_ui.MatchImg2Txtbutton.isChecked():
+                print("matching image file to current text file")
+                print(self.txtpath)
+                if self.txtpath:
+                    print("finding matched image file for " + self.txtpath)
+                    txtfilename = self.txtpath
+                    file = qtc.QFile(txtfilename)
+                    filestr = os.path.basename(txtfilename)           
+                    filedir = os.path.dirname(txtfilename)
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]                    
+                    namesplit = filename.split("_")                    
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                else:
+                    print(self.txtpath + " does not exist")
+                
+                self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
+                if self.tryimgpath:
+                    print("opening " + self.tryimgpath)
+                    self.imgpath = self.tryimgpath
+                    self.showImage(self.imgpath)
+                else:
+                    print(self.tryimgpath + " does not exist")
+
+
+        def reject():
+            pass        
+        
+        self.ImageTextPairDialog = qtw.QDialog()
+        self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
+        self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
+        self.ImageTextPairDialog.show()
+
+        self.ImageTextPairDialog_ui.buttonBox.accepted.connect(accept)
+        self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
+  
+    def GetLineSpacing(self):
+        self.ui.LHslider.setEnabled(True)
+        self.ui.LHslider.show()
+        self.ui.LHlineEdit.setPlaceholderText(str(self.ui.LHslider.value()))
+
+    def DisableLHSlider(self):
+        self.ui.LHslider.hide()
+        self.ui.LHslider.setEnabled(False)
+
+    def MoveLHSlider(self):
+        self.ui.LHslider.setEnabled(True)
+        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+    
+    def SetLineSpacing(self):
+                
+        '''num,ok = qtw.QInputDialog.getInt(self.ui.centralwidget,"Proportional Line Spacing","Enter a percent value from 0-200")  
+        
+        if ok:
+            lineSpacing = num
+        else:
+            lineSpacing = 145'''
+
+        lineSpacing = self.ui.LHslider.value()
+        self.ui.LHlineEdit.setText(str(lineSpacing))
+            
+        cursor = self.ui.OCRText.textCursor()
+        if not cursor.hasSelection():
+            cursor.select(qtg.QTextCursor.Document)
+        bf = self.ui.OCRCursor.blockFormat()
+        bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight) 
+        cursor.mergeBlockFormat(bf)
+    
+    def SaveRawTextFileDialog(self, MainWindow):
+        path = qtw.QFileDialog.getSaveFileName(
+            self.ui.centralwidget, 'Save Raw text file',self.txtdir,
+            'Text files (*.txt)')[0]
+        with open(path, 'w') as file:
+            my_RawText = self.ui.OCRDocument.toPlainText()
+            file.write(my_RawText)
+        filename = os.path.basename(path)
+        self.ui.TextLE.setText(filename)
+        file.close()
+        
+    def SaveAsCorrectedTextFileDialog(self, MainWindow):
+        path = qtw.QFileDialog.getSaveFileName(
+            self.ui.centralwidget, 'Save Corrected text file', self.txtdir,
+            'Text files (*.txt)')[0]
+        with open(path, 'w') as file:
+            my_CorrectedText = self.ui.OCRDocument.toPlainText()
+            file.write(my_CorrectedText)
+        filename = os.path.basename(path)
+        self.ui.TextLE.setText(filename)
+        file.close()
+
+    def SaveCorrectedTextFileDialog(self, MainWindow):
+        
+        #if self.txtdir:
+            #defaultdir = self.txtdir
+        #else:
+            #defaultdir = r"/home/max/Projects/Python/EstablishTruth/Greek_txt_pages/"
+        
+        defaultdir = self.txtdir + r"/" 
+        defaultfile = self.ui.TextLE.displayText()
+
+        if defaultfile:
+            path = defaultdir + defaultfile
+            print(path)
+            filename = defaultfile
+        else:
+            path = qtw.QFileDialog.getSaveFileName(
+                self.ui.centralwidget, 'Save Corrected text file', '',
+                'Text files (*.txt)')[0]
+            filename = os.path.basename(path)
+        with open(path, 'w') as file:
+            my_CorrectedText = self.ui.OCRDocument.toPlainText()
+            file.write(my_CorrectedText)
+        
+        self.ui.TextLE.setText(filename)
+        file.close()
+
+    def OpenWithMyPixer(self):
+        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyPixer.py"
+        print(mw_cmd)
+        os.system(mw_cmd)
+
+    def OpenWithMyWriter(self):
+        
+        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        print(mw_cmd)
+        os.system(mw_cmd)
+        '''
+        writer.MainWindow = qtw.QMainWindow()
+        writer.ui = writer.Ui_MyWriterUI()
+        writer.ui.setupUi(writer.MainWindow)
+        writer.MainWindow.show()'''
+
+    def on_font_update(self):
+        # update font to selection and size       
+        #font = qtg.QFont()
+        #font.setFamily(self.ui.fontComboBox.currentFont())
+        #print(self.ui.fontComboBox.currentFont())
+        font = qtg.QFont(self.ui.fontComboBox.currentFont())
+        font.setPointSize(self.ui.fontSizeBox.value())
+        #font = qtg.QFont(self.font)
+        #font.setPointSize(int(self.fontsize))
+        
+        self.ui.OCRText.setFont(font)
+
+    def on_lang_select(self):
+        pass
+
+    def loadcharboximage(self):
+        '''Load Character Box Image'''
+        img = cv2.imread(self.imgpath)
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        self.charboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        charboxcsvpath = self.charboxcsvdir + filename + r"_charbox.csv"
+
+        '''scale_percent = 25 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
+        
+        #############################################
+        #### Detecting Characters  ######
+        #############################################
+        hImg, wImg,_ = img.shape
+        charboxes = pytesseract.image_to_boxes(img,lang="feg")
+        # Pass the image to PIL  
+        pil_im = Image.fromarray(img)  
+
+        draw = ImageDraw.Draw(pil_im)  
+        # use a truetype font
+        font = ImageFont.truetype("/home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8) 
+        #font = ImageFont.truetype("FROMVS.ttf", 20)  
+
+        # Draw the text  
+        #draw.text((10, 700), text_to_show, font=font)  
+
+        # Get back the image to OpenCV  
+        #cv2_im_processed = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
+        
+        for b in charboxes.splitlines():
+            print(b)
+            b = b.split(' ')
+            print(b)
+            x, y, w, h = int(b[1]), int(b[2]), int(b[3]), int(b[4])
+            char = b[0]
+            cv2.rectangle(img, (x,hImg- y), (w,hImg- h), (255, 50, 50), 2)
+            #cv2.putText(img,b[0],(x,hImg- y+25),cv2.FONT_HERSHEY_TRIPLEX,1,(50,50,255),2)
+            
+            # Pass the image to PIL
+            pil_im = Image.fromarray(img)  
+            #draw = ImageDraw.Draw(pil_im)  
+            # use a truetype font  
+            
+            print(f"Drawing character: {char}")
+            #draw.text((x,hImg-y), char, font=font)
+            with open(charboxcsvpath, mode='a') as file_:
+                file_.write(f"{char}\t{x}\t{y}\t{w}\t{h}")
+                file_.write("\n")  # Next line.        
+        file_.close()
+        with open(charboxcsvpath, mode='r') as file_:
+            self.ui.OCRText.clear()
+            self.ui.OCRText.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_charbox.txt")
+        self.charboximagepath = f"/home/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_charbox.tif"
+        self.charboximage = pil_im.save(self.charboximagepath) 
+        self.ui.ImageLe.setText(f"{filename}_charbox.tif")
+        self.showImage(self.charboximagepath)
+        #image = ImageQt.ImageQt(pil_im)
+        #self.pixmap = qtg.QPixmap(image)
+
+        #self.ui.Image.setPixmap(pixmap)
+        #print(pytesseract.image_to_boxes(img,lang="feg"))'''
+
+        #cv2.imshow("CV Image", img)
+        #cv2.waitKey(0)
+
+    def loadwordboximage(self):
+        '''Load Word Box Image'''
+        img = cv2.imread(self.imgpath)
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        self.wordboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
+
+        '''scale_percent = 25 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
+        
+        ##############################################
+        ##### Detecting Words  ######
+        ##############################################
+        # #[   0          1           2           3           4          5         6       7       8        9        10       11 ]
+        # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
+        lines = []
+        wordboxes = pytesseract.image_to_data(img,lang="feg")
+        #self.ui.OCRText.insertPlainText(wordboxes)
+        for a,b in enumerate(wordboxes.splitlines()):
+            print(b)
+            if a!=0:
+                b = b.split()
+                if len(b)==12:
+                    imglinenum, imgwordnum = int(b[4]), int(b[5])
+                    x,y,w,h = int(b[6]),int(b[7]),int(b[8]),int(b[9])
+                    imgword = b[11]
+                    cv2.rectangle(img, (x,y), (x+w, y+h), (255, 50, 50), 2)
+                    #cv2.putText(img,b[11],(x,y-5),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
+                    # Pass the image to PIL
+                    pil_im = Image.fromarray(img)  
+                    #draw = ImageDraw.Draw(pil_im)  
+                    # use a truetype font  
+                    print(f"For Image Line #: {str(imglinenum)} and Image Word #: {str(imgwordnum)} Placing Text Word: {imgword}")
+                    #draw.text((x,y-5), imgword, font=font)
+                    with open(wordboxcsvpath, mode='a') as file_:
+                        file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{x}\t{y}\t{w}\t{h}")
+                        file_.write("\n")  # Next line.        
+        file_.close()
+        with open(wordboxcsvpath, mode='r') as file_:
+            self.ui.OCRText.clear()
+            self.ui.OCRText.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_wordbox.txt")
+        self.wordboximagepath = f"/home/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
+        self.wordboximage = pil_im.save(self.wordboximagepath) 
+        self.ui.ImageLe.setText(f"{filename}_wordbox.tif")
+        self.showImage(self.wordboximagepath)
+        #image = ImageQt.ImageQt(pil_im)
+        #self.pixmap = qtg.QPixmap(image)
+
+        #self.ui.Image.setPixmap(pixmap)
+        #print(pytesseract.image_to_boxes(img,lang="feg"))'''
+
+        #cv2.imshow("CV Image", img)
+        #cv2.waitKey(0)
+
+    def word2linebox(self):
+        filename = "greek1516_Page_082"
+        self.wordboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
+        with open(wordboxcsvpath, mode='r') as file_:
+            self.ui.OCRText.clear()
+            wordboxes = file_.read()
+            self.ui.OCRText.insertPlainText(wordboxes)
+            self.ui.TextLE.setText(f"{filename}_wordbox.csv")
+        file_.close()
+
+        boxfile = open(wordboxcsvpath)
+        with boxfile:
+            csv_f = csv.reader(boxfile, delimiter = "\t")
+            linecount = 1
+            for row in csv_f:
+                #print(f"linenum: {row[0]} wordnum: {row[1]} word: {row[2]} x: {row[3]} y: {row[4]} w: {row[5]} h: {row[6]}")
+                if int(row[0]) == linecount:
+                    print(f"linenum: {row[0]} wordnum: {row[1]}")
+                linecount =+ 1
+    
+    def makelineboximage(self):
+        '''Load Word Box Image for conversion to Line Box'''
+        img = cv2.imread(self.imgpath)
+        hImg, wImg,_ = img.shape
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        
+        self.wordboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
+        
+        self.lineboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        lineboxcsvpath = self.lineboxcsvdir + filename + r"_linebox.csv"
+
+        '''scale_percent = 25 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
+        
+        ##############################################
+        ##### Detecting Words  ######
+        ##############################################
+        # #[   0          1           2           3           4          5         6       7       8        9        10       11 ]
+        # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
+        #lines = []
+        lineboxes = pytesseract.image_to_data(img,lang="feg")
+        #linenum = 1
+        lineheight = 0
+        liney = 40
+        xmin = 2
+        wmax = wImg - 2
+
+        for linenum,b in enumerate(lineboxes.splitlines()):
+            #linecount = len(b)
+            #print(f'linecount): {linecount}')
+            if linenum!=0:
+                b = b.split()
+                
+                if len(b)==12:
+                    imglinenum, imgwordnum = int(b[4]), int(b[5])
+                    x,y,w,h = int(b[6]),int(b[7]),int(b[8]),int(b[9])
+                    imgword = b[11]
+                    wordy = y
+                    wordheight = h
+                    print(f'line#: {imglinenum} word#: {imgwordnum} word: {imgword} wordy: {wordy} wordheight: {wordheight}')
+
+                    if imglinenum == linenum:
+                        print(f'linenum: {linenum} = matchline#: {imglinenum} matchword#: {imgwordnum} matchword: {imgword}')
+                        if wordheight > lineheight:
+                            print(f'Inreasing line height from {lineheight} to {wordheight}')
+                            lineheight = wordheight
+                        if wordy < liney:
+                            print(f'Dereasing line y position from {liney} to {wordy}')
+                            liney = wordy
+                        
+                    elif imglinenum > linenum:
+                        print(f'Line#={linenum}...Drawing LineBox: x={xmin},y={liney},w={wmax},h={liney + lineheight}')
+                        cv2.rectangle(img, (xmin,liney), (wmax, liney + lineheight), (255, 50, 50), 2)
+
+                        with open(lineboxcsvpath, mode='a') as file_:
+                            file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{xmin}\t{liney}\t{wmax}\t{liney + lineheight}")
+                            file_.write("\n")  # Next line.
+                        self.ui.OCRText.insertPlainText(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{xmin}\t{liney}\t{wmax}\t{liney + lineheight}\n")
+                        #linenum += 1
+                        liney = liney + lineheight
+                        #print(f'Moving to next linenum {linenum} starting at y position {liney}')
+
+        #file_.close()
+        '''with open(lineboxcsvpath, mode='r') as file_:
+            #self.ui.OCRText.clear()
+            self.ui.OCRText.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_linebox.txt")'''
+        self.lineboximagepath = f"/home/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_linebox.tif"
+        # Pass the image to PIL
+        pil_im = Image.fromarray(img)
+        self.lineboximage = pil_im.save(self.lineboximagepath) 
+        self.ui.ImageLe.setText(f"{filename}_linebox.tif")
+        self.showImage(self.lineboximagepath)
+        #file_.close()
+
+    def loadlineboximage(self):
+        '''Load Word Box Image'''
+        img = cv2.imread(self.imgpath)
+        hImg, wImg,_ = img.shape
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        self.lineboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        lineboxcsvpath = self.lineboxcsvdir + filename + r"_linebox.csv"
+
+        '''scale_percent = 25 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
+        
+        ##############################################
+        ##### Detecting Words  ######
+        ##############################################
+        # #[   0          1           2           3           4          5         6       7       8        9        10       11 ]
+        # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
+        #lines = []
+        lineboxes = pytesseract.image_to_data(img,lang="feg")
+        #self.ui.OCRText.insertPlainText(lineboxes)
+        linenum = 1
+        #prevx = 0
+        prevy = hImg
+        #prevw = 0
+        prevh = 0
+        xmin = 2
+        #wmin = 0
+        ymin = hImg
+        #hmin = 0
+        #xmax = wImg
+        wmax = wImg - 2
+        #ymax = hImg
+        hmax = 0
+        prevline = 1
+
+        for a,b in enumerate(lineboxes.splitlines()):
+            #print(b)
+            linecount = len(b)
+            print(f'linecount): {linecount}')
+            if a!=0:
+                b = b.split()
+                
+                if len(b)==12:
+                    imglinenum, imgwordnum = int(b[4]), int(b[5])
+                    x,y,w,h = int(b[6]),int(b[7]),int(b[8]),int(b[9])
+                    imgword = b[11]
+                    print(f'line#: {imglinenum} word#: {imgwordnum} word: {imgword}')
+
+                    if imglinenum == linenum:
+                        print(f'matchline#: {imglinenum} matchword#: {imgwordnum} matchword: {imgword}')
+                        if y < prevy:
+                            ymin = y
+                            prevy = y
+                        if h > prevh:
+                            hmax = h
+                            prevh = h
+                        print()
+                    
+
+                    if imglinenum > linenum:
+                        cv2.rectangle(img, (xmin,ymin), (wmax, ymin + hmax), (255, 50, 50), 2)
+                        linenum += 1
+                        hmax = 0
+                        ymin = hImg
+                        #if imglinenum == linenum + 1:  
+                        #cv2.rectangle(img, (xmin,ymin), (wmax, ymin + hmax), (255, 50, 50), 2)
+                        #linenum += 1
+                    else:
+                        prevy = y
+                        prevh = h
+                    
+                    #cv2.rectangle(img, (xmin,ymin), (wmax-2, hmax), (255, 50, 50), 2)
+
+                    # Pass the image to PIL
+                    pil_im = Image.fromarray(img)
+                    with open(lineboxcsvpath, mode='a') as file_:
+                        file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{xmin}\t{ymin}\t{wmax}\t{hmax}")
+                        file_.write("\n")  # Next line.
+        file_.close()
+        with open(lineboxcsvpath, mode='r') as file_:
+            self.ui.OCRText.clear()
+            self.ui.OCRText.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_linebox.txt")
+        self.lineboximagepath = f"/home/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_linebox.tif"
+        self.lineboximage = pil_im.save(self.lineboximagepath) 
+        self.ui.ImageLe.setText(f"{filename}_linebox.tif")
+        self.showImage(self.lineboximagepath)
+
+    def olderloadlineboximage(self):
+        '''Load Box Image'''
+        img = cv2.imread(self.imgpath)
+        pil_im = Image.fromarray(img)
+        hImg, wImg,_ = img.shape
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        self.wordboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
+        if not os.path.exists(wordboxcsvpath):
+            self.loadwordboximage()
+        self.lineboxcsvdir = "/home/max/Projects/BiblionOCR/Model/Data/csv/"
+        lineboxcsvpath = self.lineboxcsvdir + filename + r"_linebox.csv"
+        
+        #lines = []
+        #with wordboxcsvfile:
+        '''wordboxcsvfile = open(wordboxcsvpath)
+        csv_f = csv.reader(wordboxcsvfile, delimiter = "\t")        
+        print(csv_f)
+        for row in csv_f:
+            #print(row)
+            linenum = row[0]
+            linecount = row[-1]
+            #lines.append(linenum)
+        #linecount = max(lines)
+        print(f"Line count: {linecount}")
+        #wordboxcsvfile.close()
+        #print(lines)'''
+        loopcount = 1
+        #for line in range(1,linecount):      
+            ##############################################
+            ##### Detecting Lines  ######
+            ##############################################
+            # #[   0          1           2           3           4          5         6       7       8        9        10       11 ]
+            # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
+        lineboxes = pytesseract.image_to_data(img,lang="feg")
+        #self.ui.OCRText.insertPlainText(wordboxes)
+        for a,b in enumerate(lineboxes.splitlines()):
+            #if a = line:
+            print(b)
+            if a!=0:
+                b = b.split()
+                if len(b)==12:
+                    imglinenum, imgwordnum = int(b[4]), int(b[5])
+                    x,y,w,h = int(b[6]),int(b[7]),int(b[8]),int(b[9])
+                    imgword = b[11]
+                    xmax = 0
+                    xmin = wImg
+                    ymax = 0
+                    ymin = hImg
+                    
+                    while imglinenum == loopcount:
+                        if x >= xmax:
+                            xmax = x
+                        if x <= xmin:
+                            xmin = x
+                        if y >= ymax:
+                            ymax = y
+                        if y <= ymin:
+                            ymin = y              
+                    
+                        cv2.rectangle(img, (xmin,ymin), (xmax, ymax), (255, 50, 50), 2)
+                        #cv2.putText(img,b[11],(x,y-5),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
+                        # Pass the image to PIL
+                        pil_im = Image.fromarray(img)  
+                        #draw = ImageDraw.Draw(pil_im)  
+                        # use a truetype font  
+                        print(f"For Image Line #: {str(imglinenum)} and Image Word #: {str(imgwordnum)} Placing Text Word: {imgword}")
+                        #draw.text((x,y-5), imgword, font=font)
+                        with open(lineboxcsvpath, mode='a') as file_:
+                            file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{x}\t{y}\t{w}\t{h}")
+                            file_.write("\n")  # Next line.
+                    loopcount += 1
+                            
+            #file_.close()
+            '''with open(lineboxcsvpath, mode='r') as file_:
+                self.ui.OCRText.insertPlainText(file_.read())
+                self.ui.TextLE.setText(f"{filename}_linebox.txt")'''
+
+            self.lineboximage = pil_im.save(f"/home/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_box/{filename}_linebox.tif") 
+            self.ui.ImageLe.setText(f"{filename}_linebox.tif")
+            #image = ImageQt.ImageQt(pil_im)
+            #self.pixmap = qtg.QPixmap(image)
+
+            #self.ui.Image.setPixmap(pixmap)
+            #print(pytesseract.image_to_boxes(img,lang="feg"))'''
+
+            #cv2.imshow("CV Image", img)
+            #cv2.waitKey(0)
+
+
+# Only run this code if I am actually running this script
+if __name__ == '__main__': 
+    app = qtw.QApplication(sys.argv)
+    w = MainWindow()
+    w.show()
+    app.exec()

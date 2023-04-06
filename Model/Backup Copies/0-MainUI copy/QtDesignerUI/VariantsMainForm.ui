@@ -1,0 +1,1069 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>881</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>FROMVS [MAXR]</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>βϊϐλίον Resolver</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../UI_Icons.qrc">
+    <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QCheckBox" name="PreservedCkBox">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>150</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Preserved(P)</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="CorrectedCkBox">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>180</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Corrected(C)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FormLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>130</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Form</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="TypeLabel">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>130</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Type</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ErrorCkBox">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>150</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Error(E)</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="VarianceCkBox">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>180</y>
+      <width>101</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Variance(V)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ImpactLabel">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>130</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Impact</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ContextCkBox">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>150</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Context(C)</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="InflectionCkBox">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>180</y>
+      <width>101</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Inflection(I)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ErrorCodeLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>240</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>* Key Selection</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ErrorCodeCombo">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>260</y>
+      <width>111</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>None</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Addition-A</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Diacritic-D</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RMAC-M</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Omission-O</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Punctuation-P</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Strong's-S</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Spelling-X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Spacing-Y</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Printing-Z</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Translation-T</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QTextEdit" name="DescriptionTextEdit">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>260</y>
+      <width>301</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="StrongsLabel">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>370</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Strong's</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="LemmaLabel">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>370</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Lemma</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RMACLabel">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>370</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RMAC</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VarianceCodeLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>300</y>
+      <width>101</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Variance Code</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="DescriptionLabel">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>240</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Description</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="VarianceCodeLE">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>320</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Variance Code</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VarWordSelLabel">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>70</y>
+      <width>181</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>* Variant  Word Selection</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="VarWordSelCombo">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>90</y>
+      <width>200</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <property name="currentText">
+     <string/>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::InsertAtBottom</enum>
+    </property>
+    <property name="modelColumn">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="StrongsLE">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>390</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Strong's Ref</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="LemmaLE">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>390</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Lemma</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="RMACLE">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>390</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>RMAC</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="WordLE">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>90</y>
+      <width>200</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Word</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="NoDiaWordLE">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>90</y>
+      <width>200</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Normalized Word</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="WordLabel">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>70</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Word</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="NoDiaWordLabel">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>70</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Normalized Word</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="UpdateButton">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>450</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Update Variant</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/up_alt.png</normaloff>:/Icons/Icons/up_alt.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="UpdateBibleButton">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>450</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Update Bible</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/drive-upload.png</normaloff>:/Icons/Icons/drive-upload.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="BookLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Book</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ChapterLabel">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Chapter</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VerseLable">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Verse</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="BookLE">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Book</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="ChapterLE">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>30</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Chapter</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="VerseLE">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>30</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Verse</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PreviousButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>200</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Previous</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text.png</normaloff>:/Icons/Icons/back_text.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextButton">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>200</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text.png</normaloff>:/Icons/Icons/forward_text.png</iconset>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="VarianceTable">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>510</y>
+      <width>701</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <column>
+     <property name="text">
+      <string>ID</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Line</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Book</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Chapter</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Verse</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>WordNum</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Word</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>NoDiaWord</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>VarWord</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Strong</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>RMAC</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Lemma</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>ErrorCode</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>VarCode</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Description</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Preserved</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Corrected</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Error</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Variance</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Context</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Inflection</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Resolved</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QLineEdit" name="LineLE">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>30</y>
+      <width>71</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Line Num</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="LineLabel">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Line</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="WordNumLE">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>30</y>
+      <width>91</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Word Num</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="WordNumLabel">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>10</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>WordNum</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="UpdateSimButton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>450</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Update Similar</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/up_alt.png</normaloff>:/Icons/Icons/up_alt.png</iconset>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ResolvedCkBox">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>390</y>
+      <width>92</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Resolved</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ResolveButton">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>450</y>
+      <width>101</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Update Resolved</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/drive-upload.png</normaloff>:/Icons/Icons/drive-upload.png</iconset>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="allRadButton">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>490</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Show All</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="presRadButton">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>490</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Show Preserved</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="unresRadButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>490</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Show Unresolved</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="corrRadButton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>490</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Show Corrected</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources>
+  <include location="../UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

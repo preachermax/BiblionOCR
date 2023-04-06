@@ -1,0 +1,13 @@
+Update Font Directories/FontFiles:
+
+cd ~/Documents/'My Forge'
+
+cp FROMVS.ttf ~/.local/share/fonts
+
+cp FROMVS.ttf ~/.fonts
+
+sudo cp FROMVS.ttf /usr/local/share/fonts
+
+sudo cp FROMVS.ttf /usr/share/fonts/truetype/FROMVS
+
+fc-cache -f -v

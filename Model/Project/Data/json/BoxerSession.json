@@ -176,7 +176,7 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_246_linebox.tif",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_243_linebox.tif",
         "DefaultValue": ""
     },
     {
@@ -236,7 +236,7 @@
     },
     {
         "Setting": "self.txtpath",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_246_linebox.txt",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_243_linebox.txt",
         "DefaultValue": ""
     },
     {

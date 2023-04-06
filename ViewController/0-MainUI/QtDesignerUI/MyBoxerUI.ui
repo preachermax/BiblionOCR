@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1350</width>
+    <width>1368</width>
     <height>956</height>
    </rect>
   </property>
@@ -1290,9 +1290,9 @@
     <property name="geometry">
      <rect>
       <x>730</x>
-      <y>30</y>
-      <width>597</width>
-      <height>834</height>
+      <y>33</y>
+      <width>621</width>
+      <height>831</height>
      </rect>
     </property>
     <property name="font">
@@ -1307,7 +1307,19 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="elideMode">
+     <enum>Qt::ElideRight</enum>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>true</bool>
     </property>
     <widget class="QWidget" name="Table">
      <attribute name="title">
@@ -1318,8 +1330,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>570</width>
-        <height>829</height>
+        <width>580</width>
+        <height>830</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -1350,7 +1362,7 @@
        <bool>true</bool>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>22</number>
+       <number>20</number>
       </attribute>
       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
        <bool>true</bool>
@@ -1359,7 +1371,7 @@
        <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderVisible">
-       <bool>true</bool>
+       <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderCascadingSectionResizes">
        <bool>true</bool>
@@ -1538,14 +1550,14 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>570</width>
+        <width>580</width>
         <height>830</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
-        <width>540</width>
-        <height>830</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="font">
@@ -1593,6 +1605,7 @@
      <string>Lines</string>
     </property>
    </widget>
+   <zorder>BoxTab</zorder>
    <zorder>ImagescrollArea</zorder>
    <zorder>OpenImageFilebutton</zorder>
    <zorder>ImageLe</zorder>
@@ -1621,7 +1634,6 @@
    <zorder>FindReplacebutton</zorder>
    <zorder>LHslider</zorder>
    <zorder>progressBar</zorder>
-   <zorder>BoxTab</zorder>
    <zorder>LineCheckBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1629,27 +1641,10 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1350</width>
+     <width>1368</width>
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuOCR">
-    <property name="title">
-     <string>OCR</string>
-    </property>
-    <widget class="QMenu" name="menuSelect_Language">
-     <property name="title">
-      <string>Select Language</string>
-     </property>
-     <addaction name="actionGreek_2"/>
-     <addaction name="actionHebrew_4"/>
-     <addaction name="actionLatin_2"/>
-     <addaction name="actionEnglish_2"/>
-    </widget>
-    <addaction name="menuSelect_Language"/>
-    <addaction name="actionSelect_Image"/>
-    <addaction name="actionCorrect_OCR_tb"/>
-   </widget>
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
@@ -1717,7 +1712,17 @@
      <addaction name="actionSave_Word_Box_Image"/>
      <addaction name="actionSave_Glyph_Box_Image"/>
     </widget>
+    <widget class="QMenu" name="menuSelect_Language_2">
+     <property name="title">
+      <string>Select Language</string>
+     </property>
+     <addaction name="actionEnglish_2"/>
+     <addaction name="actionGreek_2"/>
+     <addaction name="actionHebrew_4"/>
+     <addaction name="actionLatin_2"/>
+    </widget>
     <addaction name="actionProject_Explorer"/>
+    <addaction name="menuSelect_Language_2"/>
     <addaction name="menuOpen_Box_Image"/>
     <addaction name="menuOpen_Box_File"/>
     <addaction name="menuSave_Box_Image"/>
@@ -1740,13 +1745,11 @@
      <property name="title">
       <string>Edit LineBox File Pairs</string>
      </property>
+     <addaction name="actionEdit_Greek_LineBox_File_Pair"/>
      <addaction name="actionEdit_Latin_Linebox_Pair"/>
     </widget>
     <addaction name="menuEdit_PageBox_File"/>
     <addaction name="menuEdit_LineBox_File"/>
-    <addaction name="actionDraw_Selected_LineBox_tb"/>
-    <addaction name="actionPixer_Image_Editor"/>
-    <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionPrefernces"/>
     <addaction name="actionFind_and_Replace"/>
    </widget>
@@ -1783,21 +1786,6 @@
     <property name="title">
      <string>Help</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuGlyphs">
-    <property name="title">
-     <string>Forge</string>
-    </property>
-    <widget class="QMenu" name="menuIndex_Images">
-     <property name="title">
-      <string>Bitmap Images</string>
-     </property>
-     <addaction name="actionLine_tif_to_bmp"/>
-    </widget>
-    <addaction name="menuIndex_Images"/>
-    <addaction name="actionExtract_Glyphs"/>
-    <addaction name="actionFontForge"/>
-    <addaction name="actionInstall_Font"/>
    </widget>
    <widget class="QMenu" name="menuMake">
     <property name="title">
@@ -1841,8 +1829,6 @@
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
-   <addaction name="menuOCR"/>
-   <addaction name="menuGlyphs"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -1904,23 +1890,6 @@
    <addaction name="actionAutoCrop_Latin_To_tif_Lines_tb"/>
    <addaction name="actionRename_Latin_tif_Lines_tb"/>
    <addaction name="actionMove_Latin_tif_Lines_tb"/>
-  </widget>
-  <widget class="QToolBar" name="FontForgeToolBar">
-   <property name="windowTitle">
-    <string>FontForge Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>FontForge Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionLine_tif_to_bmp"/>
-   <addaction name="actionExtract_Glyphs"/>
-   <addaction name="actionFontForge"/>
   </widget>
   <widget class="QToolBar" name="BatchGreekTextLinesToolBar">
    <property name="windowTitle">
@@ -3370,6 +3339,11 @@
   <action name="actionStandardUI">
    <property name="text">
     <string>StandardUI</string>
+   </property>
+  </action>
+  <action name="actionEdit_Greek_LineBox_File_Pair">
+   <property name="text">
+    <string>Edit Greek LineBox File Pair</string>
    </property>
   </action>
  </widget>

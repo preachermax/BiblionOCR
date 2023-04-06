@@ -1,0 +1,4764 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Versifier</class>
+ <widget class="QMainWindow" name="Versifier">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1351</width>
+    <height>928</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>FROMVS [MAXR]</family>
+    <pointsize>11</pointsize>
+    <weight>50</weight>
+    <italic>false</italic>
+    <bold>false</bold>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>βϊϐλίον Versifier</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../UI_Icons.qrc">
+    <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
+  </property>
+  <property name="animated">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="VerseTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>970</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open current text(.txt,.csv) file</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SaveAsVerseTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>1000</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Save current text file as...</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SaveVerseTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>1030</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Overwrite current text file</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="VerseText">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>60</y>
+      <width>581</width>
+      <height>671</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>540</width>
+      <height>600</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reloadVerseTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reload current text</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/reload-text.png</normaloff>:/Icons/Icons/reload-text.png</iconset>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="OCRgroupBox">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>470</y>
+      <width>161</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>OCR  Language Group</string>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QComboBox" name="OCRlangComboBox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR language</string>
+     </property>
+     <property name="locale">
+      <locale language="English" country="UnitedStates"/>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Ancient Greek</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Middle Greek</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Modern Greek</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hebrew</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Latin</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="OCRlanglabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>0</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>OCR Language Group</string>
+     </property>
+     <property name="text">
+      <string> OCR Language</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="OCRModellabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string> OCR LSTM Model</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="OCRModelComboBox">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>61</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR language model</string>
+     </property>
+     <property name="locale">
+      <locale language="English" country="UnitedStates"/>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>ell</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>grc</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>feg</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>heb</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>feh</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>lat</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>fel</string>
+      </property>
+     </item>
+    </widget>
+   </widget>
+   <widget class="QLineEdit" name="TextLE">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>0</y>
+      <width>201</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>File name</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="LHslider">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>50</y>
+      <width>21</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Set current text line spacing</string>
+    </property>
+    <property name="minimum">
+     <number>100</number>
+    </property>
+    <property name="maximum">
+     <number>200</number>
+    </property>
+    <property name="singleStep">
+     <number>2</number>
+    </property>
+    <property name="pageStep">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>144</number>
+    </property>
+    <property name="sliderPosition">
+     <number>144</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>true</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBelow</enum>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="LHlineEdit">
+    <property name="geometry">
+     <rect>
+      <x>970</x>
+      <y>30</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Current text line spacing</string>
+    </property>
+    <property name="text">
+     <string>105</string>
+    </property>
+    <property name="maxLength">
+     <number>32767</number>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>150</string>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="LHDialogtbutton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Enable line spacing slider</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/edit-line-spacing.png</normaloff>:/Icons/Icons/edit-line-spacing.png</iconset>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="RefText">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>581</width>
+      <height>671</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>540</width>
+      <height>600</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="RefTextLE">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>0</y>
+      <width>201</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reference file name</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="reloadRefTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reload reference text</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/reload-text.png</normaloff>:/Icons/Icons/reload-text.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open reference text(.txt,.csv) file</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothPrevChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous chapter</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_alt.png</normaloff>:/Icons/Icons/back_alt.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothNextChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Nect chapter</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_alt.png</normaloff>:/Icons/Icons/forward_alt.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefLHDialogtbutton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Enable line spacing slider</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/edit-line-spacing.png</normaloff>:/Icons/Icons/edit-line-spacing.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="RefLHlineEdit">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>30</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Current text line spacing</string>
+    </property>
+    <property name="text">
+     <string>105</string>
+    </property>
+    <property name="maxLength">
+     <number>32767</number>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>150</string>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QSlider" name="RefLHslider">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>50</y>
+      <width>21</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Set current text line spacing</string>
+    </property>
+    <property name="minimum">
+     <number>100</number>
+    </property>
+    <property name="maximum">
+     <number>200</number>
+    </property>
+    <property name="singleStep">
+     <number>2</number>
+    </property>
+    <property name="pageStep">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>144</number>
+    </property>
+    <property name="sliderPosition">
+     <number>144</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+    <property name="invertedAppearance">
+     <bool>true</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBelow</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="ResolutiongroupBox">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>320</y>
+      <width>161</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QCheckBox" name="PreservedCkBox">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>120</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Check to preserve</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="VarianceCodeLabel">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>100</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Variance Code</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Preservedchapterlabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Preserved</string>
+     </property>
+     <property name="text">
+      <string>Preserved</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="VarWordlabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>60</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Variant word</string>
+     </property>
+     <property name="text">
+      <string>Variant Word</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="VarianceGrouplabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>0</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>OCR Language Group</string>
+     </property>
+     <property name="text">
+      <string>Variance</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Resolvebutton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Synchronize to selected verse</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/tick.png</normaloff>:/Icons/Icons/tick.png</iconset>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Resolvelabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Resolve</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="VariantWordlineEdit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="VarianceCodelineEdit">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>120</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Recorderlabel">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>20</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Recorder</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Recorderbutton">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>40</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Synchronize to selected verse</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/record.png</normaloff>:/Icons/Icons/record.png</iconset>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="NormcheckBox">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>40</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Normalized</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Normlabel">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>20</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Norm</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="AutocheckBox">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>40</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Normalized</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Normlabel_2">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Auto</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFontComboBox" name="ReffontComboBox">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>30</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select font</string>
+    </property>
+   </widget>
+   <widget class="QFontComboBox" name="VersefontComboBox">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>30</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select font</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefMyWriterbutton">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Open with Writer</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="ReffontSizeBox">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select font size</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="minimum">
+     <number>6</number>
+    </property>
+    <property name="maximum">
+     <number>30</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="VersefontSizeBox">
+    <property name="geometry">
+     <rect>
+      <x>900</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select font size</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="minimum">
+     <number>6</number>
+    </property>
+    <property name="maximum">
+     <number>30</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextRefVerseButton">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next verse</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text.png</normaloff>:/Icons/Icons/forward_text.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PrevRefVerseButton">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous verse</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text.png</normaloff>:/Icons/Icons/back_text.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RefVerseNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RefWordNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>W</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VerseNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>1220</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextVerseButton">
+    <property name="geometry">
+     <rect>
+      <x>1240</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next verse</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text.png</normaloff>:/Icons/Icons/forward_text.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PrevVerseButton">
+    <property name="geometry">
+     <rect>
+      <x>1200</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous verse</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text.png</normaloff>:/Icons/Icons/back_text.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="WordNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>1290</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>W</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefFindReplacebutton">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>30</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Find and Replace</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="BothchapterNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>C</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="BothbookNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>B</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothPrevBookButton">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous book</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PrevRefWordButton">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous word</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text2.png</normaloff>:/Icons/Icons/back_text2.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothNextBookButton">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next book</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextRefWordButton">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next word</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text2.png</normaloff>:/Icons/Icons/forward_text2.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="NextVerseWordButton">
+    <property name="geometry">
+     <rect>
+      <x>1310</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next word</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text2.png</normaloff>:/Icons/Icons/forward_text2.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PrevVerseWordButton">
+    <property name="geometry">
+     <rect>
+      <x>1270</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous word</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text2.png</normaloff>:/Icons/Icons/back_text2.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="BothWordNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>W</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="BothVerseNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothPrevVerseButton">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>30</y>
+      <width>20</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous verse</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text.png</normaloff>:/Icons/Icons/back_text.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothPrevWordButton">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>30</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous word</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_text2.png</normaloff>:/Icons/Icons/back_text2.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothNextVerseButton">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>30</y>
+      <width>20</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next verse</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text.png</normaloff>:/Icons/Icons/forward_text.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BothNextWordButton">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>30</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next word</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_text2.png</normaloff>:/Icons/Icons/forward_text2.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefNormButton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>30</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Normalize</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/stamp-pattern.png</normaloff>:/Icons/Icons/stamp-pattern.png</iconset>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="RefNormcheckBox">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>30</y>
+      <width>16</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Normalized</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="SynchgroupBox">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>180</y>
+      <width>161</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Synchronize Group</string>
+    </property>
+    <property name="title">
+     <string>Synchronize</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QPushButton" name="AddVersebutton">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>120</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Add verse line</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/addverse.png</normaloff>:/Icons/Icons/addverse.png</iconset>
+     </property>
+    </widget>
+    <widget class="QLabel" name="AddVerselabel">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>100</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string> Add</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SynchSellabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>60</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Selection</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SynchReflabel">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>60</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string> Ref</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SynchVerseslabel">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>60</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Verses</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonRef">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonSel">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>80</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonVerses">
+     <property name="geometry">
+      <rect>
+       <x>131</x>
+       <y>80</y>
+       <width>20</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="chapterlabel">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>21</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Chapter</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="verseComboBox">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>40</y>
+       <width>41</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select verse</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="colon">
+     <property name="geometry">
+      <rect>
+       <x>96</x>
+       <y>30</y>
+       <width>20</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>14</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="bookComboBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select book</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Mat</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Luk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Joh</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Act</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rom</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Co</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Co</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Gal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Eph</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Php</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Col</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Th</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Th</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Ti</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Ti</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tit</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Phm</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Heb</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jas</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Pe</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Pe</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1Jn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2Jn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3Jn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jud</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rev</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="booklabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>21</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Book</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="chapterComboBox">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>40</y>
+       <width>41</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select chapter</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="verselabel">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>21</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Verse</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Synchronizebutton">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>120</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Synchronize to selected verse</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/synchronize.png</normaloff>:/Icons/Icons/synchronize.png</iconset>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Synchlabel">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>100</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Synch</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="LastCkBox">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>120</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Check to anchor verse</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="AddVerselabel_2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>100</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Last</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Anchorbutton">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>120</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Previous book</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/anchorverse.png</normaloff>:/Icons/Icons/anchorverse.png</iconset>
+     </property>
+     <property name="autoRepeat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Anchorlabel">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>100</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Anchor</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="AnchorCkBox">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>120</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS [MAXR]</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Check to anchor verse</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonLast">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>80</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SynchVerseslabel_2">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>60</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Last</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QComboBox" name="RefchapterComboBox">
+    <property name="geometry">
+     <rect>
+      <x>64</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select chapter</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="RefverseComboBox">
+    <property name="geometry">
+     <rect>
+      <x>114</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select verse</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="RefbookComboBox">
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>30</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select book</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>Mat</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Mar</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Luk</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Joh</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Act</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Rom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Co</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Co</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Gal</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Eph</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Php</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Col</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Th</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Th</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Ti</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Ti</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Tit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Phm</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Heb</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Jas</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Pe</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Pe</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Jn</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Jn</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3Jn</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Jud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Rev</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Refcolon">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>20</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>14</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="VersechapterComboBox">
+    <property name="geometry">
+     <rect>
+      <x>1174</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select chapter</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="VerseverseComboBox">
+    <property name="geometry">
+     <rect>
+      <x>1224</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select verse</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="VersebookComboBox">
+    <property name="geometry">
+     <rect>
+      <x>1124</x>
+      <y>30</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select book</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>Mat</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Mar</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Luk</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Joh</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Act</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Rom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Co</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Co</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Gal</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Eph</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Php</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Col</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Th</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Th</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Ti</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Ti</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Tit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Phm</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Heb</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Jas</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Pe</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Pe</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1Jn</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2Jn</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3Jn</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Jud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Rev</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Versecolon">
+    <property name="geometry">
+     <rect>
+      <x>1210</x>
+      <y>20</y>
+      <width>20</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>14</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SaveRefTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Overwrite reference file</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SaveAsRefTextbutton">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Save reference file as...</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefPrevBookButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous book</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefNextBookButton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next book</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RefbookNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>B</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefPrevChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous chapter</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_alt.png</normaloff>:/Icons/Icons/back_alt.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="RefNextChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Nect chapter</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_alt.png</normaloff>:/Icons/Icons/forward_alt.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RefchapterNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>C</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VersePrevChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>1130</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous chapter</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_alt.png</normaloff>:/Icons/Icons/back_alt.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VerseNextChapterButton">
+    <property name="geometry">
+     <rect>
+      <x>1170</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Nect chapter</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_alt.png</normaloff>:/Icons/Icons/forward_alt.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VersechapterNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>1150</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>C</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VersePrevBookButton">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Previous book</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VerseNextBookButton">
+    <property name="geometry">
+     <rect>
+      <x>1100</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next book</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="VersebookNavlabel">
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>0</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>7</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>B</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VerseNormButton">
+    <property name="geometry">
+     <rect>
+      <x>1010</x>
+      <y>30</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Normalize</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/stamp-pattern.png</normaloff>:/Icons/Icons/stamp-pattern.png</iconset>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="VerseNormcheckBox">
+    <property name="geometry">
+     <rect>
+      <x>1036</x>
+      <y>30</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Normalized</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VerseMyWriterbutton">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Open with Writer</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ReffindPushButton">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Select verse line</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/binocular-small.png</normaloff>:/Icons/Icons/binocular-small.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="VersefindPushButton">
+    <property name="geometry">
+     <rect>
+      <x>1260</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Select verse line</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/binocular-small.png</normaloff>:/Icons/Icons/binocular-small.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="WordCountbutton">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>30</y>
+      <width>20</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Show word and character counts</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/countblue.png</normaloff>:/Icons/Icons/countblue.png</iconset>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="VerselineComboBox">
+    <property name="geometry">
+     <rect>
+      <x>1280</x>
+      <y>30</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select line</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ReflineComboBox">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Select line</string>
+    </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>60</y>
+      <width>161</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Words</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+    </property>
+    <widget class="QLabel" name="RefWordCntlabel">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>20</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string>Ref Words</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="VerseWordCntlineEdit">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>40</y>
+       <width>30</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="VerseWordNumlineEdit">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>90</y>
+       <width>30</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="RefWordCntlineEdit">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>30</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="VerseWordNumlabel">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>70</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string>Verse Word</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="RefWordNumlineEdit">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>90</y>
+       <width>30</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RefWordNumlabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string>Ref Word</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="VerseWordCntlabel">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string>Verse Words</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Countlabel">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>40</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string>&lt; Count &gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Numberlabel">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>90</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select OCR LSTM model</string>
+     </property>
+     <property name="text">
+      <string>&lt; Number &gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="VerseFindReplacebutton">
+    <property name="geometry">
+     <rect>
+      <x>1090</x>
+      <y>30</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Find and Replace</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1351</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="font">
+     <font>
+      <family>Ubuntu</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_Reference_Text"/>
+    <addaction name="actionOpen_Text"/>
+    <addaction name="actionSave_Text"/>
+    <addaction name="actionSave_As_Text"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="action_Writer"/>
+    <addaction name="actionUpdate_Greek_Wordlist"/>
+    <addaction name="actionUpdate_Hebrew_Wordlist"/>
+    <addaction name="actionUpdate_Latin_Wordlist"/>
+    <addaction name="actionLibreOffice_Writer"/>
+    <addaction name="actionLibreOffice_Calc"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockOutput">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>100</width>
+     <height>100</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>520</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="accessibleName">
+    <string/>
+   </property>
+   <property name="accessibleDescription">
+    <string/>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string> Output</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockOutputContents">
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <widget class="QTextEdit" name="OutputText">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>-1</y>
+       <width>1281</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockChrRef">
+   <property name="minimumSize">
+    <size>
+     <width>400</width>
+     <height>619</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>200</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Character Reference</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockChrRefContents">
+    <property name="minimumSize">
+     <size>
+      <width>400</width>
+      <height>600</height>
+     </size>
+    </property>
+    <widget class="QPlainTextEdit" name="ChrRefplainTextEdit">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>380</width>
+       <height>671</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>360</width>
+       <height>500</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="documentTitle">
+      <string>Character Reference</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="ModulesToolBar">
+   <property name="windowTitle">
+    <string>Versify Text Tool Bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Versify Text Tool Bar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Writer"/>
+   <addaction name="actionUpdate_Greek_Wordlist"/>
+   <addaction name="actionLibreOffice_Writer"/>
+   <addaction name="actionLibreOffice_Calc"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="actionpdf_to_tiff">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Icons/Icons/ocr2.png</normaloff>:/Icons/Icons/ocr2.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionmove_pdf_for_tiff">
+   <property name="text">
+    <string>pdf to tiff</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono">
+   <property name="text">
+    <string>tiff to mono</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png">
+   <property name="text">
+    <string>mono to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionGreek">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_2">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff">
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf4tiff.png</normaloff>:/Icons/Icons/pdf4tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf For tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage extracted pdf pages FOR tif conversion</string>
+   </property>
+   <property name="statusTip">
+    <string>Staging extracted pdf pages...</string>
+   </property>
+  </action>
+  <action name="actionpdf_to_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf2tiff.png</normaloff>:/Icons/Icons/pdf2tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf To tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert staged pdf pages TO tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting staged pdf pages...</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>tiff indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert tif pages TO black&amp;white indexed</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting tif pages to black&amp;white indexed...</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/png-file.png</normaloff>:/Icons/Icons/png-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>png indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert indexed tif pages TO png</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting indexed tif pages to png pages...</string>
+   </property>
+  </action>
+  <action name="actionLatin">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_3">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_4">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewGreek_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Greek tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Deskew Greek tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing Greek tif pages...</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_5">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewLatin_tiff_tb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Latin tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing Latin tif pages...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionResizeGreek_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Greek png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Resizing Greek png pages...</string>
+   </property>
+  </action>
+  <action name="actionResizeLatin_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Latin png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Resizing Latin png pages</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCrop_Languages_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Crop Languages</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto crop language pages into separate tif files</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto cropping language pages...</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionextract_pdf_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf-extract1.png</normaloff>:/Icons/Icons/pdf-extract1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Extract pdf</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract pdf pages from pdf source document</string>
+   </property>
+   <property name="statusTip">
+    <string>Extracting pdf pages...</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth">
+   <property name="text">
+    <string>tiff for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCrop">
+   <property name="text">
+    <string>Crop to tiff lines</string>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth_2">
+   <property name="text">
+    <string>Move tiff lines</string>
+   </property>
+  </action>
+  <action name="actionSplit">
+   <property name="text">
+    <string>Split text lines</string>
+   </property>
+  </action>
+  <action name="actionRename_tiff_lines">
+   <property name="text">
+    <string>Rename tiff lines</string>
+   </property>
+  </action>
+  <action name="actionRename_text_lines">
+   <property name="text">
+    <string>Rename text lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionGreek_Wordlist_2">
+   <property name="text">
+    <string>Greek Wordlist</string>
+   </property>
+  </action>
+  <action name="actionLatin_Wordlist">
+   <property name="text">
+    <string>Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionText_Lines">
+   <property name="text">
+    <string>Text Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_2">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_2">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionCorrect_OCR_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ocr3.png</normaloff>:/Icons/Icons/ocr3.png</iconset>
+   </property>
+   <property name="text">
+    <string>OCR Image</string>
+   </property>
+   <property name="toolTip">
+    <string>OCR current image</string>
+   </property>
+   <property name="statusTip">
+    <string>Performing OCR on current image...</string>
+   </property>
+  </action>
+  <action name="actionVersify_Text">
+   <property name="text">
+    <string>Versify Text</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Verses">
+   <property name="text">
+    <string>Update Verses</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words_Post">
+   <property name="text">
+    <string>Update Words</string>
+   </property>
+  </action>
+  <action name="actionNormalize">
+   <property name="text">
+    <string>Normalize</string>
+   </property>
+  </action>
+  <action name="actionLower_Case">
+   <property name="text">
+    <string>Lower Case</string>
+   </property>
+  </action>
+  <action name="actionRemove_Diacritics">
+   <property name="text">
+    <string>Remove Diacritics</string>
+   </property>
+  </action>
+  <action name="actionAlign_Strongs">
+   <property name="text">
+    <string>Align Strongs+RMAC</string>
+   </property>
+  </action>
+  <action name="actionAlign_Lemmas">
+   <property name="text">
+    <string>Align Lemmas</string>
+   </property>
+  </action>
+  <action name="actionAlign_English">
+   <property name="text">
+    <string>Align English</string>
+   </property>
+  </action>
+  <action name="actionVariants">
+   <property name="text">
+    <string>Variants</string>
+   </property>
+  </action>
+  <action name="actionTrain_Tesseract_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trainOCR4.png</normaloff>:/Icons/Icons/trainOCR4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Train Tesseract</string>
+   </property>
+   <property name="toolTip">
+    <string>Train Tesseract OCR with current Ground Truth</string>
+   </property>
+   <property name="statusTip">
+    <string>Training Tesseract OCR with current Ground Truth...</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ground-truth1.png</normaloff>:/Icons/Icons/ground-truth1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Validate Ground Truth</string>
+   </property>
+   <property name="toolTip">
+    <string>Validate current Ground Truth image|text</string>
+   </property>
+   <property name="statusTip">
+    <string>Validating current Ground Truth image|text pairs...</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Greek_Wordlist">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/update-greek-wordlist.png</normaloff>:/Icons/Icons/update-greek-wordlist.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Greek Wordlist</string>
+   </property>
+   <property name="toolTip">
+    <string>Update Greek Wordlist for OCR Training</string>
+   </property>
+   <property name="statusTip">
+    <string>Upadting Greek wordlist...</string>
+   </property>
+  </action>
+  <action name="actionAutoCrop_Greek_to_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Greek To tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto cropping Greek tif lines....</string>
+   </property>
+  </action>
+  <action name="actionRename_Greek_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Greek tif lines...</string>
+   </property>
+  </action>
+  <action name="actionMove_Greek_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Greek tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Moving Greek tif lines...</string>
+   </property>
+  </action>
+  <action name="actionSplitGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Greek Pages To Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Splitting Greek pages to text lines...</string>
+   </property>
+  </action>
+  <action name="actionRenameGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Greek text lines...</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines_3">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_menu">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Latin_Wordlist">
+   <property name="text">
+    <string>Update Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionAutoCrop_Latin_To_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="iconText">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="toolTip">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto croping Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRename_Latin_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionMove_Latin_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Latin tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Moving Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionSplit_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Latin Pages To Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Splitting Latin pages to text lines...</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRename_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Latin text lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actiondeskew_mono">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Transform indexed tif pages To deskewed tif and png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing indexed tif pages...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+  </action>
+  <action name="actionVerse_Correction">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/versify.png</normaloff>:/Icons/Icons/versify.png</iconset>
+   </property>
+   <property name="text">
+    <string>Verse Correction</string>
+   </property>
+   <property name="toolTip">
+    <string>Book Chapter:Verse Text Assignment</string>
+   </property>
+   <property name="statusTip">
+    <string>Assigning Book Chapter:Verse to text lines</string>
+   </property>
+  </action>
+  <action name="actionConvert_Greek_tiff_To_png">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2png-greek.png</normaloff>:/Icons/Icons/tiff2png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Greek tif To png</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting Greek tif pages to png pages</string>
+   </property>
+  </action>
+  <action name="actionConvert_Latin_tiff_To_png">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2png-latin.png</normaloff>:/Icons/Icons/tiff2png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Latin tif To png</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert Latin tif pages To png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting Latin tif pages To png pages</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionExtract_Glyphs">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trace1.png</normaloff>:/Icons/Icons/trace1.png</iconset>
+   </property>
+   <property name="text">
+    <string>GlyphTracer</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract and trace bitmap glyphs with GlyphTracer</string>
+   </property>
+   <property name="statusTip">
+    <string>Extracting and trace bitmap glyphs with GlyphTracer...</string>
+   </property>
+  </action>
+  <action name="actionLine_tif_to_bmp">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2bmp.png</normaloff>:/Icons/Icons/tiff2bmp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert tif To bmp</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert current tif image to bmp</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting current tif image to bmp...</string>
+   </property>
+  </action>
+  <action name="actionFontForge">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+   </property>
+   <property name="text">
+    <string>FontForge</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit current GlyphTracer sfd file in FontForge</string>
+   </property>
+   <property name="statusTip">
+    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionOpen_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Text</string>
+   </property>
+  </action>
+  <action name="actionSave_Image">
+   <property name="text">
+    <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Image">
+   <property name="text">
+    <string>Save As Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Text</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save As Text</string>
+   </property>
+  </action>
+  <action name="actionConvert_Image_s">
+   <property name="text">
+    <string>Convert Image(s)</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_3">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionHebrew">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionHebrew_2">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Hebrew_Wordlist">
+   <property name="text">
+    <string>Update Hebrew Wordlist</string>
+   </property>
+  </action>
+  <action name="actionHebrew_3">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionOCR_Image">
+   <property name="text">
+    <string>OCR Image</string>
+   </property>
+  </action>
+  <action name="actionSelect_Image">
+   <property name="text">
+    <string>Select Image</string>
+   </property>
+  </action>
+  <action name="actionGreek_2">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actionHebrew_4">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionLatin_2">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionSelect_Language_Model">
+   <property name="text">
+    <string>Select Language Model</string>
+   </property>
+  </action>
+  <action name="actionSelect_Fonts">
+   <property name="text">
+    <string>Select Fonts</string>
+   </property>
+  </action>
+  <action name="actionany">
+   <property name="text">
+    <string>any</string>
+   </property>
+  </action>
+  <action name="actionAny">
+   <property name="text">
+    <string>Any</string>
+   </property>
+  </action>
+  <action name="actionStage_Ground_Truth">
+   <property name="text">
+    <string>Stage Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCreate_e_Sword_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
+   </property>
+   <property name="text">
+    <string>e-Sword Bible Module</string>
+   </property>
+  </action>
+  <action name="actionCreate_theWord_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
+   </property>
+   <property name="text">
+    <string>theWord Bible Module</string>
+   </property>
+  </action>
+  <action name="actionEnglish">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglishh">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglish_2">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglish_3">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionOnline">
+   <property name="text">
+    <string>Online</string>
+   </property>
+  </action>
+  <action name="actionManual_Crop_Image_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/image-crop.png</normaloff>:/Icons/Icons/image-crop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manual Crop</string>
+   </property>
+   <property name="toolTip">
+    <string>Manually crop current tif image</string>
+   </property>
+   <property name="statusTip">
+    <string>Manually cropping current tif image...</string>
+   </property>
+  </action>
+  <action name="actionEdit_Image_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gimp Image Editor</string>
+   </property>
+   <property name="statusTip">
+    <string>Editing image in Gimp...</string>
+   </property>
+  </action>
+  <action name="actionLibreOffice_Writer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-writer.png</normaloff>:/Icons/Icons/libreoffice-writer.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibreOffice Writer</string>
+   </property>
+  </action>
+  <action name="actionLibreOffice_Calc">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibreOffice Calc</string>
+   </property>
+  </action>
+  <action name="actionDB_Browser_for_SQLite">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/server.png</normaloff>:/Icons/Icons/server.png</iconset>
+   </property>
+   <property name="text">
+    <string>DB Browser for SQLite</string>
+   </property>
+  </action>
+  <action name="actionOpen_Reference_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Reference Text</string>
+   </property>
+  </action>
+  <action name="action_Writer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+   </property>
+   <property name="text">
+    <string>βϊϐλίον Writer</string>
+   </property>
+  </action>
+  <action name="actionWordcount">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/countblue.png</normaloff>:/Icons/Icons/countblue.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reference Word Count</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

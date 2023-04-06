@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Boxer</class>
- <widget class="QMainWindow" name="Boxer">
+ <class>Glypher</class>
+ <widget class="QMainWindow" name="Glypher">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -23,7 +23,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>βϊϐλίον Boxer</string>
+   <string>βϊϐλίον Glypher</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../UI_Icons.qrc">
@@ -1308,6 +1308,9 @@
     </property>
     <property name="currentIndex">
      <number>0</number>
+    </property>
+    <property name="usesScrollButtons">
+     <bool>true</bool>
     </property>
     <widget class="QWidget" name="Table">
      <attribute name="title">
