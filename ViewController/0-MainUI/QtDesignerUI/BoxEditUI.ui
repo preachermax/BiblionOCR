@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BoxEdit</class>
+ <widget class="QWidget" name="BoxEdit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>572</width>
+    <height>792</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTabWidget" name="BoxTab">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>571</width>
+     <height>831</height>
+    </rect>
+   </property>
+   <property name="tabPosition">
+    <enum>QTabWidget::South</enum>
+   </property>
+   <property name="tabShape">
+    <enum>QTabWidget::Rounded</enum>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="CSV">
+    <attribute name="title">
+     <string>CSV Text</string>
+    </attribute>
+    <widget class="QTextEdit" name="BoxText">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>571</width>
+       <height>831</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>540</width>
+       <height>830</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <property name="lineWrapMode">
+      <enum>QTextEdit::NoWrap</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="Table">
+    <attribute name="title">
+     <string>Box Table</string>
+    </attribute>
+    <widget class="QTableWidget" name="BoxTable">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>571</width>
+       <height>831</height>
+      </rect>
+     </property>
+     <column>
+      <property name="text">
+       <string>Del</string>
+      </property>
+      <property name="toolTip">
+       <string>Delete Row</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/cross.png</normaloff>:/Icons/Icons/cross.png</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Ins</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/insertabove.png</normaloff>:/Icons/Icons/insertabove.png</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Line</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>X</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Y</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>W</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>H</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Rdraw</string>
+      </property>
+      <property name="toolTip">
+       <string>Draw linebox with rubberBand</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/rubberband.png</normaloff>:/Icons/Icons/rubberband.png</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Sdraw</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Accept</string>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignVCenter</set>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/Valid.png</normaloff>:/Icons/Icons/Valid.png</iconset>
+      </property>
+     </column>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

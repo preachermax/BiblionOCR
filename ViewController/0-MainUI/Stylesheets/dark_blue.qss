@@ -169,7 +169,7 @@ QRadioButton::indicator
 QRadioButton::indicator:unchecked,
 QRadioButton::indicator:unchecked:hover
 {
-    image: url(:/dark_blue/img/radio_unchecked.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_unchecked.png);
 }
 
 QRadioButton::indicator:unchecked:focus,
@@ -177,7 +177,7 @@ QRadioButton::indicator:unchecked:pressed
 {
   border: none;
   outline: none;
-    image: url(:/dark_blue/img/radio_unchecked_focus.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_unchecked_focus.png);
 }
 
 QRadioButton::indicator:checked,
@@ -185,7 +185,7 @@ QRadioButton::indicator:checked:hover
 {
   border: none;
   outline: none;
-    image: url(:/dark_blue/img/radio_checked.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_checked.png);
 }
 
 QRadioButton::indicator:checked:focus,
@@ -193,25 +193,25 @@ QRadioButton::indicato::menu-arrowr:checked:pressed
 {
   border: none;
   outline: none;
-    image: url(:/dark_blue/img/radio_checked_focus.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_checked_focus.png);
 }
 
 QRadioButton::indicator:indeterminate,
 QRadioButton::indicator:indeterminate:hover,
 QRadioButton::indicator:indeterminate:pressed
 {
-        image: url(:/dark_blue/img/radio_indeterminate.png);
+  image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_indeterminate.png);
 }
 
 QRadioButton::indicator:checked:disabled
 {
   outline: none;
-  image: url(:/dark_blue/img/radio_checked_disabled.png);
+  image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_checked_disabled.png);
 }
 
 QRadioButton::indicator:unchecked:disabled
 {
-    image: url(:/dark_blue/img/radio_unchecked_disabled.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/radio_unchecked_disabled.png);
 }
 
 
@@ -421,7 +421,6 @@ QScrollBar::add-line:horizontal:hover,QScrollBar::add-line:horizontal:on
     subcontrol-origin: margin;
 }
 
-
 QScrollBar::sub-line:horizontal:hover, QScrollBar::sub-line:horizontal:on
 {
     border-image: url(:/dark_blue/img/left_arrow.png);
@@ -436,11 +435,11 @@ QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal
     background: none;
 }
 
-
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
 {
     background: none;
 }
+
 
 QScrollBar:vertical
 {
@@ -488,7 +487,6 @@ QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on
     subcontrol-origin: margin;
 }
 
-
 QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on
 {
     border-image: url(:/dark_blue/img/down_arrow.png);
@@ -503,11 +501,11 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
     background: none;
 }
 
-
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 {
     background: none;
 }
+
 
 QTextEdit
 {
@@ -534,8 +532,8 @@ QHeaderView::section
 
 QSizeGrip {
     image: url(:/dark_blue/img/sizegrip.png);
-    width: 12px;
-    height: 12px;
+    width: 6px;
+    height: 6px;
 }
 
 QMainWindow
@@ -655,7 +653,7 @@ QComboBox
     border: 1px solid #3A3939;
     border-radius: 2px;
     padding: 2px;
-    min-width: 75px;
+    /* min-width: 30px; */
 }
 
 QPushButton:checked{
@@ -706,13 +704,17 @@ QComboBox::drop-down
 
 QComboBox::down-arrow
 {
-    image: url(:/dark_blue/img/down_arrow_disabled.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/decrease_blue.png);
+    width: 10px;
+    height: 10px;
 }
 
 QComboBox::down-arrow:on, QComboBox::down-arrow:hover,
 QComboBox::down-arrow:focus
 {
-    image: url(:/dark_blue/img/down_arrow.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/decrease_blue.png);
+    width: 10px;
+    height: 10px;
 }
 
 QPushButton:pressed
@@ -727,7 +729,7 @@ QAbstractSpinBox {
     background-color: #201F1F;
     color: silver;
     border-radius: 2px;
-    min-width: 75px;
+   /* min-width: 50px; */
 }
 
 QAbstractSpinBox:up-button
@@ -745,25 +747,25 @@ QAbstractSpinBox:down-button
 }
 
 QAbstractSpinBox::up-arrow,QAbstractSpinBox::up-arrow:disabled,QAbstractSpinBox::up-arrow:off {
-    image: url(:/dark_blue/img/up_arrow_disabled.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/increase_blue.png);
     width: 10px;
     height: 10px;
 }
 QAbstractSpinBox::up-arrow:hover
 {
-    image: url(:/dark_blue/img/up_arrow.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/increase_blue.png);
 }
 
 
 QAbstractSpinBox::down-arrow,QAbstractSpinBox::down-arrow:disabled,QAbstractSpinBox::down-arrow:off
 {
-    image: url(:/dark_blue/img/down_arrow_disabled.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/decrease_blue.png);
     width: 10px;
     height: 10px;
 }
 QAbstractSpinBox::down-arrow:hover
 {
-    image: url(:/dark_blue/img/down_arrow.png);
+    image: url(/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/pyqt-stylesheets/pyqtcss/src/dark_blue/img/decrease_blue.png);
 }
 
 

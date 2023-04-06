@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BoxEditor</class>
+ <widget class="QWidget" name="BoxEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1035</width>
+    <height>876</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTableWidget" name="BoxTable">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>40</y>
+     <width>1001</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Delete</string>
+    </property>
+    <property name="toolTip">
+     <string>Delete Row</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="textAlignment">
+     <set>AlignLeading|AlignVCenter</set>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/cross.png</normaloff>:/Icons/Icons/cross.png</iconset>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Insert</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+    <property name="textAlignment">
+     <set>AlignLeading|AlignVCenter</set>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/insertabove.png</normaloff>:/Icons/Icons/insertabove.png</iconset>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Line</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>X</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Y</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>W</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>H</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>R-Draw</string>
+    </property>
+    <property name="toolTip">
+     <string>Draw linebox with rubberBand</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+    <property name="textAlignment">
+     <set>AlignLeading|AlignVCenter</set>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/rubberband.png</normaloff>:/Icons/Icons/rubberband.png</iconset>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>S-Draw</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+    <property name="textAlignment">
+     <set>AlignLeading|AlignVCenter</set>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Accept</string>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
+    <property name="textAlignment">
+     <set>AlignLeading|AlignVCenter</set>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/Valid.png</normaloff>:/Icons/Icons/Valid.png</iconset>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

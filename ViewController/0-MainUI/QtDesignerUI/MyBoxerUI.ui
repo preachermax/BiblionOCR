@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1330</width>
-    <height>946</height>
+    <width>1350</width>
+    <height>956</height>
    </rect>
   </property>
   <property name="font">
@@ -35,7 +35,7 @@
   <property name="animated">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="BoxWidget">
    <widget class="QScrollArea" name="ImagescrollArea">
     <property name="geometry">
      <rect>
@@ -57,6 +57,9 @@
       <height>600</height>
      </size>
     </property>
+    <property name="mouseTracking">
+     <bool>false</bool>
+    </property>
     <property name="widgetResizable">
      <bool>true</bool>
     </property>
@@ -68,8 +71,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>3200</width>
-       <height>4800</height>
+       <width>6600</width>
+       <height>9600</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -80,8 +83,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>3200</width>
-       <height>4800</height>
+       <width>6600</width>
+       <height>9600</height>
       </size>
      </property>
      <property name="sizeIncrement">
@@ -96,10 +99,13 @@
        <height>700</height>
       </size>
      </property>
+     <property name="mouseTracking">
+      <bool>false</bool>
+     </property>
      <widget class="QLabel" name="Image">
       <property name="geometry">
        <rect>
-        <x>21</x>
+        <x>0</x>
         <y>0</y>
         <width>6800</width>
         <height>9600</height>
@@ -113,8 +119,8 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>3400</width>
-        <height>4800</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="baseSize">
@@ -122,6 +128,9 @@
         <width>520</width>
         <height>700</height>
        </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
       </property>
       <property name="text">
        <string/>
@@ -132,18 +141,8 @@
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
-     </widget>
-     <widget class="QLabel" name="Line">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>20</width>
-        <height>9600</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
+      <property name="margin">
+       <number>80</number>
       </property>
      </widget>
     </widget>
@@ -192,7 +191,7 @@
    <widget class="QPushButton" name="EditCorrectedTextbutton">
     <property name="geometry">
      <rect>
-      <x>980</x>
+      <x>970</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -220,7 +219,7 @@
    <widget class="QPushButton" name="SaveAsBoxCorrTextbutton">
     <property name="geometry">
      <rect>
-      <x>1250</x>
+      <x>1240</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -248,7 +247,7 @@
    <widget class="QPushButton" name="SaveBoxCorrTextbutton">
     <property name="geometry">
      <rect>
-      <x>1280</x>
+      <x>1270</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -336,7 +335,7 @@
    <widget class="QPushButton" name="PrevImgButton">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>260</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -356,7 +355,7 @@
    <widget class="QPushButton" name="NextImgButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>290</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -376,7 +375,7 @@
    <widget class="QPushButton" name="PrevTxtButton">
     <property name="geometry">
      <rect>
-      <x>1010</x>
+      <x>1040</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -396,7 +395,7 @@
    <widget class="QPushButton" name="NextTxtButton">
     <property name="geometry">
      <rect>
-      <x>1040</x>
+      <x>1070</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -479,9 +478,9 @@
    <widget class="QGroupBox" name="OCRgroupBox">
     <property name="geometry">
      <rect>
-      <x>571</x>
+      <x>570</x>
       <y>230</y>
-      <width>158</width>
+      <width>159</width>
       <height>101</height>
      </rect>
     </property>
@@ -650,6 +649,9 @@
      <property name="text">
       <string> OCR Language</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
    </widget>
    <widget class="QLineEdit" name="TextLE">
@@ -667,7 +669,7 @@
      <rect>
       <x>570</x>
       <y>30</y>
-      <width>161</width>
+      <width>159</width>
       <height>51</height>
      </rect>
     </property>
@@ -863,9 +865,9 @@
    <widget class="QGroupBox" name="TextgroupBox">
     <property name="geometry">
      <rect>
-      <x>571</x>
+      <x>570</x>
       <y>80</y>
-      <width>158</width>
+      <width>159</width>
       <height>101</height>
      </rect>
     </property>
@@ -875,10 +877,10 @@
     <widget class="QLabel" name="fontlabel">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>50</x>
        <y>0</y>
-       <width>21</width>
-       <height>17</height>
+       <width>61</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="font">
@@ -893,14 +895,17 @@
      <property name="text">
       <string>Font</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
     <widget class="QLabel" name="fontSizelabel">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>57</x>
        <y>50</y>
-       <width>41</width>
-       <height>17</height>
+       <width>51</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="font">
@@ -915,14 +920,17 @@
      <property name="text">
       <string>Font Size</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
     <widget class="QSpinBox" name="fontSizeBox">
      <property name="geometry">
       <rect>
        <x>57</x>
        <y>70</y>
-       <width>52</width>
-       <height>26</height>
+       <width>51</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="toolTip">
@@ -935,7 +943,7 @@
       <number>6</number>
      </property>
      <property name="maximum">
-      <number>30</number>
+      <number>100</number>
      </property>
      <property name="value">
       <number>20</number>
@@ -967,9 +975,9 @@
    <widget class="QComboBox" name="ZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>120</x>
       <y>0</y>
-      <width>51</width>
+      <width>81</width>
       <height>26</height>
      </rect>
     </property>
@@ -1048,6 +1056,11 @@
       <string>200 %</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>Contents</string>
+     </property>
+    </item>
    </widget>
    <widget class="QPushButton" name="Zoombutton">
     <property name="enabled">
@@ -1055,9 +1068,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>90</x>
       <y>0</y>
-      <width>32</width>
+      <width>30</width>
       <height>26</height>
      </rect>
     </property>
@@ -1126,7 +1139,7 @@
    <widget class="QLineEdit" name="LHlineEdit">
     <property name="geometry">
      <rect>
-      <x>1100</x>
+      <x>1170</x>
       <y>0</y>
       <width>31</width>
       <height>25</height>
@@ -1157,7 +1170,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1070</x>
+      <x>1140</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -1188,7 +1201,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>110</x>
       <y>30</y>
       <width>21</width>
       <height>161</height>
@@ -1237,6 +1250,7 @@
     <property name="font">
      <font>
       <family>FROMVS</family>
+      <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -1250,26 +1264,282 @@
       <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
     </property>
    </widget>
-   <widget class="QStackedWidget" name="stackedWidget">
+   <widget class="QProgressBar" name="progressBar">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>840</y>
+      <width>158</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="textVisible">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QTabWidget" name="BoxTab">
     <property name="geometry">
      <rect>
       <x>730</x>
       <y>30</y>
-      <width>571</width>
-      <height>831</height>
+      <width>597</width>
+      <height>834</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::East</enum>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="page_0">
+    <widget class="QWidget" name="Table">
+     <attribute name="title">
+      <string>Box Table</string>
+     </attribute>
+     <widget class="QTableWidget" name="BoxTable">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>570</width>
+        <height>829</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="autoScrollMargin">
+       <number>16</number>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::CurrentChanged|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <property name="cornerButtonEnabled">
+       <bool>false</bool>
+      </property>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>22</number>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>30</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Line</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>X</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Y</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>W</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>H</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>InsA</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/insertabove.png</normaloff>:/Icons/Icons/insertabove.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>InsB</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/insertbelow.png</normaloff>:/Icons/Icons/insertbelow.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Del</string>
+       </property>
+       <property name="toolTip">
+        <string>Delete Row</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/deleterow.png</normaloff>:/Icons/Icons/deleterow.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Rdraw</string>
+       </property>
+       <property name="toolTip">
+        <string>Draw linebox with rubberBand</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/rubberband.png</normaloff>:/Icons/Icons/rubberband.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Sdraw</string>
+       </property>
+       <property name="toolTip">
+        <string>Draw linebox with cell spinboxes</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/spinbox4.png</normaloff>:/Icons/Icons/spinbox4.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Accept</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/Valid.png</normaloff>:/Icons/Icons/Valid.png</iconset>
+       </property>
+      </column>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="CSV">
+     <attribute name="title">
+      <string>CSV Text</string>
+     </attribute>
      <widget class="QTextEdit" name="BoxText">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>571</width>
-        <height>831</height>
+        <width>570</width>
+        <height>830</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -1287,6 +1557,12 @@
         <bold>false</bold>
        </font>
       </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustToContents</enum>
       </property>
@@ -1295,127 +1571,26 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="page_1">
-     <widget class="QTableWidget" name="BoxTable">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>571</width>
-        <height>831</height>
-       </rect>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
-      </property>
-      <property name="editTriggers">
-       <set>QAbstractItemView::CurrentChanged|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectRows</enum>
-      </property>
-      <column>
-       <property name="text">
-        <string>Line</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>X</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Y</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>W</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>H</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>X+W</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Y+H</string>
-       </property>
-      </column>
-     </widget>
-    </widget>
    </widget>
-   <widget class="QRadioButton" name="textButton">
-    <property name="geometry">
-     <rect>
-      <x>1140</x>
-      <y>0</y>
-      <width>51</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>FROMVS</family>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Text</string>
-    </property>
-    <property name="checked">
+   <widget class="QCheckBox" name="LineCheckBox">
+    <property name="enabled">
      <bool>true</bool>
     </property>
-   </widget>
-   <widget class="QRadioButton" name="tableButton">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>210</x>
       <y>0</y>
       <width>51</width>
-      <height>23</height>
+      <height>25</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>FROMVS</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
      </font>
     </property>
     <property name="text">
-     <string>Table</string>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>840</y>
-      <width>160</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-    <property name="textVisible">
-     <bool>false</bool>
+     <string>Lines</string>
     </property>
    </widget>
    <zorder>ImagescrollArea</zorder>
@@ -1444,19 +1619,18 @@
    <zorder>LHDialogbutton</zorder>
    <zorder>Zoomslider</zorder>
    <zorder>FindReplacebutton</zorder>
-   <zorder>stackedWidget</zorder>
-   <zorder>textButton</zorder>
-   <zorder>tableButton</zorder>
    <zorder>LHslider</zorder>
    <zorder>progressBar</zorder>
+   <zorder>BoxTab</zorder>
+   <zorder>LineCheckBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1330</width>
-     <height>22</height>
+     <width>1350</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOCR">
@@ -1566,7 +1740,6 @@
      <property name="title">
       <string>Edit LineBox File Pairs</string>
      </property>
-     <addaction name="actionEdit_Greek_LineBox_Pair"/>
      <addaction name="actionEdit_Latin_Linebox_Pair"/>
     </widget>
     <addaction name="menuEdit_PageBox_File"/>
@@ -1588,9 +1761,18 @@
      <addaction name="actionToggle_Greek_Toolbars"/>
      <addaction name="actionToggle_Latin_Toolbars"/>
     </widget>
+    <widget class="QMenu" name="menuThemes">
+     <property name="title">
+      <string>Themes</string>
+     </property>
+     <addaction name="actionDark_Orange"/>
+     <addaction name="actionDark_Blue"/>
+     <addaction name="actionClassic"/>
+     <addaction name="actionStandardUI"/>
+    </widget>
     <addaction name="menuToggle_PageBox_Toolbars"/>
     <addaction name="actionToggle_LineBox_Toolbar"/>
-    <addaction name="actionThemes"/>
+    <addaction name="menuThemes"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -1623,28 +1805,28 @@
     </property>
     <widget class="QMenu" name="menuMake_PageBox_Files_From_Folder">
      <property name="title">
-      <string>Make PageBox Folder Pairs</string>
+      <string>Make PageBox Batch Folder Pairs</string>
      </property>
      <addaction name="actionGreek_PageBox_Files"/>
      <addaction name="actionLatin_PageBox_Files"/>
     </widget>
     <widget class="QMenu" name="menuMake_PageBox_File">
      <property name="title">
-      <string>Make PageBox File Pairs</string>
+      <string>Make PageBox File Pair</string>
      </property>
      <addaction name="actionGreek_PageBox_File"/>
      <addaction name="actionLatin_PageBox_File"/>
     </widget>
     <widget class="QMenu" name="menuMake_LineBox_Folder_Pairs">
      <property name="title">
-      <string>Make LineBox Folder Pairs</string>
+      <string>Make LineBox Batch Folder Pairs</string>
      </property>
      <addaction name="actionMake_Greek_LineBox_Folder_Pairs"/>
      <addaction name="actionMake_Latin_LineBox_Folder_Pairs"/>
     </widget>
     <widget class="QMenu" name="menuMake_LineBox_File_Pairs">
      <property name="title">
-      <string>Make LineBox File Pairs</string>
+      <string>Make LineBox File Pair</string>
      </property>
      <addaction name="actionMake_Greek_LineBox_File_Pair"/>
      <addaction name="actionMake_Latin_LineBox_File_Pairs"/>
@@ -1674,7 +1856,19 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QToolBar" name="GreekImageLinesBatchToolBar">
+  <widget class="QToolBar" name="BatchPageBoxesToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionCrop_Languages_tb"/>
+  </widget>
+  <widget class="QToolBar" name="BatchGreekImageLinesToolBar">
    <property name="windowTitle">
     <string>Greek Image Lines Tool Bar</string>
    </property>
@@ -1691,7 +1885,7 @@
    <addaction name="actionRename_Greek_tif_Lines_tb"/>
    <addaction name="actionMove_Greek_tif_Lines_tb"/>
   </widget>
-  <widget class="QToolBar" name="LatinImageLinesBatchToolBar">
+  <widget class="QToolBar" name="BatchLatinImageLinesToolBar">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -1728,7 +1922,7 @@
    <addaction name="actionExtract_Glyphs"/>
    <addaction name="actionFontForge"/>
   </widget>
-  <widget class="QToolBar" name="GreekTextLinesBatchToolBar">
+  <widget class="QToolBar" name="BatchGreekTextLinesToolBar">
    <property name="windowTitle">
     <string>Greek Text Lines Tool Bar</string>
    </property>
@@ -1744,15 +1938,15 @@
    <addaction name="actionSplitGreek_text_lines_tb"/>
    <addaction name="actionRenameGreek_text_lines_tb"/>
   </widget>
-  <widget class="QToolBar" name="LatinTextLinesBatchToolBar">
+  <widget class="QToolBar" name="BatchLatinTextLinesToolBar">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="windowTitle">
-    <string>Latin Text Lines Tool Bar</string>
+    <string>Latin Text Lines Batch Tool Bar</string>
    </property>
    <property name="toolTip">
-    <string>Latin Text Lines Tool Bar</string>
+    <string>Latin Text Lines Batch Tool Bar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1763,27 +1957,12 @@
    <addaction name="actionSplit_Latin_Text_Lines_tb"/>
    <addaction name="actionRename_Latin_Text_Lines_tb"/>
   </widget>
-  <widget class="QToolBar" name="ModulesToolBar">
+  <widget class="QToolBar" name="PairMakeBoxesToolBar">
    <property name="windowTitle">
-    <string>Versify Text Tool Bar</string>
+    <string>Make Linebox File Pairs Tool Bar</string>
    </property>
    <property name="toolTip">
-    <string>Versify Text Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionDB_Browser_for_SQLite"/>
-  </widget>
-  <widget class="QToolBar" name="EditBoxesToolBar">
-   <property name="windowTitle">
-    <string>Convert Source Pages Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert Source Pages Tool Bar</string>
+    <string>Make Linebox File Pairs Tool Bar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1792,8 +1971,18 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMake_Greek_LineBox_File_Pair"/>
-   <addaction name="actionDraw_Selected_LineBox_tb"/>
-   <addaction name="actionDraw_Table_LineBox_tb"/>
+  </widget>
+  <widget class="QToolBar" name="PairEditBoxesToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEdit_Greek_LineBox_Pair"/>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -2237,7 +2426,7 @@
     <string>Crop Greek To tif Lines</string>
    </property>
    <property name="statusTip">
-    <string>Auto cropping Greek tif lines....</string>
+    <string comment="Auto cropping indexed Black and White Greek tif lines into the selected folder...">Auto cropping Greek tif lines....</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -2520,7 +2709,7 @@
   <action name="actionFontForge">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/fontforgenew.png</normaloff>:/Icons/Icons/fontforgenew.png</iconset>
    </property>
    <property name="text">
     <string>FontForge</string>
@@ -2796,7 +2985,7 @@
   </action>
   <action name="actionFont_Forge">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset>
      <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
    </property>
    <property name="text">
@@ -2964,10 +3153,19 @@
   <action name="actionDraw_Selected_LineBox_tb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+     <normaloff>:/Icons/Icons/rubberband.png</normaloff>:/Icons/Icons/rubberband.png</iconset>
    </property>
    <property name="text">
-    <string>Table Edit LineBox File Pair</string>
+    <string>Draw Selected LineBox</string>
+   </property>
+   <property name="iconText">
+    <string>Draw Selected LineBox</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw Selected LineBox</string>
+   </property>
+   <property name="statusTip">
+    <string comment="Complete editing the selected tif and text linebox files with the mouse using rubberBand grips.">Drawing Selected LineBox...</string>
    </property>
   </action>
   <action name="actionToggle_LineBox_Toolbar">
@@ -3001,7 +3199,7 @@
      <normaloff>:/Icons/Icons/boxwood2.png</normaloff>:/Icons/Icons/boxwood2.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek PageBox File Pairs</string>
+    <string>Make Greek PageBox File Pair</string>
    </property>
   </action>
   <action name="actionLatin_PageBox_File">
@@ -3010,7 +3208,7 @@
      <normaloff>:/Icons/Icons/boxwood2.png</normaloff>:/Icons/Icons/boxwood2.png</iconset>
    </property>
    <property name="text">
-    <string>Make Latin PageBox File Pairs</string>
+    <string>Make Latin PageBox File Pair</string>
    </property>
   </action>
   <action name="actionGreek_LineBox_Files">
@@ -3104,10 +3302,19 @@
   <action name="actionDraw_Table_LineBox_tb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/draw-rectangle-diagonally-32.png</normaloff>:/Icons/Icons/draw-rectangle-diagonally-32.png</iconset>
+     <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
    </property>
    <property name="text">
-    <string>Draw Selected LineBox</string>
+    <string>Complete Table Edited LineBox File Pair</string>
+   </property>
+   <property name="iconText">
+    <string>Complete Table Edited LineBox File Pair</string>
+   </property>
+   <property name="toolTip">
+    <string>Complete Table Edited LineBox File Pair</string>
+   </property>
+   <property name="statusTip">
+    <string comment="Complete editing the tif and text linebox files with the BoxTable cells using Spin Boxes. ">Complete Editing LineBox File Pair with Table...</string>
    </property>
   </action>
   <action name="actionMake_Greek_LineBox_Folder_Pairs">
@@ -3116,12 +3323,12 @@
      <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek LineBox Folder Pairs</string>
+    <string>Make Greek LineBox Batch Folder Pairs</string>
    </property>
   </action>
   <action name="actionMake_Latin_LineBox_Folder_Pairs">
    <property name="text">
-    <string>Make Latin LineBox Folder Pairs</string>
+    <string>Make Latin LineBox Batch Folder Pairs</string>
    </property>
   </action>
   <action name="actionMake_Greek_LineBox_File_Pair">
@@ -3130,7 +3337,10 @@
      <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek LineBox File Pairs</string>
+    <string>Make Greek Line Box File Pair</string>
+   </property>
+   <property name="statusTip">
+    <string comment="Making Greek tif and text linebox files from the current page image. ">Making Greek Line Box File Pair...</string>
    </property>
   </action>
   <action name="actionMake_Latin_LineBox_File_Pairs">
@@ -3139,12 +3349,27 @@
      <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
    </property>
    <property name="text">
-    <string>Make Latin LineBox File Pairs</string>
+    <string>Make Latin LineBox File Pair</string>
    </property>
   </action>
-  <action name="actionThemes">
+  <action name="actionDark_Orange">
    <property name="text">
-    <string>Themes</string>
+    <string>Dark_Orange</string>
+   </property>
+  </action>
+  <action name="actionDark_Blue">
+   <property name="text">
+    <string>Dark_Blue</string>
+   </property>
+  </action>
+  <action name="actionClassic">
+   <property name="text">
+    <string>Classic</string>
+   </property>
+  </action>
+  <action name="actionStandardUI">
+   <property name="text">
+    <string>StandardUI</string>
    </property>
   </action>
  </widget>

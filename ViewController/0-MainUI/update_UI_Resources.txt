@@ -6,6 +6,6 @@ pyuic5 -x c:/users/max/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/
 
 Update UI Resource Files:
 # Linux
-pyrcc5 /home/max/Projects/BiblionOCR/ViewController/0-MainUI/UI_Icons.qrc  -o /home/max/Projects/BiblionOCR/ViewController/0-MainUI/UI_Icons.py
+pyrcc5 /home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/UI_Icons.qrc  -o /home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/UI_Icons.py
 # Windows
 pyrcc5 c:/users/home/max/Projects/BiblionOCR/ViewController/0-MainUI/UI_Icons.qrc  -o /home/max/Projects/BiblionOCR/ViewController/0-MainUI/UI_Icons.py

@@ -61,8 +61,8 @@
     },
     {
         "Setting": "self.fontsize",
-        "CurrentValue": "16",
-        "DefaultValue": "16"
+        "CurrentValue": "11",
+        "DefaultValue": "11"
     },
     {
         "Setting": "self.ocrlang",
@@ -176,7 +176,7 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_247_linebox.tif",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_246_linebox.tif",
         "DefaultValue": ""
     },
     {
@@ -216,12 +216,12 @@
     },
     {
         "Setting": "self.zoom",
-        "CurrentValue": "11 %",
-        "DefaultValue": "11 %"
+        "CurrentValue": "10 %",
+        "DefaultValue": "Contents"
     },
     {
         "Setting": "self.zoomslidervalue",
-        "CurrentValue": "11",
+        "CurrentValue": "10",
         "DefaultValue": "25"
     },
     {
@@ -231,12 +231,12 @@
     },
     {
         "Setting": "self.img_yoffset",
-        "CurrentValue": "70",
-        "DefaultValue": "70"
+        "CurrentValue": "90",
+        "DefaultValue": "90"
     },
     {
         "Setting": "self.txtpath",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_247_linebox.txt",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_246_linebox.txt",
         "DefaultValue": ""
     },
     {

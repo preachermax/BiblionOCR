@@ -1,8 +1,16 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/spinbox4.png</file>
+    <file>Icons/spintable1.png</file>
+    <file>Icons/spintable.png</file>
+    <file>Icons/fontforgenew.png</file>
     <file>Icons/insertabove.png</file>
     <file>Icons/draw-rectangle-diagonally-16.png</file>
+    <file>Icons/rubberband.png</file>
+    <file>Icons/deleterow.png</file>
     <file>Icons/draw-rectangle-diagonally-32.png</file>
+    <file>Icons/spinbox.png</file>
+    <file>Icons/spinbox3.png</file>
     <file>Icons/Image_renumber.png</file>
     <file>Icons/text_renumber.png</file>
     <file>Icons/insertbelow.png</file>
@@ -226,7 +234,6 @@
     <file>Icons/gimp.png</file>
     <file>Icons/image-crop.png</file>
     <file>Icons/epsilon-trace.png</file>
-    <file>Icons/FontForge.png</file>
     <file>Icons/glyph-trace.png</file>
     <file>Icons/tiff2png-greek.png</file>
     <file>Icons/tiff2png-latin.png</file>
@@ -281,8 +288,5 @@
     <file>Icons/folder-open-image.png</file>
     <file>Icons/image-sunset.png</file>
   </qresource>
-  <qresource prefix="newPrefix"/>
-  <qresource prefix="newPrefix"/>
-  <qresource prefix="newPrefix"/>
   <qresource prefix="Icons/"/>
 </RCC>
