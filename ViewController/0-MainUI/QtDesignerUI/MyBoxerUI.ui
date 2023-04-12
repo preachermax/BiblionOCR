@@ -1291,8 +1291,8 @@
      <rect>
       <x>730</x>
       <y>33</y>
-      <width>621</width>
-      <height>831</height>
+      <width>620</width>
+      <height>830</height>
      </rect>
     </property>
     <property name="font">
@@ -1307,7 +1307,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1331,7 +1331,7 @@
         <x>0</x>
         <y>0</y>
         <width>580</width>
-        <height>830</height>
+        <height>826</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -1551,7 +1551,7 @@
         <x>0</x>
         <y>0</y>
         <width>580</width>
-        <height>830</height>
+        <height>826</height>
        </rect>
       </property>
       <property name="minimumSize">

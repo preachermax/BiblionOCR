@@ -1,4 +1,5 @@
 {
     "sqltools.useNodeRuntime": true,
-    "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace"
+    "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
+    "git.autofetch": true
 }

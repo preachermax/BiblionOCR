@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Biblion 
+Version=v0.8.5
+Icon=/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/Icons/BiblionBoxer2.png
+X-Icon-Path=/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/Icons/
+Exec=/usr/bin/python3 /home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/MyBoxer.py %f
+Terminal=true
+Type=Application
+Name[en_US]=BiblionBoxer

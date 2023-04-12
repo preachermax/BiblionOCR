@@ -22,7 +22,9 @@ import pytesseract
 import qimage2ndarray
 import tiffcapture
 #from subprocess import Popen, PIPE, CalledProcessError
+
 from PIL import Image, ImageDraw, ImageFont, ImageQt
+
 # PyQt5 imports
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
@@ -208,7 +210,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.PrevTxtButton.clicked.connect(self.prevText)
         self.ui.NextTxtButton.clicked.connect(self.nextText)
 
-        self.ui.LineCheckBox.stateChanged.connect(self.showLineBoxImageLines)
+        self.ui.LineCheckBox.stateChanged.connect(self.getLineBoxImageLines)
 
         self.ui.Zoombutton.clicked.connect(self.get_zoom)
         self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
@@ -229,7 +231,11 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.drawLineBoxImage)
+
+        self.ui.BoxTable.setCornerButtonEnabled(False)
+        self.ui.BoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu) 
         self.ui.BoxTable.customContextMenuRequested.connect(self.openTableMenu)
+
         self.ui.reloadTextbutton.clicked.connect(self.BoxText2BoxTable)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
@@ -340,7 +346,7 @@ class MainWindow(qtw.QMainWindow):
                                        #"QProgressBar::chunk {background:blue}")
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
         self.origpixmap = None
-        self.boxcolor = "red"
+        self.box_color = "red"
         self.dirIterator = None
         self.imgfileList = []
         self.txtfileList = []
@@ -1138,82 +1144,6 @@ class MainWindow(qtw.QMainWindow):
         print("completed renaming Greek textlines for ground truth review")
         #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
     
-    '''
-    # Mouse Controllers
-    def mousePressEvent(self, event):
-        if self.statusBoxMode == "Edit":
-            self.run_event = False
-            self.event_x = event.pos().x()
-            self.event_y = event.pos().y()
-            self.start_pos = QPoint(self.event_x, self.event_y)
-            print(f'Mouse clicked as start position: {self.start_pos}')
-            # Limit scope of rubberband starting position
-            if self.ui.ImageLe.displayText() != "":
-                self.run_event = True
-                x_min = int(self.img_xoffset) - 1
-                #print(f'xmin: {x_min}')
-                x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
-                #print(f'xmax: {x_max}')
-                y_min = int(self.img_yoffset) - 1
-                #print(f'ymin: {y_min}')
-                y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
-                #print(f'ymax: {y_max}')
-            else:
-                self.run_event = False
-                print('You cannot draw without a loaded image')
-            
-            if event.button() == Qt.LeftButton and self.run_event == True:          
-                if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
-                    self.rubberBand = ResizableRubberBand(self)
-                    self.run_event = True
-                    self.rubberBand.setGeometry(QRect(self.start_pos, QSize()).normalized())
-                    self.rubberBand.show()
-                else:
-                    self.run_event = False
-                    print('You cannot draw outside the current image borders')
-        else:
-            print("You can only draw in 'Edit' mode")
-
-    def mouseMoveEvent(self, event):
-        if self.statusBoxMode == "Edit" and self.run_event: 
-            self.end_pos = event.pos()
-            self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
-            # Update BoxTable as mouse moves
-            for column in range(1,5):
-                if column == 1:
-                    self.x_rb = int(self.rubberBand.x()*self.scale)
-                    self.ui.BoxTable.setValue(self.row_current,column,self.x_rb)
-                elif column == 2:
-                    self.y_rb = int(self.rubberBand.y()*self.scale)
-                    self.ui.BoxTable.setValue(self.row_current,column,self.y_rb)
-                elif column == 3:
-                    self.w_rb = int(self.rubberBand.width()*self.scale)
-                    self.ui.BoxTable.setValue(self.row_current,column,self.w_rb)
-                elif column == 4:
-                    self.h_rb = int(self.rubberBand.height()*self.scale)
-                    self.ui.BoxTable.setValue(self.row_current,column,self.h_rb)
-
-    def mouseReleaseEvent(self, event):
-        if self.statusBoxMode == "Edit":
-            if not self.run_event:
-                self.run_event = False
-            if self.run_event and event.button() == Qt.LeftButton:
-                geo = self.rubberBand.geometry()
-                self.x_rb = self.rubberBand.x()
-                self.y_rb = self.rubberBand.y()
-                self.w_rb = self.rubberBand.width()
-                self.h_rb = self.rubberBand.height()
-                print("selection x = " + str(self.x_rb))
-                #print("selection w = " + str(self.w_rb))
-                print("selection y = " + str(self.y_rb))
-                #print("selection h = " + str(self.h_rb))
-                #print("selection x+w = " + str(self.x_rb+self.w_rb))
-                #print("selection y+h = " + str(self.y_rb+self.h_rb))
-                #print(self.x_rb,":",self.x_rb+self.w_rb,",",self.y_rb,":",self.y_rb+self.h_rb)
-
-                self.currentQRect = self.rubberBand.geometry()
-    '''
-
     # Page Toolbar Actions
     def actionRenameGreek_text_lines_old(self):
         print("renaming Greek textlines for ground truth")
@@ -1470,32 +1400,6 @@ class MainWindow(qtw.QMainWindow):
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
             self.sortImgFiles()  
-
-    '''def get_LineImg(self):
-        self.linepath = '/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/UI_Images/Line.tif'
-        if self.linepath:
-            self.linefile = qtc.QFile(self.linepath)
-            self.show_LineImg()'''
-
-    '''def show_LineImg(self):
-        if self.ui.LineCheckBox.isChecked():
-            # Show Line image
-            if self.linepath.endswith('.tif'):
-                self.loadImageStackFromFile(self.linepath)
-                self.showLineFrame(0)
-                # Convert frame ndarray to a QImage.
-                self.qlineimage = qimage2ndarray.array2qimage(self.lineframe, normalize=True)
-                self.origlinepixmap = qtg.QPixmap.fromImage(self.qlineimage)
-                # Convert self.qlineimage to pixmap
-                self.linepixmap = qtg.QPixmap.fromImage(self.qlineimage).scaled(self.ui.Line.size(), 
-                    qtc.Qt.KeepAspectRatio)
-            else:
-                self.linepixmap = qtg.QPixmap(self.linepath).scaled(self.ui.Line.size(), 
-                    qtc.Qt.KeepAspectRatio)       
-
-            if self.linepixmap.isNull():
-                return
-            #self.on_zoom()'''
     
     def get_zoom(self):
         self.ui.Zoomslider.setEnabled(True)
@@ -1564,8 +1468,6 @@ class MainWindow(qtw.QMainWindow):
             self.ui.ImagescrollAreaWidgetContents.resize(self.scale * self.ui.ImagescrollAreaWidgetContents.size())
             print(f'ImagescrollAreaWidgetContents size: {self.ui.ImagescrollAreaWidgetContents.size()}')
             self.resize_image()
-            '''if self.ui.LineCheckBox.isChecked():
-                self.resize_lineimage()'''
             self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
 
     def resize_image(self):
@@ -1590,7 +1492,6 @@ class MainWindow(qtw.QMainWindow):
         self.ui.Line.setPixmap(self.scaled_linepixmap)
         
         self.ui.Line.move(self.ui.Image.width(),0)
-
 
     def GetOCRText(self):
         my_OCR_rawtext = pytesseract.image_to_string(self.imgpath,lang="feg")
@@ -2265,9 +2166,9 @@ class MainWindow(qtw.QMainWindow):
         pass
     
     def on_rDrawSelection(self):
-        if self.boxcolor != "blue":
-            state = 'current'
-            self.on_editLineBox(state)
+        self.rubberBand = ResizableRubberBand(self)
+        self.rubberBand.hide()
+        #self.on_editLineBox(self.row_selected)
         self.statusBoxMode.setText("Edit")
         self.statusBoxType.setText("Line")
         self.statusSelectionMode.setText("Row")
@@ -2277,29 +2178,30 @@ class MainWindow(qtw.QMainWindow):
         self.row_selected = self.ui.BoxTable.currentRow()        
         #print("Editing BoxTable selection")
         self.ui.ZoomComboBox.setCurrentText('Contents')        
-        #self.getPrevLineBox()
-        #def mouseEdit():
-        print('Editing LineBox image using mouse and QRubberBand')
-        #self.ui.BoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        #self.ui.actionDraw_Selected_LineBox_tb.setEnabled(True)
-        #self.ui.actionDraw_Table_LineBox_tb.setEnabled(False)
-
+        self.setPrevLineBox()
+        # self.getPrevTextLineBox()
+        self.ui.statusbar.showMessage('Editing LineBox image using mouse and QRubberBand')
         self.on_resetLineBox()
         #self.ui.BoxTable.clearSelection()
 
     def on_sDrawSelection(self):
         self.row_selected = self.ui.BoxTable.currentRow()
-        self.on_editLineBox(self.row_selected)
+        # self.on_editLineBox(self.row_selected)
         self.statusBoxMode.setText("Edit")
         self.statusBoxType.setText("Line")
         self.statusSelectionMode.setText("Row")
         self.statusDrawingMode.setText("Table")
+
         self.ui.BoxTable.setSortingEnabled(False)      
         self.ui.ZoomComboBox.setCurrentText('Contents')        
-        self.getPrevLineBox()
+
+        self.setPrevLineBox()
+        #self.on_editLineBox(self.row_selected)
+        self.on_selectLineBox(self.row_selected)
+
         print('Edit LineBox image using BoxTable spinboxes')
         self.ui.statusbar.showMessage('Edit LineBox image using BoxTable spinboxes') 
-        self.ui.BoxTable.clearSelection()
+        # self.ui.BoxTable.clearSelection()
         self.ui.BoxTable.setSortingEnabled(False)
         colcount = self.ui.BoxTable.columnCount() - 6
         for col in range(colcount):
@@ -2319,8 +2221,10 @@ class MainWindow(qtw.QMainWindow):
                 self.currw = int(self.cellvalue)
             elif col == 4:
                 self.currh = int(self.cellvalue)
+
         print(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh}')
         print(f'Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}')
+        self.ui.statusbar.showMessage(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh} --- Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}') 
         #self.getSpinBox()
         self.getSpinBoxes()   
 
@@ -2343,7 +2247,6 @@ class MainWindow(qtw.QMainWindow):
     def on_deleteRowSelection(self):
         row = self.ui.BoxTable.currentRow()
         self.on_drawLineBox(row)
-        #self.on_selectLineBox()
         if row:
             popup = qtw.QMessageBox(self)
             popup.setIcon(qtw.QMessageBox.Information)
@@ -2355,7 +2258,7 @@ class MainWindow(qtw.QMainWindow):
             returnValue = popup.exec()
             if returnValue == qtw.QMessageBox.Ok:
                 print('OK clicked')
-                #self.getPrevLineBox()
+                self.setPrevLineBox()
                 self.on_resetLineBox()
                 self.ui.BoxTable.removeRow(row)
                 self.renumberRows()
@@ -2366,156 +2269,146 @@ class MainWindow(qtw.QMainWindow):
             else:
                 pass
 
-    '''def on_rowEditSelection(self):
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()        
-        print("Editing BoxTable selection")
-        self.ui.ZoomComboBox.setCurrentText('Contents')
-        # Show Lines, too?        
-        #self.getPrevLineBox()
-        #self.on_selectLineBox()
-        #self.ui.Boxtable.sDrawButton.clicked.connect(self.on_sDrawSelection)'''
-
-    '''
-    def on_deselection(self):
-        #if not self.row_selected.isNull():
-        row = self.row_selected
-        for column in range(1,5):
-            self.ui.BoxTable.removeCellWidget(row,column)
-            #cellvalue = self.ui.BoxTable.cellWidget(row, column).value()
-            #print(f'Cell SpinBox Widget Value: {cellvalue}')
-            #cellvalue = self.ui.BoxTable.spinbox.value
-    '''
-    
-    def on_currentRowChanged(self,current, previous):
+    def on_currentRowChanged(self,current,previous):
+        # Indexes Selected
+        self.ix_selected = current
+        self.prev_ix_selected = previous
         
         # Row Selected
         self.row_selected = current.row()        
         # Previous Row Selected
         self.prev_row_selected = previous.row()
-
+        
+        self.run_event = False
+        
         print(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
         self.ui.statusbar.showMessage(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
         
-        #if self.statusBoxMode.text() == "Edit":
-        # clear the EditButtons
+        # clear the CellWidgets
         rowcount = self.ui.BoxTable.rowCount()
-        #colcount = self.ui.BoxTable.columnCount() - 5
+        colcount = self.ui.BoxTable.columnCount()
         for row in range(rowcount):
-            for col in range(5,11):
-                #if row != self.row_selected:
+            for col in range(colcount):
                 self.ui.BoxTable.removeCellWidget(row,col)
-                #setCellWidget(row,col,blank)
-        print(f'Currently selected Row: {self.row_selected}')                    
+                 
         self.showEditButtons()
         self.ui.BoxTable.setSortingEnabled(False)
         self.row_selected = self.ui.BoxTable.currentRow()        
         print("Editing BoxTable selection")
         self.ui.ZoomComboBox.setCurrentText('Contents')
         self.ui.BoxTable.resizeRowsToContents()
-        #self.ui.BoxTable.verticalHeader().sectionSizeFromContents()
-        #self.on_rowEditSelection()        
         if self.prev_row_selected >= 0:
             self.on_editLineBox(self.prev_row_selected)
+        if self.ui.LineCheckBox.isChecked():
+            self.getLineBoxImageLines()      
         self.on_selectLineBox(self.row_selected)
-        #else:
-            #self.on_drawLineBox(self.prev_row_selected)
-
-    '''def on_selectionChanged(self, selected, deselected):
-        self.row_selected = selected.indexes(0)[0].row()
-        self.prev_row_selected = self.indexes(1)[0].row()
-        print(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
-        for currix in selected.indexes():
-            print('Selected Row: {0}, Column: {1}'.format(currix.row(), currix.column()))
-        for previx in deselected.indexes():
-            print('Previous Row: {0}, Column: {1}'.format(previx.row(), previx.column()))
-
-        if self.statusBoxType.text() == "Line" and self.statusBoxMode.text() == "Edit":
-            # Row Selected
-            #currix,previx = self.ui.BoxTable.selectionModel.currentRowChanged()
-            self.prev_row_selected = previx.row()
-            self.row_selected = currix.row()
-            #self.row_selected = self.ui.BoxTable.currentRow()
-            #self.getLineBoxImageLines
-            #if self.boxcolor != "blue":
-                #state = 'prev'
-                #self.getPrevLineBox()
-            #self.on_editLineBox(self.prev_row_selected)
-
-            # clear the EditButtons
-            rowcount = self.ui.BoxTable.rowCount()
-            colcount = self.ui.BoxTable.columnCount() - 5
-            for row in range(rowcount):
-                for col in range(5,11):
-                    #if row != self.row_selected:
-                    self.ui.BoxTable.removeCellWidget(row,col)
-                    #setCellWidget(row,col,blank)
-            print(f'Currently selected Row: {self.row_selected}')                    
-            #self.statusDrawingMode.setText("None")
-            #self.clearSpinBoxes()
-            self.showEditButtons()
-            self.on_rowEditSelection()'''
-            
-            #if self.startEditLoop == True:
-                #self.ui.BoxTable.selectionModel().selectionChanged.disconnect(self.on_selectionChanged)
-                #self.startEditLoop = False
-            
-            #if self.statusSelectionMode.text() == "Rows" :
-                #self.ui.BoxTable.selectionModel().currentChanged.connect(self.on_rowEditSelection)
-            # Cell Selected
-            #elif self.statusSelectionMode.text() == "Items":
-                #self.on_cellSelectionChanged()
-                #self.ui.BoxTable.selectionModel().currentChanged.connect(self.on_cellSelectionChanged)
-
+        
     def on_boxValueChanged(self):
         print('This is the handler for the selected spinbox value that is changed')
-        #self.spinbox.valueChanged.disconnect(self.onValueChanged)
+        #self.spinbox.valueChanged.disconnect(self.on_boxValueChanged)
+        self.on_resetLineBox()
         row = self.ui.BoxTable.currentRow()
         col = self.ui.BoxTable.currentColumn()
+        xval = int(self.ui.BoxTable.item(row,1).text())
+        yval = int(self.ui.BoxTable.item(row,2).text())
+        wval = int(self.ui.BoxTable.item(row,3).text())
+        hval = int(self.ui.BoxTable.item(row,4).text())
         if col == 1:
-            self.xval = self.ui.BoxTable.cellWidget(row, 1).value()
-            #self.ui.BoxTable.setCellWidget(row,1,qtw.QtableItemWidget)
-            #self.ui.BoxTable.setItem(row,1,str(self.xval))
-            self.ui.BoxTable.item(row,1).setText(str(self.xval))
-            self.yval = int(self.ui.BoxTable.item(row,2).text())
-            self.wval = int(self.ui.BoxTable.item(row,3).text())
-            self.hval = int(self.ui.BoxTable.item(row,4).text())
+            xval = self.ui.BoxTable.cellWidget(row, 1).value()
+            self.ui.BoxTable.item(row,1).setText(str(xval))
         elif col == 2:
-            self.yval = self.ui.BoxTable.cellWidget(row, 2).value()
-            #self.ui.BoxTable.setCellWidget(row,2,qtw.QtableItemWidget)
-            #self.ui.BoxTable.setItem(row,2,str(self.yval))
-            self.ui.BoxTable.item(row,2).setText(str(self.yval))
-            self.xval = int(self.ui.BoxTable.item(row,1).text())
-            self.wval = int(self.ui.BoxTable.item(row,3).text())
-            self.hval = int(self.ui.BoxTable.item(row,4).text())
+            yval = self.ui.BoxTable.cellWidget(row, 2).value()
+            self.ui.BoxTable.item(row,2).setText(str(yval))
         elif col == 3:
-            self.wval = self.ui.BoxTable.cellWidget(row, 3).value()
-            #self.ui.BoxTable.setCellWidget(row,3,qtw.QtableItemWidget)
-            #self.ui.BoxTable.setItem(row,3,str(self.wval))
-            self.ui.BoxTable.item(row,3).setText(str(self.wval))
-            self.xval = int(self.ui.BoxTable.item(row,1).text())
-            self.yval = int(self.ui.BoxTable.item(row,2).text())
-            self.hval = int(self.ui.BoxTable.item(row,4).text())
+            wval = self.ui.BoxTable.cellWidget(row, 3).value()
+            self.ui.BoxTable.item(row,3).setText(str(wval))
         elif col == 4:
-            self.hval = self.ui.BoxTable.cellWidget(row, 4).value()
-            #self.ui.BoxTable.setCellWidget(row,4,qtw.QtableItemWidget)
-            #self.ui.BoxTable.setItem(row,4,str(self.hval))
-            self.ui.BoxTable.item(row,4).setText(str(self.hval))
-            self.xval = int(self.ui.BoxTable.item(row,1).text())
-            self.yval = int(self.ui.BoxTable.item(row,2).text())
-            self.wval = int(self.ui.BoxTable.item(row,3).text())  
-        
+            hval = self.ui.BoxTable.cellWidget(row, 4).value()
+            self.ui.BoxTable.item(row,4).setText(str(hval))
+        #self.spinbox.valueChanged.connect(self.on_boxValueChanged)
+        self.setPrevLineBox()
+
         #For printing purposes
         line = int(self.ui.BoxTable.item(row,0).text())
-        print(f'Line: {str(line)} X:{str(self.xval)} Y:{str(self.yval)} W:{str(self.wval)} H:{str(self.hval)}')
-        
+        print(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
+        self.ui.statusbar.showMessage(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
         #Scaled
         #scaled_x,scaled_y,scaled_w,scaled_h = int(self.xval/self.scale),int(self.yval/self.scale),int(self.wval/self.scale),int(self.hval/self.scale)
         #self.drawSbLineBox(scaled_x,scaled_y,scaled_w,scaled_h)
         
         #Not Scaled
-        self.drawSbLineBox(self.xval,self.yval,self.wval,self.hval)
-        
+        self.x_sb_draw = xval
+        self.y_sb_draw = yval
+        self.w_sb_draw = wval
+        self.h_sb_draw = hval
+        self.drawSbLineBox()
+        #self.drawSbLineBox(self.xval,self.yval,self.wval,self.hval)
+
+    def on_selectLineBox(self,row):
+        # Draw/Redraw green LineBox
+        print('Setting selected linebox to green')
+        self.ui.statusbar.showMessage('Setting selected linebox to green')
+        if row:
+            x = int(self.ui.BoxTable.item(row,1).text())
+            y = int(self.ui.BoxTable.item(row,2).text())
+            w = int(self.ui.BoxTable.item(row,3).text())
+            h = int(self.ui.BoxTable.item(row,4).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),2)
+            pil_img = Image.fromarray(self.norm)
+            qimage = ImageQt.ImageQt(pil_img)        
+            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.ui.Image.setPixmap(self.pixmap)
+            print("Selected linebox should be green")
+            self.ui.statusbar.showMessage("Selected linebox should be green")
+            self.box_color = "green"
+
+    def on_editLineBox(self,prevrow):
+        if prevrow:
+            x = int(self.ui.BoxTable.item(prevrow,1).text())
+            y = int(self.ui.BoxTable.item(prevrow,2).text())
+            w = int(self.ui.BoxTable.item(prevrow,3).text())
+            h = int(self.ui.BoxTable.item(prevrow,4).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            pil_img = Image.fromarray(self.norm)
+            qimage = ImageQt.ImageQt(pil_img)        
+            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.ui.Image.setPixmap(self.pixmap)
+
+    def on_drawLineBox(self,row):
+        # Draw/Redraw red LineBox
+        print('Resetting previous linebox to red')
+        self.ui.statusbar.showMessage('Resetting linebox to red')
+        if row:
+            x = int(self.ui.BoxTable.item(row,1).text())
+            y = int(self.ui.BoxTable.item(row,2).text())
+            w = int(self.ui.BoxTable.item(row,3).text())
+            h = int(self.ui.BoxTable.item(row,4).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            pil_img = Image.fromarray(self.norm)
+            qimage = ImageQt.ImageQt(pil_img)
+            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.ui.Image.setPixmap(self.pixmap)
+            self.box_color = "red"
+            print('Selected linebox should be red')
+            self.ui.statusbar.showMessage('Selected linebox should be red')
+
+    def on_resetLineBox(self):
+        # Draw/Redraw white LineBox
+        print('Resetting previous linebox to white')
+        self.ui.statusbar.showMessage('Resetting previous linebox to white')
+        x = self.prevx
+        y = self.prevy
+        w = self.prevw
+        h = self.prevh
+        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),2)
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)      
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.ui.Image.setPixmap(self.pixmap)
+        self.box_color = "white"
+        print('Selected linebox should be removed (i.e. white, blank or background)')
+        self.ui.statusbar.showMessage('Selected linebox should be removed (i.e. white, blank or background)')
+      
     # Methods
 
     # Table Methods
@@ -2582,18 +2475,8 @@ class MainWindow(qtw.QMainWindow):
             rDrawButton = qtw.QPushButton(self.ui.BoxTable)
             sDrawButton = qtw.QPushButton(self.ui.BoxTable)
             acceptButton = qtw.QPushButton(self.ui.BoxTable)
-                        
-            #for row in range(rowcount):
-                #if row != selected_row:
-                    #insertAButton.hide()
-                    #insertBButton.hide()
-                    #deleteButton.hide()
-                    #rDrawButton.hide()
-                    #sDrawButton.hide()
-                    #acceptButton.hide()
 
             for row in range(rowcount):
-                #print(f'row = {row}, variable type = {type(row)}; selected_row = {selected_row}, variable type = {type(selected_row)}')
                 if row == selected_row:
                     print(f'Row {row} matched!')
                     for col in range(colcount):
@@ -2605,7 +2488,6 @@ class MainWindow(qtw.QMainWindow):
                             insertAButton.setIcon(insertAIcon)
                             insertAButton.setIconSize(QSize(12,12))
                             self.ui.BoxTable.setCellWidget(row,col,insertAButton)
-                            #print('The insert_above button icon should be shown')
                             self.inslocation = "above"
                             insertAButton.clicked.connect(self.on_insertRowAbove)
                         elif col == 6:
@@ -2683,7 +2565,7 @@ class MainWindow(qtw.QMainWindow):
                     newItem = qtw.QTableWidgetItem(value)
                     self.ui.BoxTable.setItem(row, column, newItem)
                 elif column >= 1 and column <= 4:
-                    print(f'Updating BoxTable column: {column}')
+                    #print(f'Updating BoxTable column: {column}')
                     newItem = qtw.QTableWidgetItem(value)
                     
                     #Scaled
@@ -2721,8 +2603,19 @@ class MainWindow(qtw.QMainWindow):
                 item.setText(str(row+1))
             self.ui.BoxTable.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
     
-    def openTableMenu(self, position):
+    def openTableMenu(self,position):
         tableMenu = QMenu()
+
+        undoAction = tableMenu.addAction("Undo")
+        iconUndo = qtg.QIcon()
+        iconUndo.addPixmap(qtg.QPixmap(":/Icons/Icons/Undo-icon.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        undoAction.setIcon(iconUndo)
+
+        redoAction = tableMenu.addAction("Redo")
+        iconRedo = qtg.QIcon()
+        iconRedo.addPixmap(qtg.QPixmap(":/Icons/Icons/Redo-icon.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        redoAction.setIcon(iconRedo)
+
         insertAboveAction = tableMenu.addAction("Insert Row Above")
         iconA = qtg.QIcon()
         iconA.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
@@ -2739,68 +2632,18 @@ class MainWindow(qtw.QMainWindow):
         deleteRowAction.setIcon(iconD)
 
         action = tableMenu.exec_(self.ui.BoxTable.mapToGlobal(position))
-        if action == insertAboveAction:
-            #
-            location = "above"
-            self.insertRow(location)
-            #self.insertRowAbove()
-            self.renumberRows()
-            self.BoxTable2csv()
-            #
-            #
+        if action == undoAction:
+            qtw.QUndoStack.undo()
+        elif action == redoAction:
+            qtw.QUndoStack.redo()
+        elif action == insertAboveAction:
+            self.on_insertRowAbove()
         elif action == insertBelowAction:
-            #
-            location = "below"
-            self.insertRow(location)
-            #self.insertRowBelow()
-            self.renumberRows()
-            self.BoxTable2csv()
-            #
-            #
+            self.on_insertRowBelow()
         elif action == deleteRowAction:
-            #
-            self.deleteRow()
-            self.renumberRows()
-            self.BoxTable2csv()
-            #
-            #
+            self.on_deleteRowSelection()
 
     # Drawing Methods
-
-    def rDrawEdit(self):
-        self.statusDrawingMode.setText('Mouse')
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()        
-        print("Editing BoxTable selection")
-        self.ui.ZoomComboBox.setCurrentText('11 %')        
-        self.getPrevLineBox()
-        print('Edit LineBox image using mouse and QRubberBand')
-        #self.ui.BoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        self.ui.actionDraw_Selected_LineBox_tb.setEnabled(True)
-        self.ui.actionDraw_Table_LineBox_tb.setEnabled(False)
-        self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
-        self.statusSelectionMode.setText("Row")
-        self.statusDrawingMode.setText("Mouse")
-        self.on_resetLineBox()
-        #self.ui.BoxTable.clearSelection()
-    
-    def sDrawEdit(self):
-        self.statusDrawingMode.setText('Table')
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()        
-        print("Editing BoxTable selection")
-        self.ui.ZoomComboBox.setCurrentText('11 %')        
-        self.getPrevLineBox()
-        print('Edit LineBox image using BoxTable spinboxes') 
-        self.ui.actionDraw_Table_LineBox_tb.setEnabled(True)
-        self.ui.actionDraw_Selected_LineBox_tb.setEnabled(False)
-        self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
-        #self.statusSelectionMode.setText("Item")
-        self.statusDrawingMode.setText("Table")
-        self.ui.BoxTable.clearSelection()
-        #self.ui.BoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectItems)
 
     def setBoxPaths(self):
         
@@ -2842,6 +2685,29 @@ class MainWindow(qtw.QMainWindow):
         #print(self.norm.shape, self.norm.dtype)
         #print(np.amin(self.norm),np.amax(self.norm))
 
+    # LineBox Lines Image Methods
+    
+    def getLineBoxImageLines(self):
+        rowcount = self.ui.BoxTable.rowCount()
+        for row in range(rowcount):
+            line = self.ui.BoxTable.item(row,0).text()
+            x = int(self.ui.BoxTable.item(row,1).text())
+            y = int(self.ui.BoxTable.item(row,2).text())
+            w = int(self.ui.BoxTable.item(row,3).text())
+            h = int(self.ui.BoxTable.item(row,4).text())
+            linex = x+w-80
+            liney = y+h-4
+            if self.ui.LineCheckBox.isChecked():
+                print(f'Placing line number at : {linex},{liney}')
+                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
+            else:
+                print(f'Removing line number at : {linex},{liney}')
+                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),3)
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)        
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.ui.Image.setPixmap(self.pixmap)
+
     def saveLineBoxImageLine(self,roi,bnum):
         PILimage = Image.fromarray(roi)
         thresh = 127
@@ -2850,47 +2716,9 @@ class MainWindow(qtw.QMainWindow):
         tif_outfile = self.path_of_imgautosplit + self.imgfilename + "_Line" + str(bnum) + ".tif"
         print("Generating: " + tif_outfile)
         PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))    
-  
-    def showLineBoxImageLines(self):
-        if self.ui.LineCheckBox.isChecked():
-            self.getLineBoxImageLines()
-            self.boximglinespath = self.imgboxfilelines
-            self.showImage(self.boximglinespath)
-        else:
-            self.showImage(self.boximgpath)
     
-    def getLineBoxImageLines(self):
-        self.norm_lines = self.norm.copy()
-        print(f'Drawing Linebox Lines Image from BoxText: \n {self.txtpath}')
-        # Set initial box count
-        bnum = 1
-        with open(self.txtpath, "r") as txtboxfile:
-            reader = list(csv.reader(txtboxfile, delimiter = '\t'))
-            # Remove column header from list of rows
-            lineboxes = reader[1:]
-            self.rowCount = len(lineboxes)
-            for linebox in lineboxes:
-                # Extract x,y,w,h from each row
-                line = str(linebox[0])
-                x = int(linebox[1])
-                y = int(linebox[2])
-                w = int(linebox[3])
-                h = int(linebox[4])
-                print(f'Placing line box at : {x},{y},{w},{h}')
-                #self.on_drawLineBox(x,y,w,h)
-                cv2.rectangle(self.norm_lines,(x,y),(x+w, y+h),(0,0,255),2)
-                linex = x+w-80
-                liney = y+h
-                print(f'Placing line number at : {linex},{liney}')
-                cv2.putText(self.norm_lines,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
-                bnum += 1
-        self.saveLineBoxImgLines()
-        txtboxfile.close()
-
-    def saveLineBoxImgLines(self):
-        self.imgboxfilelines = self.path_of_imglinebox + self.imgfilename + "_linebox_lines" + self.imgfileext
-        cv2.imwrite(self.imgboxfilelines,self.norm_lines)
-
+    # LineBox Image Methods    
+    
     def saveLineBoxImage(self):
         self.imgboxfile = self.path_of_imglinebox + self.imgfilename + "_linebox" + self.imgfileext
         cv2.imwrite(self.imgboxfile,self.norm)
@@ -2900,7 +2728,6 @@ class MainWindow(qtw.QMainWindow):
             self.showLineBoxImageLines() 
 
     def drawLineBoxImage(self):
-        self.norm_lines = self.norm.copy()
         print(f'Drawing Linebox Image from BoxText: \n {self.txtpath}')
         # Set initial box count
         bnum = 1
@@ -2920,24 +2747,28 @@ class MainWindow(qtw.QMainWindow):
                 print(f'Placing line box at : {x},{y},{w},{h}')
                 #self.on_drawLineBox(x,y,w,h)
                 cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-                #cv2.rectangle(self.norm_lines,(x,y),(x+w, y+h),(0,0,255),2)
-                linex = x+w-80
-                liney = y+h
-                print(f'Placing line number at : {linex},{liney}')
-                #cv2.putText(self.norm_lines,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
                 # Save Line Image
                 self.saveLineBoxImageLine(roi,bnum)
                 bnum += 1
-        #self.saveLineBoxImgLines()
         txtboxfile.close()
-
-    def getPrevLineBox(self):
+  
+    def setPrevLineBox(self):
         self.ui.BoxTable.setSortingEnabled(False)
         self.row_selected = self.ui.BoxTable.currentRow()
-        
+        row = self.row_selected
         #self.ui.BoxTable.setCellWidget(self.row_selected,0,self.ui.BoxTable)
         self.line = int(self.ui.BoxTable.item(self.row_selected,0).text())
         # get dimensions of selected row/linebox
+        self.prevx = int(self.ui.BoxTable.item(row,1).text())
+        self.prevy = int(self.ui.BoxTable.item(row,2).text())
+        self.prevw = int(self.ui.BoxTable.item(row,3).text())
+        self.prevh = int(self.ui.BoxTable.item(row,4).text())
+     
+    def getPrevTextLineBox(self):
+        self.ui.BoxTable.setSortingEnabled(False)
+        self.row_selected = self.ui.BoxTable.currentRow()
+        self.line = int(self.ui.BoxTable.item(self.row_selected,0).text())
+        # get dimensions of selected csv row/linebox
         with open(self.txtpath,'r') as csvfile:
             lines = csv.reader(csvfile, delimiter = '\t')
             for csvline in lines:
@@ -2947,154 +2778,98 @@ class MainWindow(qtw.QMainWindow):
                     self.prevw = int(csvline[3])
                     self.prevh = int(csvline[4])
 
-    def on_selectLineBox(self,row):
-        # Draw/Redraw green LineBox
-        print('Setting selected linebox to green')
-        self.ui.statusbar.showMessage('Setting selected linebox to green')
-        #self.row_selected = self.ui.BoxTable.currentRow()
-        if row:
-            x = int(self.ui.BoxTable.item(row,1).text())
-            y = int(self.ui.BoxTable.item(row,2).text())
-            w = int(self.ui.BoxTable.item(row,3).text())
-            h = int(self.ui.BoxTable.item(row,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),2)
-            pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)        
-            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.pixmap)
-            print("Selected linebox should be green")
-            self.ui.statusbar.showMessage("Selected linebox should be green")
-            self.box_color = "green"
-
-    def on_editLineBox(self,prevrow):
-        prevrow = int(prevrow)
-        # Draw/Redraw white LineBox
-        print(f'Resetting previous linebox: {prevrow} to blue')
-        self.ui.statusbar.showMessage('Resetting previous linebox to blue')
-        if prevrow:
-            x = int(self.ui.BoxTable.item(prevrow,1).text())
-            y = int(self.ui.BoxTable.item(prevrow,2).text())
-            w = int(self.ui.BoxTable.item(prevrow,3).text())
-            h = int(self.ui.BoxTable.item(prevrow,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-            pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)        
-            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.pixmap)
-            self.box_color = "blue"
-            print('Previous linebox should be blue')
-            self.ui.statusbar.showMessage('Previous linebox should be blue')
-
-    def on_drawLineBox(self,row):
-        # Draw/Redraw red LineBox
-        print('Resetting previous linebox to red')
-        self.ui.statusbar.showMessage('Resetting linebox to red')
-        if row:
-            x = int(self.ui.BoxTable.item(row,1).text())
-            y = int(self.ui.BoxTable.item(row,2).text())
-            w = int(self.ui.BoxTable.item(row,3).text())
-            h = int(self.ui.BoxTable.item(row,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,0,0),2)
-            pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)
-            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.pixmap)
-            self.box_color = "red"
-            print('Selected linebox should be red')
-            self.ui.statusbar.showMessage('Selected linebox should be red')
-
-    def on_resetLineBox(self):
-        # Draw/Redraw white LineBox
-        print('Resetting previous linebox to white')
-        self.ui.statusbar.showMessage('Resetting previous linebox to white')
-        x = self.prevx
-        y = self.prevy
-        w = self.prevw
-        h = self.prevh
-        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),2)
-        pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)      
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(self.pixmap)
-        self.box_color = "white"
-        print('Selected linebox should be removed (i.e. white, blank or background)')
-        self.ui.statusbar.showMessage('Selected linebox should be removed (i.e. white, blank or background)')
-  
     # LineBox Drawing Methods
 
-    # Rb LineBox Drawing Methods
-    def putRbLineBox(self,x,y,w,h):
+    # Rubberband(Rb) LineBox Drawing Methods
+    def putRbLineBox(self):
+        self.run_event = False
         if self.rubberBand:
             self.rubberBand.hide()
             self.rubberBand = None
+        x = str(self.x_rb_draw)
+        y = str(self.y_rb_draw)
+        w = str(self.w_rb_draw)
+        h = str(self.h_rb_draw)
+
         self.line = int(self.ui.BoxTable.item(self.row_selected,0).text())
-        print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
-        self.update_BoxText(str(self.line),str(x),str(y),str(w),str(h)) 
-        #self.ui.BoxTable.selectionModel().currentChanged.disconnect()
-        #self.ui.BoxTable.clearSelection()
+        print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
+        self.update_BoxText(str(self.line),x,y,w,h)
         self.BoxText2BoxTable()
+        self.saveLineBoxImage()
+        self.ui.BoxTable.clearSelection()
         self.startEditLoop = True
         # Save Line Image
+        x = int(x)
+        y = int(y)
+        w = int(w)
+        h = int(h)
         roi = self.norm[y:y+h, x:x+w]
         self.saveLineBoxImageLine(roi,self.line)
         self.statusDrawingMode.setText("None")
-        #self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_selectionChanged)
-        #self.ui.BoxTable.selectionModel().currentChanged.connect(self.on_selectionChanged)
 
-    def drawRbLineBox(self,x,y,w,h):    
+    def drawRbLineBox(self):    
         if self.statusDrawingMode.text() == "Mouse":
-            self.prevx = x
-            self.prevy = y
-            self.prevw = w
-            self.prevh = h  
-            # Draw/Redraw red LineBox
-            self.on_drawLineBox(self.row_selected)
-            #cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-            self.saveLineBoxImage()
+            x = self.x_rb_draw 
+            y = self.y_rb_draw
+            w = self.w_rb_draw
+            h = self.h_rb_draw
+            # Draw/Redraw red Linebox
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            #self.saveLineBoxImage()
             self.showImage(self.boximgpath)
-            self.putRbLineBox(x,y,w,h)
+            self.putRbLineBox()
+        
         if self.rubberBand:
             self.rubberBand.hide()
             self.rubberBand = None
 
     def getRbLineBox(self):
-        #self.rubberBand.hide()        
+        #self.rubberBand.hide()
+        self.run_event = True       
         if self.statusDrawingMode.text() == "Mouse":
             # At scale DrawLineBox QRect at LineBox Image offset from MainWindow origin(0,0)
             DrawImg_xs = self.x_rb - int(self.img_xoffset)
             DrawImg_ys = self.y_rb - int(self.img_yoffset)
+            #DrawImg_xs = self.x_rb
+            #DrawImg_ys = self.y_rb
             DrawImg_ws = self.w_rb
             DrawImg_hs = self.h_rb
             DrawImg_sqrect = QRect(DrawImg_xs,DrawImg_ys,DrawImg_ws,DrawImg_hs)
             print("Offset Scaled QRect = " + str(DrawImg_sqrect))
             
             # Up scale DrawLineBox QRect at LineBox Image previously offset from MainWindow origin(0,0)
-            DrawImg_xu = DrawImg_xs / self.scale
-            DrawImg_yu = DrawImg_ys / self.scale
-            DrawImg_wu = DrawImg_ws / self.scale
-            DrawImg_hu = DrawImg_hs / self.scale
-            DrawImg_uqrect = QRect(DrawImg_xu,DrawImg_yu,DrawImg_wu,DrawImg_hu)
+            self.x_rb_draw = int(round(DrawImg_xs / self.scale))
+            self.y_rb_draw = int(round(DrawImg_ys / self.scale))
+            self.w_rb_draw = int(round(DrawImg_ws / self.scale))
+            self.h_rb_draw = int(round(DrawImg_hs / self.scale))
+            DrawImg_uqrect = QRect(self.x_rb_draw,self.y_rb_draw,self.w_rb_draw,self.h_rb_draw)
             print("Offset Upscaled QRect = " + str(DrawImg_uqrect))
 
-            # Set LineBox values
-            x = int(DrawImg_xu)
-            y = int(DrawImg_yu)
-            w = int(DrawImg_wu)
-            h = int(DrawImg_hu)
-        
-            self.drawRbLineBox(x,y,w,h)
+            print(f'x_rb_draw: {self.x_rb_draw} y_rb_draw: {self.y_rb_draw} w_rb_draw: {self.w_rb_draw} h_rb_draw: {self.h_rb_draw}')
+            self.drawRbLineBox()
     
-    # Spinbox Drawing Methods
+    # Spinbox(Sb) Drawing Methods
     def putSbLineBox(self):
         row = self.ui.BoxTable.currentRow()
+        x = self.x_sb_draw
+        y = self.y_sb_draw
+        w = self.w_sb_draw
+        h = self.h_sb_draw
+        
         # Update BoxText and BoxTable 
+        
         self.line = int(self.ui.BoxTable.item(row,0).text())
-        print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(self.xval)}, y:{str(self.yval)}, w:{str(self.wval)}, h:{str(self.hval)}')
-        self.update_BoxText(str(self.line),str(self.xval),str(self.yval),str(self.wval),str(self.hval)) 
-        #self.ui.BoxTable.clearSelection()
+        print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
+        self.update_BoxText(str(self.line),str(x),str(y),str(w),str(h))
         self.BoxText2BoxTable()
-        self.drawLineBoxImage()
+        #self.drawLineBoxImage()
+        self.saveLineBoxImage()
+        self.ui.BoxTable.clearSelection()
         #self.clearSpinBoxes()
+        # Save Line Image
+        roi = self.norm[y:y+h, x:x+w]
+        self.saveLineBoxImageLine(roi,self.line)
+        self.statusDrawingMode.setText("None")
         self.ui.BoxTable.setSortingEnabled(True)
         self.statusDrawingMode.setText("None")
 
@@ -3113,21 +2888,18 @@ class MainWindow(qtw.QMainWindow):
             #self.clearSpinBoxes()           
             self.BoxText2BoxTable()
 
-    def drawSbLineBox(self,x,y,w,h):
-        # Draw/Redraw white LineBox
-        self.on_resetLineBox()
-        #cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-        self.prevx = x
-        self.prevy = y
-        self.prevw = w
-        self.prevh = h
-        # Draw/Redraw red LineBox
-        self.on_drawLineBox(self.row_selected)
-        #pil_img = Image.fromarray(self.norm)
-        #qimage = ImageQt.ImageQt(pil_img)        
-        #self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        #self.ui.Image.setPixmap(self.pixmap)
-        #self.ui.actionDraw_Table_LineBox_tb.triggered.connect(self.putSbLineBox)
+    def drawSbLineBox(self):        
+        x = int(self.x_sb_draw)
+        y = int(self.y_sb_draw)
+        w = int(self.w_sb_draw)
+        h = int(self.h_sb_draw)
+        print(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
+        self.ui.statusbar.showMessage(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
+        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)        
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.ui.Image.setPixmap(self.pixmap)
 
     def getSpinBoxes(self):
         self.row_selected = self.ui.BoxTable.currentRow()
@@ -3140,28 +2912,29 @@ class MainWindow(qtw.QMainWindow):
             #self.spinbox.setMaximum(6000)
             aspect = round((self.ui.Image.width()/self.ui.Image.height()),2)
             print(f'Aspect Ratio: {aspect}')
-            if column == 1 or column == 3:
-                #spinbox.setMaximum(int(round(self.scale*self.ui.Image.width())))
-                spinbox.setMaximum(self.ui.Image.width())
-                stepsize = int(round(spinbox.maximum()/1500))
-                spinbox.setSingleStep(stepsize)
-                #spinbox.setFixedWidth(50)
-
-            if column == 2 or column == 4:
-                #spinbox.setMaximum(int(round(self.scale*self.ui.Image.height())))
-                spinbox.setMaximum(self.ui.Image.height())
-                stepsize = int(round(spinbox.maximum()/4000))
-                spinbox.setSingleStep(stepsize)
-                #spinbox.setFixedWidth(40)
+            spinbox.setMaximum(self.ui.Image.width())
+            # setting step size to the reciprocal of the scale
+            stepsize = int((1/self.scale)/2)
+            # using scaled step size
+            #spinbox.setAccelerated(False)
+            spinbox.setSingleStep(stepsize)
+            #spinbox.setStepType(qtw.QAbstractSpinBox.DefaultStepType)
+            #spinbox.setStepType(qtw.QAbstractSpinBox.AdaptiveDecimalStepType)
+            #spinbox.setCorrectionMode(qtw.QAbstractSpinBox.CorrectToNearestValue)
+            
+            # getting font of the spin box
+            font = spinbox.font()
+            # setting point size
+            font.setPointSize(8)
+            # reassigning this font to the spin box
+            spinbox.setFont(font)
         
             spinbox.setFixedWidth(50)
-            #stepsize = int(round(spinbox.maximum() * self.scale * aspect))
-            #spinbox.setSingleStep(stepsize)
-            spinbox.setFixedWidth(45)
             spinbox.setValue(int(value))
             self.ui.BoxTable.setCellWidget(row,column,spinbox)
+            self.ui.BoxTable.resizeRowToContents(row)
             self.ui.BoxTable.resizeColumnToContents(column)
-            spinbox.valueChanged.connect(self.on_boxValueChanged)
+            spinbox.valueChanged.connect(self.on_boxValueChanged)        
 
     '''def getSpinBox(self):
         self.row_selected = self.ui.BoxTable.currentRow()
@@ -3173,28 +2946,9 @@ class MainWindow(qtw.QMainWindow):
         self.spinbox.setValue(int(self.cellvalue))
         self.ui.BoxTable.setCellWidget(self.row_selected,self.col_selected,self.spinbox)
         self.spinbox.valueChanged.connect(self.on_boxValueChanged)'''
-
-    '''def clearSpinBoxes(self):
-        if self.statusDrawingMode.text() == "Table":
-            print('This is the handler for removing all spinbox widgets')
-            row = self.ui.BoxTable.currentRow()
-            col = self.ui.BoxTable.currentColumn()
-            self.yval = self.ui.BoxTable.cellWidget(row, 2).value()
-            self.ui.BoxTable.setCellWidget(row,1,qtw.QTableItemWidget)
-            self.ui.BoxTable.setItem(row,1,self.xval)
-            self.yval = self.ui.BoxTable.cellWidget(row, 2).value()
-            self.ui.BoxTable.setCellWidget(row,2,qtw.QTableItemWidget)
-            self.ui.BoxTable.setItem(row,2,self.yval)
-            self.wval = self.ui.BoxTable.cellWidget(row, 3).value()
-            self.ui.BoxTable.setCellWidget(row,3,qtw.QTableItemWidget)
-            self.ui.BoxTable.setItem(row,3,self.wval)
-            self.hval = self.ui.BoxTable.cellWidget(row, 4).value()
-            self.ui.BoxTable.setCellWidget(row,4,qtw.QTableItemWidget)
-            self.ui.BoxTable.setItem(row,4,self.hval)'''
-
+    
     # LineBox Text Methods
     def json2csv(self, csvFilePath, jsonFilePath):
-        #columns = ['Line','X','Y','W','H','Ins','Del','Rdraw','SDraw','Accept']
         columns = ['Line','X','Y','W','H']
         df = pd.read_json (jsonFilePath)
         df = df[columns]
@@ -3202,7 +2956,6 @@ class MainWindow(qtw.QMainWindow):
     
     def csv2json(self, csvFilePath, jsonFilePath):
         jsonArray = []
-    
         #read csv file
         with open(csvFilePath, encoding='utf-8') as csvf: 
             #load csv file data using csv library's dictionary reader
@@ -3378,120 +3131,110 @@ class MainWindow(qtw.QMainWindow):
         print(f'Text File Name: {txtfilename}  Image File Name: {imgfilename}')
         if txtfilename == imgfilename:
             self.getText(self.txtpath)
-            #self.setProgressVal(25)
             self.ui.progressBar.setValue(25)
-            #BoxText2BoxTable()
             self.drawLineBoxImage()
-            #self.setProgressVal(50)
             self.ui.progressBar.setValue(50)
             self.saveLineBoxImage()
-            #self.setProgressVal(75)
             self.ui.progressBar.setValue(75)
             self.BoxText2BoxTable()
-            #self.setProgressVal(100)
             self.ui.progressBar.setValue(100)
             print("Waiting on BoxTable selection")
             self.row_current = self.ui.BoxTable.currentRow()
-            #self.on_rowEditSelection()
-            #self.on_selectionChanged()
             self.startEditLoop = True
-            #self.ui.BoxTable.selectionModel().selectionChanged.connect(self.on_selectionChanged)
             self.ui.BoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
-
         else:   
             print(f'The linebox text: {txtfilename} does not match the linebox image: {imgfilename} -- Please try again!')        
-        
-        #self.setProgressVal(100)
         self.ui.progressBar.setValue(101)
         self.ui.progressBar.reset()
 
     # Mouse Controllers
     def mousePressEvent(self, event):
-        if self.statusBoxMode.text() == "Edit" and self.statusDrawingMode.text() == "Mouse":
-            self.run_event = False
-            self.event_x = event.pos().x()
-            self.event_y = event.pos().y()
-            self.start_pos = QPoint(self.event_x, self.event_y)
-            print(f'Mouse clicked as start position: {self.start_pos}')
+        #if self.rubberBand:
             # Limit scope of rubberband starting position
-            if self.ui.ImageLe.displayText() != "":
-                self.run_event = True
-                x_min = int(self.img_xoffset) - 1
-                #print(f'xmin: {x_min}')
-                x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
-                #print(f'xmax: {x_max}')
-                y_min = int(self.img_yoffset) - 1
-                #print(f'ymin: {y_min}')
-                y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
-                #print(f'ymax: {y_max}')
-            else:
-                self.run_event = False
-                print('You cannot draw without a loaded image')
-            
-            if event.button() == Qt.LeftButton and self.run_event == True:          
-                if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
-                    self.rubberBand = ResizableRubberBand(self)
+        if self.ui.ImageLe.displayText() != "":
+            self.run_event = True
+            x_min = int(self.img_xoffset) - 1
+            #print(f'xmin: {x_min}')
+            x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
+            #print(f'xmax: {x_max}')
+            y_min = int(self.img_yoffset) - 1
+            #print(f'ymin: {y_min}')
+            y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
+            #print(f'ymax: {y_max}')
+        else:
+            self.run_event = False
+            print('You cannot draw without a loaded image') 
+        if self.statusBoxMode.text() == "Edit":
+            if self.statusDrawingMode.text() == "Mouse":
+                self.event_x = event.pos().x()
+                self.event_y = event.pos().y()
+                self.start_pos = QPoint(self.event_x, self.event_y)
+                print(f'Mouse clicked at start position: {self.start_pos}')
+                if self.ui.ImageLe.displayText() != "":
                     self.run_event = True
-                    self.rubberBand.setGeometry(QRect(self.start_pos, QSize()).normalized())
-                    self.rubberBand.show()
+                '''# Limit scope of rubberband starting position
+                if self.ui.ImageLe.displayText() != "":
+                    self.run_event = True
+                    x_min = int(self.img_xoffset) - 1
+                    #print(f'xmin: {x_min}')
+                    x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
+                    #print(f'xmax: {x_max}')
+                    y_min = int(self.img_yoffset) - 1
+                    #print(f'ymin: {y_min}')
+                    y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
+                    #print(f'ymax: {y_max}')
                 else:
                     self.run_event = False
-                    print('You cannot draw outside the current image borders')
-        else:
-            print("You can only draw in 'Edit' mode")
+                    print('You cannot draw without a loaded image')'''
+                
+                if event.button() == Qt.LeftButton and self.run_event == True:          
+                    if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
+                        #if self.rubberBand.w() != 0 and self.rubberBand.h() != 0:
+                        #self.rubberBand = ResizableRubberBand(self)
+                        self.run_event = True
+                        self.rubberBand.setGeometry(QRect(self.start_pos, QSize()).normalized())
+                        self.rubberBand.show()
+                    else:
+                        self.run_event = False
+                        print('You cannot draw outside the current image borders')
+            else:
+                # If in Edit mode, select Row from LineBox Image
+                self.run_event = False
+                if event.button() == Qt.LeftButton:
+                    event_x = event.pos().x()
+                    grid_x = event_x - int(self.img_xoffset)
+                    event_y = event.pos().y()
+                    grid_y = event_y - int(self.img_yoffset)
+                    scaled_x = int(round(grid_x / self.scale))
+                    scaled_y = int(round(grid_y / self.scale))
+                    if event_x >= x_min and event_x <= x_max and event_y >= y_min and event_y <= y_max:
+                        rowcount = self.ui.BoxTable.rowCount()
+                        for row in range(rowcount):
+                            y = int(self.ui.BoxTable.item(row,2).text())
+                            h = int(self.ui.BoxTable.item(row,4).text())
+                            y_h = y + h
+                            if y <= scaled_y and scaled_y <= y_h:
+                                self.ui.BoxTable.selectRow(row)
 
     def mouseMoveEvent(self, event):
         if self.statusBoxMode.text() == "Edit" and self.run_event: 
             self.end_pos = event.pos()
             self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
-            
-            '''# Update BoxTable as mouse moves
-            for column in range(1,5):
-                if column == 1:
-                    x_rb_item = qtw.QTableWidgetItem()
-                    #self.x_rb = int(self.rubberBand.x()*self.scale)
-                    self.x_rb = int(self.rubberBand.x())
-                    x_rb_item.setText(str(self.x_rb))
-                    self.ui.BoxTable.setItem(self.row_current,column,x_rb_item)
-                elif column == 2:
-                    y_rb_item = qtw.QTableWidgetItem()
-                    #self.y_rb = int(self.rubberBand.y()*self.scale)
-                    self.y_rb = int(self.rubberBand.y())
-                    y_rb_item.setText(str(self.y_rb))
-                    self.ui.BoxTable.setItem(self.row_current,column,y_rb_item)
-                elif column == 3:
-                    w_rb_item = qtw.QTableWidgetItem()
-                    #self.w_rb = int(self.rubberBand.width()*self.scale)
-                    self.w_rb = int(self.rubberBand.width())
-                    w_rb_item.setText(str(self.w_rb))
-                    self.ui.BoxTable.setItem(self.row_current,column,w_rb_item)
-                elif column == 4:
-                    h_rb_item = qtw.QTableWidgetItem()
-                    #self.h_rb = int(self.rubberBand.height()*self.scale)
-                    self.h_rb = int(self.rubberBand.height())
-                    h_rb_item.setText(str(self.h_rb))
-                    self.ui.BoxTable.setItem(self.row_current,column,h_rb_item)'''
-            
-    def mouseReleaseEvent(self, event):
-        if self.statusBoxMode.text() == "Edit":
-            if not self.run_event:
-                self.run_event = False
-            if self.run_event and event.button() == Qt.LeftButton:
-                geo = self.rubberBand.geometry()
-                self.x_rb = self.rubberBand.x()
-                self.y_rb = self.rubberBand.y()
-                self.w_rb = self.rubberBand.width()
-                self.h_rb = self.rubberBand.height()
-                print("selection x = " + str(self.x_rb))
-                #print("selection w = " + str(self.w_rb))
-                print("selection y = " + str(self.y_rb))
-                #print("selection h = " + str(self.h_rb))
-                #print("selection x+w = " + str(self.x_rb+self.w_rb))
-                #print("selection y+h = " + str(self.y_rb+self.h_rb))
-                #print(self.x_rb,":",self.x_rb+self.w_rb,",",self.y_rb,":",self.y_rb+self.h_rb)
-
-                self.currentQRect = self.rubberBand.geometry()
-
+            row = self.ui.BoxTable.currentRow()
+            geo = self.rubberBand.geometry()
+            #while self.run_event:
+            self.x_rb = self.rubberBand.x()
+            self.y_rb = self.rubberBand.y()
+            self.w_rb = self.rubberBand.width()
+            self.h_rb = self.rubberBand.height()
+            self.ui.BoxTable.item(row,1).setText(str(int(round((self.x_rb - int(self.img_xoffset))/self.scale))))
+            self.ui.BoxTable.item(row,2).setText(str(int(round((self.y_rb - int(self.img_yoffset))/self.scale))))
+            self.ui.BoxTable.item(row,3).setText(str(int(round(self.w_rb/self.scale))))
+            self.ui.BoxTable.item(row,4).setText(str(int(round(self.h_rb/self.scale))))
+            self.ui.statusbar.showMessage(f'x:{self.x_rb} y:{self.y_rb} w:{self.w_rb} h:{self.h_rb}')
+    
+    #def mouseReleaseEvent(self, event):
+        
     # Utility Methods
     def renameimages(source, destination):
             def sorted_alphanumeric(data):
@@ -3680,7 +3423,7 @@ class ResizableRubberBand(QWidget):
 
     Source: http://stackoverflow.com/a/19067132/435253
     """
-    def __init__(self, parent = None):
+    def __init__(self, parent):
         super(ResizableRubberBand, self).__init__(parent)
 
         self.setWindowFlags(Qt.SubWindow)
@@ -3694,10 +3437,21 @@ class ResizableRubberBand(QWidget):
         self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
         self.rubberband.move(0, 0)
         self.rubberband.show()
-        self.show()
-
+        # self.show()
+        
     def resizeEvent(self, event):
         self.rubberband.resize(self.size())
+        row = self.parent().ui.BoxTable.currentRow()
+        self.parent().x_rb = self.parent().rubberBand.x()
+        self.parent().y_rb = self.parent().rubberBand.y()
+        self.parent().w_rb = self.parent().rubberBand.width()
+        self.parent().h_rb = self.parent().rubberBand.height()
+        self.parent().ui.BoxTable.item(row,1).setText(str(int(round((self.parent().rubberBand.x() - int(self.parent().img_xoffset))/self.parent().scale))))
+        self.parent().ui.BoxTable.item(row,2).setText(str(int(round((self.parent().rubberBand.y() - int(self.parent().img_yoffset))/self.parent().scale))))
+        self.parent().ui.BoxTable.item(row,3).setText(str(int(round(self.parent().rubberBand.width()/self.parent().scale))))
+        self.parent().ui.BoxTable.item(row,4).setText(str(int(round(self.parent().rubberBand.height()/self.parent().scale))))
+        self.parent().ui.statusbar.showMessage(f'Resizing to x:{self.parent().x_rb} y:{self.parent().y_rb} w:{self.parent().w_rb} h:{self.parent().h_rb}')
+        #super(ResizableRubberBand, self).resizeEvent(event)
 
 # Only run this code if I am actually running this script
 if __name__ == '__main__': 
