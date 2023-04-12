@@ -8,8 +8,8 @@ self.windowsuserdir,c:/users/max,c:/users/max
 self.macoshomedir,,
 self.macosuser,,
 self.macosuserdir,,
-self.projectsdir,Model/Project,Model/Project
-self.projectname,Erasmvs1516,
+self.projectsdir,/Projects,/Projects
+self.projectname,/BiblionOCR,/BiblionOCR
 self.font,FROMVS,FROMVS
 self.fontsize,11,11
 self.ocrlang,Middle Greek,Middle Greek
@@ -22,15 +22,15 @@ self.chr,1,1
 self.glyph,,
 self.glyphname,,
 self.glyphencode,,
-self.glyphsourcedir,Model/Project/Images/GlyphTracer/sfd_source,
-self.glyphgreekdir,Model/Project/Images/GlyphTracer/sfd_greek,
+self.glyphsourcedir,Model/Project/Images/GlyphTracer/sfd_source’,
+self.glyphgreekdir,Model/Project/Images/GlyphTracer/sfd_greek’,
 self.linespacing,150,150
 self.verselinespacing,105,105
 self.reflinespacing,105,105
 self.sourcebookmarkdown,source_book_43_John,source_book_40_Matthew
 self.greekbookmarkdown,greek_book_43_John,greek_book_40_Matthew
 self.latinbookmarkdown,latin_book_43_John,latin_book_40_Matthew
-self.sourcefile,Model/Project/Images/Complete/Source/pdf_source/1516.pdf,Model/Project/Images/Complete/Source/pdf_source/1516.pdf
+self.sourcefile,Model/Project/Images/Complete/Source/pdf_source/1516.pdf’,Model/Project/Images/Complete/Source/pdf_source/1516.pdf
 self.firstpage,100,1
 self.lastpage,110,10
 self.deltapages,10,10

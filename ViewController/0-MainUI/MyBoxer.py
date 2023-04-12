@@ -442,12 +442,19 @@ class MainWindow(qtw.QMainWindow):
         # get session settings
         self.homedir = '/home'
         self.user = '/jetson'
-        self.userdir = '/home/jetson'
+        if platform.system() == 'Linux':
+            self.userdir = '/home/jetson'
+        elif platform.system() == 'Windows':
+            self.userdir = 'c:/users/max'
+        self.projectsdir = '/Projects'
+        self.projectname = '/BiblionOCR'
+        self.projecthome = self.userdir + self.projectsdir + self.projectname + '/'
+
         
         # Define json data        
         print("loading session")
-        #with open(self.userdir + '/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json') as f:
-        with open('Model/Project/Data/json/BoxerSession.json') as f:
+        with open(self.projecthome + 'Model/Project/Data/json/BoxerSession.json') as f:
+        #with open('Model/Project/Data/json/BoxerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
@@ -462,7 +469,7 @@ class MainWindow(qtw.QMainWindow):
             macosuser_key = r'self.macosuser'
             macosuserdir_key = r'self.macosuserdir'
             projectsdir_key = r'self.projectsdir'
-            projectname_key = r'self.projectname'      
+            projectname_key = r'self.projectname'     
             font_key = r"self.font"
             fontsize_key = r"self.fontsize"
             ocrlang_key = r"self.ocrlang"
@@ -610,10 +617,11 @@ class MainWindow(qtw.QMainWindow):
                 elif Setting['Setting'] == latinlinesbox_key:  
                     self.latinlinesbox = Setting['CurrentValue']
                 elif Setting['Setting'] == latinlinesautosplit_key:  
-                    self.latinlinesautosplit = Setting['CurrentValue']
-                
+                    self.latinlinesautosplit = Setting['CurrentValue']    
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
+            
+            # Update System paths
             if platform.system() == 'Linux':
                 self.homedir = self.linuxhomedir
                 self.user = self.linuxuser
@@ -630,9 +638,26 @@ class MainWindow(qtw.QMainWindow):
                 self.homedir = r'.'
                 self.user = r'/'
                 self.userdir = r'./'
-
+            self.projecthome = self.userdir + self.projectsdir + self.projectname + '/'
             print(f'Absolute Path to User Directory: {self.userdir}')           
-    
+            
+            # Update Project paths
+            self.latinlinesautosplit = self.projecthome + self.latinlinesautosplit
+            self.latinlinesbox = self.projecthome + self.latinlinesbox
+            self.latinpages = self.projecthome + self.latinpages
+            self.greeklinesautosplit = self.projecthome + self.greeklinesautosplit
+            self.greeklinesbox = self.projecthome + self.greeklinesbox
+            self.greekpages = self.projecthome + self.greekpages
+            self.txtdir = self.projecthome + self.txtdir
+            self.txtpath = self.projecthome + self.txtpath
+            self.imgdir = self.projecthome + self.imgdir
+            self.imgpath = self.projecthome + self.imgpath
+            self.sourcefile = self.projecthome + self.sourcefile
+            self.txtgreeklinebox = self.projecthome + self.txtgreeklinebox
+            self.jsongreeklinebox = self.projecthome + self.jsongreeklinebox
+            self.txtlatinlinebox = self.projecthome + self.txtlatinlinebox
+
+
     def get_workflow_settings(self):
 
         # Opening JSON file
@@ -733,7 +758,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('Model/Project/Data/json/Workflow.json') as f:
+                with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -828,7 +853,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Project/Data/json/Workflow.json') as f:
+            with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1016,7 +1041,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('Model/Project/Data/json/Workflow.json') as f:
+                with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1122,7 +1147,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('Model/Project/Data/json/Workflow.json') as f:
+                with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1166,7 +1191,7 @@ class MainWindow(qtw.QMainWindow):
     def initBookCombo(self):
 
         # Opening JSON file
-        with open('Model/Project/Data/json/BooksAbbrName.json') as f:
+        with open(self.projecthome + 'Model/Project/Data/json/BooksAbbrName.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1210,7 +1235,7 @@ class MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = self.projecthome + 'Model/Project/Data/json/BooksMarkDown.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1223,7 +1248,7 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'Model/Project/Data/json/BoxerSession.json'
+            jsonfile = self.projecthome + 'Model/Project/Data/json/BoxerSession.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1310,7 +1335,7 @@ class MainWindow(qtw.QMainWindow):
             return
     
     def loadImage(self):
-        imgdir = "Model/Project/Images/Workflow"     
+        imgdir = self.projecthome + "Model/Project/Images/Workflow"     
         self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
         self.getImage(self.imgpath)
     
@@ -1356,7 +1381,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.imgdir = os.path.dirname(self.imgpath)
 
-        jsonfile = 'Model/Project/Data/json/BoxerSession.json'
+        jsonfile = self.projecthome + 'Model/Project/Data/json/BoxerSession.json'
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1580,7 +1605,7 @@ class MainWindow(qtw.QMainWindow):
     def loadText(self):
 
         self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.BoxWidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+            self.ui.BoxWidget, 'Open text file', f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
         print(f'self.txtpath: {self.txtpath}')
         self.getText(self.txtpath)
 
@@ -1630,7 +1655,7 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = 'Model/Project/Data/json/BoxerSession.json'
+        jsonfile = self.projecthome + 'Model/Project/Data/json/BoxerSession.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1898,7 +1923,7 @@ class MainWindow(qtw.QMainWindow):
         filename = filesplit[0]
         fileext = filesplit[1]
 
-        self.charboxcsvdir = "Model/Project/Data/csv/"
+        self.charboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
         charboxcsvpath = self.charboxcsvdir + filename + r"_charbox.csv"
 
         '''scale_percent = 25 # percent of original size
@@ -1973,7 +1998,7 @@ class MainWindow(qtw.QMainWindow):
         filename = filesplit[0]
         fileext = filesplit[1]
 
-        self.wordboxcsvdir = "Model/Project/Data/csv/"
+        self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
         wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
 
         '''scale_percent = 25 # percent of original size
@@ -2029,7 +2054,7 @@ class MainWindow(qtw.QMainWindow):
 
     def word2linebox(self):
         filename = "greek1516_Page_082"
-        self.wordboxcsvdir = "Model/Project/Data/csv/"
+        self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
         wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
         with open(wordboxcsvpath, mode='r') as file_:
             self.ui.BoxText.clear()
@@ -3086,6 +3111,8 @@ class MainWindow(qtw.QMainWindow):
    
     # Edit LineBox Method
     def linebox_edit_split(self):
+        self.ui.statusbar.showMessage('Loading the LineBox file pair for editing')
+        start = time.perf_counter()
         self.ui.BoxTable.verticalHeader().hide()
         self.statusBoxMode.setText("Edit")
         self.statusBoxType.setText("Line")
@@ -3144,8 +3171,12 @@ class MainWindow(qtw.QMainWindow):
             self.ui.BoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
         else:   
             print(f'The linebox text: {txtfilename} does not match the linebox image: {imgfilename} -- Please try again!')        
+
         self.ui.progressBar.setValue(101)
         self.ui.progressBar.reset()
+        finish = time.perf_counter()
+        self.ui.statusbar.showMessage(f"File load completed successfully in {finish - start:0.4f} seconds")
+        print(f"File load completed successfully in {finish - start:0.4f} seconds")
 
     # Mouse Controllers
     def mousePressEvent(self, event):

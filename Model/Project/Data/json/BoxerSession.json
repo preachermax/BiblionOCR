@@ -46,13 +46,13 @@
     },
     {
         "Setting": "self.projectsdir",
-        "CurrentValue": "Model/Project",
-        "DefaultValue": "Model/Project"
+        "CurrentValue": "/Projects",
+        "DefaultValue": "/Projects"
     },
     {
         "Setting": "self.projectname",
-        "CurrentValue": "Erasmvs1516",
-        "DefaultValue": ""
+        "CurrentValue": "/BiblionOCR",
+        "DefaultValue": "/BiblionOCR"
     },
     {
         "Setting": "self.font",
@@ -116,12 +116,12 @@
     },
     {
         "Setting": "self.glyphsourcedir",
-        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_source",
+        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_source\u2019",
         "DefaultValue": ""
     },
     {
         "Setting": "self.glyphgreekdir",
-        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_greek",
+        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_greek\u2019",
         "DefaultValue": ""
     },
     {
@@ -156,7 +156,7 @@
     },
     {
         "Setting": "self.sourcefile",
-        "CurrentValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "CurrentValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf\u2019",
         "DefaultValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf"
     },
     {
@@ -176,12 +176,12 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_246_linebox.tif",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_245_linebox.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John",
         "DefaultValue": "Model/Project/Images/Workflow"
     },
     {
@@ -216,12 +216,12 @@
     },
     {
         "Setting": "self.zoom",
-        "CurrentValue": "10 %",
-        "DefaultValue": "Contents"
+        "CurrentValue": "11 %",
+        "DefaultValue": "11 %"
     },
     {
         "Setting": "self.zoomslidervalue",
-        "CurrentValue": "10",
+        "CurrentValue": "11",
         "DefaultValue": "25"
     },
     {
@@ -236,12 +236,12 @@
     },
     {
         "Setting": "self.txtpath",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_246_linebox.txt",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_245_linebox.txt",
         "DefaultValue": ""
     },
     {
         "Setting": "self.txtdir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages"
     },
     {
