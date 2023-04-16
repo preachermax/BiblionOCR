@@ -733,14 +733,14 @@ class MainWindow(qtw.QMainWindow):
                             # set line edits to their default workflow folders
                             if step == "GL1":
                                 self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_box_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+                                workflow_box_folder = self.projecthome + Sequence['WorkflowFullPath']+r'/'
+                                complete_box_folder = self.projecthome + Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
                             elif step == "GL2":
                                 self.crop_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                                source_folder = Sequence['DefaultSource']+r'/'
+                                source_folder = self.projecthome + Sequence['DefaultSource']+r'/'
                                 self.crop_greeklines_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_dest_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_dest_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'                                
+                                workflow_dest_folder = self.projecthome + Sequence['WorkflowFullPath']+r'/'
+                                complete_dest_folder = self.projecthome + Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'                                
                 f.close()
             
         rsp = self.crop_greeklinesDialog.exec_()
@@ -825,9 +825,9 @@ class MainWindow(qtw.QMainWindow):
                     print(Sequence['Sequence'])
                     if Sequence['Sequence'] == seq:
                         # set source line edit to default workflow folder
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
+                        source_folder = self.projecthome + Sequence['DefaultSource']+r'/'
+                        workflow_folder = self.projecthome + Sequence['WorkflowFullPath']+r'/'
+                        complete_folder = self.projecthome + Sequence['CompleteFullPath']+r'/'
                         self.greekrenamelines_ui.SourceLineEdit.setText(source_folder)
                         self.greekrenamelines_ui.DestinationLineEdit.setText(workflow_folder)
                         print(source_folder,workflow_folder,complete_folder)
@@ -925,9 +925,9 @@ class MainWindow(qtw.QMainWindow):
                     if Sequence['Sequence'] == seq:
                         print(Sequence['Sequence'])
                         # set source line edit to default workflow folder
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
+                        source_folder = self.projecthome + Sequence['DefaultSource']+r'/'
+                        workflow_folder = self.projecthome + Sequence['WorkflowFullPath']+r'/'
+                        complete_folder = self.projecthome + Sequence['CompleteFullPath']+r'/'
                         self.greekstagelines_ui.SourceLineEdit.setText(source_folder)
                         self.greekstagelines_ui.DestinationLineEdit.setText(workflow_folder)
                         self.greekstagelines_ui.StartPageLineEdit.setText("1")
@@ -1116,10 +1116,10 @@ class MainWindow(qtw.QMainWindow):
                             # set line edits to their default workflow folders
                             if step == "GL6":
                                 self.split_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/')
-                                source_folder = Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/'
+                                source_folder = self.projecthome + Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/'
                                 self.split_greeklines_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/')
-                                workflow_dest_folder = Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                                complete_dest_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                                
+                                workflow_dest_folder = self.projecthome + Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/'
+                                complete_dest_folder = self.projecthome + Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                                
                 f.close()
             
         rsp = self.split_greek_text_linesDialog.exec_()
@@ -1222,10 +1222,10 @@ class MainWindow(qtw.QMainWindow):
                             # set line edits to their default workflow folders
                             if step == "GL7":
                                 self.rename_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/')
-                                source_folder = Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/'
+                                source_folder = self.projecthome + Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/'
                                 self.rename_greeklines_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/')
-                                workflow_dest_folder = Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                                complete_dest_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                                
+                                workflow_dest_folder = self.projecthome + Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/'
+                                complete_dest_folder = self.projecthome + Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                                
                 f.close()
             
         rsp = self.rename_greek_text_linesDialog.exec_()
@@ -2758,11 +2758,11 @@ class MainWindow(qtw.QMainWindow):
     def setBoxPaths(self):
         
         # Greek Box Paths
-        self.path_of_image_page = self.greekpages
-        self.path_of_imgautosplit = self.greeklinesautosplit + r"/"
-        self.path_of_imglinebox = self.greeklinesbox + r"/" + self.greekbookmarkdown + r"/"
-        self.path_of_txtlinebox = self.txtgreeklinebox + r"/" + self.greekbookmarkdown + r"/"
-        self.path_of_jsonlinebox = self.jsongreeklinebox + r"/" + self.greekbookmarkdown + r"/"
+        self.path_of_image_page = self.projecthome + self.greekpages
+        self.path_of_imgautosplit = self.projecthome + self.greeklinesautosplit + r"/"
+        self.path_of_imglinebox = self.projecthome + self.greeklinesbox + r"/" + self.greekbookmarkdown + r"/"
+        self.path_of_txtlinebox = self.projecthome + self.txtgreeklinebox + r"/" + self.greekbookmarkdown + r"/"
+        self.path_of_jsonlinebox = self.projecthome + self.jsongreeklinebox + r"/" + self.greekbookmarkdown + r"/"
 
         # Latin Box Paths - to be added
 
@@ -2771,7 +2771,7 @@ class MainWindow(qtw.QMainWindow):
         self.imgfilename = self.imgfilesplit[0]
         self.imgfileext = self.imgfilesplit[1]
         
-        self.imglineboxfile = self.imgfilename + "_linebox" + self.imgfileext
+        self.imglineboxfile = self.projecthome + self.imgfilename + "_linebox" + self.imgfileext
         self.boximgpath = self.path_of_imglinebox + self.imglineboxfile
 
         self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
@@ -2907,6 +2907,7 @@ class MainWindow(qtw.QMainWindow):
         print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
         self.update_BoxText(str(self.line),x,y,w,h)
         self.BoxText2BoxTable()
+        self.drawLineBoxImage()
         self.saveLineBoxImage()
         self.ui.BoxTable.clearSelection()
         self.startEditLoop = True
@@ -2974,7 +2975,7 @@ class MainWindow(qtw.QMainWindow):
         print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
         self.update_BoxText(str(self.line),str(x),str(y),str(w),str(h))
         self.BoxText2BoxTable()
-        #self.drawLineBoxImage()
+        self.drawLineBoxImage()
         self.saveLineBoxImage()
         self.ui.BoxTable.clearSelection()
         #self.clearSpinBoxes()

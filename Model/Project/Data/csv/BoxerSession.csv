@@ -3,7 +3,7 @@ self.projectsdir,/Projects,/Projects
 self.projectname,/BiblionOCR,/BiblionOCR
 self.jsondir,Model/Project/Data/json,Model/Project/Data/json
 self.session,GrounderSession.json,GrounderSession.json
-self.workflow,WorkflowSession.json,WorkflowSession.json
+self.workflow,Workflow.json,Workflow.json
 self.booksmarkdown,BooksMarkDown.json,BooksMarkDown.json
 self.booksabbr,BooksAbbrName.json,BooksAbbrName.json
 self.font,FROMVS,FROMVS

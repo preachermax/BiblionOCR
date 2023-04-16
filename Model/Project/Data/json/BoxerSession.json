@@ -21,8 +21,8 @@
     },
     {
         "Setting": "self.workflow",
-        "CurrentValue": "WorkflowSession.json",
-        "DefaultValue": "WorkflowSession.json"
+        "CurrentValue": "Workflow.json",
+        "DefaultValue": "Workflow.json"
     },
     {
         "Setting": "self.booksmarkdown",

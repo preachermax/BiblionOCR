@@ -106,7 +106,7 @@
     },
     {
         "Setting": "self.bothbookabbr",
-        "CurrentValue": "Joh",
+        "CurrentValue": "Luk",
         "DefaultValue": "Mat"
     },
     {
@@ -141,22 +141,22 @@
     },
     {
         "Setting": "self.versebookabbr",
-        "CurrentValue": "Joh",
+        "CurrentValue": "Luk",
         "DefaultValue": "Mat"
     },
     {
         "Setting": "self.versechapter",
-        "CurrentValue": "2",
+        "CurrentValue": "16",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.verseverse",
-        "CurrentValue": "12",
+        "CurrentValue": "30",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.verseline",
-        "CurrentValue": "2963",
+        "CurrentValue": "2506",
         "DefaultValue": "1"
     },
     {
@@ -186,22 +186,22 @@
     },
     {
         "Setting": "self.refbookabbr",
-        "CurrentValue": "Joh",
+        "CurrentValue": "Luk",
         "DefaultValue": "Mat"
     },
     {
         "Setting": "self.refchapter",
-        "CurrentValue": "2",
+        "CurrentValue": "16",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.refverse",
-        "CurrentValue": "12",
+        "CurrentValue": "30",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.refline",
-        "CurrentValue": "2963",
+        "CurrentValue": "2506",
         "DefaultValue": "1"
     },
     {
