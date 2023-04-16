@@ -1,4 +1,17 @@
 Setting,CurrentValue,DefaultValue
+self.projectsdir,/Projects,/Projects
+self.projectname,/BiblionOCR,/BiblionOCR
+self.jsondir,Model/Project/Data/json,Model/Project/Data/json
+self.session,VersifierSession.json,GrounderSession.json
+self.workflow,WorkflowSession.json,WorkflowSession.json
+self.crossref,PageVerseCrossReference.json,PageVerseCrossReference.json
+self.booksmarkdown,BooksMarkDown.json,BooksMarkDown.json
+self.booksabbr,BooksAbbrName.json,BooksAbbrName.json
+self.bookchapter,BookChapter.json,BookChapter.json
+self.bookchapterverse,BookChapterVerse.json,BookChapterVerse.json
+self.linebookchapterverse,LineBookChapterVerse.json,LineBookChapterVerse.json
+self.booksabbrnamenumindex,BooksAbbrNameNumIndex.json,BooksAbbrNameNumIndex.json
+self.projectname,/BiblionOCR,/BiblionOCR
 self.homefontdir,/.fonts,
 self.localfontdir,/.local/share/fonts,
 self.localsharefontdir,/usr/local/share/fonts,

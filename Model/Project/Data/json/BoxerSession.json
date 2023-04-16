@@ -1,50 +1,5 @@
 [
     {
-        "Setting": "self.linuxhomedir",
-        "CurrentValue": "/home",
-        "DefaultValue": "/home"
-    },
-    {
-        "Setting": "self.linuxuser",
-        "CurrentValue": "/jetson",
-        "DefaultValue": "/jetson"
-    },
-    {
-        "Setting": "self.linuxuserdir",
-        "CurrentValue": "/home/jetson",
-        "DefaultValue": "/home/jetson"
-    },
-    {
-        "Setting": "self.windowshomedir",
-        "CurrentValue": "c:/users",
-        "DefaultValue": "c:/users"
-    },
-    {
-        "Setting": "self.windowsuser",
-        "CurrentValue": "/max",
-        "DefaultValue": "/max"
-    },
-    {
-        "Setting": "self.windowsuserdir",
-        "CurrentValue": "c:/users/max",
-        "DefaultValue": "c:/users/max"
-    },
-    {
-        "Setting": "self.macoshomedir",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.macosuser",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.macosuserdir",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
         "Setting": "self.projectsdir",
         "CurrentValue": "/Projects",
         "DefaultValue": "/Projects"
@@ -53,6 +8,31 @@
         "Setting": "self.projectname",
         "CurrentValue": "/BiblionOCR",
         "DefaultValue": "/BiblionOCR"
+    },
+    {
+        "Setting": "self.jsondir",
+        "CurrentValue": "Model/Project/Data/json",
+        "DefaultValue": "Model/Project/Data/json"
+    },
+    {
+        "Setting": "self.session",
+        "CurrentValue": "GrounderSession.json",
+        "DefaultValue": "GrounderSession.json"
+    },
+    {
+        "Setting": "self.workflow",
+        "CurrentValue": "WorkflowSession.json",
+        "DefaultValue": "WorkflowSession.json"
+    },
+    {
+        "Setting": "self.booksmarkdown",
+        "CurrentValue": "BooksMarkDown.json",
+        "DefaultValue": "BooksMarkDown.json"
+    },
+    {
+        "Setting": "self.booksabbr",
+        "CurrentValue": "BooksAbbrName.json",
+        "DefaultValue": "BooksAbbrName.json"
     },
     {
         "Setting": "self.font",
@@ -175,13 +155,23 @@
         "DefaultValue": "10"
     },
     {
+        "Setting": "self.refimgpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.refimgdir",
+        "CurrentValue": "Model/Project/Images/Workflow",
+        "DefaultValue": "Model/Project/Images/Workflow"
+    },
+    {
         "Setting": "self.imgpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John/greek1516_Page_245_linebox.tif",
+        "CurrentValue": "",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box/greek_book_43_John",
+        "CurrentValue": "Model/Project/Images/Workflow",
         "DefaultValue": "Model/Project/Images/Workflow"
     },
     {
@@ -236,12 +226,12 @@
     },
     {
         "Setting": "self.txtpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John/greek1516_Page_245_linebox.txt",
+        "CurrentValue": "",
         "DefaultValue": ""
     },
     {
         "Setting": "self.txtdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox/greek_book_43_John",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages"
     },
     {
@@ -265,32 +255,17 @@
         "DefaultValue": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box"
     },
     {
-        "Setting": "self.reftxtpath",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.reftxtdir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/TR",
-        "DefaultValue": "Model/Project/Text/EstablishTruth/TR"
-    },
-    {
-        "Setting": "self.reftxtfileList",
-        "CurrentValue": "[]",
-        "DefaultValue": "[]"
-    },
-    {
         "Setting": "self.refimgpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
         "Setting": "self.refimgdir",
-        "CurrentValue": "Model/Project/Images/Complete/Greek/tif_greek_pages",
-        "DefaultValue": "Model/Project/Images/Complete/Greek/tif_greek_pages"
+        "CurrentValue": "",
+        "DefaultValue": ""
     },
     {
-        "Setting": "self.refimgtfileList",
+        "Setting": "self.refimgfileList",
         "CurrentValue": "[]",
         "DefaultValue": "[]"
     },
@@ -310,9 +285,9 @@
         "DefaultValue": ""
     },
     {
-        "Setting": "self.imagetdir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/TR",
-        "DefaultValue": "Model/Project/Text/EstablishTruth/TR"
+        "Setting": "self.imagedir",
+        "CurrentValue": "",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.imagefileList",
@@ -428,5 +403,40 @@
         "Setting": "self.latinlinesautosplit",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit"
+    },
+    {
+        "Setting": "self.edittimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.maketimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.rdrawtimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.sdrawtimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchmaketimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchmovetimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchnametimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
     }
 ]

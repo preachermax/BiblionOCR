@@ -1,5 +1,70 @@
 [
     {
+        "Setting": "self.projectsdir",
+        "CurrentValue": "/Projects",
+        "DefaultValue": "/Projects"
+    },
+    {
+        "Setting": "self.projectname",
+        "CurrentValue": "/BiblionOCR",
+        "DefaultValue": "/BiblionOCR"
+    },
+    {
+        "Setting": "self.jsondir",
+        "CurrentValue": "Model/Project/Data/json",
+        "DefaultValue": "Model/Project/Data/json"
+    },
+    {
+        "Setting": "self.session",
+        "CurrentValue": "VersifierSession.json",
+        "DefaultValue": "GrounderSession.json"
+    },
+    {
+        "Setting": "self.workflow",
+        "CurrentValue": "WorkflowSession.json",
+        "DefaultValue": "WorkflowSession.json"
+    },
+    {
+        "Setting": "self.crossref",
+        "CurrentValue": "PageVerseCrossReference.json",
+        "DefaultValue": "PageVerseCrossReference.json"
+    },
+    {
+        "Setting": "self.booksmarkdown",
+        "CurrentValue": "BooksMarkDown.json",
+        "DefaultValue": "BooksMarkDown.json"
+    },
+    {
+        "Setting": "self.booksabbr",
+        "CurrentValue": "BooksAbbrName.json",
+        "DefaultValue": "BooksAbbrName.json"
+    },
+    {
+        "Setting": "self.bookchapter",
+        "CurrentValue": "BookChapter.json",
+        "DefaultValue": "BookChapter.json"
+    },
+    {
+        "Setting": "self.bookchapterverse",
+        "CurrentValue": "BookChapterVerse.json",
+        "DefaultValue": "BookChapterVerse.json"
+    },
+    {
+        "Setting": "self.linebookchapterverse",
+        "CurrentValue": "LineBookChapterVerse.json",
+        "DefaultValue": "LineBookChapterVerse.json"
+    },
+    {
+        "Setting": "self.booksabbrnamenumindex",
+        "CurrentValue": "BooksAbbrNameNumIndex.json",
+        "DefaultValue": "BooksAbbrNameNumIndex.json"
+    },
+    {
+        "Setting": "self.projectname",
+        "CurrentValue": "/BiblionOCR",
+        "DefaultValue": "/BiblionOCR"
+    },
+    {
         "Setting": "self.homefontdir",
         "CurrentValue": "/.fonts",
         "DefaultValue": ""
@@ -76,22 +141,22 @@
     },
     {
         "Setting": "self.versebookabbr",
-        "CurrentValue": "Mar",
+        "CurrentValue": "Joh",
         "DefaultValue": "Mat"
     },
     {
         "Setting": "self.versechapter",
-        "CurrentValue": "1",
+        "CurrentValue": "2",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.verseverse",
-        "CurrentValue": "1",
+        "CurrentValue": "12",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.verseline",
-        "CurrentValue": "1",
+        "CurrentValue": "2963",
         "DefaultValue": "1"
     },
     {
@@ -121,22 +186,22 @@
     },
     {
         "Setting": "self.refbookabbr",
-        "CurrentValue": "Mar",
+        "CurrentValue": "Joh",
         "DefaultValue": "Mat"
     },
     {
         "Setting": "self.refchapter",
-        "CurrentValue": "1",
+        "CurrentValue": "2",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.refverse",
-        "CurrentValue": "1",
+        "CurrentValue": "12",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.refline",
-        "CurrentValue": "1",
+        "CurrentValue": "2963",
         "DefaultValue": "1"
     },
     {

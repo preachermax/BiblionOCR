@@ -1,5 +1,32 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/move-textlines-latin.png</file>
+    <file>Icons/move_textlines-greek.png</file>
+    <file>Icons/rename-textlines-latin.png</file>
+    <file>Icons/rename_textlines-greek.png</file>
+    <file>Icons/split-textlines-greek.png</file>
+    <file>Icons/split-textlines-latin.png</file>
+    <file>Icons/stage_greek_text_folder.png</file>
+    <file>Icons/stage_latin_text_folder.png</file>
+    <file>Icons/box_greek_folder.png</file>
+    <file>Icons/box_latin_folder.png</file>
+    <file>Icons/split_latin_text_folder.png</file>
+    <file>Icons/split_greek_text_folder.png</file>
+    <file>Icons/split-textlines-greek.png</file>
+    <file>Icons/box-lines-latin.png</file>
+    <file>Icons/box-lines-greek.png</file>
+    <file>Icons/folder_blu.png</file>
+    <file>Icons/split_latin_text_folder.png</file>
+    <file>Icons/split_greek_text_folder.png</file>
+    <file>Icons/split_lang_folder.png</file>
+    <file>Icons/split_latin_folder.png</file>
+    <file>Icons/split_greek_folder.png</file>
+    <file>Icons/stage_latin_folder.png</file>
+    <file>Icons/stage_greek_folder.png</file>
+    <file>Icons/folder_blk.png</file>
+    <file>Icons/transparent-directory.png</file>
+    <file>Icons/stage-lines-latin .png</file>
+    <file>Icons/stage-lines-greek .png</file>
     <file>Icons/spinbox4.png</file>
     <file>Icons/spintable1.png</file>
     <file>Icons/spintable.png</file>

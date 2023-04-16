@@ -6,6 +6,7 @@ import shutil
 import json
 import csv
 import time
+import platform
 
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
@@ -23,6 +24,25 @@ from SqliteHelper import *
 class Ui_MainWindow(qtw.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Set Project Home
+        self.mod_dirname = os.path.dirname(__file__)
+        up_once = os.path.join(self.mod_dirname,"..")
+        up_twice = os.path.join(up_once,"..")
+        self.mod_rootdir = up_twice
+        self.mod_realpath = os.path.realpath(self.mod_rootdir)
+        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_relpath = os.path.relpath(self.mod_abspath)
+        self.projecthome = self.mod_abspath + r'/'
+        print(f'OS Path dirname: {self.mod_dirname}')
+        print(f'OS Path up one folder: {up_once}')
+        #print(f'OS Path up two folders: {up_twice}')
+        print(f'OS Path rootdir: {self.mod_rootdir}')
+        print(f'OS Path realpath: {self.mod_realpath}')
+        print(f'OS Path abspath: {self.mod_abspath}')
+        print(f'OS Path relpath: {self.mod_dirname}')
+        print(f'Project Home: {self.projecthome}')
+
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
@@ -163,14 +183,25 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.getstarted()
 
     def get_session_settings(self):
-        # get session settings
+        # get session settings        
         # Define json data        
         print("loading session")
-        with open('Model/Project/Data/json/VersifierSession.json') as f:
+        with open(self.projecthome + 'Model/Project/Data/json/VersifierSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
             # Set json key values
+            jsondir_key = r"self.jsondir"
+            session_key = r"self.session"
+            workflow_key = r"self.workflow"
+            crossref_key = r"self.crossref"
+            booksmarkdown_key = r"self.booksmarkdown"
+            bookchapter_key = r"self.bookchapter"
+            bookchapterverse_key = r"self.bookchapterverse"
+            linebookchapterverse_key = r"self.linebookchapterverse"
+            booksabbrnamenumindex_key = r"self.booksabbrnamenumindex"
+            projectsdir_key = r'self.projectsdir'
+            projectname_key = r'self.projectname'  
             ocrlang_key = r"self.ocrlang"
             ocrmodel_key = r"self.ocrmodel"
             sqldir_key = r"self.sqldir"
@@ -233,8 +264,37 @@ class Ui_MainWindow(qtw.QMainWindow):
             # Define session variables from json key values
             for Setting in data:
                 print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                
-                if Setting['Setting'] == ocrlang_key:
+                if Setting['Setting'] == jsondir_key:
+                    self.jsondir = Setting['CurrentValue']
+                elif Setting['Setting'] == session_key:
+                    self.session = Setting['CurrentValue']
+                    self.session = self.projecthome + self.jsondir + "/" + self.session
+                elif Setting['Setting'] == workflow_key: 
+                    self.workflow = Setting['CurrentValue']
+                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
+                elif Setting['Setting'] == crossref_key:
+                    self.crossref = Setting['CurrentValue']
+                    self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
+                elif Setting['Setting'] == booksmarkdown_key:
+                    self.booksmarkdown = Setting['CurrentValue']
+                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
+                elif Setting['Setting'] == bookchapter_key:
+                    self.bookchapter = Setting['CurrentValue']
+                    self.bookchapter = self.projecthome + self.jsondir + "/" + self.bookchapter
+                elif Setting['Setting'] == bookchapterverse_key:
+                    self.bookchapterverse = Setting['CurrentValue']
+                    self.bookchapterverse = self.projecthome + self.jsondir + "/" + self.bookchapterverse
+                elif Setting['Setting'] == linebookchapterverse_key:
+                    self.linebookchapterverse = Setting['CurrentValue']
+                    self.linebookchapterverse = self.projecthome + self.jsondir + "/" + self.linebookchapterverse
+                elif Setting['Setting'] == booksabbrnamenumindex_key:
+                    self.booksabbrnamenumindex = Setting['CurrentValue']
+                    self.booksabbrnamenumindex = self.projecthome + self.jsondir + "/" + self.booksabbrnamenumindex
+                elif Setting['Setting'] == projectsdir_key:
+                    self.projectsdir = Setting['CurrentValue']
+                elif Setting['Setting'] == projectname_key:
+                    self.projectname = Setting['CurrentValue']
+                elif Setting['Setting'] == ocrlang_key:
                     self.ocrlang = Setting['CurrentValue']
                     self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
                 elif Setting['Setting'] == ocrmodel_key:
@@ -242,6 +302,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
                 elif Setting['Setting'] == sqldir_key:
                     self.sqldir = Setting['CurrentValue']
+                    self.sqldir = self.projecthome + self.sqldir
                 elif Setting['Setting'] == bothbookabbr_key:
                     self.bothbookabbr = Setting['CurrentValue']
                     self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
@@ -307,6 +368,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.latinbookmarkdown = Setting['CurrentValue']
                 elif Setting['Setting'] == variantdb_key:
                     self.variantdb = Setting['CurrentValue']
+                    self.variantdb = self.projecthome + self.variantdb 
                 elif Setting['Setting'] == variantcorrected_key:
                     self.variantcorrected = Setting['CurrentValue']
                 elif Setting['Setting'] == variantpreserved_key:
@@ -315,19 +377,24 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.variantkey = Setting['CurrentValue']
                 elif Setting['Setting'] == versedbpath_key:
                     self.versedbpath = Setting['CurrentValue']
+                    self.versedbpath = self.projecthome + self.versedbpath
                 elif Setting['Setting'] == versetable_key:
                     self.versetable = Setting['CurrentValue']
                 elif Setting['Setting'] == versepath_key:
                     self.versepath = Setting['CurrentValue']
+                    self.versepath = self.projecthome + self.versepath
                     self.ui.VerseTextLE.setText(os.path.basename(self.versepath))
                 elif Setting['Setting'] == versedir_key:
                     self.versedir = Setting['CurrentValue']
+                    self.versedir = self.projecthome + self.versedir
                 elif Setting['Setting'] == versenormpathsel_key:
                     self.versenormpathsel = Setting['CurrentValue']
                 elif Setting['Setting'] == versenormpath_key:
                     self.versenormpath = Setting['CurrentValue']
+                    self.versenormpath = self.projecthome + self.versenormpath
                 elif Setting['Setting'] == versenormdir_key:
                     self.versenormdir = Setting['CurrentValue']
+                    self.versenormdir = self.projecthome + self.versenormdir
                 elif Setting['Setting'] == versefont_key:
                     self.versefont = Setting['CurrentValue']
                 elif Setting['Setting'] == versefontsize_key:
@@ -342,19 +409,24 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.verselineheight = Setting['CurrentValue']
                 elif Setting['Setting'] == refdbpath_key:
                     self.refdbpath = Setting['CurrentValue']
+                    self.refdbpath = self.projecthome + self.refdbpath
                 elif Setting['Setting'] == reftable_key:
                     self.reftable = Setting['CurrentValue']
                 elif Setting['Setting'] == refpath_key:
                     self.refpath = Setting['CurrentValue']
+                    self.refpath = self.projecthome + self.refpath
                     self.ui.RefTextLE.setText(os.path.basename(self.refpath))
                 elif Setting['Setting'] == refdir_key:
                     self.refdir = Setting['CurrentValue']
+                    self.refdir = self.projecthome + self.refdir
                 elif Setting['Setting'] == refnormpathsel_key:
                     self.refnormpathsel = Setting['CurrentValue']
                 elif Setting['Setting'] == refnormpath_key:
                     self.refnormpath = Setting['CurrentValue']
+                    self.refnormpath = self.projecthome + self.refnormpath
                 elif Setting['Setting'] == refnormdir_key:
                     self.refnormdir = Setting['CurrentValue']
+                    self.refnormdir = self.projecthome + self.refnormdir
                 elif Setting['Setting'] == reffont_key:
                     self.reffont = Setting['CurrentValue']
                 elif Setting['Setting'] == reffontsize_key:
@@ -370,6 +442,9 @@ class Ui_MainWindow(qtw.QMainWindow):
                 
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
+
+            # Update Project paths
+
 
     def getstarted(self):
         print(f'Reference File Path: {self.refpath}')
@@ -427,7 +502,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'self.prevtextversenum = {self.prevtextversenum}')
         print(f'self.nexttextversenum = {self.nexttextversenum}')
 
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
+        ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
     def dropAnchor(self):
@@ -455,7 +530,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Getting the anchor session settings')
         
         # Opening JSON file
-        with open('Model/Project/Data/json/VersifierSession.json') as f:
+        with open(self.session) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)  
@@ -483,7 +558,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionAnchor(self):
         print(f'Updating the anchor session setting')
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -568,7 +643,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Getting the last verse session setting')
         
         # Opening JSON file
-        with open('Model/Project/Data/json/VersifierSession.json') as f:
+        with open(self.session) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)  
@@ -596,7 +671,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionLastVerse(self):
         print(f'Updating the last verse session setting')
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -637,7 +712,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # perform checks
         
         # Opening JSON file
-        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open(self.projecthome +  'Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)  
@@ -682,7 +757,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = self.booksmarkdown
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -695,7 +770,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
               
-            '''jsonfile = 'Model/Project/Data/json/Session.json'
+            '''jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -722,7 +797,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open(self.booksabbr) as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -752,7 +827,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadChapterCombo(self):
         self.ui.chapterComboBox.clear()
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapter.json') as f:
+        with open(self.bookchapter) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -777,7 +852,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.verseComboBox.clear()
 
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open(self.bookchapterverse) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -819,7 +894,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def OpenResolver(self):
         print("Starting up QT5ResolveVariants")
-        mw_cmd = "python3 ViewController/0-MainUI/Qt5ResolveVariants.py"
+        mw_cmd = "python3 " + self.projecthome + "ViewController/0-MainUI/Qt5ResolveVariants.py"
         print(mw_cmd)
         os.system(mw_cmd)
     
@@ -849,7 +924,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     
     def loadVarWordCombo(self):
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
         #print(varwords)
 
@@ -862,7 +937,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         selvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
         
         # This is only a partial solution.  It locks onto the first match only.
@@ -873,7 +948,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def loadReplaceWordCombo(self):
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         replacewords = helper.select("SELECT DISTINCT Word FROM Bible UNION SELECT DISTINCT Word FROM IntBibleWords ORDER BY Word ASC")
         #print(varwords)
 
@@ -886,7 +961,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         selrepword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         repwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE Word =" + "'" + selrepword + "'")
         
         # This is only a partial solution.  It locks onto the first match only.
@@ -899,7 +974,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             return 
         
         print("Check if variant already exists in Resolver. If found, populate dialog.")
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
                 WHERE Line = ? and WordNum = ?"""
         data = (line,wordnum)
@@ -938,7 +1013,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.stoprecorder == True:
             return
         print(f'Inserting new variant for line: {line} and word number: {wordnum}')
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         query = """SELECT Line, WordNum, Word FROM Bible
                 WHERE Line = ? and WordNum = ?"""
         data = (varline,varwordnum)
@@ -948,7 +1023,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versewordnum = variant[1]
         verseword = variant[2]
                 
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         query = """SELECT Line, WordNum, Word, Strong, RMAC, Lemma FROM IntBibleWords
                 WHERE Line = ? and WordNum = ?"""
         data = (refline,refwordnum)
@@ -972,7 +1047,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         varword = self.varrecorder_ui.VarWordSelCombo.currentText()
         verseword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
 
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         query = """INSERT INTO Variants (Line, Book, Chapter, Verse, WordNum, Word, NoDiaWord, VarWord, Strong, RMAC, Lemma, ErrorCode, Preserved, Corrected) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
         data = (varline,varbook,varchapter,varverse,varwordnum,verseword,varnormword,varword,refstrong,refrmac,reflemma,errorcode,preserved,Corrected)
         #startProgressBar()
@@ -982,7 +1057,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.stoprecorder == True:
             return
         print('Updating existing variant') 
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
                 WHERE Line = ? and WordNum = ?"""
         data = (line,wordnum)
@@ -1069,7 +1144,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.varrecorder_ui.RefWordNumlineEdit.setText(self.ui.RefWordNumlineEdit.text())
         self.varrecorder_ui.RefNormWordlineEdit.setText(self.ui.RefText.textCursor().selectedText())
         self.loadVarWordCombo()
-        helper = SqliteHelper("Model/Project/Data/SQLite/TRiBibleWords.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         refwords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
         for word in refwords:
             refline = word[0]
@@ -1090,7 +1165,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.loadReplaceWordCombo()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
-        helper = SqliteHelper("Model/Project/Data/SQLite/FROMVS.db")
+        helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         versewords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
         for word in versewords:
             self.verseline = word[0]
@@ -1249,7 +1324,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.VersebookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = self.booksmarkdown
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1262,7 +1337,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'Model/Project/Data/json/Session.json'
+            jsonfile = self.session
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1289,7 +1364,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open(self.booksabbr) as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -1318,7 +1393,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadVerseChapterCombo(self):
         self.ui.VersechapterComboBox.clear()
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapter.json') as f:
+        with open(self.bookchapter) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1339,7 +1414,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.VerseverseComboBox.clear()
 
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open(self.bookchapterverse) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1356,7 +1431,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.VerselineComboBox.clear()
 
         # Opening JSON file
-        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open(self.linebookchapterverse) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1373,7 +1448,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def updateVerseLineCombo(self):
         #self.ui.VerselineComboBox.clear()
         # Opening JSON file
-        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open(self.linebookchapterverse) as f:
             # returns JSON object as a dictionary
             data = json.load(f)
         
@@ -1394,7 +1469,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.RefbookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = self.booksmarkdown
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1407,7 +1482,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'Model/Project/Data/json/Session.json'
+            jsonfile = self.session
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1434,7 +1509,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             f.close()
 
             # Opening JSON file
-            '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
+            '''with open(self.booksabbr) as f:
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
@@ -1459,7 +1534,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadRefChapterCombo(self):
         self.ui.RefchapterComboBox.clear()
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapter.json') as f:
+        with open(self.bookchapter) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1480,7 +1555,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefverseComboBox.clear()
 
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open(self.bookchapterverse) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1498,7 +1573,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.ReflineComboBox.clear()
 
         # Opening JSON file
-        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open(self.linebookchapterverse) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1515,7 +1590,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def updateRefLineCombo(self):
         #self.ui.ReflineComboBox.clear()
         # Opening JSON file
-        with open('Model/Project/Data/json/LineBookChapterVerse.json') as f:
+        with open(self.linebookchapterverse) as f:
             # returns JSON object as a dictionary
             data = json.load(f)
         
@@ -1673,7 +1748,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versechaptercount =  self.ui.VersechapterComboBox.count()
         nextversechapternum = int(self.ui.VersechapterComboBox.currentText()) + 1
         # Opening JSON file
-        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -1708,7 +1783,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versechaptercount =  self.ui.VersechapterComboBox.count()
         prevversechapternum = int(self.ui.VersechapterComboBox.currentText()) - 1
         # Opening JSON file
-        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -1878,7 +1953,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionBothVerse(self):
         print(f'Updating the both verse session settings')
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -1963,7 +2038,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionVerseVerse(self):
         print(f'Updating the verse text session settings')
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -2249,7 +2324,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refchaptercount =  self.ui.RefchapterComboBox.count()
         nextrefchapternum = int(self.ui.RefchapterComboBox.currentText()) + 1
         # Opening JSON file
-        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -2284,7 +2359,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refchaptercount =  self.ui.RefchapterComboBox.count()
         prevrefchapternum = int(self.ui.RefchapterComboBox.currentText()) - 1
         # Opening JSON file
-        with open('Model/Project/Data/json/BooksAbbrNameNumIndex.json') as f:
+        with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
             books = json.load(f)  
         # Iterating through the json list  
@@ -2371,7 +2446,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionRefVerse(self):
         print(f'Updating the reference text session settings')
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         # Opening JSON file
         with open(jsonfile, 'r') as f:
             # returns JSON object as
@@ -2689,7 +2764,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.centralwidget, 'Open text file',self.versedir,
         'Text files (*.txt *.csv)')[0]
         #self.txtpath = qtw.QFileDialog.getOpenFileName(
-            #self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+            #self.ui.centralwidget, 'Open text file', self.projecthome +  'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
         print(f'self.versepath: {self.versepath}')
         self.getVerseText(self.versepath)
 
@@ -2731,12 +2806,14 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetVerseLineSpacing()      
             self.versefile.close()
        
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             versepath_key = r"self.versepath"
             versedir_key = r"self.versedir"
+            self.versepath = self.versepath.replace(self.projecthome, "")
+            self.versedir = self.versedir.replace(self.projecthome, "")
             for Setting in data:
                 if Setting['Setting'] == versepath_key:
                     Setting['CurrentValue'] = self.versepath
@@ -2752,7 +2829,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         f.close()
 
         self.versetxtfileList = []
-        for t in os.listdir(self.versedir):
+        for t in os.listdir(self.projecthome + self.versedir):
             tpath = os.path.join(self.versedir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
                 self.versetxtfileList.append(tpath)
@@ -2764,7 +2841,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             print("Reloading "+ self.versepath)
             file = qtc.QFile(self.versepath)
             filename = os.path.basename(self.versepath)
-            self.ui.TextLE.setText(filename)
+            self.ui.VerseTextLE.setText(filename)
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -2827,7 +2904,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
       
-        jsonfile = 'Model/Project/Data/json/Session.json'
+        jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2884,7 +2961,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
       
-        '''jsonfile = 'Model/Project/Data/json/Session.json'
+        '''jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -3031,7 +3108,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.centralwidget, 'Open text file',self.refdir,
         'Text files (*.txt *.csv)')[0]
         #self.txtpath = qtw.QFileDialog.getOpenFileName(
-            #self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+            #self.ui.centralwidget, 'Open text file', self.projecthome +  'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
         print(f'self.refpath: {self.refpath}')
         self.getRefText(self.refpath)
 
@@ -3045,10 +3122,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.reffilename = os.path.basename(self.refpath)
                 self.refdir = os.path.dirname(self.refpath)
                 self.ui.RefTextLE.setText(self.reffilename)
+                self.refpath = textpath
                 self.showRefText(self.refpath)
     
     def showRefText(self,textpath):        
         self.refpath = textpath
+        print(f'Reference File Path: {self.refpath}')
         if self.refpath:
             reftext = open(self.refpath, encoding='UTF-8').read()
             self.ui.RefText.setPlainText(reftext)
@@ -3060,12 +3139,14 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetRefLineSpacing()
             #self.reffile.close()
        
-        jsonfile = 'Model/Project/Data/json/VersifierSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             refpath_key = r"self.refpath"
             refdir_key = r"self.refdir"
+            self.refpath = self.refpath.replace(self.projecthome,"")
+            self.refdir = self.refdir.replace(self.projecthome,"")
             for Setting in data:
                 if Setting['Setting'] == refpath_key:
                     Setting['CurrentValue'] = self.refpath
@@ -3081,7 +3162,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         f.close()
 
         self.reftxtfileList = []
-        for t in os.listdir(self.refdir):
+        for t in os.listdir(self.projecthome + self.refdir):
             tpath = os.path.join(self.refdir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
                 self.reftxtfileList.append(tpath)
@@ -3136,7 +3217,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             file.close()
         
         
-        jsonfile = 'Model/Project/Data/json/Session.json'
+        jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -3190,7 +3271,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetRefLineSpacing()
             self.refnormfile.close()
       
-        '''jsonfile = 'Model/Project/Data/json/Session.json'
+        '''jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)

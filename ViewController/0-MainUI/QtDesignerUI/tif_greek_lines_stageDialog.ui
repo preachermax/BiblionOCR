@@ -10,11 +10,14 @@
     <x>0</x>
     <y>0</y>
     <width>466</width>
-    <height>362</height>
+    <height>289</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Stage Greek tif lines</string>
+  </property>
+  <property name="toolTip">
+   <string>Stage Greek tif lines for Ground Truth</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -32,7 +35,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="SourceRenamedLineEdit">
+  <widget class="QLineEdit" name="SourceLineEdit">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -42,10 +45,10 @@
     </rect>
    </property>
    <property name="placeholderText">
-    <string>(default) working temp folder</string>
+    <string>(default) working split lines folder</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="SourceRenamedButton">
+  <widget class="QPushButton" name="SourceButton">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -72,7 +75,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>190</y>
+     <y>120</y>
      <width>101</width>
      <height>25</height>
     </rect>
@@ -89,31 +92,34 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>190</y>
+     <y>120</y>
      <width>301</width>
      <height>25</height>
     </rect>
    </property>
+   <property name="placeholderText">
+    <string>(default) working ground truth folder</string>
+   </property>
   </widget>
-  <widget class="QLabel" name="SourceRenamedLabel">
+  <widget class="QLabel" name="SourceLabel">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>30</y>
-     <width>261</width>
+     <width>271</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Stage Greek tif lines renamed folder</string>
+    <string>Stage Greek tif lines source folder</string>
    </property>
   </widget>
   <widget class="QLabel" name="DestinationLabel">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>170</y>
-     <width>291</width>
+     <x>10</x>
+     <y>100</y>
+     <width>301</width>
      <height>17</height>
     </rect>
    </property>
@@ -137,50 +143,56 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="SourceRenumberedLineEdit">
+  <widget class="QLineEdit" name="StartPageLineEdit">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>120</y>
-     <width>301</width>
+     <x>60</x>
+     <y>190</y>
+     <width>41</width>
      <height>25</height>
     </rect>
    </property>
-   <property name="placeholderText">
-    <string>(default) working temp folder</string>
-   </property>
   </widget>
-  <widget class="QLabel" name="SourceRenumberedLabel">
+  <widget class="QLabel" name="StartPageLabel">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>100</y>
-     <width>281</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Stage Greek tif lines renumbered folder</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="SourceRenumberedButton">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>120</y>
+     <x>30</x>
+     <y>160</y>
      <width>101</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Source</string>
+    <string>Starting Page</string>
    </property>
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="EndPageLabel">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>160</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ending Page</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="EndPageLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>190</y>
+     <width>41</width>
+     <height>25</height>
+    </rect>
    </property>
   </widget>
  </widget>

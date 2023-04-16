@@ -47,9 +47,10 @@ from Training import Train as tr
 from Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
 from Dialogs.crop_latin_linesDialog import Ui_crop_latin_linesDialog
 from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
-from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
+#from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
 from Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
 from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
+from Dialogs.tif_greek_lines_stageDialog import Ui_tifgreekstagelinesDialog
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from Dialogs.split_greek_text_linesDialog import Ui_splitgreektextlinesDialog
 from Dialogs.rename_greek_text_linesDialog import Ui_renamegreektextlinesDialog
@@ -160,6 +161,23 @@ class MainWindow(qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        #Set Project Path
+        self.mod_dirname = os.path.dirname(__file__)
+        up_once = os.path.join(self.mod_dirname,"..")
+        up_twice = os.path.join(up_once,"..")
+        self.mod_rootdir = up_twice
+        self.mod_realpath = os.path.realpath(self.mod_rootdir)
+        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_relpath = os.path.relpath(self.mod_abspath)
+        self.projecthome = self.mod_abspath + r'/'
+        print(f'OS Path dirname: {self.mod_dirname}')
+        print(f'OS Path rootdir: {self.mod_rootdir}')
+        print(f'OS Path realpath: {self.mod_realpath}')
+        print(f'OS Path abspath: {self.mod_abspath}')
+        print(f'OS Path relpath: {self.mod_dirname}')
+        print(f'Project Home: {self.projecthome}')
+
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
@@ -167,11 +185,11 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.actionBatchCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
-        self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
+        self.ui.actionStage_Greek_tif_Lines_tb.triggered.connect(self.actionStage_Greek_tiff_Lines)
         
         self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
         self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
-        self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
+        self.ui.actionStage_Latin_tif_Lines_tb.triggered.connect(self.actionStage_Latin_tiff_Lines)
         
         self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
         self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
@@ -188,14 +206,16 @@ class MainWindow(qtw.QMainWindow):
         self.ui.actionStandardUI.triggered.connect(self.standardUI)
         self.ui.actionProject_Explorer.triggered.connect(self.OpenProjectExplorer)
         
-        self.ui.actionMake_Greek_LineBox_File_Pair.triggered.connect(self.linebox_make_split)
+        self.ui.actionMake_Greek_LineBox_Files.triggered.connect(self.linebox_make_split)
         self.ui.actionEdit_Greek_LineBox_Pair.triggered.connect(self.linebox_edit_split)
         self.ui.actionDraw_Table_LineBox_tb.triggered.connect(self.putSbLineBox)
         self.ui.actionDraw_Selected_LineBox_tb.triggered.connect(self.getRbLineBox)
         #self.ui.actionEdit_Latin_LineBox_Pair.triggered.connect(self.linebox_edit_split)
 
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
-        self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
+        self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
+        #self.ui.action_Grounder.triggered.connect(self.OpenWithMyGrounder)
+
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
         #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)        
     
@@ -439,37 +459,19 @@ class MainWindow(qtw.QMainWindow):
         self.ui.OutputText.append(text)
 
     def get_session_settings(self):
-        # get session settings
-        self.homedir = '/home'
-        self.user = '/jetson'
-        if platform.system() == 'Linux':
-            self.userdir = '/home/jetson'
-        elif platform.system() == 'Windows':
-            self.userdir = 'c:/users/max'
-        self.projectsdir = '/Projects'
-        self.projectname = '/BiblionOCR'
-        self.projecthome = self.userdir + self.projectsdir + self.projectname + '/'
-
-        
+        # get session settings        
         # Define json data        
         print("loading session")
         with open(self.projecthome + 'Model/Project/Data/json/BoxerSession.json') as f:
-        #with open('Model/Project/Data/json/BoxerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
             # Set json key values
-            linuxhomedir_key = r'self.linuxhomedir'
-            linuxuser_key = r'self.linuxuser'
-            linuxuserdir_key = r'self.linuxuserdir'
-            windowshomedir_key = r'self.windowshomedir'
-            windowsuser_key = r'self.windowsuser'
-            windowsuserdir_key = r'self.windowsuserdir'
-            macoshomedir_key = r'self.macoshomedir'
-            macosuser_key = r'self.macosuser'
-            macosuserdir_key = r'self.macosuserdir'
-            projectsdir_key = r'self.projectsdir'
-            projectname_key = r'self.projectname'     
+            jsondir_key = r"self.jsondir"
+            session_key = r"self.session"
+            workflow_key = r"self.workflow"
+            booksmarkdown_key = r"self.booksmarkdown"
+            booksabbr_key = r"self.booksabbr"
             font_key = r"self.font"
             fontsize_key = r"self.fontsize"
             ocrlang_key = r"self.ocrlang"
@@ -518,22 +520,20 @@ class MainWindow(qtw.QMainWindow):
             # Define session variables from json key values
             for Setting in data:
                 print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == linuxhomedir_key:
-                    self.linuxhomedir = Setting['CurrentValue']
-                elif Setting['Setting'] == linuxuser_key:
-                    self.linuxuser = Setting['CurrentValue']
-                elif Setting['Setting'] == linuxuserdir_key:
-                    self.linuxuserdir = Setting['CurrentValue']                
-                elif Setting['Setting'] == windowshomedir_key:
-                    self.windowshomedir = Setting['CurrentValue']
-                elif Setting['Setting'] == windowsuser_key:
-                    self.windowsuser = Setting['CurrentValue']
-                elif Setting['Setting'] == windowsuserdir_key:
-                    self.windowsuserdir = Setting['CurrentValue']
-                elif Setting['Setting'] == projectsdir_key:
-                    self.projectsdir = Setting['CurrentValue']
-                elif Setting['Setting'] == projectname_key:
-                    self.projectname = Setting['CurrentValue']
+                if Setting['Setting'] == jsondir_key:
+                    self.jsondir = Setting['CurrentValue']
+                elif Setting['Setting'] == session_key:
+                    self.session = Setting['CurrentValue']
+                    self.session = self.projecthome + self.jsondir + "/" + self.session
+                elif Setting['Setting'] == workflow_key: 
+                    self.workflow = Setting['CurrentValue']
+                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
+                elif Setting['Setting'] == booksmarkdown_key:
+                    self.booksmarkdown = Setting['CurrentValue']
+                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
+                elif Setting['Setting'] == booksabbr_key:
+                    self.booksabbr = Setting['CurrentValue']
+                    self.booksabbr = self.projecthome + self.jsondir + "/" + self.booksabbr
                 elif Setting['Setting'] == font_key:
                     self.font = Setting['CurrentValue']
                     self.ui.fontComboBox.setCurrentText(self.font)
@@ -620,48 +620,11 @@ class MainWindow(qtw.QMainWindow):
                     self.latinlinesautosplit = Setting['CurrentValue']    
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
-            
-            # Update System paths
-            if platform.system() == 'Linux':
-                self.homedir = self.linuxhomedir
-                self.user = self.linuxuser
-                self.userdir = self.linuxuserdir
-            elif platform.system() == 'Windows':
-                self.homedir = self.windowshomedir
-                self.user = self.windowsuser
-                self.userdir = self.windowsuserdir
-            elif platform.system() == 'MacOS':
-                self.homedir = self.macoshomedir
-                self.user = self.macosuser
-                self.userdir = self.macosuserdir
-            else:
-                self.homedir = r'.'
-                self.user = r'/'
-                self.userdir = r'./'
-            self.projecthome = self.userdir + self.projectsdir + self.projectname + '/'
-            print(f'Absolute Path to User Directory: {self.userdir}')           
-            
-            # Update Project paths
-            self.latinlinesautosplit = self.projecthome + self.latinlinesautosplit
-            self.latinlinesbox = self.projecthome + self.latinlinesbox
-            self.latinpages = self.projecthome + self.latinpages
-            self.greeklinesautosplit = self.projecthome + self.greeklinesautosplit
-            self.greeklinesbox = self.projecthome + self.greeklinesbox
-            self.greekpages = self.projecthome + self.greekpages
-            self.txtdir = self.projecthome + self.txtdir
-            self.txtpath = self.projecthome + self.txtpath
-            self.imgdir = self.projecthome + self.imgdir
-            self.imgpath = self.projecthome + self.imgpath
-            self.sourcefile = self.projecthome + self.sourcefile
-            self.txtgreeklinebox = self.projecthome + self.txtgreeklinebox
-            self.jsongreeklinebox = self.projecthome + self.jsongreeklinebox
-            self.txtlatinlinebox = self.projecthome + self.txtlatinlinebox
-
 
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('Model/SQLite/json/Workflow.json') as f:
+        with open(self.workflow) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -758,7 +721,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
+                with open(self.workflow) as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -853,7 +816,7 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
+            with open(self.workflow) as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -877,27 +840,127 @@ class MainWindow(qtw.QMainWindow):
         print("completed renaming Greek tif lines for ground truth")
         # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
         # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
-
-    def actionMove_Greek_tiff_Lines(self):
-        print("moving Greek tif lines for ground truth")
-        # usage: tr.renameimages(source, destination)
-        self.greekmovelinesDialog = qtw.QDialog()
-        self.greekmovelines_ui = Ui_tifgreekmovelinesDialog()
-        self.greekmovelines_ui.setupUi(self.greekmovelinesDialog)
-        self.greekmovelinesDialog.show()
-
-        self.greekmovelines_ui.SourceButton.clicked.connect(self.GreekMovelinesDialog)
-        self.greekmovelines_ui.DestinationButton.clicked.connect(self.DestGreekMovelinesDialog)
-
-        rsp = self.greekmovelinesDialog.exec_()
+   
+    def actionStage_Greek_tiff_Lines(self):
+        print("staging Greek tif lines for ground truth")
+        # usage: tr.stageimages(source, destination, startpage, endpage)
+        self.tifgreekstagelinesDialog = qtw.QDialog()
+        self.greekstagelines_ui = Ui_tifgreekstagelinesDialog()
+        self.greekstagelines_ui.setupUi(self.tifgreekstagelinesDialog)
+        self.tifgreekstagelinesDialog.show()
         
-        if self.greekmovelinesDialog.Accepted:
-            tr.renameimages(self.greekmovelines_ui.SourceLineEdit.text(), self.greekmovelines_ui.DestinationLineEdit.text())
-            print("completed moving Greek tif lines for ground truth")
+        def accept():
+            # if self.pdf4tifDialog.Accepted:
+            # Empty default Workflow folder
+            start_page = self.greekstagelines_ui.StartPageLineEdit.displayText()
+            end_page = self.greekstagelines_ui.EndPageLineEdit.displayText()
+            print(f'source_folder: {source_folder},workflow_folder: {workflow_folder},complete_folder: {complete_folder}, start_page: {start_page}, end_page: {end_page}')
+            #print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+            '''for filename in os.listdir(workflow_folder):
+                file_path = os.path.join(workflow_folder, filename)
+                print('File Name:'+filename, 'File Path:'+file_path)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))'''
+            
+            for filename in os.listdir(source_folder):
+                print(source_folder,filename)
+                source_file_path = os.path.join(source_folder, filename)
+
+            # Extract to default Workflow folder
+            print(source_file_path, workflow_folder, start_page, end_page)
+            #tr.stageimages(self.greekstagelines_ui.SourceLineEdit.text(), self.greekstagelines_ui.DestinationLineEdit.text(), self.greekstagelines_ui.StartPageLineEdit.displayText(), self.greekstagelines_ui.EndPageLineEdit.displayText())
+            tr.stageimages(source_folder, workflow_folder, start_page, end_page)
+            # Extract to default Complete folder
+            #if complete_folder:
+                #pp.pdf4tif(source_file_path, complete_folder)
+            if complete_folder:
+                symlinks=False
+                ignore=None
+                for item in os.listdir(workflow_folder):
+                    source = os.path.join(workflow_folder, item)
+                    destination = os.path.join(complete_folder, item)
+                    if os.path.isdir(source):
+                        shutil.copytree(source, destination, symlinks, ignore)
+                    else:
+                        shutil.copy2(source, destination)
+            print("completed staging Greek tif lines for ground truth")
+        def reject():
+            pass
+
+        seq = "GT4"
+        
+        def setdefault():
+            if self.greekstagelines_ui.defaultsrcBox.isChecked():
+                self.greekstagelines_ui.SourceButton.setEnabled(False)
+                self.greekstagelines_ui.DestinationButton.setEnabled(False)
+            else:
+                self.greekstagelines_ui.SourceButton.setEnabled(True)
+                self.greekstagelines_ui.DestinationButton.setEnabled(True)
+
+        self.greekstagelines_ui.defaultsrcBox.stateChanged.connect(setdefault)
+        self.greekstagelines_ui.SourceButton.clicked.connect(self.GreekStageLinesDialog)
+        self.greekstagelines_ui.DestinationButton.clicked.connect(self.DestGreekStageLinesDialog)
+        self.greekstagelines_ui.buttonBox.accepted.connect(accept)
+        self.greekstagelines_ui.buttonBox.rejected.connect(reject)
+
+        if self.greekstagelines_ui.defaultsrcBox.isChecked(): 
+            
+            
+            # disable source button (default)
+            
+            # get default folder
+            # Define json data        
+            with open(self.workflow) as f:
+                # returns JSON object as
+                # a dictionary
+                data = json.load(f)
+                # Search the key value using 'in' operator
+                for Sequence in data:
+                    
+                    if Sequence['Sequence'] == seq:
+                        print(Sequence['Sequence'])
+                        # set source line edit to default workflow folder
+                        source_folder = Sequence['DefaultSource']+r'/'
+                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
+                        complete_folder = Sequence['CompleteFullPath']+r'/'
+                        self.greekstagelines_ui.SourceLineEdit.setText(source_folder)
+                        self.greekstagelines_ui.DestinationLineEdit.setText(workflow_folder)
+                        self.greekstagelines_ui.StartPageLineEdit.setText("1")
+                        #print(f'source_folder: {source_folder},workflow_folder: {workflow_folder},complete_folder: {complete_folder}')
+
+
+        rsp = self.tifgreekstagelinesDialog.exec_()
+        
+            
+        print("completed staging Greek tif lines for ground truth")
+        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+
+    '''def actionStage_Greek_tiff_Lines(self):
+        print("staging Greek tif lines for ground truth")
+        # usage: tr.renameimages(source, destination)
+        self.greekstagelinesDialog = qtw.QDialog()
+        self.greekstagelines_ui = Ui_tifgreekstagelinesDialog()
+        self.greekstagelines_ui.setupUi(self.greekstagelinesDialog)
+        self.greekstagelinesDialog.show()
+
+        self.greekstagelines_ui.SourceButton.clicked.connect(self.GreekStagelinesDialog)
+        self.greekstagelines_ui.DestinationButton.clicked.connect(self.DestGreekStagelinesDialog)
+
+        rsp = self.greekstagelinesDialog.exec_()
+        
+        if self.greekstagelinesDialog.Accepted:
+            tr.stageimages(self.greekstagelines_ui.SourceLineEdit.text(), self.greekstagelines_ui.DestinationLineEdit.text())
+            print("completed staging Greek tif lines for ground truth")
         
         # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
         #tr.renameimages("/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
-        #pass
+        #pass'''
 
     def actionCrop_Latin_To_tiff_Lines(self):
         print("cropping and sorting Latin tiff lines")
@@ -940,7 +1003,7 @@ class MainWindow(qtw.QMainWindow):
         # tr.renameimages(r"/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
         #tr.renameimages(r"/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
 
-    def actionMove_Latin_tiff_Lines(self):
+    def actionStage_Latin_tiff_Lines(self):
         print("moving Latin tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
         self.latinmovelinesDialog = qtw.QDialog()
@@ -1041,7 +1104,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
+                with open(self.workflow) as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1147,7 +1210,7 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open(self.projecthome + 'Model/Project/Data/json/Workflow.json') as f:
+                with open(self.workflow) as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1191,7 +1254,7 @@ class MainWindow(qtw.QMainWindow):
     def initBookCombo(self):
 
         # Opening JSON file
-        with open(self.projecthome + 'Model/Project/Data/json/BooksAbbrName.json') as f:
+        with open(self.booksabbr) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1235,7 +1298,7 @@ class MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = self.projecthome + 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = self.booksmarkdown
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1248,7 +1311,7 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = self.projecthome + 'Model/Project/Data/json/BoxerSession.json'
+            jsonfile = self.session
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1381,7 +1444,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.imgdir = os.path.dirname(self.imgpath)
 
-        jsonfile = self.projecthome + 'Model/Project/Data/json/BoxerSession.json'
+        jsonfile = self.session
                 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1522,6 +1585,7 @@ class MainWindow(qtw.QMainWindow):
         my_OCR_rawtext = pytesseract.image_to_string(self.imgpath,lang="feg")
         self.ui.OCRText.insertPlainText(my_OCR_rawtext)
 
+    # Dialog folders exist validations
     def CropGreekLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select tif pages source folder"))
 
@@ -1558,6 +1622,30 @@ class MainWindow(qtw.QMainWindow):
         if self.directory:
             self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')            
 
+    def GreekStageLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
+
+        if self.directory:
+            self.greekstagelines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def DestGreekStageLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
+        
+        if self.directory:
+            self.greekstagelines_ui.DestinationLineEdit.setText(self.directory+r'/')
+
+    def GreekMoveLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
+
+        if self.directory:
+            self.greekrenamelines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def DestGreekMoveLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename Greek lines destination folder"))
+        
+        if self.directory:
+            self.greekrenamelines_ui.DestinationLineEdit.setText(self.directory+r'/')
+      
     def GreekRenameLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
 
@@ -1593,7 +1681,8 @@ class MainWindow(qtw.QMainWindow):
         
         if self.directory:
             self.rename_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
-    
+    # End of Dialog folders exist validations
+
     def editText(self):
         if self.ui.textButton.isChecked():
             self.ui.stackedWidget.setCurrentIndex(0)
@@ -1655,7 +1744,7 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = self.projecthome + 'Model/Project/Data/json/BoxerSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2465,19 +2554,15 @@ class MainWindow(qtw.QMainWindow):
             data = json.load(f)
             # Iterating through the json
             for Line in data:
-                print(f'Line from json file: {Line} line from putRbLineBox: {line} ')
+                print(f'Line from json file: {Line} -- line from putRbLineBox: {line} ')
                 if Line['Line'] == line:
                     Line['X'] = x
                     Line['Y'] = y
                     Line['W'] = w
                     Line['H'] = h
-
-                    #Line['X+W'] = str(int(x)+int(w))
-                    #Line['Y+H'] = str(int(y)+int(h))
                     print(f'Updating Line: {line} found in JSON file. Dimensions :  X: {x}  Y: {y}  W: {w}  H: {h}')
                 else:
                     print(f'Line: {line} not found in JSON file.')
-                    break
             # Closing file
             f.close()
             os.remove(jsonfilepath)
@@ -2610,7 +2695,7 @@ class MainWindow(qtw.QMainWindow):
     def renumberRows(self):
         print('Renumbering rows')
         rowcount = self.ui.BoxTable.rowCount()
-        colcount = self.ui.BoxTable.columnCount() - 5
+        colcount = self.ui.BoxTable.columnCount() - 6
         for row in range(rowcount):
             item = self.ui.BoxTable.item(row, 0)
             if not item:
@@ -2746,11 +2831,13 @@ class MainWindow(qtw.QMainWindow):
     
     def saveLineBoxImage(self):
         self.imgboxfile = self.path_of_imglinebox + self.imgfilename + "_linebox" + self.imgfileext
+        #self.ui.statusbar.showMessage(f'Saving LineBox file: {self.imgboxfile}')
+        print(f'Saving LineBox file: {self.imgboxfile}')
         cv2.imwrite(self.imgboxfile,self.norm)
         self.boximgpath = self.imgboxfile
         self.showImage(self.boximgpath)
         if self.ui.LineCheckBox.isChecked():
-            self.showLineBoxImageLines() 
+            self.getLineBoxImageLines() 
 
     def drawLineBoxImage(self):
         print(f'Drawing Linebox Image from BoxText: \n {self.txtpath}')

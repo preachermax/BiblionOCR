@@ -109,6 +109,27 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Set Project Home
+        self.mod_dirname = os.path.dirname(__file__)
+        up_once = os.path.join(self.mod_dirname,"..")
+        up_twice = os.path.join(up_once,"..")
+        self.mod_rootdir = up_twice
+        self.mod_realpath = os.path.realpath(self.mod_rootdir)
+        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_relpath = os.path.relpath(self.mod_abspath)
+        self.projecthome = self.mod_abspath + r'/'
+        print(f'OS Path dirname: {self.mod_dirname}')
+        print(f'OS Path up one folder: {up_once}')
+        #print(f'OS Path up two folders: {up_twice}')
+        print(f'OS Path rootdir: {self.mod_rootdir}')
+        print(f'OS Path realpath: {self.mod_realpath}')
+        print(f'OS Path abspath: {self.mod_abspath}')
+        print(f'OS Path relpath: {self.mod_dirname}')
+        print(f'Project Home: {self.projecthome}')
+        
+        
+        
         # Drops
         self.setAcceptDrops(True)
 
@@ -196,11 +217,6 @@ class Ui_MainWindow(qtw.QMainWindow):
         #self.ui.RenameButton.clicked.connect(self.buildXRef)
         #self.ui.StageButton.clicked.connect()
 
-
-        # Reference
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
-        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
-
         # Restore Session settings
         self.get_session_settings()
         self.bookmarkdown = self.greekbookmarkdown
@@ -213,6 +229,10 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.txtfileList = []
         
         self.VerseLastEnd = 0
+
+        # Reference
+        ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
+        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.loadChapterCombo()
 
@@ -248,33 +268,23 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 # Session functions
     def get_session_settings(self):
-        # get session settings
+        # get session settings        
         # Define json data        
         print("loading session")
-        with open('Model/Project/Data/json/GrounderSession.json') as f:
+        with open(self.projecthome + 'Model/Project/Data/json/GrounderSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             
             # Set json key values
-            linuxhomedir_key = r'self.linuxhomedir'
-            linuxuser_key = r'self.linuxuser'
-            linuxuserdir_key = r'self.linuxuserdir'
-            windowshomedir_key = r'self.windowshomedir'
-            windowsuser_key = r'self.windowsuser'
-            windowsuserdir_key = r'self.windowsuserdir'
-            macoshomedir_key = r'self.macoshomedir'
-            macosuser_key = r'self.macosuser'
-            macosuserdir_key = r'self.macosuserdir'
-            projectsdir_key = r'self.projectsdir'
-            projectname_key = r'self.projectname'  
+            jsondir_key = r"self.jsondir"
+            session_key = r"self.session"
+            workflow_key = r"self.workflow"
+            crossref_key = r"self.crossref"
+            booksmarkdown_key = r"self.booksmarkdown"
+            bookchapter_key = r"self.bookchapter"
+            bookchapterverse_key = r"self.bookchapterverse"
             ocrlang_key = r"self.ocrlang"
             ocrmodel_key = r"self.ocrmodel"
-            linuxtessdatadir_key = r"self.linuxtessdatadir"
-            linuxtesseract_key = r"self.linuxtesseract"
-            linuxtesstrain_key = r"self.linuxtesstrain"
-            windowstessdatadir_key = r"self.windowstessdatadir"
-            windowstesseract_key = r"self.windowstesseract"
-            windowstesstrain_key = r"self.windowstesstrain"
             bookabbr_key = r"self.bookabbr"
             font_key = r"self.font"
             fontsize_key = r"self.fontsize"
@@ -318,41 +328,32 @@ class Ui_MainWindow(qtw.QMainWindow):
             # Define session variables from json key values
             for Setting in data:
                 print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                
-                if Setting['Setting'] == linuxhomedir_key:
-                    self.linuxhomedir = Setting['CurrentValue']
-                elif Setting['Setting'] == linuxuser_key:
-                    self.linuxuser = Setting['CurrentValue']
-                elif Setting['Setting'] == linuxuserdir_key:
-                    self.linuxuserdir = Setting['CurrentValue']                
-                elif Setting['Setting'] == windowshomedir_key:
-                    self.windowshomedir = Setting['CurrentValue']
-                elif Setting['Setting'] == windowsuser_key:
-                    self.windowsuser = Setting['CurrentValue']
-                elif Setting['Setting'] == windowsuserdir_key:
-                    self.windowsuserdir = Setting['CurrentValue']
-                elif Setting['Setting'] == projectsdir_key:
-                    self.projectsdir = Setting['CurrentValue']
-                elif Setting['Setting'] == projectname_key:
-                    self.projectname = Setting['CurrentValue']
-                if Setting['Setting'] == ocrlang_key:
+                if Setting['Setting'] == jsondir_key:
+                    self.jsondir = Setting['CurrentValue']
+                elif Setting['Setting'] == session_key:
+                    self.session = Setting['CurrentValue']
+                    self.session = self.projecthome + self.jsondir + "/" + self.session
+                elif Setting['Setting'] == workflow_key: 
+                    self.workflow = Setting['CurrentValue']
+                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
+                elif Setting['Setting'] == crossref_key:
+                    self.crossref = Setting['CurrentValue']
+                    self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
+                elif Setting['Setting'] == booksmarkdown_key:
+                    self.booksmarkdown = Setting['CurrentValue']
+                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
+                elif Setting['Setting'] == bookchapter_key:
+                    self.bookchapter = Setting['CurrentValue']
+                    self.bookchapter = self.projecthome + self.jsondir + "/" + self.bookchapter
+                elif Setting['Setting'] == bookchapterverse_key:
+                    self.bookchapterverse = Setting['CurrentValue']
+                    self.bookchapterverse = self.projecthome + self.jsondir + "/" + self.bookchapterverse
+                elif Setting['Setting'] == ocrlang_key:
                     self.ocrlang = Setting['CurrentValue']
                     self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
                 elif Setting['Setting'] == ocrmodel_key:
                     self.ocrmodel = Setting['CurrentValue']
                     self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == linuxtessdatadir_key:
-                    self.linuxtessdatadir = Setting['CurrentValue']
-                elif Setting['Setting'] == linuxtesseract_key:
-                    self.linuxtesseract = Setting['CurrentValue']
-                elif Setting['Setting'] == linuxtesstrain_key:
-                    self.linuxtesstrain = Setting['CurrentValue']
-                elif Setting['Setting'] == windowstessdatadir_key:
-                    self.windowstessdatadir = Setting['CurrentValue']
-                elif Setting['Setting'] == windowstesseract_key:
-                    self.windowstesseract = Setting['CurrentValue']
-                elif Setting['Setting'] == windowstesstrain_key:
-                    self.windowstesstrain = Setting['CurrentValue']
                 elif Setting['Setting'] == bookabbr_key:  
                     self.bookabbr = Setting['CurrentValue']
                 elif Setting['Setting'] == font_key:
@@ -372,19 +373,20 @@ class Ui_MainWindow(qtw.QMainWindow):
                     if self.ocrlang == "Latin":
                         self.language = "latin"
                 elif Setting['Setting'] == sourcefile_key:   
-                    self.sourcefile = Setting['CurrentValue']
+                    self.sourcefile = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == firstpage_key:  
                     self.firstpage = Setting['CurrentValue']
                 elif Setting['Setting'] == lastpage_key:  
                     self.lastpage = Setting['CurrentValue']
                 elif Setting['Setting'] == imagepath_key:
-                    self.imagepath = Setting['CurrentValue']
+                    self.imagepath = self.projecthome + Setting['CurrentValue']
+                    self.imgpath = self.imagepath
                 elif Setting['Setting'] == imagedir_key:
-                    self.imagedir = Setting['CurrentValue']
+                    self.imagedir = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == imagepage_key:
-                    self.imagepage = Setting['CurrentValue']
+                    self.imagepage = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == imageline_key:
-                    self.imageline = Setting['CurrentValue'] 
+                    self.imageline = self.projecthome + Setting['CurrentValue'] 
                 elif Setting['Setting'] == imagefileList_key:
                     self.imagefileList = Setting['CurrentValue']
                 elif Setting['Setting'] == imagezoom_key:
@@ -394,33 +396,33 @@ class Ui_MainWindow(qtw.QMainWindow):
                 elif Setting['Setting'] == dirIterator_key:  
                     self.dirIterator = Setting['CurrentValue']
                 elif Setting['Setting'] == pixmap_key:  
-                    self.pixmap = Setting['CurrentValue']
+                    self.pixmap = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == qimage_key:  
-                    self.qimage = Setting['CurrentValue']
+                    self.qimage = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == textpath_key:  
-                    self.textpath = Setting['CurrentValue'] 
+                    self.textpath = self.projecthome + Setting['CurrentValue'] 
                 elif Setting['Setting'] == textdir_key:  
-                    self.textdir = Setting['CurrentValue']
+                    self.textdir = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == textfileList_key:
-                    self.textfileList = Setting['CurrentValue']
+                    self.textfileList = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == PagelastStart_key:
                     self.PagelastStart = Setting['CurrentValue']
                 elif Setting['Setting'] == pagetextpath_key:
                     self.pagetextpath = Setting['CurrentValue']
                 elif Setting['Setting'] == pagetextdir_key:
-                    self.pagetextdir = Setting['CurrentValue']
+                    self.pagetextdir = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == pagetextfileList_key:
                     self.pagetextfileList = Setting['CurrentValue']
                 elif Setting['Setting'] == pagetextpage_key:
-                    self.pagetextpage = Setting['CurrentValue']
+                    self.pagetextpage = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == VerseStart_key:
                     self.VerseStart = int(Setting['CurrentValue'])
                 elif Setting['Setting'] == VerseLastEnd_key:
                     self.VerseLastEnd = int(Setting['CurrentValue'])
                 elif Setting['Setting'] == versetextpath_key:
-                    self.versetextpath = Setting['CurrentValue']
+                    self.versetextpath = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == versetextdir_key:
-                    self.versetextdir = Setting['CurrentValue']
+                    self.versetextdir = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == startbookabbr_key:
                     self.startbookabbr = Setting['CurrentValue']
                 elif Setting['Setting'] == startchapter_key:
@@ -437,36 +439,14 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.gtreview = Setting['CurrentValue']
                 print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
             f.close()
-            
-            if platform.system() == 'Linux':
-                self.homedir = self.linuxhomedir
-                self.user = self.linuxuser
-                self.userdir = self.linuxuserdir
-                self.tessdatadir = self.linuxtessdatadir
-                self.tesseract = self.linuxtesseract
-                self.tesstrain = self.linuxtesstrain
-            elif platform.system() == 'Windows':
-                self.homedir = self.windowshomedir
-                self.user = self.windowsuser
-                self.userdir = self.windowsuserdir
-                self.tessdatadir = self.windowstessdatadir
-                self.tesseract = self.windowstesseract
-                self.tesstrain = self.windowstesstrain
-            elif platform.system() == 'MacOS':
-                self.homedir = self.macoshomedir
-                self.user = self.macosuser
-                self.userdir = self.macosuserdir
-            else:
-                self.homedir = r'.'
-                self.user = r'/'
-                self.userdir = r'./'
+      
+            print(f'Absolute Path to Project Directory: {self.projecthome}')
 
-            print(f'Absolute Path to User Directory: {self.userdir}') 
-    
+ 
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('Model/Project/SQLite/json/Workflow.json') as f:
+        with open(self.workflow) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -480,9 +460,9 @@ class Ui_MainWindow(qtw.QMainWindow):
         f.close()
 
     def get_xref_last_image(self):
-        imgdir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
-        xrefjsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
-        markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+        imgdir = self.projecthome + "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
+        xrefjsonfile = self.crossref
+        #markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
         with open(xrefjsonfile, 'r') as f:
             data = json.load(f)
             # Iterating through the json LineImageFiles
@@ -784,7 +764,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Update Book comboBox
         bookdirsplit = self.txtdirname.split("/")
         print(f'book directory split: {bookdirsplit}')
-        bookdir = bookdirsplit[6]
+        bookdir = bookdirsplit[11]
         print(f'Text directory path: {self.txtdirname}  book directory: {bookdir}')
         dirsplit = bookdir.split("_")
         
@@ -867,9 +847,9 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.loadText()'''
    
     def syncText2Image(self):
-        imgdir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
-        xrefjsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
-        markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+        #imgdir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
+        xrefjsonfile = self.crossref
+        markdownjsonfile = self.booksmarkdown
         bookAbbr = self.bookabbr
         if self.imgpath:
             filestr = os.path.basename(self.imgpath)
@@ -957,13 +937,13 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def discardImage(self):
         print('Discard Line Image File')
-        discarddir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_discard/"
+        discarddir = self.projecthome + "Model/Project/Images/Workflow/Greek/tif_greek_lines_discard/"
         imgfile = self.ui.ImageFileName.displayText()
         shutil.move(os.path.join(self.imgdirname, imgfile), discarddir)
         self.gtvalid = False
         imagefile = self.ui.ImageFileName.displayText()
         ######################## Remove json entry
-        jsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
+        jsonfile = self.crossref
 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1059,7 +1039,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Project/Data/json/Workflow.json') as f:
+            with open(self.workflow) as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1097,7 +1077,119 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.directory:
             self.greekrenumberlines_ui.DestinationLineEdit.setText(self.directory+r'/')
 
+    '''def Stage_Greek_RenamedLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
+
+        if self.directory:
+            self.stagegreeklines_ui.SourceLineEdit.setText(self.directory+r'/')'''
+
+    '''def Stage_Greek_RenumberedLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
+
+        if self.directory:
+            self.stagegreeklines_ui.SourceLineEdit.setText(self.directory+r'/')'''
+    
     def Stage_Greek_tiff_Lines(self):
+        print("staging Greek tif lines for ground truth")
+        # usage: tr.stageimages(source, destination, startpage, endpage)
+        self.tifgreekstagelinesDialog = qtw.QDialog()
+        self.greekstagelines_ui = Ui_tifgreekstagelinesDialog()
+        self.greekstagelines_ui.setupUi(self.tifgreekstagelinesDialog)
+        self.tifgreekstagelinesDialog.show()
+        
+        def accept():
+            # if self.pdf4tifDialog.Accepted:
+            # Empty default Workflow folder
+            start_page = self.greekstagelines_ui.StartPageLineEdit.displayText()
+            end_page = self.greekstagelines_ui.EndPageLineEdit.displayText()
+            print(f'source_folder: {source_folder},workflow_folder: {workflow_folder},complete_folder: {complete_folder}, start_page: {start_page}, end_page: {end_page}')
+            #print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+            '''for filename in os.listdir(workflow_folder):
+                file_path = os.path.join(workflow_folder, filename)
+                print('File Name:'+filename, 'File Path:'+file_path)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))'''
+            
+            for filename in os.listdir(source_folder):
+                print(source_folder,filename)
+                source_file_path = os.path.join(source_folder, filename)
+
+            # Extract to default Workflow folder
+            print(source_file_path, workflow_folder, start_page, end_page)
+            #tr.stageimages(self.greekstagelines_ui.SourceLineEdit.text(), self.greekstagelines_ui.DestinationLineEdit.text(), self.greekstagelines_ui.StartPageLineEdit.displayText(), self.greekstagelines_ui.EndPageLineEdit.displayText())
+            tr.stageimages(source_folder, workflow_folder, start_page, end_page)
+            # Extract to default Complete folder
+            #if complete_folder:
+                #pp.pdf4tif(source_file_path, complete_folder)
+            if complete_folder:
+                symlinks=False
+                ignore=None
+                for item in os.listdir(workflow_folder):
+                    source = os.path.join(workflow_folder, item)
+                    destination = os.path.join(complete_folder, item)
+                    if os.path.isdir(source):
+                        shutil.copytree(source, destination, symlinks, ignore)
+                    else:
+                        shutil.copy2(source, destination)
+            print("completed staging Greek tif lines for ground truth")
+        def reject():
+            pass
+
+        seq = "GT4"
+        
+        def setdefault():
+            if self.greekstagelines_ui.defaultsrcBox.isChecked():
+                self.greekstagelines_ui.SourceButton.setEnabled(False)
+                self.greekstagelines_ui.DestinationButton.setEnabled(False)
+            else:
+                self.greekstagelines_ui.SourceButton.setEnabled(True)
+                self.greekstagelines_ui.DestinationButton.setEnabled(True)
+
+        self.greekstagelines_ui.defaultsrcBox.stateChanged.connect(setdefault)
+        self.greekstagelines_ui.SourceButton.clicked.connect(self.GreekStageLinesDialog)
+        self.greekstagelines_ui.DestinationButton.clicked.connect(self.DestGreekStageLinesDialog)
+        self.greekstagelines_ui.buttonBox.accepted.connect(accept)
+        self.greekstagelines_ui.buttonBox.rejected.connect(reject)
+
+        if self.greekstagelines_ui.defaultsrcBox.isChecked(): 
+            
+            
+            # disable source button (default)
+            
+            # get default folder
+            # Define json data        
+            with open(self.workflow) as f:
+                # returns JSON object as
+                # a dictionary
+                data = json.load(f)
+                # Search the key value using 'in' operator
+                for Sequence in data:
+                    
+                    if Sequence['Sequence'] == seq:
+                        print(Sequence['Sequence'])
+                        # set source line edit to default workflow folder
+                        source_folder = Sequence['DefaultSource']+r'/'
+                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
+                        complete_folder = Sequence['CompleteFullPath']+r'/'
+                        self.greekstagelines_ui.SourceLineEdit.setText(source_folder)
+                        self.greekstagelines_ui.DestinationLineEdit.setText(workflow_folder)
+                        self.greekstagelines_ui.StartPageLineEdit.setText("1")
+                        #print(f'source_folder: {source_folder},workflow_folder: {workflow_folder},complete_folder: {complete_folder}')
+
+
+        rsp = self.tifgreekstagelinesDialog.exec_()
+        
+            
+        print("completed staging Greek tif lines for ground truth")
+        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+    
+    '''def Stage_Greek_tiff_Lines(self):
         print("renumbering Greek tif lines for ground truth")
         # usage: tr.renumberimages(source, destination)
         self.stagegreeklinesDialog = qtw.QDialog()
@@ -1248,28 +1340,28 @@ class Ui_MainWindow(qtw.QMainWindow):
                         #print(f'source_folder: {source_folder},workflow_folder: {workflow_folder},complete_folder: {complete_folder}')
 
 
-        #rsp = self.tifstagegreeklines_uiDialog.exec_()
+        #rsp = self.tifstagegreeklines_uiDialog.exec_()'''
   
-    def Stage_Greek_RenamedLinesDialog(self):
+    def GreekStageLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
 
         if self.directory:
-            self.stagegreeklines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def Stage_Greek_RenumberedLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
-
-        if self.directory:
-            self.stagegreeklines_ui.SourceLineEdit.setText(self.directory+r'/')
+            self.greekstagelines_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestGreekStageLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
         
         if self.directory:
-            self.stagegreeklines_ui.DestinationLineEdit.setText(self.directory+r'/')
+            self.greekstagelines_ui.DestinationLineEdit.setText(self.directory+r'/')
+
+    '''def DestGreekStageLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
+        
+        if self.directory:
+            self.stagegreeklines_ui.DestinationLineEdit.setText(self.directory+r'/')'''
 
     def SaveImgFileDialog(self):
-        dirpath = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
+        dirpath = self.projecthome + "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
         imgname = os.path.basename(self.imgfilename)
         imgfilepath = os.path.join(dirpath,imgname)
         print(imgname,"\t",imgfilepath)
@@ -1296,15 +1388,13 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
         #defaultdir = r"c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/"
-        defaultdir = r"Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/" + self.greekbookmarkdown + "/"
+        defaultdir = self.projecthome + "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/" + self.greekbookmarkdown + "/"
        
         
         defaultfile = self.ui.TextFileName.displayText()
+        path = defaultdir + defaultfile
 
-        if defaultfile:
-            path = defaultdir + defaultfile
-            filename = defaultfile
-        else:
+        if defaultfile == "":
             path = qtw.QFileDialog.getSaveFileName(
                 self.ui.centralwidget, 'Save Corrected text file', '',
                 'Text files (*.txt)')[0]
@@ -1315,7 +1405,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def discardText(self):        
         print('Discard Line Text File')
-        discarddir = "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_discard"
+        discarddir = self.projecthome + "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_discard"
         txtfile = self.ui.TextFileName.displayText()
         shutil.move(os.path.join(self.txtdirname, txtfile), discarddir)
         self.gtvalid = False
@@ -1404,7 +1494,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('Model/Project/Data/json/Workflow.json') as f:
+                with open(self.workflow) as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1557,7 +1647,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = self.booksmarkdown
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1570,7 +1660,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(self.bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'Model/Project/Data/json/GrounderSession.json'
+            jsonfile = self.session
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1620,7 +1710,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadChapterCombo(self):
         self.ui.StartchapterComboBox.clear()
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapter.json') as f:
+        with open(self.bookchapter) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1640,7 +1730,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.StartverseComboBox.clear()
 
         # Opening JSON file
-        with open('Model/Project/Data/json/BookChapterVerse.json') as f:
+        with open(self.bookchapterverse) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1677,7 +1767,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # cycle through the reverse iterator until the current file is found
             if next(self.pagedirRevIterator) == self.pagetextpath:
                 break
-        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -1760,19 +1850,23 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.pagetextpath = self.pagetextdir + "/" + self.greekbookmarkdown + "/" + versionref + "_" + "Page" + "_" + self.pagenumstr + fileext
         print(f'Page text file path: {self.pagetextpath}')
         
-        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             pagetextpath_key = r"self.pagetextpath"
             pagetextdir_key = r"self.pagetextdir"
             pagetextpage_key = r"self.pagetextpage"
+            pagetextpath = self.pagetextpath
+            pagetextpath = pagetextpath.replace(self.projecthome,"")
+            pagetextdir = self.pagetextdir
+            pagetextdir = pagetextdir.replace(self.projecthome,"")
             for Setting in data:
                 if Setting['Setting'] == pagetextpath_key:
-                    Setting['CurrentValue'] = self.pagetextpath
+                    Setting['CurrentValue'] = pagetextpath
                     print(Setting['CurrentValue'])
                 elif Setting['Setting'] == pagetextdir_key:  
-                    Setting['CurrentValue'] = self.pagetextdir
+                    Setting['CurrentValue'] = pagetextdir
                 elif Setting['Setting'] == pagetextpage_key:  
                     Setting['CurrentValue'] = self.pagenumstr
                     print(Setting['CurrentValue'])
@@ -1891,7 +1985,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     
     def updatesession(self):
 
-        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2088,7 +2182,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.reconnectStartComboBoxes()
             return
         
-        jsonfile = 'Model/Project/Data/json/GrounderSession.json'
+        jsonfile = self.session
         
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2145,7 +2239,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             return sorted(data, key=alphanum_key)
             #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
-        path_of_images = r'Model/Project/Images/Complete/Greek/tif_greek_lines_renamed/'
+        path_of_images = self.projecthome + 'Model/Project/Images/Complete/Greek/tif_greek_lines_renamed/'
 
         list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
 
@@ -2179,7 +2273,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 #print(versionref,pagenum,linestr)
                 print(f"namesplit: {namesplit} versionref: {versionref} pagestr: {pagestr} pagenum: {pagenum} linenum: {linenum}")
 
-                with open(r'Model/Project/Data/csv/PageVerseCrossReference.csv', 'a', newline='') as csvfile:
+                with open(self.crossref, 'a', newline='') as csvfile:
                     fieldnames = ['LineImageFile','ImgPageNum','ImgPageLineNum','LineTextFile','LineText','Valid','ReviewComplete','StartBook','StartChapter','StartVerse','OCRAccuracy']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writerow({'LineImageFile':filestr,'ImgPageNum':pagenum,'ImgPageLineNum':linenum,'LineTextFile':'','LineText':'','Valid':'False','ReviewComplete':'False','StartBook':'','StartChapter':'','StartVerse':'','OCRAccuracy':'0'})
@@ -2192,7 +2286,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             return sorted(data, key=alphanum_key)
             #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
-        path_of_images = r'Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/'
+        path_of_images = self.projecthome + 'Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/'
 
         list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
 
@@ -2247,7 +2341,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         linenum = int(linestr)
 
         print('updating page verse cross reference')
-        jsonfile = 'Model/Project/Data/json/PageVerseCrossReference.json'
+        jsonfile = self.crossref
 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
@@ -2297,7 +2391,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             linestr = namesplit[3].replace('Line','')
             linenum = int(linestr)
             
-            XReffile = r'Model/Project/Data/csv/PageVerseCrossReference.csv'
+            XReffile = self.crossref
             tempfile = NamedTemporaryFile(mode='w', delete=False)
             
             fields = ['LineImageFile','ImgPageNum','ImgPageLineNum','LineTextFile','LineText','Valid','ReviewComplete','StartBook','StartChapter','StartVerse','OCRAccuracy']
@@ -2365,7 +2459,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             chapter = self.ui.StartchapterComboBox.currentText()
             verse = self.ui.StartverseComboBox.currentText()
             
-            self.xref_df = pd.read_json('Model/Project/Data/json/PageVerseCrossReference.json')
+            self.xref_df = pd.read_json(self.crossref)
             self.xref_table_df = self.xref_df[["Page","PageLine","StartBook","StartChapter","StartVerse"]]
             
             # Initialize comboBoxes

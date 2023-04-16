@@ -1,35 +1,11 @@
 Setting,CurrentValue,DefaultValue
-self.linuxhomedir,/home,/home
-self.linuxuser,/jetson,/jetson
-self.linuxuserdir,/home/jetson,/home/jetson
-self.windowshomedir,c:/users,c:/users
-self.windowsuser,/max,/max
-self.windowsuserdir,c:/users/max,c:/users/max
-self.macoshomedir,,
-self.macosuser,,
-self.macosuserdir,,
 self.projectsdir,/Projects,/Projects
-self.projectname,Erasmvs1516,
+self.projectname,/BiblionOCR,/BiblionOCR
+self.jsondir,Model/Project/Data/json,Model/Project/Data/json
+self.session,PixlerSession.json,GrounderSession.json
+self.workflow,WorkflowSession.json,WorkflowSession.json
 self.font,FROMVS,FROMVS
 self.fontsize,16,16
-self.forgedir,/Documents/MyForge/,/Documents/MyForge/
-self.homefontdir,/.fonts,
-self.localfontdir,/.local/share/fonts,
-self.localsharefontdir,/usr/local/share/fonts,
-self.systemsharefontdir,/usr/share/fonts/truetype/FROMVS,
-self.windowsfontdir,c:/Windows/font,
-self.sfd,/Documents/MyForge/FROMVS.sfd,/Documents/MyForge/FROMVS.sfd
-self.sfddir,/Documents/MyForge,/Documents/MyForge
-self.linuxtessdatadir,/tesseract/tessdata,/tesseract/tessdata
-self.linuxtesseract,/tesseract,/tesseract
-self.linuxtesstrain,/tesseract/tesstrain-raw-Gospels,/tesseract/tesstrain
-self.linuxtessfont,/tesseract/tesstrain-raw-Gospels/fonts/FROMVS.ttf,/tesseract/tesstrain-raw-Gospels/fonts/FROMVS.ttf
-self.linuxtessfontdir,/tesseract/tesstrain-raw-Gospels/fonts,/tesseract/tesstrain-raw-Gospels/fonts
-self.windowstessdatadir,c:/Program Files/Tesseract-OCR/tessdata,c:/Program Files/Tesseract-OCR/tessdata
-self.windowstesseract,c:/Program Files/Tesseract-OCR,c:/Program Files/Tesseract-OCR
-self.windowstesstrain,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels
-self.windowstessfont,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/FROMVS.ttf,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/FROMVS.ttf
-self.windowstessfontdir,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts
 self.ocrlang,Middle Greek,Middle Greek
 self.ocrmodel,feg,feg
 self.bookabbr,Joh,Mat

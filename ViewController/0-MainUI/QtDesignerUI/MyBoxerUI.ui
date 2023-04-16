@@ -312,26 +312,6 @@
       <normaloff>:/Icons/Icons/reload.png</normaloff>:/Icons/Icons/reload.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="MyPixlerbutton">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>0</y>
-      <width>32</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Edit source images with MyPixler</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
-    </property>
-   </widget>
    <widget class="QPushButton" name="PrevImgButton">
     <property name="geometry">
      <rect>
@@ -603,7 +583,7 @@
       </property>
      </item>
     </widget>
-    <widget class="QLabel" name="OCRModellabel_2">
+    <widget class="QLabel" name="OCRModellabel">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -1614,7 +1594,6 @@
    <zorder>SaveBoxCorrTextbutton</zorder>
    <zorder>reloadTextbutton</zorder>
    <zorder>reloadImagebutton</zorder>
-   <zorder>MyPixlerbutton</zorder>
    <zorder>PrevImgButton</zorder>
    <zorder>NextImgButton</zorder>
    <zorder>PrevTxtButton</zorder>
@@ -1691,7 +1670,7 @@
      </property>
      <addaction name="actionSave_As_Page_Box_File"/>
      <addaction name="actionSave_As_Line_Box_File"/>
-     <addaction name="actionSave_As_Wprd_Box_File"/>
+     <addaction name="actionSave_As_Word_Box_File"/>
      <addaction name="actionSave_As_Character_Box_File"/>
     </widget>
     <widget class="QMenu" name="menuSave_As_Box_Image">
@@ -1712,7 +1691,7 @@
      <addaction name="actionSave_Word_Box_Image"/>
      <addaction name="actionSave_Glyph_Box_Image"/>
     </widget>
-    <widget class="QMenu" name="menuSelect_Language_2">
+    <widget class="QMenu" name="menuSelect_Language">
      <property name="title">
       <string>Select Language</string>
      </property>
@@ -1722,7 +1701,7 @@
      <addaction name="actionLatin_2"/>
     </widget>
     <addaction name="actionProject_Explorer"/>
-    <addaction name="menuSelect_Language_2"/>
+    <addaction name="menuSelect_Language"/>
     <addaction name="menuOpen_Box_Image"/>
     <addaction name="menuOpen_Box_File"/>
     <addaction name="menuSave_Box_Image"/>
@@ -1734,13 +1713,6 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <widget class="QMenu" name="menuEdit_PageBox_File">
-     <property name="title">
-      <string>Edit PageBox File Pairs</string>
-     </property>
-     <addaction name="actionEdit_Greek_PageBox_File_Pair"/>
-     <addaction name="actionEdit_Latin_PageBox_File_Pair"/>
-    </widget>
     <widget class="QMenu" name="menuEdit_LineBox_File">
      <property name="title">
       <string>Edit LineBox File Pairs</string>
@@ -1748,9 +1720,16 @@
      <addaction name="actionEdit_Greek_LineBox_File_Pair"/>
      <addaction name="actionEdit_Latin_Linebox_Pair"/>
     </widget>
-    <addaction name="menuEdit_PageBox_File"/>
+    <widget class="QMenu" name="menuRename_Text_Lines">
+     <property name="title">
+      <string>Rename Text Lines</string>
+     </property>
+     <addaction name="actionRename_Greek_Text_Lines"/>
+     <addaction name="actionRename_Latin_Text_Lines"/>
+    </widget>
     <addaction name="menuEdit_LineBox_File"/>
-    <addaction name="actionPrefernces"/>
+    <addaction name="menuRename_Text_Lines"/>
+    <addaction name="actionPreferences"/>
     <addaction name="actionFind_and_Replace"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -1781,52 +1760,65 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="action_Pixler"/>
+    <addaction name="action_Grounder"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuMake">
+   <widget class="QMenu" name="menuSplit">
     <property name="title">
      <string>Make</string>
     </property>
-    <widget class="QMenu" name="menuMake_PageBox_Files_From_Folder">
+    <widget class="QMenu" name="menuSplit_Lines">
      <property name="title">
-      <string>Make PageBox Batch Folder Pairs</string>
+      <string>Split Lines</string>
      </property>
-     <addaction name="actionGreek_PageBox_Files"/>
-     <addaction name="actionLatin_PageBox_Files"/>
+     <addaction name="actionSplit_Greek_Lines_btb"/>
+     <addaction name="actionSplit_Latin_Lines_btb"/>
     </widget>
-    <widget class="QMenu" name="menuMake_PageBox_File">
+    <widget class="QMenu" name="menuMake_LineBox_Files">
      <property name="title">
-      <string>Make PageBox File Pair</string>
+      <string>Make LineBox Files</string>
      </property>
-     <addaction name="actionGreek_PageBox_File"/>
-     <addaction name="actionLatin_PageBox_File"/>
+     <addaction name="actionMake_Greek_LineBox_Files"/>
+     <addaction name="actionMake_Latin_LineBox_Files"/>
     </widget>
-    <widget class="QMenu" name="menuMake_LineBox_Folder_Pairs">
+    <addaction name="actionSplit_Pages"/>
+    <addaction name="menuSplit_Lines"/>
+    <addaction name="menuMake_LineBox_Files"/>
+   </widget>
+   <widget class="QMenu" name="menuStage">
+    <property name="title">
+     <string>Stage</string>
+    </property>
+    <widget class="QMenu" name="menuStage_Folder">
      <property name="title">
-      <string>Make LineBox Batch Folder Pairs</string>
+      <string>Stage Folder</string>
      </property>
-     <addaction name="actionMake_Greek_LineBox_Folder_Pairs"/>
-     <addaction name="actionMake_Latin_LineBox_Folder_Pairs"/>
+     <addaction name="actionStage_Greek_Folder_btb"/>
+     <addaction name="actionStage_Latin_Folder_btb"/>
+     <addaction name="actionStage_Greek_Line_Texts_btb"/>
+     <addaction name="actionStage_Latin_Line_Texts_btb"/>
     </widget>
-    <widget class="QMenu" name="menuMake_LineBox_File_Pairs">
+    <widget class="QMenu" name="menuStage_Page">
      <property name="title">
-      <string>Make LineBox File Pair</string>
+      <string>Stage Page</string>
      </property>
-     <addaction name="actionMake_Greek_LineBox_File_Pair"/>
-     <addaction name="actionMake_Latin_LineBox_File_Pairs"/>
+     <addaction name="actionStage_Greek_Page"/>
+     <addaction name="actionStage_Latin_Page"/>
+     <addaction name="actionStage_Greek_Text_Page"/>
+     <addaction name="actionStage_Latin_Text_Page"/>
     </widget>
-    <addaction name="menuMake_PageBox_Files_From_Folder"/>
-    <addaction name="menuMake_PageBox_File"/>
-    <addaction name="menuMake_LineBox_Folder_Pairs"/>
-    <addaction name="menuMake_LineBox_File_Pairs"/>
+    <addaction name="menuStage_Folder"/>
+    <addaction name="menuStage_Page"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuMake"/>
+   <addaction name="menuSplit"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuStage"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -1844,7 +1836,7 @@
   </widget>
   <widget class="QToolBar" name="BatchPageBoxesToolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Page Boxes Toolbar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1852,7 +1844,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionCrop_Languages_tb"/>
+   <addaction name="actionSplit_Pages_btb"/>
   </widget>
   <widget class="QToolBar" name="BatchGreekImageLinesToolBar">
    <property name="windowTitle">
@@ -1867,9 +1859,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionBatchCrop_Greek_to_tif_Lines_tb"/>
-   <addaction name="actionRename_Greek_tif_Lines_tb"/>
-   <addaction name="actionMove_Greek_tif_Lines_tb"/>
+   <addaction name="actionSplit_Greek_Lines_btb"/>
+   <addaction name="actionStage_Greek_Folder_btb"/>
   </widget>
   <widget class="QToolBar" name="BatchLatinImageLinesToolBar">
    <property name="enabled">
@@ -1887,9 +1878,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAutoCrop_Latin_To_tif_Lines_tb"/>
-   <addaction name="actionRename_Latin_tif_Lines_tb"/>
-   <addaction name="actionMove_Latin_tif_Lines_tb"/>
+   <addaction name="actionSplit_Latin_Lines_btb"/>
+   <addaction name="actionStage_Latin_Folder_btb"/>
   </widget>
   <widget class="QToolBar" name="BatchGreekTextLinesToolBar">
    <property name="windowTitle">
@@ -1904,8 +1894,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplitGreek_text_lines_tb"/>
-   <addaction name="actionRenameGreek_text_lines_tb"/>
+   <addaction name="actionStage_Greek_Line_Texts_btb"/>
   </widget>
   <widget class="QToolBar" name="BatchLatinTextLinesToolBar">
    <property name="enabled">
@@ -1923,15 +1912,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplit_Latin_Text_Lines_tb"/>
-   <addaction name="actionRename_Latin_Text_Lines_tb"/>
+   <addaction name="actionStage_Latin_Line_Texts_btb"/>
   </widget>
-  <widget class="QToolBar" name="PairMakeBoxesToolBar">
+  <widget class="QToolBar" name="SplitPageToolBar">
    <property name="windowTitle">
-    <string>Make Linebox File Pairs Tool Bar</string>
+    <string>Make Linebox File Pairs Toolbar</string>
    </property>
    <property name="toolTip">
-    <string>Make Linebox File Pairs Tool Bar</string>
+    <string>Make Linebox File Pairs</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1939,11 +1927,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionMake_Greek_LineBox_File_Pair"/>
+   <addaction name="actionCrop_Languages_tb"/>
   </widget>
-  <widget class="QToolBar" name="PairEditBoxesToolBar">
+  <widget class="QToolBar" name="GreekEditBoxesToolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Greek Edit Boxes Toolbar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1951,7 +1939,85 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionMake_Greek_LineBox_Files"/>
    <addaction name="actionEdit_Greek_LineBox_Pair"/>
+   <addaction name="actionStage_Greek_tif_Lines_tb"/>
+  </widget>
+  <widget class="QToolBar" name="LatinEditBoxesToolBar">
+   <property name="windowTitle">
+    <string>Latin Edit Boxes Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionMake_Latin_LineBox_Files"/>
+   <addaction name="actionEdit_Latin_Linebox_Pair"/>
+   <addaction name="actionStage_Latin_tif_Lines_tb"/>
+  </widget>
+  <widget class="QToolBar" name="GreekEditTextToolBar">
+   <property name="windowTitle">
+    <string>Greek Edit Text Toolbar</string>
+   </property>
+   <property name="toolTip">
+    <string>Greek Edit Text Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRename_Greek_Text_Lines"/>
+   <addaction name="actionStage_Greek_Text_Page"/>
+  </widget>
+  <widget class="QToolBar" name="LatinEditTextToolBar">
+   <property name="windowTitle">
+    <string>Latin Edit Text Tool Bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Latin Edit Text Tool Bar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRename_Latin_Text_Lines"/>
+   <addaction name="actionStage_Latin_Text_Page"/>
+  </widget>
+  <widget class="QToolBar" name="SourcesToolBar">
+   <property name="windowTitle">
+    <string>Sources Toolbar</string>
+   </property>
+   <property name="toolTip">
+    <string>Sources Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Pixler"/>
+  </widget>
+  <widget class="QToolBar" name="DestinationsToolBar">
+   <property name="windowTitle">
+    <string>Destinations Toolbar</string>
+   </property>
+   <property name="toolTip">
+    <string>Destinations Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Grounder"/>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -2216,9 +2282,13 @@
     <string>Move tiff lines</string>
    </property>
   </action>
-  <action name="actionSplit">
+  <action name="actionSplit_Pages_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split_lang_folder.png</normaloff>:/Icons/Icons/split_lang_folder.png</iconset>
+   </property>
    <property name="text">
-    <string>Split text lines</string>
+    <string>Split into language/column pages</string>
    </property>
   </action>
   <action name="actionRename_tiff_lines">
@@ -2413,22 +2483,22 @@
     <string>Renaming Greek tif lines...</string>
    </property>
   </action>
-  <action name="actionMove_Greek_tif_Lines_tb">
+  <action name="actionStage_Greek_tif_Lines_tb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
+     <normaloff>:/Icons/Icons/stage-lines-greek .png</normaloff>:/Icons/Icons/stage-lines-greek .png</iconset>
    </property>
    <property name="text">
-    <string>Move Greek tif Lines</string>
+    <string>Stage Greek tif Lines for Ground Truth</string>
    </property>
    <property name="statusTip">
-    <string>Moving Greek tif lines...</string>
+    <string>Staging Greek tif lines...</string>
    </property>
   </action>
   <action name="actionSplitGreek_text_lines_tb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
+     <normaloff>:/Icons/Icons/split_greek_text_folder.png</normaloff>:/Icons/Icons/split_greek_text_folder.png</iconset>
    </property>
    <property name="text">
     <string>Split Greek Pages To Text Lines</string>
@@ -2509,16 +2579,16 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionMove_Latin_tif_Lines_tb">
+  <action name="actionStage_Latin_tif_Lines_tb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
+     <normaloff>:/Icons/Icons/stage-lines-latin .png</normaloff>:/Icons/Icons/stage-lines-latin .png</iconset>
    </property>
    <property name="text">
-    <string>Move Latin tif Lines</string>
+    <string>Stage Latin tif Lines for Ground Truth</string>
    </property>
    <property name="statusTip">
-    <string>Moving Latin tif lines...</string>
+    <string>Staging Latin tif lines...</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -2533,7 +2603,7 @@
    </property>
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
+     <normaloff>:/Icons/Icons/split_latin_text_folder.png</normaloff>:/Icons/Icons/split_latin_text_folder.png</iconset>
    </property>
    <property name="text">
     <string>Split Latin Pages To Text Lines</string>
@@ -2690,7 +2760,7 @@
     <string>Editing current GlyphTracer sfd file in FontForge...</string>
    </property>
   </action>
-  <action name="actionPrefernces">
+  <action name="actionPreferences">
    <property name="text">
     <string>Preferences</string>
    </property>
@@ -3100,7 +3170,7 @@
     <string>Save Word Box File</string>
    </property>
   </action>
-  <action name="actionSave_As_Wprd_Box_File">
+  <action name="actionSave_As_Word_Box_File">
    <property name="text">
     <string>Save As Word Box File</string>
    </property>
@@ -3113,7 +3183,7 @@
   <action name="actionProject_Explorer">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/fileexplorer.png</normaloff>:/Icons/Icons/fileexplorer.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Project Explorer</string>
@@ -3154,12 +3224,12 @@
   </action>
   <action name="actionGreek_PageBox_Files">
    <property name="text">
-    <string>Make Greek PageBox Folder Pairs</string>
+    <string>Make Greek Page Files</string>
    </property>
   </action>
   <action name="actionLatin_PageBox_Files">
    <property name="text">
-    <string>Make Latin PageBox Folder Pairs</string>
+    <string>Make Latin Page Files</string>
    </property>
   </action>
   <action name="actionGreek_PageBox_File">
@@ -3243,19 +3313,19 @@
   <action name="actionEdit_Greek_LineBox_Pair">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
    </property>
    <property name="text">
-    <string>Edit Greek LineBox File Pair</string>
+    <string>Edit Greek LineBox</string>
    </property>
   </action>
   <action name="actionEdit_Latin_Linebox_Pair">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+     <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
    </property>
    <property name="text">
-    <string>Edit Latin LineBox File Pair</string>
+    <string>Edit Latin LineBox Files</string>
    </property>
   </action>
   <action name="actionMake_Greek_LineBox_Text_File">
@@ -3286,39 +3356,43 @@
     <string comment="Complete editing the tif and text linebox files with the BoxTable cells using Spin Boxes. ">Complete Editing LineBox File Pair with Table...</string>
    </property>
   </action>
-  <action name="actionMake_Greek_LineBox_Folder_Pairs">
+  <action name="actionSplit_Greek_Lines_btb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
+     <normaloff>:/Icons/Icons/box_greek_folder.png</normaloff>:/Icons/Icons/box_greek_folder.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek LineBox Batch Folder Pairs</string>
+    <string>Split Greek pages into LineBox Files</string>
    </property>
   </action>
-  <action name="actionMake_Latin_LineBox_Folder_Pairs">
-   <property name="text">
-    <string>Make Latin LineBox Batch Folder Pairs</string>
-   </property>
-  </action>
-  <action name="actionMake_Greek_LineBox_File_Pair">
+  <action name="actionSplit_Latin_Lines_btb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
+     <normaloff>:/Icons/Icons/box_latin_folder.png</normaloff>:/Icons/Icons/box_latin_folder.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek Line Box File Pair</string>
+    <string>Split Latin pages into  LineBox Files</string>
+   </property>
+  </action>
+  <action name="actionMake_Greek_LineBox_Files">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/box-lines-greek.png</normaloff>:/Icons/Icons/box-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Make Greek LineBox</string>
    </property>
    <property name="statusTip">
     <string comment="Making Greek tif and text linebox files from the current page image. ">Making Greek Line Box File Pair...</string>
    </property>
   </action>
-  <action name="actionMake_Latin_LineBox_File_Pairs">
+  <action name="actionMake_Latin_LineBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
+     <normaloff>:/Icons/Icons/box-lines-latin.png</normaloff>:/Icons/Icons/box-lines-latin.png</iconset>
    </property>
    <property name="text">
-    <string>Make Latin LineBox File Pair</string>
+    <string>Make Latin LineBox File</string>
    </property>
   </action>
   <action name="actionDark_Orange">
@@ -3342,8 +3416,141 @@
    </property>
   </action>
   <action name="actionEdit_Greek_LineBox_File_Pair">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
+   </property>
    <property name="text">
-    <string>Edit Greek LineBox File Pair</string>
+    <string>Edit Greek LineBox Files</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Folder_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_greek_folder.png</normaloff>:/Icons/Icons/stage_greek_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek line images for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Folder_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_latin_folder.png</normaloff>:/Icons/Icons/stage_latin_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin line images for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Page">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage-lines-greek .png</normaloff>:/Icons/Icons/stage-lines-greek .png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek Page</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Page">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage-lines-latin .png</normaloff>:/Icons/Icons/stage-lines-latin .png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin Page</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Line_Texts_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_greek_text_folder.png</normaloff>:/Icons/Icons/stage_greek_text_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek text lines for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Line_Texts_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_latin_text_folder.png</normaloff>:/Icons/Icons/stage_latin_text_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin text lines for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionRename_Greek_Text_Lines">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek Text Lines</string>
+   </property>
+  </action>
+  <action name="actionRename_Latin_Text_Lines">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin Text Lines</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Text_Page">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move_textlines-greek.png</normaloff>:/Icons/Icons/move_textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek Text Lines</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage current Greek page's text lines for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Text_Page">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-textlines-latin.png</normaloff>:/Icons/Icons/move-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin Text Page</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage current Latin page's text lines for Ground Truth</string>
+   </property>
+  </action>
+  <action name="action_Pixler">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Pixler</string>
+   </property>
+   <property name="toolTip">
+    <string>Βιβλιον Pixler  edit source images</string>
+   </property>
+  </action>
+  <action name="action_Grounder">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Grounder</string>
+   </property>
+   <property name="toolTip">
+    <string>Βιβλιον Grounder prepare Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionSplit_Pages">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split_lang_folder.png</normaloff>:/Icons/Icons/split_lang_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Pages</string>
    </property>
   </action>
  </widget>

@@ -1,15 +1,11 @@
 Setting,CurrentValue,DefaultValue
-self.linuxhomedir,/home,/home
-self.linuxuser,/jetson,/jetson
-self.linuxuserdir,/home/jetson,/home/jetson
-self.windowshomedir,c:/users,c:/users
-self.windowsuser,/max,/max
-self.windowsuserdir,c:/users/max,c:/users/max
-self.macoshomedir,,
-self.macosuser,,
-self.macosuserdir,,
 self.projectsdir,/Projects,/Projects
 self.projectname,/BiblionOCR,/BiblionOCR
+self.jsondir,Model/Project/Data/json,Model/Project/Data/json
+self.session,GrounderSession.json,GrounderSession.json
+self.workflow,WorkflowSession.json,WorkflowSession.json
+self.booksmarkdown,BooksMarkDown.json,BooksMarkDown.json
+self.booksabbr,BooksAbbrName.json,BooksAbbrName.json
 self.font,FROMVS,FROMVS
 self.fontsize,11,11
 self.ocrlang,Middle Greek,Middle Greek
@@ -34,6 +30,8 @@ self.sourcefile,Model/Project/Images/Complete/Source/pdf_source/1516.pdf’,Mode
 self.firstpage,100,1
 self.lastpage,110,10
 self.deltapages,10,10
+self.refimgpath,,
+self.refimgdir,Model/Project/Images/Workflow,Model/Project/Images/Workflow
 self.imgpath,,
 self.imgdir,Model/Project/Images/Workflow,Model/Project/Images/Workflow
 self.dirIterator,None,None
@@ -52,16 +50,13 @@ self.txtfileList,[],[]
 self.txtgreeklinebox,Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox,Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox
 self.jsongreeklinebox,Model/Project/Text/EstablishTruth/Greek/json_greek_linebox,Model/Project/Text/EstablishTruth/Greek/json_greek_linebox
 self.txtlatinlinebox,Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box,Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box
-self.reftxtpath,,
-self.reftxtdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
-self.reftxtfileList,[],[]
 self.refimgpath,,
-self.refimgdir,Model/Project/Images/Complete/Greek/tif_greek_pages,Model/Project/Images/Complete/Greek/tif_greek_pages
-self.refimgtfileList,[],[]
+self.refimgdir,,
+self.refimgfileList,[],[]
 self.refimgzoom,25 %,25
 self.refimgzoomslidervalue,25,25
 self.imagepath,,
-self.imagetdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
+self.imagedir,,
 self.imagefileList,[],[]
 self.imagezoom,25 %,25
 self.imagezoomslidervalue,25,25
@@ -85,3 +80,10 @@ self.latinlinescropped,Model/Project/Images/Workflow/Latin/tif_latin_lines_cropp
 self.latinlinescleaned,Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned,Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned
 self.latinlinesbox,Model/Project/Images/Workflow/Latin/tif_latin_lines_box,Model/Project/Images/Workflow/Latin/tif_latin_lines_box
 self.latinlinesautosplit,Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit,Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit
+self.edittimer,,
+self.maketimer,,
+self.rdrawtimer,,
+self.sdrawtimer,,
+self.batchmaketimer,,
+self.batchmovetimer,,
+self.batchnametimer,,

@@ -256,7 +256,77 @@ class Train():
                                 newlinenum += 1 
                                 print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum)) 
 
-        def stageimages(source, destination):
+        def stageimages(source, destination, startpage, endpage):
+                def sorted_alphanumeric(data):
+                        convert = lambda text: int(text) if text.isdigit() else text.lower()
+                        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+                        return sorted(data, key=alphanum_key)
+                        #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
+
+                path_of_images = source
+                dest_of_images = destination
+                start_page = int(startpage)
+                if endpage:
+                        end_page = int(endpage)
+                else:
+                        end_page = ''
+                #sorted(os.listdir(os.getcwd()), key=len) does not work
+
+                list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
+
+                print(list_of_images)
+
+                newpagenum = 1
+                newlinenum = 1
+
+                for image in list_of_images:
+                
+                        img = cv2.imread(os.path.join(path_of_images, image))
+
+                        height, width = img.shape[:2]
+                        
+                        filestr = os.path.basename(os.path.join(path_of_images, image))
+                        
+                        filesplit = os.path.splitext(filestr)
+                        
+                        filename = filesplit[0]
+                        
+                        fileext = filesplit[1]
+                        
+                        namesplit = filename.split("_")
+                       
+                        versionref = namesplit[0]
+                        
+                        pagestr = namesplit[2]
+                        
+                        pagenum = int(pagestr)
+
+                        if end_page != "":
+                                limit_page = end_page
+                        else:
+                                limit_page = 1000
+                        
+                        if pagenum >= start_page and pagenum <= limit_page:
+                                linestr = namesplit[3]
+                                #print(versionref,pagenum,linestr)
+                                print(f"namesplit: {namesplit} versionref: {versionref} pagestr: {pagestr} pagenum: {pagenum} linestr: {linestr}")
+                                linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
+                                #print("Last digits of "+filename+" are "+last_digits)
+                                
+                                if pagenum > newpagenum:
+                                        
+                                        newlinenum = 1
+                                        
+                                        newpagenum = pagenum
+                                
+                                print(versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
+
+                                shutil.copy(path_of_images + filestr, dest_of_images + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + '.gt' + fileext)
+                                
+                                newlinenum += 1 
+                                print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum)) 
+
+        def stageimagesold(source, destination):
                 def sorted_alphanumeric(data):
                         convert = lambda text: int(text) if text.isdigit() else text.lower()
                         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
@@ -314,6 +384,7 @@ class Train():
                         
                         newlinenum += 1 
                                 #print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+        
         def moveimages(source, destination):
                 def sorted_alphanumeric(data):
                         convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -372,6 +443,7 @@ class Train():
                         
                         newlinenum += 1 
                                 #print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+        
         def splittextlines(source, destination):
                 dest_of_textlinefiles = destination
                 path_of_textfiles = source

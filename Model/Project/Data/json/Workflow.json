@@ -498,36 +498,45 @@
         "Sequence": "GT1",
         "DialogUi": "stage_greek_images_linesDialog",
         "Category": "Greek Training Image",
-        "DefaultSource": "Model/Project/Images/Complete/Greek/tif_greek_lines_2groundtruth",
-        "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "FolderName": "tif_greek_lines_4groundtruth",
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
         "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     },
     {
         "Sequence": "GT2",
         "DialogUi": "stage_greek_text_linesDialog",
         "Category": "Greek Training Text",
-        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines2groundtruth",
-        "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit",
+        "FolderName": "/txt_greek_lines4groundtruth",
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines4groundtruth",
         "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     },
     {
         "Sequence": "LT1",
-        "DialogUi": "stage_greek_images_linesDialog",
+        "DialogUi": "stage_latin_images_linesDialog",
         "Category": "Latin Training Image",
-        "DefaultSource": "Model/Project/Images/Complete/Latin/tif_latin_lines_2groundtruth",
-        "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "DefaultSource": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
+        "FolderName": "tif_latin_lines_4groundtruth",
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Latin/tif_latin_lines_4groundtruth",
         "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
     },
     {
         "Sequence": "LT2",
-        "DialogUi": "stage_greek_text_linesDialog",
+        "DialogUi": "stage_latin_text_linesDialog",
         "Category": "Latin Training Text",
-        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines2groundtruth",
-        "FolderName": "staged_ground_truth",
-        "WorkflowFullPath": "Model/Project/Training/staged_ground_truth",
+        "DefaultSource": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_autosplit",
+        "FolderName": "txt_latin_lines4groundtruth",
+        "WorkflowFullPath": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines4groundtruth",
         "CompleteFullPath": "Model/Project/Training/staged_ground_truth"
+    },
+    {
+        "Sequence": "GT4",
+        "DialogUi": "stage_greek_images_linesDialog",
+        "Category": "Greek Line Images",
+        "DefaultSource": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "FolderName": "tif_greek_lines_4groundtruth",
+        "WorkflowFullPath": "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth",
+        "CompleteFullPath": "Model/Project/Images/Complete/Greek/tif_greek_lines_renumbered"
     }
 ]

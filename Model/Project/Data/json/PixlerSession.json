@@ -1,58 +1,28 @@
 [
     {
-        "Setting": "self.linuxhomedir",
-        "CurrentValue": "/home",
-        "DefaultValue": "/home"
-    },
-    {
-        "Setting": "self.linuxuser",
-        "CurrentValue": "/jetson",
-        "DefaultValue": "/jetson"
-    },
-    {
-        "Setting": "self.linuxuserdir",
-        "CurrentValue": "/home/jetson",
-        "DefaultValue": "/home/jetson"
-    },
-    {
-        "Setting": "self.windowshomedir",
-        "CurrentValue": "c:/users",
-        "DefaultValue": "c:/users"
-    },
-    {
-        "Setting": "self.windowsuser",
-        "CurrentValue": "/max",
-        "DefaultValue": "/max"
-    },
-    {
-        "Setting": "self.windowsuserdir",
-        "CurrentValue": "c:/users/max",
-        "DefaultValue": "c:/users/max"
-    },
-    {
-        "Setting": "self.macoshomedir",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.macosuser",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.macosuserdir",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
         "Setting": "self.projectsdir",
         "CurrentValue": "/Projects",
         "DefaultValue": "/Projects"
     },
     {
         "Setting": "self.projectname",
-        "CurrentValue": "Erasmvs1516",
-        "DefaultValue": ""
+        "CurrentValue": "/BiblionOCR",
+        "DefaultValue": "/BiblionOCR"
+    },
+    {
+        "Setting": "self.jsondir",
+        "CurrentValue": "Model/Project/Data/json",
+        "DefaultValue": "Model/Project/Data/json"
+    },
+    {
+        "Setting": "self.session",
+        "CurrentValue": "PixlerSession.json",
+        "DefaultValue": "GrounderSession.json"
+    },
+    {
+        "Setting": "self.workflow",
+        "CurrentValue": "WorkflowSession.json",
+        "DefaultValue": "WorkflowSession.json"
     },
     {
         "Setting": "self.font",
@@ -63,96 +33,6 @@
         "Setting": "self.fontsize",
         "CurrentValue": "16",
         "DefaultValue": "16"
-    },
-    {
-        "Setting": "self.forgedir",
-        "CurrentValue": "/Documents/MyForge/",
-        "DefaultValue": "/Documents/MyForge/"
-    },
-    {
-        "Setting": "self.homefontdir",
-        "CurrentValue": "/.fonts",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.localfontdir",
-        "CurrentValue": "/.local/share/fonts",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.localsharefontdir",
-        "CurrentValue": "/usr/local/share/fonts",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.systemsharefontdir",
-        "CurrentValue": "/usr/share/fonts/truetype/FROMVS",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.windowsfontdir",
-        "CurrentValue": "c:/Windows/font",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.sfd",
-        "CurrentValue": "/Documents/MyForge/FROMVS.sfd",
-        "DefaultValue": "/Documents/MyForge/FROMVS.sfd"
-    },
-    {
-        "Setting": "self.sfddir",
-        "CurrentValue": "/Documents/MyForge",
-        "DefaultValue": "/Documents/MyForge"
-    },
-    {
-        "Setting": "self.linuxtessdatadir",
-        "CurrentValue": "/tesseract/tessdata",
-        "DefaultValue": "/tesseract/tessdata"
-    },
-    {
-        "Setting": "self.linuxtesseract",
-        "CurrentValue": "/tesseract",
-        "DefaultValue": "/tesseract"
-    },
-    {
-        "Setting": "self.linuxtesstrain",
-        "CurrentValue": "/tesseract/tesstrain-raw-Gospels",
-        "DefaultValue": "/tesseract/tesstrain"
-    },
-    {
-        "Setting": "self.linuxtessfont",
-        "CurrentValue": "/tesseract/tesstrain-raw-Gospels/fonts/FROMVS.ttf",
-        "DefaultValue": "/tesseract/tesstrain-raw-Gospels/fonts/FROMVS.ttf"
-    },
-    {
-        "Setting": "self.linuxtessfontdir",
-        "CurrentValue": "/tesseract/tesstrain-raw-Gospels/fonts",
-        "DefaultValue": "/tesseract/tesstrain-raw-Gospels/fonts"
-    },
-    {
-        "Setting": "self.windowstessdatadir",
-        "CurrentValue": "c:/Program Files/Tesseract-OCR/tessdata",
-        "DefaultValue": "c:/Program Files/Tesseract-OCR/tessdata"
-    },
-    {
-        "Setting": "self.windowstesseract",
-        "CurrentValue": "c:/Program Files/Tesseract-OCR",
-        "DefaultValue": "c:/Program Files/Tesseract-OCR"
-    },
-    {
-        "Setting": "self.windowstesstrain",
-        "CurrentValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels",
-        "DefaultValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels"
-    },
-    {
-        "Setting": "self.windowstessfont",
-        "CurrentValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/FROMVS.ttf",
-        "DefaultValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts/FROMVS.ttf"
-    },
-    {
-        "Setting": "self.windowstessfontdir",
-        "CurrentValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts",
-        "DefaultValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels/fonts"
     },
     {
         "Setting": "self.ocrlang",
@@ -261,12 +141,12 @@
     },
     {
         "Setting": "self.refimgpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages/greek1516_Page_162.tif",
+        "CurrentValue": "",
         "DefaultValue": ""
     },
     {
         "Setting": "self.refimgdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "CurrentValue": "Model/Project/Images/Complete/Greek/tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
