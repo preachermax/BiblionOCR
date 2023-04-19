@@ -1,0 +1,407 @@
+[
+    {
+        "Setting": "self.projectsdir",
+        "CurrentValue": "/Projects",
+        "DefaultValue": "/Projects"
+    },
+    {
+        "Setting": "self.projectname",
+        "CurrentValue": "/BiblionOCR",
+        "DefaultValue": "/BiblionOCR"
+    },
+    {
+        "Setting": "self.jsondir",
+        "CurrentValue": "Model/Project/Data/json",
+        "DefaultValue": "Model/Project/Data/json"
+    },
+    {
+        "Setting": "self.session",
+        "CurrentValue": "GlypherSession.json",
+        "DefaultValue": "GlypherSession.json"
+    },
+    {
+        "Setting": "self.workflow",
+        "CurrentValue": "Workflow.json",
+        "DefaultValue": "Workflow.json"
+    },
+    {
+        "Setting": "self.booksmarkdown",
+        "CurrentValue": "BooksMarkDown.json",
+        "DefaultValue": "BooksMarkDown.json"
+    },
+    {
+        "Setting": "self.booksabbr",
+        "CurrentValue": "BooksAbbrName.json",
+        "DefaultValue": "BooksAbbrName.json"
+    },
+    {
+        "Setting": "self.font",
+        "CurrentValue": "FROMVS",
+        "DefaultValue": "FROMVS"
+    },
+    {
+        "Setting": "self.fontsize",
+        "CurrentValue": "11",
+        "DefaultValue": "11"
+    },
+    {
+        "Setting": "self.ocrlang",
+        "CurrentValue": "Middle Greek",
+        "DefaultValue": "Middle Greek"
+    },
+    {
+        "Setting": "self.ocrmodel",
+        "CurrentValue": "feg",
+        "DefaultValue": "feg"
+    },
+    {
+        "Setting": "self.bookabbr",
+        "CurrentValue": "Joh",
+        "DefaultValue": "Mat"
+    },
+    {
+        "Setting": "self.chapter",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "self.verse",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "self.word",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "self.chr",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "self.glyphboxgreekimgdir",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_glyph_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_glyph_box"
+    },
+    {
+        "Setting": "self.glyphboxgreekimgpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphboxlatinimgdir",
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_glyph_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_glyph_box"
+    },
+    {
+        "Setting": "self.glyphboxlatinimgpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphboximgfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]"
+    },
+    {
+        "Setting": "self.glyphboxgreektxtpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphboxgreektxtdir",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_glyphbox",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_glyphbox"
+    },
+    {
+        "Setting": "self.glyphboxlatintxtpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphboxlatintxtdir",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Latin/txt_latin_glyphbox",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Latin/txt_latin_glyphbox"
+    },
+    {
+        "Setting": "self.glyphboxtxtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]"
+    },
+    {
+        "Setting": "self.glyphboxzoom",
+        "CurrentValue": "25 %",
+        "DefaultValue": "25"
+    },
+    {
+        "Setting": "self.glyphboxzoomslidervalue",
+        "CurrentValue": "25",
+        "DefaultValue": "25"
+    },
+    {
+        "Setting": "self.bmpsourcedir",
+        "CurrentValue": "Model/Project/Images/GlyphTracer/bmp_source",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.bmpgreekdir",
+        "CurrentValue": "Model/Project/Images/GlyphTracer/bmp_greek",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyph",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphname",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphencode",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphsourcedir",
+        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_source\u2019",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphgreekdir",
+        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_greek\u2019",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.glyphlatindir",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.charimgdir",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.charimgpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.charimgfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]"
+    },
+    {
+        "Setting": "self.charmappath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.linespacing",
+        "CurrentValue": "150",
+        "DefaultValue": "150"
+    },
+    {
+        "Setting": "self.verselinespacing",
+        "CurrentValue": "105",
+        "DefaultValue": "105"
+    },
+    {
+        "Setting": "self.reflinespacing",
+        "CurrentValue": "105",
+        "DefaultValue": "105"
+    },
+    {
+        "Setting": "self.sourcebookmarkdown",
+        "CurrentValue": "source_book_43_John",
+        "DefaultValue": "source_book_40_Matthew"
+    },
+    {
+        "Setting": "self.greekbookmarkdown",
+        "CurrentValue": "greek_book_43_John",
+        "DefaultValue": "greek_book_40_Matthew"
+    },
+    {
+        "Setting": "self.latinbookmarkdown",
+        "CurrentValue": "latin_book_43_John",
+        "DefaultValue": "latin_book_40_Matthew"
+    },
+    {
+        "Setting": "self.sourcefile",
+        "CurrentValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf\u2019",
+        "DefaultValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf"
+    },
+    {
+        "Setting": "self.firstpage",
+        "CurrentValue": "100",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "self.lastpage",
+        "CurrentValue": "110",
+        "DefaultValue": "10"
+    },
+    {
+        "Setting": "self.deltapages",
+        "CurrentValue": "10",
+        "DefaultValue": "10"
+    },
+    {
+        "Setting": "self.imgpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.imgdir",
+        "CurrentValue": "Model/Project/Images/Workflow",
+        "DefaultValue": "Model/Project/Images/Workflow"
+    },
+    {
+        "Setting": "self.imgfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]"
+    },
+    {
+        "Setting": "self.pixmap",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.qimage",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.zoom",
+        "CurrentValue": "11 %",
+        "DefaultValue": "11 %"
+    },
+    {
+        "Setting": "self.zoomslidervalue",
+        "CurrentValue": "11",
+        "DefaultValue": "25"
+    },
+    {
+        "Setting": "self.img_xoffset",
+        "CurrentValue": "20",
+        "DefaultValue": "20"
+    },
+    {
+        "Setting": "self.img_yoffset",
+        "CurrentValue": "90",
+        "DefaultValue": "90"
+    },
+    {
+        "Setting": "self.txtpath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.txtdir",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages"
+    },
+    {
+        "Setting": "self.txtfileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]"
+    },
+    {
+        "Setting": "self.txtgreeklinebox",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox"
+    },
+    {
+        "Setting": "self.jsongreeklinebox",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/json_greek_linebox",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Greek/json_greek_linebox"
+    },
+    {
+        "Setting": "self.txtlatinlinebox",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box"
+    },
+    {
+        "Setting": "self.imagepath",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.imagedir",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.imagefileList",
+        "CurrentValue": "[]",
+        "DefaultValue": "[]"
+    },
+    {
+        "Setting": "self.imagezoom",
+        "CurrentValue": "25 %",
+        "DefaultValue": "25"
+    },
+    {
+        "Setting": "self.imagezoomslidervalue",
+        "CurrentValue": "25",
+        "DefaultValue": "25"
+    },
+    {
+        "Setting": "self.greekpages",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages"
+    },
+    {
+        "Setting": "self.greeklinesbox",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
+    },
+    {
+        "Setting": "self.latinpages",
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages"
+    },
+    {
+        "Setting": "self.latinlinesbox",
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box"
+    },
+    {
+        "Setting": "self.edittimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.maketimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.rdrawtimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.sdrawtimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchmaketimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchmovetimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchnametimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    }
+]

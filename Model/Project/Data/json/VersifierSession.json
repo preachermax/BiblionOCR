@@ -146,17 +146,17 @@
     },
     {
         "Setting": "self.versechapter",
-        "CurrentValue": "16",
+        "CurrentValue": "18",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.verseverse",
-        "CurrentValue": "30",
+        "CurrentValue": "20",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.verseline",
-        "CurrentValue": "2506",
+        "CurrentValue": "2564",
         "DefaultValue": "1"
     },
     {
@@ -191,17 +191,17 @@
     },
     {
         "Setting": "self.refchapter",
-        "CurrentValue": "16",
+        "CurrentValue": "18",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.refverse",
-        "CurrentValue": "30",
+        "CurrentValue": "20",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.refline",
-        "CurrentValue": "2506",
+        "CurrentValue": "2564",
         "DefaultValue": "1"
     },
     {

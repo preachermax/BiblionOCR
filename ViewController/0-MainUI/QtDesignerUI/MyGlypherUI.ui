@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1350</width>
+    <width>1360</width>
     <height>956</height>
    </rect>
   </property>
@@ -27,7 +27,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../UI_Icons.qrc">
-    <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+    <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -35,124 +35,13 @@
   <property name="animated">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="BoxWidget">
-   <widget class="QScrollArea" name="ImagescrollArea">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>550</width>
-      <height>831</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>501</width>
-      <height>600</height>
-     </size>
-    </property>
-    <property name="mouseTracking">
-     <bool>false</bool>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-    </property>
-    <widget class="QWidget" name="ImagescrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>6600</width>
-       <height>9600</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>6600</width>
-       <height>9600</height>
-      </size>
-     </property>
-     <property name="sizeIncrement">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>520</width>
-       <height>700</height>
-      </size>
-     </property>
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
-     <widget class="QLabel" name="Image">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>6800</width>
-        <height>9600</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="baseSize">
-       <size>
-        <width>520</width>
-        <height>700</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="margin">
-       <number>80</number>
-      </property>
-     </widget>
-    </widget>
-   </widget>
+  <widget class="QWidget" name="GlypherWidget">
    <widget class="QPushButton" name="OpenImageFilebutton">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>30</x>
       <y>0</y>
-      <width>32</width>
+      <width>21</width>
       <height>25</height>
      </rect>
     </property>
@@ -178,7 +67,7 @@
    <widget class="QLineEdit" name="ImageLe">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>340</x>
       <y>0</y>
       <width>241</width>
       <height>25</height>
@@ -191,9 +80,9 @@
    <widget class="QPushButton" name="EditCorrectedTextbutton">
     <property name="geometry">
      <rect>
-      <x>970</x>
+      <x>980</x>
       <y>0</y>
-      <width>32</width>
+      <width>21</width>
       <height>25</height>
      </rect>
     </property>
@@ -219,7 +108,7 @@
    <widget class="QPushButton" name="SaveAsBoxCorrTextbutton">
     <property name="geometry">
      <rect>
-      <x>1240</x>
+      <x>1250</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -247,7 +136,7 @@
    <widget class="QPushButton" name="SaveBoxCorrTextbutton">
     <property name="geometry">
      <rect>
-      <x>1270</x>
+      <x>1280</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -275,7 +164,7 @@
    <widget class="QPushButton" name="reloadTextbutton">
     <property name="geometry">
      <rect>
-      <x>700</x>
+      <x>710</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -295,7 +184,7 @@
    <widget class="QPushButton" name="reloadImagebutton">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>580</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -312,30 +201,10 @@
       <normaloff>:/Icons/Icons/reload.png</normaloff>:/Icons/Icons/reload.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="MyPixlerbutton">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>0</y>
-      <width>32</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Edit source images with MyPixler</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
-    </property>
-   </widget>
    <widget class="QPushButton" name="PrevImgButton">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>270</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -355,7 +224,7 @@
    <widget class="QPushButton" name="NextImgButton">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>300</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -375,7 +244,7 @@
    <widget class="QPushButton" name="PrevTxtButton">
     <property name="geometry">
      <rect>
-      <x>1040</x>
+      <x>1050</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -395,7 +264,7 @@
    <widget class="QPushButton" name="NextTxtButton">
     <property name="geometry">
      <rect>
-      <x>1070</x>
+      <x>1080</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -415,7 +284,7 @@
    <widget class="QPushButton" name="BothNextButton">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>680</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -435,7 +304,7 @@
    <widget class="QPushButton" name="BothPrevButton">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>610</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -458,7 +327,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>640</x>
       <y>0</y>
       <width>41</width>
       <height>25</height>
@@ -475,11 +344,11 @@
       <normaloff>:/Icons/Icons/documents1.png</normaloff>:/Icons/Icons/documents1.png</iconset>
     </property>
    </widget>
-   <widget class="QGroupBox" name="OCRgroupBox">
+   <widget class="QGroupBox" name="OCRGroupBox">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>230</y>
+      <x>580</x>
+      <y>30</y>
       <width>159</width>
       <height>101</height>
      </rect>
@@ -602,8 +471,13 @@
        <string>Latin</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>English</string>
+      </property>
+     </item>
     </widget>
-    <widget class="QLabel" name="OCRModellabel_2">
+    <widget class="QLabel" name="OCRModellabel">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -631,7 +505,7 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="OCRGroupLabel">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -657,18 +531,18 @@
    <widget class="QLineEdit" name="TextLE">
     <property name="geometry">
      <rect>
-      <x>730</x>
+      <x>740</x>
       <y>0</y>
       <width>241</width>
       <height>25</height>
      </rect>
     </property>
    </widget>
-   <widget class="QGroupBox" name="SessiongroupBox">
+   <widget class="QGroupBox" name="SessionGoupBox">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>30</y>
+      <x>580</x>
+      <y>130</y>
       <width>159</width>
       <height>51</height>
      </rect>
@@ -676,7 +550,7 @@
     <property name="title">
      <string/>
     </property>
-    <widget class="QLabel" name="booklabel">
+    <widget class="QLabel" name="bookLabel">
      <property name="geometry">
       <rect>
        <x>50</x>
@@ -862,11 +736,11 @@
      </item>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="TextgroupBox">
+   <widget class="QGroupBox" name="TextGroupBox">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>80</y>
+      <x>580</x>
+      <y>180</y>
       <width>159</width>
       <height>101</height>
      </rect>
@@ -874,7 +748,7 @@
     <property name="title">
      <string/>
     </property>
-    <widget class="QLabel" name="fontlabel">
+    <widget class="QLabel" name="fontLabel">
      <property name="geometry">
       <rect>
        <x>50</x>
@@ -975,7 +849,7 @@
    <widget class="QComboBox" name="ZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>130</x>
       <y>0</y>
       <width>81</width>
       <height>26</height>
@@ -1068,7 +942,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>0</y>
       <width>30</width>
       <height>26</height>
@@ -1099,7 +973,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1160</x>
       <y>30</y>
       <width>21</width>
       <height>161</height>
@@ -1139,7 +1013,7 @@
    <widget class="QLineEdit" name="LHlineEdit">
     <property name="geometry">
      <rect>
-      <x>1170</x>
+      <x>1180</x>
       <y>0</y>
       <width>31</width>
       <height>25</height>
@@ -1170,7 +1044,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1140</x>
+      <x>1150</x>
       <y>0</y>
       <width>32</width>
       <height>25</height>
@@ -1241,8 +1115,8 @@
    <widget class="QPushButton" name="FindReplacebutton">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>190</y>
+      <x>600</x>
+      <y>290</y>
       <width>121</width>
       <height>25</height>
      </rect>
@@ -1270,7 +1144,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>581</x>
       <y>840</y>
       <width>158</width>
       <height>21</height>
@@ -1289,10 +1163,10 @@
    <widget class="QTabWidget" name="BoxTab">
     <property name="geometry">
      <rect>
-      <x>730</x>
+      <x>740</x>
       <y>30</y>
-      <width>597</width>
-      <height>834</height>
+      <width>620</width>
+      <height>830</height>
      </rect>
     </property>
     <property name="font">
@@ -1304,12 +1178,21 @@
      <enum>QTabWidget::East</enum>
     </property>
     <property name="tabShape">
-     <enum>QTabWidget::Rounded</enum>
+     <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
-    <property name="usesScrollButtons">
+    <property name="iconSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="elideMode">
+     <enum>Qt::ElideRight</enum>
+    </property>
+    <property name="tabBarAutoHide">
      <bool>true</bool>
     </property>
     <widget class="QWidget" name="Table">
@@ -1321,8 +1204,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>570</width>
-        <height>829</height>
+        <width>580</width>
+        <height>826</height>
        </rect>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -1353,7 +1236,7 @@
        <bool>true</bool>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>22</number>
+       <number>20</number>
       </attribute>
       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
        <bool>true</bool>
@@ -1362,7 +1245,7 @@
        <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderVisible">
-       <bool>true</bool>
+       <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderCascadingSectionResizes">
        <bool>true</bool>
@@ -1532,23 +1415,70 @@
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="CSV">
+    <widget class="QWidget" name="CharMap">
      <attribute name="title">
-      <string>CSV Text</string>
+      <string>Char Map</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="Text">
+     <attribute name="title">
+      <string>Box Text</string>
      </attribute>
      <widget class="QTextEdit" name="BoxText">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>570</width>
-        <height>830</height>
+        <width>580</width>
+        <height>826</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
-        <width>540</width>
-        <height>830</height>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SourceTextPage">
+     <attribute name="title">
+      <string>Source Text</string>
+     </attribute>
+     <widget class="QTextEdit" name="SourceText">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>580</width>
+        <height>826</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="font">
@@ -1581,7 +1511,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>0</y>
       <width>51</width>
       <height>25</height>
@@ -1596,7 +1526,440 @@
      <string>Lines</string>
     </property>
    </widget>
-   <zorder>ImagescrollArea</zorder>
+   <widget class="QTabWidget" name="GlyphTab">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>580</width>
+      <height>831</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::West</enum>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Triangular</enum>
+    </property>
+    <property name="currentIndex">
+     <number>3</number>
+    </property>
+    <widget class="QWidget" name="GlyphBoxPage">
+     <attribute name="title">
+      <string>Glyph Box</string>
+     </attribute>
+     <widget class="QScrollArea" name="GlyphscrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>550</width>
+        <height>831</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="GlyphscrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="GlyphBox">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="GlyphMap">
+     <attribute name="title">
+      <string>Glyph Map</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="LineBoxPage">
+     <attribute name="title">
+      <string>Line Box</string>
+     </attribute>
+     <widget class="QScrollArea" name="LinescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>550</width>
+        <height>831</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="LinescrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="LineBox">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SourceImagePage">
+     <attribute name="title">
+      <string>Source Image</string>
+     </attribute>
+     <widget class="QScrollArea" name="ImagescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>552</width>
+        <height>831</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="ImagescrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="Image">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="ProjectImageFilebutton">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ProjectTextFilebutton">
+    <property name="geometry">
+     <rect>
+      <x>1010</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+    </property>
+   </widget>
+   <zorder>BoxTab</zorder>
    <zorder>OpenImageFilebutton</zorder>
    <zorder>ImageLe</zorder>
    <zorder>EditCorrectedTextbutton</zorder>
@@ -1604,7 +1967,6 @@
    <zorder>SaveBoxCorrTextbutton</zorder>
    <zorder>reloadTextbutton</zorder>
    <zorder>reloadImagebutton</zorder>
-   <zorder>MyPixlerbutton</zorder>
    <zorder>PrevImgButton</zorder>
    <zorder>NextImgButton</zorder>
    <zorder>PrevTxtButton</zorder>
@@ -1612,47 +1974,32 @@
    <zorder>BothNextButton</zorder>
    <zorder>BothPrevButton</zorder>
    <zorder>BothLoadButton</zorder>
-   <zorder>OCRgroupBox</zorder>
+   <zorder>OCRGroupBox</zorder>
    <zorder>TextLE</zorder>
-   <zorder>SessiongroupBox</zorder>
-   <zorder>TextgroupBox</zorder>
+   <zorder>SessionGoupBox</zorder>
+   <zorder>TextGroupBox</zorder>
    <zorder>ZoomComboBox</zorder>
    <zorder>Zoombutton</zorder>
    <zorder>LHlineEdit</zorder>
    <zorder>LHDialogbutton</zorder>
-   <zorder>Zoomslider</zorder>
    <zorder>FindReplacebutton</zorder>
    <zorder>LHslider</zorder>
    <zorder>progressBar</zorder>
-   <zorder>BoxTab</zorder>
    <zorder>LineCheckBox</zorder>
+   <zorder>GlyphTab</zorder>
+   <zorder>Zoomslider</zorder>
+   <zorder>ProjectImageFilebutton</zorder>
+   <zorder>ProjectTextFilebutton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1350</width>
+     <width>1360</width>
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuOCR">
-    <property name="title">
-     <string>OCR</string>
-    </property>
-    <widget class="QMenu" name="menuSelect_Language">
-     <property name="title">
-      <string>Select Language</string>
-     </property>
-     <addaction name="actionGreek_2"/>
-     <addaction name="actionHebrew_4"/>
-     <addaction name="actionLatin_2"/>
-     <addaction name="actionEnglish_2"/>
-    </widget>
-    <addaction name="menuSelect_Language"/>
-    <addaction name="actionSelect_Image"/>
-    <addaction name="actionCorrect_OCR_tb"/>
-   </widget>
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
@@ -1666,91 +2013,176 @@
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuOpen_Box_Image">
+    <widget class="QMenu" name="menuSave_As_Box_Files">
      <property name="title">
-      <string>Open Box Image</string>
+      <string>Save As Glyphs</string>
      </property>
-     <addaction name="actionOpen_Page_Box_Image"/>
-     <addaction name="actionOpen_Line_Box_Image"/>
-     <addaction name="actionOpen_Word_Box_Image"/>
-     <addaction name="actionOpen_Glyph_Box_Image"/>
+     <widget class="QMenu" name="menuImage_4">
+      <property name="title">
+       <string>Image</string>
+      </property>
+      <addaction name="actionSave_As_Greek_Box_Files"/>
+      <addaction name="actionSave_As_Hebrew_Box_Files"/>
+      <addaction name="actionSave_As_Latin_Box_Files"/>
+     </widget>
+     <widget class="QMenu" name="menuText_6">
+      <property name="title">
+       <string>Text</string>
+      </property>
+      <addaction name="actionSave_As_Greek_Text"/>
+      <addaction name="actionSave_As_Hebrew_Text"/>
+      <addaction name="actionSave_As_Latin_Text"/>
+     </widget>
+     <addaction name="menuImage_4"/>
+     <addaction name="menuText_6"/>
     </widget>
-    <widget class="QMenu" name="menuOpen_Box_File">
+    <widget class="QMenu" name="menuSave_Box_Files">
      <property name="title">
-      <string>Open Box File</string>
+      <string>Save Glyphs</string>
      </property>
-     <addaction name="actionOpen_Page_Box_File"/>
-     <addaction name="actionOpen_Line_Box_File"/>
-     <addaction name="actionOpen_Word_Box_File"/>
-     <addaction name="actionOpen_Character_Box_File"/>
+     <widget class="QMenu" name="menuText_5">
+      <property name="title">
+       <string>Text</string>
+      </property>
+      <addaction name="actionSave_Greek_Text"/>
+      <addaction name="actionSave_Hebrew_Text"/>
+      <addaction name="actionSave_Latin_Text"/>
+     </widget>
+     <widget class="QMenu" name="menuImage">
+      <property name="title">
+       <string>Image</string>
+      </property>
+      <addaction name="actionSave_Greek_Image"/>
+      <addaction name="actionSave_Hebrew_Image"/>
+      <addaction name="actionSave_Latin_Image"/>
+     </widget>
+     <widget class="QMenu" name="menuBoth_Files">
+      <property name="title">
+       <string>Both Files</string>
+      </property>
+      <addaction name="actionSave_Greek_Box_Files"/>
+      <addaction name="actionSave_Hebrew_Box_Files"/>
+      <addaction name="actionSave_Latin_Box_Files"/>
+     </widget>
+     <addaction name="menuBoth_Files"/>
+     <addaction name="menuImage"/>
+     <addaction name="menuText_5"/>
     </widget>
-    <widget class="QMenu" name="menuSave_Box_File">
+    <widget class="QMenu" name="menuSelect_Language">
      <property name="title">
-      <string>Save Box File</string>
+      <string>Select Language</string>
      </property>
-     <addaction name="actionSave_Page_Box_File"/>
-     <addaction name="actionSave_Line_Box_File"/>
-     <addaction name="actionSave_Word_Box_File"/>
-     <addaction name="actionSave_Glyph_Box_File"/>
+     <widget class="QMenu" name="menuGreek_Lang">
+      <property name="title">
+       <string>Greek</string>
+      </property>
+      <addaction name="actionAncient_Greek_Lang"/>
+      <addaction name="actionMiddle_Greek_Lang"/>
+      <addaction name="actionModern_Greek_Lang"/>
+     </widget>
+     <addaction name="menuGreek_Lang"/>
+     <addaction name="actionHebrew_Lang"/>
+     <addaction name="actionLatin_Lang"/>
+     <addaction name="actionEnglish_Lang"/>
     </widget>
-    <widget class="QMenu" name="menuSave_As_Box_File">
+    <widget class="QMenu" name="menuOpenSource">
      <property name="title">
-      <string>Save As Box File</string>
+      <string>Open Source</string>
      </property>
-     <addaction name="actionSave_As_Page_Box_File"/>
-     <addaction name="actionSave_As_Line_Box_File"/>
-     <addaction name="actionSave_As_Wprd_Box_File"/>
-     <addaction name="actionSave_As_Character_Box_File"/>
+     <widget class="QMenu" name="menuOpenSourceImage">
+      <property name="title">
+       <string>Image</string>
+      </property>
+      <addaction name="actionOpen_Greek_Source_Image"/>
+      <addaction name="actionOpen_Hebrew_Source_Image"/>
+      <addaction name="actionOpen_Latin_Source_Image"/>
+     </widget>
+     <widget class="QMenu" name="menuOpenSourceText">
+      <property name="title">
+       <string>Text</string>
+      </property>
+      <addaction name="actionOpen_Greek_Source_Text"/>
+      <addaction name="separator"/>
+      <addaction name="actionOpen_Hebrew_Source_Text"/>
+      <addaction name="actionOpen_Latin_Source_Text"/>
+     </widget>
+     <addaction name="menuOpenSourceImage"/>
+     <addaction name="menuOpenSourceText"/>
     </widget>
-    <widget class="QMenu" name="menuSave_As_Box_Image">
+    <widget class="QMenu" name="menuOpen_Lines">
      <property name="title">
-      <string>Save As Box Image</string>
+      <string>Open Lines</string>
      </property>
-     <addaction name="actionSave_As_Page_Box_Image"/>
-     <addaction name="actionSave_As_Line_Box_Image"/>
-     <addaction name="actionSave_AS_Word_Box_Image"/>
-     <addaction name="actionSave_As_Glyph_Box_Image"/>
+     <widget class="QMenu" name="menuImage_Line_Box">
+      <property name="title">
+       <string>Image</string>
+      </property>
+      <addaction name="actionOpen_Greek_LineBox_Image"/>
+      <addaction name="actionOpen_Hebrew_LineBox_Image"/>
+      <addaction name="actionOpen_Latin_LineBox_Image"/>
+     </widget>
+     <widget class="QMenu" name="menuText_Line_Box">
+      <property name="title">
+       <string>Text</string>
+      </property>
+      <addaction name="actionOpen_Greek_LineBox_Text"/>
+      <addaction name="actionOpen_Hebrew_Line_Box_Text"/>
+      <addaction name="actionOpen_Latin_Line_Box_Text"/>
+     </widget>
+     <addaction name="menuImage_Line_Box"/>
+     <addaction name="menuText_Line_Box"/>
     </widget>
-    <widget class="QMenu" name="menuSave_Box_Image">
+    <widget class="QMenu" name="menuOpen_Glyphs">
      <property name="title">
-      <string>Save Box Image</string>
+      <string>Open Glyphs</string>
      </property>
-     <addaction name="actionSave_Page_Box_Image"/>
-     <addaction name="actionSave_Line_Box_Image"/>
-     <addaction name="actionSave_Word_Box_Image"/>
-     <addaction name="actionSave_Glyph_Box_Image"/>
+     <widget class="QMenu" name="menuImage_Glyph_Box">
+      <property name="title">
+       <string>Image</string>
+      </property>
+      <addaction name="actionOpen_Greek_GlyphBox_Image"/>
+      <addaction name="actionOpen_Hebrew_GlyphBox_Image"/>
+      <addaction name="actionOpen_Latin_GlyphBox_Image"/>
+     </widget>
+     <widget class="QMenu" name="menuText_Glyph_Box">
+      <property name="title">
+       <string>Text</string>
+      </property>
+      <addaction name="actionOpen_Greek_GlyphBox_Text"/>
+      <addaction name="actionOpen_Hebrew_GlyphBox_Text"/>
+      <addaction name="actionOpen_Latin_GlyphBox_Text"/>
+     </widget>
+     <addaction name="menuImage_Glyph_Box"/>
+     <addaction name="menuText_Glyph_Box"/>
     </widget>
-    <addaction name="actionProject_Explorer"/>
-    <addaction name="menuOpen_Box_Image"/>
-    <addaction name="menuOpen_Box_File"/>
-    <addaction name="menuSave_Box_Image"/>
-    <addaction name="menuSave_As_Box_Image"/>
-    <addaction name="menuSave_Box_File"/>
-    <addaction name="menuSave_As_Box_File"/>
+    <widget class="QMenu" name="menuProject_Explorer">
+     <property name="title">
+      <string>Project Explorer</string>
+     </property>
+     <addaction name="action_Explorer"/>
+    </widget>
+    <addaction name="menuProject_Explorer"/>
+    <addaction name="menuSelect_Language"/>
+    <addaction name="menuOpenSource"/>
+    <addaction name="menuOpen_Lines"/>
+    <addaction name="menuOpen_Glyphs"/>
+    <addaction name="menuSave_Box_Files"/>
+    <addaction name="menuSave_As_Box_Files"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
-    <widget class="QMenu" name="menuEdit_PageBox_File">
-     <property name="title">
-      <string>Edit PageBox File Pairs</string>
-     </property>
-     <addaction name="actionEdit_Greek_PageBox_File_Pair"/>
-     <addaction name="actionEdit_Latin_PageBox_File_Pair"/>
-    </widget>
     <widget class="QMenu" name="menuEdit_LineBox_File">
      <property name="title">
-      <string>Edit LineBox File Pairs</string>
+      <string>Edit GlyphBox File Pairs</string>
      </property>
-     <addaction name="actionEdit_Latin_Linebox_Pair"/>
+     <addaction name="actionEdit_Greek_LineBox_File_Pair"/>
+     <addaction name="actionEdit_Latin_GlyphBox_Files"/>
+     <addaction name="actionEdit_Hebrew_GlyphBox_Files"/>
     </widget>
-    <addaction name="menuEdit_PageBox_File"/>
     <addaction name="menuEdit_LineBox_File"/>
-    <addaction name="actionDraw_Selected_LineBox_tb"/>
-    <addaction name="actionPixer_Image_Editor"/>
-    <addaction name="actionEdit_Image_tb"/>
-    <addaction name="actionPrefernces"/>
+    <addaction name="actionPreferences"/>
     <addaction name="actionFind_and_Replace"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -1759,9 +2191,10 @@
     </property>
     <widget class="QMenu" name="menuToggle_PageBox_Toolbars">
      <property name="title">
-      <string>Toggle PageBox Toolbars</string>
+      <string>Toggle Glypher Toolbars</string>
      </property>
      <addaction name="actionToggle_Greek_Toolbars"/>
+     <addaction name="actionToggle_Hebrew_Toolbars"/>
      <addaction name="actionToggle_Latin_Toolbars"/>
     </widget>
     <widget class="QMenu" name="menuThemes">
@@ -1773,79 +2206,62 @@
      <addaction name="actionClassic"/>
      <addaction name="actionStandardUI"/>
     </widget>
-    <addaction name="menuToggle_PageBox_Toolbars"/>
-    <addaction name="actionToggle_LineBox_Toolbar"/>
     <addaction name="menuThemes"/>
+    <addaction name="menuToggle_PageBox_Toolbars"/>
+    <addaction name="actionSource"/>
+    <addaction name="actionLine"/>
+    <addaction name="actionGlyph"/>
+    <addaction name="actionGlyph_Map"/>
+    <addaction name="actionBox_Table"/>
+    <addaction name="actionBox_Text"/>
+    <addaction name="actionCharcter_Map"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="action_Pixler"/>
+    <addaction name="action_Trainer"/>
+    <addaction name="action_Boxer"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuGlyphs">
-    <property name="title">
-     <string>Forge</string>
-    </property>
-    <widget class="QMenu" name="menuIndex_Images">
-     <property name="title">
-      <string>Bitmap Images</string>
-     </property>
-     <addaction name="actionLine_tif_to_bmp"/>
-    </widget>
-    <addaction name="menuIndex_Images"/>
-    <addaction name="actionExtract_Glyphs"/>
-    <addaction name="actionFontForge"/>
-    <addaction name="actionInstall_Font"/>
-   </widget>
-   <widget class="QMenu" name="menuMake">
+   <widget class="QMenu" name="menuSplit">
     <property name="title">
      <string>Make</string>
     </property>
-    <widget class="QMenu" name="menuMake_PageBox_Files_From_Folder">
+    <widget class="QMenu" name="menuMake_LineBox_Files">
      <property name="title">
-      <string>Make PageBox Batch Folder Pairs</string>
+      <string>Make GlyphBox Files</string>
      </property>
-     <addaction name="actionGreek_PageBox_Files"/>
-     <addaction name="actionLatin_PageBox_Files"/>
-    </widget>
-    <widget class="QMenu" name="menuMake_PageBox_File">
-     <property name="title">
-      <string>Make PageBox File Pair</string>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/glyph-trace.png</normaloff>:/Icons/Icons/glyph-trace.png</iconset>
      </property>
-     <addaction name="actionGreek_PageBox_File"/>
-     <addaction name="actionLatin_PageBox_File"/>
+     <addaction name="actionMake_Greek_GlyphBox_Files"/>
+     <addaction name="actionMake_Latin_GlyphBox_Files"/>
+     <addaction name="actionMake_Hebrew_GlyphBox"/>
     </widget>
-    <widget class="QMenu" name="menuMake_LineBox_Folder_Pairs">
-     <property name="title">
-      <string>Make LineBox Batch Folder Pairs</string>
-     </property>
-     <addaction name="actionMake_Greek_LineBox_Folder_Pairs"/>
-     <addaction name="actionMake_Latin_LineBox_Folder_Pairs"/>
-    </widget>
-    <widget class="QMenu" name="menuMake_LineBox_File_Pairs">
-     <property name="title">
-      <string>Make LineBox File Pair</string>
-     </property>
-     <addaction name="actionMake_Greek_LineBox_File_Pair"/>
-     <addaction name="actionMake_Latin_LineBox_File_Pairs"/>
-    </widget>
-    <addaction name="menuMake_PageBox_Files_From_Folder"/>
-    <addaction name="menuMake_PageBox_File"/>
-    <addaction name="menuMake_LineBox_Folder_Pairs"/>
-    <addaction name="menuMake_LineBox_File_Pairs"/>
+    <addaction name="menuMake_LineBox_Files"/>
+   </widget>
+   <widget class="QMenu" name="menuStage">
+    <property name="title">
+     <string>Stage</string>
+    </property>
+    <addaction name="actionStage_Greek_Glyphs"/>
+    <addaction name="actionStage_Latin_Glyphs"/>
+    <addaction name="actionStage_Greek_Characters"/>
+    <addaction name="actionStage_Latin_Characters"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuMake"/>
+   <addaction name="menuSplit"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuStage"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
-   <addaction name="menuOCR"/>
-   <addaction name="menuGlyphs"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -1859,12 +2275,9 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QToolBar" name="FontForgeToolBar">
+  <widget class="QToolBar" name="GreekEditGlyphsToolBar">
    <property name="windowTitle">
-    <string>FontForge Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>FontForge Tool Bar</string>
+    <string>Greek Edit Boxes Toolbar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1872,16 +2285,13 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLine_tif_to_bmp"/>
-   <addaction name="actionExtract_Glyphs"/>
-   <addaction name="actionFontForge"/>
+   <addaction name="actionMake_Greek_GlyphBox_Files"/>
+   <addaction name="actionEdit_Greek_GlyphBox_Files"/>
+   <addaction name="actionStage_Greek_GlyphBox_Files"/>
   </widget>
-  <widget class="QToolBar" name="BatchGreekTextLinesToolBar">
+  <widget class="QToolBar" name="LatinEditGlyphsToolBar">
    <property name="windowTitle">
-    <string>Greek Text Lines Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Greek Text Lines Tool Bar</string>
+    <string>Latin Edit Boxes Toolbar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1889,18 +2299,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplitGreek_text_lines_tb"/>
-   <addaction name="actionRenameGreek_text_lines_tb"/>
+   <addaction name="actionMake_Latin_GlyphBox_Files"/>
+   <addaction name="actionEdit_Latin_GlyphBox_Files"/>
+   <addaction name="actionStage_Latin_GlyphBox_Files"/>
   </widget>
-  <widget class="QToolBar" name="BatchLatinTextLinesToolBar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
+  <widget class="QToolBar" name="GreekEditCharacterToolBar">
    <property name="windowTitle">
-    <string>Latin Text Lines Batch Tool Bar</string>
+    <string>Greek Edit Text Toolbar</string>
    </property>
    <property name="toolTip">
-    <string>Latin Text Lines Batch Tool Bar</string>
+    <string>Greek Edit Text Toolbar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1908,15 +2316,15 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplit_Latin_Text_Lines_tb"/>
-   <addaction name="actionRename_Latin_Text_Lines_tb"/>
+   <addaction name="actionEdit_Greek_Characters"/>
+   <addaction name="actionStage_Greek_Characters"/>
   </widget>
-  <widget class="QToolBar" name="PairMakeBoxesToolBar">
+  <widget class="QToolBar" name="LatinEditCharacterToolBar">
    <property name="windowTitle">
-    <string>Make Linebox File Pairs Tool Bar</string>
+    <string>Latin Edit Text Tool Bar</string>
    </property>
    <property name="toolTip">
-    <string>Make Linebox File Pairs Tool Bar</string>
+    <string>Latin Edit Text Tool Bar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1924,9 +2332,40 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionMake_Greek_LineBox_File_Pair"/>
+   <addaction name="actionEdit_Latin_Characters"/>
+   <addaction name="actionStage_Latin_Characters"/>
   </widget>
-  <widget class="QToolBar" name="PairEditBoxesToolBar">
+  <widget class="QToolBar" name="SourcesToolBar">
+   <property name="windowTitle">
+    <string>Sources Toolbar</string>
+   </property>
+   <property name="toolTip">
+    <string>Sources Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Boxer"/>
+  </widget>
+  <widget class="QToolBar" name="DestinationsToolBar">
+   <property name="windowTitle">
+    <string>Destinations Toolbar</string>
+   </property>
+   <property name="toolTip">
+    <string>Destinations Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Trainer"/>
+  </widget>
+  <widget class="QToolBar" name="GlypherToolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -1936,32 +2375,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionEdit_Greek_LineBox_Pair"/>
+   <addaction name="actionOpen_Greek_LineBox_Image"/>
   </widget>
-  <action name="actionpdf_to_tiff">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/Icons/Icons/ocr2.png</normaloff>:/Icons/Icons/ocr2.png</iconset>
-   </property>
-   <property name="text">
-    <string>pdf for tiff</string>
-   </property>
-  </action>
-  <action name="actionmove_pdf_for_tiff">
-   <property name="text">
-    <string>pdf to tiff</string>
-   </property>
-  </action>
-  <action name="actiontiff_to_mono">
-   <property name="text">
-    <string>tiff to mono</string>
-   </property>
-  </action>
-  <action name="actionmono_to_png">
-   <property name="text">
-    <string>mono to png</string>
-   </property>
-  </action>
   <action name="actiontiff_to_png">
    <property name="text">
     <string>tiff to png</string>
@@ -2201,9 +2616,13 @@
     <string>Move tiff lines</string>
    </property>
   </action>
-  <action name="actionSplit">
+  <action name="actionSplit_Pages_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split_lang_folder.png</normaloff>:/Icons/Icons/split_lang_folder.png</iconset>
+   </property>
    <property name="text">
-    <string>Split text lines</string>
+    <string>Split into language/column pages</string>
    </property>
   </action>
   <action name="actionRename_tiff_lines">
@@ -2398,22 +2817,25 @@
     <string>Renaming Greek tif lines...</string>
    </property>
   </action>
-  <action name="actionMove_Greek_tif_Lines_tb">
+  <action name="actionStage_Greek_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
+     <normaloff>:/Icons/Icons/glyphmap_stage_greek.png</normaloff>:/Icons/Icons/glyphmap_stage_greek.png</iconset>
    </property>
    <property name="text">
-    <string>Move Greek tif Lines</string>
+    <string>Stage Greek Glyphs for Glyph Map</string>
+   </property>
+   <property name="iconText">
+    <string>Stage Greek Glyphs for Glyph Map</string>
    </property>
    <property name="statusTip">
-    <string>Moving Greek tif lines...</string>
+    <string>Staging Greek Glyphs...</string>
    </property>
   </action>
   <action name="actionSplitGreek_text_lines_tb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
+     <normaloff>:/Icons/Icons/split_greek_text_folder.png</normaloff>:/Icons/Icons/split_greek_text_folder.png</iconset>
    </property>
    <property name="text">
     <string>Split Greek Pages To Text Lines</string>
@@ -2494,16 +2916,16 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionMove_Latin_tif_Lines_tb">
+  <action name="actionStage_Latin_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
+     <normaloff>:/Icons/Icons/glyphmap_stage_latin.png</normaloff>:/Icons/Icons/glyphmap_stage_latin.png</iconset>
    </property>
    <property name="text">
-    <string>Move Latin tif Lines</string>
+    <string>Stage Latin Glyphs for GlyphMap</string>
    </property>
    <property name="statusTip">
-    <string>Moving Latin tif lines...</string>
+    <string>Staging Latin Glyphs...</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -2518,7 +2940,7 @@
    </property>
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
+     <normaloff>:/Icons/Icons/split_latin_text_folder.png</normaloff>:/Icons/Icons/split_latin_text_folder.png</iconset>
    </property>
    <property name="text">
     <string>Split Latin Pages To Text Lines</string>
@@ -2675,7 +3097,7 @@
     <string>Editing current GlyphTracer sfd file in FontForge...</string>
    </property>
   </action>
-  <action name="actionPrefernces">
+  <action name="actionPreferences">
    <property name="text">
     <string>Preferences</string>
    </property>
@@ -2720,17 +3142,12 @@
     <string>Select Image</string>
    </property>
   </action>
-  <action name="actionGreek_2">
-   <property name="text">
-    <string>Greek</string>
-   </property>
-  </action>
-  <action name="actionHebrew_4">
+  <action name="actionHebrew_Lang">
    <property name="text">
     <string>Hebrew</string>
    </property>
   </action>
-  <action name="actionLatin_2">
+  <action name="actionLatin_Lang">
    <property name="text">
     <string>Latin</string>
    </property>
@@ -2788,7 +3205,7 @@
     <string>English</string>
    </property>
   </action>
-  <action name="actionEnglish_2">
+  <action name="actionEnglish_Lang">
    <property name="text">
     <string>English</string>
    </property>
@@ -2961,18 +3378,13 @@
     <string>Ministry</string>
    </property>
   </action>
-  <action name="actionPixer_Image_Editor">
+  <action name="actionOpen_Greek_Source_Image">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/preview.png</normaloff>:/Icons/Icons/preview.png</iconset>
+     <normaloff>:/Icons/Icons/folder_blk.png</normaloff>:/Icons/Icons/folder_blk.png</iconset>
    </property>
    <property name="text">
-    <string>Pixer Image Editor</string>
-   </property>
-  </action>
-  <action name="actionOpen_Page_Box_Image">
-   <property name="text">
-    <string>Open Page Box Image</string>
+    <string>Open Greek Source Image</string>
    </property>
   </action>
   <action name="actionOpen_Page_Box_File">
@@ -2980,14 +3392,18 @@
     <string>Open Page Box File</string>
    </property>
   </action>
-  <action name="actionOpen_Line_Box_Image">
+  <action name="actionOpen_Greek_GlyphBox_Image">
    <property name="text">
-    <string>Open Line Box Image</string>
+    <string>Open Greek Glyph Box Image</string>
    </property>
   </action>
-  <action name="actionOpen_Line_Box_File">
+  <action name="actionOpen_Greek_LineBox_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/box-lines-greek.png</normaloff>:/Icons/Icons/box-lines-greek.png</iconset>
+   </property>
    <property name="text">
-    <string>Open Line Box File</string>
+    <string>Open Greek Line Box Image</string>
    </property>
   </action>
   <action name="actionOpen_Glyph_Box_Image">
@@ -2995,19 +3411,19 @@
     <string>Open Glyph Box Image</string>
    </property>
   </action>
-  <action name="actionOpen_Character_Box_File">
+  <action name="actionSave_Greek_Box_Files">
    <property name="text">
-    <string>Open Character Box File</string>
+    <string>Save Greek Glyph Box Files</string>
    </property>
   </action>
-  <action name="actionSave_Page_Box_File">
+  <action name="actionSave_Greek_Box_File">
    <property name="text">
-    <string>Save Page Box File</string>
+    <string>Save Greek Box File</string>
    </property>
   </action>
-  <action name="actionSave_Line_Box_File">
+  <action name="actionSave_Hebrew_Box_File">
    <property name="text">
-    <string>Save Line Box File</string>
+    <string>Save Hebrew Box File</string>
    </property>
   </action>
   <action name="actionSave_Glyph_Box_File">
@@ -3030,14 +3446,14 @@
     <string>Save Glyph Box Image</string>
    </property>
   </action>
-  <action name="actionSave_As_Page_Box_Image">
+  <action name="actionSave_As_Greek_Box_Files">
    <property name="text">
-    <string>Save As Page Box Image</string>
+    <string>Save As Greek Image</string>
    </property>
   </action>
-  <action name="actionSave_As_Line_Box_Image">
+  <action name="actionSave_As_Hebrew_Box_Files">
    <property name="text">
-    <string>Save As Line Box Image</string>
+    <string>Save As Hebrew Image</string>
    </property>
   </action>
   <action name="actionSave_As_Glyph_Box_Image">
@@ -3047,12 +3463,12 @@
   </action>
   <action name="actionSave_As_Page_Box_File">
    <property name="text">
-    <string>Save As Page Box File</string>
+    <string>Save As Greek Box File</string>
    </property>
   </action>
   <action name="actionSave_As_Line_Box_File">
    <property name="text">
-    <string>Save As Line Box File</string>
+    <string>Save As Hebrew Box File</string>
    </property>
   </action>
   <action name="actionSave_As_Character_Box_File">
@@ -3075,33 +3491,24 @@
     <string>Save Word Box Image</string>
    </property>
   </action>
-  <action name="actionSave_AS_Word_Box_Image">
+  <action name="actionSave_As_Latin_Box_Files">
    <property name="text">
-    <string>Save As Word Box Image</string>
+    <string>Save As Latin Image</string>
    </property>
   </action>
-  <action name="actionSave_Word_Box_File">
+  <action name="actionSave_Latin_Box_File">
    <property name="text">
-    <string>Save Word Box File</string>
+    <string>Save Latin Box File</string>
    </property>
   </action>
-  <action name="actionSave_As_Wprd_Box_File">
+  <action name="actionSave_As_Word_Box_File">
    <property name="text">
-    <string>Save As Word Box File</string>
+    <string>Save As Latin Box File</string>
    </property>
   </action>
   <action name="actionbmp_indexed">
    <property name="text">
     <string>bmp indexed</string>
-   </property>
-  </action>
-  <action name="actionProject_Explorer">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/fileexplorer.png</normaloff>:/Icons/Icons/fileexplorer.png</iconset>
-   </property>
-   <property name="text">
-    <string>Project Explorer</string>
    </property>
   </action>
   <action name="actionDraw_Selected_LineBox_tb">
@@ -3139,12 +3546,12 @@
   </action>
   <action name="actionGreek_PageBox_Files">
    <property name="text">
-    <string>Make Greek PageBox Folder Pairs</string>
+    <string>Make Greek Page Files</string>
    </property>
   </action>
   <action name="actionLatin_PageBox_Files">
    <property name="text">
-    <string>Make Latin PageBox Folder Pairs</string>
+    <string>Make Latin Page Files</string>
    </property>
   </action>
   <action name="actionGreek_PageBox_File">
@@ -3225,22 +3632,25 @@
     <string>Edit Latin PageBox File Pair</string>
    </property>
   </action>
-  <action name="actionEdit_Greek_LineBox_Pair">
+  <action name="actionEdit_Greek_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+     <normaloff>:/Icons/Icons/glyphmap_edit_greek.png</normaloff>:/Icons/Icons/glyphmap_edit_greek.png</iconset>
    </property>
    <property name="text">
-    <string>Edit Greek LineBox File Pair</string>
+    <string>Edit Greek GlyphBox</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Greek GlyphBox</string>
    </property>
   </action>
-  <action name="actionEdit_Latin_Linebox_Pair">
+  <action name="actionEdit_Latin_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/table.png</normaloff>:/Icons/Icons/table.png</iconset>
+     <normaloff>:/Icons/Icons/glyphmap_edit_latin.png</normaloff>:/Icons/Icons/glyphmap_edit_latin.png</iconset>
    </property>
    <property name="text">
-    <string>Edit Latin LineBox File Pair</string>
+    <string>Edit Latin GlyphBox Files</string>
    </property>
   </action>
   <action name="actionMake_Greek_LineBox_Text_File">
@@ -3271,39 +3681,46 @@
     <string comment="Complete editing the tif and text linebox files with the BoxTable cells using Spin Boxes. ">Complete Editing LineBox File Pair with Table...</string>
    </property>
   </action>
-  <action name="actionMake_Greek_LineBox_Folder_Pairs">
+  <action name="actionSplit_Greek_Lines_btb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
+     <normaloff>:/Icons/Icons/box_greek_folder.png</normaloff>:/Icons/Icons/box_greek_folder.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek LineBox Batch Folder Pairs</string>
+    <string>Split Greek pages into LineBox Files</string>
    </property>
   </action>
-  <action name="actionMake_Latin_LineBox_Folder_Pairs">
-   <property name="text">
-    <string>Make Latin LineBox Batch Folder Pairs</string>
-   </property>
-  </action>
-  <action name="actionMake_Greek_LineBox_File_Pair">
+  <action name="actionSplit_Latin_Lines_btb">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
+     <normaloff>:/Icons/Icons/box_latin_folder.png</normaloff>:/Icons/Icons/box_latin_folder.png</iconset>
    </property>
    <property name="text">
-    <string>Make Greek Line Box File Pair</string>
+    <string>Split Latin pages into  LineBox Files</string>
+   </property>
+  </action>
+  <action name="actionMake_Greek_GlyphBox_Files">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/glyphmap_greek.png</normaloff>:/Icons/Icons/glyphmap_greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Make Greek GlyphBox</string>
+   </property>
+   <property name="toolTip">
+    <string>Make Greek GlyphBox</string>
    </property>
    <property name="statusTip">
     <string comment="Making Greek tif and text linebox files from the current page image. ">Making Greek Line Box File Pair...</string>
    </property>
   </action>
-  <action name="actionMake_Latin_LineBox_File_Pairs">
+  <action name="actionMake_Latin_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/boxwood.png</normaloff>:/Icons/Icons/boxwood.png</iconset>
+     <normaloff>:/Icons/Icons/glyphmap_latin.png</normaloff>:/Icons/Icons/glyphmap_latin.png</iconset>
    </property>
    <property name="text">
-    <string>Make Latin LineBox File Pair</string>
+    <string>Make Latin GlyphBox</string>
    </property>
   </action>
   <action name="actionDark_Orange">
@@ -3324,6 +3741,402 @@
   <action name="actionStandardUI">
    <property name="text">
     <string>StandardUI</string>
+   </property>
+  </action>
+  <action name="actionEdit_Greek_LineBox_File_Pair">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Greek GlyphBox Files</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Folder_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_greek_folder.png</normaloff>:/Icons/Icons/stage_greek_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek line images for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Folder_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_latin_folder.png</normaloff>:/Icons/Icons/stage_latin_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin line images for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Glyphs">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage-lines-greek .png</normaloff>:/Icons/Icons/stage-lines-greek .png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek Glyphs to GlyphMap</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Glyphs">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage-lines-latin .png</normaloff>:/Icons/Icons/stage-lines-latin .png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin Glyphs to GlyphMap</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Line_Texts_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_greek_text_folder.png</normaloff>:/Icons/Icons/stage_greek_text_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek text lines for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Line_Texts_btb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage_latin_text_folder.png</normaloff>:/Icons/Icons/stage_latin_text_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin text lines for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionEdit_Greek_Characters">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/charmap_edit_greek.png</normaloff>:/Icons/Icons/charmap_edit_greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Greek Characters</string>
+   </property>
+  </action>
+  <action name="actionEdit_Latin_Characters">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/charmap_edit_latin.png</normaloff>:/Icons/Icons/charmap_edit_latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Latin Characters</string>
+   </property>
+  </action>
+  <action name="actionStage_Greek_Characters">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/charmap_stage_greek.png</normaloff>:/Icons/Icons/charmap_stage_greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Greek Characters to CharacterMap</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage Greek Characters to CharacterMap</string>
+   </property>
+   <property name="statusTip">
+    <string>Staging Greek Characters</string>
+   </property>
+  </action>
+  <action name="actionStage_Latin_Characters">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/charmap_stage_latin.png</normaloff>:/Icons/Icons/charmap_stage_latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Latin Characters to CharacterMap</string>
+   </property>
+   <property name="toolTip">
+    <string>Staging Latin Characters</string>
+   </property>
+  </action>
+  <action name="action_Pixler">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Pixler</string>
+   </property>
+   <property name="toolTip">
+    <string>Βιβλιον Pixler  edit source images</string>
+   </property>
+  </action>
+  <action name="action_Trainer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionTrainer1.png</normaloff>:/Icons/Icons/BiblionTrainer1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Grounder</string>
+   </property>
+   <property name="toolTip">
+    <string>Βιβλιον Grounder prepare Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionSplit_Pages">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split_lang_folder.png</normaloff>:/Icons/Icons/split_lang_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Pages</string>
+   </property>
+  </action>
+  <action name="actionMake_Word_Box_Files">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename.png</normaloff>:/Icons/Icons/rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Make WordBox File</string>
+   </property>
+  </action>
+  <action name="actionMake_Character_Box_Files">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/glyph-trace.png</normaloff>:/Icons/Icons/glyph-trace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Make LetterBox Files</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_Source_Image">
+   <property name="text">
+    <string>Open Latin Source Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Source_Image">
+   <property name="text">
+    <string>Open Hebrew Source Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_LineBox_Image">
+   <property name="text">
+    <string>Open Hebrew Line Box Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_LineBox_Image">
+   <property name="text">
+    <string>Open Latin Line Box Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Hebrew_Box_Files">
+   <property name="text">
+    <string>Save Hebrew Glyph Box Files</string>
+   </property>
+  </action>
+  <action name="actionSave_Latin_Box_Files">
+   <property name="text">
+    <string>Save Latin Glyph Box Files</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_GlyphBox_Image">
+   <property name="text">
+    <string>Open Hebrew Glyph Box Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Line_Box_Image">
+   <property name="text">
+    <string>Open Hebrew Glyph Box Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_Line_Box_Image">
+   <property name="text">
+    <string>Open Latin Glyph Box Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Source_Text_File">
+   <property name="text">
+    <string>Open Source Text File</string>
+   </property>
+  </action>
+  <action name="actionOpen_Box_Image_Files">
+   <property name="text">
+    <string>Open Box Text Files</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_GlyphBox_Image">
+   <property name="text">
+    <string>Open Latin Glyph Box Image</string>
+   </property>
+  </action>
+  <action name="actionImages">
+   <property name="text">
+    <string>Images</string>
+   </property>
+  </action>
+  <action name="actionOpen_Greek_Source_Text">
+   <property name="text">
+    <string>Open Greek Source Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Source_Text">
+   <property name="text">
+    <string>Open Hebrew Source Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_Source_Text">
+   <property name="text">
+    <string>Open Latin Source Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Greek_LineBox_Text">
+   <property name="text">
+    <string>Open Greek Line Box Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Line_Box_Text">
+   <property name="text">
+    <string>Open Hebrew Line Box Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_Line_Box_Text">
+   <property name="text">
+    <string>Open Latin Line Box Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Greek_GlyphBox_Text">
+   <property name="text">
+    <string>Open Greek Glyph Box Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_GlyphBox_Text">
+   <property name="text">
+    <string>Open Hebrew Glyph Box Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_GlyphBox_Text">
+   <property name="text">
+    <string>Open Latin Glyph Box Text</string>
+   </property>
+  </action>
+  <action name="actionSave_Greek_Image">
+   <property name="text">
+    <string>Save Greek Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Hebrew_Image">
+   <property name="text">
+    <string>Save Hebrew Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Latin_Image">
+   <property name="text">
+    <string>Save Latin Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Greek_Text">
+   <property name="text">
+    <string>Save Greek Text</string>
+   </property>
+  </action>
+  <action name="actionSave_Hebrew_Text">
+   <property name="text">
+    <string>Save Hebrew Text</string>
+   </property>
+  </action>
+  <action name="actionSave_Latin_Text">
+   <property name="text">
+    <string>Save Latin Text</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Greek_Text">
+   <property name="text">
+    <string>Save As Greek Text</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Hebrew_Text">
+   <property name="text">
+    <string>Save As Hebrew Text</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Latin_Text">
+   <property name="text">
+    <string>Save As Latin Text</string>
+   </property>
+  </action>
+  <action name="actionAncient_Greek_Lang">
+   <property name="text">
+    <string>Ancient Greek</string>
+   </property>
+  </action>
+  <action name="actionMiddle_Greek_Lang">
+   <property name="text">
+    <string>Middle Greek</string>
+   </property>
+  </action>
+  <action name="actionModern_Greek_Lang">
+   <property name="text">
+    <string>Modern Greek</string>
+   </property>
+  </action>
+  <action name="action_Explorer">
+   <property name="text">
+    <string>Project Explorer</string>
+   </property>
+   <property name="toolTip">
+    <string>Project Explorer</string>
+   </property>
+  </action>
+  <action name="actionEdit_Hebrew_GlyphBox_Files">
+   <property name="text">
+    <string>Edit Hebrew GlyphBox Files</string>
+   </property>
+  </action>
+  <action name="actionMake_Hebrew_GlyphBox">
+   <property name="text">
+    <string>Make Hebrew GlyphBox</string>
+   </property>
+  </action>
+  <action name="actionSource">
+   <property name="text">
+    <string>Toggle Source Page</string>
+   </property>
+  </action>
+  <action name="actionLine">
+   <property name="text">
+    <string>Toggle Line Box</string>
+   </property>
+  </action>
+  <action name="actionGlyph">
+   <property name="text">
+    <string>Toggle Glyph Box</string>
+   </property>
+  </action>
+  <action name="actionGlyph_Map">
+   <property name="text">
+    <string>Toggle Glyph Map</string>
+   </property>
+  </action>
+  <action name="actionBox_Table">
+   <property name="text">
+    <string>Toggle Box Table</string>
+   </property>
+  </action>
+  <action name="actionBox_Text">
+   <property name="text">
+    <string>Toggle Box Text</string>
+   </property>
+  </action>
+  <action name="actionCharcter_Map">
+   <property name="text">
+    <string>Toggle Character Map</string>
+   </property>
+  </action>
+  <action name="actionToggle_Hebrew_Toolbars">
+   <property name="text">
+    <string>Toggle Hebrew Toolbars</string>
+   </property>
+  </action>
+  <action name="action_Boxer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Boxer</string>
    </property>
   </action>
  </widget>

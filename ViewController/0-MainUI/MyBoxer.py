@@ -218,7 +218,9 @@ class MainWindow(qtw.QMainWindow):
 
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
         #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)        
-    
+        self.ui.actionMake_Character_Box_Files.triggered.connect(self.loadcharboximage)
+        self.ui.actionMake_Word_Box_Files.triggered.connect(self.loadwordboximage)
+        
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
         self.ui.BothPrevButton.clicked.connect(self.prevImage)

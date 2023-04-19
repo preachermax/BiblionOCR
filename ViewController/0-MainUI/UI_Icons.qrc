@@ -1,5 +1,18 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/BiblionGlypher.png</file>
+    <file>Icons/charmap_edit_greek.png</file>
+    <file>Icons/charmap_edit_latin.png</file>
+    <file>Icons/glyphmap_edit_latin.png</file>
+    <file>Icons/charmap_stage_latin.png</file>
+    <file>Icons/charmap_stage_greek.png</file>
+    <file>Icons/glyphmap_stage_greek.png</file>
+    <file>Icons/glyphmap_stage_latin.png</file>
+    <file>Icons/glyphmap_edit_greek.png</file>
+    <file>Icons/glyphmap_greek.png</file>
+    <file>Icons/glyphmap_latin.png</file>
+    <file>Icons/charmap_latin.png</file>
+    <file>Icons/charmap_greek.png</file>
     <file>Icons/move-textlines-latin.png</file>
     <file>Icons/move_textlines-greek.png</file>
     <file>Icons/rename-textlines-latin.png</file>

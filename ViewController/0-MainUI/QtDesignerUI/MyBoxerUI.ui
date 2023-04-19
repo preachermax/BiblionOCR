@@ -1789,6 +1789,8 @@
     <addaction name="actionSplit_Pages"/>
     <addaction name="menuSplit_Lines"/>
     <addaction name="menuMake_LineBox_Files"/>
+    <addaction name="actionMake_Word_Box_Files"/>
+    <addaction name="actionMake_Character_Box_Files"/>
    </widget>
    <widget class="QMenu" name="menuStage">
     <property name="title">
@@ -2018,6 +2020,19 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_Grounder"/>
+  </widget>
+  <widget class="QToolBar" name="WordCharToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionMake_Word_Box_Files"/>
+   <addaction name="actionMake_Character_Box_Files"/>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -3551,6 +3566,24 @@
    </property>
    <property name="text">
     <string>Split Pages</string>
+   </property>
+  </action>
+  <action name="actionMake_Word_Box_Files">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename.png</normaloff>:/Icons/Icons/rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Make WordBox File</string>
+   </property>
+  </action>
+  <action name="actionMake_Character_Box_Files">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/glyph-trace.png</normaloff>:/Icons/Icons/glyph-trace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Make LetterBox Files</string>
    </property>
   </action>
  </widget>
