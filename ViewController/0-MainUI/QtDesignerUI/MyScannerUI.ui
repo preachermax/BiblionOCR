@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1309</width>
-    <height>920</height>
+    <width>1317</width>
+    <height>820</height>
    </rect>
   </property>
   <property name="font">
@@ -1295,7 +1295,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1309</width>
+     <width>1317</width>
      <height>20</height>
     </rect>
    </property>
@@ -1367,6 +1367,7 @@
     <addaction name="actionGimp"/>
     <addaction name="actionWriter"/>
     <addaction name="actionBoxer"/>
+    <addaction name="actionCharacter_Reference"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1395,127 +1396,13 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionProject_Browser"/>
+   <addaction name="actionCharacter_Reference"/>
    <addaction name="actionPixler_Image_Editor"/>
    <addaction name="actionEdit_Image_tb"/>
    <addaction name="actionCorrect_OCR_tb"/>
    <addaction name="actionVersifier"/>
    <addaction name="actionWriter"/>
    <addaction name="actionBoxer"/>
-  </widget>
-  <widget class="QDockWidget" name="dockOutput">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>100</width>
-     <height>100</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>520</width>
-     <height>200</height>
-    </size>
-   </property>
-   <property name="accessibleName">
-    <string/>
-   </property>
-   <property name="accessibleDescription">
-    <string/>
-   </property>
-   <property name="floating">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string> Output</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="dockOutputContents">
-    <widget class="QTextEdit" name="OutputText">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>0</y>
-       <width>1281</width>
-       <height>100</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>100</height>
-      </size>
-     </property>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockChrRef">
-   <property name="minimumSize">
-    <size>
-     <width>400</width>
-     <height>619</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>200</width>
-     <height>500</height>
-    </size>
-   </property>
-   <property name="floating">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Character Reference</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockChrRefContents">
-    <property name="minimumSize">
-     <size>
-      <width>400</width>
-      <height>600</height>
-     </size>
-    </property>
-    <widget class="QPlainTextEdit" name="ChrRefplainTextEdit">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>380</width>
-       <height>700</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>360</width>
-       <height>500</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>FROMVS</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustIgnored</enum>
-     </property>
-     <property name="documentTitle">
-      <string>Character Reference</string>
-     </property>
-    </widget>
-   </widget>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -2208,7 +2095,7 @@
   </action>
   <action name="actionFontForge">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset>
      <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
    </property>
    <property name="text">
@@ -2522,7 +2409,7 @@
   </action>
   <action name="actionFont_Forge">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset>
      <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
    </property>
    <property name="text">
@@ -2583,6 +2470,15 @@
    </property>
    <property name="text">
     <string>Project Browser</string>
+   </property>
+  </action>
+  <action name="actionCharacter_Reference">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>Character Reference</string>
    </property>
   </action>
  </widget>

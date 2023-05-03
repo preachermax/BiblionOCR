@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1368</width>
+    <width>1351</width>
     <height>956</height>
    </rect>
   </property>
@@ -36,117 +36,6 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="BoxWidget">
-   <widget class="QScrollArea" name="ImagescrollArea">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>550</width>
-      <height>831</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>501</width>
-      <height>600</height>
-     </size>
-    </property>
-    <property name="mouseTracking">
-     <bool>false</bool>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-    </property>
-    <widget class="QWidget" name="ImagescrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>6600</width>
-       <height>9600</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>6600</width>
-       <height>9600</height>
-      </size>
-     </property>
-     <property name="sizeIncrement">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>520</width>
-       <height>700</height>
-      </size>
-     </property>
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
-     <widget class="QLabel" name="Image">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>6800</width>
-        <height>9600</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="baseSize">
-       <size>
-        <width>520</width>
-        <height>700</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="margin">
-       <number>80</number>
-      </property>
-     </widget>
-    </widget>
-   </widget>
    <widget class="QPushButton" name="OpenImageFilebutton">
     <property name="geometry">
      <rect>
@@ -459,7 +348,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>230</y>
+      <y>570</y>
       <width>159</width>
       <height>101</height>
      </rect>
@@ -846,7 +735,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>80</y>
+      <y>430</y>
       <width>159</width>
       <height>101</height>
      </rect>
@@ -955,9 +844,9 @@
    <widget class="QComboBox" name="ZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>140</x>
       <y>0</y>
-      <width>81</width>
+      <width>61</width>
       <height>26</height>
      </rect>
     </property>
@@ -1048,7 +937,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>110</x>
       <y>0</y>
       <width>30</width>
       <height>26</height>
@@ -1079,7 +968,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1140</x>
       <y>30</y>
       <width>21</width>
       <height>161</height>
@@ -1222,7 +1111,7 @@
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>190</y>
+      <y>540</y>
       <width>121</width>
       <height>25</height>
      </rect>
@@ -1250,9 +1139,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>571</x>
       <y>840</y>
-      <width>158</width>
+      <width>159</width>
       <height>21</height>
      </rect>
     </property>
@@ -1287,7 +1176,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1301,11 +1190,11 @@
     <property name="tabBarAutoHide">
      <bool>true</bool>
     </property>
-    <widget class="QWidget" name="Table">
+    <widget class="QWidget" name="LineTable">
      <attribute name="title">
-      <string>Box Table</string>
+      <string>Line Box Table</string>
      </attribute>
-     <widget class="QTableWidget" name="BoxTable">
+     <widget class="QTableWidget" name="LineBoxTable">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -1521,17 +1410,321 @@
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="CSV">
+    <widget class="QWidget" name="LineText">
      <attribute name="title">
-      <string>CSV Text</string>
+      <string>Line Box Text</string>
      </attribute>
-     <widget class="QTextEdit" name="BoxText">
+     <widget class="QTextEdit" name="LineBoxText">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
         <width>580</width>
         <height>826</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="PageTable">
+     <attribute name="title">
+      <string>Page Box Table</string>
+     </attribute>
+     <widget class="QTableWidget" name="PageBoxTable">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>580</width>
+        <height>826</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="autoScrollMargin">
+       <number>16</number>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::CurrentChanged|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <property name="cornerButtonEnabled">
+       <bool>false</bool>
+      </property>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>20</number>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>30</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Page</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>X</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Y</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>W</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>H</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>InsA</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/insertabove.png</normaloff>:/Icons/Icons/insertabove.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>InsB</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/insertbelow.png</normaloff>:/Icons/Icons/insertbelow.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Del</string>
+       </property>
+       <property name="toolTip">
+        <string>Delete Row</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/deleterow.png</normaloff>:/Icons/Icons/deleterow.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Rdraw</string>
+       </property>
+       <property name="toolTip">
+        <string>Draw linebox with rubberBand</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/rubberband.png</normaloff>:/Icons/Icons/rubberband.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Sdraw</string>
+       </property>
+       <property name="toolTip">
+        <string>Draw linebox with cell spinboxes</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/spinbox4.png</normaloff>:/Icons/Icons/spinbox4.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Accept</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/Valid.png</normaloff>:/Icons/Icons/Valid.png</iconset>
+       </property>
+      </column>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="PageText">
+     <attribute name="title">
+      <string>Page Box Text</string>
+     </attribute>
+     <widget class="QTextEdit" name="PageBoxText">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>593</width>
+        <height>825</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SourceText">
+     <attribute name="title">
+      <string>Source Text</string>
+     </attribute>
+     <widget class="QTextEdit" name="SourcePageText">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>593</width>
+        <height>825</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -1585,8 +1778,888 @@
      <string>Lines</string>
     </property>
    </widget>
+   <widget class="QTabWidget" name="ImageTab">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>571</width>
+      <height>833</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::West</enum>
+    </property>
+    <property name="currentIndex">
+     <number>2</number>
+    </property>
+    <widget class="QWidget" name="LineBoxPage">
+     <attribute name="title">
+      <string>Line Box</string>
+     </attribute>
+     <widget class="QScrollArea" name="LineImagescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>544</width>
+        <height>829</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="LineImagescrollAreaWidgetContents_3">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="LineImage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="PageBoxPage">
+     <attribute name="title">
+      <string>Page Box</string>
+     </attribute>
+     <widget class="QScrollArea" name="PageImagescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>544</width>
+        <height>831</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="PageImagescrollAreaWidgetContents_2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="PageImage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SourceImagePage">
+     <attribute name="title">
+      <string>Source Image</string>
+     </attribute>
+     <widget class="QScrollArea" name="ImagescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>544</width>
+        <height>828</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="ImagescrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="Image">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>90</y>
+      <width>161</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Morphology</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QSlider" name="threshholdSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Greyscale to binary threshold value (0-255 lower =&gt; more black pixels) </string>
+     </property>
+     <property name="statusTip">
+      <string>Adjust greyscale threshold value</string>
+     </property>
+     <property name="maximum">
+      <number>255</number>
+     </property>
+     <property name="value">
+      <number>128</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="kernel_wSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>60</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Width of contour dilation mask in pixels (0-200)</string>
+     </property>
+     <property name="maximum">
+      <number>200</number>
+     </property>
+     <property name="value">
+      <number>70</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="kernel_hSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>90</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Height of contour dilation mask in pixels (0-200)</string>
+     </property>
+     <property name="maximum">
+      <number>200</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="iterationsSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>150</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Number of times to scan the contour(1-3)</string>
+     </property>
+     <property name="maximum">
+      <number>3</number>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="threshholdLabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Greyscale Threshhold</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="kernel_wLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>70</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Dilation kernel_w</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="kernel_hLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>100</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Dilation kernel_h</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="iteratonsLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>160</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Iterations</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="blurLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>130</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Median Blur</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QSlider" name="blurSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>120</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Amount of blur from the center of the contour outward (0- 20)</string>
+     </property>
+     <property name="maximum">
+      <number>20</number>
+     </property>
+     <property name="value">
+      <number>13</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="turdLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>190</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Turd Size</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QSlider" name="turdSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>180</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Size of square (w=h) to eliminate in pixels (0-5)</string>
+     </property>
+     <property name="maximum">
+      <number>5</number>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="minWidthLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>220</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Min Width</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QSlider" name="minWidthSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>210</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Minimum width of countour - scale set by box type</string>
+     </property>
+     <property name="maximum">
+      <number>0</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="maxWidthSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>270</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Maximum width of countour - scale set by box type</string>
+     </property>
+     <property name="maximum">
+      <number>0</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="pageStep">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="maxWidthLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>280</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Max Width</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="maxHeightLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>310</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Max Height</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QSlider" name="maxHeightSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>300</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Maximum height of countour - scale set by box type</string>
+     </property>
+     <property name="maximum">
+      <number>0</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="minHeightSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>240</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Minimum height of countour - scale set by box type</string>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>0</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="pageStep">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="minHeightLabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>250</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Min Height</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
    <zorder>BoxTab</zorder>
-   <zorder>ImagescrollArea</zorder>
    <zorder>OpenImageFilebutton</zorder>
    <zorder>ImageLe</zorder>
    <zorder>EditCorrectedTextbutton</zorder>
@@ -1609,18 +2682,20 @@
    <zorder>Zoombutton</zorder>
    <zorder>LHlineEdit</zorder>
    <zorder>LHDialogbutton</zorder>
-   <zorder>Zoomslider</zorder>
    <zorder>FindReplacebutton</zorder>
    <zorder>LHslider</zorder>
    <zorder>progressBar</zorder>
    <zorder>LineCheckBox</zorder>
+   <zorder>ImageTab</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>Zoomslider</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1368</width>
+     <width>1351</width>
      <height>20</height>
     </rect>
    </property>
@@ -1701,6 +2776,7 @@
      <addaction name="actionLatin_2"/>
     </widget>
     <addaction name="actionProject_Explorer"/>
+    <addaction name="actionSource_Image"/>
     <addaction name="menuSelect_Language"/>
     <addaction name="menuOpen_Box_Image"/>
     <addaction name="menuOpen_Box_File"/>
@@ -1727,6 +2803,17 @@
      <addaction name="actionRename_Greek_Text_Lines"/>
      <addaction name="actionRename_Latin_Text_Lines"/>
     </widget>
+    <widget class="QMenu" name="menuEdit_PageBox">
+     <property name="title">
+      <string>Edit PageBox</string>
+     </property>
+     <addaction name="actionAdjust_Page_Boxes"/>
+     <addaction name="actionEdit_Latin_Page"/>
+     <addaction name="actionDeskew_Greek_tiff"/>
+     <addaction name="actionDeskew_Latin"/>
+    </widget>
+    <addaction name="actionDeskew"/>
+    <addaction name="menuEdit_PageBox"/>
     <addaction name="menuEdit_LineBox_File"/>
     <addaction name="menuRename_Text_Lines"/>
     <addaction name="actionPreferences"/>
@@ -1762,6 +2849,8 @@
     </property>
     <addaction name="action_Pixler"/>
     <addaction name="action_Grounder"/>
+    <addaction name="action_Glypher"/>
+    <addaction name="action_Lexer"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1786,11 +2875,29 @@
      <addaction name="actionMake_Greek_LineBox_Files"/>
      <addaction name="actionMake_Latin_LineBox_Files"/>
     </widget>
-    <addaction name="actionSplit_Pages"/>
+    <widget class="QMenu" name="menuSplit_Pages">
+     <property name="title">
+      <string>Split Pages</string>
+     </property>
+     <widget class="QMenu" name="menuLanguage_Contour_Morphology">
+      <property name="title">
+       <string>Language Contour Morphology</string>
+      </property>
+      <addaction name="actionThreshhold"/>
+      <addaction name="actionOperator"/>
+      <addaction name="actionSE"/>
+      <addaction name="actionkernal_x"/>
+      <addaction name="actionKernal_y"/>
+      <addaction name="actionInterations"/>
+     </widget>
+     <addaction name="menuLanguage_Contour_Morphology"/>
+     <addaction name="actionAuto_Crop_Languages"/>
+     <addaction name="actionManually_Crop_Page"/>
+    </widget>
+    <addaction name="menuSplit_Pages"/>
     <addaction name="menuSplit_Lines"/>
     <addaction name="menuMake_LineBox_Files"/>
     <addaction name="actionMake_Word_Box_Files"/>
-    <addaction name="actionMake_Character_Box_Files"/>
    </widget>
    <widget class="QMenu" name="menuStage">
     <property name="title">
@@ -1846,7 +2953,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplit_Pages_btb"/>
+   <addaction name="actionAuto_Crop_Languages"/>
   </widget>
   <widget class="QToolBar" name="BatchGreekImageLinesToolBar">
    <property name="windowTitle">
@@ -1929,7 +3036,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionCrop_Languages_tb"/>
+   <addaction name="actionDeskewPage"/>
+   <addaction name="actionManually_Crop_Page"/>
   </widget>
   <widget class="QToolBar" name="GreekEditBoxesToolBar">
    <property name="windowTitle">
@@ -1941,6 +3049,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionDeskew_Greek_tiff"/>
    <addaction name="actionMake_Greek_LineBox_Files"/>
    <addaction name="actionEdit_Greek_LineBox_Pair"/>
    <addaction name="actionStage_Greek_tif_Lines_tb"/>
@@ -1955,6 +3064,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionDeskew_Latin"/>
    <addaction name="actionMake_Latin_LineBox_Files"/>
    <addaction name="actionEdit_Latin_Linebox_Pair"/>
    <addaction name="actionStage_Latin_tif_Lines_tb"/>
@@ -2019,6 +3129,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_Glypher"/>
+   <addaction name="action_Lexer"/>
    <addaction name="action_Grounder"/>
   </widget>
   <widget class="QToolBar" name="WordCharToolBar">
@@ -2031,8 +3143,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionMake_Word_Box_Files"/>
-   <addaction name="actionMake_Character_Box_Files"/>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -2244,7 +3354,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionCrop_Languages_tb">
+  <action name="actionCropPage">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
@@ -3407,7 +4517,7 @@
      <normaloff>:/Icons/Icons/box-lines-latin.png</normaloff>:/Icons/Icons/box-lines-latin.png</iconset>
    </property>
    <property name="text">
-    <string>Make Latin LineBox File</string>
+    <string>Make Latin LineBox</string>
    </property>
   </action>
   <action name="actionDark_Orange">
@@ -3559,15 +4669,6 @@
     <string>Βιβλιον Grounder prepare Ground Truth</string>
    </property>
   </action>
-  <action name="actionSplit_Pages">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split_lang_folder.png</normaloff>:/Icons/Icons/split_lang_folder.png</iconset>
-   </property>
-   <property name="text">
-    <string>Split Pages</string>
-   </property>
-  </action>
   <action name="actionMake_Word_Box_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
@@ -3584,6 +4685,136 @@
    </property>
    <property name="text">
     <string>Make LetterBox Files</string>
+   </property>
+  </action>
+  <action name="actionDeskew">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew</string>
+   </property>
+  </action>
+  <action name="actionSource_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Source Image</string>
+   </property>
+  </action>
+  <action name="actionThreshhold">
+   <property name="text">
+    <string>Threshhold</string>
+   </property>
+  </action>
+  <action name="actionAuto_Crop_Languages">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split_lang_folder.png</normaloff>:/Icons/Icons/split_lang_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Crop Language Pages</string>
+   </property>
+  </action>
+  <action name="actionManually_Crop_Page">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
+   </property>
+   <property name="text">
+    <string>Maually Crop Language Page</string>
+   </property>
+  </action>
+  <action name="actionAdjust_Page_Boxes">
+   <property name="text">
+    <string>Edit Greek Page Box</string>
+   </property>
+  </action>
+  <action name="actionOperator">
+   <property name="text">
+    <string>Operator</string>
+   </property>
+  </action>
+  <action name="actionSE">
+   <property name="text">
+    <string>SE</string>
+   </property>
+  </action>
+  <action name="actionkernal_x">
+   <property name="text">
+    <string>kernal_x</string>
+   </property>
+  </action>
+  <action name="actionKernal_y">
+   <property name="text">
+    <string>Kernal_y</string>
+   </property>
+  </action>
+  <action name="actionInterations">
+   <property name="text">
+    <string>Interations</string>
+   </property>
+  </action>
+  <action name="actionDeskew_Greek_tiff">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Greek</string>
+   </property>
+  </action>
+  <action name="actionDeskew_Latin">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Latin</string>
+   </property>
+  </action>
+  <action name="action_Glypher">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Glypher</string>
+   </property>
+  </action>
+  <action name="action_Lexer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLexer.png</normaloff>:/Icons/Icons/BiblionLexer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Βιβλιον Lexer</string>
+   </property>
+  </action>
+  <action name="actionEdit_Latin_Page">
+   <property name="text">
+    <string>Edit Latin Page Box</string>
+   </property>
+  </action>
+  <action name="actionDeskewPage">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew</string>
+   </property>
+  </action>
+  <action name="actionRotatePage">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rotate.png</normaloff>:/Icons/Icons/rotate.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate</string>
    </property>
   </action>
  </widget>

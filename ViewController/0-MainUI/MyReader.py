@@ -30,6 +30,7 @@ import QtCropImage as cropimg
 import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
 from Training import Train as tr
+import ChrReference as chrref
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -51,7 +52,7 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 
 # The new Stream Object which replaces the default stream associated with sys.stdout
 # This object just puts data in a queue!
-class WriteStream(object):
+'''class WriteStream(object):
     def __init__(self,queue):
         self.queue = queue
 
@@ -62,12 +63,12 @@ class WriteStream(object):
         """
         Stream flush implementation
         """
-        pass
+        pass'''
     
 # A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
 # It blocks until data is available, and once it has got something from the queue, it sends
 # it to the "MainThread" by emitting a Qt Signal 
-class ThreadConsoleTextQueueReceiver(qtc.QObject):
+'''class ThreadConsoleTextQueueReceiver(qtc.QObject):
     
     queue_element_received_signal = qtc.pyqtSignal(str)
 
@@ -84,10 +85,9 @@ class ThreadConsoleTextQueueReceiver(qtc.QObject):
 
     @qtc.pyqtSlot()
     def finished(self):
-        self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
+        self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')'''
 
-'''
-class Logging(qtc.QObject):
+'''class Logging(qtc.QObject):
     def setup_logging(log_prefix):
         global __is_setup_done
 
@@ -118,9 +118,9 @@ class Logging(qtc.QObject):
             tqdm_handler.setFormatter(console_formatter)
             root.addHandler(tqdm_handler)
 
-            __is_setup_done = True
+            __is_setup_done = True'''
 
-class TqdmLoggingHandler(logging.StreamHandler):
+'''class TqdmLoggingHandler(logging.StreamHandler):
 
     def __init__(self, level=logging.NOTSET):
         logging.StreamHandler.__init__(self)
@@ -129,8 +129,8 @@ class TqdmLoggingHandler(logging.StreamHandler):
         msg = self.format(record)
         tqdm.write(msg)
         # from https://stackoverflow.com/questions/38543506/change-logging-print-function-to-tqdm-write-so-logging-doesnt-interfere-wit/38739634#38739634
-        self.flush()
-'''
+        self.flush()'''
+
 
 class MainWindow(qtw.QMainWindow):
 
@@ -229,8 +229,9 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
-        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+        self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
+        #ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
+        #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.initBookCombo()
         #self.selectBookCombo()
@@ -247,7 +248,7 @@ class MainWindow(qtw.QMainWindow):
         print('current book:',self.bookabbr)
 
 
-        #'''      
+        '''#
         #setup_logging(self.__class__.__name__)
         #self.__logger = logging.getLogger(self.__class__.__name__)
         #self.__logger.setLevel(logging.DEBUG)
@@ -626,6 +627,10 @@ class MainWindow(qtw.QMainWindow):
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''         
         
         os.system(gimp_cmd)
+
+    def OpenChrReference(self):
+        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain.show()
 
     def actionCrop_Greek_To_tiff_Lines(self):
         print("cropping and sorting Greek tiff lines")

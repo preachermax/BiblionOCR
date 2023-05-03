@@ -235,6 +235,7 @@ class PixlerMain(qtw.QMainWindow):
             imagefileList_key = r"self.imagefileList"
             imagezoom_key = r"self.imagezoom"
             imagezoomslidervalue_key = r"self.imagezoomslidervalue"
+            pixlerpagesrotatedir_key = r"self.pixlerpagesrotatedir"
             greekpages_key = r"self.greekpages"
             greekpagesrotated_key = r"self.greekpagesrotated"
             greekpagesdeskewed_key = r"self.greekpagesdeskewed"
@@ -331,6 +332,8 @@ class PixlerMain(qtw.QMainWindow):
                     self.imagezoom = Setting['CurrentValue']
                 elif Setting['Setting'] == imagezoomslidervalue_key:
                     self.imagezoomslidervalue = Setting['CurrentValue']
+                elif Setting['Setting'] == pixlerpagesrotatedir_key:
+                    self.pixlerpagesrotatedir = self.projecthome + Setting['CurrentValue']
                 elif Setting['Setting'] == greekpages_key:
                     self.greekpages = self.projecthome + Setting['CurrentValue']          
                 elif Setting['Setting'] == greekpagesrotated_key:
@@ -2184,7 +2187,7 @@ class PixlerMain(qtw.QMainWindow):
 
     def mouseReleaseEvent(self, event):
     
-        if event.button() == Qt.LeftButton:
+        if self.rubberband and event.button() == Qt.LeftButton:
             geo = self.rubberBand.geometry()
             h = self.rubberBand.height()
             w = self.rubberBand.width()
@@ -2802,7 +2805,7 @@ class PixlerMain(qtw.QMainWindow):
     
     '''def deskewRefImgold(self):
         print("Auto deskewing reference image")
-        self.workflowdir = self.pixerpagesdeskewdir
+        self.workflowdir = self.pixlerpagesdeskewdir
         # Calculate skew angle of an image
         def getSkewAngle(cvImage) -> float:
             # Prep image, copy, convert to gray scale, blur, and threshold
@@ -2915,7 +2918,7 @@ class PixlerMain(qtw.QMainWindow):
         #self.cvleft, self.cvright, self.cvtop, self.cvbottom = None, None, None, None
 
     def rotateRefImg(self):           
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         def on_Spinner():
             self.rotateDialog_ui.Sliderhorizontal.setValue(self.rotateDialog_ui.SliderspinBox.value())
             angle = self.rotateDialog_ui.Sliderhorizontal.value()
@@ -2969,7 +2972,7 @@ class PixlerMain(qtw.QMainWindow):
         #self.initcvimg()
 
     def rotateRefImg90CW(self):
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         # Reading an image in default mode
         src = cv2.imread(self.refimgpath)
         
@@ -2984,7 +2987,7 @@ class PixlerMain(qtw.QMainWindow):
         fn = lambda x : 255 if x > thresh else 0
         PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
 
-        outfile = self.pixerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
+        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
         print("Converting cv2 image to PIL image: " + outfile)
         self.imagepath = outfile
         
@@ -3015,7 +3018,7 @@ class PixlerMain(qtw.QMainWindow):
         print("Auto rotation by 90 degrees clockwise complete")
 
     def rotateRefImg90CCW(self):
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         # Reading an image in default mode
         src = cv2.imread(self.refimgpath)
 
@@ -3031,7 +3034,7 @@ class PixlerMain(qtw.QMainWindow):
         fn = lambda x : 255 if x > thresh else 0
         PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
         
-        outfile = self.pixerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
+        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
         print("Converting cv2 image to PIL image: " + outfile)
         self.imagepath = outfile
         
@@ -3061,7 +3064,7 @@ class PixlerMain(qtw.QMainWindow):
         print("Auto rotation by 90 degrees counter-clockwise complete")
 
     def rotateRefImg180CW(self):
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         # Reading an image in default mode
         src = cv2.imread(self.refimgpath)
 
@@ -3077,7 +3080,7 @@ class PixlerMain(qtw.QMainWindow):
         fn = lambda x : 255 if x > thresh else 0
         PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
         
-        outfile = self.pixerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
+        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
         print("Converting cv2 image to PIL image: " + outfile)
         self.imagepath = outfile
         

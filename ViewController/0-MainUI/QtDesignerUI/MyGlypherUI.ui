@@ -348,7 +348,7 @@
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>30</y>
+      <y>80</y>
       <width>159</width>
       <height>101</height>
      </rect>
@@ -542,7 +542,7 @@
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>130</y>
+      <y>180</y>
       <width>159</width>
       <height>51</height>
      </rect>
@@ -740,7 +740,7 @@
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>180</y>
+      <y>230</y>
       <width>159</width>
       <height>101</height>
      </rect>
@@ -1116,7 +1116,7 @@
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>290</y>
+      <y>340</y>
       <width>121</width>
       <height>25</height>
      </rect>
@@ -1160,13 +1160,13 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QTabWidget" name="BoxTab">
+   <widget class="QTabWidget" name="GlyphBoxTab">
     <property name="geometry">
      <rect>
       <x>740</x>
       <y>30</y>
       <width>620</width>
-      <height>830</height>
+      <height>831</height>
      </rect>
     </property>
     <property name="font">
@@ -1174,11 +1174,14 @@
       <pointsize>9</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Add to Project SFD</string>
+    </property>
     <property name="tabPosition">
      <enum>QTabWidget::East</enum>
     </property>
     <property name="tabShape">
-     <enum>QTabWidget::Triangular</enum>
+     <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
      <number>3</number>
@@ -1195,16 +1198,61 @@
     <property name="tabBarAutoHide">
      <bool>true</bool>
     </property>
-    <widget class="QWidget" name="Table">
+    <widget class="QWidget" name="SourceTextPage">
      <attribute name="title">
-      <string>Box Table</string>
+      <string>Source Text</string>
      </attribute>
-     <widget class="QTableWidget" name="BoxTable">
+     <widget class="QTextEdit" name="SourceText">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
         <width>580</width>
+        <height>826</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="Table">
+     <attribute name="title">
+      <string>Glyph Table</string>
+     </attribute>
+     <widget class="QTableWidget" name="GlyphBoxTable">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>593</width>
         <height>826</height>
        </rect>
       </property>
@@ -1255,12 +1303,22 @@
       </attribute>
       <column>
        <property name="text">
-        <string>Line</string>
+        <string>G</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>OCR</string>
        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
         </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>CHR</string>
        </property>
       </column>
       <column>
@@ -1415,21 +1473,16 @@
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="CharMap">
-     <attribute name="title">
-      <string>Char Map</string>
-     </attribute>
-    </widget>
     <widget class="QWidget" name="Text">
      <attribute name="title">
-      <string>Box Text</string>
+      <string>Glyph Text</string>
      </attribute>
-     <widget class="QTextEdit" name="BoxText">
+     <widget class="QTextEdit" name="GlyphBoxText">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>580</width>
+        <width>593</width>
         <height>826</height>
        </rect>
       </property>
@@ -1462,50 +1515,1046 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="SourceTextPage">
+    <widget class="QWidget" name="CharRef">
      <attribute name="title">
-      <string>Source Text</string>
+      <string>Char Ref</string>
      </attribute>
-     <widget class="QTextEdit" name="SourceText">
+     <widget class="QRadioButton" name="selectedRradioButton">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>580</width>
-        <height>826</height>
+        <x>290</x>
+        <y>101</y>
+        <width>61</width>
+        <height>20</height>
        </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
       </property>
       <property name="font">
        <font>
         <family>FROMVS</family>
         <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="whatsThis">
+       <string>Select Installed Font</string>
+      </property>
+      <property name="text">
+       <string>Select</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">fontButtonGroup</string>
+      </attribute>
+     </widget>
+     <widget class="QPushButton" name="copyButton">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>220</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Copy Seleced Character List</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/document-copy.png</normaloff>:/Icons/Icons/document-copy.png</iconset>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="hexRadioButton">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>10</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="whatsThis">
+       <string>Show Hexadecimal UCode Points</string>
+      </property>
+      <property name="text">
+       <string>Hex</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">uCodeButtonGroup</string>
+      </attribute>
+     </widget>
+     <widget class="QLabel" name="uCodeChrRangeLabel">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>40</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Unicode Range</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="uCodeChrRangeComboBox">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>40</y>
+        <width>181</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="whatsThis">
+       <string>Unicode Point Range</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="chrString">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>190</y>
+        <width>301</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Selected Character List</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="GlyphChrRef">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>61</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Glyph Trace</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="text">
+       <string>Glyph PNG</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="chrSelectedFontSize">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>190</y>
+        <width>51</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selected Chr Font Size</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="minimum">
+       <number>6</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="value">
+       <number>20</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeStartRangeLabel">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>56</y>
+        <width>25</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>6</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="languageComboBox">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>10</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Select OCR language</string>
+      </property>
+      <property name="whatsThis">
+       <string>Select Project Language</string>
+      </property>
+      <property name="locale">
+       <locale language="English" country="UnitedStates"/>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <property name="currentText">
+       <string>Greek</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Greek</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Hebrew</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Latin</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>English</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLineEdit" name="uCodeSelectedLE">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>70</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Selected Unicode Point</string>
+      </property>
+      <property name="whatsThis">
+       <string>Selected Unicode Point</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="fontlabel">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>110</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
+      <property name="text">
+       <string>Font</string>
       </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </widget>
+     <widget class="QLabel" name="uCodeSelectionLabel">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>56</y>
+        <width>39</width>
+        <height>16</height>
+       </rect>
       </property>
-      <property name="lineWrapMode">
-       <enum>QTextEdit::NoWrap</enum>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>6</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Selection</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="fontChrRefSizeBox">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>100</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Select Character Font Size</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="minimum">
+       <number>6</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="value">
+       <number>20</number>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="chrTableWidget">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>250</y>
+        <width>560</width>
+        <height>541</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::CurrentChanged|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+      </property>
+      <property name="cornerButtonEnabled">
+       <bool>false</bool>
+      </property>
+      <column>
+       <property name="text">
+        <string>UCode</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>4</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>6</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>9</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>A</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>B</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>C</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>D</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>E</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>F</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QPushButton" name="prevChrRefButton">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>220</y>
+        <width>31</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Previous Character</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/back_alt.png</normaloff>:/Icons/Icons/back_alt.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeUTFLabel">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>70</y>
+        <width>51</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>UTF-8</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="langLabel">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>10</y>
+        <width>60</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Language</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="uCodeRemoveRangeButton">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>40</y>
+        <width>16</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Remove Unicode Range</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/minus-small.png</normaloff>:/Icons/Icons/minus-small.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ttfButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>150</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Save Validated Project SFD</string>
+      </property>
+      <property name="text">
+       <string>SFD</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="chrSelected">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>40</y>
+        <width>171</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Selected Character</string>
+      </property>
+      <property name="text">
+       <string>TEXT</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="uCodeEndRangeComboBox">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>70</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>End Unicode Point Range</string>
+      </property>
+      <property name="whatsThis">
+       <string>End Unicode Point Range</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="GSubLE">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>150</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="statusTip">
+       <string>Enter Ligature Substitution Characters</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="GlyphNameLE">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>241</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string> Glyph Name</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="projectRadioButton">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>120</y>
+        <width>61</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="whatsThis">
+       <string>Select Project Font</string>
+      </property>
+      <property name="text">
+       <string>Project</string>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">fontButtonGroup</string>
+      </attribute>
+     </widget>
+     <widget class="QPushButton" name="nextChrRefButton">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>220</y>
+        <width>31</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Next Character</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/forward_alt.png</normaloff>:/Icons/Icons/forward_alt.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="uCodeAddRangeButton">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>40</y>
+        <width>16</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add Unicode Range</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/plus-small.png</normaloff>:/Icons/Icons/plus-small.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeEndRangeLabel">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>56</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>6</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>End</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ligCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>150</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Ligature Character</string>
+      </property>
+      <property name="text">
+       <string>Ligature GSUB</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/tick.png</normaloff>:/Icons/Icons/tick.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QFontComboBox" name="fontChrRefComboBox">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>100</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Select font</string>
+      </property>
+      <property name="statusTip">
+       <string>Installed Font Name</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="decRadioButton">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>10</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="whatsThis">
+       <string>Show Decimal Unicode Points</string>
+      </property>
+      <property name="text">
+       <string>Dec</string>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">uCodeButtonGroup</string>
+      </attribute>
+     </widget>
+     <widget class="QComboBox" name="uCodeStartRangeComboBox">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>70</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Start Unicode Point Range </string>
+      </property>
+      <property name="whatsThis">
+       <string>Start Unicode Point Range </string>
+      </property>
+     </widget>
+     <widget class="QDialogButtonBox" name="buttonBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>790</y>
+        <width>541</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="sfdButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>150</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Update Project SFD</string>
+      </property>
+      <property name="text">
+       <string>SFD</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/navigation-090.png</normaloff>:/Icons/Icons/navigation-090.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chrRefCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>150</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add to Project SFD</string>
+      </property>
+      <property name="text">
+       <string>SFD</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/tick.png</normaloff>:/Icons/Icons/tick.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="favoritesLabel">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>175</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>6</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Favorites</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QTableView" name="favoritesTableView">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>190</y>
+        <width>171</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="fontValidatedCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>120</y>
+        <width>16</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="statusTip">
+       <string>Project Character Validated</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="fontValidateButton">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>124</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Build and Validate Project SFD</string>
+      </property>
+      <property name="text">
+       <string>Valid</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/tick.png</normaloff>:/Icons/Icons/tick.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>8</width>
+        <height>8</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="fontProjectFontName">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>126</y>
+        <width>151</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="statusTip">
+       <string>Enter Ligature Substitution Characters</string>
       </property>
      </widget>
     </widget>
    </widget>
-   <widget class="QCheckBox" name="LineCheckBox">
+   <widget class="QCheckBox" name="NumsCheckBox">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -1523,10 +2572,10 @@
      </font>
     </property>
     <property name="text">
-     <string>Lines</string>
+     <string>Nums</string>
     </property>
    </widget>
-   <widget class="QTabWidget" name="GlyphTab">
+   <widget class="QTabWidget" name="GlyphImgTab">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1544,11 +2593,127 @@
      <enum>QTabWidget::West</enum>
     </property>
     <property name="tabShape">
-     <enum>QTabWidget::Triangular</enum>
+     <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
+    <widget class="QWidget" name="SourceImagePage">
+     <attribute name="title">
+      <string>Source Image</string>
+     </attribute>
+     <widget class="QScrollArea" name="ImagescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>553</width>
+        <height>826</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="ImagescrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="Image">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
     <widget class="QWidget" name="GlyphBoxPage">
      <attribute name="title">
       <string>Glyph Box</string>
@@ -1558,8 +2723,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>550</width>
-        <height>831</height>
+        <width>553</width>
+        <height>826</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -1669,18 +2834,463 @@
      <attribute name="title">
       <string>Glyph Map</string>
      </attribute>
+     <widget class="QPushButton" name="nextButton">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>4</y>
+        <width>31</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/forward_alt.png</normaloff>:/Icons/Icons/forward_alt.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="GlyphFileName">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>5</y>
+        <width>251</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Glyph File Name</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="prevButton">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>5</y>
+        <width>31</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/back_alt.png</normaloff>:/Icons/Icons/back_alt.png</iconset>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Glyph">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>251</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Glyph Tif</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="text">
+       <string>TIF</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="glyphTableWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>290</y>
+        <width>553</width>
+        <height>536</height>
+       </rect>
+      </property>
+      <column>
+       <property name="text">
+        <string>UCode</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>4</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>6</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>9</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>A</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>B</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>C</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>D</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>E</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>F</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QLineEdit" name="GlyphName">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>250</y>
+        <width>251</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Glyph Name</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeUTF8Label">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>40</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>UTF-8</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeRangeLabel">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>20</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Unicode Range</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeDecLabel">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>90</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Decimal</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeHexLabel">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>90</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Hex</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="uCodeRangeComboBox">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>4</y>
+        <width>221</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select Unicode Point Range</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="characterAssignedLE">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>120</y>
+        <width>171</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Glyph Bitmap</string>
+      </property>
+      <property name="text">
+       <string>BMP</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="hexComboBox">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>70</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Hexadecimal Unicode Point</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="decComboBox">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>70</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Decimal Unicode Point</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="sfd2ChrRef">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>250</y>
+        <width>41</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Trace Selected Glyphs to SFD</string>
+      </property>
+      <property name="text">
+       <string>Trace</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/navigation.png</normaloff>:/Icons/Icons/navigation.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="glyphSelectCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>250</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select Glyph for Tracing</string>
+      </property>
+      <property name="text">
+       <string>Selected</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../UI_Icons.qrc">
+        <normaloff>:/Icons/Icons/tick.png</normaloff>:/Icons/Icons/tick.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeStartRangeLabel_2">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>50</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>6</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="uCodeEndRangeLabel_2">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>50</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>6</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>End</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="ucodeStartRange">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>30</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Start Unicode Point Range</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="uCodeEndRange">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>30</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>End Unicode Point Range</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QWidget" name="LineBoxPage">
+    <widget class="QWidget" name="GlyphDrawPage">
      <attribute name="title">
-      <string>Line Box</string>
+      <string>Glyph Draw</string>
      </attribute>
      <widget class="QScrollArea" name="LinescrollArea">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>550</width>
-        <height>831</height>
+        <width>553</width>
+        <height>826</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -1783,120 +3393,270 @@
          <number>80</number>
         </property>
        </widget>
-      </widget>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="SourceImagePage">
-     <attribute name="title">
-      <string>Source Image</string>
-     </attribute>
-     <widget class="QScrollArea" name="ImagescrollArea">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>552</width>
-        <height>831</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>501</width>
-        <height>600</height>
-       </size>
-      </property>
-      <property name="mouseTracking">
-       <bool>false</bool>
-      </property>
-      <property name="widgetResizable">
-       <bool>true</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <widget class="QWidget" name="ImagescrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>6600</width>
-         <height>9600</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>6600</width>
-         <height>9600</height>
-        </size>
-       </property>
-       <property name="sizeIncrement">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="baseSize">
-        <size>
-         <width>520</width>
-         <height>700</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <widget class="QLabel" name="Image">
+       <widget class="Line" name="AdvanceWidth">
+        <property name="geometry">
+         <rect>
+          <x>450</x>
+          <y>0</y>
+          <width>1</width>
+          <height>827</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+       <widget class="Line" name="LeftOrigin">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>0</y>
+          <width>1</width>
+          <height>827</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+       <widget class="Line" name="Ascent">
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
-          <width>6800</width>
-          <height>9600</height>
+          <y>100</y>
+          <width>553</width>
+          <height>1</height>
          </rect>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="baseSize">
-         <size>
-          <width>520</width>
-          <height>700</height>
-         </size>
+       </widget>
+       <widget class="Line" name="Base">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>600</y>
+          <width>553</width>
+          <height>1</height>
+         </rect>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="ascentlabel">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>80</y>
+          <width>31</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>FROMVS</family>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(52, 101, 164);</string>
         </property>
         <property name="text">
-         <string/>
+         <string>Ascent</string>
         </property>
-        <property name="scaledContents">
-         <bool>false</bool>
+       </widget>
+       <widget class="QLabel" name="originLabel">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>580</y>
+          <width>31</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(52, 101, 164);</string>
+        </property>
+        <property name="text">
+         <string>Origin</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="letOriginLabel">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>0</y>
+          <width>16</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
-        <property name="margin">
-         <number>80</number>
+       </widget>
+       <widget class="Line" name="xHeight">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>300</y>
+          <width>553</width>
+          <height>1</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="xHeightLabel">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>280</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(52, 101, 164);</string>
+        </property>
+        <property name="text">
+         <string>X-height</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="advanceWidthLabel">
+        <property name="geometry">
+         <rect>
+          <x>450</x>
+          <y>580</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(78, 154, 6);</string>
+        </property>
+        <property name="text">
+         <string>Advance Width</string>
+        </property>
+       </widget>
+       <widget class="Line" name="CapHeight">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>150</y>
+          <width>553</width>
+          <height>1</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="capHeightLabel">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>130</y>
+          <width>51</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>FROMVS</family>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(52, 101, 164);</string>
+        </property>
+        <property name="text">
+         <string>Cap height</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="Line" name="Descent">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>650</y>
+          <width>553</width>
+          <height>1</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="descentLabel">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>630</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>FROMVS</family>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(52, 101, 164);</string>
+        </property>
+        <property name="text">
+         <string>Descent</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </widget>
@@ -1959,7 +3719,211 @@
       <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
-   <zorder>BoxTab</zorder>
+   <widget class="QLineEdit" name="lineLE">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>50</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Current Line</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lineLabel">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>30</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Line</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="pageLE">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>50</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Current Page</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="pageLabel">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>30</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Page</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="FiltersGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>370</y>
+      <width>159</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QLabel" name="filtersLabel">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>0</y>
+       <width>61</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Filters</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="overlapCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>30</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Allow Boxes to Overlap</string>
+     </property>
+     <property name="text">
+      <string>Overlap</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="oddRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select Odd Numbered Boxes</string>
+     </property>
+     <property name="text">
+      <string>Odd</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="evenRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>60</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select Even Numbered Boxes</string>
+     </property>
+     <property name="text">
+      <string>Even</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="allRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>60</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Select All Boxes (default)</string>
+     </property>
+     <property name="text">
+      <string>All</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <zorder>GlyphBoxTab</zorder>
    <zorder>OpenImageFilebutton</zorder>
    <zorder>ImageLe</zorder>
    <zorder>EditCorrectedTextbutton</zorder>
@@ -1983,13 +3947,18 @@
    <zorder>LHlineEdit</zorder>
    <zorder>LHDialogbutton</zorder>
    <zorder>FindReplacebutton</zorder>
-   <zorder>LHslider</zorder>
    <zorder>progressBar</zorder>
-   <zorder>LineCheckBox</zorder>
-   <zorder>GlyphTab</zorder>
-   <zorder>Zoomslider</zorder>
+   <zorder>NumsCheckBox</zorder>
    <zorder>ProjectImageFilebutton</zorder>
    <zorder>ProjectTextFilebutton</zorder>
+   <zorder>lineLE</zorder>
+   <zorder>lineLabel</zorder>
+   <zorder>pageLE</zorder>
+   <zorder>pageLabel</zorder>
+   <zorder>FiltersGroupBox</zorder>
+   <zorder>GlyphImgTab</zorder>
+   <zorder>Zoomslider</zorder>
+   <zorder>LHslider</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -2089,25 +4058,43 @@
      <property name="title">
       <string>Open Source</string>
      </property>
-     <widget class="QMenu" name="menuOpenSourceImage">
+     <widget class="QMenu" name="menuPage_Image">
       <property name="title">
-       <string>Image</string>
+       <string>Page Image</string>
       </property>
-      <addaction name="actionOpen_Greek_Source_Image"/>
-      <addaction name="actionOpen_Hebrew_Source_Image"/>
-      <addaction name="actionOpen_Latin_Source_Image"/>
+      <addaction name="actionOpen_Greek_Page_Image"/>
+      <addaction name="actionOpen_Hebrew_Page_Image"/>
+      <addaction name="actionOpen_Latin_Page_Image"/>
      </widget>
-     <widget class="QMenu" name="menuOpenSourceText">
+     <widget class="QMenu" name="menuPage_Text">
       <property name="title">
-       <string>Text</string>
+       <string>Page Text</string>
       </property>
-      <addaction name="actionOpen_Greek_Source_Text"/>
-      <addaction name="separator"/>
-      <addaction name="actionOpen_Hebrew_Source_Text"/>
-      <addaction name="actionOpen_Latin_Source_Text"/>
+      <addaction name="actionOpen_Greek_Page_Text"/>
+      <addaction name="actionOpen_Hebrew_Page_Text"/>
+      <addaction name="actionOpen_Latin_Page_Text"/>
      </widget>
-     <addaction name="menuOpenSourceImage"/>
-     <addaction name="menuOpenSourceText"/>
+     <widget class="QMenu" name="menuLine_Text">
+      <property name="title">
+       <string>Line Text</string>
+      </property>
+      <addaction name="actionOpen_Greek_Line_Text"/>
+      <addaction name="actionOpen_Hebrew_Line_Text"/>
+      <addaction name="actionOpen_Latin_Line_Text"/>
+     </widget>
+     <widget class="QMenu" name="menuLine_Image">
+      <property name="title">
+       <string>Line Image</string>
+      </property>
+      <addaction name="actionOpen_Greek_Line_Image"/>
+      <addaction name="actionOpen_Hebrew_Line_Image"/>
+      <addaction name="actionOpen_Latin_Line_Image"/>
+     </widget>
+     <addaction name="actionProject_Source"/>
+     <addaction name="menuPage_Image"/>
+     <addaction name="menuPage_Text"/>
+     <addaction name="menuLine_Image"/>
+     <addaction name="menuLine_Text"/>
     </widget>
     <widget class="QMenu" name="menuOpen_Lines">
      <property name="title">
@@ -2161,6 +4148,7 @@
      </property>
      <addaction name="action_Explorer"/>
     </widget>
+    <addaction name="actionExtract_Glyphs_2"/>
     <addaction name="menuProject_Explorer"/>
     <addaction name="menuSelect_Language"/>
     <addaction name="menuOpenSource"/>
@@ -2173,17 +4161,34 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <widget class="QMenu" name="menuEdit_LineBox_File">
+    <widget class="QMenu" name="menuEdit_GlyphBox_File">
      <property name="title">
-      <string>Edit GlyphBox File Pairs</string>
+      <string>Edit GlyphBoxes</string>
      </property>
      <addaction name="actionEdit_Greek_LineBox_File_Pair"/>
      <addaction name="actionEdit_Latin_GlyphBox_Files"/>
      <addaction name="actionEdit_Hebrew_GlyphBox_Files"/>
     </widget>
-    <addaction name="menuEdit_LineBox_File"/>
+    <widget class="QMenu" name="menuEdit_Glyph_Codepoints">
+     <property name="title">
+      <string>Edit Glyph Codepoints</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuEdit_Glyph_Filters">
+     <property name="title">
+      <string>Edit Glyph Filters</string>
+     </property>
+     <addaction name="actionOverlap"/>
+     <addaction name="actionOdd"/>
+     <addaction name="actionEven"/>
+    </widget>
+    <addaction name="menuEdit_GlyphBox_File"/>
     <addaction name="actionPreferences"/>
     <addaction name="actionFind_and_Replace"/>
+    <addaction name="actionEdit_Glyph_Names"/>
+    <addaction name="menuEdit_Glyph_Codepoints"/>
+    <addaction name="actionEdit_Unicode_Ranges"/>
+    <addaction name="menuEdit_Glyph_Filters"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -2223,6 +4228,7 @@
     <addaction name="action_Pixler"/>
     <addaction name="action_Trainer"/>
     <addaction name="action_Boxer"/>
+    <addaction name="actionCharacter_Reference"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -2233,19 +4239,16 @@
     <property name="title">
      <string>Make</string>
     </property>
-    <widget class="QMenu" name="menuMake_LineBox_Files">
+    <widget class="QMenu" name="menuMake_GlyphBox_Files">
      <property name="title">
       <string>Make GlyphBox Files</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../UI_Icons.qrc">
-       <normaloff>:/Icons/Icons/glyph-trace.png</normaloff>:/Icons/Icons/glyph-trace.png</iconset>
      </property>
      <addaction name="actionMake_Greek_GlyphBox_Files"/>
      <addaction name="actionMake_Latin_GlyphBox_Files"/>
      <addaction name="actionMake_Hebrew_GlyphBox"/>
     </widget>
-    <addaction name="menuMake_LineBox_Files"/>
+    <addaction name="actionLanguage_2"/>
+    <addaction name="menuMake_GlyphBox_Files"/>
    </widget>
    <widget class="QMenu" name="menuStage">
     <property name="title">
@@ -2256,10 +4259,93 @@
     <addaction name="actionStage_Greek_Characters"/>
     <addaction name="actionStage_Latin_Characters"/>
    </widget>
+   <widget class="QMenu" name="menuFont">
+    <property name="title">
+     <string>Font</string>
+    </property>
+    <widget class="QMenu" name="menuGlyphs">
+     <property name="title">
+      <string>Glyphs</string>
+     </property>
+     <widget class="QMenu" name="menuGlyph_Numbers">
+      <property name="title">
+       <string>Glyph Numbers</string>
+      </property>
+      <addaction name="actionHexadecimal"/>
+      <addaction name="actionDecimal"/>
+     </widget>
+     <addaction name="actionGlyph_Names"/>
+     <addaction name="actionGlyph_Codepoints"/>
+     <addaction name="actionGlyph_Code_Range"/>
+     <addaction name="menuGlyph_Numbers"/>
+    </widget>
+    <widget class="QMenu" name="menuFont_2">
+     <property name="title">
+      <string>Font</string>
+     </property>
+     <widget class="QMenu" name="menuProject_Font">
+      <property name="title">
+       <string>Project Font</string>
+      </property>
+      <widget class="QMenu" name="menuLigatures">
+       <property name="title">
+        <string>Ligatures</string>
+       </property>
+       <addaction name="actionGSubs"/>
+      </widget>
+      <addaction name="actionProject_Font_Family"/>
+      <addaction name="actionProject_Font_Size"/>
+      <addaction name="actionProject_Language"/>
+      <addaction name="actionProject_Encoding"/>
+      <addaction name="actionNumber_Format"/>
+      <addaction name="actionUnicode_Range"/>
+      <addaction name="menuLigatures"/>
+      <addaction name="actionGenerate_Project_TTF"/>
+     </widget>
+     <widget class="QMenu" name="menuCharRef_Font">
+      <property name="title">
+       <string>CharRef Font</string>
+      </property>
+      <addaction name="actionFont_Family_3"/>
+      <addaction name="actionFont_Size_2"/>
+     </widget>
+     <widget class="QMenu" name="menuGlyphRef_Font">
+      <property name="title">
+       <string>GlyphRef Font</string>
+      </property>
+      <addaction name="actionFont_Family_4"/>
+      <addaction name="actionFont_Size_3"/>
+     </widget>
+     <widget class="QMenu" name="menuGenerate_Project_Font">
+      <property name="title">
+       <string>Generate Project Font</string>
+      </property>
+      <addaction name="actionttf"/>
+      <addaction name="actionotf"/>
+     </widget>
+     <addaction name="menuProject_Font"/>
+     <addaction name="menuGenerate_Project_Font"/>
+     <addaction name="actionInstall_Project_Font"/>
+     <addaction name="actionEdit_Font_with_Font_Forge"/>
+     <addaction name="menuGlyphRef_Font"/>
+     <addaction name="menuCharRef_Font"/>
+    </widget>
+    <widget class="QMenu" name="menuSFD">
+     <property name="title">
+      <string>SFD</string>
+     </property>
+     <addaction name="actionGenerate_Project_SFD"/>
+    </widget>
+    <addaction name="menuGlyphs"/>
+    <addaction name="menuSFD"/>
+    <addaction name="menuFont_2"/>
+    <addaction name="actionCharacters"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSplit"/>
    <addaction name="menuEdit"/>
    <addaction name="menuStage"/>
+   <addaction name="menuFont"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -2285,6 +4371,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionOpen_Greek_LineBox_Image"/>
    <addaction name="actionMake_Greek_GlyphBox_Files"/>
    <addaction name="actionEdit_Greek_GlyphBox_Files"/>
    <addaction name="actionStage_Greek_GlyphBox_Files"/>
@@ -2365,7 +4452,7 @@
    </attribute>
    <addaction name="action_Trainer"/>
   </widget>
-  <widget class="QToolBar" name="GlypherToolBar">
+  <widget class="QToolBar" name="OutputToolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -2375,7 +4462,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpen_Greek_LineBox_Image"/>
+   <addaction name="actionCharacter_Reference"/>
+   <addaction name="actionExtract_Glyphs_2"/>
   </widget>
   <action name="actiontiff_to_png">
    <property name="text">
@@ -2820,7 +4908,7 @@
   <action name="actionStage_Greek_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/glyphmap_stage_greek.png</normaloff>:/Icons/Icons/glyphmap_stage_greek.png</iconset>
+     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
    </property>
    <property name="text">
     <string>Stage Greek Glyphs for Glyph Map</string>
@@ -2919,7 +5007,7 @@
   <action name="actionStage_Latin_GlyphBox_Files">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/glyphmap_stage_latin.png</normaloff>:/Icons/Icons/glyphmap_stage_latin.png</iconset>
+     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
    </property>
    <property name="text">
     <string>Stage Latin Glyphs for GlyphMap</string>
@@ -3378,13 +5466,13 @@
     <string>Ministry</string>
    </property>
   </action>
-  <action name="actionOpen_Greek_Source_Image">
+  <action name="actionOpen_Greek_Page_Image">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/folder_blk.png</normaloff>:/Icons/Icons/folder_blk.png</iconset>
    </property>
    <property name="text">
-    <string>Open Greek Source Image</string>
+    <string>Open Greek Page Image</string>
    </property>
   </action>
   <action name="actionOpen_Page_Box_File">
@@ -3827,7 +5915,7 @@
   <action name="actionStage_Greek_Characters">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/charmap_stage_greek.png</normaloff>:/Icons/Icons/charmap_stage_greek.png</iconset>
+     <normaloff>:/Icons/Icons/move_textlines-greek.png</normaloff>:/Icons/Icons/move_textlines-greek.png</iconset>
    </property>
    <property name="text">
     <string>Stage Greek Characters to CharacterMap</string>
@@ -3842,7 +5930,7 @@
   <action name="actionStage_Latin_Characters">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/charmap_stage_latin.png</normaloff>:/Icons/Icons/charmap_stage_latin.png</iconset>
+     <normaloff>:/Icons/Icons/move-textlines-latin.png</normaloff>:/Icons/Icons/move-textlines-latin.png</iconset>
    </property>
    <property name="text">
     <string>Stage Latin Characters to CharacterMap</string>
@@ -3902,14 +5990,14 @@
     <string>Make LetterBox Files</string>
    </property>
   </action>
-  <action name="actionOpen_Latin_Source_Image">
+  <action name="actionOpen_Latin_Page_Image">
    <property name="text">
-    <string>Open Latin Source Image</string>
+    <string>Open Latin Page Image</string>
    </property>
   </action>
-  <action name="actionOpen_Hebrew_Source_Image">
+  <action name="actionOpen_Hebrew_Page_Image">
    <property name="text">
-    <string>Open Hebrew Source Image</string>
+    <string>Open Hebrew Page Image</string>
    </property>
   </action>
   <action name="actionOpen_Hebrew_LineBox_Image">
@@ -3967,9 +6055,9 @@
     <string>Images</string>
    </property>
   </action>
-  <action name="actionOpen_Greek_Source_Text">
+  <action name="actionOpen_Greek_Page_Text">
    <property name="text">
-    <string>Open Greek Source Text</string>
+    <string>Open Greek Page Text</string>
    </property>
   </action>
   <action name="actionOpen_Hebrew_Source_Text">
@@ -3977,9 +6065,9 @@
     <string>Open Hebrew Source Text</string>
    </property>
   </action>
-  <action name="actionOpen_Latin_Source_Text">
+  <action name="actionOpen_Latin_Page_Text">
    <property name="text">
-    <string>Open Latin Source Text</string>
+    <string>Open Latin Page Text</string>
    </property>
   </action>
   <action name="actionOpen_Greek_LineBox_Text">
@@ -4139,9 +6227,229 @@
     <string>Βιβλιον Boxer</string>
    </property>
   </action>
+  <action name="actionGlyph_Names">
+   <property name="text">
+    <string>Glyph Names</string>
+   </property>
+  </action>
+  <action name="actionCharacters">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>Characters</string>
+   </property>
+  </action>
+  <action name="actionCharacter_Reference">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>Character Reference</string>
+   </property>
+  </action>
+  <action name="actionProject_Font_Size">
+   <property name="text">
+    <string>Font Size</string>
+   </property>
+  </action>
+  <action name="actionGlyph_2">
+   <property name="text">
+    <string>Glyph</string>
+   </property>
+  </action>
+  <action name="actionProject_Font_Family">
+   <property name="text">
+    <string>Font Family</string>
+   </property>
+  </action>
+  <action name="actionFont_Family_3">
+   <property name="text">
+    <string>Font Family</string>
+   </property>
+  </action>
+  <action name="actionFont_Family_4">
+   <property name="text">
+    <string>Font Family</string>
+   </property>
+  </action>
+  <action name="actionFont_Size_2">
+   <property name="text">
+    <string>Font Size</string>
+   </property>
+  </action>
+  <action name="actionFont_Size_3">
+   <property name="text">
+    <string>Font Size</string>
+   </property>
+  </action>
+  <action name="actionProject_Language">
+   <property name="text">
+    <string>Language</string>
+   </property>
+  </action>
+  <action name="actionProject_Encoding">
+   <property name="text">
+    <string>Encoding</string>
+   </property>
+  </action>
+  <action name="actionNumber_Format">
+   <property name="text">
+    <string>Number Format</string>
+   </property>
+  </action>
+  <action name="actionUnicode_Range">
+   <property name="text">
+    <string>Unicode Range</string>
+   </property>
+  </action>
+  <action name="actionGSubs">
+   <property name="text">
+    <string>GSub</string>
+   </property>
+  </action>
+  <action name="actionGenerate_Project_TTF">
+   <property name="text">
+    <string>Generate Project TTF</string>
+   </property>
+  </action>
+  <action name="actionGenerate_Project_SFD">
+   <property name="text">
+    <string>Build Project SFD</string>
+   </property>
+  </action>
+  <action name="actionEdit_Font_with_Font_Forge">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/fontforgenew.png</normaloff>:/Icons/Icons/fontforgenew.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Font with Font Forge</string>
+   </property>
+  </action>
+  <action name="actionEdit_Glyph_Names">
+   <property name="text">
+    <string>Edit Glyph Names</string>
+   </property>
+  </action>
+  <action name="actionGlyph_Codepoints">
+   <property name="text">
+    <string>Glyph Codepoints</string>
+   </property>
+  </action>
+  <action name="actionGlyph_Code_Range">
+   <property name="text">
+    <string>Glyph Code Range</string>
+   </property>
+  </action>
+  <action name="actionHexadecimal">
+   <property name="text">
+    <string>Hexadecimal</string>
+   </property>
+  </action>
+  <action name="actionDecimal">
+   <property name="text">
+    <string>Decimal</string>
+   </property>
+  </action>
+  <action name="actionInstall_Project_Font">
+   <property name="text">
+    <string>Install Project Font</string>
+   </property>
+  </action>
+  <action name="actionttf">
+   <property name="text">
+    <string>ttf</string>
+   </property>
+  </action>
+  <action name="actionotf">
+   <property name="text">
+    <string>otf</string>
+   </property>
+  </action>
+  <action name="actionEdit_Unicode_Ranges">
+   <property name="text">
+    <string>Edit Unicode Ranges</string>
+   </property>
+  </action>
+  <action name="actionOdd">
+   <property name="text">
+    <string>Odd</string>
+   </property>
+  </action>
+  <action name="actionEven">
+   <property name="text">
+    <string>Even</string>
+   </property>
+  </action>
+  <action name="actionOverlap">
+   <property name="text">
+    <string>Overlap</string>
+   </property>
+  </action>
+  <action name="actionLanguage_2">
+   <property name="text">
+    <string>Language</string>
+   </property>
+  </action>
+  <action name="actionExtract_Glyphs_2">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
+   </property>
+   <property name="text">
+    <string>Extract Glyphs</string>
+   </property>
+  </action>
+  <action name="actionOpen_Greek_Line_Text">
+   <property name="text">
+    <string>Open Greek Line Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Line_Text">
+   <property name="text">
+    <string>Open Hebrew Line Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_Line_Text">
+   <property name="text">
+    <string>Open Latin Line Text</string>
+   </property>
+  </action>
+  <action name="actionOpen_Greek_Line_Image">
+   <property name="text">
+    <string>Open Greek Line Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Line_Image">
+   <property name="text">
+    <string>Open Hebrew Line Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Latin_Line_Image">
+   <property name="text">
+    <string>Open Latin Line Image</string>
+   </property>
+  </action>
+  <action name="actionOpen_Hebrew_Page_Text">
+   <property name="text">
+    <string>Open Hebrew Page Text</string>
+   </property>
+  </action>
+  <action name="actionProject_Source">
+   <property name="text">
+    <string>Project Source</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../UI_Icons.qrc"/>
  </resources>
  <connections/>
+ <buttongroups>
+  <buttongroup name="uCodeButtonGroup"/>
+  <buttongroup name="fontButtonGroup"/>
+ </buttongroups>
 </ui>

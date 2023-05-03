@@ -1,0 +1,6010 @@
+[
+    {
+        "": "0",
+        "name": ".notdef",
+        "xMin": "26",
+        "yMin": "15",
+        "xMax": "956",
+        "yMax": "1395"
+    },
+    {
+        "": "1",
+        "name": "A",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1352"
+    },
+    {
+        "": "2",
+        "name": "AE",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1574",
+        "yMax": "1350"
+    },
+    {
+        "": "3",
+        "name": "Alpha-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1352"
+    },
+    {
+        "": "4",
+        "name": "Alphadasia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1574",
+        "yMax": "1640"
+    },
+    {
+        "": "5",
+        "name": "Alphadasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1914",
+        "yMax": "1634"
+    },
+    {
+        "": "6",
+        "name": "Alphadasiaoxiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-413",
+        "xMax": "1914",
+        "yMax": "1634"
+    },
+    {
+        "": "7",
+        "name": "Alphadasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1718",
+        "yMax": "2224"
+    },
+    {
+        "": "8",
+        "name": "Alphadasiaperispomeniprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-404",
+        "xMax": "1718",
+        "yMax": "2224"
+    },
+    {
+        "": "9",
+        "name": "Alphadasiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "1574",
+        "yMax": "1640"
+    },
+    {
+        "": "10",
+        "name": "Alphadasiavaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2089",
+        "yMax": "1642"
+    },
+    {
+        "": "11",
+        "name": "Alphadasiavariaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-406",
+        "xMax": "2089",
+        "yMax": "1642"
+    },
+    {
+        "": "12",
+        "name": "Alphamacron-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1710"
+    },
+    {
+        "": "13",
+        "name": "Alphaoxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1641"
+    },
+    {
+        "": "14",
+        "name": "Alphaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-416",
+        "xMax": "1298",
+        "yMax": "1352"
+    },
+    {
+        "": "15",
+        "name": "Alphapsili-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1454",
+        "yMax": "1637"
+    },
+    {
+        "": "16",
+        "name": "Alphapsilioxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1818",
+        "yMax": "1639"
+    },
+    {
+        "": "17",
+        "name": "Alphapsilioxiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "1818",
+        "yMax": "1639"
+    },
+    {
+        "": "18",
+        "name": "Alphapsiliperispomeni-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1642",
+        "yMax": "2212"
+    },
+    {
+        "": "19",
+        "name": "Alphapsiliperispomeniprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-404",
+        "xMax": "1642",
+        "yMax": "2212"
+    },
+    {
+        "": "20",
+        "name": "Alphapsiliprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-411",
+        "xMax": "1454",
+        "yMax": "1637"
+    },
+    {
+        "": "21",
+        "name": "Alphapsilivaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2034",
+        "yMax": "1639"
+    },
+    {
+        "": "22",
+        "name": "Alphapsilivariaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-401",
+        "xMax": "2034",
+        "yMax": "1639"
+    },
+    {
+        "": "23",
+        "name": "Alphatonos-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1637"
+    },
+    {
+        "": "24",
+        "name": "Alphavaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1466",
+        "yMax": "1638"
+    },
+    {
+        "": "25",
+        "name": "Alphavrachy-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1912"
+    },
+    {
+        "": "26",
+        "name": "B",
+        "xMin": "0",
+        "yMin": "-2",
+        "xMax": "915",
+        "yMax": "1352"
+    },
+    {
+        "": "27",
+        "name": "Beta-grek",
+        "xMin": "0",
+        "yMin": "-2",
+        "xMax": "915",
+        "yMax": "1352"
+    },
+    {
+        "": "28",
+        "name": "C",
+        "xMin": "0",
+        "yMin": "-14",
+        "xMax": "1165",
+        "yMax": "1382"
+    },
+    {
+        "": "29",
+        "name": "Chi-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1669",
+        "yMax": "1353"
+    },
+    {
+        "": "30",
+        "name": "D",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1289",
+        "yMax": "1355"
+    },
+    {
+        "": "31",
+        "name": "Delta-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1325",
+        "yMax": "1352"
+    },
+    {
+        "": "32",
+        "name": "E",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "994",
+        "yMax": "1352"
+    },
+    {
+        "": "33",
+        "name": "Epsilon-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "994",
+        "yMax": "1352"
+    },
+    {
+        "": "34",
+        "name": "Epsilondasia-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1582",
+        "yMax": "1640"
+    },
+    {
+        "": "35",
+        "name": "Epsilondasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "2055",
+        "yMax": "1638"
+    },
+    {
+        "": "36",
+        "name": "Epsilondasiavaria-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "2090",
+        "yMax": "1642"
+    },
+    {
+        "": "37",
+        "name": "Epsilonoxia-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1434",
+        "yMax": "1642"
+    },
+    {
+        "": "38",
+        "name": "Epsilonpsili-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1590",
+        "yMax": "1639"
+    },
+    {
+        "": "39",
+        "name": "Epsilonpsilioxia-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1972",
+        "yMax": "1639"
+    },
+    {
+        "": "40",
+        "name": "Epsilonpsilivaria-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "2061",
+        "yMax": "1642"
+    },
+    {
+        "": "41",
+        "name": "Epsilontonos-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1453",
+        "yMax": "1637"
+    },
+    {
+        "": "42",
+        "name": "Epsilonvaria-grek",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1518",
+        "yMax": "1638"
+    },
+    {
+        "": "43",
+        "name": "Eta-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1331",
+        "yMax": "1346"
+    },
+    {
+        "": "44",
+        "name": "Etadasia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1919",
+        "yMax": "1639"
+    },
+    {
+        "": "45",
+        "name": "Etadasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2455",
+        "yMax": "1639"
+    },
+    {
+        "": "46",
+        "name": "Etadasiaoxiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-406",
+        "xMax": "2455",
+        "yMax": "1639"
+    },
+    {
+        "": "47",
+        "name": "Etadasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2096",
+        "yMax": "2224"
+    },
+    {
+        "": "48",
+        "name": "Etadasiaperispomeniprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-404",
+        "xMax": "2096",
+        "yMax": "2224"
+    },
+    {
+        "": "49",
+        "name": "Etadasiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "1919",
+        "yMax": "1639"
+    },
+    {
+        "": "50",
+        "name": "Etadasiavaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2465",
+        "yMax": "1639"
+    },
+    {
+        "": "51",
+        "name": "Etadasiavariaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "2465",
+        "yMax": "1639"
+    },
+    {
+        "": "52",
+        "name": "Etaoxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1859",
+        "yMax": "1638"
+    },
+    {
+        "": "53",
+        "name": "Etaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-402",
+        "xMax": "1331",
+        "yMax": "1346"
+    },
+    {
+        "": "54",
+        "name": "Etapsili-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1951",
+        "yMax": "1638"
+    },
+    {
+        "": "55",
+        "name": "Etapsilioxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2376",
+        "yMax": "1638"
+    },
+    {
+        "": "56",
+        "name": "Etapsilioxiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-406",
+        "xMax": "2376",
+        "yMax": "1638"
+    },
+    {
+        "": "57",
+        "name": "Etapsiliperispomeni-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2136",
+        "yMax": "2210"
+    },
+    {
+        "": "58",
+        "name": "Etapsiliperispomeniprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-410",
+        "xMax": "2136",
+        "yMax": "2210"
+    },
+    {
+        "": "59",
+        "name": "Etapsiliprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-406",
+        "xMax": "1951",
+        "yMax": "1638"
+    },
+    {
+        "": "60",
+        "name": "Etapsilivaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2411",
+        "yMax": "1638"
+    },
+    {
+        "": "61",
+        "name": "Etapsilivariaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "2411",
+        "yMax": "1638"
+    },
+    {
+        "": "62",
+        "name": "Etatonos-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1870",
+        "yMax": "1639"
+    },
+    {
+        "": "63",
+        "name": "Etavaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1855",
+        "yMax": "1638"
+    },
+    {
+        "": "64",
+        "name": "F",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "929",
+        "yMax": "1352"
+    },
+    {
+        "": "65",
+        "name": "G",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1138",
+        "yMax": "1352"
+    },
+    {
+        "": "66",
+        "name": "Gamma-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "929",
+        "yMax": "1301"
+    },
+    {
+        "": "67",
+        "name": "H",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1331",
+        "yMax": "1346"
+    },
+    {
+        "": "68",
+        "name": "I",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "516",
+        "yMax": "1352"
+    },
+    {
+        "": "69",
+        "name": "Iota-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "516",
+        "yMax": "1352"
+    },
+    {
+        "": "70",
+        "name": "Iotadasia-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1108",
+        "yMax": "1638"
+    },
+    {
+        "": "71",
+        "name": "Iotadasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1644",
+        "yMax": "1642"
+    },
+    {
+        "": "72",
+        "name": "Iotadasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1276",
+        "yMax": "2225"
+    },
+    {
+        "": "73",
+        "name": "Iotadasiavaria-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1656",
+        "yMax": "1642"
+    },
+    {
+        "": "74",
+        "name": "Iotadialytika-grek",
+        "xMin": "15",
+        "yMin": "-8",
+        "xMax": "683",
+        "yMax": "1749"
+    },
+    {
+        "": "75",
+        "name": "Iotamacron-grek",
+        "xMin": "-148",
+        "yMin": "10",
+        "xMax": "657",
+        "yMax": "1710"
+    },
+    {
+        "": "76",
+        "name": "Iotaoxia-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1048",
+        "yMax": "1638"
+    },
+    {
+        "": "77",
+        "name": "Iotapsili-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1124",
+        "yMax": "1638"
+    },
+    {
+        "": "78",
+        "name": "Iotapsilioxia-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1560",
+        "yMax": "1639"
+    },
+    {
+        "": "79",
+        "name": "Iotapsiliperispomeni-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1331",
+        "yMax": "2216"
+    },
+    {
+        "": "80",
+        "name": "Iotapsilivaria-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1596",
+        "yMax": "1639"
+    },
+    {
+        "": "81",
+        "name": "Iotatonos-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1035",
+        "yMax": "1638"
+    },
+    {
+        "": "82",
+        "name": "Iotavaria-grek",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1040",
+        "yMax": "1642"
+    },
+    {
+        "": "83",
+        "name": "Iotavrachy-grek",
+        "xMin": "-198",
+        "yMin": "10",
+        "xMax": "706",
+        "yMax": "1912"
+    },
+    {
+        "": "84",
+        "name": "J",
+        "xMin": "0",
+        "yMin": "-27",
+        "xMax": "786",
+        "yMax": "1352"
+    },
+    {
+        "": "85",
+        "name": "K",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1444",
+        "yMax": "1368"
+    },
+    {
+        "": "86",
+        "name": "Kappa-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1444",
+        "yMax": "1368"
+    },
+    {
+        "": "87",
+        "name": "L",
+        "xMin": "0",
+        "yMin": "-8",
+        "xMax": "1204",
+        "yMax": "1352"
+    },
+    {
+        "": "88",
+        "name": "Lamda-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1298",
+        "yMax": "1352"
+    },
+    {
+        "": "89",
+        "name": "M",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1656",
+        "yMax": "1352"
+    },
+    {
+        "": "90",
+        "name": "Mu-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1656",
+        "yMax": "1352"
+    },
+    {
+        "": "91",
+        "name": "N",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1392",
+        "yMax": "1352"
+    },
+    {
+        "": "92",
+        "name": "Nu-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1392",
+        "yMax": "1352"
+    },
+    {
+        "": "93",
+        "name": "O",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1405",
+        "yMax": "1384"
+    },
+    {
+        "": "94",
+        "name": "Omega-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1727",
+        "yMax": "1355"
+    },
+    {
+        "": "95",
+        "name": "Omegadasia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2017",
+        "yMax": "1639"
+    },
+    {
+        "": "96",
+        "name": "Omegadasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2363",
+        "yMax": "1639"
+    },
+    {
+        "": "97",
+        "name": "Omegadasiaoxiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "2363",
+        "yMax": "1639"
+    },
+    {
+        "": "98",
+        "name": "Omegadasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2202",
+        "yMax": "2224"
+    },
+    {
+        "": "99",
+        "name": "Omegadasiaperispomeniprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-395",
+        "xMax": "2202",
+        "yMax": "2224"
+    },
+    {
+        "": "100",
+        "name": "Omegadasiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-401",
+        "xMax": "2017",
+        "yMax": "1639"
+    },
+    {
+        "": "101",
+        "name": "Omegadasiavaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2561",
+        "yMax": "1637"
+    },
+    {
+        "": "102",
+        "name": "Omegadasiavariaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "2561",
+        "yMax": "1637"
+    },
+    {
+        "": "103",
+        "name": "Omegaoxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1727",
+        "yMax": "1641"
+    },
+    {
+        "": "104",
+        "name": "Omegaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-410",
+        "xMax": "1727",
+        "yMax": "1355"
+    },
+    {
+        "": "105",
+        "name": "Omegapsili-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1903",
+        "yMax": "1639"
+    },
+    {
+        "": "106",
+        "name": "Omegapsilioxia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2262",
+        "yMax": "1638"
+    },
+    {
+        "": "107",
+        "name": "Omegapsilioxiaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "2262",
+        "yMax": "1638"
+    },
+    {
+        "": "108",
+        "name": "Omegapsiliperispomeni-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2092",
+        "yMax": "2211"
+    },
+    {
+        "": "109",
+        "name": "Omegapsiliperispomeniprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-410",
+        "xMax": "2092",
+        "yMax": "2211"
+    },
+    {
+        "": "110",
+        "name": "Omegapsiliprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "1903",
+        "yMax": "1639"
+    },
+    {
+        "": "111",
+        "name": "Omegapsilivaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "2513",
+        "yMax": "1636"
+    },
+    {
+        "": "112",
+        "name": "Omegapsilivariaprosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-403",
+        "xMax": "2513",
+        "yMax": "1636"
+    },
+    {
+        "": "113",
+        "name": "Omegatonos-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1784",
+        "yMax": "1638"
+    },
+    {
+        "": "114",
+        "name": "Omegavaria-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1943",
+        "yMax": "1635"
+    },
+    {
+        "": "115",
+        "name": "Omicron-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1405",
+        "yMax": "1384"
+    },
+    {
+        "": "116",
+        "name": "Omicrondasia-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1993",
+        "yMax": "1638"
+    },
+    {
+        "": "117",
+        "name": "Omicrondasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "2285",
+        "yMax": "1638"
+    },
+    {
+        "": "118",
+        "name": "Omicrondasiavaria-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "2491",
+        "yMax": "1640"
+    },
+    {
+        "": "119",
+        "name": "Omicronoxia-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1649",
+        "yMax": "1642"
+    },
+    {
+        "": "120",
+        "name": "Omicronpsili-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1833",
+        "yMax": "1638"
+    },
+    {
+        "": "121",
+        "name": "Omicronpsilioxia-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "2185",
+        "yMax": "1641"
+    },
+    {
+        "": "122",
+        "name": "Omicronpsilivaria-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "2475",
+        "yMax": "1638"
+    },
+    {
+        "": "123",
+        "name": "Omicrontonos-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1714",
+        "yMax": "1637"
+    },
+    {
+        "": "124",
+        "name": "Omicronvaria-grek",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1893",
+        "yMax": "1638"
+    },
+    {
+        "": "125",
+        "name": "P",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "985",
+        "yMax": "1368"
+    },
+    {
+        "": "126",
+        "name": "Phi-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1378",
+        "yMax": "1354"
+    },
+    {
+        "": "127",
+        "name": "Pi-grek",
+        "xMin": "0",
+        "yMin": "-1",
+        "xMax": "1319",
+        "yMax": "1350"
+    },
+    {
+        "": "128",
+        "name": "Pi_2",
+        "xMin": "0",
+        "yMin": "-1",
+        "xMax": "1216",
+        "yMax": "1351"
+    },
+    {
+        "": "129",
+        "name": "Psi-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1255",
+        "yMax": "1352"
+    },
+    {
+        "": "130",
+        "name": "Q",
+        "xMin": "0",
+        "yMin": "-268",
+        "xMax": "1581",
+        "yMax": "1384"
+    },
+    {
+        "": "131",
+        "name": "R",
+        "xMin": "-1",
+        "yMin": "0",
+        "xMax": "1315",
+        "yMax": "1362"
+    },
+    {
+        "": "132",
+        "name": "Rho-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "985",
+        "yMax": "1368"
+    },
+    {
+        "": "133",
+        "name": "Rhodasia-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1573",
+        "yMax": "1646"
+    },
+    {
+        "": "134",
+        "name": "S",
+        "xMin": "0",
+        "yMin": "4",
+        "xMax": "899",
+        "yMax": "1375"
+    },
+    {
+        "": "135",
+        "name": "Sigma-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1130",
+        "yMax": "1352"
+    },
+    {
+        "": "136",
+        "name": "T",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1489",
+        "yMax": "1352"
+    },
+    {
+        "": "137",
+        "name": "Tau-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1335",
+        "yMax": "1352"
+    },
+    {
+        "": "138",
+        "name": "Theta-grek",
+        "xMin": "0",
+        "yMin": "-5",
+        "xMax": "1405",
+        "yMax": "1402"
+    },
+    {
+        "": "139",
+        "name": "U",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "1214",
+        "yMax": "1352"
+    },
+    {
+        "": "140",
+        "name": "Upsilon-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1027",
+        "yMax": "1352"
+    },
+    {
+        "": "141",
+        "name": "Upsilondasia-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1615",
+        "yMax": "1642"
+    },
+    {
+        "": "142",
+        "name": "Upsilondasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "2102",
+        "yMax": "1638"
+    },
+    {
+        "": "143",
+        "name": "Upsilondasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1742",
+        "yMax": "2226"
+    },
+    {
+        "": "144",
+        "name": "Upsilondasiavaria-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "2162",
+        "yMax": "1642"
+    },
+    {
+        "": "145",
+        "name": "Upsilondialytika-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1027",
+        "yMax": "1737"
+    },
+    {
+        "": "146",
+        "name": "Upsilonmacron-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1027",
+        "yMax": "1710"
+    },
+    {
+        "": "147",
+        "name": "Upsilonoxia-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1459",
+        "yMax": "1642"
+    },
+    {
+        "": "148",
+        "name": "Upsilontonos-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1555",
+        "yMax": "1638"
+    },
+    {
+        "": "149",
+        "name": "Upsilonvaria-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1551",
+        "yMax": "1638"
+    },
+    {
+        "": "150",
+        "name": "Upsilonvrachy-grek",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1027",
+        "yMax": "1927"
+    },
+    {
+        "": "151",
+        "name": "V",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1366",
+        "yMax": "1352"
+    },
+    {
+        "": "152",
+        "name": "W",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1964",
+        "yMax": "1352"
+    },
+    {
+        "": "153",
+        "name": "X",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1669",
+        "yMax": "1353"
+    },
+    {
+        "": "154",
+        "name": "Xi-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1082",
+        "yMax": "1347"
+    },
+    {
+        "": "155",
+        "name": "Y",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1147",
+        "yMax": "1352"
+    },
+    {
+        "": "156",
+        "name": "Z",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1480",
+        "yMax": "1352"
+    },
+    {
+        "": "157",
+        "name": "Zeta-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1258",
+        "yMax": "1352"
+    },
+    {
+        "": "158",
+        "name": "a",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "817",
+        "yMax": "938"
+    },
+    {
+        "": "159",
+        "name": "accentatnahhafukhcomb-hebr",
+        "xMin": "-179",
+        "yMin": "-595",
+        "xMax": "180",
+        "yMax": "-167"
+    },
+    {
+        "": "160",
+        "name": "accentdargacomb-hebr",
+        "xMin": "-122",
+        "yMin": "-592",
+        "xMax": "122",
+        "yMax": "-163"
+    },
+    {
+        "": "161",
+        "name": "accentdehicomb-hebr",
+        "xMin": "375",
+        "yMin": "-587",
+        "xMax": "595",
+        "yMax": "-169"
+    },
+    {
+        "": "162",
+        "name": "accentetnahtacomb-hebr",
+        "xMin": "-180",
+        "yMin": "-592",
+        "xMax": "179",
+        "yMax": "-164"
+    },
+    {
+        "": "163",
+        "name": "accentgereshcomb-hebr",
+        "xMin": "-52",
+        "yMin": "1222",
+        "xMax": "168",
+        "yMax": "1640"
+    },
+    {
+        "": "164",
+        "name": "accentgereshmuqdamcomb-hebr",
+        "xMin": "280",
+        "yMin": "1222",
+        "xMax": "500",
+        "yMax": "1640"
+    },
+    {
+        "": "165",
+        "name": "accentgershayimcomb-hebr",
+        "xMin": "-165",
+        "yMin": "1222",
+        "xMax": "285",
+        "yMax": "1640"
+    },
+    {
+        "": "166",
+        "name": "accentiluycomb-hebr",
+        "xMin": "-152",
+        "yMin": "1203",
+        "xMax": "152",
+        "yMax": "1601"
+    },
+    {
+        "": "167",
+        "name": "accentmahapakhcomb-hebr",
+        "xMin": "-167",
+        "yMin": "-587",
+        "xMax": "158",
+        "yMax": "-171"
+    },
+    {
+        "": "168",
+        "name": "accentmerkhacomb-hebr",
+        "xMin": "-168",
+        "yMin": "-587",
+        "xMax": "52",
+        "yMax": "-169"
+    },
+    {
+        "": "169",
+        "name": "accentmerkhakefulacomb-hebr",
+        "xMin": "-285",
+        "yMin": "-587",
+        "xMax": "165",
+        "yMax": "-169"
+    },
+    {
+        "": "170",
+        "name": "accentmunahcomb-hebr",
+        "xMin": "-147",
+        "yMin": "-572",
+        "xMax": "147",
+        "yMax": "-174"
+    },
+    {
+        "": "171",
+        "name": "accentolecomb-hebr",
+        "xMin": "-110",
+        "yMin": "1223",
+        "xMax": "215",
+        "yMax": "1639"
+    },
+    {
+        "": "172",
+        "name": "accentpashtacomb-hebr",
+        "xMin": "-500",
+        "yMin": "1222",
+        "xMax": "-280",
+        "yMax": "1640"
+    },
+    {
+        "": "173",
+        "name": "accentpazercomb-hebr",
+        "xMin": "-85",
+        "yMin": "1227",
+        "xMax": "211",
+        "yMax": "1635"
+    },
+    {
+        "": "174",
+        "name": "accentqadmacomb-hebr",
+        "xMin": "-168",
+        "yMin": "1222",
+        "xMax": "52",
+        "yMax": "1640"
+    },
+    {
+        "": "175",
+        "name": "accentqarneyparacomb-hebr",
+        "xMin": "-456",
+        "yMin": "1199",
+        "xMax": "456",
+        "yMax": "1696"
+    },
+    {
+        "": "176",
+        "name": "accentreviacomb-hebr",
+        "xMin": "-121",
+        "yMin": "1213",
+        "xMax": "122",
+        "yMax": "1501"
+    },
+    {
+        "": "177",
+        "name": "accentsegolcomb-hebr",
+        "xMin": "-221",
+        "yMin": "1222",
+        "xMax": "221",
+        "yMax": "1630"
+    },
+    {
+        "": "178",
+        "name": "accentshalsheletcomb-hebr",
+        "xMin": "-133",
+        "yMin": "1207",
+        "xMax": "134",
+        "yMax": "1656"
+    },
+    {
+        "": "179",
+        "name": "accenttelishagedolacomb-hebr",
+        "xMin": "190",
+        "yMin": "1178",
+        "xMax": "595",
+        "yMax": "1696"
+    },
+    {
+        "": "180",
+        "name": "accenttelishaqetanacomb-hebr",
+        "xMin": "-595",
+        "yMin": "1178",
+        "xMax": "-190",
+        "yMax": "1696"
+    },
+    {
+        "": "181",
+        "name": "accenttevircomb-hebr",
+        "xMin": "-179",
+        "yMin": "-587",
+        "xMax": "150",
+        "yMax": "-169"
+    },
+    {
+        "": "182",
+        "name": "accenttipehacomb-hebr",
+        "xMin": "-52",
+        "yMin": "-587",
+        "xMax": "168",
+        "yMax": "-169"
+    },
+    {
+        "": "183",
+        "name": "accentyerahbenyomocomb-hebr",
+        "xMin": "-179",
+        "yMin": "-595",
+        "xMax": "180",
+        "yMax": "-167"
+    },
+    {
+        "": "184",
+        "name": "accentyetivcomb-hebr",
+        "xMin": "325",
+        "yMin": "-587",
+        "xMax": "650",
+        "yMax": "-171"
+    },
+    {
+        "": "185",
+        "name": "accentzaqefgadolcomb-hebr",
+        "xMin": "-144",
+        "yMin": "1222",
+        "xMax": "185",
+        "yMax": "1640"
+    },
+    {
+        "": "186",
+        "name": "accentzaqefqatancomb-hebr",
+        "xMin": "-82",
+        "yMin": "1222",
+        "xMax": "82",
+        "yMax": "1640"
+    },
+    {
+        "": "187",
+        "name": "accentzarqacomb-hebr",
+        "xMin": "-265",
+        "yMin": "1243",
+        "xMax": "265",
+        "yMax": "1531"
+    },
+    {
+        "": "188",
+        "name": "accentzinorcomb-hebr",
+        "xMin": "-745",
+        "yMin": "1243",
+        "xMax": "-215",
+        "yMax": "1531"
+    },
+    {
+        "": "189",
+        "name": "acute",
+        "xMin": "0",
+        "yMin": "1328",
+        "xMax": "292",
+        "yMax": "1709"
+    },
+    {
+        "": "190",
+        "name": "acutecomb",
+        "xMin": "-736",
+        "yMin": "1160",
+        "xMax": "-212",
+        "yMax": "1842"
+    },
+    {
+        "": "191",
+        "name": "acutemod",
+        "xMin": "-720",
+        "yMin": "1164",
+        "xMax": "-196",
+        "yMax": "1846"
+    },
+    {
+        "": "192",
+        "name": "acutetonemarkcomb",
+        "xMin": "-793",
+        "yMin": "1168",
+        "xMax": "-269",
+        "yMax": "1850"
+    },
+    {
+        "": "193",
+        "name": "ae",
+        "xMin": "0",
+        "yMin": "-29",
+        "xMax": "1266",
+        "yMax": "950"
+    },
+    {
+        "": "194",
+        "name": "alef-hebr",
+        "xMin": "0",
+        "yMin": "-43",
+        "xMax": "996",
+        "yMax": "1337"
+    },
+    {
+        "": "195",
+        "name": "alpha-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "983"
+    },
+    {
+        "": "196",
+        "name": "alpha_apostrophe",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1143",
+        "yMax": "1701"
+    },
+    {
+        "": "197",
+        "name": "alpha_curly",
+        "xMin": "1",
+        "yMin": "-172",
+        "xMax": "1578",
+        "yMax": "1003"
+    },
+    {
+        "": "198",
+        "name": "alpha_fin_sigma",
+        "xMin": "59",
+        "yMin": "952",
+        "xMax": "1434",
+        "yMax": "1552"
+    },
+    {
+        "": "199",
+        "name": "alpha_iota",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "1549",
+        "yMax": "977"
+    },
+    {
+        "": "200",
+        "name": "alpha_iota_perispomeni",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "1549",
+        "yMax": "1602"
+    },
+    {
+        "": "201",
+        "name": "alpha_iota_perispomeni_sigma",
+        "xMin": "60",
+        "yMin": "753",
+        "xMax": "904",
+        "yMax": "1621"
+    },
+    {
+        "": "202",
+        "name": "alpha_iota_psili",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "1549",
+        "yMax": "1903"
+    },
+    {
+        "": "203",
+        "name": "alpha_iota_psili_oxia",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "1549",
+        "yMax": "1947"
+    },
+    {
+        "": "204",
+        "name": "alpha_iota_tonos",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "1549",
+        "yMax": "1821"
+    },
+    {
+        "": "205",
+        "name": "alpha_nu",
+        "xMin": "3",
+        "yMin": "-62",
+        "xMax": "1878",
+        "yMax": "1060"
+    },
+    {
+        "": "206",
+        "name": "alpha_nu#1",
+        "xMin": "-288",
+        "yMin": "1056",
+        "xMax": "923",
+        "yMax": "1622"
+    },
+    {
+        "": "207",
+        "name": "alpha_nu_2",
+        "xMin": "2",
+        "yMin": "901",
+        "xMax": "1123",
+        "yMax": "1633"
+    },
+    {
+        "": "208",
+        "name": "alpha_nu_3",
+        "xMin": "15",
+        "yMin": "912",
+        "xMax": "1492",
+        "yMax": "1642"
+    },
+    {
+        "": "209",
+        "name": "alpha_psili_sigma_tau",
+        "xMin": "0",
+        "yMin": "-6",
+        "xMax": "1844",
+        "yMax": "1912"
+    },
+    {
+        "": "210",
+        "name": "alpha_rho",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1049",
+        "yMax": "1769"
+    },
+    {
+        "": "211",
+        "name": "alpha_sigma_2",
+        "xMin": "-2",
+        "yMin": "1154",
+        "xMax": "991",
+        "yMax": "1621"
+    },
+    {
+        "": "212",
+        "name": "alpha_sigma_tau",
+        "xMin": "0",
+        "yMin": "-6",
+        "xMax": "1844",
+        "yMax": "1048"
+    },
+    {
+        "": "213",
+        "name": "alphadasia-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1825"
+    },
+    {
+        "": "214",
+        "name": "alphadasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1139",
+        "yMax": "1865"
+    },
+    {
+        "": "215",
+        "name": "alphadasiaoxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-402",
+        "xMax": "1139",
+        "yMax": "1865"
+    },
+    {
+        "": "216",
+        "name": "alphadasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "2216"
+    },
+    {
+        "": "217",
+        "name": "alphadasiaperispomeniypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-411",
+        "xMax": "1080",
+        "yMax": "2215"
+    },
+    {
+        "": "218",
+        "name": "alphadasiavaria-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1142",
+        "yMax": "1792"
+    },
+    {
+        "": "219",
+        "name": "alphadasiavariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "1142",
+        "yMax": "1792"
+    },
+    {
+        "": "220",
+        "name": "alphadasiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "1080",
+        "yMax": "1825"
+    },
+    {
+        "": "221",
+        "name": "alphamacron-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1335"
+    },
+    {
+        "": "222",
+        "name": "alphaoxia-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1783"
+    },
+    {
+        "": "223",
+        "name": "alphaoxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-412",
+        "xMax": "1080",
+        "yMax": "1783"
+    },
+    {
+        "": "224",
+        "name": "alphaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1534"
+    },
+    {
+        "": "225",
+        "name": "alphaperispomeniypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "1080",
+        "yMax": "1534"
+    },
+    {
+        "": "226",
+        "name": "alphapsili-grek",
+        "xMin": "-2",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1826"
+    },
+    {
+        "": "227",
+        "name": "alphapsilioxia-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1132",
+        "yMax": "1814"
+    },
+    {
+        "": "228",
+        "name": "alphapsilioxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-402",
+        "xMax": "1132",
+        "yMax": "1814"
+    },
+    {
+        "": "229",
+        "name": "alphapsiliperispomeni-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "2185"
+    },
+    {
+        "": "230",
+        "name": "alphapsiliperispomeniypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-411",
+        "xMax": "1080",
+        "yMax": "2185"
+    },
+    {
+        "": "231",
+        "name": "alphapsilivaria-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1176",
+        "yMax": "1810"
+    },
+    {
+        "": "232",
+        "name": "alphapsilivariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-412",
+        "xMax": "1176",
+        "yMax": "1810"
+    },
+    {
+        "": "233",
+        "name": "alphapsiliypogegrammeni-grek",
+        "xMin": "-2",
+        "yMin": "-412",
+        "xMax": "1080",
+        "yMax": "1826"
+    },
+    {
+        "": "234",
+        "name": "alphatonos-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1792"
+    },
+    {
+        "": "235",
+        "name": "alphavaria-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1771"
+    },
+    {
+        "": "236",
+        "name": "alphavariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-402",
+        "xMax": "1080",
+        "yMax": "1771"
+    },
+    {
+        "": "237",
+        "name": "alphavrachy-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "1080",
+        "yMax": "1543"
+    },
+    {
+        "": "238",
+        "name": "alphaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-412",
+        "xMax": "1080",
+        "yMax": "983"
+    },
+    {
+        "": "239",
+        "name": "ampersand",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1388",
+        "yMax": "1354"
+    },
+    {
+        "": "240",
+        "name": "apostrophemod",
+        "xMin": "59",
+        "yMin": "1317",
+        "xMax": "369",
+        "yMax": "1852"
+    },
+    {
+        "": "241",
+        "name": "asciicircum",
+        "xMin": "0",
+        "yMin": "1265",
+        "xMax": "781",
+        "yMax": "1773"
+    },
+    {
+        "": "242",
+        "name": "asciitilde",
+        "xMin": "0",
+        "yMin": "1328",
+        "xMax": "814",
+        "yMax": "1673"
+    },
+    {
+        "": "243",
+        "name": "asterisk",
+        "xMin": "0",
+        "yMin": "441",
+        "xMax": "480",
+        "yMax": "973"
+    },
+    {
+        "": "244",
+        "name": "asteriskbelowcomb",
+        "xMin": "-1",
+        "yMin": "-578",
+        "xMax": "479",
+        "yMax": "-46"
+    },
+    {
+        "": "245",
+        "name": "at",
+        "xMin": "0",
+        "yMin": "149",
+        "xMax": "908",
+        "yMax": "1113"
+    },
+    {
+        "": "246",
+        "name": "ayin-hebr",
+        "xMin": "0",
+        "yMin": "-143",
+        "xMax": "1113",
+        "yMax": "1335"
+    },
+    {
+        "": "247",
+        "name": "b",
+        "xMin": "-25",
+        "yMin": "-35",
+        "xMax": "934",
+        "yMax": "1421"
+    },
+    {
+        "": "248",
+        "name": "backslash",
+        "xMin": "0",
+        "yMin": "-127",
+        "xMax": "351",
+        "yMax": "1317"
+    },
+    {
+        "": "249",
+        "name": "bar",
+        "xMin": "0",
+        "yMin": "-273",
+        "xMax": "115",
+        "yMax": "1328"
+    },
+    {
+        "": "250",
+        "name": "bet-hebr",
+        "xMin": "-5",
+        "yMin": "0",
+        "xMax": "1081",
+        "yMax": "1223"
+    },
+    {
+        "": "251",
+        "name": "beta-grek",
+        "xMin": "0",
+        "yMin": "-121",
+        "xMax": "1105",
+        "yMax": "1369"
+    },
+    {
+        "": "252",
+        "name": "beta_curly",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "788",
+        "yMax": "1355"
+    },
+    {
+        "": "253",
+        "name": "betasymbol-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "788",
+        "yMax": "1355"
+    },
+    {
+        "": "254",
+        "name": "braceleft",
+        "xMin": "0",
+        "yMin": "-140",
+        "xMax": "538",
+        "yMax": "1328"
+    },
+    {
+        "": "255",
+        "name": "braceright",
+        "xMin": "0",
+        "yMin": "-140",
+        "xMax": "538",
+        "yMax": "1328"
+    },
+    {
+        "": "256",
+        "name": "bracketleft",
+        "xMin": "0",
+        "yMin": "-139",
+        "xMax": "352",
+        "yMax": "1327"
+    },
+    {
+        "": "257",
+        "name": "bracketright",
+        "xMin": "0",
+        "yMin": "-139",
+        "xMax": "352",
+        "yMax": "1327"
+    },
+    {
+        "": "258",
+        "name": "brevecomb",
+        "xMin": "-1092",
+        "yMin": "1054",
+        "xMax": "-188",
+        "yMax": "1492"
+    },
+    {
+        "": "259",
+        "name": "brevemod",
+        "xMin": "-1062",
+        "yMin": "1055",
+        "xMax": "-158",
+        "yMax": "1493"
+    },
+    {
+        "": "260",
+        "name": "brokenbar",
+        "xMin": "0",
+        "yMin": "160",
+        "xMax": "80",
+        "yMax": "1227"
+    },
+    {
+        "": "261",
+        "name": "c",
+        "xMin": "0",
+        "yMin": "-31",
+        "xMax": "776",
+        "yMax": "950"
+    },
+    {
+        "": "262",
+        "name": "caroncomb",
+        "xMin": "-981",
+        "yMin": "1098",
+        "xMax": "-180",
+        "yMax": "1590"
+    },
+    {
+        "": "263",
+        "name": "cedilla",
+        "xMin": "0",
+        "yMin": "-260",
+        "xMax": "212",
+        "yMax": "-3"
+    },
+    {
+        "": "264",
+        "name": "cent",
+        "xMin": "0",
+        "yMin": "202",
+        "xMax": "437",
+        "yMax": "1121"
+    },
+    {
+        "": "265",
+        "name": "chi-grek",
+        "xMin": "0",
+        "yMin": "-337",
+        "xMax": "1254",
+        "yMax": "1056"
+    },
+    {
+        "": "266",
+        "name": "chi_apostrophe",
+        "xMin": "0",
+        "yMin": "-337",
+        "xMax": "1254",
+        "yMax": "1639"
+    },
+    {
+        "": "267",
+        "name": "chi_epsilon_nu",
+        "xMin": "0",
+        "yMin": "-337",
+        "xMax": "1401",
+        "yMax": "1734"
+    },
+    {
+        "": "268",
+        "name": "chi_rho",
+        "xMin": "0",
+        "yMin": "-473",
+        "xMax": "1318",
+        "yMax": "905"
+    },
+    {
+        "": "269",
+        "name": "circumflexcomb",
+        "xMin": "-942",
+        "yMin": "1098",
+        "xMax": "-141",
+        "yMax": "1590"
+    },
+    {
+        "": "270",
+        "name": "circumflexmod",
+        "xMin": "-906",
+        "yMin": "1098",
+        "xMax": "-105",
+        "yMax": "1590"
+    },
+    {
+        "": "271",
+        "name": "colon",
+        "xMin": "0",
+        "yMin": "-130",
+        "xMax": "270",
+        "yMax": "561"
+    },
+    {
+        "": "272",
+        "name": "comma",
+        "xMin": "0",
+        "yMin": "-281",
+        "xMax": "316",
+        "yMax": "201"
+    },
+    {
+        "": "273",
+        "name": "commacomb",
+        "xMin": "-935",
+        "yMin": "1032",
+        "xMax": "-348",
+        "yMax": "1736"
+    },
+    {
+        "": "274",
+        "name": "copyright",
+        "xMin": "0",
+        "yMin": "106",
+        "xMax": "872",
+        "yMax": "954"
+    },
+    {
+        "": "275",
+        "name": "currency",
+        "xMin": "-3",
+        "yMin": "276",
+        "xMax": "640",
+        "yMax": "985"
+    },
+    {
+        "": "276",
+        "name": "d",
+        "xMin": "0",
+        "yMin": "-98",
+        "xMax": "958",
+        "yMax": "1436"
+    },
+    {
+        "": "277",
+        "name": "dageshormapiqcomb-hebr",
+        "xMin": "-82",
+        "yMin": "437",
+        "xMax": "82",
+        "yMax": "601"
+    },
+    {
+        "": "278",
+        "name": "dalet-hebr",
+        "xMin": "0",
+        "yMin": "35",
+        "xMax": "940",
+        "yMax": "1270"
+    },
+    {
+        "": "279",
+        "name": "dasiamod-grek",
+        "xMin": "-230",
+        "yMin": "1047",
+        "xMax": "357",
+        "yMax": "1751"
+    },
+    {
+        "": "280",
+        "name": "dasiaoxiamod-grek",
+        "xMin": "-479",
+        "yMin": "1081",
+        "xMax": "647",
+        "yMax": "1791"
+    },
+    {
+        "": "281",
+        "name": "dasiaperispomenimod-grek",
+        "xMin": "-470",
+        "yMin": "1047",
+        "xMax": "472",
+        "yMax": "2334"
+    },
+    {
+        "": "282",
+        "name": "dasiavariamod-grek",
+        "xMin": "-479",
+        "yMin": "1051",
+        "xMax": "656",
+        "yMax": "1755"
+    },
+    {
+        "": "283",
+        "name": "degree",
+        "xMin": "0",
+        "yMin": "1328",
+        "xMax": "384",
+        "yMax": "1718"
+    },
+    {
+        "": "284",
+        "name": "delta-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "1125",
+        "yMax": "1633"
+    },
+    {
+        "": "285",
+        "name": "delta_alpha_fin_sigma",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "2312",
+        "yMax": "2028"
+    },
+    {
+        "": "286",
+        "name": "delta_apostrophe",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "1504",
+        "yMax": "1701"
+    },
+    {
+        "": "287",
+        "name": "delta_curly",
+        "xMin": "0",
+        "yMin": "-3",
+        "xMax": "1193",
+        "yMax": "1258"
+    },
+    {
+        "": "288",
+        "name": "delta_epsilon",
+        "xMin": "0",
+        "yMin": "13",
+        "xMax": "1404",
+        "yMax": "1585"
+    },
+    {
+        "": "289",
+        "name": "delta_epsilon_varia",
+        "xMin": "0",
+        "yMin": "13",
+        "xMax": "1415",
+        "yMax": "1585"
+    },
+    {
+        "": "290",
+        "name": "delta_epsilon_varia_2",
+        "xMin": "0",
+        "yMin": "-382",
+        "xMax": "864",
+        "yMax": "2077"
+    },
+    {
+        "": "291",
+        "name": "dialytikaoxiamod-grek",
+        "xMin": "0",
+        "yMin": "995",
+        "xMax": "695",
+        "yMax": "1977"
+    },
+    {
+        "": "292",
+        "name": "dialytikaperispomenimod-grek",
+        "xMin": "0",
+        "yMin": "1143",
+        "xMax": "942",
+        "yMax": "1957"
+    },
+    {
+        "": "293",
+        "name": "dialytikavariamod-grek",
+        "xMin": "0",
+        "yMin": "1137",
+        "xMax": "645",
+        "yMax": "2130"
+    },
+    {
+        "": "294",
+        "name": "dieresis",
+        "xMin": "0",
+        "yMin": "1328",
+        "xMax": "645",
+        "yMax": "1598"
+    },
+    {
+        "": "295",
+        "name": "dieresiscomb",
+        "xMin": "-722",
+        "yMin": "992",
+        "xMax": "-54",
+        "yMax": "1255"
+    },
+    {
+        "": "296",
+        "name": "dollar",
+        "xMin": "0",
+        "yMin": "135",
+        "xMax": "471",
+        "yMax": "1155"
+    },
+    {
+        "": "297",
+        "name": "dotaccentcomb",
+        "xMin": "-439",
+        "yMin": "991",
+        "xMax": "-169",
+        "yMax": "1254"
+    },
+    {
+        "": "298",
+        "name": "dotaccentmod",
+        "xMin": "-436",
+        "yMin": "990",
+        "xMax": "-166",
+        "yMax": "1253"
+    },
+    {
+        "": "299",
+        "name": "dotbelowcomb",
+        "xMin": "-331",
+        "yMin": "-412",
+        "xMax": "-61",
+        "yMax": "-150"
+    },
+    {
+        "": "300",
+        "name": "doubleprimemod",
+        "xMin": "216",
+        "yMin": "1174",
+        "xMax": "1139",
+        "yMax": "1858"
+    },
+    {
+        "": "301",
+        "name": "e",
+        "xMin": "0",
+        "yMin": "-14",
+        "xMax": "806",
+        "yMax": "940"
+    },
+    {
+        "": "302",
+        "name": "eight",
+        "xMin": "0",
+        "yMin": "17",
+        "xMax": "687",
+        "yMax": "1233"
+    },
+    {
+        "": "303",
+        "name": "epsilon-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "635",
+        "yMax": "918"
+    },
+    {
+        "": "304",
+        "name": "epsilon_dasia_perispomeni",
+        "xMin": "-117",
+        "yMin": "-7",
+        "xMax": "825",
+        "yMax": "2143"
+    },
+    {
+        "": "305",
+        "name": "epsilon_iota",
+        "xMin": "0",
+        "yMin": "-28",
+        "xMax": "902",
+        "yMax": "954"
+    },
+    {
+        "": "306",
+        "name": "epsilon_iota_2",
+        "xMin": "0",
+        "yMin": "-177",
+        "xMax": "629",
+        "yMax": "1785"
+    },
+    {
+        "": "307",
+        "name": "epsilon_iota_perispomeni",
+        "xMin": "0",
+        "yMin": "-28",
+        "xMax": "961",
+        "yMax": "1631"
+    },
+    {
+        "": "308",
+        "name": "epsilon_iota_perispomeni_prosgegrammeni",
+        "xMin": "0",
+        "yMin": "-406",
+        "xMax": "961",
+        "yMax": "1631"
+    },
+    {
+        "": "309",
+        "name": "epsilon_iota_sigma",
+        "xMin": "60",
+        "yMin": "623",
+        "xMax": "904",
+        "yMax": "1621"
+    },
+    {
+        "": "310",
+        "name": "epsilon_nu",
+        "xMin": "8",
+        "yMin": "946",
+        "xMax": "657",
+        "yMax": "1845"
+    },
+    {
+        "": "311",
+        "name": "epsilon_nu_2",
+        "xMin": "-1",
+        "yMin": "901",
+        "xMax": "661",
+        "yMax": "1644"
+    },
+    {
+        "": "312",
+        "name": "epsilon_perispomeni",
+        "xMin": "-205",
+        "yMin": "-7",
+        "xMax": "737",
+        "yMax": "1548"
+    },
+    {
+        "": "313",
+        "name": "epsilon_psili_nu",
+        "xMin": "0",
+        "yMin": "-389",
+        "xMax": "1531",
+        "yMax": "1909"
+    },
+    {
+        "": "314",
+        "name": "epsilon_psili_perispomeni",
+        "xMin": "-117",
+        "yMin": "-7",
+        "xMax": "825",
+        "yMax": "2143"
+    },
+    {
+        "": "315",
+        "name": "epsilon_psili_stigma_iota",
+        "xMin": "-129",
+        "yMin": "-18",
+        "xMax": "1890",
+        "yMax": "1520"
+    },
+    {
+        "": "316",
+        "name": "epsilon_psili_stigma_iota_varia",
+        "xMin": "-129",
+        "yMin": "-18",
+        "xMax": "1998",
+        "yMax": "1606"
+    },
+    {
+        "": "317",
+        "name": "epsilon_psili_xi",
+        "xMin": "-8",
+        "yMin": "-485",
+        "xMax": "1669",
+        "yMax": "1613"
+    },
+    {
+        "": "318",
+        "name": "epsilon_rho",
+        "xMin": "0",
+        "yMin": "-938",
+        "xMax": "1362",
+        "yMax": "1124"
+    },
+    {
+        "": "319",
+        "name": "epsilon_rho_2",
+        "xMin": "0",
+        "yMin": "-432",
+        "xMax": "771",
+        "yMax": "1315"
+    },
+    {
+        "": "320",
+        "name": "epsilon_stigma_iota",
+        "xMin": "18",
+        "yMin": "-18",
+        "xMax": "1890",
+        "yMax": "1428"
+    },
+    {
+        "": "321",
+        "name": "epsilon_upsilon",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1335",
+        "yMax": "1456"
+    },
+    {
+        "": "322",
+        "name": "epsilon_upsilon_2",
+        "xMin": "0",
+        "yMin": "-1",
+        "xMax": "1218",
+        "yMax": "1480"
+    },
+    {
+        "": "323",
+        "name": "epsilondasia-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "635",
+        "yMax": "1828"
+    },
+    {
+        "": "324",
+        "name": "epsilondasiaoxia-grek",
+        "xMin": "-277",
+        "yMin": "-7",
+        "xMax": "849",
+        "yMax": "1820"
+    },
+    {
+        "": "325",
+        "name": "epsilondasiavaria-grek",
+        "xMin": "-286",
+        "yMin": "-7",
+        "xMax": "849",
+        "yMax": "1824"
+    },
+    {
+        "": "326",
+        "name": "epsilonoxia-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "635",
+        "yMax": "1746"
+    },
+    {
+        "": "327",
+        "name": "epsilonpsili-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "635",
+        "yMax": "1824"
+    },
+    {
+        "": "328",
+        "name": "epsilonpsilioxia-grek",
+        "xMin": "-196",
+        "yMin": "-7",
+        "xMax": "849",
+        "yMax": "1820"
+    },
+    {
+        "": "329",
+        "name": "epsilonpsilivaria-grek",
+        "xMin": "-228",
+        "yMin": "-7",
+        "xMax": "853",
+        "yMax": "1824"
+    },
+    {
+        "": "330",
+        "name": "epsilontonos-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "635",
+        "yMax": "1722"
+    },
+    {
+        "": "331",
+        "name": "epsilonvaria-grek",
+        "xMin": "0",
+        "yMin": "-7",
+        "xMax": "635",
+        "yMax": "1742"
+    },
+    {
+        "": "332",
+        "name": "epsion_iota_2_perispomeni",
+        "xMin": "0",
+        "yMin": "-177",
+        "xMax": "1052",
+        "yMax": "1931"
+    },
+    {
+        "": "333",
+        "name": "equal",
+        "xMin": "0",
+        "yMin": "629",
+        "xMax": "491",
+        "yMax": "879"
+    },
+    {
+        "": "334",
+        "name": "eta-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "691",
+        "yMax": "927"
+    },
+    {
+        "": "335",
+        "name": "eta_2",
+        "xMin": "0",
+        "yMin": "-214",
+        "xMax": "684",
+        "yMax": "989"
+    },
+    {
+        "": "336",
+        "name": "eta_2_perispomeni",
+        "xMin": "0",
+        "yMin": "-214",
+        "xMax": "942",
+        "yMax": "1533"
+    },
+    {
+        "": "337",
+        "name": "eta_nu",
+        "xMin": "0",
+        "yMin": "-5",
+        "xMax": "1510",
+        "yMax": "1503"
+    },
+    {
+        "": "338",
+        "name": "eta_perispomeni_nu",
+        "xMin": "0",
+        "yMin": "-5",
+        "xMax": "1510",
+        "yMax": "1503"
+    },
+    {
+        "": "339",
+        "name": "eta_tonos_nu",
+        "xMin": "0",
+        "yMin": "-5",
+        "xMax": "1510",
+        "yMax": "1578"
+    },
+    {
+        "": "340",
+        "name": "eta_varia_nu",
+        "xMin": "0",
+        "yMin": "-5",
+        "xMax": "1510",
+        "yMax": "1578"
+    },
+    {
+        "": "341",
+        "name": "eta_varia_nu_2",
+        "xMin": "5",
+        "yMin": "-18",
+        "xMax": "1121",
+        "yMax": "1654"
+    },
+    {
+        "": "342",
+        "name": "eta_ypogegrammeni_fin_sigma",
+        "xMin": "142",
+        "yMin": "927",
+        "xMax": "747",
+        "yMax": "1483"
+    },
+    {
+        "": "343",
+        "name": "etadasia-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "691",
+        "yMax": "1822"
+    },
+    {
+        "": "344",
+        "name": "etadasiaoxia-grek",
+        "xMin": "-221",
+        "yMin": "-11",
+        "xMax": "905",
+        "yMax": "1829"
+    },
+    {
+        "": "345",
+        "name": "etadasiaoxiaypogegrammeni-grek",
+        "xMin": "-221",
+        "yMin": "-407",
+        "xMax": "905",
+        "yMax": "1829"
+    },
+    {
+        "": "346",
+        "name": "etadasiaperispomeni-grek",
+        "xMin": "-89",
+        "yMin": "-11",
+        "xMax": "853",
+        "yMax": "2215"
+    },
+    {
+        "": "347",
+        "name": "etadasiaperispomeniypogegrammeni-grek",
+        "xMin": "-89",
+        "yMin": "-407",
+        "xMax": "853",
+        "yMax": "2196"
+    },
+    {
+        "": "348",
+        "name": "etadasiavaria-grek",
+        "xMin": "-230",
+        "yMin": "-11",
+        "xMax": "905",
+        "yMax": "1826"
+    },
+    {
+        "": "349",
+        "name": "etadasiavariaypogegrammeni-grek",
+        "xMin": "-230",
+        "yMin": "-407",
+        "xMax": "905",
+        "yMax": "1826"
+    },
+    {
+        "": "350",
+        "name": "etadasiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "691",
+        "yMax": "1822"
+    },
+    {
+        "": "351",
+        "name": "etaoxia-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "691",
+        "yMax": "1736"
+    },
+    {
+        "": "352",
+        "name": "etaoxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "691",
+        "yMax": "1736"
+    },
+    {
+        "": "353",
+        "name": "etaperispomeni-grek",
+        "xMin": "-89",
+        "yMin": "-11",
+        "xMax": "853",
+        "yMax": "1497"
+    },
+    {
+        "": "354",
+        "name": "etaperispomeniypogegrammeni-grek",
+        "xMin": "-89",
+        "yMin": "-407",
+        "xMax": "853",
+        "yMax": "1497"
+    },
+    {
+        "": "355",
+        "name": "etapsili-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "691",
+        "yMax": "1822"
+    },
+    {
+        "": "356",
+        "name": "etapsilioxia-grek",
+        "xMin": "-140",
+        "yMin": "-11",
+        "xMax": "905",
+        "yMax": "1829"
+    },
+    {
+        "": "357",
+        "name": "etapsilioxiaypogegrammeni-grek",
+        "xMin": "-140",
+        "yMin": "-407",
+        "xMax": "905",
+        "yMax": "1829"
+    },
+    {
+        "": "358",
+        "name": "etapsiliperispomeni-grek",
+        "xMin": "-89",
+        "yMin": "-11",
+        "xMax": "853",
+        "yMax": "2186"
+    },
+    {
+        "": "359",
+        "name": "etapsiliperispomeniypogegrammeni-grek",
+        "xMin": "-89",
+        "yMin": "-407",
+        "xMax": "853",
+        "yMax": "2169"
+    },
+    {
+        "": "360",
+        "name": "etapsilivaria-grek",
+        "xMin": "-176",
+        "yMin": "-11",
+        "xMax": "905",
+        "yMax": "1828"
+    },
+    {
+        "": "361",
+        "name": "etapsilivariaypogegrammeni-grek",
+        "xMin": "-176",
+        "yMin": "-407",
+        "xMax": "905",
+        "yMax": "1828"
+    },
+    {
+        "": "362",
+        "name": "etapsiliypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "691",
+        "yMax": "1822"
+    },
+    {
+        "": "363",
+        "name": "etatonos-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "691",
+        "yMax": "1731"
+    },
+    {
+        "": "364",
+        "name": "etavaria-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "691",
+        "yMax": "1742"
+    },
+    {
+        "": "365",
+        "name": "etavariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "691",
+        "yMax": "1742"
+    },
+    {
+        "": "366",
+        "name": "etaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-407",
+        "xMax": "691",
+        "yMax": "927"
+    },
+    {
+        "": "367",
+        "name": "exclam",
+        "xMin": "0",
+        "yMin": "-132",
+        "xMax": "272",
+        "yMax": "1400"
+    },
+    {
+        "": "368",
+        "name": "exclamdown",
+        "xMin": "0",
+        "yMin": "-132",
+        "xMax": "272",
+        "yMax": "1400"
+    },
+    {
+        "": "369",
+        "name": "f",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "713",
+        "yMax": "1450"
+    },
+    {
+        "": "370",
+        "name": "finalkaf-hebr",
+        "xMin": "0",
+        "yMin": "-300",
+        "xMax": "1054",
+        "yMax": "1328"
+    },
+    {
+        "": "371",
+        "name": "finalmem-hebr",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1129",
+        "yMax": "1326"
+    },
+    {
+        "": "372",
+        "name": "finalnun-hebr",
+        "xMin": "0",
+        "yMin": "-211",
+        "xMax": "703",
+        "yMax": "1325"
+    },
+    {
+        "": "373",
+        "name": "finalpe-hebr",
+        "xMin": "0",
+        "yMin": "-406",
+        "xMax": "998",
+        "yMax": "1326"
+    },
+    {
+        "": "374",
+        "name": "finalsigma-grek",
+        "xMin": "0",
+        "yMin": "-277",
+        "xMax": "670",
+        "yMax": "922"
+    },
+    {
+        "": "375",
+        "name": "finaltsadi-hebr",
+        "xMin": "0",
+        "yMin": "-404",
+        "xMax": "981",
+        "yMax": "1327"
+    },
+    {
+        "": "376",
+        "name": "five",
+        "xMin": "0",
+        "yMin": "-184",
+        "xMax": "759",
+        "yMax": "1160"
+    },
+    {
+        "": "377",
+        "name": "four",
+        "xMin": "0",
+        "yMin": "-227",
+        "xMax": "1231",
+        "yMax": "1085"
+    },
+    {
+        "": "378",
+        "name": "g",
+        "xMin": "0",
+        "yMin": "-309",
+        "xMax": "848",
+        "yMax": "935"
+    },
+    {
+        "": "379",
+        "name": "gamma-grek",
+        "xMin": "0",
+        "yMin": "-351",
+        "xMax": "992",
+        "yMax": "919"
+    },
+    {
+        "": "380",
+        "name": "gamma_alpha_varia_rho",
+        "xMin": "0",
+        "yMin": "-385",
+        "xMax": "2105",
+        "yMax": "1494"
+    },
+    {
+        "": "381",
+        "name": "gamma_alpha_varia_rho_2",
+        "xMin": "0",
+        "yMin": "-399",
+        "xMax": "810",
+        "yMax": "1305"
+    },
+    {
+        "": "382",
+        "name": "gamma_alpha_varia_rho_3",
+        "xMin": "0",
+        "yMin": "-399",
+        "xMax": "1714",
+        "yMax": "1117"
+    },
+    {
+        "": "383",
+        "name": "gamma_alpha_varia_rho_4",
+        "xMin": "1",
+        "yMin": "-3",
+        "xMax": "1075",
+        "yMax": "1986"
+    },
+    {
+        "": "384",
+        "name": "gamma_alpha_varia_rho_5",
+        "xMin": "1",
+        "yMin": "-386",
+        "xMax": "2895",
+        "yMax": "1541"
+    },
+    {
+        "": "385",
+        "name": "gamma_epsilon_nu_oxia",
+        "xMin": "0",
+        "yMin": "-440",
+        "xMax": "2232",
+        "yMax": "1610"
+    },
+    {
+        "": "386",
+        "name": "gamma_gamma",
+        "xMin": "0",
+        "yMin": "-421",
+        "xMax": "1863",
+        "yMax": "1202"
+    },
+    {
+        "": "387",
+        "name": "gamma_omicron",
+        "xMin": "0",
+        "yMin": "-352",
+        "xMax": "1494",
+        "yMax": "953"
+    },
+    {
+        "": "388",
+        "name": "gamma_omicron_2",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "978",
+        "yMax": "913"
+    },
+    {
+        "": "389",
+        "name": "gamma_rho",
+        "xMin": "0",
+        "yMin": "-394",
+        "xMax": "1648",
+        "yMax": "952"
+    },
+    {
+        "": "390",
+        "name": "gamma_short",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "691",
+        "yMax": "987"
+    },
+    {
+        "": "391",
+        "name": "gamma_tall",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "761",
+        "yMax": "1636"
+    },
+    {
+        "": "392",
+        "name": "gimel-hebr",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "904",
+        "yMax": "1349"
+    },
+    {
+        "": "393",
+        "name": "grave",
+        "xMin": "0",
+        "yMin": "1328",
+        "xMax": "292",
+        "yMax": "1709"
+    },
+    {
+        "": "394",
+        "name": "gravecomb",
+        "xMin": "-381",
+        "yMin": "1156",
+        "xMax": "143",
+        "yMax": "1838"
+    },
+    {
+        "": "395",
+        "name": "gravemod",
+        "xMin": "-373",
+        "yMin": "1169",
+        "xMax": "151",
+        "yMax": "1851"
+    },
+    {
+        "": "396",
+        "name": "gravetonemarkcomb",
+        "xMin": "-715",
+        "yMin": "1168",
+        "xMax": "-191",
+        "yMax": "1850"
+    },
+    {
+        "": "397",
+        "name": "greater",
+        "xMin": "0",
+        "yMin": "290",
+        "xMax": "911",
+        "yMax": "1168"
+    },
+    {
+        "": "398",
+        "name": "greekdialytikatonoscomb",
+        "xMin": "-962",
+        "yMin": "998",
+        "xMax": "-267",
+        "yMax": "1980"
+    },
+    {
+        "": "399",
+        "name": "greekdialytikatonosmod",
+        "xMin": "-1",
+        "yMin": "995",
+        "xMax": "694",
+        "yMax": "1977"
+    },
+    {
+        "": "400",
+        "name": "greekkoroniscomb",
+        "xMin": "-763",
+        "yMin": "1046",
+        "xMax": "-176",
+        "yMax": "1750"
+    },
+    {
+        "": "401",
+        "name": "greeknumeralsignmod",
+        "xMin": "216",
+        "yMin": "1174",
+        "xMax": "740",
+        "yMax": "1856"
+    },
+    {
+        "": "402",
+        "name": "greekperispomenicomb",
+        "xMin": "-1077",
+        "yMin": "1114",
+        "xMax": "-135",
+        "yMax": "1567"
+    },
+    {
+        "": "403",
+        "name": "greekquestionmark",
+        "xMin": "0",
+        "yMin": "-281",
+        "xMax": "316",
+        "yMax": "624"
+    },
+    {
+        "": "404",
+        "name": "greekypogegrammenicomb",
+        "xMin": "-331",
+        "yMin": "-412",
+        "xMax": "-61",
+        "yMax": "-150"
+    },
+    {
+        "": "405",
+        "name": "guillemotleft",
+        "xMin": "0",
+        "yMin": "709",
+        "xMax": "511",
+        "yMax": "1147"
+    },
+    {
+        "": "406",
+        "name": "guillemotright",
+        "xMin": "0",
+        "yMin": "709",
+        "xMax": "511",
+        "yMax": "1147"
+    },
+    {
+        "": "407",
+        "name": "h",
+        "xMin": "-19",
+        "yMin": "0",
+        "xMax": "873",
+        "yMax": "1459"
+    },
+    {
+        "": "408",
+        "name": "hatafpatahcomb-hebr",
+        "xMin": "-318",
+        "yMin": "-587",
+        "xMax": "318",
+        "yMax": "-169"
+    },
+    {
+        "": "409",
+        "name": "hatafqamatscomb-hebr",
+        "xMin": "-325",
+        "yMin": "-587",
+        "xMax": "311",
+        "yMax": "-169"
+    },
+    {
+        "": "410",
+        "name": "hatafsegolcomb-hebr",
+        "xMin": "-357",
+        "yMin": "-587",
+        "xMax": "358",
+        "yMax": "-169"
+    },
+    {
+        "": "411",
+        "name": "he-hebr",
+        "xMin": "0",
+        "yMin": "23",
+        "xMax": "1032",
+        "yMax": "1327"
+    },
+    {
+        "": "412",
+        "name": "het-hebr",
+        "xMin": "0",
+        "yMin": "17",
+        "xMax": "1146",
+        "yMax": "1264"
+    },
+    {
+        "": "413",
+        "name": "hiriqcomb-hebr",
+        "xMin": "-82",
+        "yMin": "-333",
+        "xMax": "82",
+        "yMax": "-169"
+    },
+    {
+        "": "414",
+        "name": "holamcomb-hebr",
+        "xMin": "168",
+        "yMin": "1222",
+        "xMax": "332",
+        "yMax": "1386"
+    },
+    {
+        "": "415",
+        "name": "holamhaserforvavcomb-hebr",
+        "xMin": "168",
+        "yMin": "1222",
+        "xMax": "332",
+        "yMax": "1386"
+    },
+    {
+        "": "416",
+        "name": "hyphen",
+        "xMin": "0",
+        "yMin": "629",
+        "xMax": "464",
+        "yMax": "713"
+    },
+    {
+        "": "417",
+        "name": "i",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "416",
+        "yMax": "1352"
+    },
+    {
+        "": "418",
+        "name": "idotless",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "391",
+        "yMax": "913"
+    },
+    {
+        "": "419",
+        "name": "invertedbrevebelowcomb",
+        "xMin": "51",
+        "yMin": "-504",
+        "xMax": "955",
+        "yMax": "-66"
+    },
+    {
+        "": "420",
+        "name": "iota-grek",
+        "xMin": "0",
+        "yMin": "-2",
+        "xMax": "323",
+        "yMax": "930"
+    },
+    {
+        "": "421",
+        "name": "iota_sigma",
+        "xMin": "-436",
+        "yMin": "1045",
+        "xMax": "775",
+        "yMax": "1611"
+    },
+    {
+        "": "422",
+        "name": "iotadasia-grek",
+        "xMin": "-95",
+        "yMin": "-2",
+        "xMax": "492",
+        "yMax": "1805"
+    },
+    {
+        "": "423",
+        "name": "iotadasiaoxia-grek",
+        "xMin": "-229",
+        "yMin": "-2",
+        "xMax": "897",
+        "yMax": "1828"
+    },
+    {
+        "": "424",
+        "name": "iotadasiaperispomeni-grek",
+        "xMin": "-141",
+        "yMin": "-2",
+        "xMax": "801",
+        "yMax": "2201"
+    },
+    {
+        "": "425",
+        "name": "iotadasiavaria-grek",
+        "xMin": "-233",
+        "yMin": "-2",
+        "xMax": "902",
+        "yMax": "1828"
+    },
+    {
+        "": "426",
+        "name": "iotadialytika-grek",
+        "xMin": "-75",
+        "yMin": "-2",
+        "xMax": "593",
+        "yMax": "1315"
+    },
+    {
+        "": "427",
+        "name": "iotadialytikaoxia-grek",
+        "xMin": "-138",
+        "yMin": "-2",
+        "xMax": "557",
+        "yMax": "2034"
+    },
+    {
+        "": "428",
+        "name": "iotadialytikaperispomeni-grek",
+        "xMin": "-157",
+        "yMin": "-2",
+        "xMax": "785",
+        "yMax": "2014"
+    },
+    {
+        "": "429",
+        "name": "iotadialytikatonos-grek",
+        "xMin": "0",
+        "yMin": "-2",
+        "xMax": "695",
+        "yMax": "2010"
+    },
+    {
+        "": "430",
+        "name": "iotadialytikavaria-grek",
+        "xMin": "-161",
+        "yMin": "-2",
+        "xMax": "484",
+        "yMax": "2163"
+    },
+    {
+        "": "431",
+        "name": "iotamacron-grek",
+        "xMin": "-194",
+        "yMin": "-2",
+        "xMax": "611",
+        "yMax": "1288"
+    },
+    {
+        "": "432",
+        "name": "iotaoxia-grek",
+        "xMin": "-64",
+        "yMin": "-2",
+        "xMax": "460",
+        "yMax": "1746"
+    },
+    {
+        "": "433",
+        "name": "iotaperispomeni-grek",
+        "xMin": "-231",
+        "yMin": "-2",
+        "xMax": "711",
+        "yMax": "1497"
+    },
+    {
+        "": "434",
+        "name": "iotapsili-grek",
+        "xMin": "-95",
+        "yMin": "-2",
+        "xMax": "492",
+        "yMax": "1820"
+    },
+    {
+        "": "435",
+        "name": "iotapsilioxia-grek",
+        "xMin": "-230",
+        "yMin": "-2",
+        "xMax": "815",
+        "yMax": "1828"
+    },
+    {
+        "": "436",
+        "name": "iotapsiliperispomeni-grek",
+        "xMin": "-141",
+        "yMin": "-2",
+        "xMax": "801",
+        "yMax": "2154"
+    },
+    {
+        "": "437",
+        "name": "iotapsilivaria-grek",
+        "xMin": "-235",
+        "yMin": "-2",
+        "xMax": "846",
+        "yMax": "1768"
+    },
+    {
+        "": "438",
+        "name": "iotatonos-grek",
+        "xMin": "-54",
+        "yMin": "-2",
+        "xMax": "470",
+        "yMax": "1734"
+    },
+    {
+        "": "439",
+        "name": "iotavaria-grek",
+        "xMin": "-63",
+        "yMin": "-2",
+        "xMax": "461",
+        "yMax": "1738"
+    },
+    {
+        "": "440",
+        "name": "iotavrachy-grek",
+        "xMin": "-244",
+        "yMin": "-2",
+        "xMax": "660",
+        "yMax": "1490"
+    },
+    {
+        "": "441",
+        "name": "j",
+        "xMin": "0",
+        "yMin": "-332",
+        "xMax": "594",
+        "yMax": "1352"
+    },
+    {
+        "": "442",
+        "name": "jdotless",
+        "xMin": "0",
+        "yMin": "-332",
+        "xMax": "541",
+        "yMax": "961"
+    },
+    {
+        "": "443",
+        "name": "k",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "940",
+        "yMax": "1434"
+    },
+    {
+        "": "444",
+        "name": "kaf-hebr",
+        "xMin": "0",
+        "yMin": "-71",
+        "xMax": "1007",
+        "yMax": "1333"
+    },
+    {
+        "": "445",
+        "name": "kaisymbol-grek",
+        "xMin": "-2",
+        "yMin": "-470",
+        "xMax": "1155",
+        "yMax": "932"
+    },
+    {
+        "": "446",
+        "name": "kappa-grek",
+        "xMin": "0",
+        "yMin": "-3",
+        "xMax": "890",
+        "yMax": "918"
+    },
+    {
+        "": "447",
+        "name": "kappa_alpha_iota_2_varia",
+        "xMin": "0",
+        "yMin": "-35",
+        "xMax": "2247",
+        "yMax": "1610"
+    },
+    {
+        "": "448",
+        "name": "kappa_alpha_iota_3_varia",
+        "xMin": "0",
+        "yMin": "12",
+        "xMax": "1664",
+        "yMax": "1662"
+    },
+    {
+        "": "449",
+        "name": "kappa_alpha_iota_4_varia",
+        "xMin": "-1",
+        "yMin": "-670",
+        "xMax": "2223",
+        "yMax": "1782"
+    },
+    {
+        "": "450",
+        "name": "kappa_alpha_iota_5_varia",
+        "xMin": "-2",
+        "yMin": "-470",
+        "xMax": "1155",
+        "yMax": "1674"
+    },
+    {
+        "": "451",
+        "name": "kappa_alpha_tau_alpha",
+        "xMin": "0",
+        "yMin": "-412",
+        "xMax": "1981",
+        "yMax": "1554"
+    },
+    {
+        "": "452",
+        "name": "koronismod-grek",
+        "xMin": "-230",
+        "yMin": "1039",
+        "xMax": "357",
+        "yMax": "1743"
+    },
+    {
+        "": "453",
+        "name": "l",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "396",
+        "yMax": "1454"
+    },
+    {
+        "": "454",
+        "name": "lambda_apostrophe",
+        "xMin": "0",
+        "yMin": "-83",
+        "xMax": "1098",
+        "yMax": "1683"
+    },
+    {
+        "": "455",
+        "name": "lambda_iota_per_fin_sigma",
+        "xMin": "0",
+        "yMin": "-83",
+        "xMax": "1304",
+        "yMax": "1901"
+    },
+    {
+        "": "456",
+        "name": "lambda_lambda",
+        "xMin": "0",
+        "yMin": "-34",
+        "xMax": "1563",
+        "yMax": "1237"
+    },
+    {
+        "": "457",
+        "name": "lambda_omicron_final_sigma",
+        "xMin": "0",
+        "yMin": "-83",
+        "xMax": "1068",
+        "yMax": "1544"
+    },
+    {
+        "": "458",
+        "name": "lamda-grek",
+        "xMin": "0",
+        "yMin": "-83",
+        "xMax": "1023",
+        "yMax": "1226"
+    },
+    {
+        "": "459",
+        "name": "lamed-hebr",
+        "xMin": "0",
+        "yMin": "17",
+        "xMax": "1088",
+        "yMax": "2014"
+    },
+    {
+        "": "460",
+        "name": "lefthalfringcomb",
+        "xMin": "-768",
+        "yMin": "1026",
+        "xMax": "-181",
+        "yMax": "1730"
+    },
+    {
+        "": "461",
+        "name": "lefthalfringmod",
+        "xMin": "-772",
+        "yMin": "1032",
+        "xMax": "-185",
+        "yMax": "1736"
+    },
+    {
+        "": "462",
+        "name": "less",
+        "xMin": "0",
+        "yMin": "290",
+        "xMax": "911",
+        "yMax": "1168"
+    },
+    {
+        "": "463",
+        "name": "logicalnot",
+        "xMin": "0",
+        "yMin": "374",
+        "xMax": "828",
+        "yMax": "715"
+    },
+    {
+        "": "464",
+        "name": "longs",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "713",
+        "yMax": "1450"
+    },
+    {
+        "": "465",
+        "name": "lowernumeralsignmod-grek",
+        "xMin": "151",
+        "yMin": "-704",
+        "xMax": "675",
+        "yMax": "-22"
+    },
+    {
+        "": "466",
+        "name": "m",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1481",
+        "yMax": "954"
+    },
+    {
+        "": "467",
+        "name": "macron",
+        "xMin": "0",
+        "yMin": "1324",
+        "xMax": "464",
+        "yMax": "1408"
+    },
+    {
+        "": "468",
+        "name": "macroncomb",
+        "xMin": "-820",
+        "yMin": "1117",
+        "xMax": "-15",
+        "yMax": "1353"
+    },
+    {
+        "": "469",
+        "name": "maqaf-hebr",
+        "xMin": "30",
+        "yMin": "830",
+        "xMax": "612",
+        "yMax": "1053"
+    },
+    {
+        "": "470",
+        "name": "marklowerdotcomb-hebr",
+        "xMin": "-157",
+        "yMin": "-943",
+        "xMax": "155",
+        "yMax": "-620"
+    },
+    {
+        "": "471",
+        "name": "markmasoracirclecomb-hebr",
+        "xMin": "-195",
+        "yMin": "1306",
+        "xMax": "195",
+        "yMax": "1696"
+    },
+    {
+        "": "472",
+        "name": "markupperdotcomb-hebr",
+        "xMin": "-157",
+        "yMin": "1674",
+        "xMax": "155",
+        "yMax": "1997"
+    },
+    {
+        "": "473",
+        "name": "mem-hebr",
+        "xMin": "-2",
+        "yMin": "-104",
+        "xMax": "1310",
+        "yMax": "1326"
+    },
+    {
+        "": "474",
+        "name": "metegcomb-hebr",
+        "xMin": "-42",
+        "yMin": "-582",
+        "xMax": "43",
+        "yMax": "-174"
+    },
+    {
+        "": "475",
+        "name": "mu",
+        "xMin": "0",
+        "yMin": "-270",
+        "xMax": "865",
+        "yMax": "922"
+    },
+    {
+        "": "476",
+        "name": "mu-grek",
+        "xMin": "0",
+        "yMin": "-378",
+        "xMax": "1390",
+        "yMax": "930"
+    },
+    {
+        "": "477",
+        "name": "mu_alpha_fin_sigma",
+        "xMin": "0",
+        "yMin": "-378",
+        "xMax": "1982",
+        "yMax": "1634"
+    },
+    {
+        "": "478",
+        "name": "mu_epsilon_iota_perispomeni_nu",
+        "xMin": "0",
+        "yMin": "-378",
+        "xMax": "1796",
+        "yMax": "1783"
+    },
+    {
+        "": "479",
+        "name": "mu_epsilon_nu",
+        "xMin": "1",
+        "yMin": "-370",
+        "xMax": "2377",
+        "yMax": "1375"
+    },
+    {
+        "": "480",
+        "name": "mu_epsilon_nu_2",
+        "xMin": "0",
+        "yMin": "-358",
+        "xMax": "2385",
+        "yMax": "1367"
+    },
+    {
+        "": "481",
+        "name": "mu_epsilon_nu_3",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "2991",
+        "yMax": "991"
+    },
+    {
+        "": "482",
+        "name": "mu_epsilon_tonos_nu",
+        "xMin": "1",
+        "yMin": "-370",
+        "xMax": "2377",
+        "yMax": "1851"
+    },
+    {
+        "": "483",
+        "name": "mu_epsilon_varia_2_nu",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "2991",
+        "yMax": "1813"
+    },
+    {
+        "": "484",
+        "name": "mu_epsilon_varia_nu",
+        "xMin": "0",
+        "yMin": "-358",
+        "xMax": "2385",
+        "yMax": "1865"
+    },
+    {
+        "": "485",
+        "name": "n",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "909",
+        "yMax": "954"
+    },
+    {
+        "": "486",
+        "name": "nine",
+        "xMin": "0",
+        "yMin": "-17",
+        "xMax": "1044",
+        "yMax": "1076"
+    },
+    {
+        "": "487",
+        "name": "nu-grek",
+        "xMin": "0",
+        "yMin": "-6",
+        "xMax": "511",
+        "yMax": "919"
+    },
+    {
+        "": "488",
+        "name": "nu_alpha_iota_final_sigma",
+        "xMin": "0",
+        "yMin": "-6",
+        "xMax": "1024",
+        "yMax": "1450"
+    },
+    {
+        "": "489",
+        "name": "nu_final",
+        "xMin": "-72",
+        "yMin": "-508",
+        "xMax": "803",
+        "yMax": "956"
+    },
+    {
+        "": "490",
+        "name": "nu_omicrn_final_sigma",
+        "xMin": "0",
+        "yMin": "-6",
+        "xMax": "663",
+        "yMax": "1544"
+    },
+    {
+        "": "491",
+        "name": "numbersign",
+        "xMin": "0",
+        "yMin": "297",
+        "xMax": "764",
+        "yMax": "1188"
+    },
+    {
+        "": "492",
+        "name": "nun-hebr",
+        "xMin": "0",
+        "yMin": "-3",
+        "xMax": "750",
+        "yMax": "1331"
+    },
+    {
+        "": "493",
+        "name": "o",
+        "xMin": "0",
+        "yMin": "-29",
+        "xMax": "957",
+        "yMax": "950"
+    },
+    {
+        "": "494",
+        "name": "omega-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "924"
+    },
+    {
+        "": "495",
+        "name": "omega_nu",
+        "xMin": "-560",
+        "yMin": "1207",
+        "xMax": "284",
+        "yMax": "1615"
+    },
+    {
+        "": "496",
+        "name": "omega_nu_2",
+        "xMin": "-248",
+        "yMin": "626",
+        "xMax": "596",
+        "yMax": "1630"
+    },
+    {
+        "": "497",
+        "name": "omega_perispomeni_nu",
+        "xMin": "-563",
+        "yMin": "1121",
+        "xMax": "575",
+        "yMax": "1574"
+    },
+    {
+        "": "498",
+        "name": "omega_perispomeni_sigma",
+        "xMin": "16",
+        "yMin": "29",
+        "xMax": "1270",
+        "yMax": "2059"
+    },
+    {
+        "": "499",
+        "name": "omegadasia-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "1822"
+    },
+    {
+        "": "500",
+        "name": "omegadasiaoxia-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1140",
+        "yMax": "1823"
+    },
+    {
+        "": "501",
+        "name": "omegadasiaoxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-411",
+        "xMax": "1140",
+        "yMax": "1823"
+    },
+    {
+        "": "502",
+        "name": "omegadasiaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "2191"
+    },
+    {
+        "": "503",
+        "name": "omegadasiaperispomeniypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "1076",
+        "yMax": "2162"
+    },
+    {
+        "": "504",
+        "name": "omegadasiavaria-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1137",
+        "yMax": "1827"
+    },
+    {
+        "": "505",
+        "name": "omegadasiavariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-393",
+        "xMax": "1137",
+        "yMax": "1827"
+    },
+    {
+        "": "506",
+        "name": "omegadasiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-387",
+        "xMax": "1076",
+        "yMax": "1822"
+    },
+    {
+        "": "507",
+        "name": "omegaoxia-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "1731"
+    },
+    {
+        "": "508",
+        "name": "omegaoxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "1076",
+        "yMax": "1728"
+    },
+    {
+        "": "509",
+        "name": "omegaperispomeni-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "1499"
+    },
+    {
+        "": "510",
+        "name": "omegaperispomeniypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "1076",
+        "yMax": "1499"
+    },
+    {
+        "": "511",
+        "name": "omegapsili-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "1829"
+    },
+    {
+        "": "512",
+        "name": "omegapsilioxia-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1103",
+        "yMax": "1822"
+    },
+    {
+        "": "513",
+        "name": "omegapsilioxiaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-411",
+        "xMax": "1103",
+        "yMax": "1822"
+    },
+    {
+        "": "514",
+        "name": "omegapsiliperispomeni-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "2175"
+    },
+    {
+        "": "515",
+        "name": "omegapsiliperispomeniypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "1076",
+        "yMax": "2156"
+    },
+    {
+        "": "516",
+        "name": "omegapsilivaria-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1123",
+        "yMax": "1822"
+    },
+    {
+        "": "517",
+        "name": "omegapsilivariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-421",
+        "xMax": "1123",
+        "yMax": "1822"
+    },
+    {
+        "": "518",
+        "name": "omegapsiliypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-399",
+        "xMax": "1076",
+        "yMax": "1829"
+    },
+    {
+        "": "519",
+        "name": "omegatonos-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "1728"
+    },
+    {
+        "": "520",
+        "name": "omegavaria-grek",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1076",
+        "yMax": "1752"
+    },
+    {
+        "": "521",
+        "name": "omegavariaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-408",
+        "xMax": "1076",
+        "yMax": "1752"
+    },
+    {
+        "": "522",
+        "name": "omegaypogegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-405",
+        "xMax": "1076",
+        "yMax": "924"
+    },
+    {
+        "": "523",
+        "name": "omicron-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "666",
+        "yMax": "946"
+    },
+    {
+        "": "524",
+        "name": "omicron_dasia_perispomeni",
+        "xMin": "-73",
+        "yMin": "-12",
+        "xMax": "869",
+        "yMax": "2158"
+    },
+    {
+        "": "525",
+        "name": "omicron_iota_peris_final_sigma",
+        "xMin": "-3",
+        "yMin": "1154",
+        "xMax": "990",
+        "yMax": "1621"
+    },
+    {
+        "": "526",
+        "name": "omicron_iota_perispomeni_sigma",
+        "xMin": "2",
+        "yMin": "811",
+        "xMax": "994",
+        "yMax": "1806"
+    },
+    {
+        "": "527",
+        "name": "omicron_perispomeni",
+        "xMin": "-73",
+        "yMin": "-12",
+        "xMax": "869",
+        "yMax": "1571"
+    },
+    {
+        "": "528",
+        "name": "omicron_psili_perispomeni",
+        "xMin": "-73",
+        "yMin": "-12",
+        "xMax": "869",
+        "yMax": "2143"
+    },
+    {
+        "": "529",
+        "name": "omicron_sigma",
+        "xMin": "0",
+        "yMin": "-23",
+        "xMax": "2181",
+        "yMax": "1574"
+    },
+    {
+        "": "530",
+        "name": "omicron_sigma_2",
+        "xMin": "0",
+        "yMin": "1199",
+        "xMax": "802",
+        "yMax": "1607"
+    },
+    {
+        "": "531",
+        "name": "omicron_sigma_varia",
+        "xMin": "-616",
+        "yMin": "1045",
+        "xMax": "-42",
+        "yMax": "1610"
+    },
+    {
+        "": "532",
+        "name": "omicron_upsilon",
+        "xMin": "23",
+        "yMin": "8",
+        "xMax": "974",
+        "yMax": "1260"
+    },
+    {
+        "": "533",
+        "name": "omicron_upsilon_perispomeni",
+        "xMin": "23",
+        "yMin": "8",
+        "xMax": "974",
+        "yMax": "1715"
+    },
+    {
+        "": "534",
+        "name": "omicron_upsilon_tonos",
+        "xMin": "0",
+        "yMin": "8",
+        "xMax": "930",
+        "yMax": "1847"
+    },
+    {
+        "": "535",
+        "name": "omicron_varia_sigma",
+        "xMin": "-616",
+        "yMin": "1045",
+        "xMax": "387",
+        "yMax": "1615"
+    },
+    {
+        "": "536",
+        "name": "omicrondasia-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "666",
+        "yMax": "1812"
+    },
+    {
+        "": "537",
+        "name": "omicrondasiaoxia-grek",
+        "xMin": "-139",
+        "yMin": "-12",
+        "xMax": "987",
+        "yMax": "1828"
+    },
+    {
+        "": "538",
+        "name": "omicrondasiavaria-grek",
+        "xMin": "-139",
+        "yMin": "-12",
+        "xMax": "996",
+        "yMax": "1824"
+    },
+    {
+        "": "539",
+        "name": "omicronoxia-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "666",
+        "yMax": "1750"
+    },
+    {
+        "": "540",
+        "name": "omicronpsili-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "666",
+        "yMax": "1824"
+    },
+    {
+        "": "541",
+        "name": "omicronpsilioxia-grek",
+        "xMin": "-141",
+        "yMin": "-12",
+        "xMax": "904",
+        "yMax": "1828"
+    },
+    {
+        "": "542",
+        "name": "omicronpsilivaria-grek",
+        "xMin": "-141",
+        "yMin": "-12",
+        "xMax": "940",
+        "yMax": "1776"
+    },
+    {
+        "": "543",
+        "name": "omicrontonos-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "688",
+        "yMax": "1750"
+    },
+    {
+        "": "544",
+        "name": "omicronvaria-grek",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "666",
+        "yMax": "1748"
+    },
+    {
+        "": "545",
+        "name": "one",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "593",
+        "yMax": "1167"
+    },
+    {
+        "": "546",
+        "name": "onehalf",
+        "xMin": "0",
+        "yMin": "501",
+        "xMax": "802",
+        "yMax": "1446"
+    },
+    {
+        "": "547",
+        "name": "onequarter",
+        "xMin": "0",
+        "yMin": "485",
+        "xMax": "801",
+        "yMax": "1446"
+    },
+    {
+        "": "548",
+        "name": "ordfeminine",
+        "xMin": "-1",
+        "yMin": "1125",
+        "xMax": "444",
+        "yMax": "1644"
+    },
+    {
+        "": "549",
+        "name": "ordmasculine",
+        "xMin": "0",
+        "yMin": "1066",
+        "xMax": "524",
+        "yMax": "1644"
+    },
+    {
+        "": "550",
+        "name": "overlinecomb",
+        "xMin": "-981",
+        "yMin": "1154",
+        "xMax": "53",
+        "yMax": "1317"
+    },
+    {
+        "": "551",
+        "name": "oxiamod-grek",
+        "xMin": "0",
+        "yMin": "1174",
+        "xMax": "524",
+        "yMax": "1856"
+    },
+    {
+        "": "552",
+        "name": "p",
+        "xMin": "-21",
+        "yMin": "-379",
+        "xMax": "923",
+        "yMax": "1061"
+    },
+    {
+        "": "553",
+        "name": "paragraph",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "549",
+        "yMax": "1033"
+    },
+    {
+        "": "554",
+        "name": "parenleft",
+        "xMin": "0",
+        "yMin": "-160",
+        "xMax": "608",
+        "yMax": "1389"
+    },
+    {
+        "": "555",
+        "name": "parenright",
+        "xMin": "0",
+        "yMin": "-160",
+        "xMax": "608",
+        "yMax": "1389"
+    },
+    {
+        "": "556",
+        "name": "patahcomb-hebr",
+        "xMin": "-183",
+        "yMin": "-288",
+        "xMax": "183",
+        "yMax": "-194"
+    },
+    {
+        "": "557",
+        "name": "pe-hebr",
+        "xMin": "0",
+        "yMin": "-149",
+        "xMax": "966",
+        "yMax": "1326"
+    },
+    {
+        "": "558",
+        "name": "percent",
+        "xMin": "0",
+        "yMin": "13",
+        "xMax": "1016",
+        "yMax": "1293"
+    },
+    {
+        "": "559",
+        "name": "period",
+        "xMin": "0",
+        "yMin": "-74",
+        "xMax": "269",
+        "yMax": "188"
+    },
+    {
+        "": "560",
+        "name": "periodcentered",
+        "xMin": "0",
+        "yMin": "503",
+        "xMax": "271",
+        "yMax": "766"
+    },
+    {
+        "": "561",
+        "name": "perispomenimod-grek",
+        "xMin": "0",
+        "yMin": "1095",
+        "xMax": "942",
+        "yMax": "1548"
+    },
+    {
+        "": "562",
+        "name": "phi-grek",
+        "xMin": "0",
+        "yMin": "-358",
+        "xMax": "1027",
+        "yMax": "1155"
+    },
+    {
+        "": "563",
+        "name": "phi_apostrophe",
+        "xMin": "0",
+        "yMin": "-358",
+        "xMax": "1257",
+        "yMax": "1683"
+    },
+    {
+        "": "564",
+        "name": "phi_iota",
+        "xMin": "0",
+        "yMin": "-303",
+        "xMax": "1885",
+        "yMax": "1262"
+    },
+    {
+        "": "565",
+        "name": "phi_iota_tonos",
+        "xMin": "0",
+        "yMin": "-303",
+        "xMax": "1885",
+        "yMax": "1858"
+    },
+    {
+        "": "566",
+        "name": "phisymbol-grek",
+        "xMin": "0",
+        "yMin": "-430",
+        "xMax": "940",
+        "yMax": "950"
+    },
+    {
+        "": "567",
+        "name": "pi-grek",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "1277",
+        "yMax": "922"
+    },
+    {
+        "": "568",
+        "name": "pi_alpha_rho",
+        "xMin": "0",
+        "yMin": "-495",
+        "xMax": "2094",
+        "yMax": "1975"
+    },
+    {
+        "": "569",
+        "name": "pi_apostrophe",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "1277",
+        "yMax": "1683"
+    },
+    {
+        "": "570",
+        "name": "pi_epsilon_nu",
+        "xMin": "0",
+        "yMin": "-10",
+        "xMax": "1616",
+        "yMax": "1882"
+    },
+    {
+        "": "571",
+        "name": "pi_epsilon_nu2",
+        "xMin": "0",
+        "yMin": "-11",
+        "xMax": "1401",
+        "yMax": "1858"
+    },
+    {
+        "": "572",
+        "name": "pi_epsilon_rho",
+        "xMin": "0",
+        "yMin": "-480",
+        "xMax": "1955",
+        "yMax": "1736"
+    },
+    {
+        "": "573",
+        "name": "pi_omicron",
+        "xMin": "0",
+        "yMin": "-14",
+        "xMax": "1481",
+        "yMax": "1060"
+    },
+    {
+        "": "574",
+        "name": "pi_omicron_final_sigma",
+        "xMin": "0",
+        "yMin": "-10",
+        "xMax": "1610",
+        "yMax": "1544"
+    },
+    {
+        "": "575",
+        "name": "pi_omicron_varia",
+        "xMin": "0",
+        "yMin": "-14",
+        "xMax": "1481",
+        "yMax": "1750"
+    },
+    {
+        "": "576",
+        "name": "pi_rho",
+        "xMin": "0",
+        "yMin": "-470",
+        "xMax": "1674",
+        "yMax": "994"
+    },
+    {
+        "": "577",
+        "name": "pi_rho_omicron_final_sigma",
+        "xMin": "0",
+        "yMin": "-470",
+        "xMax": "1878",
+        "yMax": "1548"
+    },
+    {
+        "": "578",
+        "name": "pi_tau",
+        "xMin": "0",
+        "yMin": "-387",
+        "xMax": "1714",
+        "yMax": "1634"
+    },
+    {
+        "": "579",
+        "name": "pisymbol-grek",
+        "xMin": "0",
+        "yMin": "-10",
+        "xMax": "1567",
+        "yMax": "951"
+    },
+    {
+        "": "580",
+        "name": "pisymbol_apostrophe",
+        "xMin": "0",
+        "yMin": "-10",
+        "xMax": "1567",
+        "yMax": "1683"
+    },
+    {
+        "": "581",
+        "name": "plus",
+        "xMin": "0",
+        "yMin": "335",
+        "xMax": "764",
+        "yMax": "1101"
+    },
+    {
+        "": "582",
+        "name": "plusminus",
+        "xMin": "0",
+        "yMin": "184",
+        "xMax": "764",
+        "yMax": "1138"
+    },
+    {
+        "": "583",
+        "name": "primemod",
+        "xMin": "216",
+        "yMin": "1174",
+        "xMax": "740",
+        "yMax": "1856"
+    },
+    {
+        "": "584",
+        "name": "prosgegrammeni-grek",
+        "xMin": "0",
+        "yMin": "-362",
+        "xMax": "97",
+        "yMax": "-83"
+    },
+    {
+        "": "585",
+        "name": "psi-grek",
+        "xMin": "1",
+        "yMin": "-385",
+        "xMax": "1067",
+        "yMax": "1367"
+    },
+    {
+        "": "586",
+        "name": "psi_eta_ypog_fin_sigma",
+        "xMin": "157",
+        "yMin": "-383",
+        "xMax": "1478",
+        "yMax": "1679"
+    },
+    {
+        "": "587",
+        "name": "psilimod-grek",
+        "xMin": "-230",
+        "yMin": "1039",
+        "xMax": "357",
+        "yMax": "1743"
+    },
+    {
+        "": "588",
+        "name": "psilioxiamod-grek",
+        "xMin": "-230",
+        "yMin": "1039",
+        "xMax": "815",
+        "yMax": "1743"
+    },
+    {
+        "": "589",
+        "name": "psiliperispomenimod-grek",
+        "xMin": "-240",
+        "yMin": "1043",
+        "xMax": "702",
+        "yMax": "2319"
+    },
+    {
+        "": "590",
+        "name": "psilivariamod-grek",
+        "xMin": "-230",
+        "yMin": "1039",
+        "xMax": "851",
+        "yMax": "1743"
+    },
+    {
+        "": "591",
+        "name": "punctuationgeresh-hebr",
+        "xMin": "75",
+        "yMin": "685",
+        "xMax": "381",
+        "yMax": "1137"
+    },
+    {
+        "": "592",
+        "name": "punctuationgershayim-hebr",
+        "xMin": "75",
+        "yMin": "676",
+        "xMax": "681",
+        "yMax": "1137"
+    },
+    {
+        "": "593",
+        "name": "punctuationnunhafukha-hebr",
+        "xMin": "0",
+        "yMin": "5",
+        "xMax": "750",
+        "yMax": "1372"
+    },
+    {
+        "": "594",
+        "name": "punctuationpaseq-hebr",
+        "xMin": "200",
+        "yMin": "-175",
+        "xMax": "299",
+        "yMax": "1229"
+    },
+    {
+        "": "595",
+        "name": "punctuationsofpasuq-hebr",
+        "xMin": "86",
+        "yMin": "-22",
+        "xMax": "408",
+        "yMax": "976"
+    },
+    {
+        "": "596",
+        "name": "q",
+        "xMin": "0",
+        "yMin": "-375",
+        "xMax": "914",
+        "yMax": "1042"
+    },
+    {
+        "": "597",
+        "name": "qamatscomb-hebr",
+        "xMin": "-183",
+        "yMin": "-587",
+        "xMax": "183",
+        "yMax": "-194"
+    },
+    {
+        "": "598",
+        "name": "qamatsqatancomb-hebr",
+        "xMin": "-186",
+        "yMin": "-637",
+        "xMax": "186",
+        "yMax": "-184"
+    },
+    {
+        "": "599",
+        "name": "qof-hebr",
+        "xMin": "0",
+        "yMin": "-113",
+        "xMax": "1098",
+        "yMax": "1326"
+    },
+    {
+        "": "600",
+        "name": "qubutscomb-hebr",
+        "xMin": "-272",
+        "yMin": "-592",
+        "xMax": "272",
+        "yMax": "-164"
+    },
+    {
+        "": "601",
+        "name": "question",
+        "xMin": "0",
+        "yMin": "-127",
+        "xMax": "781",
+        "yMax": "1331"
+    },
+    {
+        "": "602",
+        "name": "questiondown",
+        "xMin": "0",
+        "yMin": "-127",
+        "xMax": "781",
+        "yMax": "1331"
+    },
+    {
+        "": "603",
+        "name": "quotedbl",
+        "xMin": "0",
+        "yMin": "1161",
+        "xMax": "421",
+        "yMax": "1597"
+    },
+    {
+        "": "604",
+        "name": "quotesingle",
+        "xMin": "0",
+        "yMin": "1161",
+        "xMax": "170",
+        "yMax": "1593"
+    },
+    {
+        "": "605",
+        "name": "r",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "746",
+        "yMax": "954"
+    },
+    {
+        "": "606",
+        "name": "rafecomb-hebr",
+        "xMin": "-236",
+        "yMin": "1224",
+        "xMax": "237",
+        "yMax": "1318"
+    },
+    {
+        "": "607",
+        "name": "registered",
+        "xMin": "0",
+        "yMin": "106",
+        "xMax": "872",
+        "yMax": "954"
+    },
+    {
+        "": "608",
+        "name": "resh-hebr",
+        "xMin": "0",
+        "yMin": "9",
+        "xMax": "829",
+        "yMax": "1315"
+    },
+    {
+        "": "609",
+        "name": "reversedcommacomb",
+        "xMin": "-660",
+        "yMin": "1036",
+        "xMax": "-73",
+        "yMax": "1740"
+    },
+    {
+        "": "610",
+        "name": "rho-grek",
+        "xMin": "0",
+        "yMin": "-782",
+        "xMax": "713",
+        "yMax": "907"
+    },
+    {
+        "": "611",
+        "name": "rhodasia-grek",
+        "xMin": "0",
+        "yMin": "-782",
+        "xMax": "713",
+        "yMax": "1819"
+    },
+    {
+        "": "612",
+        "name": "rhopsili-grek",
+        "xMin": "0",
+        "yMin": "-782",
+        "xMax": "713",
+        "yMax": "1817"
+    },
+    {
+        "": "613",
+        "name": "righthalfringcomb",
+        "xMin": "-691",
+        "yMin": "1056",
+        "xMax": "-104",
+        "yMax": "1760"
+    },
+    {
+        "": "614",
+        "name": "righthalfringmod",
+        "xMin": "-583",
+        "yMin": "1041",
+        "xMax": "4",
+        "yMax": "1745"
+    },
+    {
+        "": "615",
+        "name": "ringcomb",
+        "xMin": "-616",
+        "yMin": "1045",
+        "xMax": "-42",
+        "yMax": "1610"
+    },
+    {
+        "": "616",
+        "name": "ringmod",
+        "xMin": "-117",
+        "yMin": "1102",
+        "xMax": "409",
+        "yMax": "1618"
+    },
+    {
+        "": "617",
+        "name": "s",
+        "xMin": "0",
+        "yMin": "-10",
+        "xMax": "600",
+        "yMax": "950"
+    },
+    {
+        "": "618",
+        "name": "samekh-hebr",
+        "xMin": "0",
+        "yMin": "9",
+        "xMax": "961",
+        "yMax": "1326"
+    },
+    {
+        "": "619",
+        "name": "section",
+        "xMin": "0",
+        "yMin": "303",
+        "xMax": "451",
+        "yMax": "1292"
+    },
+    {
+        "": "620",
+        "name": "segolcomb-hebr",
+        "xMin": "-221",
+        "yMin": "-577",
+        "xMax": "221",
+        "yMax": "-169"
+    },
+    {
+        "": "621",
+        "name": "semicolon",
+        "xMin": "0",
+        "yMin": "-281",
+        "xMax": "316",
+        "yMax": "624"
+    },
+    {
+        "": "622",
+        "name": "seven",
+        "xMin": "0",
+        "yMin": "-333",
+        "xMax": "1004",
+        "yMax": "919"
+    },
+    {
+        "": "623",
+        "name": "shevacomb-hebr",
+        "xMin": "-82",
+        "yMin": "-587",
+        "xMax": "82",
+        "yMax": "-169"
+    },
+    {
+        "": "624",
+        "name": "shin-hebr",
+        "xMin": "0",
+        "yMin": "4",
+        "xMax": "1510",
+        "yMax": "1326"
+    },
+    {
+        "": "625",
+        "name": "shindotcomb-hebr",
+        "xMin": "306",
+        "yMin": "1222",
+        "xMax": "470",
+        "yMax": "1386"
+    },
+    {
+        "": "626",
+        "name": "sigma-grek",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1116",
+        "yMax": "1018"
+    },
+    {
+        "": "627",
+        "name": "sigma_2",
+        "xMin": "-1",
+        "yMin": "-221",
+        "xMax": "521",
+        "yMax": "945"
+    },
+    {
+        "": "628",
+        "name": "sigma_chi",
+        "xMin": "0",
+        "yMin": "-266",
+        "xMax": "1444",
+        "yMax": "1199"
+    },
+    {
+        "": "629",
+        "name": "sigma_epsilon_nu",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1401",
+        "yMax": "1858"
+    },
+    {
+        "": "630",
+        "name": "sigma_eta_ypog_fin_sigma",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1129",
+        "yMax": "1664"
+    },
+    {
+        "": "631",
+        "name": "sigma_pi",
+        "xMin": "0",
+        "yMin": "-1",
+        "xMax": "2136",
+        "yMax": "1111"
+    },
+    {
+        "": "632",
+        "name": "sigma_sigma",
+        "xMin": "0",
+        "yMin": "-49",
+        "xMax": "1325",
+        "yMax": "921"
+    },
+    {
+        "": "633",
+        "name": "sigma_tau",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "727",
+        "yMax": "922"
+    },
+    {
+        "": "634",
+        "name": "sigma_tau_rho",
+        "xMin": "0",
+        "yMin": "-467",
+        "xMax": "1331",
+        "yMax": "937"
+    },
+    {
+        "": "635",
+        "name": "sigma_theta",
+        "xMin": "0",
+        "yMin": "-12",
+        "xMax": "1368",
+        "yMax": "1559"
+    },
+    {
+        "": "636",
+        "name": "sigma_theta_alpha_iota",
+        "xMin": "0",
+        "yMin": "-364",
+        "xMax": "1953",
+        "yMax": "1788"
+    },
+    {
+        "": "637",
+        "name": "sindotcomb-hebr",
+        "xMin": "-502",
+        "yMin": "1222",
+        "xMax": "-338",
+        "yMax": "1386"
+    },
+    {
+        "": "638",
+        "name": "six",
+        "xMin": "0",
+        "yMin": "-1",
+        "xMax": "1119",
+        "yMax": "1312"
+    },
+    {
+        "": "639",
+        "name": "slant_1",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "553",
+        "yMax": "1476"
+    },
+    {
+        "": "640",
+        "name": "slant_2",
+        "xMin": "0",
+        "yMin": "335",
+        "xMax": "894",
+        "yMax": "991"
+    },
+    {
+        "": "641",
+        "name": "slash",
+        "xMin": "0",
+        "yMin": "-127",
+        "xMax": "351",
+        "yMax": "1317"
+    },
+    {
+        "": "642",
+        "name": "sterling",
+        "xMin": "0",
+        "yMin": "180",
+        "xMax": "621",
+        "yMax": "1265"
+    },
+    {
+        "": "643",
+        "name": "strokelongcomb",
+        "xMin": "-941",
+        "yMin": "415",
+        "xMax": "53",
+        "yMax": "512"
+    },
+    {
+        "": "644",
+        "name": "t",
+        "xMin": "2",
+        "yMin": "-22",
+        "xMax": "600",
+        "yMax": "1201"
+    },
+    {
+        "": "645",
+        "name": "tau-grek",
+        "xMin": "0",
+        "yMin": "-16",
+        "xMax": "1055",
+        "yMax": "928"
+    },
+    {
+        "": "646",
+        "name": "tau_alpha_iota",
+        "xMin": "18",
+        "yMin": "-680",
+        "xMax": "1325",
+        "yMax": "1042"
+    },
+    {
+        "": "647",
+        "name": "tau_alpha_iota_2",
+        "xMin": "-150",
+        "yMin": "-3",
+        "xMax": "1097",
+        "yMax": "1642"
+    },
+    {
+        "": "648",
+        "name": "tau_alpha_iota_fin_sig",
+        "xMin": "17",
+        "yMin": "-1",
+        "xMax": "1702",
+        "yMax": "1453"
+    },
+    {
+        "": "649",
+        "name": "tau_alpha_iota_fin_sig_per",
+        "xMin": "17",
+        "yMin": "-1",
+        "xMax": "1702",
+        "yMax": "1887"
+    },
+    {
+        "": "650",
+        "name": "tau_apostrophe",
+        "xMin": "17",
+        "yMin": "-1",
+        "xMax": "1230",
+        "yMax": "1685"
+    },
+    {
+        "": "651",
+        "name": "tau_epsilon",
+        "xMin": "-2",
+        "yMin": "-4",
+        "xMax": "1400",
+        "yMax": "1004"
+    },
+    {
+        "": "652",
+        "name": "tau_epsilon_final_sigma",
+        "xMin": "17",
+        "yMin": "-1",
+        "xMax": "1520",
+        "yMax": "1450"
+    },
+    {
+        "": "653",
+        "name": "tau_eta_perispomeni_sigma",
+        "xMin": "0",
+        "yMin": "-24",
+        "xMax": "1893",
+        "yMax": "1613"
+    },
+    {
+        "": "654",
+        "name": "tau_eta_perispomeni_sigma_2",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "1125",
+        "yMax": "1629"
+    },
+    {
+        "": "655",
+        "name": "tau_eta_varia2_nu",
+        "xMin": "0",
+        "yMin": "-147",
+        "xMax": "2700",
+        "yMax": "1630"
+    },
+    {
+        "": "656",
+        "name": "tau_eta_varia_nu",
+        "xMin": "0",
+        "yMin": "-20",
+        "xMax": "1631",
+        "yMax": "1652"
+    },
+    {
+        "": "657",
+        "name": "tau_iota",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "996",
+        "yMax": "1724"
+    },
+    {
+        "": "658",
+        "name": "tau_iota_per_fin_sigma",
+        "xMin": "17",
+        "yMin": "-1",
+        "xMax": "1304",
+        "yMax": "1901"
+    },
+    {
+        "": "659",
+        "name": "tau_omega_perispomeni_nu",
+        "xMin": "0",
+        "yMin": "-70",
+        "xMax": "2522",
+        "yMax": "1741"
+    },
+    {
+        "": "660",
+        "name": "tau_omega_perispomeni_nu_2",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "1165",
+        "yMax": "1532"
+    },
+    {
+        "": "661",
+        "name": "tau_omega_perispomeni_prosgegrammeni",
+        "xMin": "0",
+        "yMin": "-276",
+        "xMax": "2237",
+        "yMax": "1696"
+    },
+    {
+        "": "662",
+        "name": "tau_omicron",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "1094",
+        "yMax": "987"
+    },
+    {
+        "": "663",
+        "name": "tau_omicron_2",
+        "xMin": "17",
+        "yMin": "-6",
+        "xMax": "1553",
+        "yMax": "926"
+    },
+    {
+        "": "664",
+        "name": "tau_omicron_final_sigma",
+        "xMin": "17",
+        "yMin": "-1",
+        "xMax": "1230",
+        "yMax": "1544"
+    },
+    {
+        "": "665",
+        "name": "tau_omicron_upsilon_perispomeni",
+        "xMin": "0",
+        "yMin": "-1",
+        "xMax": "985",
+        "yMax": "1768"
+    },
+    {
+        "": "666",
+        "name": "tau_omicron_upsilon_perispomeni_2",
+        "xMin": "0",
+        "yMin": "-127",
+        "xMax": "1953",
+        "yMax": "997"
+    },
+    {
+        "": "667",
+        "name": "tau_omicron_varia",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "1094",
+        "yMax": "1750"
+    },
+    {
+        "": "668",
+        "name": "tau_omicron_varia_2",
+        "xMin": "0",
+        "yMin": "20",
+        "xMax": "1340",
+        "yMax": "1768"
+    },
+    {
+        "": "669",
+        "name": "tau_omicron_varia_3",
+        "xMin": "0",
+        "yMin": "1",
+        "xMax": "1416",
+        "yMax": "1792"
+    },
+    {
+        "": "670",
+        "name": "tau_omicron_varia_4",
+        "xMin": "17",
+        "yMin": "-6",
+        "xMax": "1553",
+        "yMax": "1761"
+    },
+    {
+        "": "671",
+        "name": "tau_omicron_varia_nu",
+        "xMin": "0",
+        "yMin": "-9",
+        "xMax": "1067",
+        "yMax": "1712"
+    },
+    {
+        "": "672",
+        "name": "tau_rho",
+        "xMin": "0",
+        "yMin": "-395",
+        "xMax": "1282",
+        "yMax": "1640"
+    },
+    {
+        "": "673",
+        "name": "tau_rho_2",
+        "xMin": "-9",
+        "yMin": "-677",
+        "xMax": "1566",
+        "yMax": "1053"
+    },
+    {
+        "": "674",
+        "name": "tau_rho_omicron_final_sigma",
+        "xMin": "0",
+        "yMin": "-395",
+        "xMax": "1847",
+        "yMax": "1640"
+    },
+    {
+        "": "675",
+        "name": "tau_tall",
+        "xMin": "-258",
+        "yMin": "-1",
+        "xMax": "616",
+        "yMax": "1639"
+    },
+    {
+        "": "676",
+        "name": "tau_tall_apostrophe",
+        "xMin": "-258",
+        "yMin": "-1",
+        "xMax": "1148",
+        "yMax": "1896"
+    },
+    {
+        "": "677",
+        "name": "tau_tall_iota_per_fin_sigma",
+        "xMin": "-258",
+        "yMin": "-1",
+        "xMax": "1304",
+        "yMax": "1901"
+    },
+    {
+        "": "678",
+        "name": "tau_tall_omicron_final_sigma",
+        "xMin": "-258",
+        "yMin": "-1",
+        "xMax": "1106",
+        "yMax": "1644"
+    },
+    {
+        "": "679",
+        "name": "tau_tall_omicron_sigma",
+        "xMin": "-258",
+        "yMin": "-1",
+        "xMax": "1772",
+        "yMax": "2065"
+    },
+    {
+        "": "680",
+        "name": "tau_tall_tau",
+        "xMin": "0",
+        "yMin": "-413",
+        "xMax": "1412",
+        "yMax": "1608"
+    },
+    {
+        "": "681",
+        "name": "tav-hebr",
+        "xMin": "0",
+        "yMin": "2",
+        "xMax": "1215",
+        "yMax": "1433"
+    },
+    {
+        "": "682",
+        "name": "tet-hebr",
+        "xMin": "0",
+        "yMin": "10",
+        "xMax": "1181",
+        "yMax": "1310"
+    },
+    {
+        "": "683",
+        "name": "theta-grek",
+        "xMin": "0",
+        "yMin": "-13",
+        "xMax": "596",
+        "yMax": "1371"
+    },
+    {
+        "": "684",
+        "name": "theta_apostrophe",
+        "xMin": "0",
+        "yMin": "-13",
+        "xMax": "1015",
+        "yMax": "1683"
+    },
+    {
+        "": "685",
+        "name": "theta_symbol_apostrophe",
+        "xMin": "0",
+        "yMin": "-137",
+        "xMax": "1416",
+        "yMax": "1682"
+    },
+    {
+        "": "686",
+        "name": "thetasymbol-grek",
+        "xMin": "0",
+        "yMin": "-137",
+        "xMax": "1058",
+        "yMax": "1487"
+    },
+    {
+        "": "687",
+        "name": "three",
+        "xMin": "0",
+        "yMin": "-325",
+        "xMax": "592",
+        "yMax": "1034"
+    },
+    {
+        "": "688",
+        "name": "threequarters",
+        "xMin": "0",
+        "yMin": "485",
+        "xMax": "803",
+        "yMax": "1437"
+    },
+    {
+        "": "689",
+        "name": "tildecomb",
+        "xMin": "-1146",
+        "yMin": "1107",
+        "xMax": "-204",
+        "yMax": "1560"
+    },
+    {
+        "": "690",
+        "name": "tildemod",
+        "xMin": "-896",
+        "yMin": "1327",
+        "xMax": "-82",
+        "yMax": "1672"
+    },
+    {
+        "": "691",
+        "name": "tonosmod-grek",
+        "xMin": "216",
+        "yMin": "1174",
+        "xMax": "740",
+        "yMax": "1856"
+    },
+    {
+        "": "692",
+        "name": "tsadi-hebr",
+        "xMin": "0",
+        "yMin": "-148",
+        "xMax": "981",
+        "yMax": "1327"
+    },
+    {
+        "": "693",
+        "name": "tserecomb-hebr",
+        "xMin": "-209",
+        "yMin": "-333",
+        "xMax": "209",
+        "yMax": "-169"
+    },
+    {
+        "": "694",
+        "name": "two",
+        "xMin": "0",
+        "yMin": "-3",
+        "xMax": "996",
+        "yMax": "1155"
+    },
+    {
+        "": "695",
+        "name": "u",
+        "xMin": "0",
+        "yMin": "-29",
+        "xMax": "865",
+        "yMax": "922"
+    },
+    {
+        "": "696",
+        "name": "underscore",
+        "xMin": "0",
+        "yMin": "-82",
+        "xMax": "564",
+        "yMax": "-2"
+    },
+    {
+        "": "697",
+        "name": "uni00AD",
+        "xMin": "0",
+        "yMin": "629",
+        "xMax": "464",
+        "yMax": "713"
+    },
+    {
+        "": "698",
+        "name": "uni00B2",
+        "xMin": "0",
+        "yMin": "1055",
+        "xMax": "498",
+        "yMax": "1634"
+    },
+    {
+        "": "699",
+        "name": "uni00B3",
+        "xMin": "-2",
+        "yMin": "965",
+        "xMax": "296",
+        "yMax": "1644"
+    },
+    {
+        "": "700",
+        "name": "uni00B9",
+        "xMin": "0",
+        "yMin": "1054",
+        "xMax": "297",
+        "yMax": "1638"
+    },
+    {
+        "": "701",
+        "name": "uniE6DC",
+        "xMin": "0",
+        "yMin": "-351",
+        "xMax": "1224",
+        "yMax": "1407"
+    },
+    {
+        "": "702",
+        "name": "uniE766",
+        "xMin": "0",
+        "yMin": "-378",
+        "xMax": "1401",
+        "yMax": "1544"
+    },
+    {
+        "": "703",
+        "name": "upsilon-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "934"
+    },
+    {
+        "": "704",
+        "name": "upsilon_dasia_iota",
+        "xMin": "0",
+        "yMin": "-527",
+        "xMax": "695",
+        "yMax": "1726"
+    },
+    {
+        "": "705",
+        "name": "upsilon_nu",
+        "xMin": "0",
+        "yMin": "-19",
+        "xMax": "1590",
+        "yMax": "930"
+    },
+    {
+        "": "706",
+        "name": "upsilon_perispomeni",
+        "xMin": "-1",
+        "yMin": "0",
+        "xMax": "1238",
+        "yMax": "1473"
+    },
+    {
+        "": "707",
+        "name": "upsilon_perispomeni_nu",
+        "xMin": "0",
+        "yMin": "-19",
+        "xMax": "1590",
+        "yMax": "1632"
+    },
+    {
+        "": "708",
+        "name": "upsilon_psili_perispomeni_nu",
+        "xMin": "0",
+        "yMin": "-19",
+        "xMax": "1590",
+        "yMax": "2151"
+    },
+    {
+        "": "709",
+        "name": "upsilon_tonos",
+        "xMin": "-1",
+        "yMin": "0",
+        "xMax": "946",
+        "yMax": "1349"
+    },
+    {
+        "": "710",
+        "name": "upsilon_tonos_nu",
+        "xMin": "0",
+        "yMin": "-19",
+        "xMax": "1590",
+        "yMax": "1713"
+    },
+    {
+        "": "711",
+        "name": "upsilon_varia_nu",
+        "xMin": "0",
+        "yMin": "-19",
+        "xMax": "1590",
+        "yMax": "1713"
+    },
+    {
+        "": "712",
+        "name": "upsilondasia-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "1828"
+    },
+    {
+        "": "713",
+        "name": "upsilondasiaoxia-grek",
+        "xMin": "-141",
+        "yMin": "-4",
+        "xMax": "985",
+        "yMax": "1838"
+    },
+    {
+        "": "714",
+        "name": "upsilondasiaperispomeni-grek",
+        "xMin": "-81",
+        "yMin": "-4",
+        "xMax": "861",
+        "yMax": "2212"
+    },
+    {
+        "": "715",
+        "name": "upsilondasiavaria-grek",
+        "xMin": "-139",
+        "yMin": "-4",
+        "xMax": "996",
+        "yMax": "1828"
+    },
+    {
+        "": "716",
+        "name": "upsilondialytika-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "1319"
+    },
+    {
+        "": "717",
+        "name": "upsilondialytikaoxia-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "2030"
+    },
+    {
+        "": "718",
+        "name": "upsilondialytikaperispomeni-grek",
+        "xMin": "-80",
+        "yMin": "-4",
+        "xMax": "862",
+        "yMax": "2013"
+    },
+    {
+        "": "719",
+        "name": "upsilondialytikatonos-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "2044"
+    },
+    {
+        "": "720",
+        "name": "upsilondialytikavaria-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "2181"
+    },
+    {
+        "": "721",
+        "name": "upsilonmacron-grek",
+        "xMin": "-12",
+        "yMin": "-4",
+        "xMax": "793",
+        "yMax": "1292"
+    },
+    {
+        "": "722",
+        "name": "upsilonoxia-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "1749"
+    },
+    {
+        "": "723",
+        "name": "upsilonperispomeni-grek",
+        "xMin": "-81",
+        "yMin": "-4",
+        "xMax": "861",
+        "yMax": "1497"
+    },
+    {
+        "": "724",
+        "name": "upsilonpsili-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "1823"
+    },
+    {
+        "": "725",
+        "name": "upsilonpsilioxia-grek",
+        "xMin": "-132",
+        "yMin": "-4",
+        "xMax": "913",
+        "yMax": "1827"
+    },
+    {
+        "": "726",
+        "name": "upsilonpsiliperispomeni-grek",
+        "xMin": "-81",
+        "yMin": "-4",
+        "xMax": "861",
+        "yMax": "2193"
+    },
+    {
+        "": "727",
+        "name": "upsilonpsilivaria-grek",
+        "xMin": "-136",
+        "yMin": "-4",
+        "xMax": "945",
+        "yMax": "1828"
+    },
+    {
+        "": "728",
+        "name": "upsilontonos-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "1738"
+    },
+    {
+        "": "729",
+        "name": "upsilonvaria-grek",
+        "xMin": "0",
+        "yMin": "-4",
+        "xMax": "707",
+        "yMax": "1746"
+    },
+    {
+        "": "730",
+        "name": "upsilonvrachy-grek",
+        "xMin": "-62",
+        "yMin": "-4",
+        "xMax": "842",
+        "yMax": "1494"
+    },
+    {
+        "": "731",
+        "name": "v",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "996",
+        "yMax": "922"
+    },
+    {
+        "": "732",
+        "name": "variamod-grek",
+        "xMin": "0",
+        "yMin": "1174",
+        "xMax": "524",
+        "yMax": "1856"
+    },
+    {
+        "": "733",
+        "name": "vav-hebr",
+        "xMin": "0",
+        "yMin": "6",
+        "xMax": "661",
+        "yMax": "1341"
+    },
+    {
+        "": "734",
+        "name": "w",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1493",
+        "yMax": "925"
+    },
+    {
+        "": "735",
+        "name": "x",
+        "xMin": "0",
+        "yMin": "-29",
+        "xMax": "955",
+        "yMax": "922"
+    },
+    {
+        "": "736",
+        "name": "xi-grek",
+        "xMin": "0",
+        "yMin": "-400",
+        "xMax": "665",
+        "yMax": "1349"
+    },
+    {
+        "": "737",
+        "name": "xi_2",
+        "xMin": "0",
+        "yMin": "-341",
+        "xMax": "784",
+        "yMax": "1585"
+    },
+    {
+        "": "738",
+        "name": "y",
+        "xMin": "0",
+        "yMin": "-388",
+        "xMax": "932",
+        "yMax": "924"
+    },
+    {
+        "": "739",
+        "name": "yen",
+        "xMin": "0",
+        "yMin": "171",
+        "xMax": "861",
+        "yMax": "1184"
+    },
+    {
+        "": "740",
+        "name": "yiddishdoublevav-hebr",
+        "xMin": "0",
+        "yMin": "6",
+        "xMax": "1204",
+        "yMax": "1341"
+    },
+    {
+        "": "741",
+        "name": "yiddishdoubleyod-hebr",
+        "xMin": "-30",
+        "yMin": "559",
+        "xMax": "1085",
+        "yMax": "1326"
+    },
+    {
+        "": "742",
+        "name": "yiddishvavyod-hebr",
+        "xMin": "0",
+        "yMin": "6",
+        "xMax": "1253",
+        "yMax": "1341"
+    },
+    {
+        "": "743",
+        "name": "yod-hebr",
+        "xMin": "0",
+        "yMin": "559",
+        "xMax": "546",
+        "yMax": "1326"
+    },
+    {
+        "": "744",
+        "name": "ypogegrammenimod-grek",
+        "xMin": "-331",
+        "yMin": "-412",
+        "xMax": "-61",
+        "yMax": "-150"
+    },
+    {
+        "": "745",
+        "name": "z",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "944",
+        "yMax": "920"
+    },
+    {
+        "": "746",
+        "name": "zayin-hebr",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "764",
+        "yMax": "1506"
+    },
+    {
+        "": "747",
+        "name": "zero",
+        "xMin": "0",
+        "yMin": "0",
+        "xMax": "1026",
+        "yMax": "1156"
+    },
+    {
+        "": "748",
+        "name": "zeta-grek",
+        "xMin": "0",
+        "yMin": "-403",
+        "xMax": "699",
+        "yMax": "1588"
+    },
+    {
+        "": "749",
+        "name": "zeta_2",
+        "xMin": "0",
+        "yMin": "-314",
+        "xMax": "739",
+        "yMax": "1603"
+    },
+    {
+        "": "750",
+        "name": "zeta_3",
+        "xMin": "0",
+        "yMin": "-193",
+        "xMax": "839",
+        "yMax": "1617"
+    }
+]

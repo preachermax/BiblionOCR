@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './QtDesignerUI/MyReaderUI.ui'
+# Form implementation generated from reading ui file '/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/MyReaderUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Reader(object):
     def setupUi(self, Reader):
         Reader.setObjectName("Reader")
         Reader.setEnabled(True)
-        Reader.resize(1309, 920)
+        Reader.resize(1319, 820)
         font = QtGui.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(11)
@@ -57,7 +59,7 @@ class Ui_Reader(object):
         self.Image.setSizePolicy(sizePolicy)
         self.Image.setMinimumSize(QtCore.QSize(3400, 4800))
         self.Image.setBaseSize(QtCore.QSize(520, 700))
-        self.Image.setAcceptDrops(False)
+        self.Image.setAcceptDrops(True)
         self.Image.setText("")
         self.Image.setScaledContents(False)
         self.Image.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
@@ -441,7 +443,7 @@ class Ui_Reader(object):
         self.FindReplacebutton.setObjectName("FindReplacebutton")
         Reader.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Reader)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1309, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1319, 20))
         self.menubar.setObjectName("menubar")
         self.menuOCR = QtWidgets.QMenu(self.menubar)
         self.menuOCR.setObjectName("menuOCR")
@@ -471,43 +473,6 @@ class Ui_Reader(object):
         self.ImageEditToolBar = QtWidgets.QToolBar(Reader)
         self.ImageEditToolBar.setObjectName("ImageEditToolBar")
         Reader.addToolBar(QtCore.Qt.TopToolBarArea, self.ImageEditToolBar)
-        self.dockOutput = QtWidgets.QDockWidget(Reader)
-        self.dockOutput.setEnabled(True)
-        self.dockOutput.setMinimumSize(QtCore.QSize(100, 100))
-        self.dockOutput.setBaseSize(QtCore.QSize(520, 200))
-        self.dockOutput.setAccessibleName("")
-        self.dockOutput.setAccessibleDescription("")
-        self.dockOutput.setFloating(False)
-        self.dockOutput.setAllowedAreas(QtCore.Qt.BottomDockWidgetArea|QtCore.Qt.LeftDockWidgetArea)
-        self.dockOutput.setObjectName("dockOutput")
-        self.dockOutputContents = QtWidgets.QWidget()
-        self.dockOutputContents.setObjectName("dockOutputContents")
-        self.OutputText = QtWidgets.QTextEdit(self.dockOutputContents)
-        self.OutputText.setGeometry(QtCore.QRect(20, 0, 1281, 100))
-        self.OutputText.setMinimumSize(QtCore.QSize(100, 100))
-        self.OutputText.setObjectName("OutputText")
-        self.dockOutput.setWidget(self.dockOutputContents)
-        Reader.addDockWidget(QtCore.Qt.DockWidgetArea(8), self.dockOutput)
-        self.dockChrRef = QtWidgets.QDockWidget(Reader)
-        self.dockChrRef.setMinimumSize(QtCore.QSize(400, 619))
-        self.dockChrRef.setBaseSize(QtCore.QSize(200, 500))
-        self.dockChrRef.setFloating(False)
-        self.dockChrRef.setAllowedAreas(QtCore.Qt.BottomDockWidgetArea|QtCore.Qt.RightDockWidgetArea)
-        self.dockChrRef.setObjectName("dockChrRef")
-        self.dockChrRefContents = QtWidgets.QWidget()
-        self.dockChrRefContents.setMinimumSize(QtCore.QSize(400, 600))
-        self.dockChrRefContents.setObjectName("dockChrRefContents")
-        self.ChrRefplainTextEdit = QtWidgets.QPlainTextEdit(self.dockChrRefContents)
-        self.ChrRefplainTextEdit.setGeometry(QtCore.QRect(0, 10, 380, 700))
-        self.ChrRefplainTextEdit.setMinimumSize(QtCore.QSize(360, 500))
-        font = QtGui.QFont()
-        font.setFamily("FROMVS")
-        font.setPointSize(18)
-        self.ChrRefplainTextEdit.setFont(font)
-        self.ChrRefplainTextEdit.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
-        self.ChrRefplainTextEdit.setObjectName("ChrRefplainTextEdit")
-        self.dockChrRef.setWidget(self.dockChrRefContents)
-        Reader.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.dockChrRef)
         self.actionpdf_to_tiff = QtWidgets.QAction(Reader)
         icon23 = QtGui.QIcon()
         icon23.addPixmap(QtGui.QPixmap(":/Icons/Icons/ocr2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -911,6 +876,11 @@ class Ui_Reader(object):
         font.setFamily("FROMVS [MAXR]")
         self.actionBoxer.setFont(font)
         self.actionBoxer.setObjectName("actionBoxer")
+        self.actionCharacter_Reference = QtWidgets.QAction(Reader)
+        icon61 = QtGui.QIcon()
+        icon61.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionGlypher.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionCharacter_Reference.setIcon(icon61)
+        self.actionCharacter_Reference.setObjectName("actionCharacter_Reference")
         self.menuSelect_Language.addAction(self.actionGreek_2)
         self.menuSelect_Language.addAction(self.actionHebrew_4)
         self.menuSelect_Language.addAction(self.actionLatin_2)
@@ -938,6 +908,7 @@ class Ui_Reader(object):
         self.menuTools.addAction(self.actionGimp)
         self.menuTools.addAction(self.actionWriter)
         self.menuTools.addAction(self.actionBoxer)
+        self.menuTools.addAction(self.actionCharacter_Reference)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -945,6 +916,7 @@ class Ui_Reader(object):
         self.menubar.addAction(self.menuOCR.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.ImageEditToolBar.addAction(self.actionPixler_Image_Editor)
+        self.ImageEditToolBar.addAction(self.actionCharacter_Reference)
         self.ImageEditToolBar.addAction(self.actionEdit_Image_tb)
         self.ImageEditToolBar.addAction(self.actionCorrect_OCR_tb)
         self.ImageEditToolBar.addAction(self.actionVerse_Correction)
@@ -1052,9 +1024,6 @@ class Ui_Reader(object):
         self.menuHelp.setTitle(_translate("Reader", "Help"))
         self.ImageEditToolBar.setWindowTitle(_translate("Reader", "ImageEditToolBar"))
         self.ImageEditToolBar.setToolTip(_translate("Reader", "ImageEditToolBar"))
-        self.dockOutput.setWindowTitle(_translate("Reader", " Output"))
-        self.dockChrRef.setWindowTitle(_translate("Reader", "Character Reference"))
-        self.ChrRefplainTextEdit.setDocumentTitle(_translate("Reader", "Character Reference"))
         self.actionpdf_to_tiff.setText(_translate("Reader", "pdf for tiff"))
         self.actionmove_pdf_for_tiff.setText(_translate("Reader", "pdf to tiff"))
         self.actiontiff_to_mono.setText(_translate("Reader", "tiff to mono"))
@@ -1233,8 +1202,9 @@ class Ui_Reader(object):
         self.actionPixler_Image_Editor.setText(_translate("Reader", "Pixer Image Editor"))
         self.actionWriter.setText(_translate("Reader", "Writer"))
         self.actionBoxer.setText(_translate("Reader", "Boxer"))
-
+        self.actionCharacter_Reference.setText(_translate("Reader", "Character Reference"))
 import UI_Icons
+
 
 if __name__ == "__main__":
     import sys
@@ -1244,4 +1214,3 @@ if __name__ == "__main__":
     ui.setupUi(Reader)
     Reader.show()
     sys.exit(app.exec_())
-

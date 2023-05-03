@@ -231,7 +231,6 @@ def i_haz_potrace():
 def data_to_glyphinfo(data):
     return GlyphInfo(data[0], data[1])
 
-
 def integerise(command_line):
     return [int(x) for x in command_line.split()[0:-1]]
 

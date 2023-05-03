@@ -1,0 +1,13 @@
+rangeID,category,hexrange,range,language
+1,Basic Latin,"['0020', '007F']","[32, 127]",Latin
+2,Latin-1 Supplement,"['0080', '00FF']","[128, 255]",Latin
+3,Latin Extended-A,"['0100', '017F']","[256, 383]",Latin
+4,Latin Extended-B,"['0180', '024F']","[384, 591]",Latin
+8,Greek and Coptic,"['0370', '03FF']","[880, 1023]",Greek
+12,Hebrew,"['0590', '05FF']","[1424, 1535]",Hebrew
+67,Latin Extended Additional,"['1E00', '1EFF']","[7680, 7935]",Latin
+68,Greek Extended,"['1F00', '1FFF']","[7936, 8191]",Greek
+69,General Punctuation,"['2000', '206F']","[8192, 8303]",Latin
+70,Superscripts and Subscripts,"['2070', '209F']","[8304, 8351]",Latin
+79,Optical Character Recognition,"['2440', '245F']","[9280, 9311]",Latin
+149,Private Use Area,"['E000', 'F8FF']","[57344, 63743]",Greek

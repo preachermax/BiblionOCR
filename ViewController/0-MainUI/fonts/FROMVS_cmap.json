@@ -1,0 +1,8237 @@
+[
+    {
+        "": "0",
+        "code": "0x0",
+        "name": "uni0000"
+    },
+    {
+        "": "1",
+        "code": "0x1d",
+        "name": "uni0000"
+    },
+    {
+        "": "2",
+        "code": "0x20",
+        "name": "space"
+    },
+    {
+        "": "3",
+        "code": "0x21",
+        "name": "exclam"
+    },
+    {
+        "": "4",
+        "code": "0x22",
+        "name": "quotedbl"
+    },
+    {
+        "": "5",
+        "code": "0x23",
+        "name": "numbersign"
+    },
+    {
+        "": "6",
+        "code": "0x24",
+        "name": "dollar"
+    },
+    {
+        "": "7",
+        "code": "0x25",
+        "name": "percent"
+    },
+    {
+        "": "8",
+        "code": "0x26",
+        "name": "ampersand"
+    },
+    {
+        "": "9",
+        "code": "0x27",
+        "name": "quotesingle"
+    },
+    {
+        "": "10",
+        "code": "0x28",
+        "name": "parenleft"
+    },
+    {
+        "": "11",
+        "code": "0x29",
+        "name": "parenright"
+    },
+    {
+        "": "12",
+        "code": "0x2a",
+        "name": "asterisk"
+    },
+    {
+        "": "13",
+        "code": "0x2b",
+        "name": "plus"
+    },
+    {
+        "": "14",
+        "code": "0x2c",
+        "name": "comma"
+    },
+    {
+        "": "15",
+        "code": "0x2d",
+        "name": "hyphen"
+    },
+    {
+        "": "16",
+        "code": "0x2e",
+        "name": "period"
+    },
+    {
+        "": "17",
+        "code": "0x2f",
+        "name": "slash"
+    },
+    {
+        "": "18",
+        "code": "0x30",
+        "name": "zero"
+    },
+    {
+        "": "19",
+        "code": "0x31",
+        "name": "one"
+    },
+    {
+        "": "20",
+        "code": "0x32",
+        "name": "two"
+    },
+    {
+        "": "21",
+        "code": "0x33",
+        "name": "three"
+    },
+    {
+        "": "22",
+        "code": "0x34",
+        "name": "four"
+    },
+    {
+        "": "23",
+        "code": "0x35",
+        "name": "five"
+    },
+    {
+        "": "24",
+        "code": "0x36",
+        "name": "six"
+    },
+    {
+        "": "25",
+        "code": "0x37",
+        "name": "seven"
+    },
+    {
+        "": "26",
+        "code": "0x38",
+        "name": "eight"
+    },
+    {
+        "": "27",
+        "code": "0x39",
+        "name": "nine"
+    },
+    {
+        "": "28",
+        "code": "0x3a",
+        "name": "colon"
+    },
+    {
+        "": "29",
+        "code": "0x3b",
+        "name": "semicolon"
+    },
+    {
+        "": "30",
+        "code": "0x3c",
+        "name": "less"
+    },
+    {
+        "": "31",
+        "code": "0x3d",
+        "name": "equal"
+    },
+    {
+        "": "32",
+        "code": "0x3e",
+        "name": "greater"
+    },
+    {
+        "": "33",
+        "code": "0x3f",
+        "name": "question"
+    },
+    {
+        "": "34",
+        "code": "0x40",
+        "name": "at"
+    },
+    {
+        "": "35",
+        "code": "0x41",
+        "name": "A"
+    },
+    {
+        "": "36",
+        "code": "0x42",
+        "name": "B"
+    },
+    {
+        "": "37",
+        "code": "0x43",
+        "name": "C"
+    },
+    {
+        "": "38",
+        "code": "0x44",
+        "name": "D"
+    },
+    {
+        "": "39",
+        "code": "0x45",
+        "name": "E"
+    },
+    {
+        "": "40",
+        "code": "0x46",
+        "name": "F"
+    },
+    {
+        "": "41",
+        "code": "0x47",
+        "name": "G"
+    },
+    {
+        "": "42",
+        "code": "0x48",
+        "name": "H"
+    },
+    {
+        "": "43",
+        "code": "0x49",
+        "name": "I"
+    },
+    {
+        "": "44",
+        "code": "0x4a",
+        "name": "J"
+    },
+    {
+        "": "45",
+        "code": "0x4b",
+        "name": "K"
+    },
+    {
+        "": "46",
+        "code": "0x4c",
+        "name": "L"
+    },
+    {
+        "": "47",
+        "code": "0x4d",
+        "name": "M"
+    },
+    {
+        "": "48",
+        "code": "0x4e",
+        "name": "N"
+    },
+    {
+        "": "49",
+        "code": "0x4f",
+        "name": "O"
+    },
+    {
+        "": "50",
+        "code": "0x50",
+        "name": "P"
+    },
+    {
+        "": "51",
+        "code": "0x51",
+        "name": "Q"
+    },
+    {
+        "": "52",
+        "code": "0x52",
+        "name": "R"
+    },
+    {
+        "": "53",
+        "code": "0x53",
+        "name": "S"
+    },
+    {
+        "": "54",
+        "code": "0x54",
+        "name": "T"
+    },
+    {
+        "": "55",
+        "code": "0x55",
+        "name": "U"
+    },
+    {
+        "": "56",
+        "code": "0x56",
+        "name": "V"
+    },
+    {
+        "": "57",
+        "code": "0x57",
+        "name": "W"
+    },
+    {
+        "": "58",
+        "code": "0x58",
+        "name": "X"
+    },
+    {
+        "": "59",
+        "code": "0x59",
+        "name": "Y"
+    },
+    {
+        "": "60",
+        "code": "0x5a",
+        "name": "Z"
+    },
+    {
+        "": "61",
+        "code": "0x5b",
+        "name": "bracketleft"
+    },
+    {
+        "": "62",
+        "code": "0x5c",
+        "name": "backslash"
+    },
+    {
+        "": "63",
+        "code": "0x5d",
+        "name": "bracketright"
+    },
+    {
+        "": "64",
+        "code": "0x5e",
+        "name": "asciicircum"
+    },
+    {
+        "": "65",
+        "code": "0x5f",
+        "name": "underscore"
+    },
+    {
+        "": "66",
+        "code": "0x60",
+        "name": "grave"
+    },
+    {
+        "": "67",
+        "code": "0x61",
+        "name": "a"
+    },
+    {
+        "": "68",
+        "code": "0x62",
+        "name": "b"
+    },
+    {
+        "": "69",
+        "code": "0x63",
+        "name": "c"
+    },
+    {
+        "": "70",
+        "code": "0x64",
+        "name": "d"
+    },
+    {
+        "": "71",
+        "code": "0x65",
+        "name": "e"
+    },
+    {
+        "": "72",
+        "code": "0x66",
+        "name": "f"
+    },
+    {
+        "": "73",
+        "code": "0x67",
+        "name": "g"
+    },
+    {
+        "": "74",
+        "code": "0x68",
+        "name": "h"
+    },
+    {
+        "": "75",
+        "code": "0x69",
+        "name": "i"
+    },
+    {
+        "": "76",
+        "code": "0x6a",
+        "name": "j"
+    },
+    {
+        "": "77",
+        "code": "0x6b",
+        "name": "k"
+    },
+    {
+        "": "78",
+        "code": "0x6c",
+        "name": "l"
+    },
+    {
+        "": "79",
+        "code": "0x6d",
+        "name": "m"
+    },
+    {
+        "": "80",
+        "code": "0x6e",
+        "name": "n"
+    },
+    {
+        "": "81",
+        "code": "0x6f",
+        "name": "o"
+    },
+    {
+        "": "82",
+        "code": "0x70",
+        "name": "p"
+    },
+    {
+        "": "83",
+        "code": "0x71",
+        "name": "q"
+    },
+    {
+        "": "84",
+        "code": "0x72",
+        "name": "r"
+    },
+    {
+        "": "85",
+        "code": "0x73",
+        "name": "s"
+    },
+    {
+        "": "86",
+        "code": "0x74",
+        "name": "t"
+    },
+    {
+        "": "87",
+        "code": "0x75",
+        "name": "u"
+    },
+    {
+        "": "88",
+        "code": "0x76",
+        "name": "v"
+    },
+    {
+        "": "89",
+        "code": "0x77",
+        "name": "w"
+    },
+    {
+        "": "90",
+        "code": "0x78",
+        "name": "x"
+    },
+    {
+        "": "91",
+        "code": "0x79",
+        "name": "y"
+    },
+    {
+        "": "92",
+        "code": "0x7a",
+        "name": "z"
+    },
+    {
+        "": "93",
+        "code": "0x7b",
+        "name": "braceleft"
+    },
+    {
+        "": "94",
+        "code": "0x7c",
+        "name": "bar"
+    },
+    {
+        "": "95",
+        "code": "0x7d",
+        "name": "braceright"
+    },
+    {
+        "": "96",
+        "code": "0x7e",
+        "name": "asciitilde"
+    },
+    {
+        "": "97",
+        "code": "0xa0",
+        "name": "uni00A0"
+    },
+    {
+        "": "98",
+        "code": "0xa1",
+        "name": "exclamdown"
+    },
+    {
+        "": "99",
+        "code": "0xa2",
+        "name": "cent"
+    },
+    {
+        "": "100",
+        "code": "0xa3",
+        "name": "sterling"
+    },
+    {
+        "": "101",
+        "code": "0xa4",
+        "name": "currency"
+    },
+    {
+        "": "102",
+        "code": "0xa5",
+        "name": "yen"
+    },
+    {
+        "": "103",
+        "code": "0xa6",
+        "name": "brokenbar"
+    },
+    {
+        "": "104",
+        "code": "0xa7",
+        "name": "section"
+    },
+    {
+        "": "105",
+        "code": "0xa8",
+        "name": "dieresis"
+    },
+    {
+        "": "106",
+        "code": "0xa9",
+        "name": "copyright"
+    },
+    {
+        "": "107",
+        "code": "0xaa",
+        "name": "ordfeminine"
+    },
+    {
+        "": "108",
+        "code": "0xab",
+        "name": "guillemotleft"
+    },
+    {
+        "": "109",
+        "code": "0xac",
+        "name": "logicalnot"
+    },
+    {
+        "": "110",
+        "code": "0xad",
+        "name": "uni00AD"
+    },
+    {
+        "": "111",
+        "code": "0xae",
+        "name": "registered"
+    },
+    {
+        "": "112",
+        "code": "0xaf",
+        "name": "macron"
+    },
+    {
+        "": "113",
+        "code": "0xb0",
+        "name": "degree"
+    },
+    {
+        "": "114",
+        "code": "0xb1",
+        "name": "plusminus"
+    },
+    {
+        "": "115",
+        "code": "0xb2",
+        "name": "uni00B2"
+    },
+    {
+        "": "116",
+        "code": "0xb3",
+        "name": "uni00B3"
+    },
+    {
+        "": "117",
+        "code": "0xb4",
+        "name": "acute"
+    },
+    {
+        "": "118",
+        "code": "0xb5",
+        "name": "mu"
+    },
+    {
+        "": "119",
+        "code": "0xb6",
+        "name": "paragraph"
+    },
+    {
+        "": "120",
+        "code": "0xb7",
+        "name": "periodcentered"
+    },
+    {
+        "": "121",
+        "code": "0xb8",
+        "name": "cedilla"
+    },
+    {
+        "": "122",
+        "code": "0xb9",
+        "name": "uni00B9"
+    },
+    {
+        "": "123",
+        "code": "0xba",
+        "name": "ordmasculine"
+    },
+    {
+        "": "124",
+        "code": "0xbb",
+        "name": "guillemotright"
+    },
+    {
+        "": "125",
+        "code": "0xbc",
+        "name": "onequarter"
+    },
+    {
+        "": "126",
+        "code": "0xbd",
+        "name": "onehalf"
+    },
+    {
+        "": "127",
+        "code": "0xbe",
+        "name": "threequarters"
+    },
+    {
+        "": "128",
+        "code": "0xbf",
+        "name": "questiondown"
+    },
+    {
+        "": "129",
+        "code": "0xc6",
+        "name": "AE"
+    },
+    {
+        "": "130",
+        "code": "0xe6",
+        "name": "ae"
+    },
+    {
+        "": "131",
+        "code": "0x131",
+        "name": "idotless"
+    },
+    {
+        "": "132",
+        "code": "0x17f",
+        "name": "longs"
+    },
+    {
+        "": "133",
+        "code": "0x237",
+        "name": "jdotless"
+    },
+    {
+        "": "134",
+        "code": "0x2b9",
+        "name": "primemod"
+    },
+    {
+        "": "135",
+        "code": "0x2ba",
+        "name": "doubleprimemod"
+    },
+    {
+        "": "136",
+        "code": "0x2bc",
+        "name": "apostrophemod"
+    },
+    {
+        "": "137",
+        "code": "0x2be",
+        "name": "righthalfringmod"
+    },
+    {
+        "": "138",
+        "code": "0x2bf",
+        "name": "lefthalfringmod"
+    },
+    {
+        "": "139",
+        "code": "0x2c6",
+        "name": "circumflexmod"
+    },
+    {
+        "": "140",
+        "code": "0x2ca",
+        "name": "acutemod"
+    },
+    {
+        "": "141",
+        "code": "0x2cb",
+        "name": "gravemod"
+    },
+    {
+        "": "142",
+        "code": "0x2d8",
+        "name": "brevemod"
+    },
+    {
+        "": "143",
+        "code": "0x2d9",
+        "name": "dotaccentmod"
+    },
+    {
+        "": "144",
+        "code": "0x2da",
+        "name": "ringmod"
+    },
+    {
+        "": "145",
+        "code": "0x2dc",
+        "name": "tildemod"
+    },
+    {
+        "": "146",
+        "code": "0x300",
+        "name": "gravecomb"
+    },
+    {
+        "": "147",
+        "code": "0x301",
+        "name": "acutecomb"
+    },
+    {
+        "": "148",
+        "code": "0x302",
+        "name": "circumflexcomb"
+    },
+    {
+        "": "149",
+        "code": "0x303",
+        "name": "tildecomb"
+    },
+    {
+        "": "150",
+        "code": "0x304",
+        "name": "macroncomb"
+    },
+    {
+        "": "151",
+        "code": "0x305",
+        "name": "overlinecomb"
+    },
+    {
+        "": "152",
+        "code": "0x306",
+        "name": "brevecomb"
+    },
+    {
+        "": "153",
+        "code": "0x307",
+        "name": "dotaccentcomb"
+    },
+    {
+        "": "154",
+        "code": "0x308",
+        "name": "dieresiscomb"
+    },
+    {
+        "": "155",
+        "code": "0x30a",
+        "name": "ringcomb"
+    },
+    {
+        "": "156",
+        "code": "0x30c",
+        "name": "caroncomb"
+    },
+    {
+        "": "157",
+        "code": "0x313",
+        "name": "commacomb"
+    },
+    {
+        "": "158",
+        "code": "0x314",
+        "name": "reversedcommacomb"
+    },
+    {
+        "": "159",
+        "code": "0x323",
+        "name": "dotbelowcomb"
+    },
+    {
+        "": "160",
+        "code": "0x32f",
+        "name": "invertedbrevebelowcomb"
+    },
+    {
+        "": "161",
+        "code": "0x336",
+        "name": "strokelongcomb"
+    },
+    {
+        "": "162",
+        "code": "0x340",
+        "name": "gravetonemarkcomb"
+    },
+    {
+        "": "163",
+        "code": "0x341",
+        "name": "acutetonemarkcomb"
+    },
+    {
+        "": "164",
+        "code": "0x342",
+        "name": "greekperispomenicomb"
+    },
+    {
+        "": "165",
+        "code": "0x343",
+        "name": "greekkoroniscomb"
+    },
+    {
+        "": "166",
+        "code": "0x344",
+        "name": "greekdialytikatonoscomb"
+    },
+    {
+        "": "167",
+        "code": "0x345",
+        "name": "greekypogegrammenicomb"
+    },
+    {
+        "": "168",
+        "code": "0x351",
+        "name": "lefthalfringcomb"
+    },
+    {
+        "": "169",
+        "code": "0x357",
+        "name": "righthalfringcomb"
+    },
+    {
+        "": "170",
+        "code": "0x359",
+        "name": "asteriskbelowcomb"
+    },
+    {
+        "": "171",
+        "code": "0x374",
+        "name": "greeknumeralsignmod"
+    },
+    {
+        "": "172",
+        "code": "0x375",
+        "name": "lowernumeralsignmod-grek"
+    },
+    {
+        "": "173",
+        "code": "0x37a",
+        "name": "ypogegrammenimod-grek"
+    },
+    {
+        "": "174",
+        "code": "0x37e",
+        "name": "greekquestionmark"
+    },
+    {
+        "": "175",
+        "code": "0x384",
+        "name": "tonosmod-grek"
+    },
+    {
+        "": "176",
+        "code": "0x385",
+        "name": "greekdialytikatonosmod"
+    },
+    {
+        "": "177",
+        "code": "0x386",
+        "name": "Alphatonos-grek"
+    },
+    {
+        "": "178",
+        "code": "0x388",
+        "name": "Epsilontonos-grek"
+    },
+    {
+        "": "179",
+        "code": "0x389",
+        "name": "Etatonos-grek"
+    },
+    {
+        "": "180",
+        "code": "0x38a",
+        "name": "Iotatonos-grek"
+    },
+    {
+        "": "181",
+        "code": "0x38c",
+        "name": "Omicrontonos-grek"
+    },
+    {
+        "": "182",
+        "code": "0x38e",
+        "name": "Upsilontonos-grek"
+    },
+    {
+        "": "183",
+        "code": "0x38f",
+        "name": "Omegatonos-grek"
+    },
+    {
+        "": "184",
+        "code": "0x390",
+        "name": "iotadialytikatonos-grek"
+    },
+    {
+        "": "185",
+        "code": "0x391",
+        "name": "Alpha-grek"
+    },
+    {
+        "": "186",
+        "code": "0x392",
+        "name": "Beta-grek"
+    },
+    {
+        "": "187",
+        "code": "0x393",
+        "name": "Gamma-grek"
+    },
+    {
+        "": "188",
+        "code": "0x394",
+        "name": "Delta-grek"
+    },
+    {
+        "": "189",
+        "code": "0x395",
+        "name": "Epsilon-grek"
+    },
+    {
+        "": "190",
+        "code": "0x396",
+        "name": "Zeta-grek"
+    },
+    {
+        "": "191",
+        "code": "0x397",
+        "name": "Eta-grek"
+    },
+    {
+        "": "192",
+        "code": "0x398",
+        "name": "Theta-grek"
+    },
+    {
+        "": "193",
+        "code": "0x399",
+        "name": "Iota-grek"
+    },
+    {
+        "": "194",
+        "code": "0x39a",
+        "name": "Kappa-grek"
+    },
+    {
+        "": "195",
+        "code": "0x39b",
+        "name": "Lamda-grek"
+    },
+    {
+        "": "196",
+        "code": "0x39c",
+        "name": "Mu-grek"
+    },
+    {
+        "": "197",
+        "code": "0x39d",
+        "name": "Nu-grek"
+    },
+    {
+        "": "198",
+        "code": "0x39e",
+        "name": "Xi-grek"
+    },
+    {
+        "": "199",
+        "code": "0x39f",
+        "name": "Omicron-grek"
+    },
+    {
+        "": "200",
+        "code": "0x3a0",
+        "name": "Pi-grek"
+    },
+    {
+        "": "201",
+        "code": "0x3a1",
+        "name": "Rho-grek"
+    },
+    {
+        "": "202",
+        "code": "0x3a3",
+        "name": "Sigma-grek"
+    },
+    {
+        "": "203",
+        "code": "0x3a4",
+        "name": "Tau-grek"
+    },
+    {
+        "": "204",
+        "code": "0x3a5",
+        "name": "Upsilon-grek"
+    },
+    {
+        "": "205",
+        "code": "0x3a6",
+        "name": "Phi-grek"
+    },
+    {
+        "": "206",
+        "code": "0x3a7",
+        "name": "Chi-grek"
+    },
+    {
+        "": "207",
+        "code": "0x3a8",
+        "name": "Psi-grek"
+    },
+    {
+        "": "208",
+        "code": "0x3a9",
+        "name": "Omega-grek"
+    },
+    {
+        "": "209",
+        "code": "0x3aa",
+        "name": "Iotadialytika-grek"
+    },
+    {
+        "": "210",
+        "code": "0x3ab",
+        "name": "Upsilondialytika-grek"
+    },
+    {
+        "": "211",
+        "code": "0x3ac",
+        "name": "alphatonos-grek"
+    },
+    {
+        "": "212",
+        "code": "0x3ad",
+        "name": "epsilontonos-grek"
+    },
+    {
+        "": "213",
+        "code": "0x3ae",
+        "name": "etatonos-grek"
+    },
+    {
+        "": "214",
+        "code": "0x3af",
+        "name": "iotatonos-grek"
+    },
+    {
+        "": "215",
+        "code": "0x3b0",
+        "name": "upsilondialytikatonos-grek"
+    },
+    {
+        "": "216",
+        "code": "0x3b1",
+        "name": "alpha-grek"
+    },
+    {
+        "": "217",
+        "code": "0x3b2",
+        "name": "beta-grek"
+    },
+    {
+        "": "218",
+        "code": "0x3b3",
+        "name": "gamma-grek"
+    },
+    {
+        "": "219",
+        "code": "0x3b4",
+        "name": "delta-grek"
+    },
+    {
+        "": "220",
+        "code": "0x3b5",
+        "name": "epsilon-grek"
+    },
+    {
+        "": "221",
+        "code": "0x3b6",
+        "name": "zeta-grek"
+    },
+    {
+        "": "222",
+        "code": "0x3b7",
+        "name": "eta-grek"
+    },
+    {
+        "": "223",
+        "code": "0x3b8",
+        "name": "theta-grek"
+    },
+    {
+        "": "224",
+        "code": "0x3b9",
+        "name": "iota-grek"
+    },
+    {
+        "": "225",
+        "code": "0x3ba",
+        "name": "kappa-grek"
+    },
+    {
+        "": "226",
+        "code": "0x3bb",
+        "name": "lamda-grek"
+    },
+    {
+        "": "227",
+        "code": "0x3bc",
+        "name": "mu-grek"
+    },
+    {
+        "": "228",
+        "code": "0x3bd",
+        "name": "nu-grek"
+    },
+    {
+        "": "229",
+        "code": "0x3be",
+        "name": "xi-grek"
+    },
+    {
+        "": "230",
+        "code": "0x3bf",
+        "name": "omicron-grek"
+    },
+    {
+        "": "231",
+        "code": "0x3c0",
+        "name": "pi-grek"
+    },
+    {
+        "": "232",
+        "code": "0x3c1",
+        "name": "rho-grek"
+    },
+    {
+        "": "233",
+        "code": "0x3c2",
+        "name": "finalsigma-grek"
+    },
+    {
+        "": "234",
+        "code": "0x3c3",
+        "name": "sigma-grek"
+    },
+    {
+        "": "235",
+        "code": "0x3c4",
+        "name": "tau-grek"
+    },
+    {
+        "": "236",
+        "code": "0x3c5",
+        "name": "upsilon-grek"
+    },
+    {
+        "": "237",
+        "code": "0x3c6",
+        "name": "phi-grek"
+    },
+    {
+        "": "238",
+        "code": "0x3c7",
+        "name": "chi-grek"
+    },
+    {
+        "": "239",
+        "code": "0x3c8",
+        "name": "psi-grek"
+    },
+    {
+        "": "240",
+        "code": "0x3c9",
+        "name": "omega-grek"
+    },
+    {
+        "": "241",
+        "code": "0x3ca",
+        "name": "iotadialytika-grek"
+    },
+    {
+        "": "242",
+        "code": "0x3cb",
+        "name": "upsilondialytika-grek"
+    },
+    {
+        "": "243",
+        "code": "0x3cc",
+        "name": "omicrontonos-grek"
+    },
+    {
+        "": "244",
+        "code": "0x3cd",
+        "name": "upsilontonos-grek"
+    },
+    {
+        "": "245",
+        "code": "0x3ce",
+        "name": "omegatonos-grek"
+    },
+    {
+        "": "246",
+        "code": "0x3d0",
+        "name": "betasymbol-grek"
+    },
+    {
+        "": "247",
+        "code": "0x3d1",
+        "name": "thetasymbol-grek"
+    },
+    {
+        "": "248",
+        "code": "0x3d5",
+        "name": "phisymbol-grek"
+    },
+    {
+        "": "249",
+        "code": "0x3d6",
+        "name": "pisymbol-grek"
+    },
+    {
+        "": "250",
+        "code": "0x3d7",
+        "name": "kaisymbol-grek"
+    },
+    {
+        "": "251",
+        "code": "0x591",
+        "name": "accentetnahtacomb-hebr"
+    },
+    {
+        "": "252",
+        "code": "0x592",
+        "name": "accentsegolcomb-hebr"
+    },
+    {
+        "": "253",
+        "code": "0x593",
+        "name": "accentshalsheletcomb-hebr"
+    },
+    {
+        "": "254",
+        "code": "0x594",
+        "name": "accentzaqefqatancomb-hebr"
+    },
+    {
+        "": "255",
+        "code": "0x595",
+        "name": "accentzaqefgadolcomb-hebr"
+    },
+    {
+        "": "256",
+        "code": "0x596",
+        "name": "accenttipehacomb-hebr"
+    },
+    {
+        "": "257",
+        "code": "0x597",
+        "name": "accentreviacomb-hebr"
+    },
+    {
+        "": "258",
+        "code": "0x598",
+        "name": "accentzarqacomb-hebr"
+    },
+    {
+        "": "259",
+        "code": "0x599",
+        "name": "accentpashtacomb-hebr"
+    },
+    {
+        "": "260",
+        "code": "0x59a",
+        "name": "accentyetivcomb-hebr"
+    },
+    {
+        "": "261",
+        "code": "0x59b",
+        "name": "accenttevircomb-hebr"
+    },
+    {
+        "": "262",
+        "code": "0x59c",
+        "name": "accentgereshcomb-hebr"
+    },
+    {
+        "": "263",
+        "code": "0x59d",
+        "name": "accentgereshmuqdamcomb-hebr"
+    },
+    {
+        "": "264",
+        "code": "0x59e",
+        "name": "accentgershayimcomb-hebr"
+    },
+    {
+        "": "265",
+        "code": "0x59f",
+        "name": "accentqarneyparacomb-hebr"
+    },
+    {
+        "": "266",
+        "code": "0x5a0",
+        "name": "accenttelishagedolacomb-hebr"
+    },
+    {
+        "": "267",
+        "code": "0x5a1",
+        "name": "accentpazercomb-hebr"
+    },
+    {
+        "": "268",
+        "code": "0x5a2",
+        "name": "accentatnahhafukhcomb-hebr"
+    },
+    {
+        "": "269",
+        "code": "0x5a3",
+        "name": "accentmunahcomb-hebr"
+    },
+    {
+        "": "270",
+        "code": "0x5a4",
+        "name": "accentmahapakhcomb-hebr"
+    },
+    {
+        "": "271",
+        "code": "0x5a5",
+        "name": "accentmerkhacomb-hebr"
+    },
+    {
+        "": "272",
+        "code": "0x5a6",
+        "name": "accentmerkhakefulacomb-hebr"
+    },
+    {
+        "": "273",
+        "code": "0x5a7",
+        "name": "accentdargacomb-hebr"
+    },
+    {
+        "": "274",
+        "code": "0x5a8",
+        "name": "accentqadmacomb-hebr"
+    },
+    {
+        "": "275",
+        "code": "0x5a9",
+        "name": "accenttelishaqetanacomb-hebr"
+    },
+    {
+        "": "276",
+        "code": "0x5aa",
+        "name": "accentyerahbenyomocomb-hebr"
+    },
+    {
+        "": "277",
+        "code": "0x5ab",
+        "name": "accentolecomb-hebr"
+    },
+    {
+        "": "278",
+        "code": "0x5ac",
+        "name": "accentiluycomb-hebr"
+    },
+    {
+        "": "279",
+        "code": "0x5ad",
+        "name": "accentdehicomb-hebr"
+    },
+    {
+        "": "280",
+        "code": "0x5ae",
+        "name": "accentzinorcomb-hebr"
+    },
+    {
+        "": "281",
+        "code": "0x5af",
+        "name": "markmasoracirclecomb-hebr"
+    },
+    {
+        "": "282",
+        "code": "0x5b0",
+        "name": "shevacomb-hebr"
+    },
+    {
+        "": "283",
+        "code": "0x5b1",
+        "name": "hatafsegolcomb-hebr"
+    },
+    {
+        "": "284",
+        "code": "0x5b2",
+        "name": "hatafpatahcomb-hebr"
+    },
+    {
+        "": "285",
+        "code": "0x5b3",
+        "name": "hatafqamatscomb-hebr"
+    },
+    {
+        "": "286",
+        "code": "0x5b4",
+        "name": "hiriqcomb-hebr"
+    },
+    {
+        "": "287",
+        "code": "0x5b5",
+        "name": "tserecomb-hebr"
+    },
+    {
+        "": "288",
+        "code": "0x5b6",
+        "name": "segolcomb-hebr"
+    },
+    {
+        "": "289",
+        "code": "0x5b7",
+        "name": "patahcomb-hebr"
+    },
+    {
+        "": "290",
+        "code": "0x5b8",
+        "name": "qamatscomb-hebr"
+    },
+    {
+        "": "291",
+        "code": "0x5b9",
+        "name": "holamcomb-hebr"
+    },
+    {
+        "": "292",
+        "code": "0x5ba",
+        "name": "holamhaserforvavcomb-hebr"
+    },
+    {
+        "": "293",
+        "code": "0x5bb",
+        "name": "qubutscomb-hebr"
+    },
+    {
+        "": "294",
+        "code": "0x5bc",
+        "name": "dageshormapiqcomb-hebr"
+    },
+    {
+        "": "295",
+        "code": "0x5bd",
+        "name": "metegcomb-hebr"
+    },
+    {
+        "": "296",
+        "code": "0x5be",
+        "name": "maqaf-hebr"
+    },
+    {
+        "": "297",
+        "code": "0x5bf",
+        "name": "rafecomb-hebr"
+    },
+    {
+        "": "298",
+        "code": "0x5c0",
+        "name": "punctuationpaseq-hebr"
+    },
+    {
+        "": "299",
+        "code": "0x5c1",
+        "name": "shindotcomb-hebr"
+    },
+    {
+        "": "300",
+        "code": "0x5c2",
+        "name": "sindotcomb-hebr"
+    },
+    {
+        "": "301",
+        "code": "0x5c3",
+        "name": "punctuationsofpasuq-hebr"
+    },
+    {
+        "": "302",
+        "code": "0x5c4",
+        "name": "markupperdotcomb-hebr"
+    },
+    {
+        "": "303",
+        "code": "0x5c5",
+        "name": "marklowerdotcomb-hebr"
+    },
+    {
+        "": "304",
+        "code": "0x5c6",
+        "name": "punctuationnunhafukha-hebr"
+    },
+    {
+        "": "305",
+        "code": "0x5c7",
+        "name": "qamatsqatancomb-hebr"
+    },
+    {
+        "": "306",
+        "code": "0x5d0",
+        "name": "alef-hebr"
+    },
+    {
+        "": "307",
+        "code": "0x5d1",
+        "name": "bet-hebr"
+    },
+    {
+        "": "308",
+        "code": "0x5d2",
+        "name": "gimel-hebr"
+    },
+    {
+        "": "309",
+        "code": "0x5d3",
+        "name": "dalet-hebr"
+    },
+    {
+        "": "310",
+        "code": "0x5d4",
+        "name": "he-hebr"
+    },
+    {
+        "": "311",
+        "code": "0x5d5",
+        "name": "vav-hebr"
+    },
+    {
+        "": "312",
+        "code": "0x5d6",
+        "name": "zayin-hebr"
+    },
+    {
+        "": "313",
+        "code": "0x5d7",
+        "name": "het-hebr"
+    },
+    {
+        "": "314",
+        "code": "0x5d8",
+        "name": "tet-hebr"
+    },
+    {
+        "": "315",
+        "code": "0x5d9",
+        "name": "yod-hebr"
+    },
+    {
+        "": "316",
+        "code": "0x5da",
+        "name": "finalkaf-hebr"
+    },
+    {
+        "": "317",
+        "code": "0x5db",
+        "name": "kaf-hebr"
+    },
+    {
+        "": "318",
+        "code": "0x5dc",
+        "name": "lamed-hebr"
+    },
+    {
+        "": "319",
+        "code": "0x5dd",
+        "name": "finalmem-hebr"
+    },
+    {
+        "": "320",
+        "code": "0x5de",
+        "name": "mem-hebr"
+    },
+    {
+        "": "321",
+        "code": "0x5df",
+        "name": "finalnun-hebr"
+    },
+    {
+        "": "322",
+        "code": "0x5e0",
+        "name": "nun-hebr"
+    },
+    {
+        "": "323",
+        "code": "0x5e1",
+        "name": "samekh-hebr"
+    },
+    {
+        "": "324",
+        "code": "0x5e2",
+        "name": "ayin-hebr"
+    },
+    {
+        "": "325",
+        "code": "0x5e3",
+        "name": "finalpe-hebr"
+    },
+    {
+        "": "326",
+        "code": "0x5e4",
+        "name": "pe-hebr"
+    },
+    {
+        "": "327",
+        "code": "0x5e5",
+        "name": "finaltsadi-hebr"
+    },
+    {
+        "": "328",
+        "code": "0x5e6",
+        "name": "tsadi-hebr"
+    },
+    {
+        "": "329",
+        "code": "0x5e7",
+        "name": "qof-hebr"
+    },
+    {
+        "": "330",
+        "code": "0x5e8",
+        "name": "resh-hebr"
+    },
+    {
+        "": "331",
+        "code": "0x5e9",
+        "name": "shin-hebr"
+    },
+    {
+        "": "332",
+        "code": "0x5ea",
+        "name": "tav-hebr"
+    },
+    {
+        "": "333",
+        "code": "0x5f0",
+        "name": "yiddishdoublevav-hebr"
+    },
+    {
+        "": "334",
+        "code": "0x5f1",
+        "name": "yiddishvavyod-hebr"
+    },
+    {
+        "": "335",
+        "code": "0x5f2",
+        "name": "yiddishdoubleyod-hebr"
+    },
+    {
+        "": "336",
+        "code": "0x5f3",
+        "name": "punctuationgeresh-hebr"
+    },
+    {
+        "": "337",
+        "code": "0x5f4",
+        "name": "punctuationgershayim-hebr"
+    },
+    {
+        "": "338",
+        "code": "0x1f00",
+        "name": "alphapsili-grek"
+    },
+    {
+        "": "339",
+        "code": "0x1f01",
+        "name": "alphadasia-grek"
+    },
+    {
+        "": "340",
+        "code": "0x1f02",
+        "name": "alphapsilivaria-grek"
+    },
+    {
+        "": "341",
+        "code": "0x1f03",
+        "name": "alphadasiavaria-grek"
+    },
+    {
+        "": "342",
+        "code": "0x1f04",
+        "name": "alphapsilioxia-grek"
+    },
+    {
+        "": "343",
+        "code": "0x1f05",
+        "name": "alphadasiaoxia-grek"
+    },
+    {
+        "": "344",
+        "code": "0x1f06",
+        "name": "alphapsiliperispomeni-grek"
+    },
+    {
+        "": "345",
+        "code": "0x1f07",
+        "name": "alphadasiaperispomeni-grek"
+    },
+    {
+        "": "346",
+        "code": "0x1f08",
+        "name": "Alphapsili-grek"
+    },
+    {
+        "": "347",
+        "code": "0x1f09",
+        "name": "Alphadasia-grek"
+    },
+    {
+        "": "348",
+        "code": "0x1f0a",
+        "name": "Alphapsilivaria-grek"
+    },
+    {
+        "": "349",
+        "code": "0x1f0b",
+        "name": "Alphadasiavaria-grek"
+    },
+    {
+        "": "350",
+        "code": "0x1f0c",
+        "name": "Alphapsilioxia-grek"
+    },
+    {
+        "": "351",
+        "code": "0x1f0d",
+        "name": "Alphadasiaoxia-grek"
+    },
+    {
+        "": "352",
+        "code": "0x1f0e",
+        "name": "Alphapsiliperispomeni-grek"
+    },
+    {
+        "": "353",
+        "code": "0x1f0f",
+        "name": "Alphadasiaperispomeni-grek"
+    },
+    {
+        "": "354",
+        "code": "0x1f10",
+        "name": "epsilonpsili-grek"
+    },
+    {
+        "": "355",
+        "code": "0x1f11",
+        "name": "epsilondasia-grek"
+    },
+    {
+        "": "356",
+        "code": "0x1f12",
+        "name": "epsilonpsilivaria-grek"
+    },
+    {
+        "": "357",
+        "code": "0x1f13",
+        "name": "epsilondasiavaria-grek"
+    },
+    {
+        "": "358",
+        "code": "0x1f14",
+        "name": "epsilonpsilioxia-grek"
+    },
+    {
+        "": "359",
+        "code": "0x1f15",
+        "name": "epsilondasiaoxia-grek"
+    },
+    {
+        "": "360",
+        "code": "0x1f16",
+        "name": "epsilon_perispomeni"
+    },
+    {
+        "": "361",
+        "code": "0x1f18",
+        "name": "Epsilonpsili-grek"
+    },
+    {
+        "": "362",
+        "code": "0x1f19",
+        "name": "Epsilondasia-grek"
+    },
+    {
+        "": "363",
+        "code": "0x1f1a",
+        "name": "Epsilonpsilivaria-grek"
+    },
+    {
+        "": "364",
+        "code": "0x1f1b",
+        "name": "Epsilondasiavaria-grek"
+    },
+    {
+        "": "365",
+        "code": "0x1f1c",
+        "name": "Epsilonpsilioxia-grek"
+    },
+    {
+        "": "366",
+        "code": "0x1f1d",
+        "name": "Epsilondasiaoxia-grek"
+    },
+    {
+        "": "367",
+        "code": "0x1f20",
+        "name": "etapsili-grek"
+    },
+    {
+        "": "368",
+        "code": "0x1f21",
+        "name": "etadasia-grek"
+    },
+    {
+        "": "369",
+        "code": "0x1f22",
+        "name": "etapsilivaria-grek"
+    },
+    {
+        "": "370",
+        "code": "0x1f23",
+        "name": "etadasiavaria-grek"
+    },
+    {
+        "": "371",
+        "code": "0x1f24",
+        "name": "etapsilioxia-grek"
+    },
+    {
+        "": "372",
+        "code": "0x1f25",
+        "name": "etadasiaoxia-grek"
+    },
+    {
+        "": "373",
+        "code": "0x1f26",
+        "name": "etapsiliperispomeni-grek"
+    },
+    {
+        "": "374",
+        "code": "0x1f27",
+        "name": "etadasiaperispomeni-grek"
+    },
+    {
+        "": "375",
+        "code": "0x1f28",
+        "name": "Etapsili-grek"
+    },
+    {
+        "": "376",
+        "code": "0x1f29",
+        "name": "Etadasia-grek"
+    },
+    {
+        "": "377",
+        "code": "0x1f2a",
+        "name": "Etapsilivaria-grek"
+    },
+    {
+        "": "378",
+        "code": "0x1f2b",
+        "name": "Etadasiavaria-grek"
+    },
+    {
+        "": "379",
+        "code": "0x1f2c",
+        "name": "Etapsilioxia-grek"
+    },
+    {
+        "": "380",
+        "code": "0x1f2d",
+        "name": "Etadasiaoxia-grek"
+    },
+    {
+        "": "381",
+        "code": "0x1f2e",
+        "name": "Etapsiliperispomeni-grek"
+    },
+    {
+        "": "382",
+        "code": "0x1f2f",
+        "name": "Etadasiaperispomeni-grek"
+    },
+    {
+        "": "383",
+        "code": "0x1f30",
+        "name": "iotapsili-grek"
+    },
+    {
+        "": "384",
+        "code": "0x1f31",
+        "name": "iotadasia-grek"
+    },
+    {
+        "": "385",
+        "code": "0x1f32",
+        "name": "iotapsilivaria-grek"
+    },
+    {
+        "": "386",
+        "code": "0x1f33",
+        "name": "iotadasiavaria-grek"
+    },
+    {
+        "": "387",
+        "code": "0x1f34",
+        "name": "iotapsilioxia-grek"
+    },
+    {
+        "": "388",
+        "code": "0x1f35",
+        "name": "iotadasiaoxia-grek"
+    },
+    {
+        "": "389",
+        "code": "0x1f36",
+        "name": "iotapsiliperispomeni-grek"
+    },
+    {
+        "": "390",
+        "code": "0x1f37",
+        "name": "iotadasiaperispomeni-grek"
+    },
+    {
+        "": "391",
+        "code": "0x1f38",
+        "name": "Iotapsili-grek"
+    },
+    {
+        "": "392",
+        "code": "0x1f39",
+        "name": "Iotadasia-grek"
+    },
+    {
+        "": "393",
+        "code": "0x1f3a",
+        "name": "Iotapsilivaria-grek"
+    },
+    {
+        "": "394",
+        "code": "0x1f3b",
+        "name": "Iotadasiavaria-grek"
+    },
+    {
+        "": "395",
+        "code": "0x1f3c",
+        "name": "Iotapsilioxia-grek"
+    },
+    {
+        "": "396",
+        "code": "0x1f3d",
+        "name": "Iotadasiaoxia-grek"
+    },
+    {
+        "": "397",
+        "code": "0x1f3e",
+        "name": "Iotapsiliperispomeni-grek"
+    },
+    {
+        "": "398",
+        "code": "0x1f3f",
+        "name": "Iotadasiaperispomeni-grek"
+    },
+    {
+        "": "399",
+        "code": "0x1f40",
+        "name": "omicronpsili-grek"
+    },
+    {
+        "": "400",
+        "code": "0x1f41",
+        "name": "omicrondasia-grek"
+    },
+    {
+        "": "401",
+        "code": "0x1f42",
+        "name": "omicronpsilivaria-grek"
+    },
+    {
+        "": "402",
+        "code": "0x1f43",
+        "name": "omicrondasiavaria-grek"
+    },
+    {
+        "": "403",
+        "code": "0x1f44",
+        "name": "omicronpsilioxia-grek"
+    },
+    {
+        "": "404",
+        "code": "0x1f45",
+        "name": "omicrondasiaoxia-grek"
+    },
+    {
+        "": "405",
+        "code": "0x1f48",
+        "name": "Omicronpsili-grek"
+    },
+    {
+        "": "406",
+        "code": "0x1f49",
+        "name": "Omicrondasia-grek"
+    },
+    {
+        "": "407",
+        "code": "0x1f4a",
+        "name": "Omicronpsilivaria-grek"
+    },
+    {
+        "": "408",
+        "code": "0x1f4b",
+        "name": "Omicrondasiavaria-grek"
+    },
+    {
+        "": "409",
+        "code": "0x1f4c",
+        "name": "Omicronpsilioxia-grek"
+    },
+    {
+        "": "410",
+        "code": "0x1f4d",
+        "name": "Omicrondasiaoxia-grek"
+    },
+    {
+        "": "411",
+        "code": "0x1f50",
+        "name": "upsilonpsili-grek"
+    },
+    {
+        "": "412",
+        "code": "0x1f51",
+        "name": "upsilondasia-grek"
+    },
+    {
+        "": "413",
+        "code": "0x1f52",
+        "name": "upsilonpsilivaria-grek"
+    },
+    {
+        "": "414",
+        "code": "0x1f53",
+        "name": "upsilondasiavaria-grek"
+    },
+    {
+        "": "415",
+        "code": "0x1f54",
+        "name": "upsilonpsilioxia-grek"
+    },
+    {
+        "": "416",
+        "code": "0x1f55",
+        "name": "upsilondasiaoxia-grek"
+    },
+    {
+        "": "417",
+        "code": "0x1f56",
+        "name": "upsilonpsiliperispomeni-grek"
+    },
+    {
+        "": "418",
+        "code": "0x1f57",
+        "name": "upsilondasiaperispomeni-grek"
+    },
+    {
+        "": "419",
+        "code": "0x1f59",
+        "name": "Upsilondasia-grek"
+    },
+    {
+        "": "420",
+        "code": "0x1f5b",
+        "name": "Upsilondasiavaria-grek"
+    },
+    {
+        "": "421",
+        "code": "0x1f5d",
+        "name": "Upsilondasiaoxia-grek"
+    },
+    {
+        "": "422",
+        "code": "0x1f5f",
+        "name": "Upsilondasiaperispomeni-grek"
+    },
+    {
+        "": "423",
+        "code": "0x1f60",
+        "name": "omegapsili-grek"
+    },
+    {
+        "": "424",
+        "code": "0x1f61",
+        "name": "omegadasia-grek"
+    },
+    {
+        "": "425",
+        "code": "0x1f62",
+        "name": "omegapsilivaria-grek"
+    },
+    {
+        "": "426",
+        "code": "0x1f63",
+        "name": "omegadasiavaria-grek"
+    },
+    {
+        "": "427",
+        "code": "0x1f64",
+        "name": "omegapsilioxia-grek"
+    },
+    {
+        "": "428",
+        "code": "0x1f65",
+        "name": "omegadasiaoxia-grek"
+    },
+    {
+        "": "429",
+        "code": "0x1f66",
+        "name": "omegapsiliperispomeni-grek"
+    },
+    {
+        "": "430",
+        "code": "0x1f67",
+        "name": "omegadasiaperispomeni-grek"
+    },
+    {
+        "": "431",
+        "code": "0x1f68",
+        "name": "Omegapsili-grek"
+    },
+    {
+        "": "432",
+        "code": "0x1f69",
+        "name": "Omegadasia-grek"
+    },
+    {
+        "": "433",
+        "code": "0x1f6a",
+        "name": "Omegapsilivaria-grek"
+    },
+    {
+        "": "434",
+        "code": "0x1f6b",
+        "name": "Omegadasiavaria-grek"
+    },
+    {
+        "": "435",
+        "code": "0x1f6c",
+        "name": "Omegapsilioxia-grek"
+    },
+    {
+        "": "436",
+        "code": "0x1f6d",
+        "name": "Omegadasiaoxia-grek"
+    },
+    {
+        "": "437",
+        "code": "0x1f6e",
+        "name": "Omegapsiliperispomeni-grek"
+    },
+    {
+        "": "438",
+        "code": "0x1f6f",
+        "name": "Omegadasiaperispomeni-grek"
+    },
+    {
+        "": "439",
+        "code": "0x1f70",
+        "name": "alphavaria-grek"
+    },
+    {
+        "": "440",
+        "code": "0x1f71",
+        "name": "alphaoxia-grek"
+    },
+    {
+        "": "441",
+        "code": "0x1f72",
+        "name": "epsilonvaria-grek"
+    },
+    {
+        "": "442",
+        "code": "0x1f73",
+        "name": "epsilonoxia-grek"
+    },
+    {
+        "": "443",
+        "code": "0x1f74",
+        "name": "etavaria-grek"
+    },
+    {
+        "": "444",
+        "code": "0x1f75",
+        "name": "etaoxia-grek"
+    },
+    {
+        "": "445",
+        "code": "0x1f76",
+        "name": "iotavaria-grek"
+    },
+    {
+        "": "446",
+        "code": "0x1f77",
+        "name": "iotaoxia-grek"
+    },
+    {
+        "": "447",
+        "code": "0x1f78",
+        "name": "omicronvaria-grek"
+    },
+    {
+        "": "448",
+        "code": "0x1f79",
+        "name": "omicronoxia-grek"
+    },
+    {
+        "": "449",
+        "code": "0x1f7a",
+        "name": "upsilonvaria-grek"
+    },
+    {
+        "": "450",
+        "code": "0x1f7b",
+        "name": "upsilonoxia-grek"
+    },
+    {
+        "": "451",
+        "code": "0x1f7c",
+        "name": "omegavaria-grek"
+    },
+    {
+        "": "452",
+        "code": "0x1f7d",
+        "name": "omegaoxia-grek"
+    },
+    {
+        "": "453",
+        "code": "0x1f80",
+        "name": "alphapsiliypogegrammeni-grek"
+    },
+    {
+        "": "454",
+        "code": "0x1f81",
+        "name": "alphadasiaypogegrammeni-grek"
+    },
+    {
+        "": "455",
+        "code": "0x1f82",
+        "name": "alphapsilivariaypogegrammeni-grek"
+    },
+    {
+        "": "456",
+        "code": "0x1f83",
+        "name": "alphadasiavariaypogegrammeni-grek"
+    },
+    {
+        "": "457",
+        "code": "0x1f84",
+        "name": "alphapsilioxiaypogegrammeni-grek"
+    },
+    {
+        "": "458",
+        "code": "0x1f85",
+        "name": "alphadasiaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "459",
+        "code": "0x1f86",
+        "name": "alphapsiliperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "460",
+        "code": "0x1f87",
+        "name": "alphadasiaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "461",
+        "code": "0x1f88",
+        "name": "Alphapsiliprosgegrammeni-grek"
+    },
+    {
+        "": "462",
+        "code": "0x1f89",
+        "name": "Alphadasiaprosgegrammeni-grek"
+    },
+    {
+        "": "463",
+        "code": "0x1f8a",
+        "name": "Alphapsilivariaprosgegrammeni-grek"
+    },
+    {
+        "": "464",
+        "code": "0x1f8b",
+        "name": "Alphadasiavariaprosgegrammeni-grek"
+    },
+    {
+        "": "465",
+        "code": "0x1f8c",
+        "name": "Alphapsilioxiaprosgegrammeni-grek"
+    },
+    {
+        "": "466",
+        "code": "0x1f8d",
+        "name": "Alphadasiaoxiaprosgegrammeni-grek"
+    },
+    {
+        "": "467",
+        "code": "0x1f8e",
+        "name": "Alphapsiliperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "468",
+        "code": "0x1f8f",
+        "name": "Alphadasiaperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "469",
+        "code": "0x1f90",
+        "name": "etapsiliypogegrammeni-grek"
+    },
+    {
+        "": "470",
+        "code": "0x1f91",
+        "name": "etadasiaypogegrammeni-grek"
+    },
+    {
+        "": "471",
+        "code": "0x1f92",
+        "name": "etapsilivariaypogegrammeni-grek"
+    },
+    {
+        "": "472",
+        "code": "0x1f93",
+        "name": "etadasiavariaypogegrammeni-grek"
+    },
+    {
+        "": "473",
+        "code": "0x1f94",
+        "name": "etapsilioxiaypogegrammeni-grek"
+    },
+    {
+        "": "474",
+        "code": "0x1f95",
+        "name": "etadasiaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "475",
+        "code": "0x1f96",
+        "name": "etapsiliperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "476",
+        "code": "0x1f97",
+        "name": "etadasiaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "477",
+        "code": "0x1f98",
+        "name": "Etapsiliprosgegrammeni-grek"
+    },
+    {
+        "": "478",
+        "code": "0x1f99",
+        "name": "Etadasiaprosgegrammeni-grek"
+    },
+    {
+        "": "479",
+        "code": "0x1f9a",
+        "name": "Etapsilivariaprosgegrammeni-grek"
+    },
+    {
+        "": "480",
+        "code": "0x1f9b",
+        "name": "Etadasiavariaprosgegrammeni-grek"
+    },
+    {
+        "": "481",
+        "code": "0x1f9c",
+        "name": "Etapsilioxiaprosgegrammeni-grek"
+    },
+    {
+        "": "482",
+        "code": "0x1f9d",
+        "name": "Etadasiaoxiaprosgegrammeni-grek"
+    },
+    {
+        "": "483",
+        "code": "0x1f9e",
+        "name": "Etapsiliperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "484",
+        "code": "0x1f9f",
+        "name": "Etadasiaperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "485",
+        "code": "0x1fa0",
+        "name": "omegapsiliypogegrammeni-grek"
+    },
+    {
+        "": "486",
+        "code": "0x1fa1",
+        "name": "omegadasiaypogegrammeni-grek"
+    },
+    {
+        "": "487",
+        "code": "0x1fa2",
+        "name": "omegapsilivariaypogegrammeni-grek"
+    },
+    {
+        "": "488",
+        "code": "0x1fa3",
+        "name": "omegadasiavariaypogegrammeni-grek"
+    },
+    {
+        "": "489",
+        "code": "0x1fa4",
+        "name": "omegapsilioxiaypogegrammeni-grek"
+    },
+    {
+        "": "490",
+        "code": "0x1fa5",
+        "name": "omegadasiaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "491",
+        "code": "0x1fa6",
+        "name": "omegapsiliperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "492",
+        "code": "0x1fa7",
+        "name": "omegadasiaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "493",
+        "code": "0x1fa8",
+        "name": "Omegapsiliprosgegrammeni-grek"
+    },
+    {
+        "": "494",
+        "code": "0x1fa9",
+        "name": "Omegadasiaprosgegrammeni-grek"
+    },
+    {
+        "": "495",
+        "code": "0x1faa",
+        "name": "Omegapsilivariaprosgegrammeni-grek"
+    },
+    {
+        "": "496",
+        "code": "0x1fab",
+        "name": "Omegadasiavariaprosgegrammeni-grek"
+    },
+    {
+        "": "497",
+        "code": "0x1fac",
+        "name": "Omegapsilioxiaprosgegrammeni-grek"
+    },
+    {
+        "": "498",
+        "code": "0x1fad",
+        "name": "Omegadasiaoxiaprosgegrammeni-grek"
+    },
+    {
+        "": "499",
+        "code": "0x1fae",
+        "name": "Omegapsiliperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "500",
+        "code": "0x1faf",
+        "name": "Omegadasiaperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "501",
+        "code": "0x1fb0",
+        "name": "alphavrachy-grek"
+    },
+    {
+        "": "502",
+        "code": "0x1fb1",
+        "name": "alphamacron-grek"
+    },
+    {
+        "": "503",
+        "code": "0x1fb2",
+        "name": "alphavariaypogegrammeni-grek"
+    },
+    {
+        "": "504",
+        "code": "0x1fb3",
+        "name": "alphaypogegrammeni-grek"
+    },
+    {
+        "": "505",
+        "code": "0x1fb4",
+        "name": "alphaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "506",
+        "code": "0x1fb6",
+        "name": "alphaperispomeni-grek"
+    },
+    {
+        "": "507",
+        "code": "0x1fb7",
+        "name": "alphaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "508",
+        "code": "0x1fb8",
+        "name": "Alphavrachy-grek"
+    },
+    {
+        "": "509",
+        "code": "0x1fb9",
+        "name": "Alphamacron-grek"
+    },
+    {
+        "": "510",
+        "code": "0x1fba",
+        "name": "Alphavaria-grek"
+    },
+    {
+        "": "511",
+        "code": "0x1fbb",
+        "name": "Alphaoxia-grek"
+    },
+    {
+        "": "512",
+        "code": "0x1fbc",
+        "name": "Alphaprosgegrammeni-grek"
+    },
+    {
+        "": "513",
+        "code": "0x1fbd",
+        "name": "koronismod-grek"
+    },
+    {
+        "": "514",
+        "code": "0x1fbe",
+        "name": "prosgegrammeni-grek"
+    },
+    {
+        "": "515",
+        "code": "0x1fbf",
+        "name": "psilimod-grek"
+    },
+    {
+        "": "516",
+        "code": "0x1fc0",
+        "name": "perispomenimod-grek"
+    },
+    {
+        "": "517",
+        "code": "0x1fc1",
+        "name": "dialytikaperispomenimod-grek"
+    },
+    {
+        "": "518",
+        "code": "0x1fc2",
+        "name": "etavariaypogegrammeni-grek"
+    },
+    {
+        "": "519",
+        "code": "0x1fc3",
+        "name": "etaypogegrammeni-grek"
+    },
+    {
+        "": "520",
+        "code": "0x1fc4",
+        "name": "etaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "521",
+        "code": "0x1fc6",
+        "name": "etaperispomeni-grek"
+    },
+    {
+        "": "522",
+        "code": "0x1fc7",
+        "name": "etaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "523",
+        "code": "0x1fc8",
+        "name": "Epsilonvaria-grek"
+    },
+    {
+        "": "524",
+        "code": "0x1fc9",
+        "name": "Epsilonoxia-grek"
+    },
+    {
+        "": "525",
+        "code": "0x1fca",
+        "name": "Etavaria-grek"
+    },
+    {
+        "": "526",
+        "code": "0x1fcb",
+        "name": "Etaoxia-grek"
+    },
+    {
+        "": "527",
+        "code": "0x1fcc",
+        "name": "Etaprosgegrammeni-grek"
+    },
+    {
+        "": "528",
+        "code": "0x1fcd",
+        "name": "psilivariamod-grek"
+    },
+    {
+        "": "529",
+        "code": "0x1fce",
+        "name": "psilioxiamod-grek"
+    },
+    {
+        "": "530",
+        "code": "0x1fcf",
+        "name": "psiliperispomenimod-grek"
+    },
+    {
+        "": "531",
+        "code": "0x1fd0",
+        "name": "iotavrachy-grek"
+    },
+    {
+        "": "532",
+        "code": "0x1fd1",
+        "name": "iotamacron-grek"
+    },
+    {
+        "": "533",
+        "code": "0x1fd2",
+        "name": "iotadialytikavaria-grek"
+    },
+    {
+        "": "534",
+        "code": "0x1fd3",
+        "name": "iotadialytikaoxia-grek"
+    },
+    {
+        "": "535",
+        "code": "0x1fd6",
+        "name": "iotaperispomeni-grek"
+    },
+    {
+        "": "536",
+        "code": "0x1fd7",
+        "name": "iotadialytikaperispomeni-grek"
+    },
+    {
+        "": "537",
+        "code": "0x1fd8",
+        "name": "Iotavrachy-grek"
+    },
+    {
+        "": "538",
+        "code": "0x1fd9",
+        "name": "Iotamacron-grek"
+    },
+    {
+        "": "539",
+        "code": "0x1fda",
+        "name": "Iotavaria-grek"
+    },
+    {
+        "": "540",
+        "code": "0x1fdb",
+        "name": "Iotaoxia-grek"
+    },
+    {
+        "": "541",
+        "code": "0x1fdd",
+        "name": "dasiavariamod-grek"
+    },
+    {
+        "": "542",
+        "code": "0x1fde",
+        "name": "dasiaoxiamod-grek"
+    },
+    {
+        "": "543",
+        "code": "0x1fdf",
+        "name": "dasiaperispomenimod-grek"
+    },
+    {
+        "": "544",
+        "code": "0x1fe0",
+        "name": "upsilonvrachy-grek"
+    },
+    {
+        "": "545",
+        "code": "0x1fe1",
+        "name": "upsilonmacron-grek"
+    },
+    {
+        "": "546",
+        "code": "0x1fe2",
+        "name": "upsilondialytikavaria-grek"
+    },
+    {
+        "": "547",
+        "code": "0x1fe3",
+        "name": "upsilondialytikaoxia-grek"
+    },
+    {
+        "": "548",
+        "code": "0x1fe4",
+        "name": "rhopsili-grek"
+    },
+    {
+        "": "549",
+        "code": "0x1fe5",
+        "name": "rhodasia-grek"
+    },
+    {
+        "": "550",
+        "code": "0x1fe6",
+        "name": "upsilonperispomeni-grek"
+    },
+    {
+        "": "551",
+        "code": "0x1fe7",
+        "name": "upsilondialytikaperispomeni-grek"
+    },
+    {
+        "": "552",
+        "code": "0x1fe8",
+        "name": "Upsilonvrachy-grek"
+    },
+    {
+        "": "553",
+        "code": "0x1fe9",
+        "name": "Upsilonmacron-grek"
+    },
+    {
+        "": "554",
+        "code": "0x1fea",
+        "name": "Upsilonvaria-grek"
+    },
+    {
+        "": "555",
+        "code": "0x1feb",
+        "name": "Upsilonoxia-grek"
+    },
+    {
+        "": "556",
+        "code": "0x1fec",
+        "name": "Rhodasia-grek"
+    },
+    {
+        "": "557",
+        "code": "0x1fed",
+        "name": "dialytikavariamod-grek"
+    },
+    {
+        "": "558",
+        "code": "0x1fee",
+        "name": "dialytikaoxiamod-grek"
+    },
+    {
+        "": "559",
+        "code": "0x1fef",
+        "name": "variamod-grek"
+    },
+    {
+        "": "560",
+        "code": "0x1ff2",
+        "name": "omegavariaypogegrammeni-grek"
+    },
+    {
+        "": "561",
+        "code": "0x1ff3",
+        "name": "omegaypogegrammeni-grek"
+    },
+    {
+        "": "562",
+        "code": "0x1ff4",
+        "name": "omegaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "563",
+        "code": "0x1ff6",
+        "name": "omegaperispomeni-grek"
+    },
+    {
+        "": "564",
+        "code": "0x1ff7",
+        "name": "omegaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "565",
+        "code": "0x1ff8",
+        "name": "Omicronvaria-grek"
+    },
+    {
+        "": "566",
+        "code": "0x1ff9",
+        "name": "Omicronoxia-grek"
+    },
+    {
+        "": "567",
+        "code": "0x1ffa",
+        "name": "Omegavaria-grek"
+    },
+    {
+        "": "568",
+        "code": "0x1ffb",
+        "name": "Omegaoxia-grek"
+    },
+    {
+        "": "569",
+        "code": "0x1ffc",
+        "name": "Omegaprosgegrammeni-grek"
+    },
+    {
+        "": "570",
+        "code": "0x1ffd",
+        "name": "oxiamod-grek"
+    },
+    {
+        "": "571",
+        "code": "0x1ffe",
+        "name": "dasiamod-grek"
+    },
+    {
+        "": "572",
+        "code": "0xe138",
+        "name": "uniE138"
+    },
+    {
+        "": "573",
+        "code": "0xe6af",
+        "name": "alpha_apostrophe"
+    },
+    {
+        "": "574",
+        "code": "0xe6b0",
+        "name": "alpha_curly"
+    },
+    {
+        "": "575",
+        "code": "0xe6b1",
+        "name": "alpha_iota"
+    },
+    {
+        "": "576",
+        "code": "0xe6b2",
+        "name": "alpha_iota_psili"
+    },
+    {
+        "": "577",
+        "code": "0xe6b3",
+        "name": "alpha_iota_tonos"
+    },
+    {
+        "": "578",
+        "code": "0xe6b4",
+        "name": "alpha_iota_psili_oxia"
+    },
+    {
+        "": "579",
+        "code": "0xe6b5",
+        "name": "alpha_iota_perispomeni"
+    },
+    {
+        "": "580",
+        "code": "0xe6b6",
+        "name": "alpha_nu"
+    },
+    {
+        "": "581",
+        "code": "0xe6b7",
+        "name": "alpha_rho"
+    },
+    {
+        "": "582",
+        "code": "0xe6b8",
+        "name": "alpha_sigma_tau"
+    },
+    {
+        "": "583",
+        "code": "0xe6b9",
+        "name": "alpha_psili_sigma_tau"
+    },
+    {
+        "": "584",
+        "code": "0xe6c0",
+        "name": "beta_curly"
+    },
+    {
+        "": "585",
+        "code": "0xe6d0",
+        "name": "gamma_short"
+    },
+    {
+        "": "586",
+        "code": "0xe6d1",
+        "name": "gamma_tall"
+    },
+    {
+        "": "587",
+        "code": "0xe6d2",
+        "name": "gamma_alpha_varia_rho"
+    },
+    {
+        "": "588",
+        "code": "0xe6d3",
+        "name": "gamma_alpha_varia_rho_2"
+    },
+    {
+        "": "589",
+        "code": "0xe6d4",
+        "name": "gamma_alpha_varia_rho_3"
+    },
+    {
+        "": "590",
+        "code": "0xe6d5",
+        "name": "gamma_alpha_varia_rho_4"
+    },
+    {
+        "": "591",
+        "code": "0xe6d6",
+        "name": "gamma_alpha_varia_rho_5"
+    },
+    {
+        "": "592",
+        "code": "0xe6d7",
+        "name": "gamma_gamma"
+    },
+    {
+        "": "593",
+        "code": "0xe6d8",
+        "name": "gamma_epsilon_nu_oxia"
+    },
+    {
+        "": "594",
+        "code": "0xe6d9",
+        "name": "gamma_omicron"
+    },
+    {
+        "": "595",
+        "code": "0xe6da",
+        "name": "gamma_omicron_2"
+    },
+    {
+        "": "596",
+        "code": "0xe6db",
+        "name": "gamma_rho"
+    },
+    {
+        "": "597",
+        "code": "0xe6dc",
+        "name": "uniE6DC"
+    },
+    {
+        "": "598",
+        "code": "0xe6df",
+        "name": "delta_apostrophe"
+    },
+    {
+        "": "599",
+        "code": "0xe6e0",
+        "name": "delta_curly"
+    },
+    {
+        "": "600",
+        "code": "0xe6e1",
+        "name": "delta_epsilon"
+    },
+    {
+        "": "601",
+        "code": "0xe6e2",
+        "name": "delta_epsilon_varia"
+    },
+    {
+        "": "602",
+        "code": "0xe6e3",
+        "name": "delta_epsilon_varia_2"
+    },
+    {
+        "": "603",
+        "code": "0xe6e4",
+        "name": "delta_alpha_fin_sigma"
+    },
+    {
+        "": "604",
+        "code": "0xe6f0",
+        "name": "epsilon_psili_perispomeni"
+    },
+    {
+        "": "605",
+        "code": "0xe6f1",
+        "name": "epsilon_dasia_perispomeni"
+    },
+    {
+        "": "606",
+        "code": "0xe6f2",
+        "name": "epsilon_iota"
+    },
+    {
+        "": "607",
+        "code": "0xe6f3",
+        "name": "epsilon_iota_2"
+    },
+    {
+        "": "608",
+        "code": "0xe6f4",
+        "name": "epsilon_iota_perispomeni"
+    },
+    {
+        "": "609",
+        "code": "0xe6f5",
+        "name": "epsion_iota_2_perispomeni"
+    },
+    {
+        "": "610",
+        "code": "0xe6f6",
+        "name": "epsilon_iota_perispomeni_prosgegrammeni"
+    },
+    {
+        "": "611",
+        "code": "0xe6f7",
+        "name": "epsilon_psili_nu"
+    },
+    {
+        "": "612",
+        "code": "0xe6f8",
+        "name": "epsilon_psili_xi"
+    },
+    {
+        "": "613",
+        "code": "0xe6f9",
+        "name": "epsilon_rho"
+    },
+    {
+        "": "614",
+        "code": "0xe6fa",
+        "name": "epsilon_rho_2"
+    },
+    {
+        "": "615",
+        "code": "0xe6fb",
+        "name": "epsilon_stigma_iota"
+    },
+    {
+        "": "616",
+        "code": "0xe6fc",
+        "name": "epsilon_psili_stigma_iota"
+    },
+    {
+        "": "617",
+        "code": "0xe6fd",
+        "name": "epsilon_psili_stigma_iota_varia"
+    },
+    {
+        "": "618",
+        "code": "0xe6fe",
+        "name": "epsilon_upsilon"
+    },
+    {
+        "": "619",
+        "code": "0xe6ff",
+        "name": "epsilon_upsilon_2"
+    },
+    {
+        "": "620",
+        "code": "0xe700",
+        "name": "zeta_2"
+    },
+    {
+        "": "621",
+        "code": "0xe701",
+        "name": "zeta_3"
+    },
+    {
+        "": "622",
+        "code": "0xe710",
+        "name": "eta_2"
+    },
+    {
+        "": "623",
+        "code": "0xe711",
+        "name": "eta_2_perispomeni"
+    },
+    {
+        "": "624",
+        "code": "0xe712",
+        "name": "eta_nu"
+    },
+    {
+        "": "625",
+        "code": "0xe713",
+        "name": "eta_tonos_nu"
+    },
+    {
+        "": "626",
+        "code": "0xe714",
+        "name": "eta_varia_nu"
+    },
+    {
+        "": "627",
+        "code": "0xe717",
+        "name": "eta_varia_nu_2"
+    },
+    {
+        "": "628",
+        "code": "0xe718",
+        "name": "eta_perispomeni_nu"
+    },
+    {
+        "": "629",
+        "code": "0xe71f",
+        "name": "theta_apostrophe"
+    },
+    {
+        "": "630",
+        "code": "0xe720",
+        "name": "theta_symbol_apostrophe"
+    },
+    {
+        "": "631",
+        "code": "0xe721",
+        "name": "phi_apostrophe"
+    },
+    {
+        "": "632",
+        "code": "0xe722",
+        "name": "phi_iota"
+    },
+    {
+        "": "633",
+        "code": "0xe723",
+        "name": "phi_iota_tonos"
+    },
+    {
+        "": "634",
+        "code": "0xe740",
+        "name": "kappa_alpha_iota_2_varia"
+    },
+    {
+        "": "635",
+        "code": "0xe741",
+        "name": "kappa_alpha_iota_3_varia"
+    },
+    {
+        "": "636",
+        "code": "0xe742",
+        "name": "kappa_alpha_iota_4_varia"
+    },
+    {
+        "": "637",
+        "code": "0xe743",
+        "name": "kappa_alpha_iota_5_varia"
+    },
+    {
+        "": "638",
+        "code": "0xe744",
+        "name": "kappa_alpha_tau_alpha"
+    },
+    {
+        "": "639",
+        "code": "0xe750",
+        "name": "lambda_apostrophe"
+    },
+    {
+        "": "640",
+        "code": "0xe751",
+        "name": "lambda_lambda"
+    },
+    {
+        "": "641",
+        "code": "0xe752",
+        "name": "lambda_omicron_final_sigma"
+    },
+    {
+        "": "642",
+        "code": "0xe753",
+        "name": "lambda_iota_per_fin_sigma"
+    },
+    {
+        "": "643",
+        "code": "0xe760",
+        "name": "mu_epsilon_nu"
+    },
+    {
+        "": "644",
+        "code": "0xe761",
+        "name": "mu_epsilon_nu_2"
+    },
+    {
+        "": "645",
+        "code": "0xe762",
+        "name": "mu_epsilon_nu_3"
+    },
+    {
+        "": "646",
+        "code": "0xe763",
+        "name": "mu_epsilon_varia_nu"
+    },
+    {
+        "": "647",
+        "code": "0xe764",
+        "name": "mu_epsilon_varia_2_nu"
+    },
+    {
+        "": "648",
+        "code": "0xe765",
+        "name": "mu_epsilon_tonos_nu"
+    },
+    {
+        "": "649",
+        "code": "0xe766",
+        "name": "uniE766"
+    },
+    {
+        "": "650",
+        "code": "0xe767",
+        "name": "mu_alpha_fin_sigma"
+    },
+    {
+        "": "651",
+        "code": "0xe768",
+        "name": "mu_epsilon_iota_perispomeni_nu"
+    },
+    {
+        "": "652",
+        "code": "0xe770",
+        "name": "nu_final"
+    },
+    {
+        "": "653",
+        "code": "0xe771",
+        "name": "nu_omicrn_final_sigma"
+    },
+    {
+        "": "654",
+        "code": "0xe772",
+        "name": "nu_alpha_iota_final_sigma"
+    },
+    {
+        "": "655",
+        "code": "0xe780",
+        "name": "xi_2"
+    },
+    {
+        "": "656",
+        "code": "0xe797",
+        "name": "omicron_psili_perispomeni"
+    },
+    {
+        "": "657",
+        "code": "0xe798",
+        "name": "omicron_dasia_perispomeni"
+    },
+    {
+        "": "658",
+        "code": "0xe799",
+        "name": "omicron_perispomeni"
+    },
+    {
+        "": "659",
+        "code": "0xe79a",
+        "name": "omicron_upsilon"
+    },
+    {
+        "": "660",
+        "code": "0xe79b",
+        "name": "omicron_upsilon_tonos"
+    },
+    {
+        "": "661",
+        "code": "0xe79c",
+        "name": "omicron_upsilon_perispomeni"
+    },
+    {
+        "": "662",
+        "code": "0xe79d",
+        "name": "omicron_sigma"
+    },
+    {
+        "": "663",
+        "code": "0xe7a0",
+        "name": "Pi_2"
+    },
+    {
+        "": "664",
+        "code": "0xe7a1",
+        "name": "pi_apostrophe"
+    },
+    {
+        "": "665",
+        "code": "0xe7a2",
+        "name": "pisymbol_apostrophe"
+    },
+    {
+        "": "666",
+        "code": "0xe7a3",
+        "name": "pi_alpha_rho"
+    },
+    {
+        "": "667",
+        "code": "0xe7a4",
+        "name": "pi_epsilon_rho"
+    },
+    {
+        "": "668",
+        "code": "0xe7a5",
+        "name": "pi_omicron"
+    },
+    {
+        "": "669",
+        "code": "0xe7a6",
+        "name": "pi_omicron_varia"
+    },
+    {
+        "": "670",
+        "code": "0xe7a7",
+        "name": "pi_rho"
+    },
+    {
+        "": "671",
+        "code": "0xe7a8",
+        "name": "pi_tau"
+    },
+    {
+        "": "672",
+        "code": "0xe7a9",
+        "name": "pi_omicron_final_sigma"
+    },
+    {
+        "": "673",
+        "code": "0xe7aa",
+        "name": "pi_rho_omicron_final_sigma"
+    },
+    {
+        "": "674",
+        "code": "0xe7ab",
+        "name": "pi_epsilon_nu"
+    },
+    {
+        "": "675",
+        "code": "0xe7ac",
+        "name": "pi_epsilon_nu2"
+    },
+    {
+        "": "676",
+        "code": "0xe7c0",
+        "name": "sigma_2"
+    },
+    {
+        "": "677",
+        "code": "0xe7c1",
+        "name": "sigma_theta"
+    },
+    {
+        "": "678",
+        "code": "0xe7c2",
+        "name": "sigma_theta_alpha_iota"
+    },
+    {
+        "": "679",
+        "code": "0xe7c3",
+        "name": "sigma_pi"
+    },
+    {
+        "": "680",
+        "code": "0xe7c4",
+        "name": "sigma_sigma"
+    },
+    {
+        "": "681",
+        "code": "0xe7c5",
+        "name": "sigma_tau"
+    },
+    {
+        "": "682",
+        "code": "0xe7c6",
+        "name": "sigma_tau_rho"
+    },
+    {
+        "": "683",
+        "code": "0xe7c7",
+        "name": "sigma_chi"
+    },
+    {
+        "": "684",
+        "code": "0xe7c8",
+        "name": "sigma_epsilon_nu"
+    },
+    {
+        "": "685",
+        "code": "0xe7c9",
+        "name": "sigma_eta_ypog_fin_sigma"
+    },
+    {
+        "": "686",
+        "code": "0xe7d0",
+        "name": "tau_tall"
+    },
+    {
+        "": "687",
+        "code": "0xe7d1",
+        "name": "tau_tall_apostrophe"
+    },
+    {
+        "": "688",
+        "code": "0xe7d2",
+        "name": "tau_apostrophe"
+    },
+    {
+        "": "689",
+        "code": "0xe7d3",
+        "name": "tau_alpha_iota"
+    },
+    {
+        "": "690",
+        "code": "0xe7d4",
+        "name": "tau_alpha_iota_2"
+    },
+    {
+        "": "691",
+        "code": "0xe7d5",
+        "name": "tau_epsilon"
+    },
+    {
+        "": "692",
+        "code": "0xe7d6",
+        "name": "tau_eta_varia_nu"
+    },
+    {
+        "": "693",
+        "code": "0xe7d7",
+        "name": "tau_eta_varia2_nu"
+    },
+    {
+        "": "694",
+        "code": "0xe7d8",
+        "name": "tau_eta_perispomeni_sigma"
+    },
+    {
+        "": "695",
+        "code": "0xe7d9",
+        "name": "tau_eta_perispomeni_sigma_2"
+    },
+    {
+        "": "696",
+        "code": "0xe7da",
+        "name": "tau_iota"
+    },
+    {
+        "": "697",
+        "code": "0xe7db",
+        "name": "tau_omicron"
+    },
+    {
+        "": "698",
+        "code": "0xe7dc",
+        "name": "tau_omicron_2"
+    },
+    {
+        "": "699",
+        "code": "0xe7dd",
+        "name": "tau_omicron_varia"
+    },
+    {
+        "": "700",
+        "code": "0xe7de",
+        "name": "tau_omicron_varia_2"
+    },
+    {
+        "": "701",
+        "code": "0xe7df",
+        "name": "tau_omicron_varia_3"
+    },
+    {
+        "": "702",
+        "code": "0xe7e0",
+        "name": "tau_omicron_varia_4"
+    },
+    {
+        "": "703",
+        "code": "0xe7e1",
+        "name": "tau_omicron_varia_nu"
+    },
+    {
+        "": "704",
+        "code": "0xe7e2",
+        "name": "tau_tall_omicron_sigma"
+    },
+    {
+        "": "705",
+        "code": "0xe7e3",
+        "name": "tau_omicron_upsilon_perispomeni"
+    },
+    {
+        "": "706",
+        "code": "0xe7e4",
+        "name": "tau_omicron_upsilon_perispomeni_2"
+    },
+    {
+        "": "707",
+        "code": "0xe7e5",
+        "name": "tau_rho"
+    },
+    {
+        "": "708",
+        "code": "0xe7e6",
+        "name": "tau_rho_2"
+    },
+    {
+        "": "709",
+        "code": "0xe7e7",
+        "name": "tau_tall_tau"
+    },
+    {
+        "": "710",
+        "code": "0xe7e8",
+        "name": "tau_omega_perispomeni_prosgegrammeni"
+    },
+    {
+        "": "711",
+        "code": "0xe7e9",
+        "name": "tau_omega_perispomeni_nu"
+    },
+    {
+        "": "712",
+        "code": "0xe7ea",
+        "name": "tau_omega_perispomeni_nu_2"
+    },
+    {
+        "": "713",
+        "code": "0xe7eb",
+        "name": "tau_omicron_final_sigma"
+    },
+    {
+        "": "714",
+        "code": "0xe7ec",
+        "name": "tau_tall_omicron_final_sigma"
+    },
+    {
+        "": "715",
+        "code": "0xe7ed",
+        "name": "tau_rho_omicron_final_sigma"
+    },
+    {
+        "": "716",
+        "code": "0xe7ee",
+        "name": "tau_tall_iota_per_fin_sigma"
+    },
+    {
+        "": "717",
+        "code": "0xe7ef",
+        "name": "tau_iota_per_fin_sigma"
+    },
+    {
+        "": "718",
+        "code": "0xe7f0",
+        "name": "upsilon_dasia_iota"
+    },
+    {
+        "": "719",
+        "code": "0xe7f1",
+        "name": "upsilon_tonos"
+    },
+    {
+        "": "720",
+        "code": "0xe7f2",
+        "name": "upsilon_perispomeni"
+    },
+    {
+        "": "721",
+        "code": "0xe7f3",
+        "name": "tau_alpha_iota_fin_sig_per"
+    },
+    {
+        "": "722",
+        "code": "0xe7f4",
+        "name": "tau_epsilon_final_sigma"
+    },
+    {
+        "": "723",
+        "code": "0xe7f5",
+        "name": "tau_alpha_iota_fin_sig"
+    },
+    {
+        "": "724",
+        "code": "0xe7f8",
+        "name": "upsilon_nu"
+    },
+    {
+        "": "725",
+        "code": "0xe7f9",
+        "name": "upsilon_tonos_nu"
+    },
+    {
+        "": "726",
+        "code": "0xe7fa",
+        "name": "upsilon_varia_nu"
+    },
+    {
+        "": "727",
+        "code": "0xe7fb",
+        "name": "upsilon_perispomeni_nu"
+    },
+    {
+        "": "728",
+        "code": "0xe7fc",
+        "name": "upsilon_psili_perispomeni_nu"
+    },
+    {
+        "": "729",
+        "code": "0xe810",
+        "name": "chi_apostrophe"
+    },
+    {
+        "": "730",
+        "code": "0xe811",
+        "name": "chi_rho"
+    },
+    {
+        "": "731",
+        "code": "0xe812",
+        "name": "chi_epsilon_nu"
+    },
+    {
+        "": "732",
+        "code": "0xe820",
+        "name": "omega_perispomeni_sigma"
+    },
+    {
+        "": "733",
+        "code": "0xe821",
+        "name": "psi_eta_ypog_fin_sigma"
+    },
+    {
+        "": "734",
+        "code": "0xe840",
+        "name": "slant_1"
+    },
+    {
+        "": "735",
+        "code": "0xe841",
+        "name": "slant_2"
+    },
+    {
+        "": "736",
+        "code": "0xe84e",
+        "name": "uniE84E"
+    },
+    {
+        "": "737",
+        "code": "0xe84f",
+        "name": "uniE84F"
+    },
+    {
+        "": "738",
+        "code": "0xe860",
+        "name": "alpha_nu#1"
+    },
+    {
+        "": "739",
+        "code": "0xe861",
+        "name": "alpha_nu_2"
+    },
+    {
+        "": "740",
+        "code": "0xe862",
+        "name": "alpha_iota_perispomeni_sigma"
+    },
+    {
+        "": "741",
+        "code": "0xe863",
+        "name": "alpha_sigma_2"
+    },
+    {
+        "": "742",
+        "code": "0xe864",
+        "name": "alpha_nu_3"
+    },
+    {
+        "": "743",
+        "code": "0xe865",
+        "name": "epsilon_iota_sigma"
+    },
+    {
+        "": "744",
+        "code": "0xe866",
+        "name": "epsilon_nu"
+    },
+    {
+        "": "745",
+        "code": "0xe867",
+        "name": "epsilon_nu_2"
+    },
+    {
+        "": "746",
+        "code": "0xe868",
+        "name": "alpha_fin_sigma"
+    },
+    {
+        "": "747",
+        "code": "0xe86a",
+        "name": "iota_sigma"
+    },
+    {
+        "": "748",
+        "code": "0xe86b",
+        "name": "omicron_iota_perispomeni_sigma"
+    },
+    {
+        "": "749",
+        "code": "0xe86c",
+        "name": "omicron_sigma_2"
+    },
+    {
+        "": "750",
+        "code": "0xe86d",
+        "name": "omega_nu"
+    },
+    {
+        "": "751",
+        "code": "0xe86e",
+        "name": "omega_nu_2"
+    },
+    {
+        "": "752",
+        "code": "0xe86f",
+        "name": "omega_perispomeni_nu"
+    },
+    {
+        "": "753",
+        "code": "0xe870",
+        "name": "omicron_sigma_varia"
+    },
+    {
+        "": "754",
+        "code": "0xe871",
+        "name": "omicron_varia_sigma"
+    },
+    {
+        "": "755",
+        "code": "0xe872",
+        "name": "omicron_iota_peris_final_sigma"
+    },
+    {
+        "": "756",
+        "code": "0xe873",
+        "name": "eta_ypogegrammeni_fin_sigma"
+    },
+    {
+        "": "757",
+        "code": "0x0",
+        "name": "uni0000"
+    },
+    {
+        "": "758",
+        "code": "0x8",
+        "name": ".null"
+    },
+    {
+        "": "759",
+        "code": "0x9",
+        "name": "glyph2"
+    },
+    {
+        "": "760",
+        "code": "0xd",
+        "name": "glyph2"
+    },
+    {
+        "": "761",
+        "code": "0x1d",
+        "name": "uni0000"
+    },
+    {
+        "": "762",
+        "code": "0x20",
+        "name": "space"
+    },
+    {
+        "": "763",
+        "code": "0x21",
+        "name": "exclam"
+    },
+    {
+        "": "764",
+        "code": "0x22",
+        "name": "quotedbl"
+    },
+    {
+        "": "765",
+        "code": "0x23",
+        "name": "numbersign"
+    },
+    {
+        "": "766",
+        "code": "0x24",
+        "name": "dollar"
+    },
+    {
+        "": "767",
+        "code": "0x25",
+        "name": "percent"
+    },
+    {
+        "": "768",
+        "code": "0x26",
+        "name": "ampersand"
+    },
+    {
+        "": "769",
+        "code": "0x27",
+        "name": "quotesingle"
+    },
+    {
+        "": "770",
+        "code": "0x28",
+        "name": "parenleft"
+    },
+    {
+        "": "771",
+        "code": "0x29",
+        "name": "parenright"
+    },
+    {
+        "": "772",
+        "code": "0x2a",
+        "name": "asterisk"
+    },
+    {
+        "": "773",
+        "code": "0x2b",
+        "name": "plus"
+    },
+    {
+        "": "774",
+        "code": "0x2c",
+        "name": "comma"
+    },
+    {
+        "": "775",
+        "code": "0x2d",
+        "name": "hyphen"
+    },
+    {
+        "": "776",
+        "code": "0x2e",
+        "name": "period"
+    },
+    {
+        "": "777",
+        "code": "0x2f",
+        "name": "slash"
+    },
+    {
+        "": "778",
+        "code": "0x30",
+        "name": "zero"
+    },
+    {
+        "": "779",
+        "code": "0x31",
+        "name": "one"
+    },
+    {
+        "": "780",
+        "code": "0x32",
+        "name": "two"
+    },
+    {
+        "": "781",
+        "code": "0x33",
+        "name": "three"
+    },
+    {
+        "": "782",
+        "code": "0x34",
+        "name": "four"
+    },
+    {
+        "": "783",
+        "code": "0x35",
+        "name": "five"
+    },
+    {
+        "": "784",
+        "code": "0x36",
+        "name": "six"
+    },
+    {
+        "": "785",
+        "code": "0x37",
+        "name": "seven"
+    },
+    {
+        "": "786",
+        "code": "0x38",
+        "name": "eight"
+    },
+    {
+        "": "787",
+        "code": "0x39",
+        "name": "nine"
+    },
+    {
+        "": "788",
+        "code": "0x3a",
+        "name": "colon"
+    },
+    {
+        "": "789",
+        "code": "0x3b",
+        "name": "semicolon"
+    },
+    {
+        "": "790",
+        "code": "0x3c",
+        "name": "less"
+    },
+    {
+        "": "791",
+        "code": "0x3d",
+        "name": "equal"
+    },
+    {
+        "": "792",
+        "code": "0x3e",
+        "name": "greater"
+    },
+    {
+        "": "793",
+        "code": "0x3f",
+        "name": "question"
+    },
+    {
+        "": "794",
+        "code": "0x40",
+        "name": "at"
+    },
+    {
+        "": "795",
+        "code": "0x41",
+        "name": "A"
+    },
+    {
+        "": "796",
+        "code": "0x42",
+        "name": "B"
+    },
+    {
+        "": "797",
+        "code": "0x43",
+        "name": "C"
+    },
+    {
+        "": "798",
+        "code": "0x44",
+        "name": "D"
+    },
+    {
+        "": "799",
+        "code": "0x45",
+        "name": "E"
+    },
+    {
+        "": "800",
+        "code": "0x46",
+        "name": "F"
+    },
+    {
+        "": "801",
+        "code": "0x47",
+        "name": "G"
+    },
+    {
+        "": "802",
+        "code": "0x48",
+        "name": "H"
+    },
+    {
+        "": "803",
+        "code": "0x49",
+        "name": "I"
+    },
+    {
+        "": "804",
+        "code": "0x4a",
+        "name": "J"
+    },
+    {
+        "": "805",
+        "code": "0x4b",
+        "name": "K"
+    },
+    {
+        "": "806",
+        "code": "0x4c",
+        "name": "L"
+    },
+    {
+        "": "807",
+        "code": "0x4d",
+        "name": "M"
+    },
+    {
+        "": "808",
+        "code": "0x4e",
+        "name": "N"
+    },
+    {
+        "": "809",
+        "code": "0x4f",
+        "name": "O"
+    },
+    {
+        "": "810",
+        "code": "0x50",
+        "name": "P"
+    },
+    {
+        "": "811",
+        "code": "0x51",
+        "name": "Q"
+    },
+    {
+        "": "812",
+        "code": "0x52",
+        "name": "R"
+    },
+    {
+        "": "813",
+        "code": "0x53",
+        "name": "S"
+    },
+    {
+        "": "814",
+        "code": "0x54",
+        "name": "T"
+    },
+    {
+        "": "815",
+        "code": "0x55",
+        "name": "U"
+    },
+    {
+        "": "816",
+        "code": "0x56",
+        "name": "V"
+    },
+    {
+        "": "817",
+        "code": "0x57",
+        "name": "W"
+    },
+    {
+        "": "818",
+        "code": "0x58",
+        "name": "X"
+    },
+    {
+        "": "819",
+        "code": "0x59",
+        "name": "Y"
+    },
+    {
+        "": "820",
+        "code": "0x5a",
+        "name": "Z"
+    },
+    {
+        "": "821",
+        "code": "0x5b",
+        "name": "bracketleft"
+    },
+    {
+        "": "822",
+        "code": "0x5c",
+        "name": "backslash"
+    },
+    {
+        "": "823",
+        "code": "0x5d",
+        "name": "bracketright"
+    },
+    {
+        "": "824",
+        "code": "0x5e",
+        "name": "asciicircum"
+    },
+    {
+        "": "825",
+        "code": "0x5f",
+        "name": "underscore"
+    },
+    {
+        "": "826",
+        "code": "0x60",
+        "name": "grave"
+    },
+    {
+        "": "827",
+        "code": "0x61",
+        "name": "a"
+    },
+    {
+        "": "828",
+        "code": "0x62",
+        "name": "b"
+    },
+    {
+        "": "829",
+        "code": "0x63",
+        "name": "c"
+    },
+    {
+        "": "830",
+        "code": "0x64",
+        "name": "d"
+    },
+    {
+        "": "831",
+        "code": "0x65",
+        "name": "e"
+    },
+    {
+        "": "832",
+        "code": "0x66",
+        "name": "f"
+    },
+    {
+        "": "833",
+        "code": "0x67",
+        "name": "g"
+    },
+    {
+        "": "834",
+        "code": "0x68",
+        "name": "h"
+    },
+    {
+        "": "835",
+        "code": "0x69",
+        "name": "i"
+    },
+    {
+        "": "836",
+        "code": "0x6a",
+        "name": "j"
+    },
+    {
+        "": "837",
+        "code": "0x6b",
+        "name": "k"
+    },
+    {
+        "": "838",
+        "code": "0x6c",
+        "name": "l"
+    },
+    {
+        "": "839",
+        "code": "0x6d",
+        "name": "m"
+    },
+    {
+        "": "840",
+        "code": "0x6e",
+        "name": "n"
+    },
+    {
+        "": "841",
+        "code": "0x6f",
+        "name": "o"
+    },
+    {
+        "": "842",
+        "code": "0x70",
+        "name": "p"
+    },
+    {
+        "": "843",
+        "code": "0x71",
+        "name": "q"
+    },
+    {
+        "": "844",
+        "code": "0x72",
+        "name": "r"
+    },
+    {
+        "": "845",
+        "code": "0x73",
+        "name": "s"
+    },
+    {
+        "": "846",
+        "code": "0x74",
+        "name": "t"
+    },
+    {
+        "": "847",
+        "code": "0x75",
+        "name": "u"
+    },
+    {
+        "": "848",
+        "code": "0x76",
+        "name": "v"
+    },
+    {
+        "": "849",
+        "code": "0x77",
+        "name": "w"
+    },
+    {
+        "": "850",
+        "code": "0x78",
+        "name": "x"
+    },
+    {
+        "": "851",
+        "code": "0x79",
+        "name": "y"
+    },
+    {
+        "": "852",
+        "code": "0x7a",
+        "name": "z"
+    },
+    {
+        "": "853",
+        "code": "0x7b",
+        "name": "braceleft"
+    },
+    {
+        "": "854",
+        "code": "0x7c",
+        "name": "bar"
+    },
+    {
+        "": "855",
+        "code": "0x7d",
+        "name": "braceright"
+    },
+    {
+        "": "856",
+        "code": "0x7e",
+        "name": "asciitilde"
+    },
+    {
+        "": "857",
+        "code": "0xa1",
+        "name": "degree"
+    },
+    {
+        "": "858",
+        "code": "0xa2",
+        "name": "cent"
+    },
+    {
+        "": "859",
+        "code": "0xa3",
+        "name": "sterling"
+    },
+    {
+        "": "860",
+        "code": "0xa4",
+        "name": "section"
+    },
+    {
+        "": "861",
+        "code": "0xa6",
+        "name": "paragraph"
+    },
+    {
+        "": "862",
+        "code": "0xa8",
+        "name": "registered"
+    },
+    {
+        "": "863",
+        "code": "0xa9",
+        "name": "copyright"
+    },
+    {
+        "": "864",
+        "code": "0xab",
+        "name": "acute"
+    },
+    {
+        "": "865",
+        "code": "0xac",
+        "name": "dieresis"
+    },
+    {
+        "": "866",
+        "code": "0xae",
+        "name": "AE"
+    },
+    {
+        "": "867",
+        "code": "0xb1",
+        "name": "plusminus"
+    },
+    {
+        "": "868",
+        "code": "0xb4",
+        "name": "yen"
+    },
+    {
+        "": "869",
+        "code": "0xb5",
+        "name": "mu"
+    },
+    {
+        "": "870",
+        "code": "0xb9",
+        "name": "pi-grek"
+    },
+    {
+        "": "871",
+        "code": "0xbb",
+        "name": "ordfeminine"
+    },
+    {
+        "": "872",
+        "code": "0xbc",
+        "name": "ordmasculine"
+    },
+    {
+        "": "873",
+        "code": "0xbd",
+        "name": "Omega-grek"
+    },
+    {
+        "": "874",
+        "code": "0xbe",
+        "name": "ae"
+    },
+    {
+        "": "875",
+        "code": "0xc0",
+        "name": "questiondown"
+    },
+    {
+        "": "876",
+        "code": "0xc1",
+        "name": "exclamdown"
+    },
+    {
+        "": "877",
+        "code": "0xc2",
+        "name": "logicalnot"
+    },
+    {
+        "": "878",
+        "code": "0xc7",
+        "name": "guillemotleft"
+    },
+    {
+        "": "879",
+        "code": "0xc8",
+        "name": "guillemotright"
+    },
+    {
+        "": "880",
+        "code": "0xca",
+        "name": "uni00A0"
+    },
+    {
+        "": "881",
+        "code": "0xe1",
+        "name": "periodcentered"
+    },
+    {
+        "": "882",
+        "code": "0xf5",
+        "name": "idotless"
+    },
+    {
+        "": "883",
+        "code": "0xf6",
+        "name": "circumflexmod"
+    },
+    {
+        "": "884",
+        "code": "0xf7",
+        "name": "tildemod"
+    },
+    {
+        "": "885",
+        "code": "0xf8",
+        "name": "macron"
+    },
+    {
+        "": "886",
+        "code": "0xf9",
+        "name": "brevemod"
+    },
+    {
+        "": "887",
+        "code": "0xfa",
+        "name": "dotaccentmod"
+    },
+    {
+        "": "888",
+        "code": "0xfb",
+        "name": "ringmod"
+    },
+    {
+        "": "889",
+        "code": "0xfc",
+        "name": "cedilla"
+    },
+    {
+        "": "890",
+        "code": "0x0",
+        "name": "uni0000"
+    },
+    {
+        "": "891",
+        "code": "0x1d",
+        "name": "uni0000"
+    },
+    {
+        "": "892",
+        "code": "0x20",
+        "name": "space"
+    },
+    {
+        "": "893",
+        "code": "0x21",
+        "name": "exclam"
+    },
+    {
+        "": "894",
+        "code": "0x22",
+        "name": "quotedbl"
+    },
+    {
+        "": "895",
+        "code": "0x23",
+        "name": "numbersign"
+    },
+    {
+        "": "896",
+        "code": "0x24",
+        "name": "dollar"
+    },
+    {
+        "": "897",
+        "code": "0x25",
+        "name": "percent"
+    },
+    {
+        "": "898",
+        "code": "0x26",
+        "name": "ampersand"
+    },
+    {
+        "": "899",
+        "code": "0x27",
+        "name": "quotesingle"
+    },
+    {
+        "": "900",
+        "code": "0x28",
+        "name": "parenleft"
+    },
+    {
+        "": "901",
+        "code": "0x29",
+        "name": "parenright"
+    },
+    {
+        "": "902",
+        "code": "0x2a",
+        "name": "asterisk"
+    },
+    {
+        "": "903",
+        "code": "0x2b",
+        "name": "plus"
+    },
+    {
+        "": "904",
+        "code": "0x2c",
+        "name": "comma"
+    },
+    {
+        "": "905",
+        "code": "0x2d",
+        "name": "hyphen"
+    },
+    {
+        "": "906",
+        "code": "0x2e",
+        "name": "period"
+    },
+    {
+        "": "907",
+        "code": "0x2f",
+        "name": "slash"
+    },
+    {
+        "": "908",
+        "code": "0x30",
+        "name": "zero"
+    },
+    {
+        "": "909",
+        "code": "0x31",
+        "name": "one"
+    },
+    {
+        "": "910",
+        "code": "0x32",
+        "name": "two"
+    },
+    {
+        "": "911",
+        "code": "0x33",
+        "name": "three"
+    },
+    {
+        "": "912",
+        "code": "0x34",
+        "name": "four"
+    },
+    {
+        "": "913",
+        "code": "0x35",
+        "name": "five"
+    },
+    {
+        "": "914",
+        "code": "0x36",
+        "name": "six"
+    },
+    {
+        "": "915",
+        "code": "0x37",
+        "name": "seven"
+    },
+    {
+        "": "916",
+        "code": "0x38",
+        "name": "eight"
+    },
+    {
+        "": "917",
+        "code": "0x39",
+        "name": "nine"
+    },
+    {
+        "": "918",
+        "code": "0x3a",
+        "name": "colon"
+    },
+    {
+        "": "919",
+        "code": "0x3b",
+        "name": "semicolon"
+    },
+    {
+        "": "920",
+        "code": "0x3c",
+        "name": "less"
+    },
+    {
+        "": "921",
+        "code": "0x3d",
+        "name": "equal"
+    },
+    {
+        "": "922",
+        "code": "0x3e",
+        "name": "greater"
+    },
+    {
+        "": "923",
+        "code": "0x3f",
+        "name": "question"
+    },
+    {
+        "": "924",
+        "code": "0x40",
+        "name": "at"
+    },
+    {
+        "": "925",
+        "code": "0x41",
+        "name": "A"
+    },
+    {
+        "": "926",
+        "code": "0x42",
+        "name": "B"
+    },
+    {
+        "": "927",
+        "code": "0x43",
+        "name": "C"
+    },
+    {
+        "": "928",
+        "code": "0x44",
+        "name": "D"
+    },
+    {
+        "": "929",
+        "code": "0x45",
+        "name": "E"
+    },
+    {
+        "": "930",
+        "code": "0x46",
+        "name": "F"
+    },
+    {
+        "": "931",
+        "code": "0x47",
+        "name": "G"
+    },
+    {
+        "": "932",
+        "code": "0x48",
+        "name": "H"
+    },
+    {
+        "": "933",
+        "code": "0x49",
+        "name": "I"
+    },
+    {
+        "": "934",
+        "code": "0x4a",
+        "name": "J"
+    },
+    {
+        "": "935",
+        "code": "0x4b",
+        "name": "K"
+    },
+    {
+        "": "936",
+        "code": "0x4c",
+        "name": "L"
+    },
+    {
+        "": "937",
+        "code": "0x4d",
+        "name": "M"
+    },
+    {
+        "": "938",
+        "code": "0x4e",
+        "name": "N"
+    },
+    {
+        "": "939",
+        "code": "0x4f",
+        "name": "O"
+    },
+    {
+        "": "940",
+        "code": "0x50",
+        "name": "P"
+    },
+    {
+        "": "941",
+        "code": "0x51",
+        "name": "Q"
+    },
+    {
+        "": "942",
+        "code": "0x52",
+        "name": "R"
+    },
+    {
+        "": "943",
+        "code": "0x53",
+        "name": "S"
+    },
+    {
+        "": "944",
+        "code": "0x54",
+        "name": "T"
+    },
+    {
+        "": "945",
+        "code": "0x55",
+        "name": "U"
+    },
+    {
+        "": "946",
+        "code": "0x56",
+        "name": "V"
+    },
+    {
+        "": "947",
+        "code": "0x57",
+        "name": "W"
+    },
+    {
+        "": "948",
+        "code": "0x58",
+        "name": "X"
+    },
+    {
+        "": "949",
+        "code": "0x59",
+        "name": "Y"
+    },
+    {
+        "": "950",
+        "code": "0x5a",
+        "name": "Z"
+    },
+    {
+        "": "951",
+        "code": "0x5b",
+        "name": "bracketleft"
+    },
+    {
+        "": "952",
+        "code": "0x5c",
+        "name": "backslash"
+    },
+    {
+        "": "953",
+        "code": "0x5d",
+        "name": "bracketright"
+    },
+    {
+        "": "954",
+        "code": "0x5e",
+        "name": "asciicircum"
+    },
+    {
+        "": "955",
+        "code": "0x5f",
+        "name": "underscore"
+    },
+    {
+        "": "956",
+        "code": "0x60",
+        "name": "grave"
+    },
+    {
+        "": "957",
+        "code": "0x61",
+        "name": "a"
+    },
+    {
+        "": "958",
+        "code": "0x62",
+        "name": "b"
+    },
+    {
+        "": "959",
+        "code": "0x63",
+        "name": "c"
+    },
+    {
+        "": "960",
+        "code": "0x64",
+        "name": "d"
+    },
+    {
+        "": "961",
+        "code": "0x65",
+        "name": "e"
+    },
+    {
+        "": "962",
+        "code": "0x66",
+        "name": "f"
+    },
+    {
+        "": "963",
+        "code": "0x67",
+        "name": "g"
+    },
+    {
+        "": "964",
+        "code": "0x68",
+        "name": "h"
+    },
+    {
+        "": "965",
+        "code": "0x69",
+        "name": "i"
+    },
+    {
+        "": "966",
+        "code": "0x6a",
+        "name": "j"
+    },
+    {
+        "": "967",
+        "code": "0x6b",
+        "name": "k"
+    },
+    {
+        "": "968",
+        "code": "0x6c",
+        "name": "l"
+    },
+    {
+        "": "969",
+        "code": "0x6d",
+        "name": "m"
+    },
+    {
+        "": "970",
+        "code": "0x6e",
+        "name": "n"
+    },
+    {
+        "": "971",
+        "code": "0x6f",
+        "name": "o"
+    },
+    {
+        "": "972",
+        "code": "0x70",
+        "name": "p"
+    },
+    {
+        "": "973",
+        "code": "0x71",
+        "name": "q"
+    },
+    {
+        "": "974",
+        "code": "0x72",
+        "name": "r"
+    },
+    {
+        "": "975",
+        "code": "0x73",
+        "name": "s"
+    },
+    {
+        "": "976",
+        "code": "0x74",
+        "name": "t"
+    },
+    {
+        "": "977",
+        "code": "0x75",
+        "name": "u"
+    },
+    {
+        "": "978",
+        "code": "0x76",
+        "name": "v"
+    },
+    {
+        "": "979",
+        "code": "0x77",
+        "name": "w"
+    },
+    {
+        "": "980",
+        "code": "0x78",
+        "name": "x"
+    },
+    {
+        "": "981",
+        "code": "0x79",
+        "name": "y"
+    },
+    {
+        "": "982",
+        "code": "0x7a",
+        "name": "z"
+    },
+    {
+        "": "983",
+        "code": "0x7b",
+        "name": "braceleft"
+    },
+    {
+        "": "984",
+        "code": "0x7c",
+        "name": "bar"
+    },
+    {
+        "": "985",
+        "code": "0x7d",
+        "name": "braceright"
+    },
+    {
+        "": "986",
+        "code": "0x7e",
+        "name": "asciitilde"
+    },
+    {
+        "": "987",
+        "code": "0xa0",
+        "name": "uni00A0"
+    },
+    {
+        "": "988",
+        "code": "0xa1",
+        "name": "exclamdown"
+    },
+    {
+        "": "989",
+        "code": "0xa2",
+        "name": "cent"
+    },
+    {
+        "": "990",
+        "code": "0xa3",
+        "name": "sterling"
+    },
+    {
+        "": "991",
+        "code": "0xa4",
+        "name": "currency"
+    },
+    {
+        "": "992",
+        "code": "0xa5",
+        "name": "yen"
+    },
+    {
+        "": "993",
+        "code": "0xa6",
+        "name": "brokenbar"
+    },
+    {
+        "": "994",
+        "code": "0xa7",
+        "name": "section"
+    },
+    {
+        "": "995",
+        "code": "0xa8",
+        "name": "dieresis"
+    },
+    {
+        "": "996",
+        "code": "0xa9",
+        "name": "copyright"
+    },
+    {
+        "": "997",
+        "code": "0xaa",
+        "name": "ordfeminine"
+    },
+    {
+        "": "998",
+        "code": "0xab",
+        "name": "guillemotleft"
+    },
+    {
+        "": "999",
+        "code": "0xac",
+        "name": "logicalnot"
+    },
+    {
+        "": "1000",
+        "code": "0xad",
+        "name": "uni00AD"
+    },
+    {
+        "": "1001",
+        "code": "0xae",
+        "name": "registered"
+    },
+    {
+        "": "1002",
+        "code": "0xaf",
+        "name": "macron"
+    },
+    {
+        "": "1003",
+        "code": "0xb0",
+        "name": "degree"
+    },
+    {
+        "": "1004",
+        "code": "0xb1",
+        "name": "plusminus"
+    },
+    {
+        "": "1005",
+        "code": "0xb2",
+        "name": "uni00B2"
+    },
+    {
+        "": "1006",
+        "code": "0xb3",
+        "name": "uni00B3"
+    },
+    {
+        "": "1007",
+        "code": "0xb4",
+        "name": "acute"
+    },
+    {
+        "": "1008",
+        "code": "0xb5",
+        "name": "mu"
+    },
+    {
+        "": "1009",
+        "code": "0xb6",
+        "name": "paragraph"
+    },
+    {
+        "": "1010",
+        "code": "0xb7",
+        "name": "periodcentered"
+    },
+    {
+        "": "1011",
+        "code": "0xb8",
+        "name": "cedilla"
+    },
+    {
+        "": "1012",
+        "code": "0xb9",
+        "name": "uni00B9"
+    },
+    {
+        "": "1013",
+        "code": "0xba",
+        "name": "ordmasculine"
+    },
+    {
+        "": "1014",
+        "code": "0xbb",
+        "name": "guillemotright"
+    },
+    {
+        "": "1015",
+        "code": "0xbc",
+        "name": "onequarter"
+    },
+    {
+        "": "1016",
+        "code": "0xbd",
+        "name": "onehalf"
+    },
+    {
+        "": "1017",
+        "code": "0xbe",
+        "name": "threequarters"
+    },
+    {
+        "": "1018",
+        "code": "0xbf",
+        "name": "questiondown"
+    },
+    {
+        "": "1019",
+        "code": "0xc6",
+        "name": "AE"
+    },
+    {
+        "": "1020",
+        "code": "0xe6",
+        "name": "ae"
+    },
+    {
+        "": "1021",
+        "code": "0x131",
+        "name": "idotless"
+    },
+    {
+        "": "1022",
+        "code": "0x17f",
+        "name": "longs"
+    },
+    {
+        "": "1023",
+        "code": "0x237",
+        "name": "jdotless"
+    },
+    {
+        "": "1024",
+        "code": "0x2b9",
+        "name": "primemod"
+    },
+    {
+        "": "1025",
+        "code": "0x2ba",
+        "name": "doubleprimemod"
+    },
+    {
+        "": "1026",
+        "code": "0x2bc",
+        "name": "apostrophemod"
+    },
+    {
+        "": "1027",
+        "code": "0x2be",
+        "name": "righthalfringmod"
+    },
+    {
+        "": "1028",
+        "code": "0x2bf",
+        "name": "lefthalfringmod"
+    },
+    {
+        "": "1029",
+        "code": "0x2c6",
+        "name": "circumflexmod"
+    },
+    {
+        "": "1030",
+        "code": "0x2ca",
+        "name": "acutemod"
+    },
+    {
+        "": "1031",
+        "code": "0x2cb",
+        "name": "gravemod"
+    },
+    {
+        "": "1032",
+        "code": "0x2d8",
+        "name": "brevemod"
+    },
+    {
+        "": "1033",
+        "code": "0x2d9",
+        "name": "dotaccentmod"
+    },
+    {
+        "": "1034",
+        "code": "0x2da",
+        "name": "ringmod"
+    },
+    {
+        "": "1035",
+        "code": "0x2dc",
+        "name": "tildemod"
+    },
+    {
+        "": "1036",
+        "code": "0x300",
+        "name": "gravecomb"
+    },
+    {
+        "": "1037",
+        "code": "0x301",
+        "name": "acutecomb"
+    },
+    {
+        "": "1038",
+        "code": "0x302",
+        "name": "circumflexcomb"
+    },
+    {
+        "": "1039",
+        "code": "0x303",
+        "name": "tildecomb"
+    },
+    {
+        "": "1040",
+        "code": "0x304",
+        "name": "macroncomb"
+    },
+    {
+        "": "1041",
+        "code": "0x305",
+        "name": "overlinecomb"
+    },
+    {
+        "": "1042",
+        "code": "0x306",
+        "name": "brevecomb"
+    },
+    {
+        "": "1043",
+        "code": "0x307",
+        "name": "dotaccentcomb"
+    },
+    {
+        "": "1044",
+        "code": "0x308",
+        "name": "dieresiscomb"
+    },
+    {
+        "": "1045",
+        "code": "0x30a",
+        "name": "ringcomb"
+    },
+    {
+        "": "1046",
+        "code": "0x30c",
+        "name": "caroncomb"
+    },
+    {
+        "": "1047",
+        "code": "0x313",
+        "name": "commacomb"
+    },
+    {
+        "": "1048",
+        "code": "0x314",
+        "name": "reversedcommacomb"
+    },
+    {
+        "": "1049",
+        "code": "0x323",
+        "name": "dotbelowcomb"
+    },
+    {
+        "": "1050",
+        "code": "0x32f",
+        "name": "invertedbrevebelowcomb"
+    },
+    {
+        "": "1051",
+        "code": "0x336",
+        "name": "strokelongcomb"
+    },
+    {
+        "": "1052",
+        "code": "0x340",
+        "name": "gravetonemarkcomb"
+    },
+    {
+        "": "1053",
+        "code": "0x341",
+        "name": "acutetonemarkcomb"
+    },
+    {
+        "": "1054",
+        "code": "0x342",
+        "name": "greekperispomenicomb"
+    },
+    {
+        "": "1055",
+        "code": "0x343",
+        "name": "greekkoroniscomb"
+    },
+    {
+        "": "1056",
+        "code": "0x344",
+        "name": "greekdialytikatonoscomb"
+    },
+    {
+        "": "1057",
+        "code": "0x345",
+        "name": "greekypogegrammenicomb"
+    },
+    {
+        "": "1058",
+        "code": "0x351",
+        "name": "lefthalfringcomb"
+    },
+    {
+        "": "1059",
+        "code": "0x357",
+        "name": "righthalfringcomb"
+    },
+    {
+        "": "1060",
+        "code": "0x359",
+        "name": "asteriskbelowcomb"
+    },
+    {
+        "": "1061",
+        "code": "0x374",
+        "name": "greeknumeralsignmod"
+    },
+    {
+        "": "1062",
+        "code": "0x375",
+        "name": "lowernumeralsignmod-grek"
+    },
+    {
+        "": "1063",
+        "code": "0x37a",
+        "name": "ypogegrammenimod-grek"
+    },
+    {
+        "": "1064",
+        "code": "0x37e",
+        "name": "greekquestionmark"
+    },
+    {
+        "": "1065",
+        "code": "0x384",
+        "name": "tonosmod-grek"
+    },
+    {
+        "": "1066",
+        "code": "0x385",
+        "name": "greekdialytikatonosmod"
+    },
+    {
+        "": "1067",
+        "code": "0x386",
+        "name": "Alphatonos-grek"
+    },
+    {
+        "": "1068",
+        "code": "0x388",
+        "name": "Epsilontonos-grek"
+    },
+    {
+        "": "1069",
+        "code": "0x389",
+        "name": "Etatonos-grek"
+    },
+    {
+        "": "1070",
+        "code": "0x38a",
+        "name": "Iotatonos-grek"
+    },
+    {
+        "": "1071",
+        "code": "0x38c",
+        "name": "Omicrontonos-grek"
+    },
+    {
+        "": "1072",
+        "code": "0x38e",
+        "name": "Upsilontonos-grek"
+    },
+    {
+        "": "1073",
+        "code": "0x38f",
+        "name": "Omegatonos-grek"
+    },
+    {
+        "": "1074",
+        "code": "0x390",
+        "name": "iotadialytikatonos-grek"
+    },
+    {
+        "": "1075",
+        "code": "0x391",
+        "name": "Alpha-grek"
+    },
+    {
+        "": "1076",
+        "code": "0x392",
+        "name": "Beta-grek"
+    },
+    {
+        "": "1077",
+        "code": "0x393",
+        "name": "Gamma-grek"
+    },
+    {
+        "": "1078",
+        "code": "0x394",
+        "name": "Delta-grek"
+    },
+    {
+        "": "1079",
+        "code": "0x395",
+        "name": "Epsilon-grek"
+    },
+    {
+        "": "1080",
+        "code": "0x396",
+        "name": "Zeta-grek"
+    },
+    {
+        "": "1081",
+        "code": "0x397",
+        "name": "Eta-grek"
+    },
+    {
+        "": "1082",
+        "code": "0x398",
+        "name": "Theta-grek"
+    },
+    {
+        "": "1083",
+        "code": "0x399",
+        "name": "Iota-grek"
+    },
+    {
+        "": "1084",
+        "code": "0x39a",
+        "name": "Kappa-grek"
+    },
+    {
+        "": "1085",
+        "code": "0x39b",
+        "name": "Lamda-grek"
+    },
+    {
+        "": "1086",
+        "code": "0x39c",
+        "name": "Mu-grek"
+    },
+    {
+        "": "1087",
+        "code": "0x39d",
+        "name": "Nu-grek"
+    },
+    {
+        "": "1088",
+        "code": "0x39e",
+        "name": "Xi-grek"
+    },
+    {
+        "": "1089",
+        "code": "0x39f",
+        "name": "Omicron-grek"
+    },
+    {
+        "": "1090",
+        "code": "0x3a0",
+        "name": "Pi-grek"
+    },
+    {
+        "": "1091",
+        "code": "0x3a1",
+        "name": "Rho-grek"
+    },
+    {
+        "": "1092",
+        "code": "0x3a3",
+        "name": "Sigma-grek"
+    },
+    {
+        "": "1093",
+        "code": "0x3a4",
+        "name": "Tau-grek"
+    },
+    {
+        "": "1094",
+        "code": "0x3a5",
+        "name": "Upsilon-grek"
+    },
+    {
+        "": "1095",
+        "code": "0x3a6",
+        "name": "Phi-grek"
+    },
+    {
+        "": "1096",
+        "code": "0x3a7",
+        "name": "Chi-grek"
+    },
+    {
+        "": "1097",
+        "code": "0x3a8",
+        "name": "Psi-grek"
+    },
+    {
+        "": "1098",
+        "code": "0x3a9",
+        "name": "Omega-grek"
+    },
+    {
+        "": "1099",
+        "code": "0x3aa",
+        "name": "Iotadialytika-grek"
+    },
+    {
+        "": "1100",
+        "code": "0x3ab",
+        "name": "Upsilondialytika-grek"
+    },
+    {
+        "": "1101",
+        "code": "0x3ac",
+        "name": "alphatonos-grek"
+    },
+    {
+        "": "1102",
+        "code": "0x3ad",
+        "name": "epsilontonos-grek"
+    },
+    {
+        "": "1103",
+        "code": "0x3ae",
+        "name": "etatonos-grek"
+    },
+    {
+        "": "1104",
+        "code": "0x3af",
+        "name": "iotatonos-grek"
+    },
+    {
+        "": "1105",
+        "code": "0x3b0",
+        "name": "upsilondialytikatonos-grek"
+    },
+    {
+        "": "1106",
+        "code": "0x3b1",
+        "name": "alpha-grek"
+    },
+    {
+        "": "1107",
+        "code": "0x3b2",
+        "name": "beta-grek"
+    },
+    {
+        "": "1108",
+        "code": "0x3b3",
+        "name": "gamma-grek"
+    },
+    {
+        "": "1109",
+        "code": "0x3b4",
+        "name": "delta-grek"
+    },
+    {
+        "": "1110",
+        "code": "0x3b5",
+        "name": "epsilon-grek"
+    },
+    {
+        "": "1111",
+        "code": "0x3b6",
+        "name": "zeta-grek"
+    },
+    {
+        "": "1112",
+        "code": "0x3b7",
+        "name": "eta-grek"
+    },
+    {
+        "": "1113",
+        "code": "0x3b8",
+        "name": "theta-grek"
+    },
+    {
+        "": "1114",
+        "code": "0x3b9",
+        "name": "iota-grek"
+    },
+    {
+        "": "1115",
+        "code": "0x3ba",
+        "name": "kappa-grek"
+    },
+    {
+        "": "1116",
+        "code": "0x3bb",
+        "name": "lamda-grek"
+    },
+    {
+        "": "1117",
+        "code": "0x3bc",
+        "name": "mu-grek"
+    },
+    {
+        "": "1118",
+        "code": "0x3bd",
+        "name": "nu-grek"
+    },
+    {
+        "": "1119",
+        "code": "0x3be",
+        "name": "xi-grek"
+    },
+    {
+        "": "1120",
+        "code": "0x3bf",
+        "name": "omicron-grek"
+    },
+    {
+        "": "1121",
+        "code": "0x3c0",
+        "name": "pi-grek"
+    },
+    {
+        "": "1122",
+        "code": "0x3c1",
+        "name": "rho-grek"
+    },
+    {
+        "": "1123",
+        "code": "0x3c2",
+        "name": "finalsigma-grek"
+    },
+    {
+        "": "1124",
+        "code": "0x3c3",
+        "name": "sigma-grek"
+    },
+    {
+        "": "1125",
+        "code": "0x3c4",
+        "name": "tau-grek"
+    },
+    {
+        "": "1126",
+        "code": "0x3c5",
+        "name": "upsilon-grek"
+    },
+    {
+        "": "1127",
+        "code": "0x3c6",
+        "name": "phi-grek"
+    },
+    {
+        "": "1128",
+        "code": "0x3c7",
+        "name": "chi-grek"
+    },
+    {
+        "": "1129",
+        "code": "0x3c8",
+        "name": "psi-grek"
+    },
+    {
+        "": "1130",
+        "code": "0x3c9",
+        "name": "omega-grek"
+    },
+    {
+        "": "1131",
+        "code": "0x3ca",
+        "name": "iotadialytika-grek"
+    },
+    {
+        "": "1132",
+        "code": "0x3cb",
+        "name": "upsilondialytika-grek"
+    },
+    {
+        "": "1133",
+        "code": "0x3cc",
+        "name": "omicrontonos-grek"
+    },
+    {
+        "": "1134",
+        "code": "0x3cd",
+        "name": "upsilontonos-grek"
+    },
+    {
+        "": "1135",
+        "code": "0x3ce",
+        "name": "omegatonos-grek"
+    },
+    {
+        "": "1136",
+        "code": "0x3d0",
+        "name": "betasymbol-grek"
+    },
+    {
+        "": "1137",
+        "code": "0x3d1",
+        "name": "thetasymbol-grek"
+    },
+    {
+        "": "1138",
+        "code": "0x3d5",
+        "name": "phisymbol-grek"
+    },
+    {
+        "": "1139",
+        "code": "0x3d6",
+        "name": "pisymbol-grek"
+    },
+    {
+        "": "1140",
+        "code": "0x3d7",
+        "name": "kaisymbol-grek"
+    },
+    {
+        "": "1141",
+        "code": "0x591",
+        "name": "accentetnahtacomb-hebr"
+    },
+    {
+        "": "1142",
+        "code": "0x592",
+        "name": "accentsegolcomb-hebr"
+    },
+    {
+        "": "1143",
+        "code": "0x593",
+        "name": "accentshalsheletcomb-hebr"
+    },
+    {
+        "": "1144",
+        "code": "0x594",
+        "name": "accentzaqefqatancomb-hebr"
+    },
+    {
+        "": "1145",
+        "code": "0x595",
+        "name": "accentzaqefgadolcomb-hebr"
+    },
+    {
+        "": "1146",
+        "code": "0x596",
+        "name": "accenttipehacomb-hebr"
+    },
+    {
+        "": "1147",
+        "code": "0x597",
+        "name": "accentreviacomb-hebr"
+    },
+    {
+        "": "1148",
+        "code": "0x598",
+        "name": "accentzarqacomb-hebr"
+    },
+    {
+        "": "1149",
+        "code": "0x599",
+        "name": "accentpashtacomb-hebr"
+    },
+    {
+        "": "1150",
+        "code": "0x59a",
+        "name": "accentyetivcomb-hebr"
+    },
+    {
+        "": "1151",
+        "code": "0x59b",
+        "name": "accenttevircomb-hebr"
+    },
+    {
+        "": "1152",
+        "code": "0x59c",
+        "name": "accentgereshcomb-hebr"
+    },
+    {
+        "": "1153",
+        "code": "0x59d",
+        "name": "accentgereshmuqdamcomb-hebr"
+    },
+    {
+        "": "1154",
+        "code": "0x59e",
+        "name": "accentgershayimcomb-hebr"
+    },
+    {
+        "": "1155",
+        "code": "0x59f",
+        "name": "accentqarneyparacomb-hebr"
+    },
+    {
+        "": "1156",
+        "code": "0x5a0",
+        "name": "accenttelishagedolacomb-hebr"
+    },
+    {
+        "": "1157",
+        "code": "0x5a1",
+        "name": "accentpazercomb-hebr"
+    },
+    {
+        "": "1158",
+        "code": "0x5a2",
+        "name": "accentatnahhafukhcomb-hebr"
+    },
+    {
+        "": "1159",
+        "code": "0x5a3",
+        "name": "accentmunahcomb-hebr"
+    },
+    {
+        "": "1160",
+        "code": "0x5a4",
+        "name": "accentmahapakhcomb-hebr"
+    },
+    {
+        "": "1161",
+        "code": "0x5a5",
+        "name": "accentmerkhacomb-hebr"
+    },
+    {
+        "": "1162",
+        "code": "0x5a6",
+        "name": "accentmerkhakefulacomb-hebr"
+    },
+    {
+        "": "1163",
+        "code": "0x5a7",
+        "name": "accentdargacomb-hebr"
+    },
+    {
+        "": "1164",
+        "code": "0x5a8",
+        "name": "accentqadmacomb-hebr"
+    },
+    {
+        "": "1165",
+        "code": "0x5a9",
+        "name": "accenttelishaqetanacomb-hebr"
+    },
+    {
+        "": "1166",
+        "code": "0x5aa",
+        "name": "accentyerahbenyomocomb-hebr"
+    },
+    {
+        "": "1167",
+        "code": "0x5ab",
+        "name": "accentolecomb-hebr"
+    },
+    {
+        "": "1168",
+        "code": "0x5ac",
+        "name": "accentiluycomb-hebr"
+    },
+    {
+        "": "1169",
+        "code": "0x5ad",
+        "name": "accentdehicomb-hebr"
+    },
+    {
+        "": "1170",
+        "code": "0x5ae",
+        "name": "accentzinorcomb-hebr"
+    },
+    {
+        "": "1171",
+        "code": "0x5af",
+        "name": "markmasoracirclecomb-hebr"
+    },
+    {
+        "": "1172",
+        "code": "0x5b0",
+        "name": "shevacomb-hebr"
+    },
+    {
+        "": "1173",
+        "code": "0x5b1",
+        "name": "hatafsegolcomb-hebr"
+    },
+    {
+        "": "1174",
+        "code": "0x5b2",
+        "name": "hatafpatahcomb-hebr"
+    },
+    {
+        "": "1175",
+        "code": "0x5b3",
+        "name": "hatafqamatscomb-hebr"
+    },
+    {
+        "": "1176",
+        "code": "0x5b4",
+        "name": "hiriqcomb-hebr"
+    },
+    {
+        "": "1177",
+        "code": "0x5b5",
+        "name": "tserecomb-hebr"
+    },
+    {
+        "": "1178",
+        "code": "0x5b6",
+        "name": "segolcomb-hebr"
+    },
+    {
+        "": "1179",
+        "code": "0x5b7",
+        "name": "patahcomb-hebr"
+    },
+    {
+        "": "1180",
+        "code": "0x5b8",
+        "name": "qamatscomb-hebr"
+    },
+    {
+        "": "1181",
+        "code": "0x5b9",
+        "name": "holamcomb-hebr"
+    },
+    {
+        "": "1182",
+        "code": "0x5ba",
+        "name": "holamhaserforvavcomb-hebr"
+    },
+    {
+        "": "1183",
+        "code": "0x5bb",
+        "name": "qubutscomb-hebr"
+    },
+    {
+        "": "1184",
+        "code": "0x5bc",
+        "name": "dageshormapiqcomb-hebr"
+    },
+    {
+        "": "1185",
+        "code": "0x5bd",
+        "name": "metegcomb-hebr"
+    },
+    {
+        "": "1186",
+        "code": "0x5be",
+        "name": "maqaf-hebr"
+    },
+    {
+        "": "1187",
+        "code": "0x5bf",
+        "name": "rafecomb-hebr"
+    },
+    {
+        "": "1188",
+        "code": "0x5c0",
+        "name": "punctuationpaseq-hebr"
+    },
+    {
+        "": "1189",
+        "code": "0x5c1",
+        "name": "shindotcomb-hebr"
+    },
+    {
+        "": "1190",
+        "code": "0x5c2",
+        "name": "sindotcomb-hebr"
+    },
+    {
+        "": "1191",
+        "code": "0x5c3",
+        "name": "punctuationsofpasuq-hebr"
+    },
+    {
+        "": "1192",
+        "code": "0x5c4",
+        "name": "markupperdotcomb-hebr"
+    },
+    {
+        "": "1193",
+        "code": "0x5c5",
+        "name": "marklowerdotcomb-hebr"
+    },
+    {
+        "": "1194",
+        "code": "0x5c6",
+        "name": "punctuationnunhafukha-hebr"
+    },
+    {
+        "": "1195",
+        "code": "0x5c7",
+        "name": "qamatsqatancomb-hebr"
+    },
+    {
+        "": "1196",
+        "code": "0x5d0",
+        "name": "alef-hebr"
+    },
+    {
+        "": "1197",
+        "code": "0x5d1",
+        "name": "bet-hebr"
+    },
+    {
+        "": "1198",
+        "code": "0x5d2",
+        "name": "gimel-hebr"
+    },
+    {
+        "": "1199",
+        "code": "0x5d3",
+        "name": "dalet-hebr"
+    },
+    {
+        "": "1200",
+        "code": "0x5d4",
+        "name": "he-hebr"
+    },
+    {
+        "": "1201",
+        "code": "0x5d5",
+        "name": "vav-hebr"
+    },
+    {
+        "": "1202",
+        "code": "0x5d6",
+        "name": "zayin-hebr"
+    },
+    {
+        "": "1203",
+        "code": "0x5d7",
+        "name": "het-hebr"
+    },
+    {
+        "": "1204",
+        "code": "0x5d8",
+        "name": "tet-hebr"
+    },
+    {
+        "": "1205",
+        "code": "0x5d9",
+        "name": "yod-hebr"
+    },
+    {
+        "": "1206",
+        "code": "0x5da",
+        "name": "finalkaf-hebr"
+    },
+    {
+        "": "1207",
+        "code": "0x5db",
+        "name": "kaf-hebr"
+    },
+    {
+        "": "1208",
+        "code": "0x5dc",
+        "name": "lamed-hebr"
+    },
+    {
+        "": "1209",
+        "code": "0x5dd",
+        "name": "finalmem-hebr"
+    },
+    {
+        "": "1210",
+        "code": "0x5de",
+        "name": "mem-hebr"
+    },
+    {
+        "": "1211",
+        "code": "0x5df",
+        "name": "finalnun-hebr"
+    },
+    {
+        "": "1212",
+        "code": "0x5e0",
+        "name": "nun-hebr"
+    },
+    {
+        "": "1213",
+        "code": "0x5e1",
+        "name": "samekh-hebr"
+    },
+    {
+        "": "1214",
+        "code": "0x5e2",
+        "name": "ayin-hebr"
+    },
+    {
+        "": "1215",
+        "code": "0x5e3",
+        "name": "finalpe-hebr"
+    },
+    {
+        "": "1216",
+        "code": "0x5e4",
+        "name": "pe-hebr"
+    },
+    {
+        "": "1217",
+        "code": "0x5e5",
+        "name": "finaltsadi-hebr"
+    },
+    {
+        "": "1218",
+        "code": "0x5e6",
+        "name": "tsadi-hebr"
+    },
+    {
+        "": "1219",
+        "code": "0x5e7",
+        "name": "qof-hebr"
+    },
+    {
+        "": "1220",
+        "code": "0x5e8",
+        "name": "resh-hebr"
+    },
+    {
+        "": "1221",
+        "code": "0x5e9",
+        "name": "shin-hebr"
+    },
+    {
+        "": "1222",
+        "code": "0x5ea",
+        "name": "tav-hebr"
+    },
+    {
+        "": "1223",
+        "code": "0x5f0",
+        "name": "yiddishdoublevav-hebr"
+    },
+    {
+        "": "1224",
+        "code": "0x5f1",
+        "name": "yiddishvavyod-hebr"
+    },
+    {
+        "": "1225",
+        "code": "0x5f2",
+        "name": "yiddishdoubleyod-hebr"
+    },
+    {
+        "": "1226",
+        "code": "0x5f3",
+        "name": "punctuationgeresh-hebr"
+    },
+    {
+        "": "1227",
+        "code": "0x5f4",
+        "name": "punctuationgershayim-hebr"
+    },
+    {
+        "": "1228",
+        "code": "0x1f00",
+        "name": "alphapsili-grek"
+    },
+    {
+        "": "1229",
+        "code": "0x1f01",
+        "name": "alphadasia-grek"
+    },
+    {
+        "": "1230",
+        "code": "0x1f02",
+        "name": "alphapsilivaria-grek"
+    },
+    {
+        "": "1231",
+        "code": "0x1f03",
+        "name": "alphadasiavaria-grek"
+    },
+    {
+        "": "1232",
+        "code": "0x1f04",
+        "name": "alphapsilioxia-grek"
+    },
+    {
+        "": "1233",
+        "code": "0x1f05",
+        "name": "alphadasiaoxia-grek"
+    },
+    {
+        "": "1234",
+        "code": "0x1f06",
+        "name": "alphapsiliperispomeni-grek"
+    },
+    {
+        "": "1235",
+        "code": "0x1f07",
+        "name": "alphadasiaperispomeni-grek"
+    },
+    {
+        "": "1236",
+        "code": "0x1f08",
+        "name": "Alphapsili-grek"
+    },
+    {
+        "": "1237",
+        "code": "0x1f09",
+        "name": "Alphadasia-grek"
+    },
+    {
+        "": "1238",
+        "code": "0x1f0a",
+        "name": "Alphapsilivaria-grek"
+    },
+    {
+        "": "1239",
+        "code": "0x1f0b",
+        "name": "Alphadasiavaria-grek"
+    },
+    {
+        "": "1240",
+        "code": "0x1f0c",
+        "name": "Alphapsilioxia-grek"
+    },
+    {
+        "": "1241",
+        "code": "0x1f0d",
+        "name": "Alphadasiaoxia-grek"
+    },
+    {
+        "": "1242",
+        "code": "0x1f0e",
+        "name": "Alphapsiliperispomeni-grek"
+    },
+    {
+        "": "1243",
+        "code": "0x1f0f",
+        "name": "Alphadasiaperispomeni-grek"
+    },
+    {
+        "": "1244",
+        "code": "0x1f10",
+        "name": "epsilonpsili-grek"
+    },
+    {
+        "": "1245",
+        "code": "0x1f11",
+        "name": "epsilondasia-grek"
+    },
+    {
+        "": "1246",
+        "code": "0x1f12",
+        "name": "epsilonpsilivaria-grek"
+    },
+    {
+        "": "1247",
+        "code": "0x1f13",
+        "name": "epsilondasiavaria-grek"
+    },
+    {
+        "": "1248",
+        "code": "0x1f14",
+        "name": "epsilonpsilioxia-grek"
+    },
+    {
+        "": "1249",
+        "code": "0x1f15",
+        "name": "epsilondasiaoxia-grek"
+    },
+    {
+        "": "1250",
+        "code": "0x1f16",
+        "name": "epsilon_perispomeni"
+    },
+    {
+        "": "1251",
+        "code": "0x1f18",
+        "name": "Epsilonpsili-grek"
+    },
+    {
+        "": "1252",
+        "code": "0x1f19",
+        "name": "Epsilondasia-grek"
+    },
+    {
+        "": "1253",
+        "code": "0x1f1a",
+        "name": "Epsilonpsilivaria-grek"
+    },
+    {
+        "": "1254",
+        "code": "0x1f1b",
+        "name": "Epsilondasiavaria-grek"
+    },
+    {
+        "": "1255",
+        "code": "0x1f1c",
+        "name": "Epsilonpsilioxia-grek"
+    },
+    {
+        "": "1256",
+        "code": "0x1f1d",
+        "name": "Epsilondasiaoxia-grek"
+    },
+    {
+        "": "1257",
+        "code": "0x1f20",
+        "name": "etapsili-grek"
+    },
+    {
+        "": "1258",
+        "code": "0x1f21",
+        "name": "etadasia-grek"
+    },
+    {
+        "": "1259",
+        "code": "0x1f22",
+        "name": "etapsilivaria-grek"
+    },
+    {
+        "": "1260",
+        "code": "0x1f23",
+        "name": "etadasiavaria-grek"
+    },
+    {
+        "": "1261",
+        "code": "0x1f24",
+        "name": "etapsilioxia-grek"
+    },
+    {
+        "": "1262",
+        "code": "0x1f25",
+        "name": "etadasiaoxia-grek"
+    },
+    {
+        "": "1263",
+        "code": "0x1f26",
+        "name": "etapsiliperispomeni-grek"
+    },
+    {
+        "": "1264",
+        "code": "0x1f27",
+        "name": "etadasiaperispomeni-grek"
+    },
+    {
+        "": "1265",
+        "code": "0x1f28",
+        "name": "Etapsili-grek"
+    },
+    {
+        "": "1266",
+        "code": "0x1f29",
+        "name": "Etadasia-grek"
+    },
+    {
+        "": "1267",
+        "code": "0x1f2a",
+        "name": "Etapsilivaria-grek"
+    },
+    {
+        "": "1268",
+        "code": "0x1f2b",
+        "name": "Etadasiavaria-grek"
+    },
+    {
+        "": "1269",
+        "code": "0x1f2c",
+        "name": "Etapsilioxia-grek"
+    },
+    {
+        "": "1270",
+        "code": "0x1f2d",
+        "name": "Etadasiaoxia-grek"
+    },
+    {
+        "": "1271",
+        "code": "0x1f2e",
+        "name": "Etapsiliperispomeni-grek"
+    },
+    {
+        "": "1272",
+        "code": "0x1f2f",
+        "name": "Etadasiaperispomeni-grek"
+    },
+    {
+        "": "1273",
+        "code": "0x1f30",
+        "name": "iotapsili-grek"
+    },
+    {
+        "": "1274",
+        "code": "0x1f31",
+        "name": "iotadasia-grek"
+    },
+    {
+        "": "1275",
+        "code": "0x1f32",
+        "name": "iotapsilivaria-grek"
+    },
+    {
+        "": "1276",
+        "code": "0x1f33",
+        "name": "iotadasiavaria-grek"
+    },
+    {
+        "": "1277",
+        "code": "0x1f34",
+        "name": "iotapsilioxia-grek"
+    },
+    {
+        "": "1278",
+        "code": "0x1f35",
+        "name": "iotadasiaoxia-grek"
+    },
+    {
+        "": "1279",
+        "code": "0x1f36",
+        "name": "iotapsiliperispomeni-grek"
+    },
+    {
+        "": "1280",
+        "code": "0x1f37",
+        "name": "iotadasiaperispomeni-grek"
+    },
+    {
+        "": "1281",
+        "code": "0x1f38",
+        "name": "Iotapsili-grek"
+    },
+    {
+        "": "1282",
+        "code": "0x1f39",
+        "name": "Iotadasia-grek"
+    },
+    {
+        "": "1283",
+        "code": "0x1f3a",
+        "name": "Iotapsilivaria-grek"
+    },
+    {
+        "": "1284",
+        "code": "0x1f3b",
+        "name": "Iotadasiavaria-grek"
+    },
+    {
+        "": "1285",
+        "code": "0x1f3c",
+        "name": "Iotapsilioxia-grek"
+    },
+    {
+        "": "1286",
+        "code": "0x1f3d",
+        "name": "Iotadasiaoxia-grek"
+    },
+    {
+        "": "1287",
+        "code": "0x1f3e",
+        "name": "Iotapsiliperispomeni-grek"
+    },
+    {
+        "": "1288",
+        "code": "0x1f3f",
+        "name": "Iotadasiaperispomeni-grek"
+    },
+    {
+        "": "1289",
+        "code": "0x1f40",
+        "name": "omicronpsili-grek"
+    },
+    {
+        "": "1290",
+        "code": "0x1f41",
+        "name": "omicrondasia-grek"
+    },
+    {
+        "": "1291",
+        "code": "0x1f42",
+        "name": "omicronpsilivaria-grek"
+    },
+    {
+        "": "1292",
+        "code": "0x1f43",
+        "name": "omicrondasiavaria-grek"
+    },
+    {
+        "": "1293",
+        "code": "0x1f44",
+        "name": "omicronpsilioxia-grek"
+    },
+    {
+        "": "1294",
+        "code": "0x1f45",
+        "name": "omicrondasiaoxia-grek"
+    },
+    {
+        "": "1295",
+        "code": "0x1f48",
+        "name": "Omicronpsili-grek"
+    },
+    {
+        "": "1296",
+        "code": "0x1f49",
+        "name": "Omicrondasia-grek"
+    },
+    {
+        "": "1297",
+        "code": "0x1f4a",
+        "name": "Omicronpsilivaria-grek"
+    },
+    {
+        "": "1298",
+        "code": "0x1f4b",
+        "name": "Omicrondasiavaria-grek"
+    },
+    {
+        "": "1299",
+        "code": "0x1f4c",
+        "name": "Omicronpsilioxia-grek"
+    },
+    {
+        "": "1300",
+        "code": "0x1f4d",
+        "name": "Omicrondasiaoxia-grek"
+    },
+    {
+        "": "1301",
+        "code": "0x1f50",
+        "name": "upsilonpsili-grek"
+    },
+    {
+        "": "1302",
+        "code": "0x1f51",
+        "name": "upsilondasia-grek"
+    },
+    {
+        "": "1303",
+        "code": "0x1f52",
+        "name": "upsilonpsilivaria-grek"
+    },
+    {
+        "": "1304",
+        "code": "0x1f53",
+        "name": "upsilondasiavaria-grek"
+    },
+    {
+        "": "1305",
+        "code": "0x1f54",
+        "name": "upsilonpsilioxia-grek"
+    },
+    {
+        "": "1306",
+        "code": "0x1f55",
+        "name": "upsilondasiaoxia-grek"
+    },
+    {
+        "": "1307",
+        "code": "0x1f56",
+        "name": "upsilonpsiliperispomeni-grek"
+    },
+    {
+        "": "1308",
+        "code": "0x1f57",
+        "name": "upsilondasiaperispomeni-grek"
+    },
+    {
+        "": "1309",
+        "code": "0x1f59",
+        "name": "Upsilondasia-grek"
+    },
+    {
+        "": "1310",
+        "code": "0x1f5b",
+        "name": "Upsilondasiavaria-grek"
+    },
+    {
+        "": "1311",
+        "code": "0x1f5d",
+        "name": "Upsilondasiaoxia-grek"
+    },
+    {
+        "": "1312",
+        "code": "0x1f5f",
+        "name": "Upsilondasiaperispomeni-grek"
+    },
+    {
+        "": "1313",
+        "code": "0x1f60",
+        "name": "omegapsili-grek"
+    },
+    {
+        "": "1314",
+        "code": "0x1f61",
+        "name": "omegadasia-grek"
+    },
+    {
+        "": "1315",
+        "code": "0x1f62",
+        "name": "omegapsilivaria-grek"
+    },
+    {
+        "": "1316",
+        "code": "0x1f63",
+        "name": "omegadasiavaria-grek"
+    },
+    {
+        "": "1317",
+        "code": "0x1f64",
+        "name": "omegapsilioxia-grek"
+    },
+    {
+        "": "1318",
+        "code": "0x1f65",
+        "name": "omegadasiaoxia-grek"
+    },
+    {
+        "": "1319",
+        "code": "0x1f66",
+        "name": "omegapsiliperispomeni-grek"
+    },
+    {
+        "": "1320",
+        "code": "0x1f67",
+        "name": "omegadasiaperispomeni-grek"
+    },
+    {
+        "": "1321",
+        "code": "0x1f68",
+        "name": "Omegapsili-grek"
+    },
+    {
+        "": "1322",
+        "code": "0x1f69",
+        "name": "Omegadasia-grek"
+    },
+    {
+        "": "1323",
+        "code": "0x1f6a",
+        "name": "Omegapsilivaria-grek"
+    },
+    {
+        "": "1324",
+        "code": "0x1f6b",
+        "name": "Omegadasiavaria-grek"
+    },
+    {
+        "": "1325",
+        "code": "0x1f6c",
+        "name": "Omegapsilioxia-grek"
+    },
+    {
+        "": "1326",
+        "code": "0x1f6d",
+        "name": "Omegadasiaoxia-grek"
+    },
+    {
+        "": "1327",
+        "code": "0x1f6e",
+        "name": "Omegapsiliperispomeni-grek"
+    },
+    {
+        "": "1328",
+        "code": "0x1f6f",
+        "name": "Omegadasiaperispomeni-grek"
+    },
+    {
+        "": "1329",
+        "code": "0x1f70",
+        "name": "alphavaria-grek"
+    },
+    {
+        "": "1330",
+        "code": "0x1f71",
+        "name": "alphaoxia-grek"
+    },
+    {
+        "": "1331",
+        "code": "0x1f72",
+        "name": "epsilonvaria-grek"
+    },
+    {
+        "": "1332",
+        "code": "0x1f73",
+        "name": "epsilonoxia-grek"
+    },
+    {
+        "": "1333",
+        "code": "0x1f74",
+        "name": "etavaria-grek"
+    },
+    {
+        "": "1334",
+        "code": "0x1f75",
+        "name": "etaoxia-grek"
+    },
+    {
+        "": "1335",
+        "code": "0x1f76",
+        "name": "iotavaria-grek"
+    },
+    {
+        "": "1336",
+        "code": "0x1f77",
+        "name": "iotaoxia-grek"
+    },
+    {
+        "": "1337",
+        "code": "0x1f78",
+        "name": "omicronvaria-grek"
+    },
+    {
+        "": "1338",
+        "code": "0x1f79",
+        "name": "omicronoxia-grek"
+    },
+    {
+        "": "1339",
+        "code": "0x1f7a",
+        "name": "upsilonvaria-grek"
+    },
+    {
+        "": "1340",
+        "code": "0x1f7b",
+        "name": "upsilonoxia-grek"
+    },
+    {
+        "": "1341",
+        "code": "0x1f7c",
+        "name": "omegavaria-grek"
+    },
+    {
+        "": "1342",
+        "code": "0x1f7d",
+        "name": "omegaoxia-grek"
+    },
+    {
+        "": "1343",
+        "code": "0x1f80",
+        "name": "alphapsiliypogegrammeni-grek"
+    },
+    {
+        "": "1344",
+        "code": "0x1f81",
+        "name": "alphadasiaypogegrammeni-grek"
+    },
+    {
+        "": "1345",
+        "code": "0x1f82",
+        "name": "alphapsilivariaypogegrammeni-grek"
+    },
+    {
+        "": "1346",
+        "code": "0x1f83",
+        "name": "alphadasiavariaypogegrammeni-grek"
+    },
+    {
+        "": "1347",
+        "code": "0x1f84",
+        "name": "alphapsilioxiaypogegrammeni-grek"
+    },
+    {
+        "": "1348",
+        "code": "0x1f85",
+        "name": "alphadasiaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "1349",
+        "code": "0x1f86",
+        "name": "alphapsiliperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1350",
+        "code": "0x1f87",
+        "name": "alphadasiaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1351",
+        "code": "0x1f88",
+        "name": "Alphapsiliprosgegrammeni-grek"
+    },
+    {
+        "": "1352",
+        "code": "0x1f89",
+        "name": "Alphadasiaprosgegrammeni-grek"
+    },
+    {
+        "": "1353",
+        "code": "0x1f8a",
+        "name": "Alphapsilivariaprosgegrammeni-grek"
+    },
+    {
+        "": "1354",
+        "code": "0x1f8b",
+        "name": "Alphadasiavariaprosgegrammeni-grek"
+    },
+    {
+        "": "1355",
+        "code": "0x1f8c",
+        "name": "Alphapsilioxiaprosgegrammeni-grek"
+    },
+    {
+        "": "1356",
+        "code": "0x1f8d",
+        "name": "Alphadasiaoxiaprosgegrammeni-grek"
+    },
+    {
+        "": "1357",
+        "code": "0x1f8e",
+        "name": "Alphapsiliperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "1358",
+        "code": "0x1f8f",
+        "name": "Alphadasiaperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "1359",
+        "code": "0x1f90",
+        "name": "etapsiliypogegrammeni-grek"
+    },
+    {
+        "": "1360",
+        "code": "0x1f91",
+        "name": "etadasiaypogegrammeni-grek"
+    },
+    {
+        "": "1361",
+        "code": "0x1f92",
+        "name": "etapsilivariaypogegrammeni-grek"
+    },
+    {
+        "": "1362",
+        "code": "0x1f93",
+        "name": "etadasiavariaypogegrammeni-grek"
+    },
+    {
+        "": "1363",
+        "code": "0x1f94",
+        "name": "etapsilioxiaypogegrammeni-grek"
+    },
+    {
+        "": "1364",
+        "code": "0x1f95",
+        "name": "etadasiaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "1365",
+        "code": "0x1f96",
+        "name": "etapsiliperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1366",
+        "code": "0x1f97",
+        "name": "etadasiaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1367",
+        "code": "0x1f98",
+        "name": "Etapsiliprosgegrammeni-grek"
+    },
+    {
+        "": "1368",
+        "code": "0x1f99",
+        "name": "Etadasiaprosgegrammeni-grek"
+    },
+    {
+        "": "1369",
+        "code": "0x1f9a",
+        "name": "Etapsilivariaprosgegrammeni-grek"
+    },
+    {
+        "": "1370",
+        "code": "0x1f9b",
+        "name": "Etadasiavariaprosgegrammeni-grek"
+    },
+    {
+        "": "1371",
+        "code": "0x1f9c",
+        "name": "Etapsilioxiaprosgegrammeni-grek"
+    },
+    {
+        "": "1372",
+        "code": "0x1f9d",
+        "name": "Etadasiaoxiaprosgegrammeni-grek"
+    },
+    {
+        "": "1373",
+        "code": "0x1f9e",
+        "name": "Etapsiliperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "1374",
+        "code": "0x1f9f",
+        "name": "Etadasiaperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "1375",
+        "code": "0x1fa0",
+        "name": "omegapsiliypogegrammeni-grek"
+    },
+    {
+        "": "1376",
+        "code": "0x1fa1",
+        "name": "omegadasiaypogegrammeni-grek"
+    },
+    {
+        "": "1377",
+        "code": "0x1fa2",
+        "name": "omegapsilivariaypogegrammeni-grek"
+    },
+    {
+        "": "1378",
+        "code": "0x1fa3",
+        "name": "omegadasiavariaypogegrammeni-grek"
+    },
+    {
+        "": "1379",
+        "code": "0x1fa4",
+        "name": "omegapsilioxiaypogegrammeni-grek"
+    },
+    {
+        "": "1380",
+        "code": "0x1fa5",
+        "name": "omegadasiaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "1381",
+        "code": "0x1fa6",
+        "name": "omegapsiliperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1382",
+        "code": "0x1fa7",
+        "name": "omegadasiaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1383",
+        "code": "0x1fa8",
+        "name": "Omegapsiliprosgegrammeni-grek"
+    },
+    {
+        "": "1384",
+        "code": "0x1fa9",
+        "name": "Omegadasiaprosgegrammeni-grek"
+    },
+    {
+        "": "1385",
+        "code": "0x1faa",
+        "name": "Omegapsilivariaprosgegrammeni-grek"
+    },
+    {
+        "": "1386",
+        "code": "0x1fab",
+        "name": "Omegadasiavariaprosgegrammeni-grek"
+    },
+    {
+        "": "1387",
+        "code": "0x1fac",
+        "name": "Omegapsilioxiaprosgegrammeni-grek"
+    },
+    {
+        "": "1388",
+        "code": "0x1fad",
+        "name": "Omegadasiaoxiaprosgegrammeni-grek"
+    },
+    {
+        "": "1389",
+        "code": "0x1fae",
+        "name": "Omegapsiliperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "1390",
+        "code": "0x1faf",
+        "name": "Omegadasiaperispomeniprosgegrammeni-grek"
+    },
+    {
+        "": "1391",
+        "code": "0x1fb0",
+        "name": "alphavrachy-grek"
+    },
+    {
+        "": "1392",
+        "code": "0x1fb1",
+        "name": "alphamacron-grek"
+    },
+    {
+        "": "1393",
+        "code": "0x1fb2",
+        "name": "alphavariaypogegrammeni-grek"
+    },
+    {
+        "": "1394",
+        "code": "0x1fb3",
+        "name": "alphaypogegrammeni-grek"
+    },
+    {
+        "": "1395",
+        "code": "0x1fb4",
+        "name": "alphaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "1396",
+        "code": "0x1fb6",
+        "name": "alphaperispomeni-grek"
+    },
+    {
+        "": "1397",
+        "code": "0x1fb7",
+        "name": "alphaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1398",
+        "code": "0x1fb8",
+        "name": "Alphavrachy-grek"
+    },
+    {
+        "": "1399",
+        "code": "0x1fb9",
+        "name": "Alphamacron-grek"
+    },
+    {
+        "": "1400",
+        "code": "0x1fba",
+        "name": "Alphavaria-grek"
+    },
+    {
+        "": "1401",
+        "code": "0x1fbb",
+        "name": "Alphaoxia-grek"
+    },
+    {
+        "": "1402",
+        "code": "0x1fbc",
+        "name": "Alphaprosgegrammeni-grek"
+    },
+    {
+        "": "1403",
+        "code": "0x1fbd",
+        "name": "koronismod-grek"
+    },
+    {
+        "": "1404",
+        "code": "0x1fbe",
+        "name": "prosgegrammeni-grek"
+    },
+    {
+        "": "1405",
+        "code": "0x1fbf",
+        "name": "psilimod-grek"
+    },
+    {
+        "": "1406",
+        "code": "0x1fc0",
+        "name": "perispomenimod-grek"
+    },
+    {
+        "": "1407",
+        "code": "0x1fc1",
+        "name": "dialytikaperispomenimod-grek"
+    },
+    {
+        "": "1408",
+        "code": "0x1fc2",
+        "name": "etavariaypogegrammeni-grek"
+    },
+    {
+        "": "1409",
+        "code": "0x1fc3",
+        "name": "etaypogegrammeni-grek"
+    },
+    {
+        "": "1410",
+        "code": "0x1fc4",
+        "name": "etaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "1411",
+        "code": "0x1fc6",
+        "name": "etaperispomeni-grek"
+    },
+    {
+        "": "1412",
+        "code": "0x1fc7",
+        "name": "etaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1413",
+        "code": "0x1fc8",
+        "name": "Epsilonvaria-grek"
+    },
+    {
+        "": "1414",
+        "code": "0x1fc9",
+        "name": "Epsilonoxia-grek"
+    },
+    {
+        "": "1415",
+        "code": "0x1fca",
+        "name": "Etavaria-grek"
+    },
+    {
+        "": "1416",
+        "code": "0x1fcb",
+        "name": "Etaoxia-grek"
+    },
+    {
+        "": "1417",
+        "code": "0x1fcc",
+        "name": "Etaprosgegrammeni-grek"
+    },
+    {
+        "": "1418",
+        "code": "0x1fcd",
+        "name": "psilivariamod-grek"
+    },
+    {
+        "": "1419",
+        "code": "0x1fce",
+        "name": "psilioxiamod-grek"
+    },
+    {
+        "": "1420",
+        "code": "0x1fcf",
+        "name": "psiliperispomenimod-grek"
+    },
+    {
+        "": "1421",
+        "code": "0x1fd0",
+        "name": "iotavrachy-grek"
+    },
+    {
+        "": "1422",
+        "code": "0x1fd1",
+        "name": "iotamacron-grek"
+    },
+    {
+        "": "1423",
+        "code": "0x1fd2",
+        "name": "iotadialytikavaria-grek"
+    },
+    {
+        "": "1424",
+        "code": "0x1fd3",
+        "name": "iotadialytikaoxia-grek"
+    },
+    {
+        "": "1425",
+        "code": "0x1fd6",
+        "name": "iotaperispomeni-grek"
+    },
+    {
+        "": "1426",
+        "code": "0x1fd7",
+        "name": "iotadialytikaperispomeni-grek"
+    },
+    {
+        "": "1427",
+        "code": "0x1fd8",
+        "name": "Iotavrachy-grek"
+    },
+    {
+        "": "1428",
+        "code": "0x1fd9",
+        "name": "Iotamacron-grek"
+    },
+    {
+        "": "1429",
+        "code": "0x1fda",
+        "name": "Iotavaria-grek"
+    },
+    {
+        "": "1430",
+        "code": "0x1fdb",
+        "name": "Iotaoxia-grek"
+    },
+    {
+        "": "1431",
+        "code": "0x1fdd",
+        "name": "dasiavariamod-grek"
+    },
+    {
+        "": "1432",
+        "code": "0x1fde",
+        "name": "dasiaoxiamod-grek"
+    },
+    {
+        "": "1433",
+        "code": "0x1fdf",
+        "name": "dasiaperispomenimod-grek"
+    },
+    {
+        "": "1434",
+        "code": "0x1fe0",
+        "name": "upsilonvrachy-grek"
+    },
+    {
+        "": "1435",
+        "code": "0x1fe1",
+        "name": "upsilonmacron-grek"
+    },
+    {
+        "": "1436",
+        "code": "0x1fe2",
+        "name": "upsilondialytikavaria-grek"
+    },
+    {
+        "": "1437",
+        "code": "0x1fe3",
+        "name": "upsilondialytikaoxia-grek"
+    },
+    {
+        "": "1438",
+        "code": "0x1fe4",
+        "name": "rhopsili-grek"
+    },
+    {
+        "": "1439",
+        "code": "0x1fe5",
+        "name": "rhodasia-grek"
+    },
+    {
+        "": "1440",
+        "code": "0x1fe6",
+        "name": "upsilonperispomeni-grek"
+    },
+    {
+        "": "1441",
+        "code": "0x1fe7",
+        "name": "upsilondialytikaperispomeni-grek"
+    },
+    {
+        "": "1442",
+        "code": "0x1fe8",
+        "name": "Upsilonvrachy-grek"
+    },
+    {
+        "": "1443",
+        "code": "0x1fe9",
+        "name": "Upsilonmacron-grek"
+    },
+    {
+        "": "1444",
+        "code": "0x1fea",
+        "name": "Upsilonvaria-grek"
+    },
+    {
+        "": "1445",
+        "code": "0x1feb",
+        "name": "Upsilonoxia-grek"
+    },
+    {
+        "": "1446",
+        "code": "0x1fec",
+        "name": "Rhodasia-grek"
+    },
+    {
+        "": "1447",
+        "code": "0x1fed",
+        "name": "dialytikavariamod-grek"
+    },
+    {
+        "": "1448",
+        "code": "0x1fee",
+        "name": "dialytikaoxiamod-grek"
+    },
+    {
+        "": "1449",
+        "code": "0x1fef",
+        "name": "variamod-grek"
+    },
+    {
+        "": "1450",
+        "code": "0x1ff2",
+        "name": "omegavariaypogegrammeni-grek"
+    },
+    {
+        "": "1451",
+        "code": "0x1ff3",
+        "name": "omegaypogegrammeni-grek"
+    },
+    {
+        "": "1452",
+        "code": "0x1ff4",
+        "name": "omegaoxiaypogegrammeni-grek"
+    },
+    {
+        "": "1453",
+        "code": "0x1ff6",
+        "name": "omegaperispomeni-grek"
+    },
+    {
+        "": "1454",
+        "code": "0x1ff7",
+        "name": "omegaperispomeniypogegrammeni-grek"
+    },
+    {
+        "": "1455",
+        "code": "0x1ff8",
+        "name": "Omicronvaria-grek"
+    },
+    {
+        "": "1456",
+        "code": "0x1ff9",
+        "name": "Omicronoxia-grek"
+    },
+    {
+        "": "1457",
+        "code": "0x1ffa",
+        "name": "Omegavaria-grek"
+    },
+    {
+        "": "1458",
+        "code": "0x1ffb",
+        "name": "Omegaoxia-grek"
+    },
+    {
+        "": "1459",
+        "code": "0x1ffc",
+        "name": "Omegaprosgegrammeni-grek"
+    },
+    {
+        "": "1460",
+        "code": "0x1ffd",
+        "name": "oxiamod-grek"
+    },
+    {
+        "": "1461",
+        "code": "0x1ffe",
+        "name": "dasiamod-grek"
+    },
+    {
+        "": "1462",
+        "code": "0xe138",
+        "name": "uniE138"
+    },
+    {
+        "": "1463",
+        "code": "0xe6af",
+        "name": "alpha_apostrophe"
+    },
+    {
+        "": "1464",
+        "code": "0xe6b0",
+        "name": "alpha_curly"
+    },
+    {
+        "": "1465",
+        "code": "0xe6b1",
+        "name": "alpha_iota"
+    },
+    {
+        "": "1466",
+        "code": "0xe6b2",
+        "name": "alpha_iota_psili"
+    },
+    {
+        "": "1467",
+        "code": "0xe6b3",
+        "name": "alpha_iota_tonos"
+    },
+    {
+        "": "1468",
+        "code": "0xe6b4",
+        "name": "alpha_iota_psili_oxia"
+    },
+    {
+        "": "1469",
+        "code": "0xe6b5",
+        "name": "alpha_iota_perispomeni"
+    },
+    {
+        "": "1470",
+        "code": "0xe6b6",
+        "name": "alpha_nu"
+    },
+    {
+        "": "1471",
+        "code": "0xe6b7",
+        "name": "alpha_rho"
+    },
+    {
+        "": "1472",
+        "code": "0xe6b8",
+        "name": "alpha_sigma_tau"
+    },
+    {
+        "": "1473",
+        "code": "0xe6b9",
+        "name": "alpha_psili_sigma_tau"
+    },
+    {
+        "": "1474",
+        "code": "0xe6c0",
+        "name": "beta_curly"
+    },
+    {
+        "": "1475",
+        "code": "0xe6d0",
+        "name": "gamma_short"
+    },
+    {
+        "": "1476",
+        "code": "0xe6d1",
+        "name": "gamma_tall"
+    },
+    {
+        "": "1477",
+        "code": "0xe6d2",
+        "name": "gamma_alpha_varia_rho"
+    },
+    {
+        "": "1478",
+        "code": "0xe6d3",
+        "name": "gamma_alpha_varia_rho_2"
+    },
+    {
+        "": "1479",
+        "code": "0xe6d4",
+        "name": "gamma_alpha_varia_rho_3"
+    },
+    {
+        "": "1480",
+        "code": "0xe6d5",
+        "name": "gamma_alpha_varia_rho_4"
+    },
+    {
+        "": "1481",
+        "code": "0xe6d6",
+        "name": "gamma_alpha_varia_rho_5"
+    },
+    {
+        "": "1482",
+        "code": "0xe6d7",
+        "name": "gamma_gamma"
+    },
+    {
+        "": "1483",
+        "code": "0xe6d8",
+        "name": "gamma_epsilon_nu_oxia"
+    },
+    {
+        "": "1484",
+        "code": "0xe6d9",
+        "name": "gamma_omicron"
+    },
+    {
+        "": "1485",
+        "code": "0xe6da",
+        "name": "gamma_omicron_2"
+    },
+    {
+        "": "1486",
+        "code": "0xe6db",
+        "name": "gamma_rho"
+    },
+    {
+        "": "1487",
+        "code": "0xe6dc",
+        "name": "uniE6DC"
+    },
+    {
+        "": "1488",
+        "code": "0xe6df",
+        "name": "delta_apostrophe"
+    },
+    {
+        "": "1489",
+        "code": "0xe6e0",
+        "name": "delta_curly"
+    },
+    {
+        "": "1490",
+        "code": "0xe6e1",
+        "name": "delta_epsilon"
+    },
+    {
+        "": "1491",
+        "code": "0xe6e2",
+        "name": "delta_epsilon_varia"
+    },
+    {
+        "": "1492",
+        "code": "0xe6e3",
+        "name": "delta_epsilon_varia_2"
+    },
+    {
+        "": "1493",
+        "code": "0xe6e4",
+        "name": "delta_alpha_fin_sigma"
+    },
+    {
+        "": "1494",
+        "code": "0xe6f0",
+        "name": "epsilon_psili_perispomeni"
+    },
+    {
+        "": "1495",
+        "code": "0xe6f1",
+        "name": "epsilon_dasia_perispomeni"
+    },
+    {
+        "": "1496",
+        "code": "0xe6f2",
+        "name": "epsilon_iota"
+    },
+    {
+        "": "1497",
+        "code": "0xe6f3",
+        "name": "epsilon_iota_2"
+    },
+    {
+        "": "1498",
+        "code": "0xe6f4",
+        "name": "epsilon_iota_perispomeni"
+    },
+    {
+        "": "1499",
+        "code": "0xe6f5",
+        "name": "epsion_iota_2_perispomeni"
+    },
+    {
+        "": "1500",
+        "code": "0xe6f6",
+        "name": "epsilon_iota_perispomeni_prosgegrammeni"
+    },
+    {
+        "": "1501",
+        "code": "0xe6f7",
+        "name": "epsilon_psili_nu"
+    },
+    {
+        "": "1502",
+        "code": "0xe6f8",
+        "name": "epsilon_psili_xi"
+    },
+    {
+        "": "1503",
+        "code": "0xe6f9",
+        "name": "epsilon_rho"
+    },
+    {
+        "": "1504",
+        "code": "0xe6fa",
+        "name": "epsilon_rho_2"
+    },
+    {
+        "": "1505",
+        "code": "0xe6fb",
+        "name": "epsilon_stigma_iota"
+    },
+    {
+        "": "1506",
+        "code": "0xe6fc",
+        "name": "epsilon_psili_stigma_iota"
+    },
+    {
+        "": "1507",
+        "code": "0xe6fd",
+        "name": "epsilon_psili_stigma_iota_varia"
+    },
+    {
+        "": "1508",
+        "code": "0xe6fe",
+        "name": "epsilon_upsilon"
+    },
+    {
+        "": "1509",
+        "code": "0xe6ff",
+        "name": "epsilon_upsilon_2"
+    },
+    {
+        "": "1510",
+        "code": "0xe700",
+        "name": "zeta_2"
+    },
+    {
+        "": "1511",
+        "code": "0xe701",
+        "name": "zeta_3"
+    },
+    {
+        "": "1512",
+        "code": "0xe710",
+        "name": "eta_2"
+    },
+    {
+        "": "1513",
+        "code": "0xe711",
+        "name": "eta_2_perispomeni"
+    },
+    {
+        "": "1514",
+        "code": "0xe712",
+        "name": "eta_nu"
+    },
+    {
+        "": "1515",
+        "code": "0xe713",
+        "name": "eta_tonos_nu"
+    },
+    {
+        "": "1516",
+        "code": "0xe714",
+        "name": "eta_varia_nu"
+    },
+    {
+        "": "1517",
+        "code": "0xe717",
+        "name": "eta_varia_nu_2"
+    },
+    {
+        "": "1518",
+        "code": "0xe718",
+        "name": "eta_perispomeni_nu"
+    },
+    {
+        "": "1519",
+        "code": "0xe71f",
+        "name": "theta_apostrophe"
+    },
+    {
+        "": "1520",
+        "code": "0xe720",
+        "name": "theta_symbol_apostrophe"
+    },
+    {
+        "": "1521",
+        "code": "0xe721",
+        "name": "phi_apostrophe"
+    },
+    {
+        "": "1522",
+        "code": "0xe722",
+        "name": "phi_iota"
+    },
+    {
+        "": "1523",
+        "code": "0xe723",
+        "name": "phi_iota_tonos"
+    },
+    {
+        "": "1524",
+        "code": "0xe740",
+        "name": "kappa_alpha_iota_2_varia"
+    },
+    {
+        "": "1525",
+        "code": "0xe741",
+        "name": "kappa_alpha_iota_3_varia"
+    },
+    {
+        "": "1526",
+        "code": "0xe742",
+        "name": "kappa_alpha_iota_4_varia"
+    },
+    {
+        "": "1527",
+        "code": "0xe743",
+        "name": "kappa_alpha_iota_5_varia"
+    },
+    {
+        "": "1528",
+        "code": "0xe744",
+        "name": "kappa_alpha_tau_alpha"
+    },
+    {
+        "": "1529",
+        "code": "0xe750",
+        "name": "lambda_apostrophe"
+    },
+    {
+        "": "1530",
+        "code": "0xe751",
+        "name": "lambda_lambda"
+    },
+    {
+        "": "1531",
+        "code": "0xe752",
+        "name": "lambda_omicron_final_sigma"
+    },
+    {
+        "": "1532",
+        "code": "0xe753",
+        "name": "lambda_iota_per_fin_sigma"
+    },
+    {
+        "": "1533",
+        "code": "0xe760",
+        "name": "mu_epsilon_nu"
+    },
+    {
+        "": "1534",
+        "code": "0xe761",
+        "name": "mu_epsilon_nu_2"
+    },
+    {
+        "": "1535",
+        "code": "0xe762",
+        "name": "mu_epsilon_nu_3"
+    },
+    {
+        "": "1536",
+        "code": "0xe763",
+        "name": "mu_epsilon_varia_nu"
+    },
+    {
+        "": "1537",
+        "code": "0xe764",
+        "name": "mu_epsilon_varia_2_nu"
+    },
+    {
+        "": "1538",
+        "code": "0xe765",
+        "name": "mu_epsilon_tonos_nu"
+    },
+    {
+        "": "1539",
+        "code": "0xe766",
+        "name": "uniE766"
+    },
+    {
+        "": "1540",
+        "code": "0xe767",
+        "name": "mu_alpha_fin_sigma"
+    },
+    {
+        "": "1541",
+        "code": "0xe768",
+        "name": "mu_epsilon_iota_perispomeni_nu"
+    },
+    {
+        "": "1542",
+        "code": "0xe770",
+        "name": "nu_final"
+    },
+    {
+        "": "1543",
+        "code": "0xe771",
+        "name": "nu_omicrn_final_sigma"
+    },
+    {
+        "": "1544",
+        "code": "0xe772",
+        "name": "nu_alpha_iota_final_sigma"
+    },
+    {
+        "": "1545",
+        "code": "0xe780",
+        "name": "xi_2"
+    },
+    {
+        "": "1546",
+        "code": "0xe797",
+        "name": "omicron_psili_perispomeni"
+    },
+    {
+        "": "1547",
+        "code": "0xe798",
+        "name": "omicron_dasia_perispomeni"
+    },
+    {
+        "": "1548",
+        "code": "0xe799",
+        "name": "omicron_perispomeni"
+    },
+    {
+        "": "1549",
+        "code": "0xe79a",
+        "name": "omicron_upsilon"
+    },
+    {
+        "": "1550",
+        "code": "0xe79b",
+        "name": "omicron_upsilon_tonos"
+    },
+    {
+        "": "1551",
+        "code": "0xe79c",
+        "name": "omicron_upsilon_perispomeni"
+    },
+    {
+        "": "1552",
+        "code": "0xe79d",
+        "name": "omicron_sigma"
+    },
+    {
+        "": "1553",
+        "code": "0xe7a0",
+        "name": "Pi_2"
+    },
+    {
+        "": "1554",
+        "code": "0xe7a1",
+        "name": "pi_apostrophe"
+    },
+    {
+        "": "1555",
+        "code": "0xe7a2",
+        "name": "pisymbol_apostrophe"
+    },
+    {
+        "": "1556",
+        "code": "0xe7a3",
+        "name": "pi_alpha_rho"
+    },
+    {
+        "": "1557",
+        "code": "0xe7a4",
+        "name": "pi_epsilon_rho"
+    },
+    {
+        "": "1558",
+        "code": "0xe7a5",
+        "name": "pi_omicron"
+    },
+    {
+        "": "1559",
+        "code": "0xe7a6",
+        "name": "pi_omicron_varia"
+    },
+    {
+        "": "1560",
+        "code": "0xe7a7",
+        "name": "pi_rho"
+    },
+    {
+        "": "1561",
+        "code": "0xe7a8",
+        "name": "pi_tau"
+    },
+    {
+        "": "1562",
+        "code": "0xe7a9",
+        "name": "pi_omicron_final_sigma"
+    },
+    {
+        "": "1563",
+        "code": "0xe7aa",
+        "name": "pi_rho_omicron_final_sigma"
+    },
+    {
+        "": "1564",
+        "code": "0xe7ab",
+        "name": "pi_epsilon_nu"
+    },
+    {
+        "": "1565",
+        "code": "0xe7ac",
+        "name": "pi_epsilon_nu2"
+    },
+    {
+        "": "1566",
+        "code": "0xe7c0",
+        "name": "sigma_2"
+    },
+    {
+        "": "1567",
+        "code": "0xe7c1",
+        "name": "sigma_theta"
+    },
+    {
+        "": "1568",
+        "code": "0xe7c2",
+        "name": "sigma_theta_alpha_iota"
+    },
+    {
+        "": "1569",
+        "code": "0xe7c3",
+        "name": "sigma_pi"
+    },
+    {
+        "": "1570",
+        "code": "0xe7c4",
+        "name": "sigma_sigma"
+    },
+    {
+        "": "1571",
+        "code": "0xe7c5",
+        "name": "sigma_tau"
+    },
+    {
+        "": "1572",
+        "code": "0xe7c6",
+        "name": "sigma_tau_rho"
+    },
+    {
+        "": "1573",
+        "code": "0xe7c7",
+        "name": "sigma_chi"
+    },
+    {
+        "": "1574",
+        "code": "0xe7c8",
+        "name": "sigma_epsilon_nu"
+    },
+    {
+        "": "1575",
+        "code": "0xe7c9",
+        "name": "sigma_eta_ypog_fin_sigma"
+    },
+    {
+        "": "1576",
+        "code": "0xe7d0",
+        "name": "tau_tall"
+    },
+    {
+        "": "1577",
+        "code": "0xe7d1",
+        "name": "tau_tall_apostrophe"
+    },
+    {
+        "": "1578",
+        "code": "0xe7d2",
+        "name": "tau_apostrophe"
+    },
+    {
+        "": "1579",
+        "code": "0xe7d3",
+        "name": "tau_alpha_iota"
+    },
+    {
+        "": "1580",
+        "code": "0xe7d4",
+        "name": "tau_alpha_iota_2"
+    },
+    {
+        "": "1581",
+        "code": "0xe7d5",
+        "name": "tau_epsilon"
+    },
+    {
+        "": "1582",
+        "code": "0xe7d6",
+        "name": "tau_eta_varia_nu"
+    },
+    {
+        "": "1583",
+        "code": "0xe7d7",
+        "name": "tau_eta_varia2_nu"
+    },
+    {
+        "": "1584",
+        "code": "0xe7d8",
+        "name": "tau_eta_perispomeni_sigma"
+    },
+    {
+        "": "1585",
+        "code": "0xe7d9",
+        "name": "tau_eta_perispomeni_sigma_2"
+    },
+    {
+        "": "1586",
+        "code": "0xe7da",
+        "name": "tau_iota"
+    },
+    {
+        "": "1587",
+        "code": "0xe7db",
+        "name": "tau_omicron"
+    },
+    {
+        "": "1588",
+        "code": "0xe7dc",
+        "name": "tau_omicron_2"
+    },
+    {
+        "": "1589",
+        "code": "0xe7dd",
+        "name": "tau_omicron_varia"
+    },
+    {
+        "": "1590",
+        "code": "0xe7de",
+        "name": "tau_omicron_varia_2"
+    },
+    {
+        "": "1591",
+        "code": "0xe7df",
+        "name": "tau_omicron_varia_3"
+    },
+    {
+        "": "1592",
+        "code": "0xe7e0",
+        "name": "tau_omicron_varia_4"
+    },
+    {
+        "": "1593",
+        "code": "0xe7e1",
+        "name": "tau_omicron_varia_nu"
+    },
+    {
+        "": "1594",
+        "code": "0xe7e2",
+        "name": "tau_tall_omicron_sigma"
+    },
+    {
+        "": "1595",
+        "code": "0xe7e3",
+        "name": "tau_omicron_upsilon_perispomeni"
+    },
+    {
+        "": "1596",
+        "code": "0xe7e4",
+        "name": "tau_omicron_upsilon_perispomeni_2"
+    },
+    {
+        "": "1597",
+        "code": "0xe7e5",
+        "name": "tau_rho"
+    },
+    {
+        "": "1598",
+        "code": "0xe7e6",
+        "name": "tau_rho_2"
+    },
+    {
+        "": "1599",
+        "code": "0xe7e7",
+        "name": "tau_tall_tau"
+    },
+    {
+        "": "1600",
+        "code": "0xe7e8",
+        "name": "tau_omega_perispomeni_prosgegrammeni"
+    },
+    {
+        "": "1601",
+        "code": "0xe7e9",
+        "name": "tau_omega_perispomeni_nu"
+    },
+    {
+        "": "1602",
+        "code": "0xe7ea",
+        "name": "tau_omega_perispomeni_nu_2"
+    },
+    {
+        "": "1603",
+        "code": "0xe7eb",
+        "name": "tau_omicron_final_sigma"
+    },
+    {
+        "": "1604",
+        "code": "0xe7ec",
+        "name": "tau_tall_omicron_final_sigma"
+    },
+    {
+        "": "1605",
+        "code": "0xe7ed",
+        "name": "tau_rho_omicron_final_sigma"
+    },
+    {
+        "": "1606",
+        "code": "0xe7ee",
+        "name": "tau_tall_iota_per_fin_sigma"
+    },
+    {
+        "": "1607",
+        "code": "0xe7ef",
+        "name": "tau_iota_per_fin_sigma"
+    },
+    {
+        "": "1608",
+        "code": "0xe7f0",
+        "name": "upsilon_dasia_iota"
+    },
+    {
+        "": "1609",
+        "code": "0xe7f1",
+        "name": "upsilon_tonos"
+    },
+    {
+        "": "1610",
+        "code": "0xe7f2",
+        "name": "upsilon_perispomeni"
+    },
+    {
+        "": "1611",
+        "code": "0xe7f3",
+        "name": "tau_alpha_iota_fin_sig_per"
+    },
+    {
+        "": "1612",
+        "code": "0xe7f4",
+        "name": "tau_epsilon_final_sigma"
+    },
+    {
+        "": "1613",
+        "code": "0xe7f5",
+        "name": "tau_alpha_iota_fin_sig"
+    },
+    {
+        "": "1614",
+        "code": "0xe7f8",
+        "name": "upsilon_nu"
+    },
+    {
+        "": "1615",
+        "code": "0xe7f9",
+        "name": "upsilon_tonos_nu"
+    },
+    {
+        "": "1616",
+        "code": "0xe7fa",
+        "name": "upsilon_varia_nu"
+    },
+    {
+        "": "1617",
+        "code": "0xe7fb",
+        "name": "upsilon_perispomeni_nu"
+    },
+    {
+        "": "1618",
+        "code": "0xe7fc",
+        "name": "upsilon_psili_perispomeni_nu"
+    },
+    {
+        "": "1619",
+        "code": "0xe810",
+        "name": "chi_apostrophe"
+    },
+    {
+        "": "1620",
+        "code": "0xe811",
+        "name": "chi_rho"
+    },
+    {
+        "": "1621",
+        "code": "0xe812",
+        "name": "chi_epsilon_nu"
+    },
+    {
+        "": "1622",
+        "code": "0xe820",
+        "name": "omega_perispomeni_sigma"
+    },
+    {
+        "": "1623",
+        "code": "0xe821",
+        "name": "psi_eta_ypog_fin_sigma"
+    },
+    {
+        "": "1624",
+        "code": "0xe840",
+        "name": "slant_1"
+    },
+    {
+        "": "1625",
+        "code": "0xe841",
+        "name": "slant_2"
+    },
+    {
+        "": "1626",
+        "code": "0xe84e",
+        "name": "uniE84E"
+    },
+    {
+        "": "1627",
+        "code": "0xe84f",
+        "name": "uniE84F"
+    },
+    {
+        "": "1628",
+        "code": "0xe860",
+        "name": "alpha_nu#1"
+    },
+    {
+        "": "1629",
+        "code": "0xe861",
+        "name": "alpha_nu_2"
+    },
+    {
+        "": "1630",
+        "code": "0xe862",
+        "name": "alpha_iota_perispomeni_sigma"
+    },
+    {
+        "": "1631",
+        "code": "0xe863",
+        "name": "alpha_sigma_2"
+    },
+    {
+        "": "1632",
+        "code": "0xe864",
+        "name": "alpha_nu_3"
+    },
+    {
+        "": "1633",
+        "code": "0xe865",
+        "name": "epsilon_iota_sigma"
+    },
+    {
+        "": "1634",
+        "code": "0xe866",
+        "name": "epsilon_nu"
+    },
+    {
+        "": "1635",
+        "code": "0xe867",
+        "name": "epsilon_nu_2"
+    },
+    {
+        "": "1636",
+        "code": "0xe868",
+        "name": "alpha_fin_sigma"
+    },
+    {
+        "": "1637",
+        "code": "0xe86a",
+        "name": "iota_sigma"
+    },
+    {
+        "": "1638",
+        "code": "0xe86b",
+        "name": "omicron_iota_perispomeni_sigma"
+    },
+    {
+        "": "1639",
+        "code": "0xe86c",
+        "name": "omicron_sigma_2"
+    },
+    {
+        "": "1640",
+        "code": "0xe86d",
+        "name": "omega_nu"
+    },
+    {
+        "": "1641",
+        "code": "0xe86e",
+        "name": "omega_nu_2"
+    },
+    {
+        "": "1642",
+        "code": "0xe86f",
+        "name": "omega_perispomeni_nu"
+    },
+    {
+        "": "1643",
+        "code": "0xe870",
+        "name": "omicron_sigma_varia"
+    },
+    {
+        "": "1644",
+        "code": "0xe871",
+        "name": "omicron_varia_sigma"
+    },
+    {
+        "": "1645",
+        "code": "0xe872",
+        "name": "omicron_iota_peris_final_sigma"
+    },
+    {
+        "": "1646",
+        "code": "0xe873",
+        "name": "eta_ypogegrammeni_fin_sigma"
+    }
+]

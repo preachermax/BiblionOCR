@@ -34,6 +34,7 @@ import MyWriter as writer
 import MyBoxer as boxer
 import MyPixler as pixler
 import MyExplorer as explorer
+import ChrReference as chrref
 #import MyResolver as resolver
 #import MyGrounder as grounder
 
@@ -231,9 +232,12 @@ class MainWindow(qtw.QMainWindow):
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
         
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
+            
+        self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
 
-        ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
-        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+
+        #ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
+        #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.initBookCombo()
         #self.selectBookCombo()
@@ -250,7 +254,7 @@ class MainWindow(qtw.QMainWindow):
         print('current book:',self.bookabbr)
 
 
-        #'''      
+        '''#
         #setup_logging(self.__class__.__name__)
         #self.__logger = logging.getLogger(self.__class__.__name__)
         #self.__logger.setLevel(logging.DEBUG)
@@ -280,14 +284,15 @@ class MainWindow(qtw.QMainWindow):
         self.thread_queue_listener.started.connect(self.console_text_receiver.run)
         self.thread_queue_listener.finished.connect(self.console_text_receiver.finished)
         self.thread_queue_listener.start()
-        #'''
+        #
                 
         
         # Install a custom output stream by connecting sys.stdout to instance of Streamer.
-        #sys.stdout = Streamer(textWritten=self.output_terminal_written)
+        #sys.stdout = Streamer(textWritten=self.output_terminal_written)'''
         
         self.show()
         #self.toggleLatinToolbars()
+
     def dragEnterEvent(self, event):
         m = event.mimeData()
         if m.hasUrls():
@@ -315,7 +320,7 @@ class MainWindow(qtw.QMainWindow):
             print(f'text file path ignored: {file_path}')
             event.ignore()
 
-    @qtc.pyqtSlot(str)
+    '''@qtc.pyqtSlot(str)
     def append_text(self,text):
         #self.ui.OutputText.moveCursor(QTextCursor.End)
         #self.ui.OutputText.insertPlainText(text)
@@ -323,7 +328,7 @@ class MainWindow(qtw.QMainWindow):
       
     #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
     def output_terminal_written(self, text):
-        self.ui.OutputText.append(text)
+        self.ui.OutputText.append(text)'''
   
     def get_session_settings(self):
         # get session settings
@@ -606,6 +611,10 @@ class MainWindow(qtw.QMainWindow):
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''
         
         os.system(gimp_cmd)
+
+    def OpenChrReference(self):
+        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain.show()
 
     def actionCrop_Greek_To_tiff_Lines(self):
         print("cropping and sorting Greek tiff lines")

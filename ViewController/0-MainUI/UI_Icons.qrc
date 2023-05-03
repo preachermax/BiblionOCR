@@ -1,5 +1,50 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/BiblionLexer.png</file>
+    <file>Icons/BiblionProfile.png</file>
+    <file>Icons/decrease_blue.png</file>
+    <file>Icons/increase_blue.png</file>
+    <file>Icons/increase_orng.png</file>
+    <file>Icons/decrease_orng.png</file>
+    <file>Icons/decrease_blk.png</file>
+    <file>Icons/increase_blk.png</file>
+    <file>Icons/sizegrip.png</file>
+    <file>Icons/resize2.png</file>
+    <file>Icons/navigation.png</file>
+    <file>Icons/navigation-270-button-white.png</file>
+    <file>Icons/navigation-270.png</file>
+    <file>Icons/navigation-270-frame.png</file>
+    <file>Icons/navigation-270-button.png</file>
+    <file>Icons/navigation-180.png</file>
+    <file>Icons/navigation-180-white.png</file>
+    <file>Icons/navigation-180-frame.png</file>
+    <file>Icons/navigation-180-button.png</file>
+    <file>Icons/navigation-180-button-white.png</file>
+    <file>Icons/navigation-090.png</file>
+    <file>Icons/navigation-090-white.png</file>
+    <file>Icons/navigation-090-frame.png</file>
+    <file>Icons/navigation-090-button.png</file>
+    <file>Icons/navigation-090-button-white.png</file>
+    <file>Icons/navigation-000-white.png</file>
+    <file>Icons/navigation-000-frame.png</file>
+    <file>Icons/navigation-000-button.png</file>
+    <file>Icons/navigation-000-button-white.png</file>
+    <file>Icons/edit.png</file>
+    <file>Icons/font1.png</file>
+    <file>Icons/font-size.png</file>
+    <file>Icons/font-color.png</file>
+    <file>Icons/bold.png</file>
+    <file>Icons/font.png</file>
+    <file>Icons/fontforgenew.png</file>
+    <file>Icons/minus.png</file>
+    <file>Icons/minus-button.png</file>
+    <file>Icons/minus-circle.png</file>
+    <file>Icons/minus-circle-frame.png</file>
+    <file>Icons/minus-octagon.png</file>
+    <file>Icons/minus-octagon-frame.png</file>
+    <file>Icons/minus-small.png</file>
+    <file>Icons/minus-small-circle.png</file>
+    <file>Icons/move.png</file>
     <file>Icons/BiblionGlypher.png</file>
     <file>Icons/charmap_edit_greek.png</file>
     <file>Icons/charmap_edit_latin.png</file>

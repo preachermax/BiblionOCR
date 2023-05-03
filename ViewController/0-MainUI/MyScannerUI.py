@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './QtDesignerUI/MyScannerUI.ui'
+# Form implementation generated from reading ui file '/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/MyScannerUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Scanner(object):
     def setupUi(self, Scanner):
         Scanner.setObjectName("Scanner")
         Scanner.setWindowModality(QtCore.Qt.NonModal)
         Scanner.setEnabled(True)
-        Scanner.resize(1309, 920)
+        Scanner.resize(1317, 820)
         font = QtGui.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(11)
@@ -438,7 +440,7 @@ class Ui_Scanner(object):
         self.FindReplacebutton.setObjectName("FindReplacebutton")
         Scanner.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Scanner)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1309, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1317, 20))
         self.menubar.setObjectName("menubar")
         self.menuOCR = QtWidgets.QMenu(self.menubar)
         self.menuOCR.setObjectName("menuOCR")
@@ -468,43 +470,6 @@ class Ui_Scanner(object):
         self.ImageEditToolBar = QtWidgets.QToolBar(Scanner)
         self.ImageEditToolBar.setObjectName("ImageEditToolBar")
         Scanner.addToolBar(QtCore.Qt.TopToolBarArea, self.ImageEditToolBar)
-        self.dockOutput = QtWidgets.QDockWidget(Scanner)
-        self.dockOutput.setEnabled(True)
-        self.dockOutput.setMinimumSize(QtCore.QSize(100, 100))
-        self.dockOutput.setBaseSize(QtCore.QSize(520, 200))
-        self.dockOutput.setAccessibleName("")
-        self.dockOutput.setAccessibleDescription("")
-        self.dockOutput.setFloating(False)
-        self.dockOutput.setAllowedAreas(QtCore.Qt.BottomDockWidgetArea|QtCore.Qt.LeftDockWidgetArea)
-        self.dockOutput.setObjectName("dockOutput")
-        self.dockOutputContents = QtWidgets.QWidget()
-        self.dockOutputContents.setObjectName("dockOutputContents")
-        self.OutputText = QtWidgets.QTextEdit(self.dockOutputContents)
-        self.OutputText.setGeometry(QtCore.QRect(20, 0, 1281, 100))
-        self.OutputText.setMinimumSize(QtCore.QSize(100, 100))
-        self.OutputText.setObjectName("OutputText")
-        self.dockOutput.setWidget(self.dockOutputContents)
-        Scanner.addDockWidget(QtCore.Qt.DockWidgetArea(8), self.dockOutput)
-        self.dockChrRef = QtWidgets.QDockWidget(Scanner)
-        self.dockChrRef.setMinimumSize(QtCore.QSize(400, 619))
-        self.dockChrRef.setBaseSize(QtCore.QSize(200, 500))
-        self.dockChrRef.setFloating(False)
-        self.dockChrRef.setAllowedAreas(QtCore.Qt.BottomDockWidgetArea|QtCore.Qt.RightDockWidgetArea)
-        self.dockChrRef.setObjectName("dockChrRef")
-        self.dockChrRefContents = QtWidgets.QWidget()
-        self.dockChrRefContents.setMinimumSize(QtCore.QSize(400, 600))
-        self.dockChrRefContents.setObjectName("dockChrRefContents")
-        self.ChrRefplainTextEdit = QtWidgets.QPlainTextEdit(self.dockChrRefContents)
-        self.ChrRefplainTextEdit.setGeometry(QtCore.QRect(0, 10, 380, 700))
-        self.ChrRefplainTextEdit.setMinimumSize(QtCore.QSize(360, 500))
-        font = QtGui.QFont()
-        font.setFamily("FROMVS")
-        font.setPointSize(18)
-        self.ChrRefplainTextEdit.setFont(font)
-        self.ChrRefplainTextEdit.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
-        self.ChrRefplainTextEdit.setObjectName("ChrRefplainTextEdit")
-        self.dockChrRef.setWidget(self.dockChrRefContents)
-        Scanner.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.dockChrRef)
         self.actionpdf_to_tiff = QtWidgets.QAction(Scanner)
         icon22 = QtGui.QIcon()
         icon22.addPixmap(QtGui.QPixmap(":/Icons/Icons/ocr2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -915,6 +880,11 @@ class Ui_Scanner(object):
         icon61.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionExplorer.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionProject_Browser.setIcon(icon61)
         self.actionProject_Browser.setObjectName("actionProject_Browser")
+        self.actionCharacter_Reference = QtWidgets.QAction(Scanner)
+        icon62 = QtGui.QIcon()
+        icon62.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionGlypher.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionCharacter_Reference.setIcon(icon62)
+        self.actionCharacter_Reference.setObjectName("actionCharacter_Reference")
         self.menuSelect_Language.addAction(self.actionGreek_2)
         self.menuSelect_Language.addAction(self.actionHebrew_4)
         self.menuSelect_Language.addAction(self.actionLatin_2)
@@ -943,6 +913,7 @@ class Ui_Scanner(object):
         self.menuTools.addAction(self.actionGimp)
         self.menuTools.addAction(self.actionWriter)
         self.menuTools.addAction(self.actionBoxer)
+        self.menuTools.addAction(self.actionCharacter_Reference)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -950,6 +921,7 @@ class Ui_Scanner(object):
         self.menubar.addAction(self.menuOCR.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.ImageEditToolBar.addAction(self.actionProject_Browser)
+        self.ImageEditToolBar.addAction(self.actionCharacter_Reference)
         self.ImageEditToolBar.addAction(self.actionPixler_Image_Editor)
         self.ImageEditToolBar.addAction(self.actionEdit_Image_tb)
         self.ImageEditToolBar.addAction(self.actionCorrect_OCR_tb)
@@ -1057,9 +1029,6 @@ class Ui_Scanner(object):
         self.menuHelp.setTitle(_translate("Scanner", "Help"))
         self.ImageEditToolBar.setWindowTitle(_translate("Scanner", "ImageEditToolBar"))
         self.ImageEditToolBar.setToolTip(_translate("Scanner", "ImageEditToolBar"))
-        self.dockOutput.setWindowTitle(_translate("Scanner", " Output"))
-        self.dockChrRef.setWindowTitle(_translate("Scanner", "Character Reference"))
-        self.ChrRefplainTextEdit.setDocumentTitle(_translate("Scanner", "Character Reference"))
         self.actionpdf_to_tiff.setText(_translate("Scanner", "pdf for tiff"))
         self.actionmove_pdf_for_tiff.setText(_translate("Scanner", "pdf to tiff"))
         self.actiontiff_to_mono.setText(_translate("Scanner", "tiff to mono"))
@@ -1239,8 +1208,9 @@ class Ui_Scanner(object):
         self.actionWriter.setText(_translate("Scanner", "Writer"))
         self.actionBoxer.setText(_translate("Scanner", "Boxer"))
         self.actionProject_Browser.setText(_translate("Scanner", "Project Browser"))
-
+        self.actionCharacter_Reference.setText(_translate("Scanner", "Character Reference"))
 import UI_Icons
+
 
 if __name__ == "__main__":
     import sys
@@ -1250,4 +1220,3 @@ if __name__ == "__main__":
     ui.setupUi(Scanner)
     Scanner.show()
     sys.exit(app.exec_())
-

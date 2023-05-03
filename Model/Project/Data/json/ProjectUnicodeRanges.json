@@ -1,0 +1,86 @@
+[
+    {
+        "rangeID": "1",
+        "category": "Basic Latin",
+        "hexrange": "['0020', '007F']",
+        "range": "[32, 127]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "2",
+        "category": "Latin-1 Supplement",
+        "hexrange": "['0080', '00FF']",
+        "range": "[128, 255]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "3",
+        "category": "Latin Extended-A",
+        "hexrange": "['0100', '017F']",
+        "range": "[256, 383]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "4",
+        "category": "Latin Extended-B",
+        "hexrange": "['0180', '024F']",
+        "range": "[384, 591]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "8",
+        "category": "Greek and Coptic",
+        "hexrange": "['0370', '03FF']",
+        "range": "[880, 1023]",
+        "language": "greek"
+    },
+    {
+        "rangeID": "12",
+        "category": "Hebrew",
+        "hexrange": "['0590', '05FF']",
+        "range": "[1424, 1535]",
+        "language": "hebrew"
+    },
+    {
+        "rangeID": "67",
+        "category": "Latin Extended Additional",
+        "hexrange": "['1E00', '1EFF']",
+        "range": "[7680, 7935]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "68",
+        "category": "Greek Extended",
+        "hexrange": "['1F00', '1FFF']",
+        "range": "[7936, 8191]",
+        "language": "greek"
+    },
+    {
+        "rangeID": "69",
+        "category": "General Punctuation",
+        "hexrange": "['2000', '206F']",
+        "range": "[8192, 8303]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "70",
+        "category": "Superscripts and Subscripts",
+        "hexrange": "['2070', '209F']",
+        "range": "[8304, 8351]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "79",
+        "category": "Optical Character Recognition",
+        "hexrange": "['2440', '245F']",
+        "range": "[9280, 9311]",
+        "language": "latin"
+    },
+    {
+        "rangeID": "149",
+        "category": "Private Use Area",
+        "hexrange": "['E000', 'F8FF']",
+        "range": "[57344, 63743]",
+        "language": "greek"
+    }
+]

@@ -38,6 +38,7 @@ from queue import Queue
 from ext import mainfind
 from MyGlypherUI import Ui_Glypher
 from Training import Train as tr
+import ChrReference as chrref
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal 
@@ -98,6 +99,8 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
+
+        self.ui.GlyphImgTab.currentChanged.connect(self.on_tabChanged)
         
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
@@ -111,10 +114,10 @@ class MainWindow(qtw.QMainWindow):
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
 
-        self.ui.actionOpen_Greek_Source_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Greek_Page_Image.triggered.connect(self.loadImage)
         self.ui.actionMake_Greek_GlyphBox_Files.triggered.connect(self.glyphbox_make_split)
         self.ui.actionEdit_Greek_GlyphBox_Files.triggered.connect(self.glyphbox_edit_split)
-
+        self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
         #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)   
         
@@ -129,7 +132,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.PrevTxtButton.clicked.connect(self.prevText)
         self.ui.NextTxtButton.clicked.connect(self.nextText)
 
-        self.ui.LineCheckBox.stateChanged.connect(self.getLineBoxImageLines)
+        self.ui.NumsCheckBox.stateChanged.connect(self.getGlyphBoxImageNums)
 
         self.ui.Zoombutton.clicked.connect(self.get_zoom)
         self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
@@ -149,23 +152,24 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
-        self.ui.reloadImagebutton.clicked.connect(self.drawLineBoxImage)
+        self.ui.reloadImagebutton.clicked.connect(self.drawGlyphBoxImage)
 
-        self.ui.BoxTable.setCornerButtonEnabled(False)
-        self.ui.BoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu) 
-        self.ui.BoxTable.customContextMenuRequested.connect(self.openTableMenu)
+        self.ui.GlyphBoxTable.setCornerButtonEnabled(False)
+        self.ui.GlyphBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu) 
+        self.ui.GlyphBoxTable.customContextMenuRequested.connect(self.openTableMenu)
 
-        self.ui.reloadTextbutton.clicked.connect(self.BoxText2BoxTable)
+        self.ui.reloadTextbutton.clicked.connect(self.GlyphBoxText2GlyphBoxTable)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
-        self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
+        #self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
+        self.ui.OCRlangComboBox.currentTextChanged.connect(self.on_lang_select)
 
         self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
 
         # UI and slots code ends here.
         
         # Show the Main user interface
-        self.ui.BoxDocument = qtg.QTextDocument(self.ui.BoxText)
+        self.ui.BoxDocument = qtg.QTextDocument(self.ui.GlyphBoxText)
         font = qtg.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(20)
@@ -173,10 +177,10 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.BoxDocument.setDefaultFont(font)
         self.ui.BoxBlockFormat = qtg.QTextBlockFormat()
-        self.ui.BoxTextFormat = qtg.QTextFormat()
+        self.ui.GlyphBoxTextFormat = qtg.QTextFormat()
         self.ui.BoxCursor = qtg.QTextCursor(self.ui.BoxDocument)
         
-        self.ui.BoxText.setDocument(self.ui.BoxDocument)
+        self.ui.GlyphBoxText.setDocument(self.ui.BoxDocument)
         
         #self.ui.progressBar.valueChanged.connect(self.restartProgressTimer)
         # Initialize statusProgressBar Widget -- invoke addWidget as needed
@@ -261,14 +265,22 @@ class MainWindow(qtw.QMainWindow):
         self.get_session_settings()
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
+        
+        self.ui.GlyphImgTab.setCurrentIndex(0)
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
         self.origpixmap = None
         self.box_color = "red"
         self.dirIterator = None
         self.imgfileList = []
         self.txtfileList = []
-        self.imgdir = ""
+        self.imgdir = self.greekpages
         self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+        self.imgopentitle = "Open Image"
+        self.txtopentitle = "Open Text"
+
+
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
 
@@ -296,6 +308,7 @@ class MainWindow(qtw.QMainWindow):
             verse_key = r"self.verse"
             word_key = r"self.word"
             chr_key = r"self.chr"
+
             glyphboxgreekimgdir_key = r"self.glyphboxgreekimgdir"
             glyphboxgreekimgpath_key = r"self.glyphboxgreekimgpath"
             glyphboxlatinimgdir_key = r"self.glyphboxlatinimgdir"
@@ -303,27 +316,44 @@ class MainWindow(qtw.QMainWindow):
             glyphboximgfileList_key = r"self.glyphboximgfileList"
             glyphboxgreektxtpath_key = r"self.glyphboxgreektxtpath"
             glyphboxgreektxtdir_key = r"self.glyphboxgreektxtdir"
+            glyphboxgreekjsondir_key = r"self.glyphboxgreekjsondir"
             glyphboxlatintxtpath_key = r"self.glyphboxlatintxtpath"
             glyphboxlatintxtdir_key = r"self.glyphboxlatintxtdir"
+            glyphboxlatinjsondir_key = r"self.glyphboxlatinjsondir"
             glyphboxtxtfileList_key = r"self.glyphboxtxtfileList"
             glyphboxzoom_key = r"self.glyphboxzoom"
             glyphboxzoomslidervalue_key = r"self.glyphboxzoomslidervalue"
-            bmpsourcedir_key = r"self.bmpsourcedir"
-            bmpgreekdir_key = r"self.bmpgreekdir"
-            glyph_key = r"self.glyph"
+            
+            glyphtifsourcedir_key = r"self.glyphtifsourcedir"
+            glyphtifgreekdir_key = r"self.glyphtifgreekdir"
+            glyphtiflatindir_key = r"self.glyphtiflatindir"
+            glyphbmpsourcedir_key = r"self.glyphbmpsourcedir"
+            glyphbmpgreekdir_key = r"self.glyphbmpgreekdir"
+            glyphbmplatindir_key = r"self.glyphbmplatindir"
+            glyphbmp_key = r"self.glyphbmp"
+            glyphmapgreekdir_key = r"self.glyphmapgreekdir"
+            glyphmaplatindir_key = r"self.glyphmaplatindir"
+            glyphcode_key = r"self.glyphcode"
+            glyphsfddir_key = r"self.glyphsfddir"
+            glyphgreeksfddir_key = r"self.glyphgreeksfddir"
+            glyphlatinsfddir_key = r"self.sourceimgdir"
+
+
             glyphname_key = r"self.glyphname"
             glyphencode_key = r"self.glyphencode"
-            glyphsourcedir_key = r"self.glyphsourcedir"
-            glyphgreekdir_key = r"self.glyphgreekdir"
             charimgdir_key = r"self.charimgdir"
             charimgpath_key = r"self.charimgpath"
             charimgfileList_key = r"self.charimgfileList"
             charmappath_key = r"self.charmappath"
+            
+            sourceimgdir_key = r"self.sourceimgdir"
+            sourceimgpath_key = r"self.sourceimgpath"
+
             linespacing_key = r"self.linespacing"
             source_book_markdown_key = r"self.sourcebookmarkdown"
             greek_book_markdown_key = r"self.greekbookmarkdown"
             latin_book_markdown_key = r"self.latinbookmarkdown"
-            sourcefile_key = r"self.sourcefile"
+            
             firstpage_key = r"self.firstpage"
             lastpage_key = r"self.lastpage"            
             deltapages_key = r"self.deltapages"
@@ -346,6 +376,7 @@ class MainWindow(qtw.QMainWindow):
             greeklinesbox_key = r"self.greeklinesbox"
             latinpages_key = r"self.latinpages"
             latinlinesbox_key = r"self.latinlinesbox"
+
 
             print(bookabbr_key,chapter_key)
             # Find the json key values using 'in' operator
@@ -409,36 +440,70 @@ class MainWindow(qtw.QMainWindow):
                 elif Setting['Setting'] == glyphboxgreektxtdir_key:
                     self.glyphboxgreektxtdir = Setting['CurrentValue']
                     self.glyphboxgreektxtdir = self.projecthome + self.glyphboxgreektxtdir
+                elif Setting['Setting'] == glyphboxgreekjsondir_key:
+                    self.glyphboxgreekjsondir = Setting['CurrentValue']
+                    self.glyphboxgreekjsondir = self.projecthome + self.glyphboxgreekjsondir
                 elif Setting['Setting'] == glyphboxlatintxtpath_key:
                     self.glyphboxlatintxtpath = Setting['CurrentValue']
                     self.glyphboxlatintxtpath = self.projecthome + self.glyphboxlatintxtpath
                 elif Setting['Setting'] == glyphboxlatintxtdir_key:
                     self.glyphboxlatintxtdir = Setting['CurrentValue']
                     self.glyphboxlatintxtdir = self.projecthome + self.glyphboxlatintxtdir
+                elif Setting['Setting'] == glyphboxlatinjsondir_key:
+                    self.glyphboxlatinjsondir = Setting['CurrentValue']
+                    self.glyphboxlatinjsondir = self.projecthome + self.glyphboxlatinjsondir
                 elif Setting['Setting'] == glyphboxtxtfileList_key:
                     self.glyphboxtxtfileList = Setting['CurrentValue']
                 elif Setting['Setting'] == glyphboxzoom_key:
                     self.glyphboxzoom = Setting['CurrentValue']
                 elif Setting['Setting'] == glyphboxzoomslidervalue_key:
                     self.glyphboxzoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == bmpsourcedir_key:
-                    self.bmpsourcedir = Setting['CurrentValue']
-                    self.bmpsourcedir = self.projecthome + self.bmpsourcedir
-                elif Setting['Setting'] == bmpgreekdir_key:
-                    self.bmpgreekdir = Setting['CurrentValue']
-                    self.bmpgreekdir = self.projecthome + self.bmpgreekdir
-                elif Setting['Setting'] == glyph_key:
-                    self.glyph = Setting['CurrentValue']
+                elif Setting['Setting'] == glyphtifsourcedir_key:
+                    self.glyphtifsourcedir = Setting['CurrentValue']
+                elif Setting['Setting'] == glyphtifgreekdir_key:
+                    self.glyphtifgreekdir = Setting['CurrentValue']
+                    self.glyphtifgreekdir = self.projecthome + self.glyphtifgreekdir
+                elif Setting['Setting'] == glyphtiflatindir_key:
+                    self.glyphtiflatindir = Setting['CurrentValue']
+                    self.glyphtiflatindir = self.projecthome + self.glyphtiflatindir
+                elif Setting['Setting'] == glyphbmpsourcedir_key:
+                    self.glyphbmpsourcedir = Setting['CurrentValue']
+                    self.glyphbmpsourcedir = self.projecthome + self.glyphbmpsourcedir
+                elif Setting['Setting'] == glyphbmpgreekdir_key:
+                    self.glyphbmpgreekdir = Setting['CurrentValue']
+                    self.glyphbmpgreekdir = self.projecthome + self.glyphbmpgreekdir
+                elif Setting['Setting'] == glyphbmplatindir_key:
+                    self.glyphbmplatindir = Setting['CurrentValue']
+                    self.glyphbmplatindir = self.projecthome + self.glyphbmplatindir
+                elif Setting['Setting'] == glyphbmp_key:
+                    self.glyphbmp = Setting['CurrentValue']
+                elif Setting['Setting'] == glyphmapgreekdir_key:
+                    self.glyphmapgreekdir = Setting['CurrentValue']
+                    self.glyphmapgreekdir = self.projecthome + self.glyphmapgreekdir
+                elif Setting['Setting'] == glyphmaplatindir_key:
+                    self.glyphmaplatindir = Setting['CurrentValue']
+                    self.glyphmaplatindir = self.projecthome + self.glyphmaplatindir
+                elif Setting['Setting'] == glyphcode_key:
+                    self.glyphcode = Setting['CurrentValue']
+                elif Setting['Setting'] == glyphsfddir_key:
+                    self.glyphsfddir = Setting['CurrentValue']
+                    self.glyphsfddir = self.projecthome + self.glyphsfddir
+                elif Setting['Setting'] == glyphgreeksfddir_key:
+                    self.glyphgreeksfddir = Setting['CurrentValue']
+                    self.glyphgreeksfddir = self.projecthome + self.glyphgreeksfddir
+                elif Setting['Setting'] == glyphlatinsfddir_key:
+                    self.glyphlatinsfddir = Setting['CurrentValue']
+                    self.glyphlatinsfddir = self.projecthome + self.glyphlatinsfddir
+                elif Setting['Setting'] == sourceimgdir_key:
+                    self.sourceimgdir = Setting['CurrentValue']
+                    self.sourceimgdir = self.projecthome + self.sourceimgdir
+                elif Setting['Setting'] == sourceimgpath_key:
+                    self.sourceimgpath = Setting['CurrentValue']
+                    self.sourceimgpath = self.projecthome + self.sourceimgpath
                 elif Setting['Setting'] == glyphname_key:
                     self.glyphname = Setting['CurrentValue']
                 elif Setting['Setting'] == glyphencode_key:
                     self.glyphencode = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphsourcedir_key:
-                    self.glyphsourcedir = Setting['CurrentValue']
-                    self.glyphsourcedir = self.projecthome + self.glyphsourcedir
-                elif Setting['Setting'] == glyphgreekdir_key:
-                    self.glyphgreekdir = Setting['CurrentValue']
-                    self.glyphgreekdir = self.projecthome + self.glyphgreekdir
                 elif Setting['Setting'] == charimgdir_key:
                     self.charimgdir = Setting['CurrentValue']
                     self.charimgdir = self.projecthome + self.charimgdir
@@ -459,8 +524,6 @@ class MainWindow(qtw.QMainWindow):
                     self.greekbookmarkdown = Setting['CurrentValue']
                 elif Setting['Setting'] == latin_book_markdown_key:  
                     self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == sourcefile_key:   
-                    self.sourcefile = Setting['CurrentValue']
                 elif Setting['Setting'] == firstpage_key:  
                     self.firstpage = Setting['CurrentValue']
                 elif Setting['Setting'] == lastpage_key:  
@@ -525,7 +588,49 @@ class MainWindow(qtw.QMainWindow):
         
         # Closing file
         f.close()
-  
+
+    def on_lang_select(self):
+        self.lang = self.ui.OCRlangComboBox.currentText()
+        if  self.lang == "Ancient Greek" or self.lang == "Middle Greek" or self.lang == "Modern Greek":          
+            self.ui.LatinEditCharacterToolBar.setVisible(False)
+            self.ui.LatinEditGlyphsToolBar.setVisible(False)
+            self.ui.GreekEditCharacterToolBar.setVisible(True)
+            self.ui.GreekEditGlyphsToolBar.setVisible(True)
+            
+        if  self.lang == "Latin":          
+            self.ui.GreekEditCharacterToolBar.setVisible(False)
+            self.ui.GreekEditGlyphsToolBar.setVisible(False)
+            self.ui.LatinEditCharacterToolBar.setVisible(True)
+            self.ui.LatinEditGlyphsToolBar.setVisible(True)
+
+    def on_tabChanged(self):
+        self.currenttabindex = self.ui.GlyphImgTab.currentIndex()
+        self.currenttabtext = self.ui.GlyphImgTab.tabText(self.currenttabindex)
+        print(f'Current Tab: {self.currenttabtext}')
+        if self.currenttabtext == "Glyph Box":
+            self.imgdir = self.glyphboxgreekimgdir
+            self.imgpath = self.glyphboxgreekimgpath
+            self.imgopentitle = "Open Glyph Box Image"
+            self.txtdir = self.glyphboxgreektxtdir
+            self.txtpath = self.glyphboxgreektxtpath
+            self.txtopentitle = "Open Glyph Box Text"
+            self.getImage(self.imgpath)
+        elif self.currenttabtext == "Glyph Map":
+            self.imgdir = self.glyphbmpgreekdir
+            #self.imgpath = self.glypbmpgreekimgpath
+            self.imgopentitle = "Open Glyph Bitmap Image"
+            self.txtdir = self.glyphmapgreekdir
+            self.txtopentitle = "Open Glyph Box Text"
+        elif self.currenttabtext == "Glyph Draw":
+            #self.imgdir = self.greeklinesbox
+            self.imgopentitle = "Open Glyph Box Image"
+            #self.txtdir = self.txtgreeklinebox
+            self.txtopentitle = "Open Glyph Box Text"
+        elif self.currenttabtext == "Source Page":
+            self.imgdir = self.greekpages
+            self.imgopentitle = "Open Source Image"
+            self.txtopentitle = "Open Source Text"
+            
     def initBookCombo(self):
 
         # Opening JSON file
@@ -546,26 +651,24 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.bookComboBox.setEditText(self.bookabbr)'''
 
     def toggleGreekToolbars(self):
+        if self.ui.GreekEditGlyphsToolBar.isVisible():
+            self.ui.GreekEditGlyphsToolBar.setVisible(False)
+        elif not self.ui.GreekEditGlyphsToolBar.isVisible():
+            self.ui.GreekEditGlyphsToolBar.setVisible(True)
+        if self.ui.GreekEditCharacterToolBar.isVisible():
+            self.ui.GreekEditCharacterToolBar.setVisible(False)
+        elif not self.ui.GreekEditCharacterToolBar.isVisible():
+            self.ui.GreekEditCharacterToolBar.setVisible(True)
 
-        greekimgpagesstate = self.ui.GreekImagePagesToolBar.isVisible()
-        greekimglinesstate = self.ui.GreekImageLinesBatchToolBar.isVisible()
-        greektxtlinesstate = self.ui.GreekTextLinesBatchToolBar.isVisible()        
-        
-        # Set the visibility to its inverse
-        self.ui.GreekImagePagesToolBar.setVisible(not greekimgpagesstate)
-        self.ui.GreekImageLinesBatchToolBar.setVisible(not greekimglinesstate)
-        self.ui.GreekTextLinesBatchToolBar.setVisible(not greektxtlinesstate)
-
-    '''def toggleLatinToolbars(self):
-
-        #latinimgpagesstate = self.ui.LatinImagePagesToolBar.isVisible()
-        latinimglinesstate = self.ui.LatinImageLinesBatchToolBar.isVisible()
-        latintxtlinesstate = self.ui.LatinTextLinesBatchToolBar.isVisible()        
-        
-        # Set the visibility to its inverse
-        #self.ui.LatinImagePagesToolBar.setVisible(not latinimgpagesstate)
-        self.ui.LatinImageLinesBatchToolBar.setVisible(not latinimglinesstate)
-        self.ui.LatinTextLinesBatchToolBar.setVisible(not latintxtlinesstate)'''
+    def toggleLatinToolbars(self):
+        if self.ui.LatinEditGlyphsToolBar.isVisible():
+            self.ui.LatinEditGlyphsToolBar.setVisible(False)
+        elif not self.ui.LatinEditGlyphsToolBar.isVisible():
+            self.ui.LatinEditGlyphsToolBar.setVisible(True)
+        if self.ui.LatinEditCharacterToolBar.isVisible():
+            self.ui.LatinEditCharacterToolBar.setVisible(False)
+        elif not self.ui.LatinEditCharacterToolBar.isVisible():
+            self.ui.LatinEditCharacterToolBar.setVisible(True)      
 
     def selectBookCombo(self):
         oldbookabbr = self.bookabbr
@@ -673,8 +776,8 @@ class MainWindow(qtw.QMainWindow):
             return
     
     def loadImage(self):
-        imgdir = self.projecthome + "Model/Project/Images/Workflow"     
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.GlypherWidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
+        #imgdir = self.projecthome + "Model/Project/Images/Workflow"     
+        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.GlypherWidget,self.imgopentitle,self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]      
         self.getImage(self.imgpath)
     
     def getImage(self, imgpath):
@@ -712,7 +815,7 @@ class MainWindow(qtw.QMainWindow):
 
         if self.pixmap.isNull():
             return
-        #self.get_LineImg()
+        #self.get_GlyphImg()
         self.on_zoom()
 
         #self.ui.Image.setPixmap(self.pixmap) -- moved out to resize_image
@@ -826,7 +929,13 @@ class MainWindow(qtw.QMainWindow):
             print(f'Final scale: {self.scale*100}' + ' %')
 
             self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origpixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.scaled_pixmap)            
+            if self.currenttabtext == "Glyph Box":
+                self.ui.GlyphBox.setPixmap(self.scaled_pixmap)
+            elif self.currenttabtext == "Glyph Map":
+                self.ui.GlyphMap.setPixmap(self.scaled_pixmap)
+            else:
+                #elif self.currenttabtext == "Source Page":
+                self.ui.Image.setPixmap(self.scaled_pixmap)          
             print('Resizing contents')
             self.ui.ImagescrollAreaWidgetContents.resize(self.scale * self.ui.ImagescrollAreaWidgetContents.size())
             print(f'ImagescrollAreaWidgetContents size: {self.ui.ImagescrollAreaWidgetContents.size()}')
@@ -839,7 +948,13 @@ class MainWindow(qtw.QMainWindow):
             self.origheight = self.origpixmap.height
             self.origwidth = self.origpixmap.width
             self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.scaled_pixmap)
+            if self.currenttabtext == "Glyph Box":
+                self.ui.GlyphBox.setPixmap(self.scaled_pixmap)
+            elif self.currenttabtext == "Glyph Map":
+                self.ui.GlyphMap.setPixmap(self.scaled_pixmap)
+            else:
+                #elif self.currenttabtext == "Source Page":
+                self.ui.Image.setPixmap(self.scaled_pixmap)
     
     def resize_lineimage(self):
 
@@ -869,9 +984,11 @@ class MainWindow(qtw.QMainWindow):
             self.ui.stackedWidget.setCurrentIndex(1)   
     
     def loadText(self):
-
+        if not self.txtopentitle:
+            self.txtopentitle = "Open Text"
         self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.GlypherWidget, 'Open text file', f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+            #self.ui.GlypherWidget, 'Open text file', f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+            self.ui.GlypherWidget, self.txtopentitle,self.txtdir,'Text files (*.txt)')[0]
         print(f'self.txtpath: {self.txtpath}')
         self.getText(self.txtpath)
 
@@ -880,7 +997,7 @@ class MainWindow(qtw.QMainWindow):
             self.txtdirname = os.path.dirname(self.txtpath)
             #create file list 
             if self.txtpath:
-                #self.ui.BoxText.setText(os.path.basename(self.txtpath))       
+                #self.ui.GlyphBoxText.setText(os.path.basename(self.txtpath))       
                 self.txtfile = qtc.QFile(self.txtpath)
                 self.txtfilename = os.path.basename(self.txtpath)
                 self.txtdirname = os.path.dirname(self.txtpath)
@@ -905,12 +1022,12 @@ class MainWindow(qtw.QMainWindow):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
-                self.ui.BoxText.clear()
+                self.ui.GlyphBoxText.clear()
                 if info.completeSuffix() == 'txt':
                     #self.ui.editor_text.setHtml(text
-                    self.ui.BoxText.insertPlainText(text)
+                    self.ui.GlyphBoxText.insertPlainText(text)
                 else:
-                    self.ui.BoxText.setPlainText(text)
+                    self.ui.GlyphBoxText.setPlainText(text)
             #textfile.close()
             #txtdirpath = os.path.dirname(self.txtpath)
 
@@ -968,12 +1085,12 @@ class MainWindow(qtw.QMainWindow):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
-                self.ui.BoxText.clear()
+                self.ui.GlyphBoxText.clear()
                 if info.completeSuffix() == 'txt':
                     #self.ui.editor_text.setHtml(text
-                    self.ui.BoxText.insertPlainText(text)
+                    self.ui.GlyphBoxText.insertPlainText(text)
                 else:
-                    self.ui.BoxText.setPlainText(text)
+                    self.ui.GlyphBoxText.setPlainText(text)
                 
                 # update font to selection and size       
                 self.on_font_update()
@@ -1079,7 +1196,7 @@ class MainWindow(qtw.QMainWindow):
         lineSpacing = self.ui.LHslider.value()
         self.ui.LHlineEdit.setText(str(lineSpacing))
             
-        cursor = self.ui.BoxText.textCursor()
+        cursor = self.ui.GlyphBoxText.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         bf = self.ui.BoxCursor.blockFormat()
@@ -1163,6 +1280,10 @@ class MainWindow(qtw.QMainWindow):
         writer.ui = writer.Ui_MyWriterUI()
         writer.ui.setupUi(writer.MainWindow)
         writer.MainWindow.show()'''
+    
+    def OpenChrReference(self):
+        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain.show()
 
     def on_font_update(self):
         # update font to selection and size       
@@ -1174,11 +1295,7 @@ class MainWindow(qtw.QMainWindow):
         #font = qtg.QFont(self.font)
         #font.setPointSize(int(self.fontsize))
         
-        self.ui.BoxText.setFont(font)
-
-    def on_lang_select(self):
-        pass
-
+        self.ui.GlyphBoxText.setFont(font)
 
     def loadwordboximage(self):
         '''Load Word Box Image'''
@@ -1206,7 +1323,7 @@ class MainWindow(qtw.QMainWindow):
         # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
         lines = []
         wordboxes = pytesseract.image_to_data(img,lang="feg")
-        #self.ui.BoxText.insertPlainText(wordboxes)
+        #self.ui.GlyphBoxText.insertPlainText(wordboxes)
         for a,b in enumerate(wordboxes.splitlines()):
             print(b)
             if a!=0:
@@ -1228,8 +1345,8 @@ class MainWindow(qtw.QMainWindow):
                         file_.write("\n")  # Next line.        
         file_.close()
         with open(wordboxcsvpath, mode='r') as file_:
-            self.ui.BoxText.clear()
-            self.ui.BoxText.insertPlainText(file_.read())
+            self.ui.GlyphBoxText.clear()
+            self.ui.GlyphBoxText.insertPlainText(file_.read())
             self.ui.TextLE.setText(f"{filename}_wordbox.txt")
         self.wordboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
         self.wordboximage = pil_im.save(self.wordboximagepath) 
@@ -1249,9 +1366,9 @@ class MainWindow(qtw.QMainWindow):
         self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
         wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
         with open(wordboxcsvpath, mode='r') as file_:
-            self.ui.BoxText.clear()
+            self.ui.GlyphBoxText.clear()
             wordboxes = file_.read()
-            self.ui.BoxText.insertPlainText(wordboxes)
+            self.ui.GlyphBoxText.insertPlainText(wordboxes)
             self.ui.TextLE.setText(f"{filename}_wordbox.csv")
         file_.close()
 
@@ -1368,63 +1485,63 @@ class MainWindow(qtw.QMainWindow):
                     
                     #cv2.imshow("box image",image)
                     #cv2.waitKey(0)
-                    #print("Writing "+filename+" Linebox Image")
+                    #print("Writing "+filename+" Glyphbox Image")
     
-    # Start of LineBox Slots and Methods
+    # Start of GlyphBox Slots and Methods
    
     # Slots
     
-    def on_acceptLineBoxEdit(self):
+    def on_acceptGlyphBoxEdit(self):
         if self.statusDrawingMode.text() == 'Table':
-            self.putSbLineBox()
-            #self.completeSbLineBox
+            self.putSbGlyphBox()
+            #self.completeSbGlyphBox
         if self.statusDrawingMode.text() == 'Mouse':
-            self.getRbLineBox()
+            self.getRbGlyphBox()
         pass
     
     def on_rDrawSelection(self):
         self.rubberBand = ResizableRubberBand(self)
         self.rubberBand.hide()
-        #self.on_editLineBox(self.row_selected)
+        #self.on_editGlyphBox(self.row_selected)
         self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
+        self.statusBoxType.setText("Glyph")
         self.statusSelectionMode.setText("Row")
         self.statusDrawingMode.setText("Mouse")
 
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()        
-        #print("Editing BoxTable selection")
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()        
+        #print("Editing GlyphBoxTable selection")
         self.ui.ZoomComboBox.setCurrentText('Contents')        
-        self.setPrevLineBox()
-        # self.getPrevTextLineBox()
-        self.ui.statusbar.showMessage('Editing LineBox image using mouse and QRubberBand')
-        self.on_resetLineBox()
-        #self.ui.BoxTable.clearSelection()
+        self.setPrevGlyphBox()
+        # self.getPrevTextGlyphBox()
+        self.ui.statusbar.showMessage('Editing GlyphBox image using mouse and QRubberBand')
+        self.on_resetGlyphBox()
+        #self.ui.GlyphBoxTable.clearSelection()
 
     def on_sDrawSelection(self):
-        self.row_selected = self.ui.BoxTable.currentRow()
-        # self.on_editLineBox(self.row_selected)
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
+        # self.on_editGlyphBox(self.row_selected)
         self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
+        self.statusBoxType.setText("Glyph")
         self.statusSelectionMode.setText("Row")
         self.statusDrawingMode.setText("Table")
 
-        self.ui.BoxTable.setSortingEnabled(False)      
+        self.ui.GlyphBoxTable.setSortingEnabled(False)      
         self.ui.ZoomComboBox.setCurrentText('Contents')        
 
-        self.setPrevLineBox()
-        #self.on_editLineBox(self.row_selected)
-        self.on_selectLineBox(self.row_selected)
+        self.setPrevGlyphBox()
+        #self.on_editGlyphBox(self.row_selected)
+        self.on_selectGlyphBox(self.row_selected)
 
-        print('Edit LineBox image using BoxTable spinboxes')
-        self.ui.statusbar.showMessage('Edit LineBox image using BoxTable spinboxes') 
-        # self.ui.BoxTable.clearSelection()
-        self.ui.BoxTable.setSortingEnabled(False)
-        colcount = self.ui.BoxTable.columnCount() - 6
+        print('Edit GlyphBox image using GlyphBoxTable spinboxes')
+        self.ui.statusbar.showMessage('Edit GlyphBox image using GlyphBoxTable spinboxes') 
+        # self.ui.GlyphBoxTable.clearSelection()
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        colcount = self.ui.GlyphBoxTable.columnCount() - 6
         for col in range(colcount):
-            self.tableitem = self.ui.BoxTable.item(self.row_selected, col)
-            self.cellwidget = self.ui.BoxTable.cellWidget(self.row_selected, col)
-            self.cellvalue = self.ui.BoxTable.item(self.row_selected, col).text()
+            self.tableitem = self.ui.GlyphBoxTable.item(self.row_selected, col)
+            self.cellwidget = self.ui.GlyphBoxTable.cellWidget(self.row_selected, col)
+            self.cellvalue = self.ui.GlyphBoxTable.item(self.row_selected, col).text()
             print(f'Selected Cell Location:  Row: {self.row_selected} Column: {col}')
             print(f'Current Cell Widget: {self.cellwidget}')
             print(f'Current Cell Value: {self.cellvalue}')
@@ -1446,24 +1563,24 @@ class MainWindow(qtw.QMainWindow):
         self.getSpinBoxes()   
 
     def on_insertRowAbove(self):  
-        row = self.ui.BoxTable.currentRow()
-        self.on_editLineBox(row)
+        row = self.ui.GlyphBoxTable.currentRow()
+        self.on_editGlyphBox(row)
         if row:
-            self.ui.BoxTable.insertRow(row)
+            self.ui.GlyphBoxTable.insertRow(row)
             self.renumberRows()
-            self.BoxTable2csv() 
+            self.GlyphBoxTable2csv() 
     
     def on_insertRowBelow(self):
-        row = self.ui.BoxTable.currentRow()
-        self.on_editLineBox(row)
+        row = self.ui.GlyphBoxTable.currentRow()
+        self.on_editGlyphBox(row)
         if row:
-            self.ui.BoxTable.insertRow(row+1)
+            self.ui.GlyphBoxTable.insertRow(row+1)
             self.renumberRows()
-            self.BoxTable2csv() 
+            self.GlyphBoxTable2csv() 
 
     def on_deleteRowSelection(self):
-        row = self.ui.BoxTable.currentRow()
-        self.on_drawLineBox(row)
+        row = self.ui.GlyphBoxTable.currentRow()
+        self.on_drawGlyphBox(row)
         if row:
             popup = qtw.QMessageBox(self)
             popup.setIcon(qtw.QMessageBox.Information)
@@ -1475,14 +1592,14 @@ class MainWindow(qtw.QMainWindow):
             returnValue = popup.exec()
             if returnValue == qtw.QMessageBox.Ok:
                 print('OK clicked')
-                self.setPrevLineBox()
-                self.on_resetLineBox()
-                self.ui.BoxTable.removeRow(row)
+                self.setPrevGlyphBox()
+                self.on_resetGlyphBox()
+                self.ui.GlyphBoxTable.removeRow(row)
                 self.renumberRows()
-                self.BoxTable2csv()
-                self.drawLineBoxImage
-                self.saveLineBoxImage()
-                self.BoxText2BoxTable()        
+                self.GlyphBoxTable2csv()
+                self.drawGlyphBoxImage
+                self.saveGlyphBoxImage()
+                self.GlyphBoxText2GlyphBoxTable()        
             else:
                 pass
 
@@ -1502,170 +1619,170 @@ class MainWindow(qtw.QMainWindow):
         self.ui.statusbar.showMessage(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
         
         # clear the CellWidgets
-        rowcount = self.ui.BoxTable.rowCount()
-        colcount = self.ui.BoxTable.columnCount()
+        rowcount = self.ui.GlyphBoxTable.rowCount()
+        colcount = self.ui.GlyphBoxTable.columnCount()
         for row in range(rowcount):
             for col in range(colcount):
-                self.ui.BoxTable.removeCellWidget(row,col)
+                self.ui.GlyphBoxTable.removeCellWidget(row,col)
                  
         self.showEditButtons()
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()        
-        print("Editing BoxTable selection")
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()        
+        print("Editing GlyphBoxTable selection")
         self.ui.ZoomComboBox.setCurrentText('Contents')
-        self.ui.BoxTable.resizeRowsToContents()
+        self.ui.GlyphBoxTable.resizeRowsToContents()
         if self.prev_row_selected >= 0:
-            self.on_editLineBox(self.prev_row_selected)
-        if self.ui.LineCheckBox.isChecked():
-            self.getLineBoxImageLines()      
-        self.on_selectLineBox(self.row_selected)
+            self.on_editGlyphBox(self.prev_row_selected)
+        if self.ui.NumsCheckBox.isChecked():
+            self.getGlyphBoxImageNums()      
+        self.on_selectGlyphBox(self.row_selected)
         
     def on_boxValueChanged(self):
         print('This is the handler for the selected spinbox value that is changed')
         #self.spinbox.valueChanged.disconnect(self.on_boxValueChanged)
-        self.on_resetLineBox()
-        row = self.ui.BoxTable.currentRow()
-        col = self.ui.BoxTable.currentColumn()
-        xval = int(self.ui.BoxTable.item(row,1).text())
-        yval = int(self.ui.BoxTable.item(row,2).text())
-        wval = int(self.ui.BoxTable.item(row,3).text())
-        hval = int(self.ui.BoxTable.item(row,4).text())
+        self.on_resetGlyphBox()
+        row = self.ui.GlyphBoxTable.currentRow()
+        col = self.ui.GlyphBoxTable.currentColumn()
+        xval = int(self.ui.GlyphBoxTable.item(row,3).text())
+        yval = int(self.ui.GlyphBoxTable.item(row,4).text())
+        wval = int(self.ui.GlyphBoxTable.item(row,5).text())
+        hval = int(self.ui.GlyphBoxTable.item(row,6).text())
         if col == 1:
-            xval = self.ui.BoxTable.cellWidget(row, 1).value()
-            self.ui.BoxTable.item(row,1).setText(str(xval))
+            xval = self.ui.GlyphBoxTable.cellWidget(row, 3).value()
+            self.ui.GlyphBoxTable.item(row,3).setText(str(xval))
         elif col == 2:
-            yval = self.ui.BoxTable.cellWidget(row, 2).value()
-            self.ui.BoxTable.item(row,2).setText(str(yval))
+            yval = self.ui.GlyphBoxTable.cellWidget(row, 4).value()
+            self.ui.GlyphBoxTable.item(row,4).setText(str(yval))
         elif col == 3:
-            wval = self.ui.BoxTable.cellWidget(row, 3).value()
-            self.ui.BoxTable.item(row,3).setText(str(wval))
+            wval = self.ui.GlyphBoxTable.cellWidget(row, 5).value()
+            self.ui.GlyphBoxTable.item(row,5).setText(str(wval))
         elif col == 4:
-            hval = self.ui.BoxTable.cellWidget(row, 4).value()
-            self.ui.BoxTable.item(row,4).setText(str(hval))
+            hval = self.ui.GlyphBoxTable.cellWidget(row, 6).value()
+            self.ui.GlyphBoxTable.item(row,6).setText(str(hval))
         #self.spinbox.valueChanged.connect(self.on_boxValueChanged)
-        self.setPrevLineBox()
+        self.setPrevGlyphBox()
 
         #For printing purposes
-        line = int(self.ui.BoxTable.item(row,0).text())
-        print(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
-        self.ui.statusbar.showMessage(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
+        line = int(self.ui.GlyphBoxTable.item(row,0).text())
+        print(f'Glyph: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
+        self.ui.statusbar.showMessage(f'Glyph: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
         #Scaled
         #scaled_x,scaled_y,scaled_w,scaled_h = int(self.xval/self.scale),int(self.yval/self.scale),int(self.wval/self.scale),int(self.hval/self.scale)
-        #self.drawSbLineBox(scaled_x,scaled_y,scaled_w,scaled_h)
+        #self.drawSbGlyphBox(scaled_x,scaled_y,scaled_w,scaled_h)
         
         #Not Scaled
         self.x_sb_draw = xval
         self.y_sb_draw = yval
         self.w_sb_draw = wval
         self.h_sb_draw = hval
-        self.drawSbLineBox()
-        #self.drawSbLineBox(self.xval,self.yval,self.wval,self.hval)
+        self.drawSbGlyphBox()
+        #self.drawSbGlyphBox(self.xval,self.yval,self.wval,self.hval)
 
-    def on_selectLineBox(self,row):
-        # Draw/Redraw green LineBox
-        print('Setting selected linebox to green')
-        self.ui.statusbar.showMessage('Setting selected linebox to green')
+    def on_selectGlyphBox(self,row):
+        # Draw/Redraw green GlyphBox
+        print('Setting selected glyphbox to green')
+        self.ui.statusbar.showMessage('Setting selected glyphbox to green')
         if row:
-            x = int(self.ui.BoxTable.item(row,1).text())
-            y = int(self.ui.BoxTable.item(row,2).text())
-            w = int(self.ui.BoxTable.item(row,3).text())
-            h = int(self.ui.BoxTable.item(row,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),2)
+            x = int(self.ui.GlyphBoxTable.item(row,3).text())
+            y = int(self.ui.GlyphBoxTable.item(row,4).text())
+            w = int(self.ui.GlyphBoxTable.item(row,5).text())
+            h = int(self.ui.GlyphBoxTable.item(row,6).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),4)
             pil_img = Image.fromarray(self.norm)
             qimage = ImageQt.ImageQt(pil_img)        
             self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.pixmap)
-            print("Selected linebox should be green")
-            self.ui.statusbar.showMessage("Selected linebox should be green")
+            print("Selected glyphbox should be green")
+            self.ui.statusbar.showMessage("Selected glyphbox should be green")
             self.box_color = "green"
 
-    def on_editLineBox(self,prevrow):
+    def on_editGlyphBox(self,prevrow):
         if prevrow:
-            x = int(self.ui.BoxTable.item(prevrow,1).text())
-            y = int(self.ui.BoxTable.item(prevrow,2).text())
-            w = int(self.ui.BoxTable.item(prevrow,3).text())
-            h = int(self.ui.BoxTable.item(prevrow,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            x = int(self.ui.GlyphBoxTable.item(prevrow,3).text())
+            y = int(self.ui.GlyphBoxTable.item(prevrow,4).text())
+            w = int(self.ui.GlyphBoxTable.item(prevrow,5).text())
+            h = int(self.ui.GlyphBoxTable.item(prevrow,6).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),4)
             pil_img = Image.fromarray(self.norm)
             qimage = ImageQt.ImageQt(pil_img)        
             self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.pixmap)
 
-    def on_drawLineBox(self,row):
-        # Draw/Redraw red LineBox
-        print('Resetting previous linebox to red')
-        self.ui.statusbar.showMessage('Resetting linebox to red')
+    def on_drawGlyphBox(self,row):
+        # Draw/Redraw red GlyphBox
+        print('Resetting previous glyphbox to red')
+        self.ui.statusbar.showMessage('Resetting glyphbox to red')
         if row:
-            x = int(self.ui.BoxTable.item(row,1).text())
-            y = int(self.ui.BoxTable.item(row,2).text())
-            w = int(self.ui.BoxTable.item(row,3).text())
-            h = int(self.ui.BoxTable.item(row,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            x = int(self.ui.GlyphBoxTable.item(row,3).text())
+            y = int(self.ui.GlyphBoxTable.item(row,4).text())
+            w = int(self.ui.GlyphBoxTable.item(row,5).text())
+            h = int(self.ui.GlyphBoxTable.item(row,6).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),4)
             pil_img = Image.fromarray(self.norm)
             qimage = ImageQt.ImageQt(pil_img)
             self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.pixmap)
             self.box_color = "red"
-            print('Selected linebox should be red')
-            self.ui.statusbar.showMessage('Selected linebox should be red')
+            print('Selected glyphbox should be red')
+            self.ui.statusbar.showMessage('Selected glyphbox should be red')
 
-    def on_resetLineBox(self):
-        # Draw/Redraw white LineBox
-        print('Resetting previous linebox to white')
-        self.ui.statusbar.showMessage('Resetting previous linebox to white')
+    def on_resetGlyphBox(self):
+        # Draw/Redraw white GlyphBox
+        print('Resetting previous glyphbox to white')
+        self.ui.statusbar.showMessage('Resetting previous glyphbox to white')
         x = self.prevx
         y = self.prevy
         w = self.prevw
         h = self.prevh
-        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),2)
+        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),4)
         pil_img = Image.fromarray(self.norm)
         qimage = ImageQt.ImageQt(pil_img)      
         self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
         self.box_color = "white"
-        print('Selected linebox should be removed (i.e. white, blank or background)')
-        self.ui.statusbar.showMessage('Selected linebox should be removed (i.e. white, blank or background)')
+        print('Selected glyphbox should be removed (i.e. white, blank or background)')
+        self.ui.statusbar.showMessage('Selected glyphbox should be removed (i.e. white, blank or background)')
       
     # Methods
 
     # Table Methods
-    def BoxTable2csv(self):
-        #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
-        print(f'Path of linebox.txt: {self.txtpath}')
+    def GlyphBoxTable2csv(self):
+        #self.txtpath = self.path_of_txtglyphbox + self.imgfilename + "_glyphbox.txt"
+        print(f'Path of glyphbox.txt: {self.txtpath}')
         if os.path.exists(self.txtpath):
             print(f'Removing: {self.txtpath}')
             os.remove(self.txtpath)
-            self.ui.BoxText.clear()
-        colCount = range(self.ui.BoxTable.columnCount()- 6)
-        header = [self.ui.BoxTable.horizontalHeaderItem(column).text() for column in colCount]
+            self.ui.GlyphBoxText.clear()
+        colCount = range(self.ui.GlyphBoxTable.columnCount()- 6)
+        header = [self.ui.GlyphBoxTable.horizontalHeaderItem(column).text() for column in colCount]
         with open(self.txtpath, 'w') as csvfile:
             #writer = csv.writer(csvfile, dialect='excel', lineterminator='\n')
             writer = csv.writer(csvfile, dialect='excel', delimiter='\t', lineterminator='\n')
             writer.writerow(header)
-            for row in range(self.ui.BoxTable.rowCount()):
-                writer.writerow(self.ui.BoxTable.item(row, column).text() for column in colCount)
+            for row in range(self.ui.GlyphBoxTable.rowCount()):
+                writer.writerow(self.ui.GlyphBoxTable.item(row, column).text() for column in colCount)
         self.getText(self.txtpath)
 
-    def update_BoxText(self,line,x,y,w,h):
-        print(f'From getRbLineBox method - Line: {line}  X: {x}  Y: {y}  W: {w} H: {h}')
-        self.jsonpath = self.path_of_jsonlinebox + self.imgfilename + "_linebox.json"
+    def update_GlyphBoxText(self,line,x,y,w,h):
+        print(f'From getRbGlyphBox method - Glyph: {line}  X: {x}  Y: {y}  W: {w} H: {h}')
+        self.jsonpath = self.path_of_jsonglyphbox + self.imgfilename + "_glyphbox.json"
         jsonfilepath = self.jsonpath
-        self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+        self.txtpath = self.path_of_txtglyphbox + self.imgfilename + "_glyphbox.txt"
         csvfilepath = self.txtpath
         self.csv2json(csvfilepath,jsonfilepath)
         with open(jsonfilepath, 'r') as f:
             data = json.load(f)
             # Iterating through the json
-            for Line in data:
-                print(f'Line from json file: {Line} -- line from putRbLineBox: {line} ')
-                if Line['Line'] == line:
-                    Line['X'] = x
-                    Line['Y'] = y
-                    Line['W'] = w
-                    Line['H'] = h
-                    print(f'Updating Line: {line} found in JSON file. Dimensions :  X: {x}  Y: {y}  W: {w}  H: {h}')
+            for Glyph in data:
+                print(f'Glyph from json file: {Glyph} -- line from putRbGlyphBox: {line} ')
+                if Glyph['Glyph'] == line:
+                    Glyph['X'] = x
+                    Glyph['Y'] = y
+                    Glyph['W'] = w
+                    Glyph['H'] = h
+                    print(f'Updating Glyph: {line} found in JSON file. Dimensions :  X: {x}  Y: {y}  W: {w}  H: {h}')
                 else:
-                    print(f'Line: {line} not found in JSON file.')
+                    print(f'Glyph: {line} not found in JSON file.')
             # Closing file
             f.close()
             os.remove(jsonfilepath)
@@ -1677,84 +1794,84 @@ class MainWindow(qtw.QMainWindow):
 
     def showEditButtons(self):
         if self.statusBoxMode.text() == 'Edit':
-            rowcount = self.ui.BoxTable.rowCount()
-            selected_row = self.ui.BoxTable.currentRow()
+            rowcount = self.ui.GlyphBoxTable.rowCount()
+            selected_row = self.ui.GlyphBoxTable.currentRow()
             print(f'selected_row: {selected_row}')
-            colcount = self.ui.BoxTable.columnCount()
-            self.ui.BoxTable.horizontalHeader().resizeSection(0, 25)
-            insertAButton = qtw.QPushButton(self.ui.BoxTable)
-            insertBButton = qtw.QPushButton(self.ui.BoxTable)
-            deleteButton = qtw.QPushButton(self.ui.BoxTable)
-            rDrawButton = qtw.QPushButton(self.ui.BoxTable)
-            sDrawButton = qtw.QPushButton(self.ui.BoxTable)
-            acceptButton = qtw.QPushButton(self.ui.BoxTable)
+            colcount = self.ui.GlyphBoxTable.columnCount()
+            self.ui.GlyphBoxTable.horizontalHeader().resizeSection(0, 25)
+            insertAButton = qtw.QPushButton(self.ui.GlyphBoxTable)
+            insertBButton = qtw.QPushButton(self.ui.GlyphBoxTable)
+            deleteButton = qtw.QPushButton(self.ui.GlyphBoxTable)
+            rDrawButton = qtw.QPushButton(self.ui.GlyphBoxTable)
+            sDrawButton = qtw.QPushButton(self.ui.GlyphBoxTable)
+            acceptButton = qtw.QPushButton(self.ui.GlyphBoxTable)
 
             for row in range(rowcount):
                 if row == selected_row:
                     print(f'Row {row} matched!')
                     for col in range(colcount):
-                        if col == 5:
+                        if col == 7:
                             insertAButton.setEnabled(True)
                             insertAButton.show()
                             insertAIcon = qtg.QIcon()
                             insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             insertAButton.setIcon(insertAIcon)
                             insertAButton.setIconSize(QSize(12,12))
-                            self.ui.BoxTable.setCellWidget(row,col,insertAButton)
+                            self.ui.GlyphBoxTable.setCellWidget(row,col,insertAButton)
                             self.inslocation = "above"
                             insertAButton.clicked.connect(self.on_insertRowAbove)
-                        elif col == 6:
+                        elif col == 8:
                             insertBButton.setEnabled(True)
                             insertBButton.show()
                             insertBIcon = qtg.QIcon()
                             insertBIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             insertBButton.setIcon(insertBIcon)
                             insertBButton.setIconSize(QSize(12,12))
-                            self.ui.BoxTable.setCellWidget(row,col,insertBButton)
+                            self.ui.GlyphBoxTable.setCellWidget(row,col,insertBButton)
                             self.inslocation = "below"
                             insertBButton.clicked.connect(self.on_insertRowBelow)
-                        elif col == 7:
+                        elif col == 9:
                             deleteButton.setEnabled(True)
                             deleteButton.show() 
                             deleteIcon = qtg.QIcon()
                             deleteIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/deleterow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             deleteButton.setIcon(deleteIcon)
                             deleteButton.setIconSize(QSize(12,12))
-                            self.ui.BoxTable.setCellWidget(row,col,deleteButton)
+                            self.ui.GlyphBoxTable.setCellWidget(row,col,deleteButton)
                             deleteButton.clicked.connect(self.on_deleteRowSelection)                                 
-                        elif col == 8:
+                        elif col == 10:
                             rDrawButton.setEnabled(True)
                             rDrawButton.show()
                             rDrawIcon = qtg.QIcon()
                             rDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/rubberband.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             rDrawButton.setIcon(rDrawIcon)
                             rDrawButton.setIconSize(QSize(12,12))
-                            self.ui.BoxTable.setCellWidget(row,col,rDrawButton)
+                            self.ui.GlyphBoxTable.setCellWidget(row,col,rDrawButton)
                             rDrawButton.clicked.connect(self.on_rDrawSelection)
-                        elif col == 9:
+                        elif col == 11:
                             sDrawButton.setEnabled(True)
                             sDrawButton.show()
                             sDrawIcon = qtg.QIcon()
                             sDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/spinbox4.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             sDrawButton.setIcon(sDrawIcon)
                             sDrawButton.setIconSize(QSize(16,16))
-                            self.ui.BoxTable.setCellWidget(row,col,sDrawButton)
+                            self.ui.GlyphBoxTable.setCellWidget(row,col,sDrawButton)
                             sDrawButton.clicked.connect(self.on_sDrawSelection)
-                        elif col == 10:
+                        elif col == 12:
                             acceptButton.setEnabled(True)
                             acceptButton.show()
-                            acceptButton = qtw.QPushButton(self.ui.BoxTable)
+                            acceptButton = qtw.QPushButton(self.ui.GlyphBoxTable)
                             acceptIcon = qtg.QIcon()
                             acceptIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/Valid.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             acceptButton.setIcon(acceptIcon)
                             acceptButton.setIconSize(QSize(12,12))
-                            self.ui.BoxTable.setCellWidget(row,col,acceptButton)
-                            acceptButton.clicked.connect(self.on_acceptLineBoxEdit)
+                            self.ui.GlyphBoxTable.setCellWidget(row,col,acceptButton)
+                            acceptButton.clicked.connect(self.on_acceptGlyphBoxEdit)
                         
-    def BoxText2BoxTable(self):
-        #self.ui.BoxTable.clearContents()
+    def GlyphBoxText2GlyphBoxTable(self):
+        #self.ui.GlyphBoxTable.clearContents()
         boxes = []
-        reader = csv.reader(open(self.txtpath), delimiter = '\t')
+        reader = csv.reader(open(self.glyphboxgreektxtpath), delimiter = '\t')
         
         for row in reader:
             boxes.append(row)
@@ -1765,56 +1882,58 @@ class MainWindow(qtw.QMainWindow):
             boxes = boxes[1:]
 
         rowCount = len(boxes)
-        self.ui.BoxTable.setRowCount(rowCount)
-        colcount = self.ui.BoxTable.columnCount()
-        print(f'BoxTable column count: {colcount}')              
-        self.ui.BoxTable.setSortingEnabled(False)
-        #self.ui.BoxTable.clearContents()
+        self.ui.GlyphBoxTable.setRowCount(rowCount)
+        colcount = self.ui.GlyphBoxTable.columnCount()
+        print(f'GlyphBoxTable column count: {colcount}')              
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        #self.ui.GlyphBoxTable.clearContents()
         for row, boxes in enumerate(boxes):
             for column, value in enumerate(boxes):
                 if column == 0:
                     tableitem = qtw.QTableWidgetItem()
                     tableitem.setFlags(qtc.Qt.ItemIsEditable)
                     newItem = qtw.QTableWidgetItem(value)
-                    self.ui.BoxTable.setItem(row, column, newItem)
-                elif column >= 1 and column <= 4:
-                    #print(f'Updating BoxTable column: {column}')
-                    newItem = qtw.QTableWidgetItem(value)
-                    
-                    #Scaled
-                    #newVal = int(newItem.text())
-                    #scaledVal = int(newVal * self.scale)
-                    #newItem.setText(str(scaledVal))
-                    
+                    newItem.setText(str(row+1))
+                    self.ui.GlyphBoxTable.setItem(row, column, newItem)
+                elif column >= 1 and column <= 2:
+                     #print(f'Updating GlyphBoxTable column: {column}')
+                    newItem = qtw.QTableWidgetItem(value)                    
+                    #Not Scaled
+                    newVal = newItem.text()
+                    newItem.setText(str(newVal))
+                    self.ui.GlyphBoxTable.setItem(row, column, newItem)
+                elif column >= 3 and column <= 6:
+                    #print(f'Updating GlyphBoxTable column: {column}')
+                    newItem = qtw.QTableWidgetItem(value)                    
                     #Not Scaled
                     newVal = int(newItem.text())
                     newItem.setText(str(newVal))
-                    self.ui.BoxTable.setItem(row, column, newItem)
+                    self.ui.GlyphBoxTable.setItem(row, column, newItem)
         self.showEditButtons()
-        self.ui.BoxTable.resizeColumnsToContents()
-        self.ui.BoxTable.resizeRowsToContents()
-        self.ui.BoxTable.setSortingEnabled(True)
+        self.ui.GlyphBoxTable.resizeColumnsToContents()
+        self.ui.GlyphBoxTable.resizeRowsToContents()
+        self.ui.GlyphBoxTable.setSortingEnabled(True)
 
     def renumberRows(self):
         print('Renumbering rows')
-        rowcount = self.ui.BoxTable.rowCount()
-        colcount = self.ui.BoxTable.columnCount() - 6
+        rowcount = self.ui.GlyphBoxTable.rowCount()
+        colcount = self.ui.GlyphBoxTable.columnCount() - 6
         for row in range(rowcount):
-            item = self.ui.BoxTable.item(row, 0)
+            item = self.ui.GlyphBoxTable.item(row, 0)
             if not item:
                 self.newrow = row
                 print(f'Inserted row number: {row}')
                 for column in range(colcount):
                     itemwidget = qtw.QTableWidgetItem()
-                    self.ui.BoxTable.setItem(row, column,itemwidget)
-                    item = self.ui.BoxTable.item(row, column)
+                    self.ui.GlyphBoxTable.setItem(row, column,itemwidget)
+                    item = self.ui.GlyphBoxTable.item(row, column)
                     if column == 0:
                         item.setText(str(row+1))
                     else:
                         item.setText(str(0))
             else:
                 item.setText(str(row+1))
-            self.ui.BoxTable.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
+            self.ui.GlyphBoxTable.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
     
     def openTableMenu(self,position):
         tableMenu = QMenu()
@@ -1844,7 +1963,7 @@ class MainWindow(qtw.QMainWindow):
         iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         deleteRowAction.setIcon(iconD)
 
-        action = tableMenu.exec_(self.ui.BoxTable.mapToGlobal(position))
+        action = tableMenu.exec_(self.ui.GlyphBoxTable.mapToGlobal(position))
         if action == undoAction:
             qtw.QUndoStack.undo()
         elif action == redoAction:
@@ -1859,29 +1978,25 @@ class MainWindow(qtw.QMainWindow):
     # Drawing Methods
 
     def setBoxPaths(self):
+        # Current Box Paths
+
+        # Greek GlyphBox Paths
+        self.path_of_imgglyphbox = self.glyphboxgreekimgdir + r"/" + self.greekbookmarkdown + r"/"
+        self.path_of_txtglyphbox = self.glyphboxgreektxtdir + r"/" + self.greekbookmarkdown + r"/"
+        self.path_of_jsonglyphbox = self.glyphboxgreekjsondir + r"/" + self.greekbookmarkdown + r"/"
         
-        # Greek Box Paths
-        self.path_of_image_page = self.projecthome + self.greekpages
-        self.path_of_imgautosplit = self.projecthome + self.greeklinesautosplit + r"/"
-        self.path_of_imglinebox = self.projecthome + self.greeklinesbox + r"/" + self.greekbookmarkdown + r"/"
-        self.path_of_txtlinebox = self.projecthome + self.txtgreeklinebox + r"/" + self.greekbookmarkdown + r"/"
-        self.path_of_jsonlinebox = self.projecthome + self.jsongreeklinebox + r"/" + self.greekbookmarkdown + r"/"
-
-        # Latin Box Paths - to be added
-
         self.imgfilestr = os.path.basename(self.imgpath)
         self.imgfilesplit = os.path.splitext(self.imgfilestr)
         self.imgfilename = self.imgfilesplit[0]
-        self.imgfileext = self.imgfilesplit[1]
-        
-        self.imglineboxfile = self.projecthome + self.imgfilename + "_linebox" + self.imgfileext
-        self.boximgpath = self.path_of_imglinebox + self.imglineboxfile
+        self.imgfileext = self.imgfilesplit[1]        
+        self.imgglyphboxfile = self.projecthome + self.imgfilename + "_glyphbox" + self.imgfileext
+        self.boximgpath = self.imgglyphboxfile
 
-        self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+        self.txtpath = self.path_of_txtglyphbox + self.imgfilename + "_glyphbox.txt"
         self.txtfilestr = os.path.basename(self.txtpath)
         self.txtfilesplit = os.path.splitext(self.txtfilestr)
         self.txtfilename = self.txtfilesplit[0]
-        self.txtfilename = self.txtfilename.replace("_linebox","")
+        self.txtfilename = self.txtfilename.replace("_glyphbox","")
         self.txtfileext = self.txtfilesplit[1]
 
     def normImage(self):
@@ -1898,19 +2013,22 @@ class MainWindow(qtw.QMainWindow):
         #print(self.norm.shape, self.norm.dtype)
         #print(np.amin(self.norm),np.amax(self.norm))
 
-    # LineBox Lines Image Methods
+    # GlyphBox Glyphs Image Methods
+    def getGlyphBoxImageNums(self):
+        # Place and remove box/row numbers
+        pass
     
-    def getLineBoxImageLines(self):
-        rowcount = self.ui.BoxTable.rowCount()
+    def getGlyphBoxImageGlyphs(self):
+        rowcount = self.ui.GlyphBoxTable.rowCount()
         for row in range(rowcount):
-            line = self.ui.BoxTable.item(row,0).text()
-            x = int(self.ui.BoxTable.item(row,1).text())
-            y = int(self.ui.BoxTable.item(row,2).text())
-            w = int(self.ui.BoxTable.item(row,3).text())
-            h = int(self.ui.BoxTable.item(row,4).text())
+            line = self.ui.GlyphBoxTable.item(row,0).text()
+            x = int(self.ui.GlyphBoxTable.item(row,1).text())
+            y = int(self.ui.GlyphBoxTable.item(row,2).text())
+            w = int(self.ui.GlyphBoxTable.item(row,3).text())
+            h = int(self.ui.GlyphBoxTable.item(row,4).text())
             linex = x+w-80
             liney = y+h-4
-            if self.ui.LineCheckBox.isChecked():
+            if self.ui.NumsCheckBox.isChecked():
                 print(f'Placing line number at : {linex},{liney}')
                 cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
             else:
@@ -1921,82 +2039,87 @@ class MainWindow(qtw.QMainWindow):
         self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
 
-    def saveLineBoxImageLine(self,roi,bnum):
+    def saveGlyphBoxImageGlyph(self,roi,bnum):
         PILimage = Image.fromarray(roi)
         thresh = 127
-        fn = lambda x : 255 if x > thresh else 0
-        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
-        tif_outfile = self.path_of_imgautosplit + self.imgfilename + "_Line" + str(bnum) + ".tif"
-        print("Generating: " + tif_outfile)
-        PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))    
+        fn = lambda x : 255 if x > thresh else 0 
+        PIL_BWtif = PILimage.convert('L').point(fn, mode='1')
+        tif_outfile = self.glyphtifgreekdir + "/" + self.imgfilename + "_glyph_" + str(bnum) + ".tif"
+        print("Generating Glyph tif: " + tif_outfile)
+        PIL_BWtif.save(tif_outfile, "TIFF", dpi=(300,300)) 
+
+        #PIL_BWbmp = PIL_BWtif.tobitmap(self.imgfilename)
+        bmp_outfile = self.glyphbmpgreekdir + "/" + self.imgfilename + "_glyph_" + str(bnum) + ".bmp"
+        print("Generating Glyph bmp: " + bmp_outfile)
+        PIL_BWtif.save(bmp_outfile) 
+   
+    # GlyphBox Image Methods    
     
-    # LineBox Image Methods    
-    
-    def saveLineBoxImage(self):
-        self.imgboxfile = self.path_of_imglinebox + self.imgfilename + "_linebox" + self.imgfileext
-        #self.ui.statusbar.showMessage(f'Saving LineBox file: {self.imgboxfile}')
-        print(f'Saving LineBox file: {self.imgboxfile}')
+    def saveGlyphBoxImage(self):
+        self.imgboxfile = self.path_of_imgglyphbox + self.imgfilename + "_glyphbox" + self.imgfileext
+        #self.ui.statusbar.showMessage(f'Saving GlyphBox file: {self.imgboxfile}')
+        print(f'Saving GlyphBox file: {self.imgboxfile}')
         cv2.imwrite(self.imgboxfile,self.norm)
         self.boximgpath = self.imgboxfile
         self.showImage(self.boximgpath)
-        if self.ui.LineCheckBox.isChecked():
-            self.getLineBoxImageLines() 
+        if self.ui.NumsCheckBox.isChecked():
+            self.getGlyphBoxImageGlyphs() 
 
-    def drawLineBoxImage(self):
-        print(f'Drawing Linebox Image from BoxText: \n {self.txtpath}')
+    def drawGlyphBoxImage(self):
+        print(f'Drawing Glyphbox Image from GlyphBoxText: \n {self.txtpath}')
         # Set initial box count
         bnum = 1
         with open(self.txtpath, "r") as txtboxfile:
             reader = list(csv.reader(txtboxfile, delimiter = '\t'))
             # Remove column header from list of rows
-            lineboxes = reader[1:]
-            self.rowCount = len(lineboxes)
-            for linebox in lineboxes:
+            glyphboxes = reader[1:]
+            self.rowCount = len(glyphboxes)
+            for glyphbox in glyphboxes:
                 # Extract x,y,w,h from each row
-                line = str(linebox[0])
-                x = int(linebox[1])
-                y = int(linebox[2])
-                w = int(linebox[3])
-                h = int(linebox[4])
+                line = str(glyphbox[0])
+                x = int(glyphbox[1])
+                y = int(glyphbox[2])
+                w = int(glyphbox[3])
+                h = int(glyphbox[4])
                 roi = self.norm[y:y+h, x:x+w]
                 print(f'Placing line box at : {x},{y},{w},{h}')
-                #self.on_drawLineBox(x,y,w,h)
-                cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-                # Save Line Image
-                self.saveLineBoxImageLine(roi,bnum)
+                #self.on_drawGlyphBox(x,y,w,h)
+                cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),4)
+                # Save Glyph Image
+                self.saveGlyphBoxImageGlyph(roi,bnum)
                 bnum += 1
         txtboxfile.close()
   
-    def setPrevLineBox(self):
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()
+    def setPrevGlyphBox(self):
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
         row = self.row_selected
-        #self.ui.BoxTable.setCellWidget(self.row_selected,0,self.ui.BoxTable)
-        self.line = int(self.ui.BoxTable.item(self.row_selected,0).text())
-        # get dimensions of selected row/linebox
-        self.prevx = int(self.ui.BoxTable.item(row,1).text())
-        self.prevy = int(self.ui.BoxTable.item(row,2).text())
-        self.prevw = int(self.ui.BoxTable.item(row,3).text())
-        self.prevh = int(self.ui.BoxTable.item(row,4).text())
+        #self.ui.GlyphBoxTable.setCellWidget(self.row_selected,0,self.ui.GlyphBoxTable)
+        self.line = int(self.ui.GlyphBoxTable.item(self.row_selected,0).text())
+        # get dimensions of selected row/glyphbox
+        self.prevx = int(self.ui.GlyphBoxTable.item(row,3).text())
+        self.prevy = int(self.ui.GlyphBoxTable.item(row,4).text())
+        self.prevw = int(self.ui.GlyphBoxTable.item(row,5).text())
+        self.prevh = int(self.ui.GlyphBoxTable.item(row,6).text())
      
-    def getPrevTextLineBox(self):
-        self.ui.BoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.BoxTable.currentRow()
-        self.line = int(self.ui.BoxTable.item(self.row_selected,0).text())
-        # get dimensions of selected csv row/linebox
+    def getPrevTextGlyphBox(self):
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
+        self.line = int(self.ui.GlyphBoxTable.item(self.row_selected,0).text())
+        # get dimensions of selected csv row/glyphbox
         with open(self.txtpath,'r') as csvfile:
             lines = csv.reader(csvfile, delimiter = '\t')
             for csvline in lines:
                 if csvline[0] == str(self.line):
-                    self.prevx = int(csvline[1])
-                    self.prevy = int(csvline[2])
-                    self.prevw = int(csvline[3])
-                    self.prevh = int(csvline[4])
+                    self.prevx = int(csvline[3])
+                    self.prevy = int(csvline[4])
+                    self.prevw = int(csvline[5])
+                    self.prevh = int(csvline[6])
 
-    # LineBox Drawing Methods
+    # GlyphBox Drawing Methods
 
-    # Rubberband(Rb) LineBox Drawing Methods
-    def putRbLineBox(self):
+    # Rubberband(Rb) GlyphBox Drawing Methods
+    def putRbGlyphBox(self):
         self.run_event = False
         if self.rubberBand:
             self.rubberBand.hide()
@@ -2006,44 +2129,44 @@ class MainWindow(qtw.QMainWindow):
         w = str(self.w_rb_draw)
         h = str(self.h_rb_draw)
 
-        self.line = int(self.ui.BoxTable.item(self.row_selected,0).text())
-        print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
-        self.update_BoxText(str(self.line),x,y,w,h)
-        self.BoxText2BoxTable()
-        self.drawLineBoxImage()
-        self.saveLineBoxImage()
-        self.ui.BoxTable.clearSelection()
+        self.line = int(self.ui.GlyphBoxTable.item(self.row_selected,0).text())
+        print(f'Updating GlyphBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
+        self.update_GlyphBoxText(str(self.line),x,y,w,h)
+        self.GlyphBoxText2GlyphBoxTable()
+        self.drawGlyphBoxImage()
+        self.saveGlyphBoxImage()
+        self.ui.GlyphBoxTable.clearSelection()
         self.startEditLoop = True
-        # Save Line Image
+        # Save Glyph Image
         x = int(x)
         y = int(y)
         w = int(w)
         h = int(h)
         roi = self.norm[y:y+h, x:x+w]
-        self.saveLineBoxImageLine(roi,self.line)
+        self.saveGlyphBoxImageGlyph(roi,self.line)
         self.statusDrawingMode.setText("None")
 
-    def drawRbLineBox(self):    
+    def drawRbGlyphBox(self):    
         if self.statusDrawingMode.text() == "Mouse":
             x = self.x_rb_draw 
             y = self.y_rb_draw
             w = self.w_rb_draw
             h = self.h_rb_draw
-            # Draw/Redraw red Linebox
+            # Draw/Redraw red Glyphbox
             cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-            #self.saveLineBoxImage()
+            #self.saveGlyphBoxImage()
             self.showImage(self.boximgpath)
-            self.putRbLineBox()
+            self.putRbGlyphBox()
         
         if self.rubberBand:
             self.rubberBand.hide()
             self.rubberBand = None
 
-    def getRbLineBox(self):
+    def getRbGlyphBox(self):
         #self.rubberBand.hide()
         self.run_event = True       
         if self.statusDrawingMode.text() == "Mouse":
-            # At scale DrawLineBox QRect at LineBox Image offset from MainWindow origin(0,0)
+            # At scale DrawGlyphBox QRect at GlyphBox Image offset from MainWindow origin(0,0)
             DrawImg_xs = self.x_rb - int(self.img_xoffset)
             DrawImg_ys = self.y_rb - int(self.img_yoffset)
             #DrawImg_xs = self.x_rb
@@ -2053,7 +2176,7 @@ class MainWindow(qtw.QMainWindow):
             DrawImg_sqrect = QRect(DrawImg_xs,DrawImg_ys,DrawImg_ws,DrawImg_hs)
             print("Offset Scaled QRect = " + str(DrawImg_sqrect))
             
-            # Up scale DrawLineBox QRect at LineBox Image previously offset from MainWindow origin(0,0)
+            # Up scale DrawGlyphBox QRect at GlyphBox Image previously offset from MainWindow origin(0,0)
             self.x_rb_draw = int(round(DrawImg_xs / self.scale))
             self.y_rb_draw = int(round(DrawImg_ys / self.scale))
             self.w_rb_draw = int(round(DrawImg_ws / self.scale))
@@ -2062,49 +2185,49 @@ class MainWindow(qtw.QMainWindow):
             print("Offset Upscaled QRect = " + str(DrawImg_uqrect))
 
             print(f'x_rb_draw: {self.x_rb_draw} y_rb_draw: {self.y_rb_draw} w_rb_draw: {self.w_rb_draw} h_rb_draw: {self.h_rb_draw}')
-            self.drawRbLineBox()
+            self.drawRbGlyphBox()
     
     # Spinbox(Sb) Drawing Methods
-    def putSbLineBox(self):
-        row = self.ui.BoxTable.currentRow()
+    def putSbGlyphBox(self):
+        row = self.ui.GlyphBoxTable.currentRow()
         x = self.x_sb_draw
         y = self.y_sb_draw
         w = self.w_sb_draw
         h = self.h_sb_draw
         
-        # Update BoxText and BoxTable 
+        # Update GlyphBoxText and GlyphBoxTable 
         
-        self.line = int(self.ui.BoxTable.item(row,0).text())
-        print(f'Updating BoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
-        self.update_BoxText(str(self.line),str(x),str(y),str(w),str(h))
-        self.BoxText2BoxTable()
-        self.drawLineBoxImage()
-        self.saveLineBoxImage()
-        self.ui.BoxTable.clearSelection()
+        self.line = int(self.ui.GlyphBoxTable.item(row,0).text())
+        print(f'Updating GlyphBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
+        self.update_GlyphBoxText(str(self.line),str(x),str(y),str(w),str(h))
+        self.GlyphBoxText2GlyphBoxTable()
+        self.drawGlyphBoxImage()
+        self.saveGlyphBoxImage()
+        self.ui.GlyphBoxTable.clearSelection()
         #self.clearSpinBoxes()
-        # Save Line Image
+        # Save Glyph Image
         roi = self.norm[y:y+h, x:x+w]
-        self.saveLineBoxImageLine(roi,self.line)
+        self.saveGlyphBoxImageGlyph(roi,self.line)
         self.statusDrawingMode.setText("None")
-        self.ui.BoxTable.setSortingEnabled(True)
+        self.ui.GlyphBoxTable.setSortingEnabled(True)
         self.statusDrawingMode.setText("None")
 
-    def completeSbLineBox(self):
+    def completeSbGlyphBox(self):
         popup = qtw.QMessageBox(self)
         popup.setWindowModality(Qt.NonModal)
         popup.setIcon(qtw.QMessageBox.Information)
-        popup.setWindowTitle("Edit Line Box")
-        popup.setText("Press OK to keep the edited Line Box")
+        popup.setWindowTitle("Edit Glyph Box")
+        popup.setText("Press OK to keep the edited Glyph Box")
         popup.setStandardButtons(qtw.QMessageBox.Ok|qtw.QMessageBox.Cancel)
         popup.exec()
         if popup.clickedButton() == qtw.QMessageBox.Ok:
-            self.putSbLineBox()
+            self.putSbGlyphBox()
         #elif popup.clickedButton() == qtw.QMessageBox.Cancel:
         else:
             #self.clearSpinBoxes()           
-            self.BoxText2BoxTable()
+            self.GlyphBoxText2GlyphBoxTable()
 
-    def drawSbLineBox(self):        
+    def drawSbGlyphBox(self):        
         x = int(self.x_sb_draw)
         y = int(self.y_sb_draw)
         w = int(self.w_sb_draw)
@@ -2118,13 +2241,13 @@ class MainWindow(qtw.QMainWindow):
         self.ui.Image.setPixmap(self.pixmap)
 
     def getSpinBoxes(self):
-        self.row_selected = self.ui.BoxTable.currentRow()
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
         row = self.row_selected
-        #self.col_selected = self.ui.BoxTable.currentColumn() 
+        #self.col_selected = self.ui.GlyphBoxTable.currentColumn() 
         #print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
         for column in range(1,5):
-            value = self.ui.BoxTable.item(row,column).text()
-            spinbox = QSpinBox(self.ui.BoxTable) #changed parent from None to self.ui.BoxTable - could also be just self
+            value = self.ui.GlyphBoxTable.item(row,column).text()
+            spinbox = QSpinBox(self.ui.GlyphBoxTable) #changed parent from None to self.ui.GlyphBoxTable - could also be just self
             #self.spinbox.setMaximum(6000)
             aspect = round((self.ui.Image.width()/self.ui.Image.height()),2)
             print(f'Aspect Ratio: {aspect}')
@@ -2147,25 +2270,25 @@ class MainWindow(qtw.QMainWindow):
         
             spinbox.setFixedWidth(50)
             spinbox.setValue(int(value))
-            self.ui.BoxTable.setCellWidget(row,column,spinbox)
-            self.ui.BoxTable.resizeRowToContents(row)
-            self.ui.BoxTable.resizeColumnToContents(column)
+            self.ui.GlyphBoxTable.setCellWidget(row,column,spinbox)
+            self.ui.GlyphBoxTable.resizeRowToContents(row)
+            self.ui.GlyphBoxTable.resizeColumnToContents(column)
             spinbox.valueChanged.connect(self.on_boxValueChanged)        
 
     '''def getSpinBox(self):
-        self.row_selected = self.ui.BoxTable.currentRow()
-        self.col_selected = self.ui.BoxTable.currentColumn() 
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
+        self.col_selected = self.ui.GlyphBoxTable.currentColumn() 
         print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
-        self.spinbox = QSpinBox(self.ui.BoxTable) #changed parent from None to self.ui.BoxTable - could also be just self
+        self.spinbox = QSpinBox(self.ui.GlyphBoxTable) #changed parent from None to self.ui.GlyphBoxTable - could also be just self
         #self.spinbox.setMaximum(6000)
         self.spinbox.setMaximum(int(self.scale*self.ui.Image.height()))
         self.spinbox.setValue(int(self.cellvalue))
-        self.ui.BoxTable.setCellWidget(self.row_selected,self.col_selected,self.spinbox)
+        self.ui.GlyphBoxTable.setCellWidget(self.row_selected,self.col_selected,self.spinbox)
         self.spinbox.valueChanged.connect(self.on_boxValueChanged)'''
     
-    # LineBox Text Methods
+    # GlyphBox Text Methods
     def json2csv(self, csvFilePath, jsonFilePath):
-        columns = ['Line','X','Y','W','H']
+        columns = ['Glyph','X','Y','W','H']
         df = pd.read_json (jsonFilePath)
         df = df[columns]
         df.to_csv(csvFilePath, sep='\t', header=True, index=False, encoding='utf-8')
@@ -2188,6 +2311,46 @@ class MainWindow(qtw.QMainWindow):
 
     # Make GlyphBox Method
     def glyphbox_make_split(self):
+        self.ui.GlyphBoxTable.verticalHeader().hide()
+        self.statusBoxMode.setText('Make')
+        self.statusBoxType.setText('Glyph')
+        self.statusDrawingMode.setText('Auto')
+        
+        # Activate the Source Tab
+        self.ui.GlyphImgTab.setCurrentIndex(0)
+
+        #If no source page image present, then load one.
+        if self.ui.ImageLe.displayText() == "":
+            self.loadImage()
+        else:    
+            print('Open Make Image message dailog')
+            popup = qtw.QMessageBox(self)
+            popup.setIcon(qtw.QMessageBox.Information)
+            popup.setWindowTitle("Make GlyphBox File Pair")
+            popup.setText("'Make Current' glyph box pair or load and 'Make Other'")
+            currentButton = popup.addButton('Make Current', qtw.QMessageBox.YesRole)
+            otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
+            popup.exec()
+            if popup.clickedButton() == currentButton:
+                pass      
+            elif popup.clickedButton() == otherButton:
+                self.ui.ImageLe.clear()
+                self.ui.Image.clear()
+                self.ui.TextLE.clear()
+                self.ui.GlyphBoxText.clear()
+                self.ui.GlyphBoxTable.clear()
+                # Get imgglyphbox source file
+                self.loadImage()
+
+        
+        # setting value to progress bar
+        self.ui.progressBar.setValue(10)
+        # Make GlyphBox File Pair
+        self.setBoxPaths()
+        self.ui.ImageLe.clear()
+        self.ui.ImageLe.setText(self.imgfilename + "_glyphbox.tif")
+        dosplit = True
+        self.ui.progressBar.setValue(20)
         '''Load GlyphBox Image'''
         img = cv2.imread(self.imgpath)
         self.imgdir = os.path.dirname(self.imgpath)
@@ -2197,54 +2360,162 @@ class MainWindow(qtw.QMainWindow):
         filename = filesplit[0]
         fileext = filesplit[1]
 
-        self.glyphboxgreektxtpath = self.glyphboxgreektxtdir + r"/" + filename + r"_glyphbox.csv"
-        self.glyphboxgreekimgpath = self.glyphboxgreekimgdir+ r"/" + filename + r"_glyphbox.tif"
-        
+        self.glyphboxgreektxtpath = self.glyphboxgreektxtdir + r"/" + filename + r"_glyphbox.txt"
+        self.glyphboxgreekimgpath = self.glyphboxgreekimgdir + r"/" + filename + r"_glyphbox.tif"
+        self.ui.progressBar.setValue(30)
         #############################################
         #### Detecting Characters  ######
         #############################################
         '''Load GlyphBox Image'''
         hImg, wImg,_ = img.shape
         glyphboxes = pytesseract.image_to_boxes(img,lang="feg")  
-
+        print(f'Image Height: {hImg} Width: {wImg}')
+        print(f'x-Offset:{self.img_xoffset}  Y-Offset:{self.img_yoffset}')
         #draw = ImageDraw.Draw(pil_im)  
         # use a truetype font
         # font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8) 
-        
+        glyphcount = 1
+        self.ui.progressBar.setValue(40)
+        if os.path.exists(self.glyphboxgreektxtpath):
+                print(f'Removing: {self.glyphboxgreektxtpath}')
+                os.remove(self.glyphboxgreektxtpath)
         for b in glyphboxes.splitlines():
-            print(b)
+            #print(b)
             b = b.split(' ')
-            print(b)
-            x, y, w, h = int(b[1]), int(b[2]), int(b[3]), int(b[4])
-            char = b[0]
-            # Place the box on the img
-            cv2.rectangle(img, (x,hImg- y), (w,hImg- h), (255, 50, 50), 2)
-            #cv2.putText(img,b[0],(x,hImg- y+25),cv2.FONT_HERSHEY_TRIPLEX,1,(50,50,255),2)
-            # Write the box text to csv file
-            with open(self.glyphboxgreektxtpath, mode='a') as file_:
-                file_.write(f"{char}\t{x}\t{y}\t{w}\t{h}")
-                file_.write("\n")  # Next line.        
+            ocrchar = b[0]
+            newchar = "" #placeholder
+            y_offset = int(self.img_yoffset)
+            # Transformation of pytesseract's bottom-left origin to opencv's top-left origin.
+            x = int(b[1])
+            y = hImg - int(b[2]) - y_offset
+            w = int(b[3]) - int(b[1])
+            h = int(b[4]) - int(b[2])
+            # Add padding to help ensure 'full glyph' encapsulation
+            if x>=1 and y>=1 and w<=wImg-1 and h<=hImg-1:
+                x -= 2  #px
+                y -= 2
+                w += 2
+                h += 2
+            # if statement to reduce loopcount (for filtering and testing)
+            if glyphcount <= 5:
+                print(f'From pytesseract - Box:{b}')
+                print(f'From pytesseract - Split:{glyphcount} Box: B1:{b[1]} B2:{b[2]} B3:{b[3]} B4:{b[4]}')
+                print(f'From breakdown - Glyph:{glyphcount} Box: X:{x} Y:{y} W:{w} H:{h} XW:{x+w} YH:{y+h}')
+                print(f'For cv2.rectangle - Glyph:{glyphcount} Box: X:{x} Y:{y} W:{x+w} H:{y+h}')
+                print(f'For Save GlyphBox - roi = img[{y}:{y+h},{x}:{x+w}]')
+                cv2.rectangle(img, (x,y), (x+w,y+h), (255, 0, 0), 4)
+                cv2.putText(img,str(glyphcount),(x,y-5),cv2.FONT_HERSHEY_TRIPLEX,1,(0,0,255),4)
+                roi = img[y:y+h,x:x+w]
+                #cv2.imshow("ROI",roi)
+                # Write the box text to csv file
+                with open(self.glyphboxgreektxtpath, mode='a') as file_:
+                    print(f'For GylphBox Table - Glyph:{glyphcount} Box: X:{x} Y:{y} W:{w} H:{h}')
+                    file_.write(f"{glyphcount}\t{ocrchar}\t{newchar}\t{x}\t{y}\t{w}\t{h}")
+                    file_.write("\n")  # Next line.
+                self.ui.progressBar.setValue(50)
+                # Crop and save glyph-tif
+                if dosplit and glyphcount<=5:
+                    roi = img[y:y+h,x:x+w]
+                    #print(f'For Save GlyphBox - roi = img[{y}:{y+h},{x}:{x+w}]')
+                    #cv2.imshow("ROI",roi)
+                    self.saveGlyphBoxImageGlyph(roi,glyphcount)
+            glyphcount += 1
+        self.ui.progressBar.setValue(75)        
         file_.close()
+        self.glyphcount = glyphcount
         with open(self.glyphboxgreektxtpath, mode='r') as file_:
-            self.ui.BoxText.clear()
-            self.ui.BoxText.insertPlainText(file_.read())
-            self.ui.TextLE.setText(f"{filename}_glyphbox.csv")
-        
+            self.ui.GlyphBoxText.clear()
+            self.ui.GlyphBoxText.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_glyphbox.txt")
         # Pass the image to PIL and convert to pixmap
         pil_im = Image.fromarray(img) 
-        qimage = ImageQt.ImageQt(pil_im)        
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        #show pixmap
-        self.ui.GlyphBox.setPixmap(self.pixmap)
-        #save image and show filename
+        #show pixmap  #### moved below to GlyphImgTab.setCurrentIndex(1), which handles it all
+        self.ui.progressBar.setValue(85) 
+        #save glyphbox image and show filename
         self.glyphbox = pil_im.save(self.glyphboxgreekimgpath)
         self.ui.ImageLe.setText(f"{filename}_glyphbox.tif")
+        self.ui.progressBar.setValue(90)
+        # check current tab and show pixmap
+        self.ui.GlyphImgTab.setCurrentIndex(1)  
+        self.GlyphBoxText2GlyphBoxTable()
+        self.ui.progressBar.setValue(101)
+        self.ui.progressBar.reset()   
+
+    # Edit GlyphBox Method    
+    def glyphbox_edit_split(self):
+        self.ui.statusbar.showMessage('Loading the GlyphBox file pair for editing')
+        start = time.perf_counter()
+        self.ui.GlyphBoxTable.verticalHeader().hide()
+        self.statusBoxMode.setText("Edit")
+        self.statusBoxType.setText("Glyph")
+        self.statusSelectionMode.setText("Rows")
+        self.ui.GlyphBoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        print('Box Table Selection Mode: Single Selection (default)')
+        print('Box Table Selection Behavior: Select Rows (default)')
+        if self.ui.ImageLe.displayText() != "":
+            popup = qtw.QMessageBox(self)
+            popup.setIcon(qtw.QMessageBox.Information)
+            popup.setWindowTitle("Edit Mode")
+            popup.setText("'Edit Current' glyphbox pair or load and 'Edit Other'")
+            currentButton = popup.addButton('Edit Current', qtw.QMessageBox.YesRole)
+            otherButton = popup.addButton('Edit Other', qtw.QMessageBox.YesRole)
+            popup.exec()
+            if popup.clickedButton() == currentButton:
+                pass
+            elif popup.clickedButton() == otherButton:
+                self.ui.ImageLe.clear()
+                self.ui.GlyphBox.clear()
+        
+        if self.ui.ImageLe.displayText() == "":
+            # Get imgglyphbox source file
+            self.loadImage()
+            self.setBoxPaths()
+            self.ui.ImageLe.clear()
+            self.ui.ImageLe.setText(self.imgfilename + "_glyphbox.txt")
+            # Normalize indexed tif source file to RGB image
+            self.normImage()
+        else: 
+            self.showImage(self.imgpath)       
+            self.ui.ImageLe.setText(self.imgfilename + "_glyphbox.txt")
+  
+        # setting value to progress bar
+        self.ui.progressBar.setValue(10)
+        self.ui.TextLE.clear()
+        self.ui.TextLE.setText(self.txtfilestr)
+        imgfilename = self.ui.ImageLe.displayText().split(r".")[0]
+        txtfilename = self.ui.TextLE.displayText().split(r".")[0]
+        
+        # Get matching GlyphBoxText file
+        print(f'Text File Name: {txtfilename}  Image File Name: {imgfilename}')
+        if txtfilename == imgfilename:
+            self.glyphboxgreekimgpath = self.glyphboxgreekimgdir + r"/" + txtfilename + r".tif"
+            self.glyphboxgreektxtpath = self.glyphboxgreektxtdir + r"/" + imgfilename + r".txt"
+            self.getText(self.glyphboxgreektxtpath)
+            self.ui.progressBar.setValue(25)
+            #self.drawGlyphBoxImage()
+            self.ui.progressBar.setValue(50)
+            #self.saveGlyphBoxImage()
+            self.ui.progressBar.setValue(75)
+            self.GlyphBoxText2GlyphBoxTable()
+            self.ui.progressBar.setValue(100)
+            print("Waiting on GlyphBoxTable selection")
+            self.row_current = self.ui.GlyphBoxTable.currentRow()
+            self.startEditLoop = True
+            self.ui.GlyphBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
+        else:   
+            print(f'The glyphbox text: {txtfilename} does not match the glyphbox image: {imgfilename} -- Please try again!')        
+
+        self.ui.progressBar.setValue(101)
+        self.ui.progressBar.reset()
+        finish = time.perf_counter()
+        self.ui.statusbar.showMessage(f"File load completed successfully in {finish - start:0.4f} seconds")
+        print(f"File load completed successfully in {finish - start:0.4f} seconds")
 
     # Make LineBox Method
     def linebox_make_split(self):
-            self.ui.BoxTable.verticalHeader().hide()
+            self.ui.GlyphBoxTable.verticalHeader().hide()
             self.statusBoxMode.setText('Make')
-            self.statusBoxType.setText('Line')
+            self.statusBoxType.setText('Glyph')
             self.statusDrawingMode.setText('Auto')
             #If no page image present, then load one.
             
@@ -2254,7 +2525,7 @@ class MainWindow(qtw.QMainWindow):
                 print('Open Make Image message dailog')
                 popup = qtw.QMessageBox(self)
                 popup.setIcon(qtw.QMessageBox.Information)
-                popup.setWindowTitle("Make LineBox File Pair")
+                popup.setWindowTitle("Make GlyphBox File Pair")
                 popup.setText("'Make Current' linebox pair or load and 'Make Other'")
                 currentButton = popup.addButton('Make Current', qtw.QMessageBox.YesRole)
                 otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
@@ -2265,13 +2536,13 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.ImageLe.clear()
                     self.ui.Image.clear()
                     self.ui.TextLE.clear()
-                    self.ui.BoxText.clear()
-                    self.ui.BoxTable.clear()
+                    self.ui.GlyphBoxText.clear()
+                    self.ui.GlyphBoxTable.clear()
                     # Get imglinebox source file
                     self.loadImage()
             # setting value to progress bar
             self.ui.progressBar.setValue(10)
-            # Make LineBox File Pair
+            # Make GlyphBox File Pair
             self.setBoxPaths()
             self.ui.ImageLe.clear()
             self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
@@ -2296,7 +2567,7 @@ class MainWindow(qtw.QMainWindow):
             (ctrs, boundingBoxes) = zip(*sorted(zip(ctrs, boundingBoxes),key=lambda b:b[1][i], reverse=reverse))
             # Set initial box count
             bnum = 1
-            self.ui.BoxText.clear()
+            self.ui.GlyphBoxText.clear()
             self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
             if os.path.exists(self.txtpath):
                 print(f'Removing: {self.txtpath}')
@@ -2311,11 +2582,11 @@ class MainWindow(qtw.QMainWindow):
                         if h>120 and h<200:
                                 roi = binary[y:y+h, x:x+w]
                                 cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)                                                                              
-                                # Append to BoxText
+                                # Append to GlyphBoxText
                                 #boxlinestr = str(bnum) + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h) + ',' + str(x+w) + ',' + str(y+h) + '\n'
                                 boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\n'
                                 txtboxfile.write(boxlinestr)
-                                self.saveLineBoxImageLine(roi,bnum)
+                                self.saveGlyphBoxImageGlyph(roi,bnum)
                                 bnum += 1
                         # Set height of multi-line contours and subdivide proportionally
                         elif h > 200:
@@ -2324,45 +2595,43 @@ class MainWindow(qtw.QMainWindow):
                                     print('subloopcount =' + str(subdiv))
                                     roi = binary[y:y+h, x:x+w]
                                     cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)
-                                    # Append to BoxText
+                                    # Append to GlyphBoxText
                                     boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\t' + '\n'
                                     txtboxfile.write(boxlinestr)
                                     y = y + h
                                     if dosplit:
-                                        self.saveLineBoxImageLine(roi,bnum)
+                                        self.saveGlyphBoxImageGlyph(roi,bnum)
                                     bnum += 1
                         # setting value to progress bar
                         self.ui.progressBar.setValue(bnum)
-            print(f'Created LineBox Text File: {self.txtpath}')
+            print(f'Created GlyphBox Text File: {self.txtpath}')
             #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"                                  
             txtboxfile.close()
             self.ui.progressBar.setValue(50)
             
-            # Write Text Box File to BoxTable TableWidget
-            self.BoxText2BoxTable()
+            # Write Text Box File to GlyphBoxTable TableWidget
+            self.GlyphBoxText2GlyphBoxTable()
             self.ui.progressBar.setValue(75)
 
-            # Overwrite Text Box File from BoxTable TableWidget
+            # Overwrite Text Box File from GlyphBoxTable TableWidget
             # Already wrote the txtboxfile, above; so,likely unecessary 
-            self.BoxTable2csv()
+            self.GlyphBoxTable2csv()
             self.ui.progressBar.setValue(85)
 
             # Write linebox image to file
-            self.saveLineBoxImage()
+            self.saveGlyphBoxImage()
             self.ui.ImageLe.clear()
             self.ui.ImageLe.setText(os.path.basename(self.boximgpath))
             self.ui.progressBar.setValue(101)
             self.ui.progressBar.reset()
-   
-    # Edit LineBox Method
     def linebox_edit_split(self):
-        self.ui.statusbar.showMessage('Loading the LineBox file pair for editing')
+        self.ui.statusbar.showMessage('Loading the GlyphBox file pair for editing')
         start = time.perf_counter()
-        self.ui.BoxTable.verticalHeader().hide()
+        self.ui.GlyphBoxTable.verticalHeader().hide()
         self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
+        self.statusBoxType.setText("Glyph")
         self.statusSelectionMode.setText("Rows")
-        self.ui.BoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.ui.GlyphBoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
         print('Box Table Selection Mode: Single Selection (default)')
         print('Box Table Selection Behavior: Select Rows (default)')
         if self.ui.ImageLe.displayText() != "":
@@ -2399,21 +2668,21 @@ class MainWindow(qtw.QMainWindow):
         self.ui.TextLE.setText(self.txtfilestr)
         imgfilename = self.ui.ImageLe.displayText().split(r".")[0]
         txtfilename = self.ui.TextLE.displayText().split(r".")[0]
-        # Get matching BoxText file
+        # Get matching GlyphBoxText file
         print(f'Text File Name: {txtfilename}  Image File Name: {imgfilename}')
         if txtfilename == imgfilename:
             self.getText(self.txtpath)
             self.ui.progressBar.setValue(25)
-            self.drawLineBoxImage()
+            self.drawGlyphBoxImage()
             self.ui.progressBar.setValue(50)
-            self.saveLineBoxImage()
+            self.saveGlyphBoxImage()
             self.ui.progressBar.setValue(75)
-            self.BoxText2BoxTable()
+            self.GlyphBoxText2GlyphBoxTable()
             self.ui.progressBar.setValue(100)
-            print("Waiting on BoxTable selection")
-            self.row_current = self.ui.BoxTable.currentRow()
+            print("Waiting on GlyphBoxTable selection")
+            self.row_current = self.ui.GlyphBoxTable.currentRow()
             self.startEditLoop = True
-            self.ui.BoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
+            self.ui.GlyphBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
         else:   
             print(f'The linebox text: {txtfilename} does not match the linebox image: {imgfilename} -- Please try again!')        
 
@@ -2474,7 +2743,7 @@ class MainWindow(qtw.QMainWindow):
                         self.run_event = False
                         print('You cannot draw outside the current image borders')
             else:
-                # If in Edit mode, select Row from LineBox Image
+                # If in Edit mode, select Row from GlyphBox Image
                 self.run_event = False
                 if event.button() == Qt.LeftButton:
                     event_x = event.pos().x()
@@ -2484,29 +2753,29 @@ class MainWindow(qtw.QMainWindow):
                     scaled_x = int(round(grid_x / self.scale))
                     scaled_y = int(round(grid_y / self.scale))
                     if event_x >= x_min and event_x <= x_max and event_y >= y_min and event_y <= y_max:
-                        rowcount = self.ui.BoxTable.rowCount()
+                        rowcount = self.ui.GlyphBoxTable.rowCount()
                         for row in range(rowcount):
-                            y = int(self.ui.BoxTable.item(row,2).text())
-                            h = int(self.ui.BoxTable.item(row,4).text())
+                            y = int(self.ui.GlyphBoxTable.item(row,2).text())
+                            h = int(self.ui.GlyphBoxTable.item(row,4).text())
                             y_h = y + h
                             if y <= scaled_y and scaled_y <= y_h:
-                                self.ui.BoxTable.selectRow(row)
+                                self.ui.GlyphBoxTable.selectRow(row)
 
     def mouseMoveEvent(self, event):
         if self.statusBoxMode.text() == "Edit" and self.run_event: 
             self.end_pos = event.pos()
             self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
-            row = self.ui.BoxTable.currentRow()
+            row = self.ui.GlyphBoxTable.currentRow()
             geo = self.rubberBand.geometry()
             #while self.run_event:
             self.x_rb = self.rubberBand.x()
             self.y_rb = self.rubberBand.y()
             self.w_rb = self.rubberBand.width()
             self.h_rb = self.rubberBand.height()
-            self.ui.BoxTable.item(row,1).setText(str(int(round((self.x_rb - int(self.img_xoffset))/self.scale))))
-            self.ui.BoxTable.item(row,2).setText(str(int(round((self.y_rb - int(self.img_yoffset))/self.scale))))
-            self.ui.BoxTable.item(row,3).setText(str(int(round(self.w_rb/self.scale))))
-            self.ui.BoxTable.item(row,4).setText(str(int(round(self.h_rb/self.scale))))
+            self.ui.GlyphBoxTable.item(row,1).setText(str(int(round((self.x_rb - int(self.img_xoffset))/self.scale))))
+            self.ui.GlyphBoxTable.item(row,2).setText(str(int(round((self.y_rb - int(self.img_yoffset))/self.scale))))
+            self.ui.GlyphBoxTable.item(row,3).setText(str(int(round(self.w_rb/self.scale))))
+            self.ui.GlyphBoxTable.item(row,4).setText(str(int(round(self.h_rb/self.scale))))
             self.ui.statusbar.showMessage(f'x:{self.x_rb} y:{self.y_rb} w:{self.w_rb} h:{self.h_rb}')
     
     #def mouseReleaseEvent(self, event):
@@ -2717,15 +2986,15 @@ class ResizableRubberBand(QWidget):
         
     def resizeEvent(self, event):
         self.rubberband.resize(self.size())
-        row = self.parent().ui.BoxTable.currentRow()
+        row = self.parent().ui.GlyphBoxTable.currentRow()
         self.parent().x_rb = self.parent().rubberBand.x()
         self.parent().y_rb = self.parent().rubberBand.y()
         self.parent().w_rb = self.parent().rubberBand.width()
         self.parent().h_rb = self.parent().rubberBand.height()
-        self.parent().ui.BoxTable.item(row,1).setText(str(int(round((self.parent().rubberBand.x() - int(self.parent().img_xoffset))/self.parent().scale))))
-        self.parent().ui.BoxTable.item(row,2).setText(str(int(round((self.parent().rubberBand.y() - int(self.parent().img_yoffset))/self.parent().scale))))
-        self.parent().ui.BoxTable.item(row,3).setText(str(int(round(self.parent().rubberBand.width()/self.parent().scale))))
-        self.parent().ui.BoxTable.item(row,4).setText(str(int(round(self.parent().rubberBand.height()/self.parent().scale))))
+        self.parent().ui.GlyphBoxTable.item(row,1).setText(str(int(round((self.parent().rubberBand.x() - int(self.parent().img_xoffset))/self.parent().scale))))
+        self.parent().ui.GlyphBoxTable.item(row,2).setText(str(int(round((self.parent().rubberBand.y() - int(self.parent().img_yoffset))/self.parent().scale))))
+        self.parent().ui.GlyphBoxTable.item(row,3).setText(str(int(round(self.parent().rubberBand.width()/self.parent().scale))))
+        self.parent().ui.GlyphBoxTable.item(row,4).setText(str(int(round(self.parent().rubberBand.height()/self.parent().scale))))
         self.parent().ui.statusbar.showMessage(f'Resizing to x:{self.parent().x_rb} y:{self.parent().y_rb} w:{self.parent().w_rb} h:{self.parent().h_rb}')
         #super(ResizableRubberBand, self).resizeEvent(event)
 

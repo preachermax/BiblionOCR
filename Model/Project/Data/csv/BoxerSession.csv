@@ -47,6 +47,8 @@ self.img_yoffset,90,90
 self.txtpath,,
 self.txtdir,Model/Project/Text/EstablishTruth/Greek_txt_pages,Model/Project/Text/EstablishTruth/Greek_txt_pages
 self.txtfileList,[],[]
+self.txtpagesbox,Model/Project/Text/EstablishTruth/Source/txt_pages_box,Model/Project/Text/EstablishTruth/Source/txt_pages_box
+self.jsonpagebox,Model/Project/Text/EstablishTruth/Source/json_pages_box,Model/Project/Text/EstablishTruth/Source/json_pages_box
 self.txtgreeklinebox,Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox,Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox
 self.jsongreeklinebox,Model/Project/Text/EstablishTruth/Greek/json_greek_linebox,Model/Project/Text/EstablishTruth/Greek/json_greek_linebox
 self.txtlatinlinebox,Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box,Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box
@@ -60,6 +62,14 @@ self.imagedir,,
 self.imagefileList,[],[]
 self.imagezoom,25 %,25
 self.imagezoomslidervalue,25,25
+self.pages,Model/Project/Images/Source/tif_black_white,Model/Project/Images/Source/tif_black_white
+self.pagesrotated,Model/Project/Images/Source/tif_black_white_rotated,Model/Project/Images/Source/tif_black_white_rotated
+self.pagesdeskewed,Model/Project/Images/Source/tif_black_white_deskewed,Model/Project/Images/Source/tif_black_white_deskewed
+self.pagescropped,Model/Project/Images/Source/tif_black_white_cropped,Model/Project/Images/Source/tif_black_white_cropped
+self.pagescleaned,Model/Project/Images/Source/tif_black_white_cleaned,Model/Project/Images/Source/tif_black_white_cleaned
+self.pagesbox,Model/Project/Images/Source/tif_black_white_pages_box,Model/Project/Images/Source/tif_black_white_pages_box
+self.pageseliminated,Model/Project/Images/Source/tif_black_white_eliminated,Model/Project/Images/Source/tif_black_white_eliminated
+self.greekpagesautosplit,Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit,Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit
 self.greekpages,Model/Project/Images/Workflow/Greek/tif_greek_pages,Model/Project/Images/Workflow/Greek/tif_greek_pages
 self.greekpagesrotated,Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated,Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated
 self.greekpagesdeskewed,Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed,Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed
@@ -70,6 +80,7 @@ self.greeklinescropped,Model/Project/Images/Workflow/Greek/tif_greek_lines_cropp
 self.greeklinescleaned,Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned,Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned
 self.greeklinesbox,Model/Project/Images/Workflow/Greek/tif_greek_lines_box,Model/Project/Images/Workflow/Greek/tif_greek_lines_box
 self.greeklinesautosplit,Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit,Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit
+self.latinpagesautosplit,Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit,
 self.latinpages,Model/Project/Images/Workflow/Latin/tif_latin_pages,Model/Project/Images/Workflow/Latin/tif_latin_pages
 self.latinpagesrotated,Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated,Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated
 self.latinpagesdeskewed,Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed,Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed

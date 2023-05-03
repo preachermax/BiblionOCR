@@ -240,6 +240,16 @@
         "DefaultValue": "[]"
     },
     {
+        "Setting": "self.txtpagesbox",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Source/txt_pages_box",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Source/txt_pages_box"
+    },
+    {
+        "Setting": "self.jsonpagebox",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Source/json_pages_box",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Source/json_pages_box"
+    },
+    {
         "Setting": "self.txtgreeklinebox",
         "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_linebox"
@@ -305,6 +315,46 @@
         "DefaultValue": "25"
     },
     {
+        "Setting": "self.pages",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white"
+    },
+    {
+        "Setting": "self.pagesrotated",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white_rotated",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white_rotated"
+    },
+    {
+        "Setting": "self.pagesdeskewed",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white_deskewed",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white_deskewed"
+    },
+    {
+        "Setting": "self.pagescropped",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white_cropped",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white_cropped"
+    },
+    {
+        "Setting": "self.pagescleaned",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white_cleaned",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white_cleaned"
+    },
+    {
+        "Setting": "self.pagesbox",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white_pages_box",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white_pages_box"
+    },
+    {
+        "Setting": "self.pageseliminated",
+        "CurrentValue": "Model/Project/Images/Source/tif_black_white_eliminated",
+        "DefaultValue": "Model/Project/Images/Source/tif_black_white_eliminated"
+    },
+    {
+        "Setting": "self.greekpagesautosplit",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_autosplit"
+    },
+    {
         "Setting": "self.greekpages",
         "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages"
@@ -353,6 +403,11 @@
         "Setting": "self.greeklinesautosplit",
         "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
         "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit"
+    },
+    {
+        "Setting": "self.latinpagesautosplit",
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.latinpages",

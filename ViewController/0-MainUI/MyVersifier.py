@@ -19,6 +19,7 @@ from ext import versifiercount, versefind, reffind
 from MyVersifierUI import Ui_Versifier
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
+import ChrReference as chrref
 #import pytesseract
 
 class Ui_MainWindow(qtw.QMainWindow):
@@ -47,6 +48,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
+
+        self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
 
         self.ui.BothPrevBookButton.clicked.connect(self.findPrevVerseBook)
         self.ui.BothPrevBookButton.clicked.connect(self.findPrevRefBook)
@@ -502,9 +505,14 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'self.prevtextversenum = {self.prevtextversenum}')
         print(f'self.nexttextversenum = {self.nexttextversenum}')
 
-        ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
-        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
-        
+        #ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
+        #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+        self.OpenChrReference()
+
+    def OpenChrReference(self):
+        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain.show()
+
     def dropAnchor(self):
         print("Drop Anchor!")
         self.ui.AnchorCkBox.setChecked(True)

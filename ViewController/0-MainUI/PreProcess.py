@@ -278,7 +278,7 @@ class PreProcess():
             dilate = cv2.dilate(thresh, kernel, iterations=5)
 
             # Find all contours
-            dilated, contours, hierarchy = cv2.findContours(dilate, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            contours, hierarchy = cv2.findContours(dilate, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
             contours = sorted(contours, key = cv2.contourArea, reverse = True)
 
             # Find largest contour and surround in min area box

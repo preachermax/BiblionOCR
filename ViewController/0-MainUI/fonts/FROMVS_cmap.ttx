@@ -1,0 +1,1661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="4.39">
+
+  <cmap>
+    <tableVersion version="0"/>
+    <cmap_format_4 platformID="0" platEncID="3" language="0">
+      <map code="0x0" name="uni0000"/><!-- ???? -->
+      <map code="0x1d" name="uni0000"/><!-- ???? -->
+      <map code="0x20" name="space"/><!-- SPACE -->
+      <map code="0x21" name="exclam"/><!-- EXCLAMATION MARK -->
+      <map code="0x22" name="quotedbl"/><!-- QUOTATION MARK -->
+      <map code="0x23" name="numbersign"/><!-- NUMBER SIGN -->
+      <map code="0x24" name="dollar"/><!-- DOLLAR SIGN -->
+      <map code="0x25" name="percent"/><!-- PERCENT SIGN -->
+      <map code="0x26" name="ampersand"/><!-- AMPERSAND -->
+      <map code="0x27" name="quotesingle"/><!-- APOSTROPHE -->
+      <map code="0x28" name="parenleft"/><!-- LEFT PARENTHESIS -->
+      <map code="0x29" name="parenright"/><!-- RIGHT PARENTHESIS -->
+      <map code="0x2a" name="asterisk"/><!-- ASTERISK -->
+      <map code="0x2b" name="plus"/><!-- PLUS SIGN -->
+      <map code="0x2c" name="comma"/><!-- COMMA -->
+      <map code="0x2d" name="hyphen"/><!-- HYPHEN-MINUS -->
+      <map code="0x2e" name="period"/><!-- FULL STOP -->
+      <map code="0x2f" name="slash"/><!-- SOLIDUS -->
+      <map code="0x30" name="zero"/><!-- DIGIT ZERO -->
+      <map code="0x31" name="one"/><!-- DIGIT ONE -->
+      <map code="0x32" name="two"/><!-- DIGIT TWO -->
+      <map code="0x33" name="three"/><!-- DIGIT THREE -->
+      <map code="0x34" name="four"/><!-- DIGIT FOUR -->
+      <map code="0x35" name="five"/><!-- DIGIT FIVE -->
+      <map code="0x36" name="six"/><!-- DIGIT SIX -->
+      <map code="0x37" name="seven"/><!-- DIGIT SEVEN -->
+      <map code="0x38" name="eight"/><!-- DIGIT EIGHT -->
+      <map code="0x39" name="nine"/><!-- DIGIT NINE -->
+      <map code="0x3a" name="colon"/><!-- COLON -->
+      <map code="0x3b" name="semicolon"/><!-- SEMICOLON -->
+      <map code="0x3c" name="less"/><!-- LESS-THAN SIGN -->
+      <map code="0x3d" name="equal"/><!-- EQUALS SIGN -->
+      <map code="0x3e" name="greater"/><!-- GREATER-THAN SIGN -->
+      <map code="0x3f" name="question"/><!-- QUESTION MARK -->
+      <map code="0x40" name="at"/><!-- COMMERCIAL AT -->
+      <map code="0x41" name="A"/><!-- LATIN CAPITAL LETTER A -->
+      <map code="0x42" name="B"/><!-- LATIN CAPITAL LETTER B -->
+      <map code="0x43" name="C"/><!-- LATIN CAPITAL LETTER C -->
+      <map code="0x44" name="D"/><!-- LATIN CAPITAL LETTER D -->
+      <map code="0x45" name="E"/><!-- LATIN CAPITAL LETTER E -->
+      <map code="0x46" name="F"/><!-- LATIN CAPITAL LETTER F -->
+      <map code="0x47" name="G"/><!-- LATIN CAPITAL LETTER G -->
+      <map code="0x48" name="H"/><!-- LATIN CAPITAL LETTER H -->
+      <map code="0x49" name="I"/><!-- LATIN CAPITAL LETTER I -->
+      <map code="0x4a" name="J"/><!-- LATIN CAPITAL LETTER J -->
+      <map code="0x4b" name="K"/><!-- LATIN CAPITAL LETTER K -->
+      <map code="0x4c" name="L"/><!-- LATIN CAPITAL LETTER L -->
+      <map code="0x4d" name="M"/><!-- LATIN CAPITAL LETTER M -->
+      <map code="0x4e" name="N"/><!-- LATIN CAPITAL LETTER N -->
+      <map code="0x4f" name="O"/><!-- LATIN CAPITAL LETTER O -->
+      <map code="0x50" name="P"/><!-- LATIN CAPITAL LETTER P -->
+      <map code="0x51" name="Q"/><!-- LATIN CAPITAL LETTER Q -->
+      <map code="0x52" name="R"/><!-- LATIN CAPITAL LETTER R -->
+      <map code="0x53" name="S"/><!-- LATIN CAPITAL LETTER S -->
+      <map code="0x54" name="T"/><!-- LATIN CAPITAL LETTER T -->
+      <map code="0x55" name="U"/><!-- LATIN CAPITAL LETTER U -->
+      <map code="0x56" name="V"/><!-- LATIN CAPITAL LETTER V -->
+      <map code="0x57" name="W"/><!-- LATIN CAPITAL LETTER W -->
+      <map code="0x58" name="X"/><!-- LATIN CAPITAL LETTER X -->
+      <map code="0x59" name="Y"/><!-- LATIN CAPITAL LETTER Y -->
+      <map code="0x5a" name="Z"/><!-- LATIN CAPITAL LETTER Z -->
+      <map code="0x5b" name="bracketleft"/><!-- LEFT SQUARE BRACKET -->
+      <map code="0x5c" name="backslash"/><!-- REVERSE SOLIDUS -->
+      <map code="0x5d" name="bracketright"/><!-- RIGHT SQUARE BRACKET -->
+      <map code="0x5e" name="asciicircum"/><!-- CIRCUMFLEX ACCENT -->
+      <map code="0x5f" name="underscore"/><!-- LOW LINE -->
+      <map code="0x60" name="grave"/><!-- GRAVE ACCENT -->
+      <map code="0x61" name="a"/><!-- LATIN SMALL LETTER A -->
+      <map code="0x62" name="b"/><!-- LATIN SMALL LETTER B -->
+      <map code="0x63" name="c"/><!-- LATIN SMALL LETTER C -->
+      <map code="0x64" name="d"/><!-- LATIN SMALL LETTER D -->
+      <map code="0x65" name="e"/><!-- LATIN SMALL LETTER E -->
+      <map code="0x66" name="f"/><!-- LATIN SMALL LETTER F -->
+      <map code="0x67" name="g"/><!-- LATIN SMALL LETTER G -->
+      <map code="0x68" name="h"/><!-- LATIN SMALL LETTER H -->
+      <map code="0x69" name="i"/><!-- LATIN SMALL LETTER I -->
+      <map code="0x6a" name="j"/><!-- LATIN SMALL LETTER J -->
+      <map code="0x6b" name="k"/><!-- LATIN SMALL LETTER K -->
+      <map code="0x6c" name="l"/><!-- LATIN SMALL LETTER L -->
+      <map code="0x6d" name="m"/><!-- LATIN SMALL LETTER M -->
+      <map code="0x6e" name="n"/><!-- LATIN SMALL LETTER N -->
+      <map code="0x6f" name="o"/><!-- LATIN SMALL LETTER O -->
+      <map code="0x70" name="p"/><!-- LATIN SMALL LETTER P -->
+      <map code="0x71" name="q"/><!-- LATIN SMALL LETTER Q -->
+      <map code="0x72" name="r"/><!-- LATIN SMALL LETTER R -->
+      <map code="0x73" name="s"/><!-- LATIN SMALL LETTER S -->
+      <map code="0x74" name="t"/><!-- LATIN SMALL LETTER T -->
+      <map code="0x75" name="u"/><!-- LATIN SMALL LETTER U -->
+      <map code="0x76" name="v"/><!-- LATIN SMALL LETTER V -->
+      <map code="0x77" name="w"/><!-- LATIN SMALL LETTER W -->
+      <map code="0x78" name="x"/><!-- LATIN SMALL LETTER X -->
+      <map code="0x79" name="y"/><!-- LATIN SMALL LETTER Y -->
+      <map code="0x7a" name="z"/><!-- LATIN SMALL LETTER Z -->
+      <map code="0x7b" name="braceleft"/><!-- LEFT CURLY BRACKET -->
+      <map code="0x7c" name="bar"/><!-- VERTICAL LINE -->
+      <map code="0x7d" name="braceright"/><!-- RIGHT CURLY BRACKET -->
+      <map code="0x7e" name="asciitilde"/><!-- TILDE -->
+      <map code="0xa0" name="uni00A0"/><!-- NO-BREAK SPACE -->
+      <map code="0xa1" name="exclamdown"/><!-- INVERTED EXCLAMATION MARK -->
+      <map code="0xa2" name="cent"/><!-- CENT SIGN -->
+      <map code="0xa3" name="sterling"/><!-- POUND SIGN -->
+      <map code="0xa4" name="currency"/><!-- CURRENCY SIGN -->
+      <map code="0xa5" name="yen"/><!-- YEN SIGN -->
+      <map code="0xa6" name="brokenbar"/><!-- BROKEN BAR -->
+      <map code="0xa7" name="section"/><!-- SECTION SIGN -->
+      <map code="0xa8" name="dieresis"/><!-- DIAERESIS -->
+      <map code="0xa9" name="copyright"/><!-- COPYRIGHT SIGN -->
+      <map code="0xaa" name="ordfeminine"/><!-- FEMININE ORDINAL INDICATOR -->
+      <map code="0xab" name="guillemotleft"/><!-- LEFT-POINTING DOUBLE ANGLE QUOTATION MARK -->
+      <map code="0xac" name="logicalnot"/><!-- NOT SIGN -->
+      <map code="0xad" name="uni00AD"/><!-- SOFT HYPHEN -->
+      <map code="0xae" name="registered"/><!-- REGISTERED SIGN -->
+      <map code="0xaf" name="macron"/><!-- MACRON -->
+      <map code="0xb0" name="degree"/><!-- DEGREE SIGN -->
+      <map code="0xb1" name="plusminus"/><!-- PLUS-MINUS SIGN -->
+      <map code="0xb2" name="uni00B2"/><!-- SUPERSCRIPT TWO -->
+      <map code="0xb3" name="uni00B3"/><!-- SUPERSCRIPT THREE -->
+      <map code="0xb4" name="acute"/><!-- ACUTE ACCENT -->
+      <map code="0xb5" name="mu"/><!-- MICRO SIGN -->
+      <map code="0xb6" name="paragraph"/><!-- PILCROW SIGN -->
+      <map code="0xb7" name="periodcentered"/><!-- MIDDLE DOT -->
+      <map code="0xb8" name="cedilla"/><!-- CEDILLA -->
+      <map code="0xb9" name="uni00B9"/><!-- SUPERSCRIPT ONE -->
+      <map code="0xba" name="ordmasculine"/><!-- MASCULINE ORDINAL INDICATOR -->
+      <map code="0xbb" name="guillemotright"/><!-- RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK -->
+      <map code="0xbc" name="onequarter"/><!-- VULGAR FRACTION ONE QUARTER -->
+      <map code="0xbd" name="onehalf"/><!-- VULGAR FRACTION ONE HALF -->
+      <map code="0xbe" name="threequarters"/><!-- VULGAR FRACTION THREE QUARTERS -->
+      <map code="0xbf" name="questiondown"/><!-- INVERTED QUESTION MARK -->
+      <map code="0xc6" name="AE"/><!-- LATIN CAPITAL LETTER AE -->
+      <map code="0xe6" name="ae"/><!-- LATIN SMALL LETTER AE -->
+      <map code="0x131" name="idotless"/><!-- LATIN SMALL LETTER DOTLESS I -->
+      <map code="0x17f" name="longs"/><!-- LATIN SMALL LETTER LONG S -->
+      <map code="0x237" name="jdotless"/><!-- LATIN SMALL LETTER DOTLESS J -->
+      <map code="0x2b9" name="primemod"/><!-- MODIFIER LETTER PRIME -->
+      <map code="0x2ba" name="doubleprimemod"/><!-- MODIFIER LETTER DOUBLE PRIME -->
+      <map code="0x2bc" name="apostrophemod"/><!-- MODIFIER LETTER APOSTROPHE -->
+      <map code="0x2be" name="righthalfringmod"/><!-- MODIFIER LETTER RIGHT HALF RING -->
+      <map code="0x2bf" name="lefthalfringmod"/><!-- MODIFIER LETTER LEFT HALF RING -->
+      <map code="0x2c6" name="circumflexmod"/><!-- MODIFIER LETTER CIRCUMFLEX ACCENT -->
+      <map code="0x2ca" name="acutemod"/><!-- MODIFIER LETTER ACUTE ACCENT -->
+      <map code="0x2cb" name="gravemod"/><!-- MODIFIER LETTER GRAVE ACCENT -->
+      <map code="0x2d8" name="brevemod"/><!-- BREVE -->
+      <map code="0x2d9" name="dotaccentmod"/><!-- DOT ABOVE -->
+      <map code="0x2da" name="ringmod"/><!-- RING ABOVE -->
+      <map code="0x2dc" name="tildemod"/><!-- SMALL TILDE -->
+      <map code="0x300" name="gravecomb"/><!-- COMBINING GRAVE ACCENT -->
+      <map code="0x301" name="acutecomb"/><!-- COMBINING ACUTE ACCENT -->
+      <map code="0x302" name="circumflexcomb"/><!-- COMBINING CIRCUMFLEX ACCENT -->
+      <map code="0x303" name="tildecomb"/><!-- COMBINING TILDE -->
+      <map code="0x304" name="macroncomb"/><!-- COMBINING MACRON -->
+      <map code="0x305" name="overlinecomb"/><!-- COMBINING OVERLINE -->
+      <map code="0x306" name="brevecomb"/><!-- COMBINING BREVE -->
+      <map code="0x307" name="dotaccentcomb"/><!-- COMBINING DOT ABOVE -->
+      <map code="0x308" name="dieresiscomb"/><!-- COMBINING DIAERESIS -->
+      <map code="0x30a" name="ringcomb"/><!-- COMBINING RING ABOVE -->
+      <map code="0x30c" name="caroncomb"/><!-- COMBINING CARON -->
+      <map code="0x313" name="commacomb"/><!-- COMBINING COMMA ABOVE -->
+      <map code="0x314" name="reversedcommacomb"/><!-- COMBINING REVERSED COMMA ABOVE -->
+      <map code="0x323" name="dotbelowcomb"/><!-- COMBINING DOT BELOW -->
+      <map code="0x32f" name="invertedbrevebelowcomb"/><!-- COMBINING INVERTED BREVE BELOW -->
+      <map code="0x336" name="strokelongcomb"/><!-- COMBINING LONG STROKE OVERLAY -->
+      <map code="0x340" name="gravetonemarkcomb"/><!-- COMBINING GRAVE TONE MARK -->
+      <map code="0x341" name="acutetonemarkcomb"/><!-- COMBINING ACUTE TONE MARK -->
+      <map code="0x342" name="greekperispomenicomb"/><!-- COMBINING GREEK PERISPOMENI -->
+      <map code="0x343" name="greekkoroniscomb"/><!-- COMBINING GREEK KORONIS -->
+      <map code="0x344" name="greekdialytikatonoscomb"/><!-- COMBINING GREEK DIALYTIKA TONOS -->
+      <map code="0x345" name="greekypogegrammenicomb"/><!-- COMBINING GREEK YPOGEGRAMMENI -->
+      <map code="0x351" name="lefthalfringcomb"/><!-- COMBINING LEFT HALF RING ABOVE -->
+      <map code="0x357" name="righthalfringcomb"/><!-- COMBINING RIGHT HALF RING ABOVE -->
+      <map code="0x359" name="asteriskbelowcomb"/><!-- COMBINING ASTERISK BELOW -->
+      <map code="0x374" name="greeknumeralsignmod"/><!-- GREEK NUMERAL SIGN -->
+      <map code="0x375" name="lowernumeralsignmod-grek"/><!-- GREEK LOWER NUMERAL SIGN -->
+      <map code="0x37a" name="ypogegrammenimod-grek"/><!-- GREEK YPOGEGRAMMENI -->
+      <map code="0x37e" name="greekquestionmark"/><!-- GREEK QUESTION MARK -->
+      <map code="0x384" name="tonosmod-grek"/><!-- GREEK TONOS -->
+      <map code="0x385" name="greekdialytikatonosmod"/><!-- GREEK DIALYTIKA TONOS -->
+      <map code="0x386" name="Alphatonos-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH TONOS -->
+      <map code="0x388" name="Epsilontonos-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH TONOS -->
+      <map code="0x389" name="Etatonos-grek"/><!-- GREEK CAPITAL LETTER ETA WITH TONOS -->
+      <map code="0x38a" name="Iotatonos-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH TONOS -->
+      <map code="0x38c" name="Omicrontonos-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH TONOS -->
+      <map code="0x38e" name="Upsilontonos-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH TONOS -->
+      <map code="0x38f" name="Omegatonos-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH TONOS -->
+      <map code="0x390" name="iotadialytikatonos-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS -->
+      <map code="0x391" name="Alpha-grek"/><!-- GREEK CAPITAL LETTER ALPHA -->
+      <map code="0x392" name="Beta-grek"/><!-- GREEK CAPITAL LETTER BETA -->
+      <map code="0x393" name="Gamma-grek"/><!-- GREEK CAPITAL LETTER GAMMA -->
+      <map code="0x394" name="Delta-grek"/><!-- GREEK CAPITAL LETTER DELTA -->
+      <map code="0x395" name="Epsilon-grek"/><!-- GREEK CAPITAL LETTER EPSILON -->
+      <map code="0x396" name="Zeta-grek"/><!-- GREEK CAPITAL LETTER ZETA -->
+      <map code="0x397" name="Eta-grek"/><!-- GREEK CAPITAL LETTER ETA -->
+      <map code="0x398" name="Theta-grek"/><!-- GREEK CAPITAL LETTER THETA -->
+      <map code="0x399" name="Iota-grek"/><!-- GREEK CAPITAL LETTER IOTA -->
+      <map code="0x39a" name="Kappa-grek"/><!-- GREEK CAPITAL LETTER KAPPA -->
+      <map code="0x39b" name="Lamda-grek"/><!-- GREEK CAPITAL LETTER LAMDA -->
+      <map code="0x39c" name="Mu-grek"/><!-- GREEK CAPITAL LETTER MU -->
+      <map code="0x39d" name="Nu-grek"/><!-- GREEK CAPITAL LETTER NU -->
+      <map code="0x39e" name="Xi-grek"/><!-- GREEK CAPITAL LETTER XI -->
+      <map code="0x39f" name="Omicron-grek"/><!-- GREEK CAPITAL LETTER OMICRON -->
+      <map code="0x3a0" name="Pi-grek"/><!-- GREEK CAPITAL LETTER PI -->
+      <map code="0x3a1" name="Rho-grek"/><!-- GREEK CAPITAL LETTER RHO -->
+      <map code="0x3a3" name="Sigma-grek"/><!-- GREEK CAPITAL LETTER SIGMA -->
+      <map code="0x3a4" name="Tau-grek"/><!-- GREEK CAPITAL LETTER TAU -->
+      <map code="0x3a5" name="Upsilon-grek"/><!-- GREEK CAPITAL LETTER UPSILON -->
+      <map code="0x3a6" name="Phi-grek"/><!-- GREEK CAPITAL LETTER PHI -->
+      <map code="0x3a7" name="Chi-grek"/><!-- GREEK CAPITAL LETTER CHI -->
+      <map code="0x3a8" name="Psi-grek"/><!-- GREEK CAPITAL LETTER PSI -->
+      <map code="0x3a9" name="Omega-grek"/><!-- GREEK CAPITAL LETTER OMEGA -->
+      <map code="0x3aa" name="Iotadialytika-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DIALYTIKA -->
+      <map code="0x3ab" name="Upsilondialytika-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DIALYTIKA -->
+      <map code="0x3ac" name="alphatonos-grek"/><!-- GREEK SMALL LETTER ALPHA WITH TONOS -->
+      <map code="0x3ad" name="epsilontonos-grek"/><!-- GREEK SMALL LETTER EPSILON WITH TONOS -->
+      <map code="0x3ae" name="etatonos-grek"/><!-- GREEK SMALL LETTER ETA WITH TONOS -->
+      <map code="0x3af" name="iotatonos-grek"/><!-- GREEK SMALL LETTER IOTA WITH TONOS -->
+      <map code="0x3b0" name="upsilondialytikatonos-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS -->
+      <map code="0x3b1" name="alpha-grek"/><!-- GREEK SMALL LETTER ALPHA -->
+      <map code="0x3b2" name="beta-grek"/><!-- GREEK SMALL LETTER BETA -->
+      <map code="0x3b3" name="gamma-grek"/><!-- GREEK SMALL LETTER GAMMA -->
+      <map code="0x3b4" name="delta-grek"/><!-- GREEK SMALL LETTER DELTA -->
+      <map code="0x3b5" name="epsilon-grek"/><!-- GREEK SMALL LETTER EPSILON -->
+      <map code="0x3b6" name="zeta-grek"/><!-- GREEK SMALL LETTER ZETA -->
+      <map code="0x3b7" name="eta-grek"/><!-- GREEK SMALL LETTER ETA -->
+      <map code="0x3b8" name="theta-grek"/><!-- GREEK SMALL LETTER THETA -->
+      <map code="0x3b9" name="iota-grek"/><!-- GREEK SMALL LETTER IOTA -->
+      <map code="0x3ba" name="kappa-grek"/><!-- GREEK SMALL LETTER KAPPA -->
+      <map code="0x3bb" name="lamda-grek"/><!-- GREEK SMALL LETTER LAMDA -->
+      <map code="0x3bc" name="mu-grek"/><!-- GREEK SMALL LETTER MU -->
+      <map code="0x3bd" name="nu-grek"/><!-- GREEK SMALL LETTER NU -->
+      <map code="0x3be" name="xi-grek"/><!-- GREEK SMALL LETTER XI -->
+      <map code="0x3bf" name="omicron-grek"/><!-- GREEK SMALL LETTER OMICRON -->
+      <map code="0x3c0" name="pi-grek"/><!-- GREEK SMALL LETTER PI -->
+      <map code="0x3c1" name="rho-grek"/><!-- GREEK SMALL LETTER RHO -->
+      <map code="0x3c2" name="finalsigma-grek"/><!-- GREEK SMALL LETTER FINAL SIGMA -->
+      <map code="0x3c3" name="sigma-grek"/><!-- GREEK SMALL LETTER SIGMA -->
+      <map code="0x3c4" name="tau-grek"/><!-- GREEK SMALL LETTER TAU -->
+      <map code="0x3c5" name="upsilon-grek"/><!-- GREEK SMALL LETTER UPSILON -->
+      <map code="0x3c6" name="phi-grek"/><!-- GREEK SMALL LETTER PHI -->
+      <map code="0x3c7" name="chi-grek"/><!-- GREEK SMALL LETTER CHI -->
+      <map code="0x3c8" name="psi-grek"/><!-- GREEK SMALL LETTER PSI -->
+      <map code="0x3c9" name="omega-grek"/><!-- GREEK SMALL LETTER OMEGA -->
+      <map code="0x3ca" name="iotadialytika-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA -->
+      <map code="0x3cb" name="upsilondialytika-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA -->
+      <map code="0x3cc" name="omicrontonos-grek"/><!-- GREEK SMALL LETTER OMICRON WITH TONOS -->
+      <map code="0x3cd" name="upsilontonos-grek"/><!-- GREEK SMALL LETTER UPSILON WITH TONOS -->
+      <map code="0x3ce" name="omegatonos-grek"/><!-- GREEK SMALL LETTER OMEGA WITH TONOS -->
+      <map code="0x3d0" name="betasymbol-grek"/><!-- GREEK BETA SYMBOL -->
+      <map code="0x3d1" name="thetasymbol-grek"/><!-- GREEK THETA SYMBOL -->
+      <map code="0x3d5" name="phisymbol-grek"/><!-- GREEK PHI SYMBOL -->
+      <map code="0x3d6" name="pisymbol-grek"/><!-- GREEK PI SYMBOL -->
+      <map code="0x3d7" name="kaisymbol-grek"/><!-- GREEK KAI SYMBOL -->
+      <map code="0x591" name="accentetnahtacomb-hebr"/><!-- HEBREW ACCENT ETNAHTA -->
+      <map code="0x592" name="accentsegolcomb-hebr"/><!-- HEBREW ACCENT SEGOL -->
+      <map code="0x593" name="accentshalsheletcomb-hebr"/><!-- HEBREW ACCENT SHALSHELET -->
+      <map code="0x594" name="accentzaqefqatancomb-hebr"/><!-- HEBREW ACCENT ZAQEF QATAN -->
+      <map code="0x595" name="accentzaqefgadolcomb-hebr"/><!-- HEBREW ACCENT ZAQEF GADOL -->
+      <map code="0x596" name="accenttipehacomb-hebr"/><!-- HEBREW ACCENT TIPEHA -->
+      <map code="0x597" name="accentreviacomb-hebr"/><!-- HEBREW ACCENT REVIA -->
+      <map code="0x598" name="accentzarqacomb-hebr"/><!-- HEBREW ACCENT ZARQA -->
+      <map code="0x599" name="accentpashtacomb-hebr"/><!-- HEBREW ACCENT PASHTA -->
+      <map code="0x59a" name="accentyetivcomb-hebr"/><!-- HEBREW ACCENT YETIV -->
+      <map code="0x59b" name="accenttevircomb-hebr"/><!-- HEBREW ACCENT TEVIR -->
+      <map code="0x59c" name="accentgereshcomb-hebr"/><!-- HEBREW ACCENT GERESH -->
+      <map code="0x59d" name="accentgereshmuqdamcomb-hebr"/><!-- HEBREW ACCENT GERESH MUQDAM -->
+      <map code="0x59e" name="accentgershayimcomb-hebr"/><!-- HEBREW ACCENT GERSHAYIM -->
+      <map code="0x59f" name="accentqarneyparacomb-hebr"/><!-- HEBREW ACCENT QARNEY PARA -->
+      <map code="0x5a0" name="accenttelishagedolacomb-hebr"/><!-- HEBREW ACCENT TELISHA GEDOLA -->
+      <map code="0x5a1" name="accentpazercomb-hebr"/><!-- HEBREW ACCENT PAZER -->
+      <map code="0x5a2" name="accentatnahhafukhcomb-hebr"/><!-- HEBREW ACCENT ATNAH HAFUKH -->
+      <map code="0x5a3" name="accentmunahcomb-hebr"/><!-- HEBREW ACCENT MUNAH -->
+      <map code="0x5a4" name="accentmahapakhcomb-hebr"/><!-- HEBREW ACCENT MAHAPAKH -->
+      <map code="0x5a5" name="accentmerkhacomb-hebr"/><!-- HEBREW ACCENT MERKHA -->
+      <map code="0x5a6" name="accentmerkhakefulacomb-hebr"/><!-- HEBREW ACCENT MERKHA KEFULA -->
+      <map code="0x5a7" name="accentdargacomb-hebr"/><!-- HEBREW ACCENT DARGA -->
+      <map code="0x5a8" name="accentqadmacomb-hebr"/><!-- HEBREW ACCENT QADMA -->
+      <map code="0x5a9" name="accenttelishaqetanacomb-hebr"/><!-- HEBREW ACCENT TELISHA QETANA -->
+      <map code="0x5aa" name="accentyerahbenyomocomb-hebr"/><!-- HEBREW ACCENT YERAH BEN YOMO -->
+      <map code="0x5ab" name="accentolecomb-hebr"/><!-- HEBREW ACCENT OLE -->
+      <map code="0x5ac" name="accentiluycomb-hebr"/><!-- HEBREW ACCENT ILUY -->
+      <map code="0x5ad" name="accentdehicomb-hebr"/><!-- HEBREW ACCENT DEHI -->
+      <map code="0x5ae" name="accentzinorcomb-hebr"/><!-- HEBREW ACCENT ZINOR -->
+      <map code="0x5af" name="markmasoracirclecomb-hebr"/><!-- HEBREW MARK MASORA CIRCLE -->
+      <map code="0x5b0" name="shevacomb-hebr"/><!-- HEBREW POINT SHEVA -->
+      <map code="0x5b1" name="hatafsegolcomb-hebr"/><!-- HEBREW POINT HATAF SEGOL -->
+      <map code="0x5b2" name="hatafpatahcomb-hebr"/><!-- HEBREW POINT HATAF PATAH -->
+      <map code="0x5b3" name="hatafqamatscomb-hebr"/><!-- HEBREW POINT HATAF QAMATS -->
+      <map code="0x5b4" name="hiriqcomb-hebr"/><!-- HEBREW POINT HIRIQ -->
+      <map code="0x5b5" name="tserecomb-hebr"/><!-- HEBREW POINT TSERE -->
+      <map code="0x5b6" name="segolcomb-hebr"/><!-- HEBREW POINT SEGOL -->
+      <map code="0x5b7" name="patahcomb-hebr"/><!-- HEBREW POINT PATAH -->
+      <map code="0x5b8" name="qamatscomb-hebr"/><!-- HEBREW POINT QAMATS -->
+      <map code="0x5b9" name="holamcomb-hebr"/><!-- HEBREW POINT HOLAM -->
+      <map code="0x5ba" name="holamhaserforvavcomb-hebr"/><!-- HEBREW POINT HOLAM HASER FOR VAV -->
+      <map code="0x5bb" name="qubutscomb-hebr"/><!-- HEBREW POINT QUBUTS -->
+      <map code="0x5bc" name="dageshormapiqcomb-hebr"/><!-- HEBREW POINT DAGESH OR MAPIQ -->
+      <map code="0x5bd" name="metegcomb-hebr"/><!-- HEBREW POINT METEG -->
+      <map code="0x5be" name="maqaf-hebr"/><!-- HEBREW PUNCTUATION MAQAF -->
+      <map code="0x5bf" name="rafecomb-hebr"/><!-- HEBREW POINT RAFE -->
+      <map code="0x5c0" name="punctuationpaseq-hebr"/><!-- HEBREW PUNCTUATION PASEQ -->
+      <map code="0x5c1" name="shindotcomb-hebr"/><!-- HEBREW POINT SHIN DOT -->
+      <map code="0x5c2" name="sindotcomb-hebr"/><!-- HEBREW POINT SIN DOT -->
+      <map code="0x5c3" name="punctuationsofpasuq-hebr"/><!-- HEBREW PUNCTUATION SOF PASUQ -->
+      <map code="0x5c4" name="markupperdotcomb-hebr"/><!-- HEBREW MARK UPPER DOT -->
+      <map code="0x5c5" name="marklowerdotcomb-hebr"/><!-- HEBREW MARK LOWER DOT -->
+      <map code="0x5c6" name="punctuationnunhafukha-hebr"/><!-- HEBREW PUNCTUATION NUN HAFUKHA -->
+      <map code="0x5c7" name="qamatsqatancomb-hebr"/><!-- HEBREW POINT QAMATS QATAN -->
+      <map code="0x5d0" name="alef-hebr"/><!-- HEBREW LETTER ALEF -->
+      <map code="0x5d1" name="bet-hebr"/><!-- HEBREW LETTER BET -->
+      <map code="0x5d2" name="gimel-hebr"/><!-- HEBREW LETTER GIMEL -->
+      <map code="0x5d3" name="dalet-hebr"/><!-- HEBREW LETTER DALET -->
+      <map code="0x5d4" name="he-hebr"/><!-- HEBREW LETTER HE -->
+      <map code="0x5d5" name="vav-hebr"/><!-- HEBREW LETTER VAV -->
+      <map code="0x5d6" name="zayin-hebr"/><!-- HEBREW LETTER ZAYIN -->
+      <map code="0x5d7" name="het-hebr"/><!-- HEBREW LETTER HET -->
+      <map code="0x5d8" name="tet-hebr"/><!-- HEBREW LETTER TET -->
+      <map code="0x5d9" name="yod-hebr"/><!-- HEBREW LETTER YOD -->
+      <map code="0x5da" name="finalkaf-hebr"/><!-- HEBREW LETTER FINAL KAF -->
+      <map code="0x5db" name="kaf-hebr"/><!-- HEBREW LETTER KAF -->
+      <map code="0x5dc" name="lamed-hebr"/><!-- HEBREW LETTER LAMED -->
+      <map code="0x5dd" name="finalmem-hebr"/><!-- HEBREW LETTER FINAL MEM -->
+      <map code="0x5de" name="mem-hebr"/><!-- HEBREW LETTER MEM -->
+      <map code="0x5df" name="finalnun-hebr"/><!-- HEBREW LETTER FINAL NUN -->
+      <map code="0x5e0" name="nun-hebr"/><!-- HEBREW LETTER NUN -->
+      <map code="0x5e1" name="samekh-hebr"/><!-- HEBREW LETTER SAMEKH -->
+      <map code="0x5e2" name="ayin-hebr"/><!-- HEBREW LETTER AYIN -->
+      <map code="0x5e3" name="finalpe-hebr"/><!-- HEBREW LETTER FINAL PE -->
+      <map code="0x5e4" name="pe-hebr"/><!-- HEBREW LETTER PE -->
+      <map code="0x5e5" name="finaltsadi-hebr"/><!-- HEBREW LETTER FINAL TSADI -->
+      <map code="0x5e6" name="tsadi-hebr"/><!-- HEBREW LETTER TSADI -->
+      <map code="0x5e7" name="qof-hebr"/><!-- HEBREW LETTER QOF -->
+      <map code="0x5e8" name="resh-hebr"/><!-- HEBREW LETTER RESH -->
+      <map code="0x5e9" name="shin-hebr"/><!-- HEBREW LETTER SHIN -->
+      <map code="0x5ea" name="tav-hebr"/><!-- HEBREW LETTER TAV -->
+      <map code="0x5f0" name="yiddishdoublevav-hebr"/><!-- HEBREW LIGATURE YIDDISH DOUBLE VAV -->
+      <map code="0x5f1" name="yiddishvavyod-hebr"/><!-- HEBREW LIGATURE YIDDISH VAV YOD -->
+      <map code="0x5f2" name="yiddishdoubleyod-hebr"/><!-- HEBREW LIGATURE YIDDISH DOUBLE YOD -->
+      <map code="0x5f3" name="punctuationgeresh-hebr"/><!-- HEBREW PUNCTUATION GERESH -->
+      <map code="0x5f4" name="punctuationgershayim-hebr"/><!-- HEBREW PUNCTUATION GERSHAYIM -->
+      <map code="0x1f00" name="alphapsili-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI -->
+      <map code="0x1f01" name="alphadasia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA -->
+      <map code="0x1f02" name="alphapsilivaria-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND VARIA -->
+      <map code="0x1f03" name="alphadasiavaria-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND VARIA -->
+      <map code="0x1f04" name="alphapsilioxia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND OXIA -->
+      <map code="0x1f05" name="alphadasiaoxia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND OXIA -->
+      <map code="0x1f06" name="alphapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f07" name="alphadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f08" name="Alphapsili-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI -->
+      <map code="0x1f09" name="Alphadasia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA -->
+      <map code="0x1f0a" name="Alphapsilivaria-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND VARIA -->
+      <map code="0x1f0b" name="Alphadasiavaria-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND VARIA -->
+      <map code="0x1f0c" name="Alphapsilioxia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND OXIA -->
+      <map code="0x1f0d" name="Alphadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND OXIA -->
+      <map code="0x1f0e" name="Alphapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f0f" name="Alphadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f10" name="epsilonpsili-grek"/><!-- GREEK SMALL LETTER EPSILON WITH PSILI -->
+      <map code="0x1f11" name="epsilondasia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH DASIA -->
+      <map code="0x1f12" name="epsilonpsilivaria-grek"/><!-- GREEK SMALL LETTER EPSILON WITH PSILI AND VARIA -->
+      <map code="0x1f13" name="epsilondasiavaria-grek"/><!-- GREEK SMALL LETTER EPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f14" name="epsilonpsilioxia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH PSILI AND OXIA -->
+      <map code="0x1f15" name="epsilondasiaoxia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f16" name="epsilon_perispomeni"/><!-- ???? -->
+      <map code="0x1f18" name="Epsilonpsili-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH PSILI -->
+      <map code="0x1f19" name="Epsilondasia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH DASIA -->
+      <map code="0x1f1a" name="Epsilonpsilivaria-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH PSILI AND VARIA -->
+      <map code="0x1f1b" name="Epsilondasiavaria-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f1c" name="Epsilonpsilioxia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH PSILI AND OXIA -->
+      <map code="0x1f1d" name="Epsilondasiaoxia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f20" name="etapsili-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI -->
+      <map code="0x1f21" name="etadasia-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA -->
+      <map code="0x1f22" name="etapsilivaria-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND VARIA -->
+      <map code="0x1f23" name="etadasiavaria-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND VARIA -->
+      <map code="0x1f24" name="etapsilioxia-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND OXIA -->
+      <map code="0x1f25" name="etadasiaoxia-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND OXIA -->
+      <map code="0x1f26" name="etapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f27" name="etadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f28" name="Etapsili-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI -->
+      <map code="0x1f29" name="Etadasia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA -->
+      <map code="0x1f2a" name="Etapsilivaria-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND VARIA -->
+      <map code="0x1f2b" name="Etadasiavaria-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND VARIA -->
+      <map code="0x1f2c" name="Etapsilioxia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND OXIA -->
+      <map code="0x1f2d" name="Etadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND OXIA -->
+      <map code="0x1f2e" name="Etapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f2f" name="Etadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f30" name="iotapsili-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI -->
+      <map code="0x1f31" name="iotadasia-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA -->
+      <map code="0x1f32" name="iotapsilivaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI AND VARIA -->
+      <map code="0x1f33" name="iotadasiavaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA AND VARIA -->
+      <map code="0x1f34" name="iotapsilioxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI AND OXIA -->
+      <map code="0x1f35" name="iotadasiaoxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA AND OXIA -->
+      <map code="0x1f36" name="iotapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f37" name="iotadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f38" name="Iotapsili-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI -->
+      <map code="0x1f39" name="Iotadasia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA -->
+      <map code="0x1f3a" name="Iotapsilivaria-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI AND VARIA -->
+      <map code="0x1f3b" name="Iotadasiavaria-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA AND VARIA -->
+      <map code="0x1f3c" name="Iotapsilioxia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI AND OXIA -->
+      <map code="0x1f3d" name="Iotadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA AND OXIA -->
+      <map code="0x1f3e" name="Iotapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f3f" name="Iotadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f40" name="omicronpsili-grek"/><!-- GREEK SMALL LETTER OMICRON WITH PSILI -->
+      <map code="0x1f41" name="omicrondasia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH DASIA -->
+      <map code="0x1f42" name="omicronpsilivaria-grek"/><!-- GREEK SMALL LETTER OMICRON WITH PSILI AND VARIA -->
+      <map code="0x1f43" name="omicrondasiavaria-grek"/><!-- GREEK SMALL LETTER OMICRON WITH DASIA AND VARIA -->
+      <map code="0x1f44" name="omicronpsilioxia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH PSILI AND OXIA -->
+      <map code="0x1f45" name="omicrondasiaoxia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH DASIA AND OXIA -->
+      <map code="0x1f48" name="Omicronpsili-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH PSILI -->
+      <map code="0x1f49" name="Omicrondasia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH DASIA -->
+      <map code="0x1f4a" name="Omicronpsilivaria-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH PSILI AND VARIA -->
+      <map code="0x1f4b" name="Omicrondasiavaria-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH DASIA AND VARIA -->
+      <map code="0x1f4c" name="Omicronpsilioxia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH PSILI AND OXIA -->
+      <map code="0x1f4d" name="Omicrondasiaoxia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH DASIA AND OXIA -->
+      <map code="0x1f50" name="upsilonpsili-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI -->
+      <map code="0x1f51" name="upsilondasia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA -->
+      <map code="0x1f52" name="upsilonpsilivaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI AND VARIA -->
+      <map code="0x1f53" name="upsilondasiavaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f54" name="upsilonpsilioxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI AND OXIA -->
+      <map code="0x1f55" name="upsilondasiaoxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f56" name="upsilonpsiliperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f57" name="upsilondasiaperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f59" name="Upsilondasia-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA -->
+      <map code="0x1f5b" name="Upsilondasiavaria-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f5d" name="Upsilondasiaoxia-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f5f" name="Upsilondasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f60" name="omegapsili-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI -->
+      <map code="0x1f61" name="omegadasia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA -->
+      <map code="0x1f62" name="omegapsilivaria-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND VARIA -->
+      <map code="0x1f63" name="omegadasiavaria-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND VARIA -->
+      <map code="0x1f64" name="omegapsilioxia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND OXIA -->
+      <map code="0x1f65" name="omegadasiaoxia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND OXIA -->
+      <map code="0x1f66" name="omegapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f67" name="omegadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f68" name="Omegapsili-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI -->
+      <map code="0x1f69" name="Omegadasia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA -->
+      <map code="0x1f6a" name="Omegapsilivaria-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND VARIA -->
+      <map code="0x1f6b" name="Omegadasiavaria-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND VARIA -->
+      <map code="0x1f6c" name="Omegapsilioxia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND OXIA -->
+      <map code="0x1f6d" name="Omegadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND OXIA -->
+      <map code="0x1f6e" name="Omegapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f6f" name="Omegadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f70" name="alphavaria-grek"/><!-- GREEK SMALL LETTER ALPHA WITH VARIA -->
+      <map code="0x1f71" name="alphaoxia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH OXIA -->
+      <map code="0x1f72" name="epsilonvaria-grek"/><!-- GREEK SMALL LETTER EPSILON WITH VARIA -->
+      <map code="0x1f73" name="epsilonoxia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH OXIA -->
+      <map code="0x1f74" name="etavaria-grek"/><!-- GREEK SMALL LETTER ETA WITH VARIA -->
+      <map code="0x1f75" name="etaoxia-grek"/><!-- GREEK SMALL LETTER ETA WITH OXIA -->
+      <map code="0x1f76" name="iotavaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH VARIA -->
+      <map code="0x1f77" name="iotaoxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH OXIA -->
+      <map code="0x1f78" name="omicronvaria-grek"/><!-- GREEK SMALL LETTER OMICRON WITH VARIA -->
+      <map code="0x1f79" name="omicronoxia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH OXIA -->
+      <map code="0x1f7a" name="upsilonvaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH VARIA -->
+      <map code="0x1f7b" name="upsilonoxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH OXIA -->
+      <map code="0x1f7c" name="omegavaria-grek"/><!-- GREEK SMALL LETTER OMEGA WITH VARIA -->
+      <map code="0x1f7d" name="omegaoxia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH OXIA -->
+      <map code="0x1f80" name="alphapsiliypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND YPOGEGRAMMENI -->
+      <map code="0x1f81" name="alphadasiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND YPOGEGRAMMENI -->
+      <map code="0x1f82" name="alphapsilivariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f83" name="alphadasiavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f84" name="alphapsilioxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f85" name="alphadasiaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f86" name="alphapsiliperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f87" name="alphadasiaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f88" name="Alphapsiliprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND PROSGEGRAMMENI -->
+      <map code="0x1f89" name="Alphadasiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8a" name="Alphapsilivariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8b" name="Alphadasiavariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8c" name="Alphapsilioxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8d" name="Alphadasiaoxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8e" name="Alphapsiliperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1f8f" name="Alphadasiaperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1f90" name="etapsiliypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND YPOGEGRAMMENI -->
+      <map code="0x1f91" name="etadasiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND YPOGEGRAMMENI -->
+      <map code="0x1f92" name="etapsilivariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f93" name="etadasiavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f94" name="etapsilioxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f95" name="etadasiaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f96" name="etapsiliperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f97" name="etadasiaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f98" name="Etapsiliprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND PROSGEGRAMMENI -->
+      <map code="0x1f99" name="Etadasiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9a" name="Etapsilivariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9b" name="Etadasiavariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9c" name="Etapsilioxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9d" name="Etadasiaoxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9e" name="Etapsiliperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1f9f" name="Etadasiaperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1fa0" name="omegapsiliypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND YPOGEGRAMMENI -->
+      <map code="0x1fa1" name="omegadasiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa2" name="omegapsilivariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa3" name="omegadasiavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa4" name="omegapsilioxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa5" name="omegadasiaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa6" name="omegapsiliperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fa7" name="omegadasiaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fa8" name="Omegapsiliprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND PROSGEGRAMMENI -->
+      <map code="0x1fa9" name="Omegadasiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND PROSGEGRAMMENI -->
+      <map code="0x1faa" name="Omegapsilivariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1fab" name="Omegadasiavariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1fac" name="Omegapsilioxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1fad" name="Omegadasiaoxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1fae" name="Omegapsiliperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1faf" name="Omegadasiaperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1fb0" name="alphavrachy-grek"/><!-- GREEK SMALL LETTER ALPHA WITH VRACHY -->
+      <map code="0x1fb1" name="alphamacron-grek"/><!-- GREEK SMALL LETTER ALPHA WITH MACRON -->
+      <map code="0x1fb2" name="alphavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fb3" name="alphaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH YPOGEGRAMMENI -->
+      <map code="0x1fb4" name="alphaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fb6" name="alphaperispomeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PERISPOMENI -->
+      <map code="0x1fb7" name="alphaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fb8" name="Alphavrachy-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH VRACHY -->
+      <map code="0x1fb9" name="Alphamacron-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH MACRON -->
+      <map code="0x1fba" name="Alphavaria-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH VARIA -->
+      <map code="0x1fbb" name="Alphaoxia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH OXIA -->
+      <map code="0x1fbc" name="Alphaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PROSGEGRAMMENI -->
+      <map code="0x1fbd" name="koronismod-grek"/><!-- GREEK KORONIS -->
+      <map code="0x1fbe" name="prosgegrammeni-grek"/><!-- GREEK PROSGEGRAMMENI -->
+      <map code="0x1fbf" name="psilimod-grek"/><!-- GREEK PSILI -->
+      <map code="0x1fc0" name="perispomenimod-grek"/><!-- GREEK PERISPOMENI -->
+      <map code="0x1fc1" name="dialytikaperispomenimod-grek"/><!-- GREEK DIALYTIKA AND PERISPOMENI -->
+      <map code="0x1fc2" name="etavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fc3" name="etaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH YPOGEGRAMMENI -->
+      <map code="0x1fc4" name="etaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fc6" name="etaperispomeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PERISPOMENI -->
+      <map code="0x1fc7" name="etaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fc8" name="Epsilonvaria-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH VARIA -->
+      <map code="0x1fc9" name="Epsilonoxia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH OXIA -->
+      <map code="0x1fca" name="Etavaria-grek"/><!-- GREEK CAPITAL LETTER ETA WITH VARIA -->
+      <map code="0x1fcb" name="Etaoxia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH OXIA -->
+      <map code="0x1fcc" name="Etaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PROSGEGRAMMENI -->
+      <map code="0x1fcd" name="psilivariamod-grek"/><!-- GREEK PSILI AND VARIA -->
+      <map code="0x1fce" name="psilioxiamod-grek"/><!-- GREEK PSILI AND OXIA -->
+      <map code="0x1fcf" name="psiliperispomenimod-grek"/><!-- GREEK PSILI AND PERISPOMENI -->
+      <map code="0x1fd0" name="iotavrachy-grek"/><!-- GREEK SMALL LETTER IOTA WITH VRACHY -->
+      <map code="0x1fd1" name="iotamacron-grek"/><!-- GREEK SMALL LETTER IOTA WITH MACRON -->
+      <map code="0x1fd2" name="iotadialytikavaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND VARIA -->
+      <map code="0x1fd3" name="iotadialytikaoxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND OXIA -->
+      <map code="0x1fd6" name="iotaperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH PERISPOMENI -->
+      <map code="0x1fd7" name="iotadialytikaperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND PERISPOMENI -->
+      <map code="0x1fd8" name="Iotavrachy-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH VRACHY -->
+      <map code="0x1fd9" name="Iotamacron-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH MACRON -->
+      <map code="0x1fda" name="Iotavaria-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH VARIA -->
+      <map code="0x1fdb" name="Iotaoxia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH OXIA -->
+      <map code="0x1fdd" name="dasiavariamod-grek"/><!-- GREEK DASIA AND VARIA -->
+      <map code="0x1fde" name="dasiaoxiamod-grek"/><!-- GREEK DASIA AND OXIA -->
+      <map code="0x1fdf" name="dasiaperispomenimod-grek"/><!-- GREEK DASIA AND PERISPOMENI -->
+      <map code="0x1fe0" name="upsilonvrachy-grek"/><!-- GREEK SMALL LETTER UPSILON WITH VRACHY -->
+      <map code="0x1fe1" name="upsilonmacron-grek"/><!-- GREEK SMALL LETTER UPSILON WITH MACRON -->
+      <map code="0x1fe2" name="upsilondialytikavaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND VARIA -->
+      <map code="0x1fe3" name="upsilondialytikaoxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND OXIA -->
+      <map code="0x1fe4" name="rhopsili-grek"/><!-- GREEK SMALL LETTER RHO WITH PSILI -->
+      <map code="0x1fe5" name="rhodasia-grek"/><!-- GREEK SMALL LETTER RHO WITH DASIA -->
+      <map code="0x1fe6" name="upsilonperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PERISPOMENI -->
+      <map code="0x1fe7" name="upsilondialytikaperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND PERISPOMENI -->
+      <map code="0x1fe8" name="Upsilonvrachy-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH VRACHY -->
+      <map code="0x1fe9" name="Upsilonmacron-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH MACRON -->
+      <map code="0x1fea" name="Upsilonvaria-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH VARIA -->
+      <map code="0x1feb" name="Upsilonoxia-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH OXIA -->
+      <map code="0x1fec" name="Rhodasia-grek"/><!-- GREEK CAPITAL LETTER RHO WITH DASIA -->
+      <map code="0x1fed" name="dialytikavariamod-grek"/><!-- GREEK DIALYTIKA AND VARIA -->
+      <map code="0x1fee" name="dialytikaoxiamod-grek"/><!-- GREEK DIALYTIKA AND OXIA -->
+      <map code="0x1fef" name="variamod-grek"/><!-- GREEK VARIA -->
+      <map code="0x1ff2" name="omegavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1ff3" name="omegaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH YPOGEGRAMMENI -->
+      <map code="0x1ff4" name="omegaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1ff6" name="omegaperispomeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PERISPOMENI -->
+      <map code="0x1ff7" name="omegaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1ff8" name="Omicronvaria-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH VARIA -->
+      <map code="0x1ff9" name="Omicronoxia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH OXIA -->
+      <map code="0x1ffa" name="Omegavaria-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH VARIA -->
+      <map code="0x1ffb" name="Omegaoxia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH OXIA -->
+      <map code="0x1ffc" name="Omegaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI -->
+      <map code="0x1ffd" name="oxiamod-grek"/><!-- GREEK OXIA -->
+      <map code="0x1ffe" name="dasiamod-grek"/><!-- GREEK DASIA -->
+      <map code="0xe138" name="uniE138"/><!-- ???? -->
+      <map code="0xe6af" name="alpha_apostrophe"/><!-- ???? -->
+      <map code="0xe6b0" name="alpha_curly"/><!-- ???? -->
+      <map code="0xe6b1" name="alpha_iota"/><!-- ???? -->
+      <map code="0xe6b2" name="alpha_iota_psili"/><!-- ???? -->
+      <map code="0xe6b3" name="alpha_iota_tonos"/><!-- ???? -->
+      <map code="0xe6b4" name="alpha_iota_psili_oxia"/><!-- ???? -->
+      <map code="0xe6b5" name="alpha_iota_perispomeni"/><!-- ???? -->
+      <map code="0xe6b6" name="alpha_nu"/><!-- ???? -->
+      <map code="0xe6b7" name="alpha_rho"/><!-- ???? -->
+      <map code="0xe6b8" name="alpha_sigma_tau"/><!-- ???? -->
+      <map code="0xe6b9" name="alpha_psili_sigma_tau"/><!-- ???? -->
+      <map code="0xe6c0" name="beta_curly"/><!-- ???? -->
+      <map code="0xe6d0" name="gamma_short"/><!-- ???? -->
+      <map code="0xe6d1" name="gamma_tall"/><!-- ???? -->
+      <map code="0xe6d2" name="gamma_alpha_varia_rho"/><!-- ???? -->
+      <map code="0xe6d3" name="gamma_alpha_varia_rho_2"/><!-- ???? -->
+      <map code="0xe6d4" name="gamma_alpha_varia_rho_3"/><!-- ???? -->
+      <map code="0xe6d5" name="gamma_alpha_varia_rho_4"/><!-- ???? -->
+      <map code="0xe6d6" name="gamma_alpha_varia_rho_5"/><!-- ???? -->
+      <map code="0xe6d7" name="gamma_gamma"/><!-- ???? -->
+      <map code="0xe6d8" name="gamma_epsilon_nu_oxia"/><!-- ???? -->
+      <map code="0xe6d9" name="gamma_omicron"/><!-- ???? -->
+      <map code="0xe6da" name="gamma_omicron_2"/><!-- ???? -->
+      <map code="0xe6db" name="gamma_rho"/><!-- ???? -->
+      <map code="0xe6dc" name="uniE6DC"/><!-- ???? -->
+      <map code="0xe6df" name="delta_apostrophe"/><!-- ???? -->
+      <map code="0xe6e0" name="delta_curly"/><!-- ???? -->
+      <map code="0xe6e1" name="delta_epsilon"/><!-- ???? -->
+      <map code="0xe6e2" name="delta_epsilon_varia"/><!-- ???? -->
+      <map code="0xe6e3" name="delta_epsilon_varia_2"/><!-- ???? -->
+      <map code="0xe6e4" name="delta_alpha_fin_sigma"/><!-- ???? -->
+      <map code="0xe6f0" name="epsilon_psili_perispomeni"/><!-- ???? -->
+      <map code="0xe6f1" name="epsilon_dasia_perispomeni"/><!-- ???? -->
+      <map code="0xe6f2" name="epsilon_iota"/><!-- ???? -->
+      <map code="0xe6f3" name="epsilon_iota_2"/><!-- ???? -->
+      <map code="0xe6f4" name="epsilon_iota_perispomeni"/><!-- ???? -->
+      <map code="0xe6f5" name="epsion_iota_2_perispomeni"/><!-- ???? -->
+      <map code="0xe6f6" name="epsilon_iota_perispomeni_prosgegrammeni"/><!-- ???? -->
+      <map code="0xe6f7" name="epsilon_psili_nu"/><!-- ???? -->
+      <map code="0xe6f8" name="epsilon_psili_xi"/><!-- ???? -->
+      <map code="0xe6f9" name="epsilon_rho"/><!-- ???? -->
+      <map code="0xe6fa" name="epsilon_rho_2"/><!-- ???? -->
+      <map code="0xe6fb" name="epsilon_stigma_iota"/><!-- ???? -->
+      <map code="0xe6fc" name="epsilon_psili_stigma_iota"/><!-- ???? -->
+      <map code="0xe6fd" name="epsilon_psili_stigma_iota_varia"/><!-- ???? -->
+      <map code="0xe6fe" name="epsilon_upsilon"/><!-- ???? -->
+      <map code="0xe6ff" name="epsilon_upsilon_2"/><!-- ???? -->
+      <map code="0xe700" name="zeta_2"/><!-- ???? -->
+      <map code="0xe701" name="zeta_3"/><!-- ???? -->
+      <map code="0xe710" name="eta_2"/><!-- ???? -->
+      <map code="0xe711" name="eta_2_perispomeni"/><!-- ???? -->
+      <map code="0xe712" name="eta_nu"/><!-- ???? -->
+      <map code="0xe713" name="eta_tonos_nu"/><!-- ???? -->
+      <map code="0xe714" name="eta_varia_nu"/><!-- ???? -->
+      <map code="0xe717" name="eta_varia_nu_2"/><!-- ???? -->
+      <map code="0xe718" name="eta_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe71f" name="theta_apostrophe"/><!-- ???? -->
+      <map code="0xe720" name="theta_symbol_apostrophe"/><!-- ???? -->
+      <map code="0xe721" name="phi_apostrophe"/><!-- ???? -->
+      <map code="0xe722" name="phi_iota"/><!-- ???? -->
+      <map code="0xe723" name="phi_iota_tonos"/><!-- ???? -->
+      <map code="0xe740" name="kappa_alpha_iota_2_varia"/><!-- ???? -->
+      <map code="0xe741" name="kappa_alpha_iota_3_varia"/><!-- ???? -->
+      <map code="0xe742" name="kappa_alpha_iota_4_varia"/><!-- ???? -->
+      <map code="0xe743" name="kappa_alpha_iota_5_varia"/><!-- ???? -->
+      <map code="0xe744" name="kappa_alpha_tau_alpha"/><!-- ???? -->
+      <map code="0xe750" name="lambda_apostrophe"/><!-- ???? -->
+      <map code="0xe751" name="lambda_lambda"/><!-- ???? -->
+      <map code="0xe752" name="lambda_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe753" name="lambda_iota_per_fin_sigma"/><!-- ???? -->
+      <map code="0xe760" name="mu_epsilon_nu"/><!-- ???? -->
+      <map code="0xe761" name="mu_epsilon_nu_2"/><!-- ???? -->
+      <map code="0xe762" name="mu_epsilon_nu_3"/><!-- ???? -->
+      <map code="0xe763" name="mu_epsilon_varia_nu"/><!-- ???? -->
+      <map code="0xe764" name="mu_epsilon_varia_2_nu"/><!-- ???? -->
+      <map code="0xe765" name="mu_epsilon_tonos_nu"/><!-- ???? -->
+      <map code="0xe766" name="uniE766"/><!-- ???? -->
+      <map code="0xe767" name="mu_alpha_fin_sigma"/><!-- ???? -->
+      <map code="0xe768" name="mu_epsilon_iota_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe770" name="nu_final"/><!-- ???? -->
+      <map code="0xe771" name="nu_omicrn_final_sigma"/><!-- ???? -->
+      <map code="0xe772" name="nu_alpha_iota_final_sigma"/><!-- ???? -->
+      <map code="0xe780" name="xi_2"/><!-- ???? -->
+      <map code="0xe797" name="omicron_psili_perispomeni"/><!-- ???? -->
+      <map code="0xe798" name="omicron_dasia_perispomeni"/><!-- ???? -->
+      <map code="0xe799" name="omicron_perispomeni"/><!-- ???? -->
+      <map code="0xe79a" name="omicron_upsilon"/><!-- ???? -->
+      <map code="0xe79b" name="omicron_upsilon_tonos"/><!-- ???? -->
+      <map code="0xe79c" name="omicron_upsilon_perispomeni"/><!-- ???? -->
+      <map code="0xe79d" name="omicron_sigma"/><!-- ???? -->
+      <map code="0xe7a0" name="Pi_2"/><!-- ???? -->
+      <map code="0xe7a1" name="pi_apostrophe"/><!-- ???? -->
+      <map code="0xe7a2" name="pisymbol_apostrophe"/><!-- ???? -->
+      <map code="0xe7a3" name="pi_alpha_rho"/><!-- ???? -->
+      <map code="0xe7a4" name="pi_epsilon_rho"/><!-- ???? -->
+      <map code="0xe7a5" name="pi_omicron"/><!-- ???? -->
+      <map code="0xe7a6" name="pi_omicron_varia"/><!-- ???? -->
+      <map code="0xe7a7" name="pi_rho"/><!-- ???? -->
+      <map code="0xe7a8" name="pi_tau"/><!-- ???? -->
+      <map code="0xe7a9" name="pi_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7aa" name="pi_rho_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ab" name="pi_epsilon_nu"/><!-- ???? -->
+      <map code="0xe7ac" name="pi_epsilon_nu2"/><!-- ???? -->
+      <map code="0xe7c0" name="sigma_2"/><!-- ???? -->
+      <map code="0xe7c1" name="sigma_theta"/><!-- ???? -->
+      <map code="0xe7c2" name="sigma_theta_alpha_iota"/><!-- ???? -->
+      <map code="0xe7c3" name="sigma_pi"/><!-- ???? -->
+      <map code="0xe7c4" name="sigma_sigma"/><!-- ???? -->
+      <map code="0xe7c5" name="sigma_tau"/><!-- ???? -->
+      <map code="0xe7c6" name="sigma_tau_rho"/><!-- ???? -->
+      <map code="0xe7c7" name="sigma_chi"/><!-- ???? -->
+      <map code="0xe7c8" name="sigma_epsilon_nu"/><!-- ???? -->
+      <map code="0xe7c9" name="sigma_eta_ypog_fin_sigma"/><!-- ???? -->
+      <map code="0xe7d0" name="tau_tall"/><!-- ???? -->
+      <map code="0xe7d1" name="tau_tall_apostrophe"/><!-- ???? -->
+      <map code="0xe7d2" name="tau_apostrophe"/><!-- ???? -->
+      <map code="0xe7d3" name="tau_alpha_iota"/><!-- ???? -->
+      <map code="0xe7d4" name="tau_alpha_iota_2"/><!-- ???? -->
+      <map code="0xe7d5" name="tau_epsilon"/><!-- ???? -->
+      <map code="0xe7d6" name="tau_eta_varia_nu"/><!-- ???? -->
+      <map code="0xe7d7" name="tau_eta_varia2_nu"/><!-- ???? -->
+      <map code="0xe7d8" name="tau_eta_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe7d9" name="tau_eta_perispomeni_sigma_2"/><!-- ???? -->
+      <map code="0xe7da" name="tau_iota"/><!-- ???? -->
+      <map code="0xe7db" name="tau_omicron"/><!-- ???? -->
+      <map code="0xe7dc" name="tau_omicron_2"/><!-- ???? -->
+      <map code="0xe7dd" name="tau_omicron_varia"/><!-- ???? -->
+      <map code="0xe7de" name="tau_omicron_varia_2"/><!-- ???? -->
+      <map code="0xe7df" name="tau_omicron_varia_3"/><!-- ???? -->
+      <map code="0xe7e0" name="tau_omicron_varia_4"/><!-- ???? -->
+      <map code="0xe7e1" name="tau_omicron_varia_nu"/><!-- ???? -->
+      <map code="0xe7e2" name="tau_tall_omicron_sigma"/><!-- ???? -->
+      <map code="0xe7e3" name="tau_omicron_upsilon_perispomeni"/><!-- ???? -->
+      <map code="0xe7e4" name="tau_omicron_upsilon_perispomeni_2"/><!-- ???? -->
+      <map code="0xe7e5" name="tau_rho"/><!-- ???? -->
+      <map code="0xe7e6" name="tau_rho_2"/><!-- ???? -->
+      <map code="0xe7e7" name="tau_tall_tau"/><!-- ???? -->
+      <map code="0xe7e8" name="tau_omega_perispomeni_prosgegrammeni"/><!-- ???? -->
+      <map code="0xe7e9" name="tau_omega_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe7ea" name="tau_omega_perispomeni_nu_2"/><!-- ???? -->
+      <map code="0xe7eb" name="tau_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ec" name="tau_tall_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ed" name="tau_rho_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ee" name="tau_tall_iota_per_fin_sigma"/><!-- ???? -->
+      <map code="0xe7ef" name="tau_iota_per_fin_sigma"/><!-- ???? -->
+      <map code="0xe7f0" name="upsilon_dasia_iota"/><!-- ???? -->
+      <map code="0xe7f1" name="upsilon_tonos"/><!-- ???? -->
+      <map code="0xe7f2" name="upsilon_perispomeni"/><!-- ???? -->
+      <map code="0xe7f3" name="tau_alpha_iota_fin_sig_per"/><!-- ???? -->
+      <map code="0xe7f4" name="tau_epsilon_final_sigma"/><!-- ???? -->
+      <map code="0xe7f5" name="tau_alpha_iota_fin_sig"/><!-- ???? -->
+      <map code="0xe7f8" name="upsilon_nu"/><!-- ???? -->
+      <map code="0xe7f9" name="upsilon_tonos_nu"/><!-- ???? -->
+      <map code="0xe7fa" name="upsilon_varia_nu"/><!-- ???? -->
+      <map code="0xe7fb" name="upsilon_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe7fc" name="upsilon_psili_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe810" name="chi_apostrophe"/><!-- ???? -->
+      <map code="0xe811" name="chi_rho"/><!-- ???? -->
+      <map code="0xe812" name="chi_epsilon_nu"/><!-- ???? -->
+      <map code="0xe820" name="omega_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe821" name="psi_eta_ypog_fin_sigma"/><!-- ???? -->
+      <map code="0xe840" name="slant_1"/><!-- ???? -->
+      <map code="0xe841" name="slant_2"/><!-- ???? -->
+      <map code="0xe84e" name="uniE84E"/><!-- ???? -->
+      <map code="0xe84f" name="uniE84F"/><!-- ???? -->
+      <map code="0xe860" name="alpha_nu#1"/><!-- ???? -->
+      <map code="0xe861" name="alpha_nu_2"/><!-- ???? -->
+      <map code="0xe862" name="alpha_iota_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe863" name="alpha_sigma_2"/><!-- ???? -->
+      <map code="0xe864" name="alpha_nu_3"/><!-- ???? -->
+      <map code="0xe865" name="epsilon_iota_sigma"/><!-- ???? -->
+      <map code="0xe866" name="epsilon_nu"/><!-- ???? -->
+      <map code="0xe867" name="epsilon_nu_2"/><!-- ???? -->
+      <map code="0xe868" name="alpha_fin_sigma"/><!-- ???? -->
+      <map code="0xe86a" name="iota_sigma"/><!-- ???? -->
+      <map code="0xe86b" name="omicron_iota_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe86c" name="omicron_sigma_2"/><!-- ???? -->
+      <map code="0xe86d" name="omega_nu"/><!-- ???? -->
+      <map code="0xe86e" name="omega_nu_2"/><!-- ???? -->
+      <map code="0xe86f" name="omega_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe870" name="omicron_sigma_varia"/><!-- ???? -->
+      <map code="0xe871" name="omicron_varia_sigma"/><!-- ???? -->
+      <map code="0xe872" name="omicron_iota_peris_final_sigma"/><!-- ???? -->
+      <map code="0xe873" name="eta_ypogegrammeni_fin_sigma"/><!-- ???? -->
+    </cmap_format_4>
+    <cmap_format_0 platformID="1" platEncID="0" language="0">
+      <map code="0x0" name="uni0000"/>
+      <map code="0x8" name=".null"/>
+      <map code="0x9" name="glyph2"/>
+      <map code="0xd" name="glyph2"/>
+      <map code="0x1d" name="uni0000"/>
+      <map code="0x20" name="space"/>
+      <map code="0x21" name="exclam"/>
+      <map code="0x22" name="quotedbl"/>
+      <map code="0x23" name="numbersign"/>
+      <map code="0x24" name="dollar"/>
+      <map code="0x25" name="percent"/>
+      <map code="0x26" name="ampersand"/>
+      <map code="0x27" name="quotesingle"/>
+      <map code="0x28" name="parenleft"/>
+      <map code="0x29" name="parenright"/>
+      <map code="0x2a" name="asterisk"/>
+      <map code="0x2b" name="plus"/>
+      <map code="0x2c" name="comma"/>
+      <map code="0x2d" name="hyphen"/>
+      <map code="0x2e" name="period"/>
+      <map code="0x2f" name="slash"/>
+      <map code="0x30" name="zero"/>
+      <map code="0x31" name="one"/>
+      <map code="0x32" name="two"/>
+      <map code="0x33" name="three"/>
+      <map code="0x34" name="four"/>
+      <map code="0x35" name="five"/>
+      <map code="0x36" name="six"/>
+      <map code="0x37" name="seven"/>
+      <map code="0x38" name="eight"/>
+      <map code="0x39" name="nine"/>
+      <map code="0x3a" name="colon"/>
+      <map code="0x3b" name="semicolon"/>
+      <map code="0x3c" name="less"/>
+      <map code="0x3d" name="equal"/>
+      <map code="0x3e" name="greater"/>
+      <map code="0x3f" name="question"/>
+      <map code="0x40" name="at"/>
+      <map code="0x41" name="A"/>
+      <map code="0x42" name="B"/>
+      <map code="0x43" name="C"/>
+      <map code="0x44" name="D"/>
+      <map code="0x45" name="E"/>
+      <map code="0x46" name="F"/>
+      <map code="0x47" name="G"/>
+      <map code="0x48" name="H"/>
+      <map code="0x49" name="I"/>
+      <map code="0x4a" name="J"/>
+      <map code="0x4b" name="K"/>
+      <map code="0x4c" name="L"/>
+      <map code="0x4d" name="M"/>
+      <map code="0x4e" name="N"/>
+      <map code="0x4f" name="O"/>
+      <map code="0x50" name="P"/>
+      <map code="0x51" name="Q"/>
+      <map code="0x52" name="R"/>
+      <map code="0x53" name="S"/>
+      <map code="0x54" name="T"/>
+      <map code="0x55" name="U"/>
+      <map code="0x56" name="V"/>
+      <map code="0x57" name="W"/>
+      <map code="0x58" name="X"/>
+      <map code="0x59" name="Y"/>
+      <map code="0x5a" name="Z"/>
+      <map code="0x5b" name="bracketleft"/>
+      <map code="0x5c" name="backslash"/>
+      <map code="0x5d" name="bracketright"/>
+      <map code="0x5e" name="asciicircum"/>
+      <map code="0x5f" name="underscore"/>
+      <map code="0x60" name="grave"/>
+      <map code="0x61" name="a"/>
+      <map code="0x62" name="b"/>
+      <map code="0x63" name="c"/>
+      <map code="0x64" name="d"/>
+      <map code="0x65" name="e"/>
+      <map code="0x66" name="f"/>
+      <map code="0x67" name="g"/>
+      <map code="0x68" name="h"/>
+      <map code="0x69" name="i"/>
+      <map code="0x6a" name="j"/>
+      <map code="0x6b" name="k"/>
+      <map code="0x6c" name="l"/>
+      <map code="0x6d" name="m"/>
+      <map code="0x6e" name="n"/>
+      <map code="0x6f" name="o"/>
+      <map code="0x70" name="p"/>
+      <map code="0x71" name="q"/>
+      <map code="0x72" name="r"/>
+      <map code="0x73" name="s"/>
+      <map code="0x74" name="t"/>
+      <map code="0x75" name="u"/>
+      <map code="0x76" name="v"/>
+      <map code="0x77" name="w"/>
+      <map code="0x78" name="x"/>
+      <map code="0x79" name="y"/>
+      <map code="0x7a" name="z"/>
+      <map code="0x7b" name="braceleft"/>
+      <map code="0x7c" name="bar"/>
+      <map code="0x7d" name="braceright"/>
+      <map code="0x7e" name="asciitilde"/>
+      <map code="0xa1" name="degree"/>
+      <map code="0xa2" name="cent"/>
+      <map code="0xa3" name="sterling"/>
+      <map code="0xa4" name="section"/>
+      <map code="0xa6" name="paragraph"/>
+      <map code="0xa8" name="registered"/>
+      <map code="0xa9" name="copyright"/>
+      <map code="0xab" name="acute"/>
+      <map code="0xac" name="dieresis"/>
+      <map code="0xae" name="AE"/>
+      <map code="0xb1" name="plusminus"/>
+      <map code="0xb4" name="yen"/>
+      <map code="0xb5" name="mu"/>
+      <map code="0xb9" name="pi-grek"/>
+      <map code="0xbb" name="ordfeminine"/>
+      <map code="0xbc" name="ordmasculine"/>
+      <map code="0xbd" name="Omega-grek"/>
+      <map code="0xbe" name="ae"/>
+      <map code="0xc0" name="questiondown"/>
+      <map code="0xc1" name="exclamdown"/>
+      <map code="0xc2" name="logicalnot"/>
+      <map code="0xc7" name="guillemotleft"/>
+      <map code="0xc8" name="guillemotright"/>
+      <map code="0xca" name="uni00A0"/>
+      <map code="0xe1" name="periodcentered"/>
+      <map code="0xf5" name="idotless"/>
+      <map code="0xf6" name="circumflexmod"/>
+      <map code="0xf7" name="tildemod"/>
+      <map code="0xf8" name="macron"/>
+      <map code="0xf9" name="brevemod"/>
+      <map code="0xfa" name="dotaccentmod"/>
+      <map code="0xfb" name="ringmod"/>
+      <map code="0xfc" name="cedilla"/>
+    </cmap_format_0>
+    <cmap_format_4 platformID="3" platEncID="1" language="0">
+      <map code="0x0" name="uni0000"/><!-- ???? -->
+      <map code="0x1d" name="uni0000"/><!-- ???? -->
+      <map code="0x20" name="space"/><!-- SPACE -->
+      <map code="0x21" name="exclam"/><!-- EXCLAMATION MARK -->
+      <map code="0x22" name="quotedbl"/><!-- QUOTATION MARK -->
+      <map code="0x23" name="numbersign"/><!-- NUMBER SIGN -->
+      <map code="0x24" name="dollar"/><!-- DOLLAR SIGN -->
+      <map code="0x25" name="percent"/><!-- PERCENT SIGN -->
+      <map code="0x26" name="ampersand"/><!-- AMPERSAND -->
+      <map code="0x27" name="quotesingle"/><!-- APOSTROPHE -->
+      <map code="0x28" name="parenleft"/><!-- LEFT PARENTHESIS -->
+      <map code="0x29" name="parenright"/><!-- RIGHT PARENTHESIS -->
+      <map code="0x2a" name="asterisk"/><!-- ASTERISK -->
+      <map code="0x2b" name="plus"/><!-- PLUS SIGN -->
+      <map code="0x2c" name="comma"/><!-- COMMA -->
+      <map code="0x2d" name="hyphen"/><!-- HYPHEN-MINUS -->
+      <map code="0x2e" name="period"/><!-- FULL STOP -->
+      <map code="0x2f" name="slash"/><!-- SOLIDUS -->
+      <map code="0x30" name="zero"/><!-- DIGIT ZERO -->
+      <map code="0x31" name="one"/><!-- DIGIT ONE -->
+      <map code="0x32" name="two"/><!-- DIGIT TWO -->
+      <map code="0x33" name="three"/><!-- DIGIT THREE -->
+      <map code="0x34" name="four"/><!-- DIGIT FOUR -->
+      <map code="0x35" name="five"/><!-- DIGIT FIVE -->
+      <map code="0x36" name="six"/><!-- DIGIT SIX -->
+      <map code="0x37" name="seven"/><!-- DIGIT SEVEN -->
+      <map code="0x38" name="eight"/><!-- DIGIT EIGHT -->
+      <map code="0x39" name="nine"/><!-- DIGIT NINE -->
+      <map code="0x3a" name="colon"/><!-- COLON -->
+      <map code="0x3b" name="semicolon"/><!-- SEMICOLON -->
+      <map code="0x3c" name="less"/><!-- LESS-THAN SIGN -->
+      <map code="0x3d" name="equal"/><!-- EQUALS SIGN -->
+      <map code="0x3e" name="greater"/><!-- GREATER-THAN SIGN -->
+      <map code="0x3f" name="question"/><!-- QUESTION MARK -->
+      <map code="0x40" name="at"/><!-- COMMERCIAL AT -->
+      <map code="0x41" name="A"/><!-- LATIN CAPITAL LETTER A -->
+      <map code="0x42" name="B"/><!-- LATIN CAPITAL LETTER B -->
+      <map code="0x43" name="C"/><!-- LATIN CAPITAL LETTER C -->
+      <map code="0x44" name="D"/><!-- LATIN CAPITAL LETTER D -->
+      <map code="0x45" name="E"/><!-- LATIN CAPITAL LETTER E -->
+      <map code="0x46" name="F"/><!-- LATIN CAPITAL LETTER F -->
+      <map code="0x47" name="G"/><!-- LATIN CAPITAL LETTER G -->
+      <map code="0x48" name="H"/><!-- LATIN CAPITAL LETTER H -->
+      <map code="0x49" name="I"/><!-- LATIN CAPITAL LETTER I -->
+      <map code="0x4a" name="J"/><!-- LATIN CAPITAL LETTER J -->
+      <map code="0x4b" name="K"/><!-- LATIN CAPITAL LETTER K -->
+      <map code="0x4c" name="L"/><!-- LATIN CAPITAL LETTER L -->
+      <map code="0x4d" name="M"/><!-- LATIN CAPITAL LETTER M -->
+      <map code="0x4e" name="N"/><!-- LATIN CAPITAL LETTER N -->
+      <map code="0x4f" name="O"/><!-- LATIN CAPITAL LETTER O -->
+      <map code="0x50" name="P"/><!-- LATIN CAPITAL LETTER P -->
+      <map code="0x51" name="Q"/><!-- LATIN CAPITAL LETTER Q -->
+      <map code="0x52" name="R"/><!-- LATIN CAPITAL LETTER R -->
+      <map code="0x53" name="S"/><!-- LATIN CAPITAL LETTER S -->
+      <map code="0x54" name="T"/><!-- LATIN CAPITAL LETTER T -->
+      <map code="0x55" name="U"/><!-- LATIN CAPITAL LETTER U -->
+      <map code="0x56" name="V"/><!-- LATIN CAPITAL LETTER V -->
+      <map code="0x57" name="W"/><!-- LATIN CAPITAL LETTER W -->
+      <map code="0x58" name="X"/><!-- LATIN CAPITAL LETTER X -->
+      <map code="0x59" name="Y"/><!-- LATIN CAPITAL LETTER Y -->
+      <map code="0x5a" name="Z"/><!-- LATIN CAPITAL LETTER Z -->
+      <map code="0x5b" name="bracketleft"/><!-- LEFT SQUARE BRACKET -->
+      <map code="0x5c" name="backslash"/><!-- REVERSE SOLIDUS -->
+      <map code="0x5d" name="bracketright"/><!-- RIGHT SQUARE BRACKET -->
+      <map code="0x5e" name="asciicircum"/><!-- CIRCUMFLEX ACCENT -->
+      <map code="0x5f" name="underscore"/><!-- LOW LINE -->
+      <map code="0x60" name="grave"/><!-- GRAVE ACCENT -->
+      <map code="0x61" name="a"/><!-- LATIN SMALL LETTER A -->
+      <map code="0x62" name="b"/><!-- LATIN SMALL LETTER B -->
+      <map code="0x63" name="c"/><!-- LATIN SMALL LETTER C -->
+      <map code="0x64" name="d"/><!-- LATIN SMALL LETTER D -->
+      <map code="0x65" name="e"/><!-- LATIN SMALL LETTER E -->
+      <map code="0x66" name="f"/><!-- LATIN SMALL LETTER F -->
+      <map code="0x67" name="g"/><!-- LATIN SMALL LETTER G -->
+      <map code="0x68" name="h"/><!-- LATIN SMALL LETTER H -->
+      <map code="0x69" name="i"/><!-- LATIN SMALL LETTER I -->
+      <map code="0x6a" name="j"/><!-- LATIN SMALL LETTER J -->
+      <map code="0x6b" name="k"/><!-- LATIN SMALL LETTER K -->
+      <map code="0x6c" name="l"/><!-- LATIN SMALL LETTER L -->
+      <map code="0x6d" name="m"/><!-- LATIN SMALL LETTER M -->
+      <map code="0x6e" name="n"/><!-- LATIN SMALL LETTER N -->
+      <map code="0x6f" name="o"/><!-- LATIN SMALL LETTER O -->
+      <map code="0x70" name="p"/><!-- LATIN SMALL LETTER P -->
+      <map code="0x71" name="q"/><!-- LATIN SMALL LETTER Q -->
+      <map code="0x72" name="r"/><!-- LATIN SMALL LETTER R -->
+      <map code="0x73" name="s"/><!-- LATIN SMALL LETTER S -->
+      <map code="0x74" name="t"/><!-- LATIN SMALL LETTER T -->
+      <map code="0x75" name="u"/><!-- LATIN SMALL LETTER U -->
+      <map code="0x76" name="v"/><!-- LATIN SMALL LETTER V -->
+      <map code="0x77" name="w"/><!-- LATIN SMALL LETTER W -->
+      <map code="0x78" name="x"/><!-- LATIN SMALL LETTER X -->
+      <map code="0x79" name="y"/><!-- LATIN SMALL LETTER Y -->
+      <map code="0x7a" name="z"/><!-- LATIN SMALL LETTER Z -->
+      <map code="0x7b" name="braceleft"/><!-- LEFT CURLY BRACKET -->
+      <map code="0x7c" name="bar"/><!-- VERTICAL LINE -->
+      <map code="0x7d" name="braceright"/><!-- RIGHT CURLY BRACKET -->
+      <map code="0x7e" name="asciitilde"/><!-- TILDE -->
+      <map code="0xa0" name="uni00A0"/><!-- NO-BREAK SPACE -->
+      <map code="0xa1" name="exclamdown"/><!-- INVERTED EXCLAMATION MARK -->
+      <map code="0xa2" name="cent"/><!-- CENT SIGN -->
+      <map code="0xa3" name="sterling"/><!-- POUND SIGN -->
+      <map code="0xa4" name="currency"/><!-- CURRENCY SIGN -->
+      <map code="0xa5" name="yen"/><!-- YEN SIGN -->
+      <map code="0xa6" name="brokenbar"/><!-- BROKEN BAR -->
+      <map code="0xa7" name="section"/><!-- SECTION SIGN -->
+      <map code="0xa8" name="dieresis"/><!-- DIAERESIS -->
+      <map code="0xa9" name="copyright"/><!-- COPYRIGHT SIGN -->
+      <map code="0xaa" name="ordfeminine"/><!-- FEMININE ORDINAL INDICATOR -->
+      <map code="0xab" name="guillemotleft"/><!-- LEFT-POINTING DOUBLE ANGLE QUOTATION MARK -->
+      <map code="0xac" name="logicalnot"/><!-- NOT SIGN -->
+      <map code="0xad" name="uni00AD"/><!-- SOFT HYPHEN -->
+      <map code="0xae" name="registered"/><!-- REGISTERED SIGN -->
+      <map code="0xaf" name="macron"/><!-- MACRON -->
+      <map code="0xb0" name="degree"/><!-- DEGREE SIGN -->
+      <map code="0xb1" name="plusminus"/><!-- PLUS-MINUS SIGN -->
+      <map code="0xb2" name="uni00B2"/><!-- SUPERSCRIPT TWO -->
+      <map code="0xb3" name="uni00B3"/><!-- SUPERSCRIPT THREE -->
+      <map code="0xb4" name="acute"/><!-- ACUTE ACCENT -->
+      <map code="0xb5" name="mu"/><!-- MICRO SIGN -->
+      <map code="0xb6" name="paragraph"/><!-- PILCROW SIGN -->
+      <map code="0xb7" name="periodcentered"/><!-- MIDDLE DOT -->
+      <map code="0xb8" name="cedilla"/><!-- CEDILLA -->
+      <map code="0xb9" name="uni00B9"/><!-- SUPERSCRIPT ONE -->
+      <map code="0xba" name="ordmasculine"/><!-- MASCULINE ORDINAL INDICATOR -->
+      <map code="0xbb" name="guillemotright"/><!-- RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK -->
+      <map code="0xbc" name="onequarter"/><!-- VULGAR FRACTION ONE QUARTER -->
+      <map code="0xbd" name="onehalf"/><!-- VULGAR FRACTION ONE HALF -->
+      <map code="0xbe" name="threequarters"/><!-- VULGAR FRACTION THREE QUARTERS -->
+      <map code="0xbf" name="questiondown"/><!-- INVERTED QUESTION MARK -->
+      <map code="0xc6" name="AE"/><!-- LATIN CAPITAL LETTER AE -->
+      <map code="0xe6" name="ae"/><!-- LATIN SMALL LETTER AE -->
+      <map code="0x131" name="idotless"/><!-- LATIN SMALL LETTER DOTLESS I -->
+      <map code="0x17f" name="longs"/><!-- LATIN SMALL LETTER LONG S -->
+      <map code="0x237" name="jdotless"/><!-- LATIN SMALL LETTER DOTLESS J -->
+      <map code="0x2b9" name="primemod"/><!-- MODIFIER LETTER PRIME -->
+      <map code="0x2ba" name="doubleprimemod"/><!-- MODIFIER LETTER DOUBLE PRIME -->
+      <map code="0x2bc" name="apostrophemod"/><!-- MODIFIER LETTER APOSTROPHE -->
+      <map code="0x2be" name="righthalfringmod"/><!-- MODIFIER LETTER RIGHT HALF RING -->
+      <map code="0x2bf" name="lefthalfringmod"/><!-- MODIFIER LETTER LEFT HALF RING -->
+      <map code="0x2c6" name="circumflexmod"/><!-- MODIFIER LETTER CIRCUMFLEX ACCENT -->
+      <map code="0x2ca" name="acutemod"/><!-- MODIFIER LETTER ACUTE ACCENT -->
+      <map code="0x2cb" name="gravemod"/><!-- MODIFIER LETTER GRAVE ACCENT -->
+      <map code="0x2d8" name="brevemod"/><!-- BREVE -->
+      <map code="0x2d9" name="dotaccentmod"/><!-- DOT ABOVE -->
+      <map code="0x2da" name="ringmod"/><!-- RING ABOVE -->
+      <map code="0x2dc" name="tildemod"/><!-- SMALL TILDE -->
+      <map code="0x300" name="gravecomb"/><!-- COMBINING GRAVE ACCENT -->
+      <map code="0x301" name="acutecomb"/><!-- COMBINING ACUTE ACCENT -->
+      <map code="0x302" name="circumflexcomb"/><!-- COMBINING CIRCUMFLEX ACCENT -->
+      <map code="0x303" name="tildecomb"/><!-- COMBINING TILDE -->
+      <map code="0x304" name="macroncomb"/><!-- COMBINING MACRON -->
+      <map code="0x305" name="overlinecomb"/><!-- COMBINING OVERLINE -->
+      <map code="0x306" name="brevecomb"/><!-- COMBINING BREVE -->
+      <map code="0x307" name="dotaccentcomb"/><!-- COMBINING DOT ABOVE -->
+      <map code="0x308" name="dieresiscomb"/><!-- COMBINING DIAERESIS -->
+      <map code="0x30a" name="ringcomb"/><!-- COMBINING RING ABOVE -->
+      <map code="0x30c" name="caroncomb"/><!-- COMBINING CARON -->
+      <map code="0x313" name="commacomb"/><!-- COMBINING COMMA ABOVE -->
+      <map code="0x314" name="reversedcommacomb"/><!-- COMBINING REVERSED COMMA ABOVE -->
+      <map code="0x323" name="dotbelowcomb"/><!-- COMBINING DOT BELOW -->
+      <map code="0x32f" name="invertedbrevebelowcomb"/><!-- COMBINING INVERTED BREVE BELOW -->
+      <map code="0x336" name="strokelongcomb"/><!-- COMBINING LONG STROKE OVERLAY -->
+      <map code="0x340" name="gravetonemarkcomb"/><!-- COMBINING GRAVE TONE MARK -->
+      <map code="0x341" name="acutetonemarkcomb"/><!-- COMBINING ACUTE TONE MARK -->
+      <map code="0x342" name="greekperispomenicomb"/><!-- COMBINING GREEK PERISPOMENI -->
+      <map code="0x343" name="greekkoroniscomb"/><!-- COMBINING GREEK KORONIS -->
+      <map code="0x344" name="greekdialytikatonoscomb"/><!-- COMBINING GREEK DIALYTIKA TONOS -->
+      <map code="0x345" name="greekypogegrammenicomb"/><!-- COMBINING GREEK YPOGEGRAMMENI -->
+      <map code="0x351" name="lefthalfringcomb"/><!-- COMBINING LEFT HALF RING ABOVE -->
+      <map code="0x357" name="righthalfringcomb"/><!-- COMBINING RIGHT HALF RING ABOVE -->
+      <map code="0x359" name="asteriskbelowcomb"/><!-- COMBINING ASTERISK BELOW -->
+      <map code="0x374" name="greeknumeralsignmod"/><!-- GREEK NUMERAL SIGN -->
+      <map code="0x375" name="lowernumeralsignmod-grek"/><!-- GREEK LOWER NUMERAL SIGN -->
+      <map code="0x37a" name="ypogegrammenimod-grek"/><!-- GREEK YPOGEGRAMMENI -->
+      <map code="0x37e" name="greekquestionmark"/><!-- GREEK QUESTION MARK -->
+      <map code="0x384" name="tonosmod-grek"/><!-- GREEK TONOS -->
+      <map code="0x385" name="greekdialytikatonosmod"/><!-- GREEK DIALYTIKA TONOS -->
+      <map code="0x386" name="Alphatonos-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH TONOS -->
+      <map code="0x388" name="Epsilontonos-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH TONOS -->
+      <map code="0x389" name="Etatonos-grek"/><!-- GREEK CAPITAL LETTER ETA WITH TONOS -->
+      <map code="0x38a" name="Iotatonos-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH TONOS -->
+      <map code="0x38c" name="Omicrontonos-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH TONOS -->
+      <map code="0x38e" name="Upsilontonos-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH TONOS -->
+      <map code="0x38f" name="Omegatonos-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH TONOS -->
+      <map code="0x390" name="iotadialytikatonos-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS -->
+      <map code="0x391" name="Alpha-grek"/><!-- GREEK CAPITAL LETTER ALPHA -->
+      <map code="0x392" name="Beta-grek"/><!-- GREEK CAPITAL LETTER BETA -->
+      <map code="0x393" name="Gamma-grek"/><!-- GREEK CAPITAL LETTER GAMMA -->
+      <map code="0x394" name="Delta-grek"/><!-- GREEK CAPITAL LETTER DELTA -->
+      <map code="0x395" name="Epsilon-grek"/><!-- GREEK CAPITAL LETTER EPSILON -->
+      <map code="0x396" name="Zeta-grek"/><!-- GREEK CAPITAL LETTER ZETA -->
+      <map code="0x397" name="Eta-grek"/><!-- GREEK CAPITAL LETTER ETA -->
+      <map code="0x398" name="Theta-grek"/><!-- GREEK CAPITAL LETTER THETA -->
+      <map code="0x399" name="Iota-grek"/><!-- GREEK CAPITAL LETTER IOTA -->
+      <map code="0x39a" name="Kappa-grek"/><!-- GREEK CAPITAL LETTER KAPPA -->
+      <map code="0x39b" name="Lamda-grek"/><!-- GREEK CAPITAL LETTER LAMDA -->
+      <map code="0x39c" name="Mu-grek"/><!-- GREEK CAPITAL LETTER MU -->
+      <map code="0x39d" name="Nu-grek"/><!-- GREEK CAPITAL LETTER NU -->
+      <map code="0x39e" name="Xi-grek"/><!-- GREEK CAPITAL LETTER XI -->
+      <map code="0x39f" name="Omicron-grek"/><!-- GREEK CAPITAL LETTER OMICRON -->
+      <map code="0x3a0" name="Pi-grek"/><!-- GREEK CAPITAL LETTER PI -->
+      <map code="0x3a1" name="Rho-grek"/><!-- GREEK CAPITAL LETTER RHO -->
+      <map code="0x3a3" name="Sigma-grek"/><!-- GREEK CAPITAL LETTER SIGMA -->
+      <map code="0x3a4" name="Tau-grek"/><!-- GREEK CAPITAL LETTER TAU -->
+      <map code="0x3a5" name="Upsilon-grek"/><!-- GREEK CAPITAL LETTER UPSILON -->
+      <map code="0x3a6" name="Phi-grek"/><!-- GREEK CAPITAL LETTER PHI -->
+      <map code="0x3a7" name="Chi-grek"/><!-- GREEK CAPITAL LETTER CHI -->
+      <map code="0x3a8" name="Psi-grek"/><!-- GREEK CAPITAL LETTER PSI -->
+      <map code="0x3a9" name="Omega-grek"/><!-- GREEK CAPITAL LETTER OMEGA -->
+      <map code="0x3aa" name="Iotadialytika-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DIALYTIKA -->
+      <map code="0x3ab" name="Upsilondialytika-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DIALYTIKA -->
+      <map code="0x3ac" name="alphatonos-grek"/><!-- GREEK SMALL LETTER ALPHA WITH TONOS -->
+      <map code="0x3ad" name="epsilontonos-grek"/><!-- GREEK SMALL LETTER EPSILON WITH TONOS -->
+      <map code="0x3ae" name="etatonos-grek"/><!-- GREEK SMALL LETTER ETA WITH TONOS -->
+      <map code="0x3af" name="iotatonos-grek"/><!-- GREEK SMALL LETTER IOTA WITH TONOS -->
+      <map code="0x3b0" name="upsilondialytikatonos-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS -->
+      <map code="0x3b1" name="alpha-grek"/><!-- GREEK SMALL LETTER ALPHA -->
+      <map code="0x3b2" name="beta-grek"/><!-- GREEK SMALL LETTER BETA -->
+      <map code="0x3b3" name="gamma-grek"/><!-- GREEK SMALL LETTER GAMMA -->
+      <map code="0x3b4" name="delta-grek"/><!-- GREEK SMALL LETTER DELTA -->
+      <map code="0x3b5" name="epsilon-grek"/><!-- GREEK SMALL LETTER EPSILON -->
+      <map code="0x3b6" name="zeta-grek"/><!-- GREEK SMALL LETTER ZETA -->
+      <map code="0x3b7" name="eta-grek"/><!-- GREEK SMALL LETTER ETA -->
+      <map code="0x3b8" name="theta-grek"/><!-- GREEK SMALL LETTER THETA -->
+      <map code="0x3b9" name="iota-grek"/><!-- GREEK SMALL LETTER IOTA -->
+      <map code="0x3ba" name="kappa-grek"/><!-- GREEK SMALL LETTER KAPPA -->
+      <map code="0x3bb" name="lamda-grek"/><!-- GREEK SMALL LETTER LAMDA -->
+      <map code="0x3bc" name="mu-grek"/><!-- GREEK SMALL LETTER MU -->
+      <map code="0x3bd" name="nu-grek"/><!-- GREEK SMALL LETTER NU -->
+      <map code="0x3be" name="xi-grek"/><!-- GREEK SMALL LETTER XI -->
+      <map code="0x3bf" name="omicron-grek"/><!-- GREEK SMALL LETTER OMICRON -->
+      <map code="0x3c0" name="pi-grek"/><!-- GREEK SMALL LETTER PI -->
+      <map code="0x3c1" name="rho-grek"/><!-- GREEK SMALL LETTER RHO -->
+      <map code="0x3c2" name="finalsigma-grek"/><!-- GREEK SMALL LETTER FINAL SIGMA -->
+      <map code="0x3c3" name="sigma-grek"/><!-- GREEK SMALL LETTER SIGMA -->
+      <map code="0x3c4" name="tau-grek"/><!-- GREEK SMALL LETTER TAU -->
+      <map code="0x3c5" name="upsilon-grek"/><!-- GREEK SMALL LETTER UPSILON -->
+      <map code="0x3c6" name="phi-grek"/><!-- GREEK SMALL LETTER PHI -->
+      <map code="0x3c7" name="chi-grek"/><!-- GREEK SMALL LETTER CHI -->
+      <map code="0x3c8" name="psi-grek"/><!-- GREEK SMALL LETTER PSI -->
+      <map code="0x3c9" name="omega-grek"/><!-- GREEK SMALL LETTER OMEGA -->
+      <map code="0x3ca" name="iotadialytika-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA -->
+      <map code="0x3cb" name="upsilondialytika-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA -->
+      <map code="0x3cc" name="omicrontonos-grek"/><!-- GREEK SMALL LETTER OMICRON WITH TONOS -->
+      <map code="0x3cd" name="upsilontonos-grek"/><!-- GREEK SMALL LETTER UPSILON WITH TONOS -->
+      <map code="0x3ce" name="omegatonos-grek"/><!-- GREEK SMALL LETTER OMEGA WITH TONOS -->
+      <map code="0x3d0" name="betasymbol-grek"/><!-- GREEK BETA SYMBOL -->
+      <map code="0x3d1" name="thetasymbol-grek"/><!-- GREEK THETA SYMBOL -->
+      <map code="0x3d5" name="phisymbol-grek"/><!-- GREEK PHI SYMBOL -->
+      <map code="0x3d6" name="pisymbol-grek"/><!-- GREEK PI SYMBOL -->
+      <map code="0x3d7" name="kaisymbol-grek"/><!-- GREEK KAI SYMBOL -->
+      <map code="0x591" name="accentetnahtacomb-hebr"/><!-- HEBREW ACCENT ETNAHTA -->
+      <map code="0x592" name="accentsegolcomb-hebr"/><!-- HEBREW ACCENT SEGOL -->
+      <map code="0x593" name="accentshalsheletcomb-hebr"/><!-- HEBREW ACCENT SHALSHELET -->
+      <map code="0x594" name="accentzaqefqatancomb-hebr"/><!-- HEBREW ACCENT ZAQEF QATAN -->
+      <map code="0x595" name="accentzaqefgadolcomb-hebr"/><!-- HEBREW ACCENT ZAQEF GADOL -->
+      <map code="0x596" name="accenttipehacomb-hebr"/><!-- HEBREW ACCENT TIPEHA -->
+      <map code="0x597" name="accentreviacomb-hebr"/><!-- HEBREW ACCENT REVIA -->
+      <map code="0x598" name="accentzarqacomb-hebr"/><!-- HEBREW ACCENT ZARQA -->
+      <map code="0x599" name="accentpashtacomb-hebr"/><!-- HEBREW ACCENT PASHTA -->
+      <map code="0x59a" name="accentyetivcomb-hebr"/><!-- HEBREW ACCENT YETIV -->
+      <map code="0x59b" name="accenttevircomb-hebr"/><!-- HEBREW ACCENT TEVIR -->
+      <map code="0x59c" name="accentgereshcomb-hebr"/><!-- HEBREW ACCENT GERESH -->
+      <map code="0x59d" name="accentgereshmuqdamcomb-hebr"/><!-- HEBREW ACCENT GERESH MUQDAM -->
+      <map code="0x59e" name="accentgershayimcomb-hebr"/><!-- HEBREW ACCENT GERSHAYIM -->
+      <map code="0x59f" name="accentqarneyparacomb-hebr"/><!-- HEBREW ACCENT QARNEY PARA -->
+      <map code="0x5a0" name="accenttelishagedolacomb-hebr"/><!-- HEBREW ACCENT TELISHA GEDOLA -->
+      <map code="0x5a1" name="accentpazercomb-hebr"/><!-- HEBREW ACCENT PAZER -->
+      <map code="0x5a2" name="accentatnahhafukhcomb-hebr"/><!-- HEBREW ACCENT ATNAH HAFUKH -->
+      <map code="0x5a3" name="accentmunahcomb-hebr"/><!-- HEBREW ACCENT MUNAH -->
+      <map code="0x5a4" name="accentmahapakhcomb-hebr"/><!-- HEBREW ACCENT MAHAPAKH -->
+      <map code="0x5a5" name="accentmerkhacomb-hebr"/><!-- HEBREW ACCENT MERKHA -->
+      <map code="0x5a6" name="accentmerkhakefulacomb-hebr"/><!-- HEBREW ACCENT MERKHA KEFULA -->
+      <map code="0x5a7" name="accentdargacomb-hebr"/><!-- HEBREW ACCENT DARGA -->
+      <map code="0x5a8" name="accentqadmacomb-hebr"/><!-- HEBREW ACCENT QADMA -->
+      <map code="0x5a9" name="accenttelishaqetanacomb-hebr"/><!-- HEBREW ACCENT TELISHA QETANA -->
+      <map code="0x5aa" name="accentyerahbenyomocomb-hebr"/><!-- HEBREW ACCENT YERAH BEN YOMO -->
+      <map code="0x5ab" name="accentolecomb-hebr"/><!-- HEBREW ACCENT OLE -->
+      <map code="0x5ac" name="accentiluycomb-hebr"/><!-- HEBREW ACCENT ILUY -->
+      <map code="0x5ad" name="accentdehicomb-hebr"/><!-- HEBREW ACCENT DEHI -->
+      <map code="0x5ae" name="accentzinorcomb-hebr"/><!-- HEBREW ACCENT ZINOR -->
+      <map code="0x5af" name="markmasoracirclecomb-hebr"/><!-- HEBREW MARK MASORA CIRCLE -->
+      <map code="0x5b0" name="shevacomb-hebr"/><!-- HEBREW POINT SHEVA -->
+      <map code="0x5b1" name="hatafsegolcomb-hebr"/><!-- HEBREW POINT HATAF SEGOL -->
+      <map code="0x5b2" name="hatafpatahcomb-hebr"/><!-- HEBREW POINT HATAF PATAH -->
+      <map code="0x5b3" name="hatafqamatscomb-hebr"/><!-- HEBREW POINT HATAF QAMATS -->
+      <map code="0x5b4" name="hiriqcomb-hebr"/><!-- HEBREW POINT HIRIQ -->
+      <map code="0x5b5" name="tserecomb-hebr"/><!-- HEBREW POINT TSERE -->
+      <map code="0x5b6" name="segolcomb-hebr"/><!-- HEBREW POINT SEGOL -->
+      <map code="0x5b7" name="patahcomb-hebr"/><!-- HEBREW POINT PATAH -->
+      <map code="0x5b8" name="qamatscomb-hebr"/><!-- HEBREW POINT QAMATS -->
+      <map code="0x5b9" name="holamcomb-hebr"/><!-- HEBREW POINT HOLAM -->
+      <map code="0x5ba" name="holamhaserforvavcomb-hebr"/><!-- HEBREW POINT HOLAM HASER FOR VAV -->
+      <map code="0x5bb" name="qubutscomb-hebr"/><!-- HEBREW POINT QUBUTS -->
+      <map code="0x5bc" name="dageshormapiqcomb-hebr"/><!-- HEBREW POINT DAGESH OR MAPIQ -->
+      <map code="0x5bd" name="metegcomb-hebr"/><!-- HEBREW POINT METEG -->
+      <map code="0x5be" name="maqaf-hebr"/><!-- HEBREW PUNCTUATION MAQAF -->
+      <map code="0x5bf" name="rafecomb-hebr"/><!-- HEBREW POINT RAFE -->
+      <map code="0x5c0" name="punctuationpaseq-hebr"/><!-- HEBREW PUNCTUATION PASEQ -->
+      <map code="0x5c1" name="shindotcomb-hebr"/><!-- HEBREW POINT SHIN DOT -->
+      <map code="0x5c2" name="sindotcomb-hebr"/><!-- HEBREW POINT SIN DOT -->
+      <map code="0x5c3" name="punctuationsofpasuq-hebr"/><!-- HEBREW PUNCTUATION SOF PASUQ -->
+      <map code="0x5c4" name="markupperdotcomb-hebr"/><!-- HEBREW MARK UPPER DOT -->
+      <map code="0x5c5" name="marklowerdotcomb-hebr"/><!-- HEBREW MARK LOWER DOT -->
+      <map code="0x5c6" name="punctuationnunhafukha-hebr"/><!-- HEBREW PUNCTUATION NUN HAFUKHA -->
+      <map code="0x5c7" name="qamatsqatancomb-hebr"/><!-- HEBREW POINT QAMATS QATAN -->
+      <map code="0x5d0" name="alef-hebr"/><!-- HEBREW LETTER ALEF -->
+      <map code="0x5d1" name="bet-hebr"/><!-- HEBREW LETTER BET -->
+      <map code="0x5d2" name="gimel-hebr"/><!-- HEBREW LETTER GIMEL -->
+      <map code="0x5d3" name="dalet-hebr"/><!-- HEBREW LETTER DALET -->
+      <map code="0x5d4" name="he-hebr"/><!-- HEBREW LETTER HE -->
+      <map code="0x5d5" name="vav-hebr"/><!-- HEBREW LETTER VAV -->
+      <map code="0x5d6" name="zayin-hebr"/><!-- HEBREW LETTER ZAYIN -->
+      <map code="0x5d7" name="het-hebr"/><!-- HEBREW LETTER HET -->
+      <map code="0x5d8" name="tet-hebr"/><!-- HEBREW LETTER TET -->
+      <map code="0x5d9" name="yod-hebr"/><!-- HEBREW LETTER YOD -->
+      <map code="0x5da" name="finalkaf-hebr"/><!-- HEBREW LETTER FINAL KAF -->
+      <map code="0x5db" name="kaf-hebr"/><!-- HEBREW LETTER KAF -->
+      <map code="0x5dc" name="lamed-hebr"/><!-- HEBREW LETTER LAMED -->
+      <map code="0x5dd" name="finalmem-hebr"/><!-- HEBREW LETTER FINAL MEM -->
+      <map code="0x5de" name="mem-hebr"/><!-- HEBREW LETTER MEM -->
+      <map code="0x5df" name="finalnun-hebr"/><!-- HEBREW LETTER FINAL NUN -->
+      <map code="0x5e0" name="nun-hebr"/><!-- HEBREW LETTER NUN -->
+      <map code="0x5e1" name="samekh-hebr"/><!-- HEBREW LETTER SAMEKH -->
+      <map code="0x5e2" name="ayin-hebr"/><!-- HEBREW LETTER AYIN -->
+      <map code="0x5e3" name="finalpe-hebr"/><!-- HEBREW LETTER FINAL PE -->
+      <map code="0x5e4" name="pe-hebr"/><!-- HEBREW LETTER PE -->
+      <map code="0x5e5" name="finaltsadi-hebr"/><!-- HEBREW LETTER FINAL TSADI -->
+      <map code="0x5e6" name="tsadi-hebr"/><!-- HEBREW LETTER TSADI -->
+      <map code="0x5e7" name="qof-hebr"/><!-- HEBREW LETTER QOF -->
+      <map code="0x5e8" name="resh-hebr"/><!-- HEBREW LETTER RESH -->
+      <map code="0x5e9" name="shin-hebr"/><!-- HEBREW LETTER SHIN -->
+      <map code="0x5ea" name="tav-hebr"/><!-- HEBREW LETTER TAV -->
+      <map code="0x5f0" name="yiddishdoublevav-hebr"/><!-- HEBREW LIGATURE YIDDISH DOUBLE VAV -->
+      <map code="0x5f1" name="yiddishvavyod-hebr"/><!-- HEBREW LIGATURE YIDDISH VAV YOD -->
+      <map code="0x5f2" name="yiddishdoubleyod-hebr"/><!-- HEBREW LIGATURE YIDDISH DOUBLE YOD -->
+      <map code="0x5f3" name="punctuationgeresh-hebr"/><!-- HEBREW PUNCTUATION GERESH -->
+      <map code="0x5f4" name="punctuationgershayim-hebr"/><!-- HEBREW PUNCTUATION GERSHAYIM -->
+      <map code="0x1f00" name="alphapsili-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI -->
+      <map code="0x1f01" name="alphadasia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA -->
+      <map code="0x1f02" name="alphapsilivaria-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND VARIA -->
+      <map code="0x1f03" name="alphadasiavaria-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND VARIA -->
+      <map code="0x1f04" name="alphapsilioxia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND OXIA -->
+      <map code="0x1f05" name="alphadasiaoxia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND OXIA -->
+      <map code="0x1f06" name="alphapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f07" name="alphadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f08" name="Alphapsili-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI -->
+      <map code="0x1f09" name="Alphadasia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA -->
+      <map code="0x1f0a" name="Alphapsilivaria-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND VARIA -->
+      <map code="0x1f0b" name="Alphadasiavaria-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND VARIA -->
+      <map code="0x1f0c" name="Alphapsilioxia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND OXIA -->
+      <map code="0x1f0d" name="Alphadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND OXIA -->
+      <map code="0x1f0e" name="Alphapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f0f" name="Alphadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f10" name="epsilonpsili-grek"/><!-- GREEK SMALL LETTER EPSILON WITH PSILI -->
+      <map code="0x1f11" name="epsilondasia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH DASIA -->
+      <map code="0x1f12" name="epsilonpsilivaria-grek"/><!-- GREEK SMALL LETTER EPSILON WITH PSILI AND VARIA -->
+      <map code="0x1f13" name="epsilondasiavaria-grek"/><!-- GREEK SMALL LETTER EPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f14" name="epsilonpsilioxia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH PSILI AND OXIA -->
+      <map code="0x1f15" name="epsilondasiaoxia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f16" name="epsilon_perispomeni"/><!-- ???? -->
+      <map code="0x1f18" name="Epsilonpsili-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH PSILI -->
+      <map code="0x1f19" name="Epsilondasia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH DASIA -->
+      <map code="0x1f1a" name="Epsilonpsilivaria-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH PSILI AND VARIA -->
+      <map code="0x1f1b" name="Epsilondasiavaria-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f1c" name="Epsilonpsilioxia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH PSILI AND OXIA -->
+      <map code="0x1f1d" name="Epsilondasiaoxia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f20" name="etapsili-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI -->
+      <map code="0x1f21" name="etadasia-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA -->
+      <map code="0x1f22" name="etapsilivaria-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND VARIA -->
+      <map code="0x1f23" name="etadasiavaria-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND VARIA -->
+      <map code="0x1f24" name="etapsilioxia-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND OXIA -->
+      <map code="0x1f25" name="etadasiaoxia-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND OXIA -->
+      <map code="0x1f26" name="etapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f27" name="etadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f28" name="Etapsili-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI -->
+      <map code="0x1f29" name="Etadasia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA -->
+      <map code="0x1f2a" name="Etapsilivaria-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND VARIA -->
+      <map code="0x1f2b" name="Etadasiavaria-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND VARIA -->
+      <map code="0x1f2c" name="Etapsilioxia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND OXIA -->
+      <map code="0x1f2d" name="Etadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND OXIA -->
+      <map code="0x1f2e" name="Etapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f2f" name="Etadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f30" name="iotapsili-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI -->
+      <map code="0x1f31" name="iotadasia-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA -->
+      <map code="0x1f32" name="iotapsilivaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI AND VARIA -->
+      <map code="0x1f33" name="iotadasiavaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA AND VARIA -->
+      <map code="0x1f34" name="iotapsilioxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI AND OXIA -->
+      <map code="0x1f35" name="iotadasiaoxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA AND OXIA -->
+      <map code="0x1f36" name="iotapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f37" name="iotadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f38" name="Iotapsili-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI -->
+      <map code="0x1f39" name="Iotadasia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA -->
+      <map code="0x1f3a" name="Iotapsilivaria-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI AND VARIA -->
+      <map code="0x1f3b" name="Iotadasiavaria-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA AND VARIA -->
+      <map code="0x1f3c" name="Iotapsilioxia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI AND OXIA -->
+      <map code="0x1f3d" name="Iotadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA AND OXIA -->
+      <map code="0x1f3e" name="Iotapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f3f" name="Iotadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f40" name="omicronpsili-grek"/><!-- GREEK SMALL LETTER OMICRON WITH PSILI -->
+      <map code="0x1f41" name="omicrondasia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH DASIA -->
+      <map code="0x1f42" name="omicronpsilivaria-grek"/><!-- GREEK SMALL LETTER OMICRON WITH PSILI AND VARIA -->
+      <map code="0x1f43" name="omicrondasiavaria-grek"/><!-- GREEK SMALL LETTER OMICRON WITH DASIA AND VARIA -->
+      <map code="0x1f44" name="omicronpsilioxia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH PSILI AND OXIA -->
+      <map code="0x1f45" name="omicrondasiaoxia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH DASIA AND OXIA -->
+      <map code="0x1f48" name="Omicronpsili-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH PSILI -->
+      <map code="0x1f49" name="Omicrondasia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH DASIA -->
+      <map code="0x1f4a" name="Omicronpsilivaria-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH PSILI AND VARIA -->
+      <map code="0x1f4b" name="Omicrondasiavaria-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH DASIA AND VARIA -->
+      <map code="0x1f4c" name="Omicronpsilioxia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH PSILI AND OXIA -->
+      <map code="0x1f4d" name="Omicrondasiaoxia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH DASIA AND OXIA -->
+      <map code="0x1f50" name="upsilonpsili-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI -->
+      <map code="0x1f51" name="upsilondasia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA -->
+      <map code="0x1f52" name="upsilonpsilivaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI AND VARIA -->
+      <map code="0x1f53" name="upsilondasiavaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f54" name="upsilonpsilioxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI AND OXIA -->
+      <map code="0x1f55" name="upsilondasiaoxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f56" name="upsilonpsiliperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f57" name="upsilondasiaperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f59" name="Upsilondasia-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA -->
+      <map code="0x1f5b" name="Upsilondasiavaria-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA AND VARIA -->
+      <map code="0x1f5d" name="Upsilondasiaoxia-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA AND OXIA -->
+      <map code="0x1f5f" name="Upsilondasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f60" name="omegapsili-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI -->
+      <map code="0x1f61" name="omegadasia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA -->
+      <map code="0x1f62" name="omegapsilivaria-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND VARIA -->
+      <map code="0x1f63" name="omegadasiavaria-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND VARIA -->
+      <map code="0x1f64" name="omegapsilioxia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND OXIA -->
+      <map code="0x1f65" name="omegadasiaoxia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND OXIA -->
+      <map code="0x1f66" name="omegapsiliperispomeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f67" name="omegadasiaperispomeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f68" name="Omegapsili-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI -->
+      <map code="0x1f69" name="Omegadasia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA -->
+      <map code="0x1f6a" name="Omegapsilivaria-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND VARIA -->
+      <map code="0x1f6b" name="Omegadasiavaria-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND VARIA -->
+      <map code="0x1f6c" name="Omegapsilioxia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND OXIA -->
+      <map code="0x1f6d" name="Omegadasiaoxia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND OXIA -->
+      <map code="0x1f6e" name="Omegapsiliperispomeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND PERISPOMENI -->
+      <map code="0x1f6f" name="Omegadasiaperispomeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND PERISPOMENI -->
+      <map code="0x1f70" name="alphavaria-grek"/><!-- GREEK SMALL LETTER ALPHA WITH VARIA -->
+      <map code="0x1f71" name="alphaoxia-grek"/><!-- GREEK SMALL LETTER ALPHA WITH OXIA -->
+      <map code="0x1f72" name="epsilonvaria-grek"/><!-- GREEK SMALL LETTER EPSILON WITH VARIA -->
+      <map code="0x1f73" name="epsilonoxia-grek"/><!-- GREEK SMALL LETTER EPSILON WITH OXIA -->
+      <map code="0x1f74" name="etavaria-grek"/><!-- GREEK SMALL LETTER ETA WITH VARIA -->
+      <map code="0x1f75" name="etaoxia-grek"/><!-- GREEK SMALL LETTER ETA WITH OXIA -->
+      <map code="0x1f76" name="iotavaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH VARIA -->
+      <map code="0x1f77" name="iotaoxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH OXIA -->
+      <map code="0x1f78" name="omicronvaria-grek"/><!-- GREEK SMALL LETTER OMICRON WITH VARIA -->
+      <map code="0x1f79" name="omicronoxia-grek"/><!-- GREEK SMALL LETTER OMICRON WITH OXIA -->
+      <map code="0x1f7a" name="upsilonvaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH VARIA -->
+      <map code="0x1f7b" name="upsilonoxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH OXIA -->
+      <map code="0x1f7c" name="omegavaria-grek"/><!-- GREEK SMALL LETTER OMEGA WITH VARIA -->
+      <map code="0x1f7d" name="omegaoxia-grek"/><!-- GREEK SMALL LETTER OMEGA WITH OXIA -->
+      <map code="0x1f80" name="alphapsiliypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND YPOGEGRAMMENI -->
+      <map code="0x1f81" name="alphadasiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND YPOGEGRAMMENI -->
+      <map code="0x1f82" name="alphapsilivariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f83" name="alphadasiavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f84" name="alphapsilioxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f85" name="alphadasiaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f86" name="alphapsiliperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PSILI AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f87" name="alphadasiaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH DASIA AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f88" name="Alphapsiliprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND PROSGEGRAMMENI -->
+      <map code="0x1f89" name="Alphadasiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8a" name="Alphapsilivariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8b" name="Alphadasiavariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8c" name="Alphapsilioxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8d" name="Alphadasiaoxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f8e" name="Alphapsiliperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PSILI AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1f8f" name="Alphadasiaperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH DASIA AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1f90" name="etapsiliypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND YPOGEGRAMMENI -->
+      <map code="0x1f91" name="etadasiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND YPOGEGRAMMENI -->
+      <map code="0x1f92" name="etapsilivariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f93" name="etadasiavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1f94" name="etapsilioxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f95" name="etadasiaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1f96" name="etapsiliperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PSILI AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f97" name="etadasiaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH DASIA AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1f98" name="Etapsiliprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND PROSGEGRAMMENI -->
+      <map code="0x1f99" name="Etadasiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9a" name="Etapsilivariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9b" name="Etadasiavariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9c" name="Etapsilioxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9d" name="Etadasiaoxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1f9e" name="Etapsiliperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PSILI AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1f9f" name="Etadasiaperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH DASIA AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1fa0" name="omegapsiliypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND YPOGEGRAMMENI -->
+      <map code="0x1fa1" name="omegadasiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa2" name="omegapsilivariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa3" name="omegadasiavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa4" name="omegapsilioxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa5" name="omegadasiaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fa6" name="omegapsiliperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PSILI AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fa7" name="omegadasiaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH DASIA AND PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fa8" name="Omegapsiliprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND PROSGEGRAMMENI -->
+      <map code="0x1fa9" name="Omegadasiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND PROSGEGRAMMENI -->
+      <map code="0x1faa" name="Omegapsilivariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1fab" name="Omegadasiavariaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND VARIA AND PROSGEGRAMMENI -->
+      <map code="0x1fac" name="Omegapsilioxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1fad" name="Omegadasiaoxiaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND OXIA AND PROSGEGRAMMENI -->
+      <map code="0x1fae" name="Omegapsiliperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PSILI AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1faf" name="Omegadasiaperispomeniprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH DASIA AND PERISPOMENI AND PROSGEGRAMMENI -->
+      <map code="0x1fb0" name="alphavrachy-grek"/><!-- GREEK SMALL LETTER ALPHA WITH VRACHY -->
+      <map code="0x1fb1" name="alphamacron-grek"/><!-- GREEK SMALL LETTER ALPHA WITH MACRON -->
+      <map code="0x1fb2" name="alphavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fb3" name="alphaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH YPOGEGRAMMENI -->
+      <map code="0x1fb4" name="alphaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fb6" name="alphaperispomeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PERISPOMENI -->
+      <map code="0x1fb7" name="alphaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ALPHA WITH PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fb8" name="Alphavrachy-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH VRACHY -->
+      <map code="0x1fb9" name="Alphamacron-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH MACRON -->
+      <map code="0x1fba" name="Alphavaria-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH VARIA -->
+      <map code="0x1fbb" name="Alphaoxia-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH OXIA -->
+      <map code="0x1fbc" name="Alphaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ALPHA WITH PROSGEGRAMMENI -->
+      <map code="0x1fbd" name="koronismod-grek"/><!-- GREEK KORONIS -->
+      <map code="0x1fbe" name="prosgegrammeni-grek"/><!-- GREEK PROSGEGRAMMENI -->
+      <map code="0x1fbf" name="psilimod-grek"/><!-- GREEK PSILI -->
+      <map code="0x1fc0" name="perispomenimod-grek"/><!-- GREEK PERISPOMENI -->
+      <map code="0x1fc1" name="dialytikaperispomenimod-grek"/><!-- GREEK DIALYTIKA AND PERISPOMENI -->
+      <map code="0x1fc2" name="etavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1fc3" name="etaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH YPOGEGRAMMENI -->
+      <map code="0x1fc4" name="etaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1fc6" name="etaperispomeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PERISPOMENI -->
+      <map code="0x1fc7" name="etaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER ETA WITH PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1fc8" name="Epsilonvaria-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH VARIA -->
+      <map code="0x1fc9" name="Epsilonoxia-grek"/><!-- GREEK CAPITAL LETTER EPSILON WITH OXIA -->
+      <map code="0x1fca" name="Etavaria-grek"/><!-- GREEK CAPITAL LETTER ETA WITH VARIA -->
+      <map code="0x1fcb" name="Etaoxia-grek"/><!-- GREEK CAPITAL LETTER ETA WITH OXIA -->
+      <map code="0x1fcc" name="Etaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER ETA WITH PROSGEGRAMMENI -->
+      <map code="0x1fcd" name="psilivariamod-grek"/><!-- GREEK PSILI AND VARIA -->
+      <map code="0x1fce" name="psilioxiamod-grek"/><!-- GREEK PSILI AND OXIA -->
+      <map code="0x1fcf" name="psiliperispomenimod-grek"/><!-- GREEK PSILI AND PERISPOMENI -->
+      <map code="0x1fd0" name="iotavrachy-grek"/><!-- GREEK SMALL LETTER IOTA WITH VRACHY -->
+      <map code="0x1fd1" name="iotamacron-grek"/><!-- GREEK SMALL LETTER IOTA WITH MACRON -->
+      <map code="0x1fd2" name="iotadialytikavaria-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND VARIA -->
+      <map code="0x1fd3" name="iotadialytikaoxia-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND OXIA -->
+      <map code="0x1fd6" name="iotaperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH PERISPOMENI -->
+      <map code="0x1fd7" name="iotadialytikaperispomeni-grek"/><!-- GREEK SMALL LETTER IOTA WITH DIALYTIKA AND PERISPOMENI -->
+      <map code="0x1fd8" name="Iotavrachy-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH VRACHY -->
+      <map code="0x1fd9" name="Iotamacron-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH MACRON -->
+      <map code="0x1fda" name="Iotavaria-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH VARIA -->
+      <map code="0x1fdb" name="Iotaoxia-grek"/><!-- GREEK CAPITAL LETTER IOTA WITH OXIA -->
+      <map code="0x1fdd" name="dasiavariamod-grek"/><!-- GREEK DASIA AND VARIA -->
+      <map code="0x1fde" name="dasiaoxiamod-grek"/><!-- GREEK DASIA AND OXIA -->
+      <map code="0x1fdf" name="dasiaperispomenimod-grek"/><!-- GREEK DASIA AND PERISPOMENI -->
+      <map code="0x1fe0" name="upsilonvrachy-grek"/><!-- GREEK SMALL LETTER UPSILON WITH VRACHY -->
+      <map code="0x1fe1" name="upsilonmacron-grek"/><!-- GREEK SMALL LETTER UPSILON WITH MACRON -->
+      <map code="0x1fe2" name="upsilondialytikavaria-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND VARIA -->
+      <map code="0x1fe3" name="upsilondialytikaoxia-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND OXIA -->
+      <map code="0x1fe4" name="rhopsili-grek"/><!-- GREEK SMALL LETTER RHO WITH PSILI -->
+      <map code="0x1fe5" name="rhodasia-grek"/><!-- GREEK SMALL LETTER RHO WITH DASIA -->
+      <map code="0x1fe6" name="upsilonperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH PERISPOMENI -->
+      <map code="0x1fe7" name="upsilondialytikaperispomeni-grek"/><!-- GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND PERISPOMENI -->
+      <map code="0x1fe8" name="Upsilonvrachy-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH VRACHY -->
+      <map code="0x1fe9" name="Upsilonmacron-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH MACRON -->
+      <map code="0x1fea" name="Upsilonvaria-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH VARIA -->
+      <map code="0x1feb" name="Upsilonoxia-grek"/><!-- GREEK CAPITAL LETTER UPSILON WITH OXIA -->
+      <map code="0x1fec" name="Rhodasia-grek"/><!-- GREEK CAPITAL LETTER RHO WITH DASIA -->
+      <map code="0x1fed" name="dialytikavariamod-grek"/><!-- GREEK DIALYTIKA AND VARIA -->
+      <map code="0x1fee" name="dialytikaoxiamod-grek"/><!-- GREEK DIALYTIKA AND OXIA -->
+      <map code="0x1fef" name="variamod-grek"/><!-- GREEK VARIA -->
+      <map code="0x1ff2" name="omegavariaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH VARIA AND YPOGEGRAMMENI -->
+      <map code="0x1ff3" name="omegaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH YPOGEGRAMMENI -->
+      <map code="0x1ff4" name="omegaoxiaypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH OXIA AND YPOGEGRAMMENI -->
+      <map code="0x1ff6" name="omegaperispomeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PERISPOMENI -->
+      <map code="0x1ff7" name="omegaperispomeniypogegrammeni-grek"/><!-- GREEK SMALL LETTER OMEGA WITH PERISPOMENI AND YPOGEGRAMMENI -->
+      <map code="0x1ff8" name="Omicronvaria-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH VARIA -->
+      <map code="0x1ff9" name="Omicronoxia-grek"/><!-- GREEK CAPITAL LETTER OMICRON WITH OXIA -->
+      <map code="0x1ffa" name="Omegavaria-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH VARIA -->
+      <map code="0x1ffb" name="Omegaoxia-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH OXIA -->
+      <map code="0x1ffc" name="Omegaprosgegrammeni-grek"/><!-- GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI -->
+      <map code="0x1ffd" name="oxiamod-grek"/><!-- GREEK OXIA -->
+      <map code="0x1ffe" name="dasiamod-grek"/><!-- GREEK DASIA -->
+      <map code="0xe138" name="uniE138"/><!-- ???? -->
+      <map code="0xe6af" name="alpha_apostrophe"/><!-- ???? -->
+      <map code="0xe6b0" name="alpha_curly"/><!-- ???? -->
+      <map code="0xe6b1" name="alpha_iota"/><!-- ???? -->
+      <map code="0xe6b2" name="alpha_iota_psili"/><!-- ???? -->
+      <map code="0xe6b3" name="alpha_iota_tonos"/><!-- ???? -->
+      <map code="0xe6b4" name="alpha_iota_psili_oxia"/><!-- ???? -->
+      <map code="0xe6b5" name="alpha_iota_perispomeni"/><!-- ???? -->
+      <map code="0xe6b6" name="alpha_nu"/><!-- ???? -->
+      <map code="0xe6b7" name="alpha_rho"/><!-- ???? -->
+      <map code="0xe6b8" name="alpha_sigma_tau"/><!-- ???? -->
+      <map code="0xe6b9" name="alpha_psili_sigma_tau"/><!-- ???? -->
+      <map code="0xe6c0" name="beta_curly"/><!-- ???? -->
+      <map code="0xe6d0" name="gamma_short"/><!-- ???? -->
+      <map code="0xe6d1" name="gamma_tall"/><!-- ???? -->
+      <map code="0xe6d2" name="gamma_alpha_varia_rho"/><!-- ???? -->
+      <map code="0xe6d3" name="gamma_alpha_varia_rho_2"/><!-- ???? -->
+      <map code="0xe6d4" name="gamma_alpha_varia_rho_3"/><!-- ???? -->
+      <map code="0xe6d5" name="gamma_alpha_varia_rho_4"/><!-- ???? -->
+      <map code="0xe6d6" name="gamma_alpha_varia_rho_5"/><!-- ???? -->
+      <map code="0xe6d7" name="gamma_gamma"/><!-- ???? -->
+      <map code="0xe6d8" name="gamma_epsilon_nu_oxia"/><!-- ???? -->
+      <map code="0xe6d9" name="gamma_omicron"/><!-- ???? -->
+      <map code="0xe6da" name="gamma_omicron_2"/><!-- ???? -->
+      <map code="0xe6db" name="gamma_rho"/><!-- ???? -->
+      <map code="0xe6dc" name="uniE6DC"/><!-- ???? -->
+      <map code="0xe6df" name="delta_apostrophe"/><!-- ???? -->
+      <map code="0xe6e0" name="delta_curly"/><!-- ???? -->
+      <map code="0xe6e1" name="delta_epsilon"/><!-- ???? -->
+      <map code="0xe6e2" name="delta_epsilon_varia"/><!-- ???? -->
+      <map code="0xe6e3" name="delta_epsilon_varia_2"/><!-- ???? -->
+      <map code="0xe6e4" name="delta_alpha_fin_sigma"/><!-- ???? -->
+      <map code="0xe6f0" name="epsilon_psili_perispomeni"/><!-- ???? -->
+      <map code="0xe6f1" name="epsilon_dasia_perispomeni"/><!-- ???? -->
+      <map code="0xe6f2" name="epsilon_iota"/><!-- ???? -->
+      <map code="0xe6f3" name="epsilon_iota_2"/><!-- ???? -->
+      <map code="0xe6f4" name="epsilon_iota_perispomeni"/><!-- ???? -->
+      <map code="0xe6f5" name="epsion_iota_2_perispomeni"/><!-- ???? -->
+      <map code="0xe6f6" name="epsilon_iota_perispomeni_prosgegrammeni"/><!-- ???? -->
+      <map code="0xe6f7" name="epsilon_psili_nu"/><!-- ???? -->
+      <map code="0xe6f8" name="epsilon_psili_xi"/><!-- ???? -->
+      <map code="0xe6f9" name="epsilon_rho"/><!-- ???? -->
+      <map code="0xe6fa" name="epsilon_rho_2"/><!-- ???? -->
+      <map code="0xe6fb" name="epsilon_stigma_iota"/><!-- ???? -->
+      <map code="0xe6fc" name="epsilon_psili_stigma_iota"/><!-- ???? -->
+      <map code="0xe6fd" name="epsilon_psili_stigma_iota_varia"/><!-- ???? -->
+      <map code="0xe6fe" name="epsilon_upsilon"/><!-- ???? -->
+      <map code="0xe6ff" name="epsilon_upsilon_2"/><!-- ???? -->
+      <map code="0xe700" name="zeta_2"/><!-- ???? -->
+      <map code="0xe701" name="zeta_3"/><!-- ???? -->
+      <map code="0xe710" name="eta_2"/><!-- ???? -->
+      <map code="0xe711" name="eta_2_perispomeni"/><!-- ???? -->
+      <map code="0xe712" name="eta_nu"/><!-- ???? -->
+      <map code="0xe713" name="eta_tonos_nu"/><!-- ???? -->
+      <map code="0xe714" name="eta_varia_nu"/><!-- ???? -->
+      <map code="0xe717" name="eta_varia_nu_2"/><!-- ???? -->
+      <map code="0xe718" name="eta_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe71f" name="theta_apostrophe"/><!-- ???? -->
+      <map code="0xe720" name="theta_symbol_apostrophe"/><!-- ???? -->
+      <map code="0xe721" name="phi_apostrophe"/><!-- ???? -->
+      <map code="0xe722" name="phi_iota"/><!-- ???? -->
+      <map code="0xe723" name="phi_iota_tonos"/><!-- ???? -->
+      <map code="0xe740" name="kappa_alpha_iota_2_varia"/><!-- ???? -->
+      <map code="0xe741" name="kappa_alpha_iota_3_varia"/><!-- ???? -->
+      <map code="0xe742" name="kappa_alpha_iota_4_varia"/><!-- ???? -->
+      <map code="0xe743" name="kappa_alpha_iota_5_varia"/><!-- ???? -->
+      <map code="0xe744" name="kappa_alpha_tau_alpha"/><!-- ???? -->
+      <map code="0xe750" name="lambda_apostrophe"/><!-- ???? -->
+      <map code="0xe751" name="lambda_lambda"/><!-- ???? -->
+      <map code="0xe752" name="lambda_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe753" name="lambda_iota_per_fin_sigma"/><!-- ???? -->
+      <map code="0xe760" name="mu_epsilon_nu"/><!-- ???? -->
+      <map code="0xe761" name="mu_epsilon_nu_2"/><!-- ???? -->
+      <map code="0xe762" name="mu_epsilon_nu_3"/><!-- ???? -->
+      <map code="0xe763" name="mu_epsilon_varia_nu"/><!-- ???? -->
+      <map code="0xe764" name="mu_epsilon_varia_2_nu"/><!-- ???? -->
+      <map code="0xe765" name="mu_epsilon_tonos_nu"/><!-- ???? -->
+      <map code="0xe766" name="uniE766"/><!-- ???? -->
+      <map code="0xe767" name="mu_alpha_fin_sigma"/><!-- ???? -->
+      <map code="0xe768" name="mu_epsilon_iota_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe770" name="nu_final"/><!-- ???? -->
+      <map code="0xe771" name="nu_omicrn_final_sigma"/><!-- ???? -->
+      <map code="0xe772" name="nu_alpha_iota_final_sigma"/><!-- ???? -->
+      <map code="0xe780" name="xi_2"/><!-- ???? -->
+      <map code="0xe797" name="omicron_psili_perispomeni"/><!-- ???? -->
+      <map code="0xe798" name="omicron_dasia_perispomeni"/><!-- ???? -->
+      <map code="0xe799" name="omicron_perispomeni"/><!-- ???? -->
+      <map code="0xe79a" name="omicron_upsilon"/><!-- ???? -->
+      <map code="0xe79b" name="omicron_upsilon_tonos"/><!-- ???? -->
+      <map code="0xe79c" name="omicron_upsilon_perispomeni"/><!-- ???? -->
+      <map code="0xe79d" name="omicron_sigma"/><!-- ???? -->
+      <map code="0xe7a0" name="Pi_2"/><!-- ???? -->
+      <map code="0xe7a1" name="pi_apostrophe"/><!-- ???? -->
+      <map code="0xe7a2" name="pisymbol_apostrophe"/><!-- ???? -->
+      <map code="0xe7a3" name="pi_alpha_rho"/><!-- ???? -->
+      <map code="0xe7a4" name="pi_epsilon_rho"/><!-- ???? -->
+      <map code="0xe7a5" name="pi_omicron"/><!-- ???? -->
+      <map code="0xe7a6" name="pi_omicron_varia"/><!-- ???? -->
+      <map code="0xe7a7" name="pi_rho"/><!-- ???? -->
+      <map code="0xe7a8" name="pi_tau"/><!-- ???? -->
+      <map code="0xe7a9" name="pi_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7aa" name="pi_rho_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ab" name="pi_epsilon_nu"/><!-- ???? -->
+      <map code="0xe7ac" name="pi_epsilon_nu2"/><!-- ???? -->
+      <map code="0xe7c0" name="sigma_2"/><!-- ???? -->
+      <map code="0xe7c1" name="sigma_theta"/><!-- ???? -->
+      <map code="0xe7c2" name="sigma_theta_alpha_iota"/><!-- ???? -->
+      <map code="0xe7c3" name="sigma_pi"/><!-- ???? -->
+      <map code="0xe7c4" name="sigma_sigma"/><!-- ???? -->
+      <map code="0xe7c5" name="sigma_tau"/><!-- ???? -->
+      <map code="0xe7c6" name="sigma_tau_rho"/><!-- ???? -->
+      <map code="0xe7c7" name="sigma_chi"/><!-- ???? -->
+      <map code="0xe7c8" name="sigma_epsilon_nu"/><!-- ???? -->
+      <map code="0xe7c9" name="sigma_eta_ypog_fin_sigma"/><!-- ???? -->
+      <map code="0xe7d0" name="tau_tall"/><!-- ???? -->
+      <map code="0xe7d1" name="tau_tall_apostrophe"/><!-- ???? -->
+      <map code="0xe7d2" name="tau_apostrophe"/><!-- ???? -->
+      <map code="0xe7d3" name="tau_alpha_iota"/><!-- ???? -->
+      <map code="0xe7d4" name="tau_alpha_iota_2"/><!-- ???? -->
+      <map code="0xe7d5" name="tau_epsilon"/><!-- ???? -->
+      <map code="0xe7d6" name="tau_eta_varia_nu"/><!-- ???? -->
+      <map code="0xe7d7" name="tau_eta_varia2_nu"/><!-- ???? -->
+      <map code="0xe7d8" name="tau_eta_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe7d9" name="tau_eta_perispomeni_sigma_2"/><!-- ???? -->
+      <map code="0xe7da" name="tau_iota"/><!-- ???? -->
+      <map code="0xe7db" name="tau_omicron"/><!-- ???? -->
+      <map code="0xe7dc" name="tau_omicron_2"/><!-- ???? -->
+      <map code="0xe7dd" name="tau_omicron_varia"/><!-- ???? -->
+      <map code="0xe7de" name="tau_omicron_varia_2"/><!-- ???? -->
+      <map code="0xe7df" name="tau_omicron_varia_3"/><!-- ???? -->
+      <map code="0xe7e0" name="tau_omicron_varia_4"/><!-- ???? -->
+      <map code="0xe7e1" name="tau_omicron_varia_nu"/><!-- ???? -->
+      <map code="0xe7e2" name="tau_tall_omicron_sigma"/><!-- ???? -->
+      <map code="0xe7e3" name="tau_omicron_upsilon_perispomeni"/><!-- ???? -->
+      <map code="0xe7e4" name="tau_omicron_upsilon_perispomeni_2"/><!-- ???? -->
+      <map code="0xe7e5" name="tau_rho"/><!-- ???? -->
+      <map code="0xe7e6" name="tau_rho_2"/><!-- ???? -->
+      <map code="0xe7e7" name="tau_tall_tau"/><!-- ???? -->
+      <map code="0xe7e8" name="tau_omega_perispomeni_prosgegrammeni"/><!-- ???? -->
+      <map code="0xe7e9" name="tau_omega_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe7ea" name="tau_omega_perispomeni_nu_2"/><!-- ???? -->
+      <map code="0xe7eb" name="tau_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ec" name="tau_tall_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ed" name="tau_rho_omicron_final_sigma"/><!-- ???? -->
+      <map code="0xe7ee" name="tau_tall_iota_per_fin_sigma"/><!-- ???? -->
+      <map code="0xe7ef" name="tau_iota_per_fin_sigma"/><!-- ???? -->
+      <map code="0xe7f0" name="upsilon_dasia_iota"/><!-- ???? -->
+      <map code="0xe7f1" name="upsilon_tonos"/><!-- ???? -->
+      <map code="0xe7f2" name="upsilon_perispomeni"/><!-- ???? -->
+      <map code="0xe7f3" name="tau_alpha_iota_fin_sig_per"/><!-- ???? -->
+      <map code="0xe7f4" name="tau_epsilon_final_sigma"/><!-- ???? -->
+      <map code="0xe7f5" name="tau_alpha_iota_fin_sig"/><!-- ???? -->
+      <map code="0xe7f8" name="upsilon_nu"/><!-- ???? -->
+      <map code="0xe7f9" name="upsilon_tonos_nu"/><!-- ???? -->
+      <map code="0xe7fa" name="upsilon_varia_nu"/><!-- ???? -->
+      <map code="0xe7fb" name="upsilon_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe7fc" name="upsilon_psili_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe810" name="chi_apostrophe"/><!-- ???? -->
+      <map code="0xe811" name="chi_rho"/><!-- ???? -->
+      <map code="0xe812" name="chi_epsilon_nu"/><!-- ???? -->
+      <map code="0xe820" name="omega_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe821" name="psi_eta_ypog_fin_sigma"/><!-- ???? -->
+      <map code="0xe840" name="slant_1"/><!-- ???? -->
+      <map code="0xe841" name="slant_2"/><!-- ???? -->
+      <map code="0xe84e" name="uniE84E"/><!-- ???? -->
+      <map code="0xe84f" name="uniE84F"/><!-- ???? -->
+      <map code="0xe860" name="alpha_nu#1"/><!-- ???? -->
+      <map code="0xe861" name="alpha_nu_2"/><!-- ???? -->
+      <map code="0xe862" name="alpha_iota_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe863" name="alpha_sigma_2"/><!-- ???? -->
+      <map code="0xe864" name="alpha_nu_3"/><!-- ???? -->
+      <map code="0xe865" name="epsilon_iota_sigma"/><!-- ???? -->
+      <map code="0xe866" name="epsilon_nu"/><!-- ???? -->
+      <map code="0xe867" name="epsilon_nu_2"/><!-- ???? -->
+      <map code="0xe868" name="alpha_fin_sigma"/><!-- ???? -->
+      <map code="0xe86a" name="iota_sigma"/><!-- ???? -->
+      <map code="0xe86b" name="omicron_iota_perispomeni_sigma"/><!-- ???? -->
+      <map code="0xe86c" name="omicron_sigma_2"/><!-- ???? -->
+      <map code="0xe86d" name="omega_nu"/><!-- ???? -->
+      <map code="0xe86e" name="omega_nu_2"/><!-- ???? -->
+      <map code="0xe86f" name="omega_perispomeni_nu"/><!-- ???? -->
+      <map code="0xe870" name="omicron_sigma_varia"/><!-- ???? -->
+      <map code="0xe871" name="omicron_varia_sigma"/><!-- ???? -->
+      <map code="0xe872" name="omicron_iota_peris_final_sigma"/><!-- ???? -->
+      <map code="0xe873" name="eta_ypogegrammeni_fin_sigma"/><!-- ???? -->
+    </cmap_format_4>
+  </cmap>
+
+</ttFont>

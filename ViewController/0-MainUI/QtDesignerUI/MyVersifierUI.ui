@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1351</width>
-    <height>928</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="font">
@@ -3800,7 +3800,7 @@
      <x>0</x>
      <y>0</y>
      <width>1351</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -3836,6 +3836,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionCharacter_Reference"/>
     <addaction name="action_Writer"/>
     <addaction name="actionUpdate_Greek_Wordlist"/>
     <addaction name="actionUpdate_Hebrew_Wordlist"/>
@@ -3855,124 +3856,6 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dockOutput">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>100</width>
-     <height>100</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>520</width>
-     <height>200</height>
-    </size>
-   </property>
-   <property name="accessibleName">
-    <string/>
-   </property>
-   <property name="accessibleDescription">
-    <string/>
-   </property>
-   <property name="floating">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string> Output</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="dockOutputContents">
-    <property name="minimumSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <widget class="QTextEdit" name="OutputText">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>-1</y>
-       <width>1281</width>
-       <height>101</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>100</height>
-      </size>
-     </property>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockChrRef">
-   <property name="minimumSize">
-    <size>
-     <width>400</width>
-     <height>625</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>200</width>
-     <height>200</height>
-    </size>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Character Reference</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockChrRefContents">
-    <property name="minimumSize">
-     <size>
-      <width>400</width>
-      <height>600</height>
-     </size>
-    </property>
-    <widget class="QPlainTextEdit" name="ChrRefplainTextEdit">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>380</width>
-       <height>671</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>360</width>
-       <height>500</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>FROMVS</family>
-       <pointsize>18</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="documentTitle">
-      <string>Character Reference</string>
-     </property>
-    </widget>
-   </widget>
-  </widget>
   <widget class="QToolBar" name="ModulesToolBar">
    <property name="windowTitle">
     <string>Versify Text Tool Bar</string>
@@ -3987,6 +3870,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_Writer"/>
+   <addaction name="actionCharacter_Reference"/>
    <addaction name="actionUpdate_Greek_Wordlist"/>
    <addaction name="actionLibreOffice_Writer"/>
    <addaction name="actionLibreOffice_Calc"/>
@@ -4693,7 +4577,7 @@
   </action>
   <action name="actionFontForge">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset>
      <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
    </property>
    <property name="text">
@@ -4950,6 +4834,15 @@
    </property>
    <property name="text">
     <string>Reference Word Count</string>
+   </property>
+  </action>
+  <action name="actionCharacter_Reference">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>Character Reference</string>
    </property>
   </action>
  </widget>

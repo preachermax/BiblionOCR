@@ -141,12 +141,12 @@
     },
     {
         "Setting": "self.refimgpath",
-        "CurrentValue": "",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_box/1516_Page_202.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.refimgdir",
-        "CurrentValue": "Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_box",
         "DefaultValue": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
@@ -210,324 +210,324 @@
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerrefimgpath",
+        "Setting": "self.pixlerrefimgpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerrefimgpixmap",
+        "Setting": "self.pixlerrefimgpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerrefimgqimage",
+        "Setting": "self.pixlerrefimgqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerrefimgdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_refimg",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_refimg"
+        "Setting": "self.pixlerrefimgdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_refimg",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_refimg"
     },
     {
-        "Setting": "self.pixerpagesboxfileList",
+        "Setting": "self.pixlerpagesboxfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesboxpixmap",
+        "Setting": "self.pixlerpagesboxpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesboxqimage",
+        "Setting": "self.pixlerpagesboxqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesboxpath",
+        "Setting": "self.pixlerpagesboxpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesboxdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_box",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_box"
+        "Setting": "self.pixlerpagesboxdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_pages_box",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_pages_box"
     },
     {
-        "Setting": "self.pixerpagescropfileList",
+        "Setting": "self.pixlerpagescropfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescroppixmap",
+        "Setting": "self.pixlerpagescroppixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescropqimage",
+        "Setting": "self.pixlerpagescropqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescroppath",
+        "Setting": "self.pixlerpagescroppath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescropdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_cropped",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_cropped"
+        "Setting": "self.pixlerpagescropdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_pages_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_pages_cropped"
     },
     {
-        "Setting": "self.pixerpagesdeskewfileList",
+        "Setting": "self.pixlerpagesdeskewfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdeskewpixmap",
+        "Setting": "self.pixlerpagesdeskewpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdeskewqimage",
+        "Setting": "self.pixlerpagesdeskewqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdeskewpath",
+        "Setting": "self.pixlerpagesdeskewpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdeskewdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_deskewed",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_deskewed"
+        "Setting": "self.pixlerpagesdeskewdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_pages_deskewed",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_pages_deskewed"
     },
     {
-        "Setting": "self.pixerpagesdenoisefileList",
+        "Setting": "self.pixlerpagesdenoisefileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdenoisepixmap",
+        "Setting": "self.pixlerpagesdenoisepixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdenoiseqimage",
+        "Setting": "self.pixlerpagesdenoiseqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdenoisepath",
+        "Setting": "self.pixlerpagesdenoisepath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesdenoisedir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_denoise",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_denoise"
+        "Setting": "self.pixlerpagesdenoisedir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_pages_denoise",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_pages_denoise"
     },
     {
-        "Setting": "self.pixerpagesrotatefileList",
+        "Setting": "self.pixlerpagesrotatefileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesrotatepixmap",
+        "Setting": "self.pixlerpagesrotatepixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesrotateqimage",
+        "Setting": "self.pixlerpagesrotateqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesrotatepath",
+        "Setting": "self.pixlerpagesrotatepath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagesrotatedir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_rotated",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_rotated"
+        "Setting": "self.pixlerpagesrotatedir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_pages_rotated",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_pages_rotated"
     },
     {
-        "Setting": "self.pixerpagescleanfileList",
+        "Setting": "self.pixlerpagescleanfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescleanpixmap",
+        "Setting": "self.pixlerpagescleanpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescleanqimage",
+        "Setting": "self.pixlerpagescleanqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescleanpath",
+        "Setting": "self.pixlerpagescleanpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerpagescleandir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_cleaned",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_pages_cleaned"
+        "Setting": "self.pixlerpagescleandir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_pages_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_pages_cleaned"
     },
     {
-        "Setting": "self.pixerlinesboxfileList",
+        "Setting": "self.pixlerlinesboxfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesboxpixmap",
+        "Setting": "self.pixlerlinesboxpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesboxqimage",
+        "Setting": "self.pixlerlinesboxqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesboxpath",
+        "Setting": "self.pixlerlinesboxpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesboxdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_box",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_box"
+        "Setting": "self.pixlerlinesboxdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_lines_box"
     },
     {
-        "Setting": "self.pixerlinescropfileList",
+        "Setting": "self.pixlerlinescropfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescroppixmap",
+        "Setting": "self.pixlerlinescroppixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescropqimage",
+        "Setting": "self.pixlerlinescropqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescroppath",
+        "Setting": "self.pixlerlinescroppath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescropdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_cropped",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_cropped"
+        "Setting": "self.pixlerlinescropdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_lines_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_lines_cropped"
     },
     {
-        "Setting": "self.pixerlinesdeskewfileList",
+        "Setting": "self.pixlerlinesdeskewfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdeskewpixmap",
+        "Setting": "self.pixlerlinesdeskewpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdeskewqimage",
+        "Setting": "self.pixlerlinesdeskewqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdeskewpath",
+        "Setting": "self.pixlerlinesdeskewpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdeskewdir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_deskewed",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_deskewed"
+        "Setting": "self.pixlerlinesdeskewdir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_lines_deskewed",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_lines_deskewed"
     },
     {
-        "Setting": "self.pixerlinesdenoisefileList",
+        "Setting": "self.pixlerlinesdenoisefileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdenoisepixmap",
+        "Setting": "self.pixlerlinesdenoisepixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdenoiseqimage",
+        "Setting": "self.pixlerlinesdenoiseqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdenoisepath",
+        "Setting": "self.pixlerlinesdenoisepath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesdenoisedir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_denoise",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_denoise"
+        "Setting": "self.pixlerlinesdenoisedir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_lines_denoise",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_lines_denoise"
     },
     {
-        "Setting": "self.pixerlinesrotatefileList",
+        "Setting": "self.pixlerlinesrotatefileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesrotatepixmap",
+        "Setting": "self.pixlerlinesrotatepixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesrotateqimage",
+        "Setting": "self.pixlerlinesrotateqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesrotatepath",
+        "Setting": "self.pixlerlinesrotatepath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinesrotatedir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_rotated",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_rotated"
+        "Setting": "self.pixlerlinesrotatedir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_lines_rotated",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_lines_rotated"
     },
     {
-        "Setting": "self.pixerlinescleanfileList",
+        "Setting": "self.pixlerlinescleanfileList",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescleanpixmap",
+        "Setting": "self.pixlerlinescleanpixmap",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescleanqimage",
+        "Setting": "self.pixlerlinescleanqimage",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescleanpath",
+        "Setting": "self.pixlerlinescleanpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.pixerlinescleandir",
-        "CurrentValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_cleaned",
-        "DefaultValue": "Model/Project/Images/Workflow/Pixer/pixer_lines_cleaned"
+        "Setting": "self.pixlerlinescleandir",
+        "CurrentValue": "Model/Project/Images/Workflow/pixler/pixler_lines_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/pixler/pixler_lines_cleaned"
     },
     {
         "Setting": "self.greekpagesdenoised",

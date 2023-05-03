@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1172</width>
+    <width>796</width>
     <height>982</height>
    </rect>
   </property>
@@ -1519,73 +1519,6 @@
       <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
     </property>
    </widget>
-   <widget class="QDockWidget" name="dockChrRef">
-    <property name="geometry">
-     <rect>
-      <x>760</x>
-      <y>62</y>
-      <width>400</width>
-      <height>711</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>400</width>
-      <height>622</height>
-     </size>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>200</width>
-      <height>500</height>
-     </size>
-    </property>
-    <property name="floating">
-     <bool>false</bool>
-    </property>
-    <property name="allowedAreas">
-     <set>Qt::RightDockWidgetArea</set>
-    </property>
-    <property name="windowTitle">
-     <string>Character Reference</string>
-    </property>
-    <widget class="QWidget" name="dockChrRefContents">
-     <property name="minimumSize">
-      <size>
-       <width>400</width>
-       <height>600</height>
-      </size>
-     </property>
-     <widget class="QPlainTextEdit" name="ChrRefplainTextEdit">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>380</width>
-        <height>711</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>360</width>
-        <height>500</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>FROMVS [MAXR]</family>
-        <pointsize>18</pointsize>
-       </font>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustIgnored</enum>
-      </property>
-      <property name="documentTitle">
-       <string>Character Reference</string>
-      </property>
-     </widget>
-    </widget>
-   </widget>
    <widget class="QSpinBox" name="PagefontSizeBox">
     <property name="geometry">
      <rect>
@@ -1972,8 +1905,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1172</width>
-     <height>19</height>
+     <width>796</width>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -2006,6 +1939,7 @@
     <addaction name="actionScanner"/>
     <addaction name="actionVersifier"/>
     <addaction name="actionStage_Ground_Truth"/>
+    <addaction name="actionCharacter_Reference"/>
     <addaction name="actionPage_Verse_Cross_Reference"/>
     <addaction name="actionRenumber_Images"/>
     <addaction name="actionRenumber_Text"/>
@@ -2043,6 +1977,7 @@
    <addaction name="actionScanner"/>
    <addaction name="actionVersifier"/>
    <addaction name="actionStage_Ground_Truth"/>
+   <addaction name="actionCharacter_Reference"/>
    <addaction name="actionPage_Verse_Cross_Reference"/>
    <addaction name="actionRenumber_Images"/>
    <addaction name="actionRenumber_Text"/>
@@ -2174,6 +2109,15 @@
    </property>
    <property name="text">
     <string>Stage Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCharacter_Reference">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>Character Reference</string>
    </property>
   </action>
  </widget>

@@ -421,7 +421,7 @@
     },
     {
         "Setting": "self.pagetextpath",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_pages/greek_book_42_Luke/greek1516_Page_172.txt",
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_pages/greek_book_42_Luke/greek1516_Page_173.txt",
         "DefaultValue": ""
     },
     {
@@ -436,17 +436,17 @@
     },
     {
         "Setting": "self.pagetextpage",
-        "CurrentValue": "172",
+        "CurrentValue": "173",
         "DefaultValue": "1"
     },
     {
         "Setting": "self.VerseStart",
-        "CurrentValue": 23334,
+        "CurrentValue": 271807,
         "DefaultValue": "0"
     },
     {
         "Setting": "self.VerseLastEnd",
-        "CurrentValue": 20945,
+        "CurrentValue": 271844,
         "DefaultValue": "0"
     },
     {

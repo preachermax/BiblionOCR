@@ -52,6 +52,8 @@ import MyVersifier as versifier
 import MyBoxer as boxer
 import MyScanner as scanner
 import MyExplorer as explorer
+import ChrReference as chrref
+
 #import PageVerseCrossReference as xref
 
 # Custom Exception class heirarchy
@@ -144,6 +146,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.actionVersifier.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionBoxer.triggered.connect(self.OpenWithMyBoxer)
         self.ui.actionProject_Browser.triggered.connect(self.OpenMyBrowser)
+        self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
         #self.ui.actionPage_Verse_Cross_Reference.triggered.connect(self.OpenPageVerseXref)
         #self.ui.actionPage_Verse_Cross_Reference.triggered.connect(self.PageVerseXref)
 
@@ -229,10 +232,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.txtfileList = []
         
         self.VerseLastEnd = 0
+        
+        self.OpenChrReference()
 
         # Reference
-        ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
-        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+        #ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
+        #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         #self.loadChapterCombo()
 
@@ -495,6 +500,11 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         self.browsermain = explorer.MyFileBrowser()
         self.browsermain.show()
+    
+    def OpenChrReference(self):
+        
+        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain.show()
 
     
 # Line image functions

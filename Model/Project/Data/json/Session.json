@@ -281,12 +281,12 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages (copy)/greek1516_Page_242.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages (copy)",
         "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages"
     },
     {

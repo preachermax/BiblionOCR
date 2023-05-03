@@ -1,0 +1,72 @@
+[
+    {
+        "GlyphID": "1",
+        "GlyphTifPath": "",
+        "GlyphDraw": "",
+        "GlyphName": "kai",
+        "Gsub": "\u03ba\u03b1\u03b9",
+        "Chr": "\ue741",
+        "ChrFont": "FROMVS",
+        "ChrFontSize": "40",
+        "ChrUCodeHex": "E741",
+        "ChrUCodeDec": "59201",
+        "Language": "",
+        "Favorites": ""
+    },
+    {
+        "GlyphID": "2",
+        "GlyphTifPath": "",
+        "GlyphDraw": "",
+        "GlyphName": "",
+        "Gsub": "",
+        "Chr": "\u1fb3",
+        "ChrFont": "",
+        "ChrFontSize": "",
+        "ChrUCodeHex": "1FB3",
+        "ChrUCodeDec": "8115",
+        "Language": "",
+        "Favorites": ""
+    },
+    {
+        "GlyphID": "3",
+        "GlyphTifPath": "",
+        "GlyphDraw": "",
+        "GlyphName": "",
+        "Gsub": "",
+        "Chr": "\u03c5",
+        "ChrFont": "",
+        "ChrFontSize": "",
+        "ChrUCodeHex": "3C5",
+        "ChrUCodeDec": "965",
+        "Language": "",
+        "Favorites": ""
+    },
+    {
+        "GlyphID": "4",
+        "GlyphTifPath": "",
+        "GlyphDraw": "",
+        "GlyphName": "",
+        "Gsub": "",
+        "Chr": "",
+        "ChrFont": "",
+        "ChrFontSize": "",
+        "ChrUCodeHex": "",
+        "ChrUCodeDec": "",
+        "Language": "",
+        "Favorites": ""
+    },
+    {
+        "GlyphID": "5",
+        "GlyphTifPath": "",
+        "GlyphDraw": "",
+        "GlyphName": "",
+        "Gsub": "",
+        "Chr": "\u1ff7",
+        "ChrFont": "",
+        "ChrFontSize": "",
+        "ChrUCodeHex": "1FF7",
+        "ChrUCodeDec": "8183",
+        "Language": "",
+        "Favorites": ""
+    }
+]
