@@ -1,0 +1,77 @@
+Setting,CurrentValue,DefaultValue
+self.ocrlang,Middle Greek,Middle Greek
+self.ocrmodel,feg,feg
+self.tessdatadir,c:/Program Files/Tesseract-OCR/tessdata,c:/Program Files/Tesseract-OCR/tessdata
+self.tesseract,c:/Program Files/Tesseract-OCR,c:/Program Files/Tesseract-OCR
+self.tesstrain,c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels,c:/Program Files/Tesseract-OCR/tesstrain
+self.bookabbr,Joh,Mat
+self.chapter,1,1
+self.verse,1,1
+self.word,1,1
+self.chr,1,1
+self.font,FROMVS,FROMVS
+self.fontsize,20,20
+self.fontinstallpath,c:/Windows/fonts/FROMVS,
+self.homefontinstallpath,c:/Windows/fonts/FROMVS,
+self.usrfontinstallpath,c:/Windows/fonts/FROMVS,
+self.tessfont,c:/users/max/tesseract/tesstrain-raw-Gospels/fonts/FROMVS,
+self.tessdir,c:/users/max/tesseract/tesstrain-raw-Gospels/fonts,
+self.sfd,/Documents/MyForge/FROMVS.sfd,
+self.sfddir,/Documents/MyForge,
+self.glyph,,
+self.glyphname,,
+self.glyphencode,,
+self.glyphsourcedir,Model/Project/Images/GlyphTracer/sfd_source,
+self.glyphgreekdir,Model/Project/Images/GlyphTracer/sfd_greek,
+self.linespacing,150,150
+self.verselinespacing,105,105
+self.reflinespacing,105,105
+self.sourcebookmarkdown,source_book_43_John,source_book_40_Matthew
+self.greekbookmarkdown,greek_book_43_John,greek_book_40_Matthew
+self.latinbookmarkdown,latin_book_43_John,latin_book_40_Matthew
+self.sourcefile,Model/Project/Images/Complete/Source/pdf_source/1516.pdf,Model/Project/Images/Complete/Source/pdf_source/1516.pdf
+self.firstpage,100,1
+self.lastpage,110,10
+self.deltapages,10,10
+self.imgpath,,
+self.imgdir,Model/Project/Images/Complete/Greek/tif_greek_pages,Model/Project/Images/Workflow/Greek/tif_greek_pages
+self.dirIterator,None,None
+self.imgfileList,[],[]
+self.pixmap,,
+self.qimage,,
+self.bmpsourcedir,Model/Project/Images/GlyphTracer/bmp_source,
+self.bmpgreekdir,Model/Project/Images/GlyphTracer/bmp_greek,
+self.zoom,25 %,25
+self.zoomslidervalue,25,25
+self.txtpath,,
+self.txtdir,Model/Project/Text/EstablishTruth/Greek_txt_pages,Model/Project/Text/EstablishTruth/Greek_txt_pages
+self.txtfileList,[],[]
+self.reftxtpath,,
+self.reftxtdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
+self.reftxtfileList,[],[]
+self.refimgpath,,
+self.refimgdir,Model/Project/Images/Complete/Greek/tif_greek_pages,Model/Project/Images/Complete/Greek/tif_greek_pages
+self.refimgtfileList,[],[]
+self.refimgzoom,25 %,25
+self.refimgzoomslidervalue,25,25
+self.imagepath,,
+self.imagetdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
+self.imagefileList,[],[]
+self.imagezoom,25 %,25
+self.imagezoomslidervalue,25,25
+self.greekpagesrotated,Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated,Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated
+self.greekpagesdeskewed,Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed,Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed
+self.greekpagescropped,Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped,Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped
+self.greekpagescleaned,Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned,Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned
+self.greekpagesbox,Model/Project/Images/Workflow/Greek/tif_greek_pages_box,Model/Project/Images/Workflow/Greek/tif_greek_pages_box
+self.greeklinescropped,Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped,Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped
+self.greeklinescleaned,Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned,Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned
+self.greeklinesbox,Model/Project/Images/Workflow/Greek/tif_greek_lines_box,Model/Project/Images/Workflow/Greek/tif_greek_lines_box
+self.latinpagesrotated,Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated,Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated
+self.latinpagesdeskewed,Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed,Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed
+self.latinpagescropped,Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped,Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped
+self.latinpagescleaned,Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned,Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned
+self.latinpagesbox,Model/Project/Images/Workflow/Latin/tif_latin_pages_box,Model/Project/Images/Workflow/Latin/tif_latin_pages_box
+self.latinlinescropped,Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped,Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped
+self.latinlinescleaned,Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned,Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned
+self.latinlinesbox,Model/Project/Images/Workflow/Latin/tif_latin_lines_box,Model/Project/Images/Workflow/Latin/tif_latin_lines_box

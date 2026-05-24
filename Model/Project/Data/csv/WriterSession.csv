@@ -18,8 +18,8 @@ self.sourcebookmarkdown,source_book_43_John,source_book_40_Matthew
 self.greekbookmarkdown,greek_book_43_John,greek_book_40_Matthew
 self.latinbookmarkdown,latin_book_43_John,latin_book_40_Matthew
 self.txtpath,,
-self.txtdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages
+self.txtdir,Model/Project/Text/EstablishTruth/Greek_txt_pages,Model/Project/Text/EstablishTruth/Greek_txt_pages
 self.txtfileList,[],[]
 self.reftxtpath,,
-self.reftxtdir,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR,c:/users/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR
+self.reftxtdir,Model/Project/Text/EstablishTruth/TR,Model/Project/Text/EstablishTruth/TR
 self.reftxtfileList,[],[]

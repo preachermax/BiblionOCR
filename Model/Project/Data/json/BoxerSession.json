@@ -1,5 +1,10 @@
 [
     {
+        "Setting": "APPLICATION",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
         "Setting": "self.projectsdir",
         "CurrentValue": "/Projects",
         "DefaultValue": "/Projects"
@@ -25,24 +30,44 @@
         "DefaultValue": "Workflow.json"
     },
     {
-        "Setting": "self.booksmarkdown",
-        "CurrentValue": "BooksMarkDown.json",
-        "DefaultValue": "BooksMarkDown.json"
+        "Setting": "self.edittimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
     },
     {
-        "Setting": "self.booksabbr",
-        "CurrentValue": "BooksAbbrName.json",
-        "DefaultValue": "BooksAbbrName.json"
+        "Setting": "self.maketimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
     },
     {
-        "Setting": "self.font",
-        "CurrentValue": "FROMVS",
-        "DefaultValue": "FROMVS"
+        "Setting": "self.rdrawtimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
     },
     {
-        "Setting": "self.fontsize",
-        "CurrentValue": "11",
-        "DefaultValue": "11"
+        "Setting": "self.sdrawtimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchmaketimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchmovetimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.batchnametimer",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "LANGUAGE",
+        "CurrentValue": "",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.ocrlang",
@@ -55,88 +80,13 @@
         "DefaultValue": "feg"
     },
     {
-        "Setting": "self.bookabbr",
-        "CurrentValue": "Joh",
-        "DefaultValue": "Mat"
-    },
-    {
-        "Setting": "self.chapter",
-        "CurrentValue": "1",
-        "DefaultValue": "1"
-    },
-    {
-        "Setting": "self.verse",
-        "CurrentValue": "1",
-        "DefaultValue": "1"
-    },
-    {
-        "Setting": "self.word",
-        "CurrentValue": "1",
-        "DefaultValue": "1"
-    },
-    {
-        "Setting": "self.chr",
-        "CurrentValue": "1",
-        "DefaultValue": "1"
-    },
-    {
-        "Setting": "self.glyph",
+        "Setting": "SOURCE IMAGE",
         "CurrentValue": "",
         "DefaultValue": ""
-    },
-    {
-        "Setting": "self.glyphname",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.glyphencode",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.glyphsourcedir",
-        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_source\u2019",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.glyphgreekdir",
-        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_greek\u2019",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.linespacing",
-        "CurrentValue": "150",
-        "DefaultValue": "150"
-    },
-    {
-        "Setting": "self.verselinespacing",
-        "CurrentValue": "105",
-        "DefaultValue": "105"
-    },
-    {
-        "Setting": "self.reflinespacing",
-        "CurrentValue": "105",
-        "DefaultValue": "105"
-    },
-    {
-        "Setting": "self.sourcebookmarkdown",
-        "CurrentValue": "source_book_43_John",
-        "DefaultValue": "source_book_40_Matthew"
-    },
-    {
-        "Setting": "self.greekbookmarkdown",
-        "CurrentValue": "greek_book_43_John",
-        "DefaultValue": "greek_book_40_Matthew"
-    },
-    {
-        "Setting": "self.latinbookmarkdown",
-        "CurrentValue": "latin_book_43_John",
-        "DefaultValue": "latin_book_40_Matthew"
     },
     {
         "Setting": "self.sourcefile",
-        "CurrentValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf\u2019",
+        "CurrentValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
         "DefaultValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf"
     },
     {
@@ -155,23 +105,13 @@
         "DefaultValue": "10"
     },
     {
-        "Setting": "self.refimgpath",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.refimgdir",
-        "CurrentValue": "Model/Project/Images/Workflow",
-        "DefaultValue": "Model/Project/Images/Workflow"
-    },
-    {
         "Setting": "self.imgpath",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "Model/Project/Images/Workflow",
+        "CurrentValue": "Model/Project/Images/Complete/Source/tif_black_white",
         "DefaultValue": "Model/Project/Images/Workflow"
     },
     {
@@ -195,16 +135,6 @@
         "DefaultValue": ""
     },
     {
-        "Setting": "self.bmpsourcedir",
-        "CurrentValue": "Model/Project/Images/GlyphTracer/bmp_source",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.bmpgreekdir",
-        "CurrentValue": "Model/Project/Images/GlyphTracer/bmp_greek",
-        "DefaultValue": ""
-    },
-    {
         "Setting": "self.zoom",
         "CurrentValue": "11 %",
         "DefaultValue": "11 %"
@@ -216,13 +146,23 @@
     },
     {
         "Setting": "self.img_xoffset",
-        "CurrentValue": "20",
-        "DefaultValue": "20"
+        "CurrentValue": "26",
+        "DefaultValue": "26"
     },
     {
         "Setting": "self.img_yoffset",
-        "CurrentValue": "90",
-        "DefaultValue": "90"
+        "CurrentValue": "91",
+        "DefaultValue": "91"
+    },
+    {
+        "Setting": "SOURCE TEXT",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.linespacing",
+        "CurrentValue": "150",
+        "DefaultValue": "150"
     },
     {
         "Setting": "self.txtpath",
@@ -265,54 +205,54 @@
         "DefaultValue": "Model/Project/Text/EstablishTruth/Latin/txt_latin_lines_box"
     },
     {
-        "Setting": "self.refimgpath",
+        "Setting": "BOOK",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.refimgdir",
+        "Setting": "self.booksmarkdown",
+        "CurrentValue": "BooksMarkDown.json",
+        "DefaultValue": "BooksMarkDown.json"
+    },
+    {
+        "Setting": "self.booksabbr",
+        "CurrentValue": "BooksAbbrName.json",
+        "DefaultValue": "BooksAbbrName.json"
+    },
+    {
+        "Setting": "self.bookabbr",
+        "CurrentValue": "Joh",
+        "DefaultValue": "Mat"
+    },
+    {
+        "Setting": "self.sourcebookmarkdown",
+        "CurrentValue": "source_book_43_John",
+        "DefaultValue": "source_book_40_Matthew"
+    },
+    {
+        "Setting": "self.greekbookmarkdown",
+        "CurrentValue": "greek_book_43_John",
+        "DefaultValue": "greek_book_40_Matthew"
+    },
+    {
+        "Setting": "self.latinbookmarkdown",
+        "CurrentValue": "latin_book_43_John",
+        "DefaultValue": "latin_book_40_Matthew"
+    },
+    {
+        "Setting": "CHAPTER",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.refimgfileList",
-        "CurrentValue": "[]",
-        "DefaultValue": "[]"
+        "Setting": "self.chapter",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
     },
     {
-        "Setting": "self.refimgzoom",
-        "CurrentValue": "25 %",
-        "DefaultValue": "25"
-    },
-    {
-        "Setting": "self.refimgzoomslidervalue",
-        "CurrentValue": "25",
-        "DefaultValue": "25"
-    },
-    {
-        "Setting": "self.imagepath",
+        "Setting": "PAGE IMAGE",
         "CurrentValue": "",
         "DefaultValue": ""
-    },
-    {
-        "Setting": "self.imagedir",
-        "CurrentValue": "",
-        "DefaultValue": ""
-    },
-    {
-        "Setting": "self.imagefileList",
-        "CurrentValue": "[]",
-        "DefaultValue": "[]"
-    },
-    {
-        "Setting": "self.imagezoom",
-        "CurrentValue": "25 %",
-        "DefaultValue": "25"
-    },
-    {
-        "Setting": "self.imagezoomslidervalue",
-        "CurrentValue": "25",
-        "DefaultValue": "25"
     },
     {
         "Setting": "self.pages",
@@ -385,29 +325,9 @@
         "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_box"
     },
     {
-        "Setting": "self.greeklinescropped",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped"
-    },
-    {
-        "Setting": "self.greeklinescleaned",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned"
-    },
-    {
-        "Setting": "self.greeklinesbox",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
-    },
-    {
-        "Setting": "self.greeklinesautosplit",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit"
-    },
-    {
         "Setting": "self.latinpagesautosplit",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit",
-        "DefaultValue": ""
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_autosplit"
     },
     {
         "Setting": "self.latinpages",
@@ -440,6 +360,51 @@
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_box"
     },
     {
+        "Setting": "PAGE TEXT",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "LINE IMAGE",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.greeklinescropped",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped"
+    },
+    {
+        "Setting": "self.greeklinescleaned",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned"
+    },
+    {
+        "Setting": "self.greeklinesbox",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
+    },
+    {
+        "Setting": "self.greeklinesautosplit",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit"
+    },
+    {
+        "Setting": "self.greeklinescropped",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped"
+    },
+    {
+        "Setting": "self.greeklinescleaned",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned"
+    },
+    {
+        "Setting": "self.greeklinesbox",
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
+    },
+    {
         "Setting": "self.latinlinescropped",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped"
@@ -460,38 +425,58 @@
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit"
     },
     {
-        "Setting": "self.edittimer",
+        "Setting": "self.latinlinescropped",
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped"
+    },
+    {
+        "Setting": "self.latinlinescleaned",
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned"
+    },
+    {
+        "Setting": "LINE TEXT",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.maketimer",
+        "Setting": "VERSE",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.rdrawtimer",
+        "Setting": "self.verse",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "WORD",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.sdrawtimer",
+        "Setting": "self.word",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
+    },
+    {
+        "Setting": "CHARACTER",
         "CurrentValue": "",
         "DefaultValue": ""
     },
     {
-        "Setting": "self.batchmaketimer",
-        "CurrentValue": "",
-        "DefaultValue": ""
+        "Setting": "self.chr",
+        "CurrentValue": "1",
+        "DefaultValue": "1"
     },
     {
-        "Setting": "self.batchmovetimer",
-        "CurrentValue": "",
-        "DefaultValue": ""
+        "Setting": "self.font",
+        "CurrentValue": "FROMVS",
+        "DefaultValue": "FROMVS"
     },
     {
-        "Setting": "self.batchnametimer",
-        "CurrentValue": "",
-        "DefaultValue": ""
+        "Setting": "self.fontsize",
+        "CurrentValue": "11",
+        "DefaultValue": "11"
     }
 ]

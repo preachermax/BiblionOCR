@@ -4,6 +4,7 @@ import json
 import os
 import re
 from pathlib import Path
+from HelpSystem import add_help_menu
 
 #import glob
 import shutil
@@ -39,6 +40,7 @@ from ext import mainfind
 from MyBoxerUI import Ui_Boxer
 from Training import Train as tr
 from PreProcess import PreProcess as pp
+from SessionManager import SessionManager
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal 
@@ -57,9 +59,10 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from Dialogs.split_greek_text_linesDialog import Ui_splitgreektextlinesDialog
 from Dialogs.rename_greek_text_linesDialog import Ui_renamegreektextlinesDialog
 
-# The new Stream Object which replaces the default stream associated with sys.stdout
-# This object just puts data in a queue!
-class WriteStream(object):
+###########    Unused Thread Classes   ############
+'''class WriteStream(object):
+    # The new Stream Object which replaces the default stream associated with sys.stdout
+    # This object just puts data in a queue!
     def __init__(self,queue):
         self.queue = queue
 
@@ -70,14 +73,11 @@ class WriteStream(object):
         """
         Stream flush implementation
         """
-        pass
-    
-# A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
-# It blocks until data is available, and once it has got something from the queue, it sends
-# it to the "MainThread" by emitting a Qt Signal
-
-class ThreadConsoleTextQueueReceiver(qtc.QObject):
-    
+        pass'''
+'''class ThreadConsoleTextQueueReceiver(qtc.QObject):
+    # A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
+    # It blocks until data is available, and once it has got something from the queue, it sends
+    # it to the "MainThread" by emitting a Qt Signal
     queue_element_received_signal = qtc.pyqtSignal(str)
 
     def __init__(self, q: Queue, *args, **kwargs):
@@ -93,10 +93,8 @@ class ThreadConsoleTextQueueReceiver(qtc.QObject):
 
     @qtc.pyqtSlot()
     def finished(self):
-        self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
-
-'''
-class Logging(qtc.QObject):
+        self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')'''
+'''class Logging(qtc.QObject):
     def setup_logging(log_prefix):
         global __is_setup_done
 
@@ -140,15 +138,8 @@ class TqdmLoggingHandler(logging.StreamHandler):
         # from https://stackoverflow.com/questions/38543506/change-logging-print-function-to-tqdm-write-so-logging-doesnt-interfere-wit/38739634#38739634
         self.flush()
 '''
-class VLine(QFrame):
-    # a simple VLine, like the one you get from designer
-    def __init__(self):
-        super(VLine, self).__init__()
-        self.setFrameShape(self.VLine|self.Sunken)
 
-class changedSignalTest(QObject):
-    signaltest = pyqtSignal(str,dict)
-
+###########    Partially Used Classes    ############
 class ProgThread(QThread):
     # Create a counter thread
     change_value = pyqtSignal(int)
@@ -159,11 +150,22 @@ class ProgThread(QThread):
             time.sleep(0.3)
             self.change_value.emit(cnt)
 
+class VLine(QFrame):
+    # a simple VLine, like the one you get from designer
+    def __init__(self):
+        super(VLine, self).__init__()
+        self.setFrameShape(self.VLine|self.Sunken)
+
+class changedSignalTest(QObject):
+    signaltest = pyqtSignal(str,dict)
+
+###########    Main Application Window Class    ############
 class MainWindow(qtw.QMainWindow):
 
+###########    Initialize Main Application Window    ############
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+                
         #Set Project Path
         self.mod_dirname = os.path.dirname(__file__)
         up_once = os.path.join(self.mod_dirname,"..")
@@ -173,6 +175,7 @@ class MainWindow(qtw.QMainWindow):
         self.mod_abspath = os.path.abspath(self.mod_realpath) 
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + r'/'
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path rootdir: {self.mod_rootdir}')
         print(f'OS Path realpath: {self.mod_realpath}')
@@ -184,14 +187,18 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
         self.ui.setupUi(self)
-        
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyBoxer')
         self.ui.ImageTab.currentChanged.connect(self.on_tabChanged)
-        
         # Manual
         self.ui.actionManually_Crop_Page.triggered.connect(self.pagebox_make_split)
+        self.ui.actionEdit_Greek_PageBox.triggered.connect(self.pagebox_edit_split)
+        #self.ui.actionEdit_Latin_PageBox.triggered.connect(self.pagebox_edit_split)
         #self.ui.actionCropPage.triggered.connect(self.crop)
         self.ui.actionDeskewPage.triggered.connect(self.deskewImage)
         #self.ui.actionRotatePage.triggered.connect(self.rotateImage)
+        self.currentBoxTable = self.ui.LineBoxTable
+        self.currentTextTable = self.ui.LineBoxText
           
         # Auto
         self.ui.actionAuto_Crop_Languages.triggered.connect(self.actionCrop_Languages)
@@ -273,7 +280,11 @@ class MainWindow(qtw.QMainWindow):
         self.ui.LineBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu) 
         self.ui.LineBoxTable.customContextMenuRequested.connect(self.openTableMenu)
 
-        self.ui.reloadTextbutton.clicked.connect(self.LineBoxText2LineBoxTable)
+        self.ui.PageBoxTable.setCornerButtonEnabled(False)
+        self.ui.PageBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu) 
+        self.ui.PageBoxTable.customContextMenuRequested.connect(self.openTableMenu)
+
+        self.ui.reloadTextbutton.clicked.connect(self.BoxText2BoxTable)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
         self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
@@ -283,7 +294,7 @@ class MainWindow(qtw.QMainWindow):
         # UI and slots code ends here.
         
         # Show the Main user interface
-        self.ui.BoxDocument = qtg.QTextDocument(self.ui.LineBoxText)
+        self.ui.BoxDocument = qtg.QTextDocument(self.currentTextTable)
         font = qtg.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(20)
@@ -291,10 +302,10 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.BoxDocument.setDefaultFont(font)
         self.ui.BoxBlockFormat = qtg.QTextBlockFormat()
-        self.ui.LineBoxTextFormat = qtg.QTextFormat()
+        self.currentTextTableFormat = qtg.QTextFormat()
         self.ui.BoxCursor = qtg.QTextCursor(self.ui.BoxDocument)
         
-        self.ui.LineBoxText.setDocument(self.ui.BoxDocument)
+        self.currentTextTable.setDocument(self.ui.BoxDocument)
         
         #self.ui.progressBar.valueChanged.connect(self.restartProgressTimer)
         # Initialize statusProgressBar Widget -- invoke addWidget as needed
@@ -382,19 +393,22 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
+        
+
+        self.ui.ImageTab.setCurrentIndex(3)
+        self.currenttabindex = self.ui.ImageTab.currentIndex()
+        self.currenttabtext = self.ui.ImageTab.tabText(self.currenttabindex)
         self.origpixmap = None
         self.box_color = "red"
         self.dirIterator = None
         self.imgfileList = []
         self.txtfileList = []
-        self.imgdir = self.greekpages
         self.imgpath = ""
-        self.txtdir = ""
         self.txtpath = ""
         self.imgopentitle = "Open Image"
         self.txtopentitle = "Open Text"
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
-        print('current book:',self.bookabbr)
+        #print('current book:',self.bookabbr)
 
         #self.disableMouseEvents()
 
@@ -474,208 +488,97 @@ class MainWindow(qtw.QMainWindow):
         cursor.insertText(text)
         self.process.setTextCursor(cursor)
         self.process.ensureCursorVisible()'''
-    
-    # Input_Output
-    #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
-    def output_terminal_written(self, text):
-        self.ui.OutputText.append(text)
+    '''def output_terminal_written(self, text):
+        #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
+        self.ui.OutputText.append(text)'''
 
-    # Session
+###########    Initialize Session    ############
     def get_session_settings(self):
-        # get session settings        
-        # Define json data        
+        # get session settings from shared manager
         print("loading session")
-        with open(self.projecthome + 'Model/Project/Data/json/BoxerSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            jsondir_key = r"self.jsondir"
-            session_key = r"self.session"
-            workflow_key = r"self.workflow"
-            booksmarkdown_key = r"self.booksmarkdown"
-            booksabbr_key = r"self.booksabbr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            ocrlang_key = r"self.ocrlang"
-            ocrmodel_key = r"self.ocrmodel"
-            bookabbr_key = r"self.bookabbr"
-            chapter_key = r"self.chapter"
-            verse_key = r"self.verse"
-            word_key = r"self.word"
-            chr_key = r"self.chr"
-            linespacing_key = r"self.linespacing"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            sourcefile_key = r"self.sourcefile"
-            firstpage_key = r"self.firstpage"
-            lastpage_key = r"self.lastpage"            
-            deltapages_key = r"self.deltapages"
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            dirIterator_key = r"self.dirIterator"
-            imgfileList_key = r"self.imgfileList"
-            pixmap_key = r"self.pixmap"
-            qimage_key = r"self.qimage"
-            zoom_key = r"self.zoom"
-            zoomslidervalue_key = r"self.zoomslidervalue"
-            img_xoffset_key = r"self.img_xoffset"
-            img_yoffset_key = r"self.img_yoffset"
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            txtfileList_key = r"self.txtfileList"
-            txtpagesbox_key = r"self.txtpagesbox"
-            jsonpagebox_key = r"self.jsonpagebox"
-            txtgreeklinebox_key = r"self.txtgreeklinebox"
-            jsongreeklinebox_key = r"self.jsongreeklinebox"
-            txtlatinlinebox_key = r"self.txtlatinlinebox"
-            glyph_key = r"self.glyph"
-            glyphname_key = r"self.glyphname"
-            glyphencode_key = r"self.glyphencode"
-            pages_key = r"self.pages"
-            pagesrotated_key = r"self.pagesrotated"
-            pagesdeskewed_key = r"self.pagesdeskewed"
-            pagescropped_key = r"self.pagescropped"
-            pagescleaned_key = r"self.pagescleaned"
-            pagesbox_key = r"self.pagesbox"
-            pageseliminated_key = r"self.pageseliminated"
-            greekpagesautosplit_key = r"self.greekpagesautosplit"
-            greekpages_key = r"self.greekpages"
-            greeklinesbox_key = r"self.greeklinesbox"
-            greeklinesautosplit_key = r"self.greeklinesautosplit"
-            latinpagesautosplit_key = r"self.latinpagesautosplit"
-            latinpages_key = r"self.latinpages"
-            latinlinesbox_key = r"self.latinlinesbox"
-            latinlinesautosplit_key = r"self.latinlinesautosplit"
+        session = self.session_manager.values('BoxerSession.json')
 
-            print(bookabbr_key,chapter_key)
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == jsondir_key:
-                    self.jsondir = Setting['CurrentValue']
-                elif Setting['Setting'] == session_key:
-                    self.session = Setting['CurrentValue']
-                    self.session = self.projecthome + self.jsondir + "/" + self.session
-                elif Setting['Setting'] == workflow_key: 
-                    self.workflow = Setting['CurrentValue']
-                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
-                elif Setting['Setting'] == booksmarkdown_key:
-                    self.booksmarkdown = Setting['CurrentValue']
-                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
-                elif Setting['Setting'] == booksabbr_key:
-                    self.booksabbr = Setting['CurrentValue']
-                    self.booksabbr = self.projecthome + self.jsondir + "/" + self.booksabbr
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                    self.ui.fontComboBox.setCurrentText(self.font)
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']
-                    self.ui.fontSizeBox.setValue(int(self.fontsize))
-                elif Setting['Setting'] == ocrlang_key:
-                    self.ocrlang = Setting['CurrentValue']
-                    self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-                elif Setting['Setting'] == ocrmodel_key:
-                    self.ocrmodel = Setting['CurrentValue']
-                    self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                    self.ui.bookComboBox.setCurrentText(self.bookabbr)            
-                elif Setting['Setting'] == chapter_key:  
-                    self.chapter = Setting['CurrentValue']          
-                elif Setting['Setting'] == verse_key:
-                    self.verse = Setting['CurrentValue']
-                elif Setting['Setting'] == word_key:
-                    self.word = Setting['CurrentValue'] 
-                elif Setting['Setting'] == chr_key:
-                    self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == linespacing_key:
-                    self.linespacing = Setting['CurrentValue']
-                    self.ui.LHlineEdit.setText(self.linespacing)
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == sourcefile_key:   
-                    self.sourcefile = Setting['CurrentValue']
-                elif Setting['Setting'] == firstpage_key:  
-                    self.firstpage = Setting['CurrentValue']
-                elif Setting['Setting'] == lastpage_key:  
-                    self.lastpage = Setting['CurrentValue']
-                elif Setting['Setting'] == deltapages_key:
-                    self.deltapages = Setting['CurrentValue']
-                elif Setting['Setting'] == imgpath_key:
-                    self.imgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == imgdir_key:  
-                    self.imgdir = Setting['CurrentValue']
-                elif Setting['Setting'] == dirIterator_key:  
-                    self.dirIterator = Setting['CurrentValue']
-                elif Setting['Setting'] == imgfileList_key:  
-                    self.imgfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixmap_key:  
-                    self.pixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == qimage_key:  
-                    self.qimage = Setting['CurrentValue']
-                elif Setting['Setting'] == zoom_key:  
-                    self.zoom = Setting['CurrentValue']
-                    self.ui.ZoomComboBox.setCurrentText(self.zoom)
-                elif Setting['Setting'] == zoomslidervalue_key:
-                    self.zoomslidervalue = Setting['CurrentValue']
-                    self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
-                elif Setting['Setting'] == img_xoffset_key:
-                    self.img_xoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == img_yoffset_key:
-                    self.img_yoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == txtpath_key:  
-                    self.txtpath = Setting['CurrentValue']
-                elif Setting['Setting'] == txtpagesbox_key:
-                    self.txtpagesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == jsonpagebox_key:
-                    self.jsonpagebox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == txtgreeklinebox_key:  
-                    self.txtgreeklinebox = Setting['CurrentValue']
-                elif Setting['Setting'] == jsongreeklinebox_key:  
-                    self.jsongreeklinebox = Setting['CurrentValue']
-                elif Setting['Setting'] == txtlatinlinebox_key:  
-                    self.txtlatinlinebox = Setting['CurrentValue']
-                elif Setting['Setting'] == txtdir_key:  
-                    self.txtdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pages_key:
-                    self.pages = self.projecthome + Setting['CurrentValue']                
-                elif Setting['Setting'] == pagesrotated_key:
-                    self.pagesrotated = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == pagesdeskewed_key:
-                    self.pagesdeskewed = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == pagescropped_key:
-                    self.pagescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == pagescleaned_key:
-                    self.pagescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == pagesbox_key:
-                    self.pagesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == pageseliminated_key:
-                    self.pageseliminated  = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagesautosplit_key:
-                    self.greekpagesautosplit = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpages_key:  
-                    self.greekpages = Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinesbox_key:  
-                    self.greeklinesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinesautosplit_key:  
-                    self.greeklinesautosplit = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesautosplit_key:
-                    self.latinpagesautosplit = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpages_key:  
-                    self.latinpages = Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinesbox_key:  
-                    self.latinlinesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinesautosplit_key:  
-                    self.latinlinesautosplit = Setting['CurrentValue']    
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        def abs_project_path(key: str) -> str:
+            value = session.get(key)
+            if value:
+                return self.projecthome + value
+            return getattr(self, key.replace('self.', ''), '')
+
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
+
+        self.jsondir = get_setting('jsondir', '')
+        self.session = abs_project_path('self.session')
+        self.workflow = abs_project_path('self.workflow')
+        self.booksmarkdown = abs_project_path('self.booksmarkdown')
+        self.booksabbr = abs_project_path('self.booksabbr')
+        self.font = get_setting('font', '')
+        self.fontsize = get_setting('fontsize', '20')
+        self.ocrlang = get_setting('ocrlang', '')
+        self.ocrmodel = get_setting('ocrmodel', '')
+        self.bookabbr = get_setting('bookabbr', '')
+        self.chapter = get_setting('chapter', '1')
+        self.verse = get_setting('verse', '1')
+        self.word = get_setting('word', '1')
+        self.chr = get_setting('chr', '1')
+        self.linespacing = get_setting('linespacing', '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.sourcefile = get_setting('sourcefile', '')
+        self.firstpage = get_setting('firstpage', '1')
+        self.lastpage = get_setting('lastpage', '1')
+        self.deltapages = get_setting('deltapages', '1')
+        self.imgpath = get_setting('imgpath', '')
+        self.imgdir = get_setting('imgdir', '')
+        self.dirIterator = get_setting('dirIterator', None)
+        self.imgfileList = get_setting('imgfileList', [])
+        self.pixmap = get_setting('pixmap', '')
+        self.qimage = get_setting('qimage', '')
+        self.zoom = get_setting('zoom', '25 %')
+        self.zoomslidervalue = get_setting('zoomslidervalue', '25')
+        self.img_xoffset = get_setting('img_xoffset', 0)
+        self.img_yoffset = get_setting('img_yoffset', 0)
+        self.txtpath = get_setting('txtpath', '')
+        self.txtdir = get_setting('txtdir', '')
+        self.txtfileList = get_setting('txtfileList', [])
+        self.txtpagesbox = abs_project_path('self.txtpagesbox')
+        self.jsonpagebox = abs_project_path('self.jsonpagebox')
+        self.txtgreeklinebox = get_setting('txtgreeklinebox', '')
+        self.jsongreeklinebox = get_setting('jsongreeklinebox', '')
+        self.txtlatinlinebox = get_setting('txtlatinlinebox', '')
+        self.glyph = get_setting('glyph', '')
+        self.glyphname = get_setting('glyphname', '')
+        self.glyphencode = get_setting('glyphencode', '')
+        self.pages = abs_project_path('self.pages')
+        self.pagesrotated = abs_project_path('self.pagesrotated')
+        self.pagesdeskewed = abs_project_path('self.pagesdeskewed')
+        self.pagescropped = abs_project_path('self.pagescropped')
+        self.pagescleaned = abs_project_path('self.pagescleaned')
+        self.pagesbox = abs_project_path('self.pagesbox')
+        self.pageseliminated = abs_project_path('self.pageseliminated')
+        self.greekpagesautosplit = abs_project_path('self.greekpagesautosplit')
+        self.greekpages = get_setting('greekpages', '')
+        self.greekpagesbox = get_setting('greekpagesbox', '')
+        self.greeklinesbox = get_setting('greeklinesbox', '')
+        self.greeklinesautosplit = get_setting('greeklinesautosplit', '')
+        self.latinpagesautosplit = abs_project_path('self.latinpagesautosplit')
+        self.latinpages = get_setting('latinpages', '')
+        self.latinpagesbox = get_setting('latinpagesbox', '')
+        self.latinlinesbox = get_setting('latinlinesbox', '')
+        self.latinlinesautosplit = get_setting('latinlinesautosplit', '')
+
+        self.ui.fontComboBox.setCurrentText(self.font)
+        self.ui.fontSizeBox.setValue(int(self.fontsize) if str(self.fontsize).isdigit() else self.ui.fontSizeBox.value())
+        self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+        self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+        self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        self.ui.LHlineEdit.setText(self.linespacing)
+
+    def save_session_settings(self, **updates):
+        self.session_manager.update('BoxerSession.json', updates)
 
     def get_workflow_settings(self):
 
@@ -693,99 +596,344 @@ class MainWindow(qtw.QMainWindow):
         # Closing file
         f.close()
 
+###########    Start Application    ############
+    
     def on_tabChanged(self):
         self.currenttabindex = self.ui.ImageTab.currentIndex()
         self.currenttabtext = self.ui.ImageTab.tabText(self.currenttabindex)
         print(f'Current Tab: {self.currenttabtext}')
+        #if self.imgpath:
         if self.currenttabtext == "Line Box":
-            self.imgdir = self.glyphboxgreekimgdir
-            self.imgpath = self.glyphboxgreekimgpath
+            #if self.statusBoxMode.text() == 'Make':
+                #self.imgdir = self.greekpages
+            #elif self.statusBoxMode.text() == 'Edit':
+            self.currentBoxImage = self.ui.LineBoxImage
+            self.currentBoxTable = self.ui.LineBoxTable
+            self.currentTextTable = self.ui.LineBoxText
+            self.imgdir = self.greeklinesbox
+            print(f'TabChanged Image Dir: {self.imgdir}')
             self.imgopentitle = "Open Line Box Image"
-            self.txtdir = self.glyphboxgreektxtdir
-            self.txtpath = self.glyphboxgreektxtpath
+            self.txtdir = self.txtgreeklinebox
             self.txtopentitle = "Open Line Box Text"
-            self.getImage(self.imgpath)
-        elif self.currenttabtext == "Page Box":
-            #self.imgdir = self.greeklinesbox
-            self.imgopentitle = "Open Page Box Image"
-            #self.txtdir = self.txtgreeklinebox
-            self.txtopentitle = "Open Page Box Text"
-        elif self.currenttabtext == "Source Page":
+        elif self.currenttabtext == "Page Image":
+            self.pageimage = self.imgpath
             self.imgdir = self.greekpages
+        elif self.currenttabtext == "Page Box":
+            #self.imgstrippath = self.imgpath.split("_")
+            #self.imgpath = self.imgstrippath[0] + "_pagebox.tif"
+            #if self.statusBoxMode.text() == 'Make':
+                #self.imgdir = self.greekpages
+            #elif self.statusBoxMode.text() == 'Edit':           
+                #self.imgdir = self.pagesbox
+            self.currentBoxImage = self.ui.PageBoxImage
+            self.currentBoxTable = self.ui.PageBoxTable
+            self.currentTextTable = self.ui.PageBoxText
+            self.imgdir = self.greekpagesbox
+            print(f'TabChanged Image Dir: {self.imgdir}')
+            self.imgopentitle = "Open Page Box Image"
+            self.txtdir = self.txtpagesbox
+            self.txtopentitle = "Open Page Box Text"
+        elif self.currenttabtext == "Source Image":
+            self.imgstrippath = self.imgpath.split("_")
+            self.imgpath = self.imgstrippath[0] + ".tif" 
+            self.imgdir = "Model/Project/Images/Complete/Source/tif_black_white"
             self.imgopentitle = "Open Source Image"
             self.txtopentitle = "Open Source Text"
-    # Source Actions 
+            #print(f'TabChanged Image Dir: {self.imgdir}')
+            #self.getImage(self.imgpath)
 
-    def crop(self):
-        # RefImg QRect
-        print("This is the new crop method of the Pixler class")
-        
-        # Initialize RefImg QRect
-        RefImg_qimage = qtg.QPixmap.toImage(self.ui.RefImg.pixmap())
-        RefImg_qimage_size = RefImg_qimage.size()
-        RefImg_xr = self.ui.RefImg.geometry().x()
-        RefImg_yr = self.ui.RefImg.geometry().y()
-        RefImg_wr = self.RefImg_width
-        RefImg_hr = self.RefImg_height
-        #RefImg_wr = self.ui.RefImg.pixmap().width()
-        #RefImg_hr = self.ui.RefImg.pixmap().height()
-        RefImg_qrect = QRect(RefImg_xr, RefImg_yr, RefImg_wr, RefImg_hr)
-        print("Reference Image QRect = " + str(RefImg_qrect))
+    def setBoxPaths(self):
+        self.imgfilestr = os.path.basename(self.imgpath)
+        self.imgfilesplit = os.path.splitext(self.imgfilestr)
+        self.imgfilename = self.imgfilesplit[0]
+        self.imgfileext = self.imgfilesplit[1]
 
-        # Initialize Scaled RefImg QRect
-        RefImg_xs = 0
-        RefImg_ys = 0
-        RefImg_ws = 0
-        RefImg_hs = 0
-        RefImg_xs = RefImg_xr * self.refimgscale
-        RefImg_ys = RefImg_yr * self.refimgscale
-        RefImg_ws = RefImg_wr * self.refimgscale
-        RefImg_hs = RefImg_hr * self.refimgscale
-        RefImg_sqrect = QRect(RefImg_xs,RefImg_ys,RefImg_ws,RefImg_hs)
-        print("Reference Image Scaled QRect = " + str(RefImg_sqrect))
         
-        # CropImg QRect
+        self.txtfilestr = os.path.basename(self.txtpath)
+        self.txtfilesplit = os.path.splitext(self.txtfilestr)
+        self.txtfilename = self.txtfilesplit[0]
+        self.txtfileext = self.txtfilesplit[1] 
+    
+        #Line Box Paths
+        if self.currenttabtext == "Line Box":    
+            self.path_of_imgautosplit = self.projecthome + self.greeklinesautosplit + r"/"
+            self.path_of_imglinebox = self.projecthome + self.greeklinesbox + r"/" + self.greekbookmarkdown + r"/"
+            self.path_of_txtlinebox = self.projecthome + self.txtgreeklinebox + r"/" + self.greekbookmarkdown + r"/"
+            #self.path_of_jsonlinebox = self.projecthome + self.jsongreeklinebox + r"/" + self.greekbookmarkdown + r"/"
+            self.jsonpath = self.projecthome + self.jsongreeklinebox + r"/" + self.greekbookmarkdown + r"/"
+            self.imglineboxfile = self.path_of_imglinebox + self.imgfilename.replace("_linebox", "") + "_linebox" + self.imgfileext
+            #if self.statusBoxMode.text() == 'Make':
+                #self.imglineboxfile = self.projecthome + self.imgfilename + "_linebox" + self.imgfileext
+            #elif self.statusBoxMode.text() == 'Edit':
+                #self.imglineboxfile = self.projecthome + self.imgfilename + self.imgfileext
+            self.boximgpath = self.imglineboxfile  
+            self.txtpath = self.path_of_txtlinebox + self.imgfilename.replace("_linebox", "") + "_linebox.txt"
+            self.txtfilestr = os.path.basename(self.txtpath)
+            self.txtfilesplit = os.path.splitext(self.txtfilestr)
+            self.txtfilename = self.txtfilesplit[0]
+            self.txtfileext = self.txtfilesplit[1] 
+        #Page Image Paths
+        elif self.currenttabtext == "Page Image":
+            self.pageimage = self.imgpath
+            self.path_of_image_page = self.projecthome + self.greekpages
+        #Page Box Paths
+        elif self.currenttabtext == "Page Box":
+            self.pageimage = self.imgpath
+            self.path_of_image_page = self.projecthome + self.greekpagesbox + r"/"
+            self.imgfilestr = os.path.basename(self.imgpath)
+            self.imgfilesplit = os.path.splitext(self.imgfilestr)
+            self.imgfilename = self.imgfilesplit[0]
+            self.imgfileext = self.imgfilesplit[1]
+            self.imgpageboxfile = self.path_of_image_page + self.imgfilename.replace("_pagebox", "") + "_pagebox" + self.imgfileext
+            self.boximgpath = self.imgpageboxfile
+            self.path_of_txtpagebox = self.txtpagesbox + r"/"
+            self.path_of_jsonpagebox = self.jsonpagebox + r"/"
+            self.jsonpath = self.path_of_jsonpagebox + self.imgfilename.replace("_pagebox", "") + "_pagebox.json"
+            self.txtpath = self.path_of_txtpagebox + self.imgfilename.replace("_pagebox", "") + "_pagebox.txt"
+            self.txtfilestr = os.path.basename(self.txtpath)
+            self.txtfilesplit = os.path.splitext(self.txtfilestr)
+            self.txtfileext = self.txtfilesplit[1] 
 
-        # Get CropImg QRect from event.pos()
-        CropImg_xc = self.rubberBand.x() 
-        CropImg_yc = self.rubberBand.y()
-        CropImg_wc = self.rubberBand.width()
-        CropImg_hc = self.rubberBand.height()
-        CropImg_cqrect = QRect(CropImg_xc,CropImg_yc,CropImg_wc,CropImg_hc)
-        print("Reference Image Cropped QRect = " + str(CropImg_cqrect))
+    # Combo Boxes
+    def initBookCombo(self):
+
+        # Opening JSON file
+        with open(self.booksabbr) as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
         
-        # Move CropImg QRect to RefImg MainWindow origin(0,0)
-        CropImg_xm = self.rubberBand.x() - int(self.refimg_xoffset) 
-        CropImg_ym= self.rubberBand.y() - int(self.refimg_yoffset)
-        CropImg_wm = self.rubberBand.width()
-        CropImg_hm = self.rubberBand.height()
-        CropImg_mqrect = QRect(CropImg_xm,CropImg_ym,CropImg_wm,CropImg_hm)
-        print("Crop Image Cropped2Main QRect = " + str(CropImg_mqrect))
+        # Iterating through the json
+        # list
+        for booknumber in data:
+            print(booknumber['bookabbr'])
+            self.ui.bookComboBox.addItem(booknumber['bookabbr'])
+        
+        # Closing file
+        f.close()
+        
+        #self.ui.bookComboBox.setEditText(self.bookabbr)'''
+
+    def selectBookCombo(self):
+        oldbookabbr = self.bookabbr
+        self.bookabbr = self.ui.bookComboBox.currentText()
+        
+        if self.ui.bookComboBox.currentText() != oldbookabbr:
+                  
+            jsonfile = self.booksmarkdown
             
-        # Upscale CropImg QRect at RefImg MainWindow origin(0,0)
-        CropImg_xu = 0
-        CropImg_yu = 0
-        CropImg_wu = 0
-        CropImg_hu = 0
-        CropImg_xu = CropImg_xm / self.refimgscale
-        CropImg_yu = CropImg_ym / self.refimgscale
-        CropImg_wu = CropImg_wm / self.refimgscale
-        CropImg_hu = CropImg_hm / self.refimgscale
-        CropImg_uqrect = QRect(CropImg_xu,CropImg_yu,CropImg_wu,CropImg_hu)
-        print("Crop Image Upscaled QRect = " + str(CropImg_uqrect))
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                for BookAbbr in data:
+                    if BookAbbr['BookAbbr'] == self.bookabbr:
+                        bookmarkdown = BookAbbr['BookMarkdown']
+                        self.sourcebookmarkdown = 'source'+bookmarkdown
+                        self.greekbookmarkdown = 'greek'+bookmarkdown
+                        self.latinbookmarkdown = 'latin'+bookmarkdown
+                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
+            f.close()
+            
+            self.session_manager.update('BoxerSession.json', {
+                'self.bookabbr': self.bookabbr,
+                'self.sourcebookmarkdown': self.sourcebookmarkdown,
+                'self.greekbookmarkdown': self.greekbookmarkdown,
+                'self.latinbookmarkdown': self.latinbookmarkdown,
+            })
+            
+        self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
-        # Show Cropped Image
-        #self.ui.RefImg.setPixmap(self.origpixmap)
-        self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
-        self.croppixmap = self.refimgpixmap.copy(CropImg_uqrect)
-        print("Cropped Image Size = " + str(self.croppixmap.size()))       
-        #self.croppixmap = self.ui.RefImg.pixmap().copy(CropImg_uqrect)
-        #print("Cropped Image Size = " + str(self.ui.RefImg.pixmap().size()))
-        self.imagepixmap = self.croppixmap
-        self.ui.Image.setPixmap(self.imagepixmap)
-        self.resize_Image()
-        self.rubberBand.hide()
+    def OpenProjectExplorer(self):
+        mw_cmd = f"python3 \"{os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyExplorer.py')}\""
+        print(mw_cmd)
+        os.system(mw_cmd)
+        '''newapp = qtw.QApplication([])
+        dirPath = rself.userdir + '/Projects/BiblionOCR/'
+        self.explorer = qtw.QMainWindow()
+        self.ui = Ui_Explorer()
+        self.ui.setupUi(self.explorer)
+        fb = MyFileBrowser()
+        fb.show()
+        #self.explorer.show()
+        newapp.exec_()'''
+    
+    def OpenWithMyPixler(self):
+        mw_cmd = f"python3 \"{os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyPixler.py')}\""
+        print(mw_cmd)
+        os.system(mw_cmd)
 
+    def OpenWithMyWriter(self):
+        
+        mw_cmd = f"python3 \"{os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyWriter.py')}\""
+        print(mw_cmd)
+        os.system(mw_cmd)
+        '''
+        writer.MainWindow = qtw.QMainWindow()
+        writer.ui = writer.Ui_MyWriterUI()
+        writer.ui.setupUi(writer.MainWindow)"
+        writer.MainWindow.show()'''
+
+###########    Source Shared Methods    #############
+    # Start Character Box Methods - Moved to Glypher
+    def loadcharboximage(self):
+        '''Load Character Box Image'''
+        img = cv2.imread(self.imgpath)
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        self.charboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
+        charboxcsvpath = self.charboxcsvdir + filename + r"_charbox.csv"
+
+        '''scale_percent = 25 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
+        
+        #############################################
+        #### Detecting Characters  ######
+        #############################################
+        hImg, wImg,_ = img.shape
+        charboxes = pytesseract.image_to_boxes(img,lang="feg")
+        # Pass the image to PIL  
+        pil_im = Image.fromarray(img)  
+
+        draw = ImageDraw.Draw(pil_im)  
+        # use a truetype font
+        font = ImageFont.truetype(os.path.join(self.projecthome, "ViewController", "0-MainUI", "fonts", "FROMVS.ttf"), 8) 
+        #font = ImageFont.truetype("FROMVS.ttf", 20)  
+
+        # Draw the text  
+        #draw.text((10, 700), text_to_show, font=font)  
+
+        # Get back the image to OpenCV  
+        #cv2_im_processed = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
+        
+        for b in charboxes.splitlines():
+            print(b)
+            b = b.split(' ')
+            print(b)
+            x, y, w, h = int(b[1]), int(b[2]), int(b[3]), int(b[4])
+            char = b[0]
+            cv2.rectangle(img, (x,hImg- y), (w,hImg- h), (255, 50, 50), 2)
+            #cv2.putText(img,b[0],(x,hImg- y+25),cv2.FONT_HERSHEY_TRIPLEX,1,(50,50,255),2)
+            
+            # Pass the image to PIL
+            pil_im = Image.fromarray(img)  
+            #draw = ImageDraw.Draw(pil_im)  
+            # use a truetype font  
+            
+            print(f"Drawing character: {char}")
+            #draw.text((x,hImg-y), char, font=font)
+            with open(charboxcsvpath, mode='a') as file_:
+                file_.write(f"{char}\t{x}\t{y}\t{w}\t{h}")
+                file_.write("\n")  # Next line.        
+        file_.close()
+        with open(charboxcsvpath, mode='r') as file_:
+            self.currentTextTable.clear()
+            self.currentTextTable.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_charbox.txt")
+        self.charboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_charbox.tif"
+        self.charboximage = pil_im.save(self.charboximagepath) 
+        self.ui.ImageLe.setText(f"{filename}_charbox.tif")
+        self.showImage(self.charboximagepath)
+        #image = ImageQt.ImageQt(pil_im)
+        #self.pixmap = qtg.QPixmap(image)
+
+        #self.ui.Image.setPixmap(pixmap)
+        #print(pytesseract.image_to_boxes(img,lang="feg"))'''
+
+        #cv2.imshow("CV Image", img)
+        #cv2.waitKey(0)
+    #Start Word Box Methods --- Move to Lexer
+    def loadwordboximage(self):
+        '''Load Word Box Image'''
+        img = cv2.imread(self.imgpath)
+        self.imgdir = os.path.dirname(self.imgpath)
+        filestr = os.path.basename(self.imgpath)
+        os.path.splitext(filestr)            
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+
+        self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
+        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
+
+        '''scale_percent = 25 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
+        
+        ##############################################
+        ##### Detecting Words  ######
+        ##############################################
+        # #[   0          1           2           3           4          5         6       7       8        9        10       11 ]
+        # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
+        lines = []
+        wordboxes = pytesseract.image_to_data(img,lang="feg")
+        #self.currentTextTable.insertPlainText(wordboxes)
+        for a,b in enumerate(wordboxes.splitlines()):
+            print(b)
+            if a!=0:
+                b = b.split()
+                if len(b)==12:
+                    imglinenum, imgwordnum = int(b[4]), int(b[5])
+                    x,y,w,h = int(b[6]),int(b[7]),int(b[8]),int(b[9])
+                    imgword = b[11]
+                    cv2.rectangle(img, (x,y), (x+w, y+h), (255, 50, 50), 2)
+                    #cv2.putText(img,b[11],(x,y-5),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
+                    # Pass the image to PIL
+                    pil_im = Image.fromarray(img)  
+                    #draw = ImageDraw.Draw(pil_im)  
+                    # use a truetype font  
+                    print(f"For Image Line #: {str(imglinenum)} and Image Word #: {str(imgwordnum)} Placing Text Word: {imgword}")
+                    #draw.text((x,y-5), imgword, font=font)
+                    with open(wordboxcsvpath, mode='a') as file_:
+                        file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{x}\t{y}\t{w}\t{h}")
+                        file_.write("\n")  # Next line.        
+        file_.close()
+        with open(wordboxcsvpath, mode='r') as file_:
+            self.currentTextTable.clear()
+            self.currentTextTable.insertPlainText(file_.read())
+            self.ui.TextLE.setText(f"{filename}_wordbox.txt")
+        self.wordboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
+        self.wordboximage = pil_im.save(self.wordboximagepath) 
+        self.ui.ImageLe.setText(f"{filename}_wordbox.tif")
+        self.showImage(self.wordboximagepath)
+        #image = ImageQt.ImageQt(pil_im)
+        #self.pixmap = qtg.QPixmap(image)
+
+        #self.ui.Image.setPixmap(pixmap)
+        #print(pytesseract.image_to_boxes(img,lang="feg"))'''
+
+        #cv2.imshow("CV Image", img)
+        #cv2.waitKey(0)
+    def word2linebox(self):
+        filename = "greek1516_Page_082"
+        self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
+        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
+        with open(wordboxcsvpath, mode='r') as file_:
+            self.currentTextTable.clear()
+            wordboxes = file_.read()
+            self.currentTextTable.insertPlainText(wordboxes)
+            self.ui.TextLE.setText(f"{filename}_wordbox.csv")
+        file_.close()
+
+        boxfile = open(wordboxcsvpath)
+        with boxfile:
+            csv_f = csv.reader(boxfile, delimiter = "\t")
+            linecount = 1
+            for row in csv_f:
+                #print(f"linenum: {row[0]} wordnum: {row[1]} word: {row[2]} x: {row[3]} y: {row[4]} w: {row[5]} h: {row[6]}")
+                if int(row[0]) == linecount:
+                    print(f"linenum: {row[0]} wordnum: {row[1]}")
+                linecount =+ 1
+    
+###########    Source Image Methods    #############   
     def deskewImage(self):
         print("Deskewing current reference image")
         if self.imgpath != "":
@@ -794,63 +942,510 @@ class MainWindow(qtw.QMainWindow):
             print("Reloading deskewed image")
             self.showImage(self.imgpath)
         print("Deskew current image complete")
+
+    def setImageStack(self, tiffCaptureHandle):
+            """ Set the scene's current TIFF image stack to the input TiffCapture object.
+            Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
+            :type tiffCaptureHandle: TiffCapture
+            """
+            if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
+                raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
+            self._tiffCaptureHandle = tiffCaptureHandle
+            self.showFrame(0)
+
+    def loadImageStackFromFile(self,fileName=''):
+        """ Load an image stack from file.
+        Without any arguments, loadImageStackFromFile() will popup a file dialog to choose the image file.
+        With a fileName argument, loadImageStackFromFile(fileName) will attempt to load the specified file directly.
+        
+        if len(fileName) == 0:
+            if QT_VERSION_STR[0] == '4':
+                fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
+            elif QT_VERSION_STR[0] == '5':
+                fileName, dummy = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")"""
+        fileName = str(fileName)
+        if len(fileName) and os.path.isfile(fileName):
+            self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
+            
+    def numFrames(self):
+        """ Return the number of image frames in the stack.
+        """
+        if self._tiffCaptureHandle is not None:
+            # !!! tiffcapture has length=0 for a single page TIFF.
+            # If our handle is valid, we'll assume we have at least one image.
+            return max([1, self._tiffCaptureHandle.length])
+        return 0
+
+    def getFrame(self, i=None):
+        """ Return the i^th image frame as a NumPy ndarray.
+        If i is None, return the current image frame.
+        """
+        if self._tiffCaptureHandle is None:
+            return None
+        if i is None:
+            i = self.currentFrameIndex
+        if (i is None) or (i < 0) or (i >= self.numFrames()):
+            return None
+        return self._tiffCaptureHandle.find_and_read(i)
+
+    def showFrame(self, i=None):
+        """ Display the i^th frame in the viewer.
+        Also update the frame slider position and current frame text.
+        """
+        self.frame = self.getFrame(i)
+        if self.frame is None:
+            return
+        
+    def showLineFrame(self, i=None):
+        self.lineframe = self.getFrame(i)
+        if self.lineframe is None:
+            return
     
-    def rotateImage(self):           
-        self.workflowdir = self.pagesrotated
-        def on_Spinner():
-            self.rotateDialog_ui.Sliderhorizontal.setValue(self.rotateDialog_ui.SliderspinBox.value())
-            angle = self.rotateDialog_ui.Sliderhorizontal.value()
-            print("New Rotation Angle = " + str(angle) + " degrees")
-            self.rotatedpixmap = self.ui.Image.pixmap().transformed(qtg.QTransform().rotate(angle))
-            self.ui.Image.setPixmap(self.rotatedpixmap)
+    def loadImage(self):
+        imgdir = self.projecthome + self.imgdir
+        print(f'Current Image Folder: {imgdir}')
+        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget,self.imgopentitle,imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]     
+        #self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
+        self.getImage(self.imgpath)
+    
+    def getImage(self, imgpath):
+        self.imgpath = imgpath
+        #create file list 
+        if self.imgpath:
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))       
+            self.imgfile = qtc.QFile(self.imgpath)
+            self.imgfilename = os.path.basename(self.imgpath)
+            self.imgdir = os.path.dirname(self.imgpath)
+            self.imgfileList = []
+        for i in os.listdir(self.imgdir):
+            ipath = self.imgdir + "/" + i
+            #ipath = os.path.join(self.imgdir, i)
+            #ipath = ipath.replace(r'\\', '/')
+            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                self.imgfileList.append(ipath)
+        self.sortImgFiles()
+        self.showImage(self.imgpath)
 
-        def on_Slider():
-            self.rotateDialog_ui.SliderspinBox.setValue(self.rotateDialog_ui.Sliderhorizontal.value())
-            angle = self.rotateDialog_ui.SliderspinBox.value()
+    def showImage(self,imgpath):
+        self.imgpath = imgpath
+        if self.imgpath.endswith('.tif'):
+            self.loadImageStackFromFile(self.imgpath)
+            self.showFrame(0)
+            # Convert frame ndarray to a QImage.
+            self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
+            self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
+            # Convert self.qimage to pixmap
+            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.SourceImage.size(), 
+                qtc.Qt.KeepAspectRatio)
+        else:
+            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.SourceImage.size(), 
+                qtc.Qt.KeepAspectRatio)
 
-        def accept():
-            print("Rotating Original Source Image")
-            angle = self.rotateDialog_ui.SliderspinBox.value()
-            self.imagepixmap = self.origpixmap.transformed(qtg.QTransform().rotate(angle))
-            self.ui.Image.setPixmap(self.imagepixmap)
+        if self.pixmap.isNull():
+            return
+        #self.get_LineImg()
+        self.on_zoom()
+
+        #self.ui.Image.setPixmap(self.pixmap) -- moved out to resize_image
+
+        self.imgdir = os.path.dirname(self.imgpath)
+
+        self.session_manager.update('BoxerSession.json', {
+            'self.imgpath': self.imgpath,
+            'self.imgdir': self.imgdir,
+        })
+
+    def sortImgFiles(self):
+        #print(f'Image File List: {self.imgfileList}')
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
+        #print(f'Sorted Image File List: {self.sorted_imgfilelist}')
+
+    def nextImage(self):
+        if self.imgpath:
+            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) + 1) % len(self.sorted_imgfilelist)]
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.on_zoom()
+            self.getImage(self.imgpath)
+    
+    def prevImage(self):
+        if self.imgpath:
+            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) - 1) % len(self.sorted_imgfilelist)]
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            self.getImage(self.imgpath)
+
+    def ReloadImage(self):
+        if self.imgpath:
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            self.showImage(self.imgpath)
+            self.sortImgFiles()  
+    
+    def get_zoom(self):
+        self.ui.Zoomslider.setEnabled(True)
+        self.ui.Zoomslider.show()
+        self.zoomValue = self.ui.Zoomslider.value()
+        
+    def DisableZoomSlider(self):
+        self.ui.Zoomslider.hide()
+        self.ui.Zoomslider.setEnabled(False)
+
+    def MoveZoomSlider(self):
+        self.ui.Zoomslider.setEnabled(True)
+        self.ui.Zoomslider.setValue(int(self.ui.ZoomComboBox.currentText()[0]))
+
+    def show_combo(self):
+        self.ui.ZoomComboBox.show()
+
+    def on_zoomslider(self):
+        #if self.ui.Zoomslider.isEnabled():
+        zoomValue = self.ui.Zoomslider.value()
+        self.ui.ZoomComboBox.setCurrentText(str(zoomValue) + " %")
+        print(zoomValue)
+        self.scale = zoomValue/100
+        print(self.scale)
+    
+    def on_zoom(self):
+        if self.qimage:
+            self.ui.ZoomComboBox.currentTextChanged.disconnect(self.on_zoom)
+            seltext = self.ui.ZoomComboBox.currentText()
+            if self.ui.Zoomslider.isEnabled() == True:
+                print('Zoomslider is enabled')
+            else :
+                print('Zoomslider is disabled')
+            if seltext == "Contents":
+                print("Resizing to Contents")
+                #self.DisableZoomSlider()
+                if self.qimage:
+                    self.origsize = self.origpixmap.size()
+                self.scale = float((self.ui.SourceImagescrollArea.height())/self.origpixmap.height())
+                #self.ui.ImagescrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                #self.ui.ImagescrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                #scale_width = float(self.scaled_pixmap.width()/self.origpixmap.width())
+                #scale_height = float(self.scaled_pixmap.height()/self.origpixmap.height())
+                #image_scale = float(scale_width/scale_height)
+                self.ui.ZoomComboBox.setCurrentText(str(int(self.scale*100)) + " %" )
+                self.ui.Zoomslider.setValue(int(self.scale*100))
+            elif self.ui.Zoomslider.isEnabled() == True:
+                print("Resizing to Zoomslider value")
+                #self.ui.ImagescrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                #self.ui.ImagescrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                self.on_zoomslider()
+                selnumtext = seltext.split(" ")
+                print(selnumtext[0])
+                self.scale = float(selnumtext[0])/100
+                print(self.scale)
+                #self.resize_image()
+            else:
+                self.scale = float(int(seltext.split(" ")[0])/100)
+                print(f'Starting scale: {self.scale*100}' + ' %')
+            
+            print(f'Final scale: {self.scale*100}' + ' %')
+            self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origpixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+
+            print('Resizing contents')
+            self.ui.SourceImagescrollAreaWidgetContents.resize(self.scale * self.ui.SourceImagescrollAreaWidgetContents.size())
+            print(f'SourceImagescrollAreaWidgetContents size: {self.ui.SourceImagescrollAreaWidgetContents.size()}')
+            self.resize_image()
+            self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
+
+    def resize_image(self):
+        if self.qimage:
+            self.origsize = self.origpixmap.size()       
+            self.origheight = self.origpixmap.height
+            self.origwidth = self.origpixmap.width
+            self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            if self.currenttabtext == "Line Box":
+                self.currentBoxImage.setPixmap(self.scaled_pixmap)
+            elif self.currenttabtext == "Page Image":
+                self.ui.PageImage.setPixmap(self.scaled_pixmap)
+            elif self.currenttabtext == "Page Box":
+                self.currentBoxImage.setPixmap(self.scaled_pixmap)
+            elif self.currenttabtext == "Source Image":
+                self.ui.SourceImage.setPixmap(self.scaled_pixmap)
+     
+###########    Source Text Methods    #############
+    def GetOCRText(self):
+        my_OCR_rawtext = pytesseract.image_to_string(self.imgpath,lang="feg")
+        self.ui.OCRText.insertPlainText(my_OCR_rawtext)
+
+    def editText(self):
+        if self.ui.textButton.isChecked():
+            self.ui.stackedWidget.setCurrentIndex(0)
+
+    def editTable(self):
+        if self.ui.tableButton.isChecked():
+            self.ui.stackedWidget.setCurrentIndex(1)   
+    
+    def loadText(self):
+        if not self.txtopentitle:
+            self.txtopentitle = "Open Text File"
+        self.txtpath = qtw.QFileDialog.getOpenFileName(
+            self.ui.BoxWidget, self.txtopentitle, f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
+        print(f'self.txtpath: {self.txtpath}')
+        self.getText(self.txtpath)
+
+    def getText(self,textpath):
+            self.txtpath = textpath
+            self.txtdirname = os.path.dirname(self.txtpath)
+            #create file list 
+            if self.txtpath:
+                #self.currentTextTable.setText(os.path.basename(self.txtpath))       
+                self.txtfile = qtc.QFile(self.txtpath)
+                self.txtfilename = os.path.basename(self.txtpath)
+                self.txtdirname = os.path.dirname(self.txtpath)
+                self.txtfileList = []
+            for t in os.listdir(self.txtdirname):
+                #tpath = os.path.join(self.txtdirname, t)
+                tpath = self.txtdirname + '/' + t
+                if os.path.isfile(tpath) and t.endswith(('.txt')):
+                    self.txtfileList.append(tpath)
+            self.sortTextFiles()
+            self.showText(self.txtpath)
+    
+    def showText(self,txtpath):        
+        self.txtpath = txtpath
+        if self.txtpath:
+            file = qtc.QFile(self.txtpath)
+            filename = os.path.basename(self.txtpath)
+            self.txtdir = os.path.dirname(self.txtpath)
+            self.ui.TextLE.setText(filename)
+        
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.txtpath)
+                self.currentTextTable.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.currentTextTable.insertPlainText(text)
+                else:
+                    self.currentTextTable.setPlainText(text)
+            #textfile.close()
+            #txtdirpath = os.path.dirname(self.txtpath)
+
+            # update font to selection and size       
+            self.on_font_update()
+            
+            # update line spacing
+            self.SetLineSpacing()
+            file.close()
+       
+        self.session_manager.update('BoxerSession.json', {
+            'self.txtpath': self.txtpath,
+            'self.txtdir': self.txtdir,
+        })
+
+    def sortTextFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)     
+
+    def nextText(self):
+        if self.txtpath:
+            self.txtpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.txtpath) + 1) % len(self.sorted_txtfilelist)]
+            self.ui.TextFileName.setText(os.path.basename(self.txtpath))
+            self.getText(self.txtpath)
+
+    def prevText(self):
+        if self.txtpath:
+            self.txtpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.txtpath) - 1) % len(self.sorted_txtfilelist)]
+            self.ui.TextFileName.setText(os.path.basename(self.txtpath))
+            self.getText(self.txtpath)
+
+    def ReloadText(self):
+        if self.txtpath:
+            print("Reloading "+ self.txtpath)
+            file = qtc.QFile(self.txtpath)
+            filename = os.path.basename(self.txtpath)
+            self.ui.TextLE.setText(filename)
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.txtpath)
+                self.currentTextTable.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.currentTextTable.insertPlainText(text)
+                else:
+                    self.currentTextTable.setPlainText(text)
+                
+                # update font to selection and size       
+                self.on_font_update()
+                
+                # update line spacing
+                self.SetLineSpacing()
+
+    def bothLoad(self):
+        ''' load the matching file for either the current image or the current text '''
+        def accept():
+            #if self.ImageTextPairDialog.Accepted:
+            if self.ImageTextPairDialog_ui.MatchTxt2Imgbutton.isChecked():
+                print("matching text file to current image file")
+                print(self.imgpath)
+                if self.imgpath:
+                    print("finding matched text file for " + self.imgpath)
+                    imgfilename = self.imgpath
+                    file = qtc.QFile(imgfilename)
+                    filestr = os.path.basename(imgfilename)           
+                    filedir = os.path.dirname(imgfilename)
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]                    
+                    namesplit = filename.split("_")                    
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
+                else:
+                    print(self.imgpath + " does not exist")
+                
+                self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
+                if self.trytxtpath:
+                    print("opening " + self.trytxtpath)
+                    self.txtpath = self.trytxtpath
+                    self.showText()
+                    #self.ReloadText()
+                else:
+                    print(self.trytxtpath + " does not exist")
+
+            elif self.ImageTextPairDialog_ui.MatchImg2Txtbutton.isChecked():
+                print("matching image file to current text file")
+                print(self.txtpath)
+                if self.txtpath:
+                    print("finding matched image file for " + self.txtpath)
+                    txtfilename = self.txtpath
+                    file = qtc.QFile(txtfilename)
+                    filestr = os.path.basename(txtfilename)           
+                    filedir = os.path.dirname(txtfilename)
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]                    
+                    namesplit = filename.split("_")                    
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                else:
+                    print(self.txtpath + " does not exist")
+                
+                self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
+                if self.tryimgpath:
+                    print("opening " + self.tryimgpath)
+                    self.imgpath = self.tryimgpath
+                    self.showImage(self.imgpath)
+                else:
+                    print(self.tryimgpath + " does not exist")
+
 
         def reject():
-            print("Rotation cancelled")
-            self.ui.Image.clear()
-            self.imagepixmap = self.origpixmap
-            self.ui.Image.setPixmap(self.imagepixmap)
-
-        self.rotateDialog = qtw.QDialog()
-        self.rotateDialog_ui = Ui_SliderDialog()
-        self.rotateDialog_ui.setupUi(self.rotateDialog)
-        self.rotateDialog.show()
+            pass        
         
-        '''Configure slider to adjust rotation angle (0:360)'''
-        self.rotateDialog_ui.Sliderhorizontal.setEnabled(True)
-        self.rotateDialog_ui.Sliderlabel.setEnabled(True)
-        self.rotateDialog_ui.Sliderlabel.setText("Adjust rotation angle from 0 to 360 degrees")
-        self.rotateDialog_ui.Sliderhorizontal.setMinimum(0)
-        self.rotateDialog_ui.Sliderhorizontal.setMaximum(360)
-        self.rotateDialog_ui.Sliderhorizontal.setSingleStep(1)
-        self.rotateDialog_ui.Sliderhorizontal.setPageStep(15)
-        self.rotateDialog_ui.Sliderhorizontal.setProperty("value", 180)
-        self.rotateDialog_ui.Sliderhorizontal.setSliderPosition(180)
-        self.rotateDialog_ui.Sliderhorizontal.setOrientation(Qt.Horizontal)
-        self.rotateDialog_ui.Sliderhorizontal.setInvertedAppearance(False)
-        self.rotateDialog_ui.SliderspinBox.setEnabled(True)
-        self.rotateDialog_ui.SliderspinBox.setMinimum(0)
-        self.rotateDialog_ui.SliderspinBox.setMaximum(360)
-        self.rotateDialog_ui.SliderspinBox.setSingleStep(1)
-        self.rotateDialog_ui.SliderspinBox.setValue(180)
-        self.rotateDialog_ui.SliderspinBox.setSuffix(" deg")
-        self.rotateDialog_ui.Sliderhorizontal.valueChanged.connect(on_Slider)
-        self.rotateDialog_ui.SliderspinBox.valueChanged.connect(on_Spinner)
-        self.rotateDialog_ui.SliderbuttonBox.accepted.connect(accept)
-        self.rotateDialog_ui.SliderbuttonBox.rejected.connect(reject)
-        #self.initcvimg()
+        self.ImageTextPairDialog = qtw.QDialog()
+        self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
+        self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
+        self.ImageTextPairDialog.show()
 
+        self.ImageTextPairDialog_ui.buttonBox.accepted.connect(accept)
+        self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
+  
+    def GetLineSpacing(self):
+        self.ui.LHslider.setEnabled(True)
+        self.ui.LHslider.show()
+        self.ui.LHlineEdit.setPlaceholderText(str(self.ui.LHslider.value()))
+
+    def DisableLHSlider(self):
+        self.ui.LHslider.hide()
+        self.ui.LHslider.setEnabled(False)
+
+    def MoveLHSlider(self):
+        self.ui.LHslider.setEnabled(True)
+        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+    
+    def SetLineSpacing(self):
+                
+        '''num,ok = qtw.QInputDialog.getInt(self.ui.BoxWidget,"Proportional Line Spacing","Enter a percent value from 0-200")  
+        
+        if ok:
+            lineSpacing = num
+        else:
+            lineSpacing = 145'''
+
+        lineSpacing = self.ui.LHslider.value()
+        self.ui.LHlineEdit.setText(str(lineSpacing))
+            
+        cursor = self.currentTextTable.textCursor()
+        if not cursor.hasSelection():
+            cursor.select(qtg.QTextCursor.Document)
+        bf = self.ui.BoxCursor.blockFormat()
+        bf.setLineHeight(lineSpacing, self.ui.BoxBlockFormat.ProportionalHeight) 
+        cursor.mergeBlockFormat(bf)
+    
+    def SaveRawTextFileDialog(self, MainWindow):
+        path = qtw.QFileDialog.getSaveFileName(
+            self.ui.BoxWidget, 'Save Raw text file',self.txtdir,
+            'Text files (*.txt)')[0]
+        with open(path, 'w') as file:
+            my_RawText = self.ui.BoxDocument.toPlainText()
+            file.write(my_RawText)
+        filename = os.path.basename(path)
+        self.ui.TextLE.setText(filename)
+        file.close()
+        
+    def SaveAsCorrectedTextFileDialog(self, MainWindow):
+        path = qtw.QFileDialog.getSaveFileName(
+            self.ui.BoxWidget, 'Save Corrected text file', self.txtdir,
+            'Text files (*.txt)')[0]
+        with open(path, 'w') as file:
+            my_CorrectedText = self.ui.BoxDocument.toPlainText()
+            file.write(my_CorrectedText)
+        filename = os.path.basename(path)
+        self.ui.TextLE.setText(filename)
+        file.close()
+
+    def SaveCorrectedTextFileDialog(self, MainWindow):
+        
+        #if self.txtdir:
+            #defaultdir = self.txtdir
+        #else:
+            #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
+        
+        defaultdir = self.txtdir + r"/" 
+        defaultfile = self.ui.TextLE.displayText()
+
+        if defaultfile:
+            path = defaultdir + defaultfile
+            print(path)
+            filename = defaultfile
+        else:
+            path = qtw.QFileDialog.getSaveFileName(
+                self.ui.BoxWidget, 'Save Corrected text file', '',
+                'Text files (*.txt)')[0]
+            filename = os.path.basename(path)
+        with open(path, 'w') as file:
+            my_CorrectedText = self.ui.BoxDocument.toPlainText()
+            file.write(my_CorrectedText)
+        
+        self.ui.TextLE.setText(filename)
+        file.close()
+
+    def on_font_update(self):
+        # update font to selection and size       
+        #font = qtg.QFont()
+        #font.setFamily(self.ui.fontComboBox.currentFont())
+        #print(self.ui.fontComboBox.currentFont())
+        font = qtg.QFont(self.ui.fontComboBox.currentFont())
+        font.setPointSize(self.ui.fontSizeBox.value())
+        #font = qtg.QFont(self.font)
+        #font.setPointSize(int(self.fontsize))
+        
+        self.currentTextTable.setFont(font)
+        self.ui.PageBoxText.setFont(font)
+
+    def on_lang_select(self):
+        pass
+
+
+###########    Page Box Shared Methods    #############
     # Page Toolbar Actions
 
     def actionDeskew_Greek_tiff(self):
@@ -1287,24 +1882,614 @@ class MainWindow(qtw.QMainWindow):
                         
                 cv2.imwrite(os.path.join(dest_of_box, filename + fileext),binary)'''
 
-    def actionRenameGreek_text_lines_old(self):
-        print("renaming Greek textlines for ground truth")
-        # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
-        tr.text2groundtruth(r"Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/", "Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/")
-    
-    def actionSplit_Latin_Text_Lines(self):
-        print("splitting Latin textlines for ground truth")
-        # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
-        tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+    def renameimages(source, destination):
+            def sorted_alphanumeric(data):
+                    convert = lambda text: int(text) if text.isdigit() else text.lower()
+                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+                    return sorted(data, key=alphanum_key)
+                    #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
-    def actionRename_Latin_Text_Lines(self):
-        print("renaming Latin textlines for ground truth")
-        # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
-        tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+            path_of_images = source
+            dest_of_images = destination
+            list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
+
+            print(list_of_images)
+
+            newpagenum = 1
+            newlinenum = 1
+
+            for image in list_of_images:
+                    img = cv2.imread(os.path.join(path_of_images, image))
+                    height, width = img.shape[:2]
+                    filestr = os.path.basename(os.path.join(path_of_images, image))
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    linestr = namesplit[3]
+                    #print(versionref,pagenum,linestr)
+                    print(f"namesplit: {namesplit} versionref: {versionref} pagestr: {pagestr} pagenum: {pagenum} linestr: {linestr}")
+                    linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
+                    #print("Last digits of "+filename+" are "+last_digits)
+                    if pagenum > newpagenum:
+                            newlinenum = 1
+                            newpagenum = pagenum
+                    print("pagenum: " + pagestr + "  newpagenum: " + str(newpagenum) + "  linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+                    shutil.copy(path_of_images + filestr, dest_of_images + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
+                    newlinenum += 1 
+                    print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+
+    def moveimages(source, destination):
+            def sorted_alphanumeric(data):
+                    convert = lambda text: int(text) if text.isdigit() else text.lower()
+                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+                    return sorted(data, key=alphanum_key)
+                    #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
+
+            path_of_images = source
+            dest_of_groundtruth = destination
+            #sorted(os.listdir(os.getcwd()), key=len) does not work
+
+            list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
+
+            #print(list_of_images)
+
+            newpagenum = 1
+            newlinenum = 1
+
+            for image in list_of_images:
+            
+                    img = cv2.imread(os.path.join(path_of_images, image))
+
+                    height, width = img.shape[:2]
+                    
+                    filestr = os.path.basename(os.path.join(path_of_images, image))
+                    
+                    filesplit = os.path.splitext(filestr)
+                    
+                    filename = filesplit[0]
+                    
+                    fileext = filesplit[1]
+                    
+                    namesplit = filename.split("_")
+                    
+                    versionref = namesplit[0]
+                    
+                    pagestr = namesplit[2]
+                    
+                    pagenum = int(pagestr)
+                    
+                    linestr = namesplit[3]
+                    #print(versionref,pagenum,linestr)
+                    
+                    linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
+                    #print("Last digits of "+filename+" are "+last_digits)
+                    
+                    if pagenum > newpagenum:
+                            
+                            newlinenum = 1
+                            
+                            newpagenum = pagenum
+                    
+                    print("pagenum: " + pagestr + "  newpagenum: " + str(newpagenum) + "  linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+                            
+                    shutil.move(path_of_images + filestr, dest_of_groundtruth + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
+                    
+                    newlinenum += 1 
+                            #print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
   
+    # Page Box Dialogs
+    def CropLanguagesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
+        
+        if self.directory:
+            self.crop_languages_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def BoxFolderDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        
+        if self.directory:
+            self.crop_languages_ui.BoxFolderLineEdit.setText(self.directory+r'/')
+
+    def ElimFolderDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        
+        if self.directory:
+            self.crop_languages_ui.ElimFolderLineEdit.setText(self.directory+r'/')
+
+    def DestGreekDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        
+        if self.directory:
+            self.crop_languages_ui.DestGreekLineEdit.setText(self.directory+r'/')
+
+    def DestLatinDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+
+        if self.directory:
+            self.crop_languages_ui.DestLatinLineEdit.setText(self.directory+r'/')
+    
+    # Start Page Box Methods 
+    
+    # Page Box Methods   
+    def pagebox_make_split(self):
+            path_of_images = self.pages
+            dest_of_box = self.pagesbox
+            dest_of_elimination = self.pageseliminated
+            dest_of_greek = self.greekpagesautosplit
+            dest_of_latin = self.latinpagesautosplit
+
+            self.currentBoxTable.verticalHeader().hide()
+            self.statusBoxMode.setText('Make')
+            self.statusBoxType.setText('Page')
+            self.statusDrawingMode.setText('Auto')
+            self.editCurrent = False
+            #If no page image present, then load one.
+            if self.ui.SourceImage.pixmap():
+                if self.ui.ImageTab.currentIndex() != 3:
+                    self.ui.ImageTab.setCurrentIndex(3)
+                    self.loadImage()
+               
+                print('Open Make Image message dailog')
+                popup = qtw.QMessageBox(self)
+                popup.setIcon(qtw.QMessageBox.Information)
+                popup.setWindowTitle("Make PageBox File Pair")
+                popup.setText("'Make Current' pagebox pair or load and 'Make Other'")
+                currentButton = popup.addButton('Make Current', qtw.QMessageBox.YesRole)
+                otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
+                popup.exec()
+                if popup.clickedButton() == currentButton:
+                    self.getImage(self.imgpath)    
+                elif popup.clickedButton() == otherButton:
+                    self.ui.ImageLe.clear()
+                    self.ui.SourceImage.clear()
+                    self.currentBoxImage.clear()
+                    self.ui.TextLE.clear()
+                    self.currentTextTable.clear()
+                    self.currentBoxTable.clear()
+                    # Get imglinebox source file
+                    self.loadImage()
+            else:
+                # Activate the Page Image Tab
+                if self.ui.ImageTab.currentIndex() != 3:
+                    self.ui.ImageTab.setCurrentIndex(3)
+                # Get page box source file
+                self.loadImage()
+            print(f'from Load Source Image: self.imgpath = {self.imgpath}')  
+            # setting value to progress bar
+            self.ui.progressBar.setValue(10)
+
+            # Make PageBox File Pair
+            self.ui.ImageLe.clear()
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            dosplit = True
+            self.normImage()
+            # convert image to binary numpy array for finding contours
+            ret,binary = cv2.threshold(self.gray,127,255,cv2.THRESH_BINARY)
+            # binary numpy array inversion
+            ret,thresh = cv2.threshold(self.gray,127,255,cv2.THRESH_BINARY_INV)
+            # binary numpy array dilation
+            kernel = np.ones((70,100), np.uint8)
+            img_dilation = cv2.dilate(thresh, kernel, iterations=1)
+            # binary numpy array medianblur
+            #median = cv2.medianBlur(img_dilation, 13)
+            # find binary numpy array line contours
+            ctrs, hier = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            # set flags for sorting contours top to bottom
+            reverse = False
+            i = 1
+            # construct the list of bounding boxes and sort them from top to bottom
+            boundingBoxes = [cv2.boundingRect(c) for c in ctrs]
+            (ctrs, boundingBoxes) = zip(*sorted(zip(ctrs, boundingBoxes),key=lambda b:b[1][i], reverse=reverse))
+            
+            # Activate the Page Box Tab
+            if self.ui.ImageTab.currentIndex() != 2:
+                self.ui.ImageTab.setCurrentIndex(2)
+            else:
+                self.on_tabChanged()
+            print(f'after tab changed to Page Box: self.imgpath = {self.imgpath}')
+            self.ui.progressBar.setValue(40)
+            
+            self.setBoxPaths()
+            print(f'from setBoxPaths: imgfilename = {self.imgfilename}')            
+            self.imgpath = self.boximgpath
+            
+            # Set initial box count
+            bnum = 0
+            self.currentTextTable.clear()
+            if os.path.exists(self.txtpath):
+                print(f'Removing: {self.txtpath}')
+                os.remove(self.txtpath)
+            with open(self.txtpath, "a") as txtboxfile:           
+                for i,c in enumerate(ctrs):
+                    # Get bounding box
+                    x, y, w, h = cv2.boundingRect(c)
+                    dividers = int(round(w/3400))            
+                    # Get ROI
+                    roi = binary[y:y+h, x:x+w]
+                    #if i >= 0:    
+                    # Set height validation of contour to eliminate unwanted ROI's
+                    if w < 3600 and h > 4000:
+                            bnum += 1                              
+                            print(f'Page Box Number: {bnum}')
+                            if x <= 2300:
+                                    self.pagedestfolder = dest_of_greek
+                                    self.pagedeststr = 'greek'
+                            elif x >= 2301:
+                                    self.pagedestfolder = dest_of_latin
+                                    self.pagedeststr = 'latin'
+
+                            if self.pagedestfolder != "":
+                                    # Write accepted ROI to correct folder/file
+                                    PILimage = Image.fromarray(roi)
+                                    thresh = 127
+                                    fn = lambda x : 255 if x > thresh else 0
+                                    PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
+                                    outfile = self.pagedestfolder + r"/" + self.pagedeststr + self.imgfilename + "_pagebox.tif"
+                                    print("Generating: " + outfile)
+                                    PIL_BWimage.save(outfile, "TIFF", dpi=(300,300))
+                                    
+                                    #cv2.imwrite(destfolder+deststr+filename, roi)
+                                    # Draw box around accepted ROI
+                                    cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(90,0,255),2)                                                                                                        
+                                    boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\n'
+                                    txtboxfile.write(boxlinestr)
+                    '''elif w > 3600:
+                        # Set width of multi-page contours and subdivide proportionally
+                        w = int(round(w/dividers))
+                        for subdiv in range(0,dividers):
+                            print('subloopcount =' + str(subdiv))
+                            roi = binary[y:y+h, x:x+w]
+                            cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)
+                            # Append to LineBoxText
+                            boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\t' + '\n'
+                            txtboxfile.write(boxlinestr)'''
+
+            '''with open(self.txtpath, "a") as txtboxfile:
+                for i,c in enumerate(ctrs):
+                        # Get bounding box
+                        x, y, w, h = cv2.boundingRect(c)
+                        dividers = int(round(w/3400))
+                        print("countour height = " + str(h) + "\t" + "number of boxes = " + str(dividers))
+                        # Set size validation of contour to eliminate unwanted boxes
+                        if w < 3600 and h > 4000:
+                            #if h>120 and h<200:
+                            roi = binary[y:y+h, x:x+w]
+                            cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)                                                                              
+                            # Append to LineBoxText
+                            #boxlinestr = str(bnum) + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h) + ',' + str(x+w) + ',' + str(y+h) + '\n'
+                            boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\n'
+                            txtboxfile.write(boxlinestr)
+                            self.savePageBoxImagePage(roi,bnum)
+                            bnum += 1
+                        # Set height of multi-page contours and subdivide proportionally
+                        elif w > 3600:
+                                w = int(round(w/dividers))
+                                for subdiv in range(0,dividers):
+                                    print('subloopcount =' + str(subdiv))
+                                    roi = binary[y:y+h, x:x+w]
+                                    cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)
+                                    # Append to LineBoxText
+                                    boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\t' + '\n'
+                                    txtboxfile.write(boxlinestr)
+                                    y = y + h
+                                    #if dosplit:
+                                        #self.savePageBoxImagePage(roi,bnum)
+                                    bnum += 1'''
+                        # setting value to progress bar
+                        #self.ui.progressBar.setValue(bnum)
+            
+            print(f'Created PageBox Text File: {self.txtpath}')
+            #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"                                  
+            txtboxfile.close()
+            self.ui.progressBar.setValue(50)
+            
+            # Write Text Box File to PageBoxTable TableWidget
+            self.BoxText2BoxTable()
+            self.ui.progressBar.setValue(75)
+
+            # Overwrite Text Box File from PageBoxTable TableWidget
+            # Already wrote the txtboxfile, above; so,likely unecessary 
+            self.PageBoxTable2csv()
+            self.ui.progressBar.setValue(85)
+
+            # Write page image to file
+            self.savePageBoxImage()
+            self.ui.ImageLe.clear()
+            self.ui.ImageLe.setText(os.path.basename(self.boximgpath))
+            self.ui.progressBar.setValue(101)
+            self.ui.progressBar.reset()
+
+    # Edit PageBox Method
+    def pagebox_edit_split(self):
+
+        self.ui.statusbar.showMessage('Loading the PageBox file pair for editing')
+        start = time.perf_counter()        
+        # Activate the Page Image Tab
+        if self.ui.ImageTab.currentIndex() != 2:
+            self.ui.ImageTab.setCurrentIndex(2)
+        else:
+            self.on_tabChanged()  
+        self.setBoxPaths()
+        self.imgpath = self.boximgpath
+
+        self.currentBoxTable.verticalHeader().hide()
+        self.statusBoxMode.setText("Edit")
+        self.statusBoxType.setText("Page")
+        self.statusSelectionMode.setText("Rows")
+        self.currentBoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        
+        def loadBoxImage():
+            self.ui.ImageLe.clear()
+            self.currentBoxImage.clear()
+            self.loadImage()
+            self.setBoxPaths()
+            self.imgpath = self.boximgpath
+            self.showImage(self.imgpath)
+        
+        self.editCurrent = True
+        if self.currentBoxImage.pixmap():
+        #if self.ui.ImageLe.displayText() != "":
+            popup = qtw.QMessageBox(self)
+            popup.setIcon(qtw.QMessageBox.Information)
+            popup.setWindowTitle("Edit Mode")
+            popup.setText("'Edit Current' pagebox pair or load and 'Edit Other'")
+            currentButton = popup.addButton('Edit Current', qtw.QMessageBox.YesRole)
+            otherButton = popup.addButton('Edit Other', qtw.QMessageBox.YesRole)
+            popup.exec()
+            if popup.clickedButton() == currentButton:
+                self.getImage(self.imgpath)
+                self.editCurrent = True
+            elif popup.clickedButton() == otherButton:
+                loadBoxImage()
+                self.editCurrent = False
+        else:
+            loadBoxImage()
+        self.normImage()      
+        self.ui.ImageLe.setText(os.path.basename(self.boximgpath))
+        print(f"From setBoxPaths: self.txtpath = {self.txtpath}")
+        # setting value to progress bar
+        self.ui.progressBar.setValue(10)
+    
+        # validate image as a PageBox Image 
+        '''pathsplit = self.imgpath.split('_')
+        tailsplit = pathsplit[1]
+        if tailsplit == "pagebox.tif":
+            is_pagebox = True
+        else:
+            is_pagebox = False
+            print("This is not a valid PageBox Image! Please try again")  # need to throw error'''
+        self.ui.TextLE.clear()
+        self.ui.TextLE.setText(self.txtfilestr)
+        imgfilename = self.ui.ImageLe.displayText().split(r".")[0]
+        txtfilename = self.ui.TextLE.displayText().split(r".")[0]
+        # Get matching PageBoxText file
+        print(f'Text File Name: {txtfilename}  Image File Name: {imgfilename}')
+        if txtfilename == imgfilename:
+            self.getText(self.txtpath)
+            self.ui.progressBar.setValue(25)
+            #if drawbox:
+                # self.drawPageBoxImage()
+            self.ui.progressBar.setValue(50)
+            #self.savePageBoxImage()
+            self.ui.progressBar.setValue(75)
+            self.BoxText2BoxTable()
+            self.ui.progressBar.setValue(100)
+            print("Waiting on PageBoxTable selection")
+            self.row_current = self.currentBoxTable.currentRow()
+            self.startEditLoop = True
+            self.currentBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
+        else:   
+            print(f'The pagebox text: {txtfilename} does not match the pagebox image: {imgfilename} -- Please try again!')        
+
+        self.ui.progressBar.setValue(101)
+        self.ui.progressBar.reset()
+        finish = time.perf_counter()
+        self.ui.statusbar.showMessage(f"File load completed successfully in {finish - start:0.4f} seconds")
+        print(f"File load completed successfully in {finish - start:0.4f} seconds")
+
+############    Page Box Image Methods    #############
+
+    def getPageBoxImagePages(self):
+        rowcount = self.currentBoxTable.rowCount()
+        for row in range(rowcount):
+            page = self.currentBoxTable.item(row,0).text()
+            x = int(self.currentBoxTable.item(row,1).text())
+            y = int(self.currentBoxTable.item(row,2).text())
+            w = int(self.currentBoxTable.item(row,3).text())
+            h = int(self.currentBoxTable.item(row,4).text())
+            linex = x+w-80
+            liney = y+h-4
+            '''if self.ui.LineCheckBox.isChecked():
+                print(f'Placing line number at : {linex},{liney}')
+                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
+            else:
+                print(f'Removing line number at : {linex},{liney}')
+                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),3)'''
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)        
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.ui.PageImage.setPixmap(self.pixmap)
+
+    def savePageBoxImagePage(self,roi,bnum):
+        dest_of_greek = self.greekpagesautosplit
+        dest_of_latin = self.latinpagesautosplit
+        currentRow = self.ui.PageBoxTable.currentRow()
+        if int(self.ui.PageBoxTable.item(currentRow,1).text()) <= 2300:
+            self.pagedestfolder = dest_of_greek
+            self.pagedeststr = 'greek'
+        elif int(self.ui.PageBoxTable.item(currentRow,1).text()) >= 2301:
+            self.pagedestfolder = dest_of_latin
+            self.pagedeststr = 'latin'
+
+        if self.pagedestfolder != "":
+            PILimage = Image.fromarray(roi)
+            thresh = 127
+            fn = lambda x : 255 if x > thresh else 0
+            PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
+            tif_outfile = self.pagedestfolder + self.pagedeststr + self.imgfilename.replace("_pagebox.tif","") + "_pagebox.tif"
+            print("Generating: " + tif_outfile)
+            PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))    
+    
+    def savePageBoxImage(self):
+        self.ui.statusbar.showMessage(f'Saving PageBox file: {self.imgpath}')
+        print(f'Saving PageBox file: {self.imgpath}')
+        cv2.imwrite(self.imgpath, self.norm)
+        self.boximgpath = self.imgpath
+        self.showImage(self.boximgpath)
+        #if self.ui.LineCheckBox.isChecked():
+            #self.getLineBoxImageLines()
+
+###########    Page Box Text Methods    #############
+
+    def BoxText2BoxTable(self):
+        #self.currentBoxTable.clearContents()
+        boxes = []
+        reader = csv.reader(open(self.txtpath), delimiter = '\t')
+        
+        for row in reader:
+            boxes.append(row)
+        
+        '''if self.statusBoxType.text() == "Page":
+            if self.statusBoxMode.text() == "Make":
+                boxes = boxes[0:]
+            elif self.statusBoxMode.text() == "Edit":
+                if self.editCurrent == True:
+                    boxes = boxes[0:]
+                else:
+                    boxes = boxes[1:]
+        if self.statusBoxType.text() == "Line":'''
+        if self.statusBoxMode.text() == "Make":
+            boxes = boxes[0:]
+        else:
+            boxes = boxes[1:]
+        #boxes = boxes[1:]
+        rowCount = len(boxes)
+        self.currentBoxTable.setRowCount(rowCount)
+        colcount = self.currentBoxTable.columnCount()
+        print(f'BoxTable column count: {colcount}')              
+        self.currentBoxTable.setSortingEnabled(False)
+        #self.currentBoxTable.clearContents()
+        for row, boxes in enumerate(boxes):
+            for column, value in enumerate(boxes):
+                if column == 0:
+                    tableitem = qtw.QTableWidgetItem()
+                    tableitem.setFlags(qtc.Qt.ItemIsEditable)
+                    newItem = qtw.QTableWidgetItem(value)
+                    self.currentBoxTable.setItem(row, column, newItem)
+                elif column >= 1 and column <= 4:
+                    #print(f'Updating PageBoxTable column: {column}')
+                    newItem = qtw.QTableWidgetItem(value)
+                    
+                    #Scaled
+                    #newVal = int(newItem.text())
+                    #scaledVal = int(newVal * self.scale)
+                    #newItem.setText(str(scaledVal))
+                    
+                    #Not Scaled
+                    newVal = int(newItem.text())
+                    newItem.setText(str(newVal))
+                    self.currentBoxTable.setItem(row, column, newItem)
+        self.showEditButtons()
+        self.currentBoxTable.resizeColumnsToContents()
+        self.currentBoxTable.resizeRowsToContents()
+        self.currentBoxTable.setSortingEnabled(True)
+
+    def update_PageBoxText(self,page,x,y,w,h):
+        print(f'From getRbBox method - Page: {page}  X: {x}  Y: {y}  W: {w} H: {h}')
+        #self.jsonpath = self.path_of_jsonpagebox + self.imgfilename + "_pagebox.json"
+        jsonfilepath = self.jsonpath
+        #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+        csvfilepath = self.txtpath
+        self.csv2json(csvfilepath,jsonfilepath)
+        with open(jsonfilepath, 'r') as f:
+            data = json.load(f)
+            # Iterating through the json
+            for Page in data:
+                print(f'Page from json file: {Page} -- page from putRbBox: {page} ')
+                if Page['Page'] == page:
+                    Page['X'] = x
+                    Page['Y'] = y
+                    Page['W'] = w
+                    Page['H'] = h
+                    print(f'Updating Page: {page} found in JSON file. Dimensions :  X: {x}  Y: {y}  W: {w}  H: {h}')
+                else:
+                    print(f'Page: {page} not found in JSON file.')
+            # Closing file
+            f.close()
+            os.remove(jsonfilepath)
+            with open(jsonfilepath, 'w') as f:
+                json.dump(data, f, indent=4)
+            f.close()
+        self.json2csv(csvfilepath,jsonfilepath)
+        self.showText(csvfilepath)
+
+    def PageBoxText2PageBoxTable(self):
+        #self.currentBoxTable.clearContents()
+        boxes = []
+        reader = csv.reader(open(self.txtpath), delimiter = '\t')
+        
+        for row in reader:
+            boxes.append(row)
+        
+        '''if self.statusBoxMode.text() == "Make":
+            boxes = boxes[0:]
+        else:
+            boxes = boxes[1:]'''
+        boxes = boxes[0:]
+        rowCount = len(boxes)
+        self.currentBoxTable.setRowCount(rowCount)
+        colcount = self.currentBoxTable.columnCount()
+        print(f'PageBoxTable column count: {colcount}')              
+        self.currentBoxTable.setSortingEnabled(False)
+        #self.currentBoxTable.clearContents()
+        for row, boxes in enumerate(boxes):
+            for column, value in enumerate(boxes):
+                if column == 0:
+                    tableitem = qtw.QTableWidgetItem()
+                    tableitem.setFlags(qtc.Qt.ItemIsEditable)
+                    newItem = qtw.QTableWidgetItem(value)
+                    self.currentBoxTable.setItem(row, column, newItem)
+                elif column >= 1 and column <= 4:
+                    #print(f'Updating PageBoxTable column: {column}')
+                    newItem = qtw.QTableWidgetItem(value)
+                    
+                    #Scaled
+                    #newVal = int(newItem.text())
+                    #scaledVal = int(newVal * self.scale)
+                    #newItem.setText(str(scaledVal))
+                    
+                    #Not Scaled
+                    newVal = int(newItem.text())
+                    newItem.setText(str(newVal))
+                    self.currentBoxTable.setItem(row, column, newItem)
+        self.showEditButtons()
+        self.currentBoxTable.resizeColumnsToContents()
+        self.currentBoxTable.resizeRowsToContents()
+        self.currentBoxTable.setSortingEnabled(True)
+
+    def PageBoxTable2csv(self):
+        #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+        print(f'Path of pagebox.txt: {self.txtpath}')
+        if os.path.exists(self.txtpath):
+            print(f'Removing: {self.txtpath}')
+            os.remove(self.txtpath)
+            self.currentTextTable.clear()
+        colCount = range(self.currentBoxTable.columnCount()- 6)
+        header = [self.currentBoxTable.horizontalHeaderItem(column).text() for column in colCount]
+        with open(self.txtpath, 'w') as csvfile:
+            #writer = csv.writer(csvfile, dialect='excel', lineterminator='\n')
+            writer = csv.writer(csvfile, dialect='excel', delimiter='\t', lineterminator='\n')
+            writer.writerow(header)
+            for row in range(self.currentBoxTable.rowCount()):
+                writer.writerow(self.currentBoxTable.item(row, column).text() for column in colCount)
+        self.getText(self.txtpath)
+
+
+###########    Line Box Shared Methods    #############
     # Line Toolbar Actions
 
     def actionCrop_Greek_To_tiff_Lines(self):
@@ -1901,26 +3086,6 @@ class MainWindow(qtw.QMainWindow):
         rsp = self.rename_greek_text_linesDialog.exec_()
         print("completed renaming Greek textlines for ground truth review")
         #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
-    
-    # Globals
-    def initBookCombo(self):
-
-        # Opening JSON file
-        with open(self.booksabbr) as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)
-        
-        # Iterating through the json
-        # list
-        for booknumber in data:
-            print(booknumber['bookabbr'])
-            self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-        
-        # Closing file
-        f.close()
-        
-        #self.ui.bookComboBox.setEditText(self.bookabbr)'''
 
     def toggleGreekToolbars(self):
 
@@ -1944,1103 +3109,6 @@ class MainWindow(qtw.QMainWindow):
         self.ui.LatinImageLinesBatchToolBar.setVisible(not latinimglinesstate)
         self.ui.LatinTextLinesBatchToolBar.setVisible(not latintxtlinesstate)'''
 
-    def selectBookCombo(self):
-        oldbookabbr = self.bookabbr
-        self.bookabbr = self.ui.bookComboBox.currentText()
-        
-        if self.ui.bookComboBox.currentText() != oldbookabbr:
-                  
-            jsonfile = self.booksmarkdown
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                for BookAbbr in data:
-                    if BookAbbr['BookAbbr'] == self.bookabbr:
-                        bookmarkdown = BookAbbr['BookMarkdown']
-                        self.sourcebookmarkdown = 'source'+bookmarkdown
-                        self.greekbookmarkdown = 'greek'+bookmarkdown
-                        self.latinbookmarkdown = 'latin'+bookmarkdown
-                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
-            f.close()
-            
-            jsonfile = self.session
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                bookabbr_key = r"self.bookabbr"
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == bookabbr_key:
-                        Setting['CurrentValue'] = self.bookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-            
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
-            
-        self.ui.bookComboBox.setCurrentText(self.bookabbr)
-
-    def setImageStack(self, tiffCaptureHandle):
-            """ Set the scene's current TIFF image stack to the input TiffCapture object.
-            Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
-            :type tiffCaptureHandle: TiffCapture
-            """
-            if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
-                raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
-            self._tiffCaptureHandle = tiffCaptureHandle
-            self.showFrame(0)
-
-    def loadImageStackFromFile(self,fileName=''):
-        """ Load an image stack from file.
-        Without any arguments, loadImageStackFromFile() will popup a file dialog to choose the image file.
-        With a fileName argument, loadImageStackFromFile(fileName) will attempt to load the specified file directly.
-        
-        if len(fileName) == 0:
-            if QT_VERSION_STR[0] == '4':
-                fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
-            elif QT_VERSION_STR[0] == '5':
-                fileName, dummy = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")"""
-        fileName = str(fileName)
-        if len(fileName) and os.path.isfile(fileName):
-            self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
-            
-    def numFrames(self):
-        """ Return the number of image frames in the stack.
-        """
-        if self._tiffCaptureHandle is not None:
-            # !!! tiffcapture has length=0 for a single page TIFF.
-            # If our handle is valid, we'll assume we have at least one image.
-            return max([1, self._tiffCaptureHandle.length])
-        return 0
-
-    def getFrame(self, i=None):
-        """ Return the i^th image frame as a NumPy ndarray.
-        If i is None, return the current image frame.
-        """
-        if self._tiffCaptureHandle is None:
-            return None
-        if i is None:
-            i = self.currentFrameIndex
-        if (i is None) or (i < 0) or (i >= self.numFrames()):
-            return None
-        return self._tiffCaptureHandle.find_and_read(i)
-
-    def showFrame(self, i=None):
-        """ Display the i^th frame in the viewer.
-        Also update the frame slider position and current frame text.
-        """
-        self.frame = self.getFrame(i)
-        if self.frame is None:
-            return
-        
-    def showLineFrame(self, i=None):
-        self.lineframe = self.getFrame(i)
-        if self.lineframe is None:
-            return
-    
-    def loadImage(self):
-        imgdir = self.projecthome + "Model/Project/Images/Workflow"
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget,self.imgopentitle,self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]     
-        #self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        self.getImage(self.imgpath)
-    
-    def getImage(self, imgpath):
-        self.imgpath = imgpath
-        #create file list 
-        if self.imgpath:
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))       
-            self.imgfile = qtc.QFile(self.imgpath)
-            self.imgfilename = os.path.basename(self.imgpath)
-            self.imgdir = os.path.dirname(self.imgpath)
-            self.imgfileList = []
-        for i in os.listdir(self.imgdir):
-            ipath = self.imgdir + "/" + i
-            #ipath = os.path.join(self.imgdir, i)
-            #ipath = ipath.replace(r'\\', '/')
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)
-        self.sortImgFiles()
-        self.showImage(self.imgpath)
-
-    def showImage(self,imgpath):
-        self.imgpath = imgpath
-        if self.imgpath.endswith('.tif'):
-            self.loadImageStackFromFile(self.imgpath)
-            self.showFrame(0)
-            # Convert frame ndarray to a QImage.
-            self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
-            self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-            # Convert self.qimage to pixmap
-            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                qtc.Qt.KeepAspectRatio)
-        else:
-            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.Image.size(), 
-                qtc.Qt.KeepAspectRatio)
-
-        if self.pixmap.isNull():
-            return
-        #self.get_LineImg()
-        self.on_zoom()
-
-        #self.ui.Image.setPixmap(self.pixmap) -- moved out to resize_image
-
-        self.imgdir = os.path.dirname(self.imgpath)
-
-        jsonfile = self.session
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            for Setting in data:
-                if Setting['Setting'] == imgpath_key:
-                    Setting['CurrentValue'] = self.imgpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imgdir_key:  
-                    Setting['CurrentValue'] = self.imgdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
-
-    def sortImgFiles(self):
-        #print(f'Image File List: {self.imgfileList}')
-        convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
-        #print(f'Sorted Image File List: {self.sorted_imgfilelist}')
-
-    def nextImage(self):
-        if self.imgpath:
-            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) + 1) % len(self.sorted_imgfilelist)]
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.getImage(self.imgpath)
-    
-    def prevImage(self):
-        if self.imgpath:
-            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) - 1) % len(self.sorted_imgfilelist)]
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.getImage(self.imgpath)
-
-    def ReloadImage(self):
-        if self.imgpath:
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.showImage(self.imgpath)
-            self.sortImgFiles()  
-    
-    def get_zoom(self):
-        self.ui.Zoomslider.setEnabled(True)
-        self.ui.Zoomslider.show()
-        self.zoomValue = self.ui.Zoomslider.value()
-        
-    def DisableZoomSlider(self):
-        self.ui.Zoomslider.hide()
-        self.ui.Zoomslider.setEnabled(False)
-
-    def MoveZoomSlider(self):
-        self.ui.Zoomslider.setEnabled(True)
-        self.ui.Zoomslider.setValue(int(self.ui.ZoomComboBox.currentText()[0]))
-
-    def show_combo(self):
-        self.ui.ZoomComboBox.show()
-
-    def on_zoomslider(self):
-        #if self.ui.Zoomslider.isEnabled():
-        zoomValue = self.ui.Zoomslider.value()
-        self.ui.ZoomComboBox.setCurrentText(str(zoomValue) + " %")
-        print(zoomValue)
-        self.scale = zoomValue/100
-        print(self.scale)
-    
-    def on_zoom(self):
-        if self.qimage:
-            self.ui.ZoomComboBox.currentTextChanged.disconnect(self.on_zoom)
-            seltext = self.ui.ZoomComboBox.currentText()
-            if self.ui.Zoomslider.isEnabled() == True:
-                print('Zoomslider is enabled')
-            else :
-                print('Zoomslider is disabled')
-            if seltext == "Contents":
-                print("Resizing to Contents")
-                #self.DisableZoomSlider()
-                if self.qimage:
-                    self.origsize = self.origpixmap.size()
-                self.scale = float((self.ui.ImagescrollArea.height())/self.origpixmap.height())
-                #self.ui.ImagescrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                #self.ui.ImagescrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                #scale_width = float(self.scaled_pixmap.width()/self.origpixmap.width())
-                #scale_height = float(self.scaled_pixmap.height()/self.origpixmap.height())
-                #image_scale = float(scale_width/scale_height)
-                self.ui.ZoomComboBox.setCurrentText(str(int(self.scale*100)) + " %" )
-                self.ui.Zoomslider.setValue(int(self.scale*100))
-            elif self.ui.Zoomslider.isEnabled() == True:
-                print("Resizing to Zoomslider value")
-                #self.ui.ImagescrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-                #self.ui.ImagescrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-                self.on_zoomslider()
-                selnumtext = seltext.split(" ")
-                print(selnumtext[0])
-                self.scale = float(selnumtext[0])/100
-                print(self.scale)
-                #self.resize_image()
-            else:
-                self.scale = float(int(seltext.split(" ")[0])/100)
-                print(f'Starting scale: {self.scale*100}' + ' %')
-            
-            print(f'Final scale: {self.scale*100}' + ' %')
-
-            self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origpixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.scaled_pixmap)            
-            print('Resizing contents')
-            self.ui.ImagescrollAreaWidgetContents.resize(self.scale * self.ui.ImagescrollAreaWidgetContents.size())
-            print(f'ImagescrollAreaWidgetContents size: {self.ui.ImagescrollAreaWidgetContents.size()}')
-            self.resize_image()
-            self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
-
-    def resize_image(self):
-        if self.qimage:
-            self.origsize = self.origpixmap.size()       
-            self.origheight = self.origpixmap.height
-            self.origwidth = self.origpixmap.width
-            self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.scaled_pixmap)
-    
-    def resize_lineimage(self):
-
-        self.ui.Line.setDisabled(False)
-        self.ui.Line.clear()
-        #self.get_LineImg()
-        #if self.qlineimage():
-        print('Placing Line label...')
-        self.scaled_linepixmap = self.origlinepixmap.scaled(self.scale * self.origlinepixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        
-        #self.ui.Line.resize(self.ui.Line.width(),self.ui.Image.height())
-        #self.ui.Line.setGeometry(int(self.img_xoffset) + self.ui.Image.width() + 1,0,self.ui.Line.width(),self.ui.Image.height())      
-        self.ui.Line.setPixmap(self.scaled_linepixmap)
-        
-        self.ui.Line.move(self.ui.Image.width(),0)
-
-    def GetOCRText(self):
-        my_OCR_rawtext = pytesseract.image_to_string(self.imgpath,lang="feg")
-        self.ui.OCRText.insertPlainText(my_OCR_rawtext)
-
-    # Dialog folders exist validations
-
-    # Page Box Dialogs
-    def CropLanguagesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
-        
-        if self.directory:
-            self.crop_languages_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def BoxFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
-        if self.directory:
-            self.crop_languages_ui.BoxFolderLineEdit.setText(self.directory+r'/')
-
-    def ElimFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
-        if self.directory:
-            self.crop_languages_ui.ElimFolderLineEdit.setText(self.directory+r'/')
-
-    def DestGreekDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
-        if self.directory:
-            self.crop_languages_ui.DestGreekLineEdit.setText(self.directory+r'/')
-
-    def DestLatinDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-
-        if self.directory:
-            self.crop_languages_ui.DestLatinLineEdit.setText(self.directory+r'/')
-
-
-    # Line Box Dialogs
-    def CropGreekLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select tif pages source folder"))
-
-        if self.directory:
-            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def GreekLineBoxFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select linebox destination folder"))
-        
-        if self.directory:
-            self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(self.directory+r'/')
-
-    def DestGreekLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek lines destination folder"))
-        
-        if self.directory:
-            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
-
-    def CropLatinLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select tif pages source folder"))
-
-        if self.directory:
-            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def LatinLineBoxFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select linebox destination folder"))
-        
-        if self.directory:
-            self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
-
-    def DestLatinLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek lines destination folder"))
-        
-        if self.directory:
-            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')            
-
-    def GreekStageLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
-
-        if self.directory:
-            self.greekstagelines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestGreekStageLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
-        
-        if self.directory:
-            self.greekstagelines_ui.DestinationLineEdit.setText(self.directory+r'/')
-
-    def GreekMoveLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
-
-        if self.directory:
-            self.greekrenamelines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestGreekMoveLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename Greek lines destination folder"))
-        
-        if self.directory:
-            self.greekrenamelines_ui.DestinationLineEdit.setText(self.directory+r'/')
-      
-    def GreekRenameLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
-
-        if self.directory:
-            self.greekrenamelines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestGreekRenameLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename Greek lines destination folder"))
-        
-        if self.directory:
-            self.greekrenamelines_ui.DestinationLineEdit.setText(self.directory+r'/')
-
-    def SplitGreekTextLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text pages source folder"))
-
-        if self.directory:
-            self.split_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestGreekTextLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text lines destination folder"))
-        
-        if self.directory:
-            self.split_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
-
-    def RenameGreekTextLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text pages source folder"))
-
-        if self.directory:
-            self.rename_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestRenameGreekTextLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text lines destination folder"))
-        
-        if self.directory:
-            self.rename_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
-    # End of Dialog folders exist validations
-
-    def editText(self):
-        if self.ui.textButton.isChecked():
-            self.ui.stackedWidget.setCurrentIndex(0)
-
-    def editTable(self):
-        if self.ui.tableButton.isChecked():
-            self.ui.stackedWidget.setCurrentIndex(1)   
-    
-    def loadText(self):
-
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.BoxWidget, 'Open text file', f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-        print(f'self.txtpath: {self.txtpath}')
-        self.getText(self.txtpath)
-
-    def getText(self,textpath):
-            self.txtpath = textpath
-            self.txtdirname = os.path.dirname(self.txtpath)
-            #create file list 
-            if self.txtpath:
-                #self.ui.LineBoxText.setText(os.path.basename(self.txtpath))       
-                self.txtfile = qtc.QFile(self.txtpath)
-                self.txtfilename = os.path.basename(self.txtpath)
-                self.txtdirname = os.path.dirname(self.txtpath)
-                self.txtfileList = []
-            for t in os.listdir(self.txtdirname):
-                #tpath = os.path.join(self.txtdirname, t)
-                tpath = self.txtdirname + '/' + t
-                if os.path.isfile(tpath) and t.endswith(('.txt')):
-                    self.txtfileList.append(tpath)
-            self.sortTextFiles()
-            self.showText(self.txtpath)
-    
-    def showText(self,txtpath):        
-        self.txtpath = txtpath
-        if self.txtpath:
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.txtdir = os.path.dirname(self.txtpath)
-            self.ui.TextLE.setText(filename)
-        
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
-                text = stream.readAll()
-                info = qtc.QFileInfo(self.txtpath)
-                self.ui.LineBoxText.clear()
-                if info.completeSuffix() == 'txt':
-                    #self.ui.editor_text.setHtml(text
-                    self.ui.LineBoxText.insertPlainText(text)
-                else:
-                    self.ui.LineBoxText.setPlainText(text)
-            #textfile.close()
-            #txtdirpath = os.path.dirname(self.txtpath)
-
-            # update font to selection and size       
-            self.on_font_update()
-            
-            # update line spacing
-            self.SetLineSpacing()
-            file.close()
-       
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            for Setting in data:
-                if Setting['Setting'] == txtpath_key:
-                    Setting['CurrentValue'] = self.txtpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
-                    Setting['CurrentValue'] = self.txtdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
-
-    def sortTextFiles(self):
-        convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)     
-
-    def nextText(self):
-        if self.txtpath:
-            self.txtpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.txtpath) + 1) % len(self.sorted_txtfilelist)]
-            self.ui.TextFileName.setText(os.path.basename(self.txtpath))
-            self.getText(self.txtpath)
-
-    def prevText(self):
-        if self.txtpath:
-            self.txtpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.txtpath) - 1) % len(self.sorted_txtfilelist)]
-            self.ui.TextFileName.setText(os.path.basename(self.txtpath))
-            self.getText(self.txtpath)
-
-    def ReloadText(self):
-        if self.txtpath:
-            print("Reloading "+ self.txtpath)
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.ui.TextLE.setText(filename)
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
-                text = stream.readAll()
-                info = qtc.QFileInfo(self.txtpath)
-                self.ui.LineBoxText.clear()
-                if info.completeSuffix() == 'txt':
-                    #self.ui.editor_text.setHtml(text
-                    self.ui.LineBoxText.insertPlainText(text)
-                else:
-                    self.ui.LineBoxText.setPlainText(text)
-                
-                # update font to selection and size       
-                self.on_font_update()
-                
-                # update line spacing
-                self.SetLineSpacing()
-
-    def bothLoad(self):
-        ''' load the matching file for either the current image or the current text '''
-        def accept():
-            #if self.ImageTextPairDialog.Accepted:
-            if self.ImageTextPairDialog_ui.MatchTxt2Imgbutton.isChecked():
-                print("matching text file to current image file")
-                print(self.imgpath)
-                if self.imgpath:
-                    print("finding matched text file for " + self.imgpath)
-                    imgfilename = self.imgpath
-                    file = qtc.QFile(imgfilename)
-                    filestr = os.path.basename(imgfilename)           
-                    filedir = os.path.dirname(imgfilename)
-                    filesplit = os.path.splitext(filestr)
-                    filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
-                    versionref = namesplit[0]
-                    pagestr = namesplit[2]
-                    pagenum = int(pagestr)
-                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
-                else:
-                    print(self.imgpath + " does not exist")
-                
-                self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
-                if self.trytxtpath:
-                    print("opening " + self.trytxtpath)
-                    self.txtpath = self.trytxtpath
-                    self.showText()
-                    #self.ReloadText()
-                else:
-                    print(self.trytxtpath + " does not exist")
-
-            elif self.ImageTextPairDialog_ui.MatchImg2Txtbutton.isChecked():
-                print("matching image file to current text file")
-                print(self.txtpath)
-                if self.txtpath:
-                    print("finding matched image file for " + self.txtpath)
-                    txtfilename = self.txtpath
-                    file = qtc.QFile(txtfilename)
-                    filestr = os.path.basename(txtfilename)           
-                    filedir = os.path.dirname(txtfilename)
-                    filesplit = os.path.splitext(filestr)
-                    filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
-                    versionref = namesplit[0]
-                    pagestr = namesplit[2]
-                    pagenum = int(pagestr)
-                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
-                else:
-                    print(self.txtpath + " does not exist")
-                
-                self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
-                if self.tryimgpath:
-                    print("opening " + self.tryimgpath)
-                    self.imgpath = self.tryimgpath
-                    self.showImage(self.imgpath)
-                else:
-                    print(self.tryimgpath + " does not exist")
-
-
-        def reject():
-            pass        
-        
-        self.ImageTextPairDialog = qtw.QDialog()
-        self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
-        self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
-        self.ImageTextPairDialog.show()
-
-        self.ImageTextPairDialog_ui.buttonBox.accepted.connect(accept)
-        self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
-  
-    def GetLineSpacing(self):
-        self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.show()
-        self.ui.LHlineEdit.setPlaceholderText(str(self.ui.LHslider.value()))
-
-    def DisableLHSlider(self):
-        self.ui.LHslider.hide()
-        self.ui.LHslider.setEnabled(False)
-
-    def MoveLHSlider(self):
-        self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
-    
-    def SetLineSpacing(self):
-                
-        '''num,ok = qtw.QInputDialog.getInt(self.ui.BoxWidget,"Proportional Line Spacing","Enter a percent value from 0-200")  
-        
-        if ok:
-            lineSpacing = num
-        else:
-            lineSpacing = 145'''
-
-        lineSpacing = self.ui.LHslider.value()
-        self.ui.LHlineEdit.setText(str(lineSpacing))
-            
-        cursor = self.ui.LineBoxText.textCursor()
-        if not cursor.hasSelection():
-            cursor.select(qtg.QTextCursor.Document)
-        bf = self.ui.BoxCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.BoxBlockFormat.ProportionalHeight) 
-        cursor.mergeBlockFormat(bf)
-    
-    def SaveRawTextFileDialog(self, MainWindow):
-        path = qtw.QFileDialog.getSaveFileName(
-            self.ui.BoxWidget, 'Save Raw text file',self.txtdir,
-            'Text files (*.txt)')[0]
-        with open(path, 'w') as file:
-            my_RawText = self.ui.BoxDocument.toPlainText()
-            file.write(my_RawText)
-        filename = os.path.basename(path)
-        self.ui.TextLE.setText(filename)
-        file.close()
-        
-    def SaveAsCorrectedTextFileDialog(self, MainWindow):
-        path = qtw.QFileDialog.getSaveFileName(
-            self.ui.BoxWidget, 'Save Corrected text file', self.txtdir,
-            'Text files (*.txt)')[0]
-        with open(path, 'w') as file:
-            my_CorrectedText = self.ui.BoxDocument.toPlainText()
-            file.write(my_CorrectedText)
-        filename = os.path.basename(path)
-        self.ui.TextLE.setText(filename)
-        file.close()
-
-    def SaveCorrectedTextFileDialog(self, MainWindow):
-        
-        #if self.txtdir:
-            #defaultdir = self.txtdir
-        #else:
-            #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
-        
-        defaultdir = self.txtdir + r"/" 
-        defaultfile = self.ui.TextLE.displayText()
-
-        if defaultfile:
-            path = defaultdir + defaultfile
-            print(path)
-            filename = defaultfile
-        else:
-            path = qtw.QFileDialog.getSaveFileName(
-                self.ui.BoxWidget, 'Save Corrected text file', '',
-                'Text files (*.txt)')[0]
-            filename = os.path.basename(path)
-        with open(path, 'w') as file:
-            my_CorrectedText = self.ui.BoxDocument.toPlainText()
-            file.write(my_CorrectedText)
-        
-        self.ui.TextLE.setText(filename)
-        file.close()
-
-    def OpenProjectExplorer(self):
-        mw_cmd = "python3 ViewController/Application/0-MainUI/ProjectBrowser.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
-        '''newapp = qtw.QApplication([])
-        dirPath = rself.userdir + '/Projects/BiblionOCR/'
-        self.explorer = qtw.QMainWindow()
-        self.ui = Ui_Explorer()
-        self.ui.setupUi(self.explorer)
-        fb = MyFileBrowser()
-        fb.show()
-        #self.explorer.show()
-        newapp.exec_()'''
-    
-    def OpenWithMyPixler(self):
-        mw_cmd = "python3 ViewController/Application/0-MainUI/MyPixler.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
-
-    def OpenWithMyWriter(self):
-        
-        mw_cmd = "python3 ViewController/Application/0-MainUI/MyWriter.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
-        '''
-        writer.MainWindow = qtw.QMainWindow()
-        writer.ui = writer.Ui_MyWriterUI()
-        writer.ui.setupUi(writer.MainWindow)
-        writer.MainWindow.show()'''
-
-    def on_font_update(self):
-        # update font to selection and size       
-        #font = qtg.QFont()
-        #font.setFamily(self.ui.fontComboBox.currentFont())
-        #print(self.ui.fontComboBox.currentFont())
-        font = qtg.QFont(self.ui.fontComboBox.currentFont())
-        font.setPointSize(self.ui.fontSizeBox.value())
-        #font = qtg.QFont(self.font)
-        #font.setPointSize(int(self.fontsize))
-        
-        self.ui.LineBoxText.setFont(font)
-        self.ui.PageBoxText.setFont(font)
-
-    def on_lang_select(self):
-        pass
-
-    # Start Page Box Methods 
-    def getPageBoxImagePages(self):
-        rowcount = self.ui.PageBoxTable.rowCount()
-        for row in range(rowcount):
-            page = self.ui.PageBoxTable.item(row,0).text()
-            x = int(self.ui.PageBoxTable.item(row,1).text())
-            y = int(self.ui.PageBoxTable.item(row,2).text())
-            w = int(self.ui.PageBoxTable.item(row,3).text())
-            h = int(self.ui.PageBoxTable.item(row,4).text())
-            linex = x+w-80
-            liney = y+h-4
-            '''if self.ui.LineCheckBox.isChecked():
-                print(f'Placing line number at : {linex},{liney}')
-                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
-            else:
-                print(f'Removing line number at : {linex},{liney}')
-                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),3)'''
-        pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)        
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(self.pixmap)
-
-    def savePageBoxImagePages(self,roi,bnum):
-        PILimage = Image.fromarray(roi)
-        thresh = 127
-        fn = lambda x : 255 if x > thresh else 0
-        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
-        tif_outfile = self.pagedestfolder + self.pagedeststr + self.imgfilename +  + "_Page" + str(bnum) + "_pagebox.tif"
-        print("Generating: " + tif_outfile)
-        PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))    
-    
-    def pagebox_make_split(self):
-            path_of_images = self.pages
-            dest_of_box = self.pagesbox
-            dest_of_elimination = self.pageseliminated
-            dest_of_greek = self.greekpagesautosplit
-            dest_of_latin = self.latinpagesautosplit
-
-            self.ui.PageBoxTable.verticalHeader().hide()
-            self.statusBoxMode.setText('Make')
-            self.statusBoxType.setText('Page')
-            self.statusDrawingMode.setText('Auto')
-            #If no page image present, then load one.
-            
-            if self.ui.ImageLe.displayText() == "":
-                self.loadImage()
-            else:    
-                print('Open Make Image message dailog')
-                popup = qtw.QMessageBox(self)
-                popup.setIcon(qtw.QMessageBox.Information)
-                popup.setWindowTitle("Make PageBox File Pair")
-                popup.setText("'Make Current' pagebox pair or load and 'Make Other'")
-                currentButton = popup.addButton('Make Current', qtw.QMessageBox.YesRole)
-                otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
-                popup.exec()
-                if popup.clickedButton() == currentButton:
-                    pass      
-                elif popup.clickedButton() == otherButton:
-                    self.ui.ImageLe.clear()
-                    self.ui.Image.clear()
-                    self.ui.TextLE.clear()
-                    self.ui.PageBoxText.clear()
-                    self.ui.PageBoxTable.clear()
-                    # Get imglinebox source file
-                    self.loadImage()
-            # setting value to progress bar
-            self.ui.progressBar.setValue(10)
-            # Make LineBox File Pair
-            self.setBoxPaths()
-            self.ui.ImageLe.clear()
-            self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
-            dosplit = True
-            
-            self.normImage()
-            # convert image to binary numpy array for finding contours
-            ret,binary = cv2.threshold(self.gray,127,255,cv2.THRESH_BINARY)
-            # binary numpy array inversion
-            ret,thresh = cv2.threshold(self.gray,127,255,cv2.THRESH_BINARY_INV)
-            # binary numpy array dilation
-            kernel = np.ones((70,100), np.uint8)
-            img_dilation = cv2.dilate(thresh, kernel, iterations=1)
-            # binary numpy array medianblur
-            #median = cv2.medianBlur(img_dilation, 13)
-            # find binary numpy array line contours
-            ctrs, hier = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            # set flags for sorting contours top to bottom
-            reverse = False
-            i = 0
-            # construct the list of bounding boxes and sort them from top to bottom
-            boundingBoxes = [cv2.boundingRect(c) for c in ctrs]
-            (ctrs, boundingBoxes) = zip(*sorted(zip(ctrs, boundingBoxes),key=lambda b:b[1][i], reverse=reverse))
-            
-            for i,c in enumerate(ctrs):
-                # Get bounding box
-                x, y, w, h = cv2.boundingRect(c)            
-                # Get ROI
-                roi = binary[y:y+h, x:x+w]
-                # Set height validation of contour to eliminate unwanted ROI's
-                if w > 1600 and h > 4000:                              
-                        if bnum==1:
-                                self.pagedestfolder = dest_of_greek
-                                self.pagedeststr = 'greek'
-                                bnum = bnum + 1
-                        else:
-                                self.pagedestfolder = dest_of_latin
-                                self.pagedeststr = 'latin'
-                                bnum = 1
-
-                        if self.destfolder!="":
-                                # Write accepted ROI to correct folder/file
-                                PILimage = Image.fromarray(roi)
-                                thresh = 127
-                                fn = lambda x : 255 if x > thresh else 0
-                                PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
-                                outfile = self.pagedestfolder + self.pagedeststr + self.imgfilename +  + "_Page" + str(bnum) + "_pagebox.tif"
-                                print("Generating: " + outfile)
-                                PIL_BWimage.save(outfile, "TIFF", dpi=(300,300))
-                                
-                                #cv2.imwrite(destfolder+deststr+filename, roi)
-                                # Draw box around accepted ROI
-                                cv2.rectangle(binary,(x,y),( x + w, y + h ),(90,0,255),2)
-
-            # Set initial box count
-            bnum = 1            
-            self.ui.LineBoxText.clear()
-            
-            self.txtpath = self.txtpagesbox + self.imgfilename + "_pagebox.txt"
-            
-            if os.path.exists(self.txtpath):
-                print(f'Removing: {self.txtpath}')
-                os.remove(self.txtpath)
-            with open(self.txtpath, "a") as txtboxfile:
-                for i,c in enumerate(ctrs):
-                        # Get bounding box
-                        x, y, w, h = cv2.boundingRect(c)
-                        dividers = int(round(w/3400))
-                        print("countour height = " + str(h) + "\t" + "number of boxes = " + str(dividers))
-                        # Set size validation of contour to eliminate unwanted boxes
-                        if w < 3600 and h > 4000:
-                            #if h>120 and h<200:
-                            roi = binary[y:y+h, x:x+w]
-                            cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)                                                                              
-                            # Append to LineBoxText
-                            #boxlinestr = str(bnum) + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h) + ',' + str(x+w) + ',' + str(y+h) + '\n'
-                            boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\n'
-                            txtboxfile.write(boxlinestr)
-                            self.savePageBoxImagePage(roi,bnum)
-                            bnum += 1
-                        # Set height of multi-page contours and subdivide proportionally
-                        elif w > 3600:
-                                w = int(round(w/dividers))
-                                for subdiv in range(0,dividers):
-                                    print('subloopcount =' + str(subdiv))
-                                    roi = binary[y:y+h, x:x+w]
-                                    cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)
-                                    # Append to LineBoxText
-                                    boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\t' + '\n'
-                                    txtboxfile.write(boxlinestr)
-                                    y = y + h
-                                    #if dosplit:
-                                        #self.savePageBoxImagePage(roi,bnum)
-                                    bnum += 1
-                        # setting value to progress bar
-                        self.ui.progressBar.setValue(bnum)
-            print(f'Created PageBox Text File: {self.txtpath}')
-            #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"                                  
-            txtboxfile.close()
-            self.ui.progressBar.setValue(50)
-            
-            # Write Text Box File to PageBoxTable TableWidget
-            #self.LineBoxText2PageBoxTable()
-            self.ui.progressBar.setValue(75)
-
-            # Overwrite Text Box File from PageBoxTable TableWidget
-            # Already wrote the txtboxfile, above; so,likely unecessary 
-            #self.PageBoxTable2csv()
-            self.ui.progressBar.setValue(85)
-
-            # Write linebox image to file
-            #self.saveLineBoxImage()
-            self.ui.ImageLe.clear()
-            self.ui.ImageLe.setText(os.path.basename(self.boximgpath))
-            self.ui.progressBar.setValue(101)
-            self.ui.progressBar.reset()
-      
-    
-    
-    # Start Character Box Methods - Moved to Glypher
-    def loadcharboximage(self):
-        '''Load Character Box Image'''
-        img = cv2.imread(self.imgpath)
-        self.imgdir = os.path.dirname(self.imgpath)
-        filestr = os.path.basename(self.imgpath)
-        os.path.splitext(filestr)            
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-
-        self.charboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
-        charboxcsvpath = self.charboxcsvdir + filename + r"_charbox.csv"
-
-        '''scale_percent = 25 # percent of original size
-        width = int(img.shape[1] * scale_percent / 100)
-        height = int(img.shape[0] * scale_percent / 100)
-        dim = (width, height)
-        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
-        
-        #############################################
-        #### Detecting Characters  ######
-        #############################################
-        hImg, wImg,_ = img.shape
-        charboxes = pytesseract.image_to_boxes(img,lang="feg")
-        # Pass the image to PIL  
-        pil_im = Image.fromarray(img)  
-
-        draw = ImageDraw.Draw(pil_im)  
-        # use a truetype font
-        font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8) 
-        #font = ImageFont.truetype("FROMVS.ttf", 20)  
-
-        # Draw the text  
-        #draw.text((10, 700), text_to_show, font=font)  
-
-        # Get back the image to OpenCV  
-        #cv2_im_processed = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
-        
-        for b in charboxes.splitlines():
-            print(b)
-            b = b.split(' ')
-            print(b)
-            x, y, w, h = int(b[1]), int(b[2]), int(b[3]), int(b[4])
-            char = b[0]
-            cv2.rectangle(img, (x,hImg- y), (w,hImg- h), (255, 50, 50), 2)
-            #cv2.putText(img,b[0],(x,hImg- y+25),cv2.FONT_HERSHEY_TRIPLEX,1,(50,50,255),2)
-            
-            # Pass the image to PIL
-            pil_im = Image.fromarray(img)  
-            #draw = ImageDraw.Draw(pil_im)  
-            # use a truetype font  
-            
-            print(f"Drawing character: {char}")
-            #draw.text((x,hImg-y), char, font=font)
-            with open(charboxcsvpath, mode='a') as file_:
-                file_.write(f"{char}\t{x}\t{y}\t{w}\t{h}")
-                file_.write("\n")  # Next line.        
-        file_.close()
-        with open(charboxcsvpath, mode='r') as file_:
-            self.ui.LineBoxText.clear()
-            self.ui.LineBoxText.insertPlainText(file_.read())
-            self.ui.TextLE.setText(f"{filename}_charbox.txt")
-        self.charboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_charbox.tif"
-        self.charboximage = pil_im.save(self.charboximagepath) 
-        self.ui.ImageLe.setText(f"{filename}_charbox.tif")
-        self.showImage(self.charboximagepath)
-        #image = ImageQt.ImageQt(pil_im)
-        #self.pixmap = qtg.QPixmap(image)
-
-        #self.ui.Image.setPixmap(pixmap)
-        #print(pytesseract.image_to_boxes(img,lang="feg"))'''
-
-        #cv2.imshow("CV Image", img)
-        #cv2.waitKey(0)
-
-    #Start Word Box Methods --- Move to Lexer
-    
-    def loadwordboximage(self):
-        '''Load Word Box Image'''
-        img = cv2.imread(self.imgpath)
-        self.imgdir = os.path.dirname(self.imgpath)
-        filestr = os.path.basename(self.imgpath)
-        os.path.splitext(filestr)            
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-
-        self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
-        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
-
-        '''scale_percent = 25 # percent of original size
-        width = int(img.shape[1] * scale_percent / 100)
-        height = int(img.shape[0] * scale_percent / 100)
-        dim = (width, height)
-        resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
-        
-        ##############################################
-        ##### Detecting Words  ######
-        ##############################################
-        # #[   0          1           2           3           4          5         6       7       8        9        10       11 ]
-        # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
-        lines = []
-        wordboxes = pytesseract.image_to_data(img,lang="feg")
-        #self.ui.LineBoxText.insertPlainText(wordboxes)
-        for a,b in enumerate(wordboxes.splitlines()):
-            print(b)
-            if a!=0:
-                b = b.split()
-                if len(b)==12:
-                    imglinenum, imgwordnum = int(b[4]), int(b[5])
-                    x,y,w,h = int(b[6]),int(b[7]),int(b[8]),int(b[9])
-                    imgword = b[11]
-                    cv2.rectangle(img, (x,y), (x+w, y+h), (255, 50, 50), 2)
-                    #cv2.putText(img,b[11],(x,y-5),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
-                    # Pass the image to PIL
-                    pil_im = Image.fromarray(img)  
-                    #draw = ImageDraw.Draw(pil_im)  
-                    # use a truetype font  
-                    print(f"For Image Line #: {str(imglinenum)} and Image Word #: {str(imgwordnum)} Placing Text Word: {imgword}")
-                    #draw.text((x,y-5), imgword, font=font)
-                    with open(wordboxcsvpath, mode='a') as file_:
-                        file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{x}\t{y}\t{w}\t{h}")
-                        file_.write("\n")  # Next line.        
-        file_.close()
-        with open(wordboxcsvpath, mode='r') as file_:
-            self.ui.LineBoxText.clear()
-            self.ui.LineBoxText.insertPlainText(file_.read())
-            self.ui.TextLE.setText(f"{filename}_wordbox.txt")
-        self.wordboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
-        self.wordboximage = pil_im.save(self.wordboximagepath) 
-        self.ui.ImageLe.setText(f"{filename}_wordbox.tif")
-        self.showImage(self.wordboximagepath)
-        #image = ImageQt.ImageQt(pil_im)
-        #self.pixmap = qtg.QPixmap(image)
-
-        #self.ui.Image.setPixmap(pixmap)
-        #print(pytesseract.image_to_boxes(img,lang="feg"))'''
-
-        #cv2.imshow("CV Image", img)
-        #cv2.waitKey(0)
-
-    def word2linebox(self):
-        filename = "greek1516_Page_082"
-        self.wordboxcsvdir = self.projecthome + "Model/Project/Data/csv/"
-        wordboxcsvpath = self.wordboxcsvdir + filename + r"_wordbox.csv"
-        with open(wordboxcsvpath, mode='r') as file_:
-            self.ui.LineBoxText.clear()
-            wordboxes = file_.read()
-            self.ui.LineBoxText.insertPlainText(wordboxes)
-            self.ui.TextLE.setText(f"{filename}_wordbox.csv")
-        file_.close()
-
-        boxfile = open(wordboxcsvpath)
-        with boxfile:
-            csv_f = csv.reader(boxfile, delimiter = "\t")
-            linecount = 1
-            for row in csv_f:
-                #print(f"linenum: {row[0]} wordnum: {row[1]} word: {row[2]} x: {row[3]} y: {row[4]} w: {row[5]} h: {row[6]}")
-                if int(row[0]) == linecount:
-                    print(f"linenum: {row[0]} wordnum: {row[1]}")
-                linecount =+ 1
-    
-    # Start of LineBox Slots and Methods
     def sortcroplines(source, linebox, splitdir):
             dest_of_autosplit = splitdir
             dest_of_linebox = linebox
@@ -3146,856 +3214,168 @@ class MainWindow(qtw.QMainWindow):
                     #cv2.waitKey(0)
                     #print("Writing "+filename+" Linebox Image")
    
-    # Line Box Slots
-    def on_acceptLineBoxEdit(self):
-        if self.statusDrawingMode.text() == 'Table':
-            self.putSbLineBox()
-            #self.completeSbLineBox
-        if self.statusDrawingMode.text() == 'Mouse':
-            self.getRbLineBox()
-        pass
-    
-    def on_rDrawSelection(self):
-        self.rubberBand = ResizableRubberBand(self)
-        self.rubberBand.hide()
-        #self.on_editLineBox(self.row_selected)
-        self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
-        self.statusSelectionMode.setText("Row")
-        self.statusDrawingMode.setText("Mouse")
 
-        self.ui.LineBoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.LineBoxTable.currentRow()        
-        #print("Editing LineBoxTable selection")
-        self.ui.ZoomComboBox.setCurrentText('Contents')        
-        self.setPrevLineBox()
-        # self.getPrevTextLineBox()
-        self.ui.statusbar.showMessage('Editing LineBox image using mouse and QRubberBand')
-        self.on_resetLineBox()
-        #self.ui.LineBoxTable.clearSelection()
+    # Line Box Dialogs
+    def CropGreekLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select tif pages source folder"))
 
-    def on_sDrawSelection(self):
-        self.row_selected = self.ui.LineBoxTable.currentRow()
-        # self.on_editLineBox(self.row_selected)
-        self.statusBoxMode.setText("Edit")
-        self.statusBoxType.setText("Line")
-        self.statusSelectionMode.setText("Row")
-        self.statusDrawingMode.setText("Table")
+        if self.directory:
+            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
 
-        self.ui.LineBoxTable.setSortingEnabled(False)      
-        self.ui.ZoomComboBox.setCurrentText('Contents')        
-
-        self.setPrevLineBox()
-        #self.on_editLineBox(self.row_selected)
-        self.on_selectLineBox(self.row_selected)
-
-        print('Edit LineBox image using LineBoxTable spinboxes')
-        self.ui.statusbar.showMessage('Edit LineBox image using LineBoxTable spinboxes') 
-        # self.ui.LineBoxTable.clearSelection()
-        self.ui.LineBoxTable.setSortingEnabled(False)
-        colcount = self.ui.LineBoxTable.columnCount() - 6
-        for col in range(colcount):
-            self.tableitem = self.ui.LineBoxTable.item(self.row_selected, col)
-            self.cellwidget = self.ui.LineBoxTable.cellWidget(self.row_selected, col)
-            self.cellvalue = self.ui.LineBoxTable.item(self.row_selected, col).text()
-            print(f'Selected Cell Location:  Row: {self.row_selected} Column: {col}')
-            print(f'Current Cell Widget: {self.cellwidget}')
-            print(f'Current Cell Value: {self.cellvalue}')
-            if col == 0:
-                self.tableitem.setFlags(qtc.Qt.ItemIsEditable)
-            elif col == 1:                   
-                self.currx = int(self.cellvalue)
-            elif col == 2:
-                self.curry = int(self.cellvalue)
-            elif col == 3:
-                self.currw = int(self.cellvalue)
-            elif col == 4:
-                self.currh = int(self.cellvalue)
-
-        print(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh}')
-        print(f'Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}')
-        self.ui.statusbar.showMessage(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh} --- Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}') 
-        #self.getSpinBox()
-        self.getSpinBoxes()   
-
-    def on_insertRowAbove(self):  
-        row = self.ui.LineBoxTable.currentRow()
-        self.on_editLineBox(row)
-        if row:
-            self.ui.LineBoxTable.insertRow(row)
-            self.renumberRows()
-            self.LineBoxTable2csv() 
-    
-    def on_insertRowBelow(self):
-        row = self.ui.LineBoxTable.currentRow()
-        self.on_editLineBox(row)
-        if row:
-            self.ui.LineBoxTable.insertRow(row+1)
-            self.renumberRows()
-            self.LineBoxTable2csv() 
-
-    def on_deleteRowSelection(self):
-        row = self.ui.LineBoxTable.currentRow()
-        self.on_drawLineBox(row)
-        if row:
-            popup = qtw.QMessageBox(self)
-            popup.setIcon(qtw.QMessageBox.Information)
-            popup.setWindowTitle("Are you sure?")
-            popup.setText("This will delete the current row! This cannot be undone!")
-            popup.setStandardButtons(qtw.QMessageBox.Ok|qtw.QMessageBox.Cancel)
-            #popup.exec()
-            #if popup.buttonClicked() == qtw.QMessageBox.Ok:
-            returnValue = popup.exec()
-            if returnValue == qtw.QMessageBox.Ok:
-                print('OK clicked')
-                self.setPrevLineBox()
-                self.on_resetLineBox()
-                self.ui.LineBoxTable.removeRow(row)
-                self.renumberRows()
-                self.LineBoxTable2csv()
-                self.drawLineBoxImage
-                self.saveLineBoxImage()
-                self.LineBoxText2LineBoxTable()        
-            else:
-                pass
-
-    def on_currentRowChanged(self,current,previous):
-        # Indexes Selected
-        self.ix_selected = current
-        self.prev_ix_selected = previous
+    def GreekLineBoxFolderDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select linebox destination folder"))
         
-        # Row Selected
-        self.row_selected = current.row()        
-        # Previous Row Selected
-        self.prev_row_selected = previous.row()
-        
-        self.run_event = False
-        
-        print(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
-        self.ui.statusbar.showMessage(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
-        
-        # clear the CellWidgets
-        rowcount = self.ui.LineBoxTable.rowCount()
-        colcount = self.ui.LineBoxTable.columnCount()
-        for row in range(rowcount):
-            for col in range(colcount):
-                self.ui.LineBoxTable.removeCellWidget(row,col)
-                 
-        self.showEditButtons()
-        self.ui.LineBoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.LineBoxTable.currentRow()        
-        print("Editing LineBoxTable selection")
-        self.ui.ZoomComboBox.setCurrentText('Contents')
-        self.ui.LineBoxTable.resizeRowsToContents()
-        if self.prev_row_selected >= 0:
-            self.on_editLineBox(self.prev_row_selected)
-        if self.ui.LineCheckBox.isChecked():
-            self.getLineBoxImageLines()      
-        self.on_selectLineBox(self.row_selected)
-        
-    def on_boxValueChanged(self):
-        print('This is the handler for the selected spinbox value that is changed')
-        #self.spinbox.valueChanged.disconnect(self.on_boxValueChanged)
-        self.on_resetLineBox()
-        row = self.ui.LineBoxTable.currentRow()
-        col = self.ui.LineBoxTable.currentColumn()
-        xval = int(self.ui.LineBoxTable.item(row,1).text())
-        yval = int(self.ui.LineBoxTable.item(row,2).text())
-        wval = int(self.ui.LineBoxTable.item(row,3).text())
-        hval = int(self.ui.LineBoxTable.item(row,4).text())
-        if col == 1:
-            xval = self.ui.LineBoxTable.cellWidget(row, 1).value()
-            self.ui.LineBoxTable.item(row,1).setText(str(xval))
-        elif col == 2:
-            yval = self.ui.LineBoxTable.cellWidget(row, 2).value()
-            self.ui.LineBoxTable.item(row,2).setText(str(yval))
-        elif col == 3:
-            wval = self.ui.LineBoxTable.cellWidget(row, 3).value()
-            self.ui.LineBoxTable.item(row,3).setText(str(wval))
-        elif col == 4:
-            hval = self.ui.LineBoxTable.cellWidget(row, 4).value()
-            self.ui.LineBoxTable.item(row,4).setText(str(hval))
-        #self.spinbox.valueChanged.connect(self.on_boxValueChanged)
-        self.setPrevLineBox()
+        if self.directory:
+            self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(self.directory+r'/')
 
-        #For printing purposes
-        line = int(self.ui.LineBoxTable.item(row,0).text())
-        print(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
-        self.ui.statusbar.showMessage(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
-        #Scaled
-        #scaled_x,scaled_y,scaled_w,scaled_h = int(self.xval/self.scale),int(self.yval/self.scale),int(self.wval/self.scale),int(self.hval/self.scale)
-        #self.drawSbLineBox(scaled_x,scaled_y,scaled_w,scaled_h)
+    def DestGreekLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek lines destination folder"))
         
-        #Not Scaled
-        self.x_sb_draw = xval
-        self.y_sb_draw = yval
-        self.w_sb_draw = wval
-        self.h_sb_draw = hval
-        self.drawSbLineBox()
-        #self.drawSbLineBox(self.xval,self.yval,self.wval,self.hval)
+        if self.directory:
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
-    def on_selectLineBox(self,row):
-        # Draw/Redraw green LineBox
-        print('Setting selected linebox to green')
-        self.ui.statusbar.showMessage('Setting selected linebox to green')
-        if row:
-            x = int(self.ui.LineBoxTable.item(row,1).text())
-            y = int(self.ui.LineBoxTable.item(row,2).text())
-            w = int(self.ui.LineBoxTable.item(row,3).text())
-            h = int(self.ui.LineBoxTable.item(row,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),2)
-            pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)        
-            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.pixmap)
-            print("Selected linebox should be green")
-            self.ui.statusbar.showMessage("Selected linebox should be green")
-            self.box_color = "green"
+    def CropLatinLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select tif pages source folder"))
 
-    def on_editLineBox(self,prevrow):
-        if prevrow:
-            x = int(self.ui.LineBoxTable.item(prevrow,1).text())
-            y = int(self.ui.LineBoxTable.item(prevrow,2).text())
-            w = int(self.ui.LineBoxTable.item(prevrow,3).text())
-            h = int(self.ui.LineBoxTable.item(prevrow,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-            pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)        
-            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.pixmap)
+        if self.directory:
+            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def on_drawLineBox(self,row):
-        # Draw/Redraw red LineBox
-        print('Resetting previous linebox to red')
-        self.ui.statusbar.showMessage('Resetting linebox to red')
-        if row:
-            x = int(self.ui.LineBoxTable.item(row,1).text())
-            y = int(self.ui.LineBoxTable.item(row,2).text())
-            w = int(self.ui.LineBoxTable.item(row,3).text())
-            h = int(self.ui.LineBoxTable.item(row,4).text())
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-            pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)
-            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-            self.ui.Image.setPixmap(self.pixmap)
-            self.box_color = "red"
-            print('Selected linebox should be red')
-            self.ui.statusbar.showMessage('Selected linebox should be red')
+    def LatinLineBoxFolderDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select linebox destination folder"))
+        
+        if self.directory:
+            self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
 
-    def on_resetLineBox(self):
-        # Draw/Redraw white LineBox
-        print('Resetting previous linebox to white')
-        self.ui.statusbar.showMessage('Resetting previous linebox to white')
-        x = self.prevx
-        y = self.prevy
-        w = self.prevw
-        h = self.prevh
-        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),2)
-        pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)      
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(self.pixmap)
-        self.box_color = "white"
-        print('Selected linebox should be removed (i.e. white, blank or background)')
-        self.ui.statusbar.showMessage('Selected linebox should be removed (i.e. white, blank or background)')
+    def DestLatinLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek lines destination folder"))
+        
+        if self.directory:
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')            
+
+    def GreekStageLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
+
+        if self.directory:
+            self.greekstagelines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def DestGreekStageLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
+        
+        if self.directory:
+            self.greekstagelines_ui.DestinationLineEdit.setText(self.directory+r'/')
+
+    def GreekMoveLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
+
+        if self.directory:
+            self.greekrenamelines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def DestGreekMoveLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename Greek lines destination folder"))
+        
+        if self.directory:
+            self.greekrenamelines_ui.DestinationLineEdit.setText(self.directory+r'/')
       
-    # LineBox Methods
+    def GreekRenameLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
 
-    # Table Methods
-    def LineBoxTable2csv(self):
-        #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
-        print(f'Path of linebox.txt: {self.txtpath}')
-        if os.path.exists(self.txtpath):
-            print(f'Removing: {self.txtpath}')
-            os.remove(self.txtpath)
-            self.ui.LineBoxText.clear()
-        colCount = range(self.ui.LineBoxTable.columnCount()- 6)
-        header = [self.ui.LineBoxTable.horizontalHeaderItem(column).text() for column in colCount]
-        with open(self.txtpath, 'w') as csvfile:
-            #writer = csv.writer(csvfile, dialect='excel', lineterminator='\n')
-            writer = csv.writer(csvfile, dialect='excel', delimiter='\t', lineterminator='\n')
-            writer.writerow(header)
-            for row in range(self.ui.LineBoxTable.rowCount()):
-                writer.writerow(self.ui.LineBoxTable.item(row, column).text() for column in colCount)
-        self.getText(self.txtpath)
+        if self.directory:
+            self.greekrenamelines_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def update_LineBoxText(self,line,x,y,w,h):
-        print(f'From getRbLineBox method - Line: {line}  X: {x}  Y: {y}  W: {w} H: {h}')
-        self.jsonpath = self.path_of_jsonlinebox + self.imgfilename + "_linebox.json"
-        jsonfilepath = self.jsonpath
-        self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
-        csvfilepath = self.txtpath
-        self.csv2json(csvfilepath,jsonfilepath)
-        with open(jsonfilepath, 'r') as f:
-            data = json.load(f)
-            # Iterating through the json
-            for Line in data:
-                print(f'Line from json file: {Line} -- line from putRbLineBox: {line} ')
-                if Line['Line'] == line:
-                    Line['X'] = x
-                    Line['Y'] = y
-                    Line['W'] = w
-                    Line['H'] = h
-                    print(f'Updating Line: {line} found in JSON file. Dimensions :  X: {x}  Y: {y}  W: {w}  H: {h}')
-                else:
-                    print(f'Line: {line} not found in JSON file.')
-            # Closing file
-            f.close()
-            os.remove(jsonfilepath)
-            with open(jsonfilepath, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
-        self.json2csv(csvfilepath,jsonfilepath)
-        self.showText(csvfilepath)
-
-    def showEditButtons(self):
-        if self.statusBoxMode.text() == 'Edit':
-            rowcount = self.ui.LineBoxTable.rowCount()
-            selected_row = self.ui.LineBoxTable.currentRow()
-            print(f'selected_row: {selected_row}')
-            colcount = self.ui.LineBoxTable.columnCount()
-            self.ui.LineBoxTable.horizontalHeader().resizeSection(0, 25)
-            insertAButton = qtw.QPushButton(self.ui.LineBoxTable)
-            insertBButton = qtw.QPushButton(self.ui.LineBoxTable)
-            deleteButton = qtw.QPushButton(self.ui.LineBoxTable)
-            rDrawButton = qtw.QPushButton(self.ui.LineBoxTable)
-            sDrawButton = qtw.QPushButton(self.ui.LineBoxTable)
-            acceptButton = qtw.QPushButton(self.ui.LineBoxTable)
-
-            for row in range(rowcount):
-                if row == selected_row:
-                    print(f'Row {row} matched!')
-                    for col in range(colcount):
-                        if col == 5:
-                            insertAButton.setEnabled(True)
-                            insertAButton.show()
-                            insertAIcon = qtg.QIcon()
-                            insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-                            insertAButton.setIcon(insertAIcon)
-                            insertAButton.setIconSize(QSize(12,12))
-                            self.ui.LineBoxTable.setCellWidget(row,col,insertAButton)
-                            self.inslocation = "above"
-                            insertAButton.clicked.connect(self.on_insertRowAbove)
-                        elif col == 6:
-                            insertBButton.setEnabled(True)
-                            insertBButton.show()
-                            insertBIcon = qtg.QIcon()
-                            insertBIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-                            insertBButton.setIcon(insertBIcon)
-                            insertBButton.setIconSize(QSize(12,12))
-                            self.ui.LineBoxTable.setCellWidget(row,col,insertBButton)
-                            self.inslocation = "below"
-                            insertBButton.clicked.connect(self.on_insertRowBelow)
-                        elif col == 7:
-                            deleteButton.setEnabled(True)
-                            deleteButton.show() 
-                            deleteIcon = qtg.QIcon()
-                            deleteIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/deleterow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-                            deleteButton.setIcon(deleteIcon)
-                            deleteButton.setIconSize(QSize(12,12))
-                            self.ui.LineBoxTable.setCellWidget(row,col,deleteButton)
-                            deleteButton.clicked.connect(self.on_deleteRowSelection)                                 
-                        elif col == 8:
-                            rDrawButton.setEnabled(True)
-                            rDrawButton.show()
-                            rDrawIcon = qtg.QIcon()
-                            rDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/rubberband.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-                            rDrawButton.setIcon(rDrawIcon)
-                            rDrawButton.setIconSize(QSize(12,12))
-                            self.ui.LineBoxTable.setCellWidget(row,col,rDrawButton)
-                            rDrawButton.clicked.connect(self.on_rDrawSelection)
-                        elif col == 9:
-                            sDrawButton.setEnabled(True)
-                            sDrawButton.show()
-                            sDrawIcon = qtg.QIcon()
-                            sDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/spinbox4.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-                            sDrawButton.setIcon(sDrawIcon)
-                            sDrawButton.setIconSize(QSize(16,16))
-                            self.ui.LineBoxTable.setCellWidget(row,col,sDrawButton)
-                            sDrawButton.clicked.connect(self.on_sDrawSelection)
-                        elif col == 10:
-                            acceptButton.setEnabled(True)
-                            acceptButton.show()
-                            acceptButton = qtw.QPushButton(self.ui.LineBoxTable)
-                            acceptIcon = qtg.QIcon()
-                            acceptIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/Valid.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-                            acceptButton.setIcon(acceptIcon)
-                            acceptButton.setIconSize(QSize(12,12))
-                            self.ui.LineBoxTable.setCellWidget(row,col,acceptButton)
-                            acceptButton.clicked.connect(self.on_acceptLineBoxEdit)
-                        
-    def LineBoxText2LineBoxTable(self):
-        #self.ui.LineBoxTable.clearContents()
-        boxes = []
-        reader = csv.reader(open(self.txtpath), delimiter = '\t')
+    def DestGreekRenameLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename Greek lines destination folder"))
         
-        for row in reader:
-            boxes.append(row)
+        if self.directory:
+            self.greekrenamelines_ui.DestinationLineEdit.setText(self.directory+r'/')
+
+    def SplitGreekTextLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text pages source folder"))
+
+        if self.directory:
+            self.split_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
+
+    def DestGreekTextLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text lines destination folder"))
         
-        if self.statusBoxMode.text() == "Make":
-            boxes = boxes[0:]
-        else:
-            boxes = boxes[1:]
+        if self.directory:
+            self.split_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
 
-        rowCount = len(boxes)
-        self.ui.LineBoxTable.setRowCount(rowCount)
-        colcount = self.ui.LineBoxTable.columnCount()
-        print(f'LineBoxTable column count: {colcount}')              
-        self.ui.LineBoxTable.setSortingEnabled(False)
-        #self.ui.LineBoxTable.clearContents()
-        for row, boxes in enumerate(boxes):
-            for column, value in enumerate(boxes):
-                if column == 0:
-                    tableitem = qtw.QTableWidgetItem()
-                    tableitem.setFlags(qtc.Qt.ItemIsEditable)
-                    newItem = qtw.QTableWidgetItem(value)
-                    self.ui.LineBoxTable.setItem(row, column, newItem)
-                elif column >= 1 and column <= 4:
-                    #print(f'Updating LineBoxTable column: {column}')
-                    newItem = qtw.QTableWidgetItem(value)
-                    
-                    #Scaled
-                    #newVal = int(newItem.text())
-                    #scaledVal = int(newVal * self.scale)
-                    #newItem.setText(str(scaledVal))
-                    
-                    #Not Scaled
-                    newVal = int(newItem.text())
-                    newItem.setText(str(newVal))
-                    self.ui.LineBoxTable.setItem(row, column, newItem)
-        self.showEditButtons()
-        self.ui.LineBoxTable.resizeColumnsToContents()
-        self.ui.LineBoxTable.resizeRowsToContents()
-        self.ui.LineBoxTable.setSortingEnabled(True)
+    def RenameGreekTextLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text pages source folder"))
 
-    def renumberRows(self):
-        print('Renumbering rows')
-        rowcount = self.ui.LineBoxTable.rowCount()
-        colcount = self.ui.LineBoxTable.columnCount() - 6
-        for row in range(rowcount):
-            item = self.ui.LineBoxTable.item(row, 0)
-            if not item:
-                self.newrow = row
-                print(f'Inserted row number: {row}')
-                for column in range(colcount):
-                    itemwidget = qtw.QTableWidgetItem()
-                    self.ui.LineBoxTable.setItem(row, column,itemwidget)
-                    item = self.ui.LineBoxTable.item(row, column)
-                    if column == 0:
-                        item.setText(str(row+1))
-                    else:
-                        item.setText(str(0))
-            else:
-                item.setText(str(row+1))
-            self.ui.LineBoxTable.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
-    
-    def openTableMenu(self,position):
-        tableMenu = QMenu()
+        if self.directory:
+            self.rename_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
 
-        undoAction = tableMenu.addAction("Undo")
-        iconUndo = qtg.QIcon()
-        iconUndo.addPixmap(qtg.QPixmap(":/Icons/Icons/Undo-icon.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-        undoAction.setIcon(iconUndo)
-
-        redoAction = tableMenu.addAction("Redo")
-        iconRedo = qtg.QIcon()
-        iconRedo.addPixmap(qtg.QPixmap(":/Icons/Icons/Redo-icon.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-        redoAction.setIcon(iconRedo)
-
-        insertAboveAction = tableMenu.addAction("Insert Row Above")
-        iconA = qtg.QIcon()
-        iconA.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-        insertAboveAction.setIcon(iconA)
-
-        insertBelowAction = tableMenu.addAction("Insert Row Below")
-        iconB = qtg.QIcon()
-        iconB.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-        insertBelowAction.setIcon(iconB)
-
-        deleteRowAction = tableMenu.addAction("Delete Current Row")
-        iconD = qtg.QIcon()
-        iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
-        deleteRowAction.setIcon(iconD)
-
-        action = tableMenu.exec_(self.ui.LineBoxTable.mapToGlobal(position))
-        if action == undoAction:
-            qtw.QUndoStack.undo()
-        elif action == redoAction:
-            qtw.QUndoStack.redo()
-        elif action == insertAboveAction:
-            self.on_insertRowAbove()
-        elif action == insertBelowAction:
-            self.on_insertRowBelow()
-        elif action == deleteRowAction:
-            self.on_deleteRowSelection()
-
-    # LineBox Drawing Methods
-
-    def setBoxPaths(self):
+    def DestRenameGreekTextLinesDialog(self):
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek text lines destination folder"))
         
-        # Greek Box Paths
-        self.path_of_image_page = self.projecthome + self.greekpages
-        self.path_of_imgautosplit = self.projecthome + self.greeklinesautosplit + r"/"
-        self.path_of_imglinebox = self.projecthome + self.greeklinesbox + r"/" + self.greekbookmarkdown + r"/"
-        self.path_of_txtlinebox = self.projecthome + self.txtgreeklinebox + r"/" + self.greekbookmarkdown + r"/"
-        self.path_of_jsonlinebox = self.projecthome + self.jsongreeklinebox + r"/" + self.greekbookmarkdown + r"/"
-
-        # Latin Box Paths - to be added
-
-        self.imgfilestr = os.path.basename(self.imgpath)
-        self.imgfilesplit = os.path.splitext(self.imgfilestr)
-        self.imgfilename = self.imgfilesplit[0]
-        self.imgfileext = self.imgfilesplit[1]
-        
-        self.imglineboxfile = self.projecthome + self.imgfilename + "_linebox" + self.imgfileext
-        self.boximgpath = self.path_of_imglinebox + self.imglineboxfile
-
-        self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
-        self.txtfilestr = os.path.basename(self.txtpath)
-        self.txtfilesplit = os.path.splitext(self.txtfilestr)
-        self.txtfilename = self.txtfilesplit[0]
-        self.txtfilename = self.txtfilename.replace("_linebox","")
-        self.txtfileext = self.txtfilesplit[1]
-
-    def normImage(self):
-        img = cv2.imread(self.imgpath)
-        # convert image to grayscale and normalized rgb
-        self.gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-        # normalize to Black and White
-        norm = cv2.normalize(self.gray, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-        #print(norm.shape, norm.dtype)
-
-        # convert to 3 channel
-        self.norm = cv2.cvtColor(norm, cv2.COLOR_GRAY2BGR)
-        #print(self.norm.shape, self.norm.dtype)
-        #print(np.amin(self.norm),np.amax(self.norm))
-
-    # LineBox Lines Image Methods
+        if self.directory:
+            self.rename_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
+    # End of Dialog folders exist validations
     
-    def getLineBoxImageLines(self):
-        rowcount = self.ui.LineBoxTable.rowCount()
-        for row in range(rowcount):
-            line = self.ui.LineBoxTable.item(row,0).text()
-            x = int(self.ui.LineBoxTable.item(row,1).text())
-            y = int(self.ui.LineBoxTable.item(row,2).text())
-            w = int(self.ui.LineBoxTable.item(row,3).text())
-            h = int(self.ui.LineBoxTable.item(row,4).text())
-            linex = x+w-80
-            liney = y+h-4
-            if self.ui.LineCheckBox.isChecked():
-                print(f'Placing line number at : {linex},{liney}')
-                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
-            else:
-                print(f'Removing line number at : {linex},{liney}')
-                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),3)
-        pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)        
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(self.pixmap)
-
-    def saveLineBoxImageLine(self,roi,bnum):
-        PILimage = Image.fromarray(roi)
-        thresh = 127
-        fn = lambda x : 255 if x > thresh else 0
-        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
-        tif_outfile = self.path_of_imgautosplit + self.imgfilename + "_Line" + str(bnum) + ".tif"
-        print("Generating: " + tif_outfile)
-        PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))    
-    
-    # LineBox Image Methods    
-    
-    def saveLineBoxImage(self):
-        self.imgboxfile = self.path_of_imglinebox + self.imgfilename + "_linebox" + self.imgfileext
-        #self.ui.statusbar.showMessage(f'Saving LineBox file: {self.imgboxfile}')
-        print(f'Saving LineBox file: {self.imgboxfile}')
-        cv2.imwrite(self.imgboxfile,self.norm)
-        self.boximgpath = self.imgboxfile
-        self.showImage(self.boximgpath)
-        if self.ui.LineCheckBox.isChecked():
-            self.getLineBoxImageLines() 
-
-    def drawLineBoxImage(self):
-        print(f'Drawing Linebox Image from LineBoxText: \n {self.txtpath}')
-        # Set initial box count
-        bnum = 1
-        with open(self.txtpath, "r") as txtboxfile:
-            reader = list(csv.reader(txtboxfile, delimiter = '\t'))
-            # Remove column header from list of rows
-            lineboxes = reader[1:]
-            self.rowCount = len(lineboxes)
-            for linebox in lineboxes:
-                # Extract x,y,w,h from each row
-                line = str(linebox[0])
-                x = int(linebox[1])
-                y = int(linebox[2])
-                w = int(linebox[3])
-                h = int(linebox[4])
-                roi = self.norm[y:y+h, x:x+w]
-                print(f'Placing line box at : {x},{y},{w},{h}')
-                #self.on_drawLineBox(x,y,w,h)
-                cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-                # Save Line Image
-                self.saveLineBoxImageLine(roi,bnum)
-                bnum += 1
-        txtboxfile.close()
-  
-    def setPrevLineBox(self):
-        self.ui.LineBoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.LineBoxTable.currentRow()
-        row = self.row_selected
-        #self.ui.LineBoxTable.setCellWidget(self.row_selected,0,self.ui.LineBoxTable)
-        self.line = int(self.ui.LineBoxTable.item(self.row_selected,0).text())
-        # get dimensions of selected row/linebox
-        self.prevx = int(self.ui.LineBoxTable.item(row,1).text())
-        self.prevy = int(self.ui.LineBoxTable.item(row,2).text())
-        self.prevw = int(self.ui.LineBoxTable.item(row,3).text())
-        self.prevh = int(self.ui.LineBoxTable.item(row,4).text())
-     
-    def getPrevTextLineBox(self):
-        self.ui.LineBoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.LineBoxTable.currentRow()
-        self.line = int(self.ui.LineBoxTable.item(self.row_selected,0).text())
-        # get dimensions of selected csv row/linebox
-        with open(self.txtpath,'r') as csvfile:
-            lines = csv.reader(csvfile, delimiter = '\t')
-            for csvline in lines:
-                if csvline[0] == str(self.line):
-                    self.prevx = int(csvline[1])
-                    self.prevy = int(csvline[2])
-                    self.prevw = int(csvline[3])
-                    self.prevh = int(csvline[4])
-
-    # LineBox Drawing Methods
-
-    # Rubberband(Rb) LineBox Drawing Methods
-    def putRbLineBox(self):
-        self.run_event = False
-        if self.rubberBand:
-            self.rubberBand.hide()
-            self.rubberBand = None
-        x = str(self.x_rb_draw)
-        y = str(self.y_rb_draw)
-        w = str(self.w_rb_draw)
-        h = str(self.h_rb_draw)
-
-        self.line = int(self.ui.LineBoxTable.item(self.row_selected,0).text())
-        print(f'Updating LineBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
-        self.update_LineBoxText(str(self.line),x,y,w,h)
-        self.LineBoxText2LineBoxTable()
-        self.drawLineBoxImage()
-        self.saveLineBoxImage()
-        self.ui.LineBoxTable.clearSelection()
-        self.startEditLoop = True
-        # Save Line Image
-        x = int(x)
-        y = int(y)
-        w = int(w)
-        h = int(h)
-        roi = self.norm[y:y+h, x:x+w]
-        self.saveLineBoxImageLine(roi,self.line)
-        self.statusDrawingMode.setText("None")
-
-    def drawRbLineBox(self):    
-        if self.statusDrawingMode.text() == "Mouse":
-            x = self.x_rb_draw 
-            y = self.y_rb_draw
-            w = self.w_rb_draw
-            h = self.h_rb_draw
-            # Draw/Redraw red Linebox
-            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-            #self.saveLineBoxImage()
-            self.showImage(self.boximgpath)
-            self.putRbLineBox()
-        
-        if self.rubberBand:
-            self.rubberBand.hide()
-            self.rubberBand = None
-
-    def getRbLineBox(self):
-        #self.rubberBand.hide()
-        self.run_event = True       
-        if self.statusDrawingMode.text() == "Mouse":
-            # At scale DrawLineBox QRect at LineBox Image offset from MainWindow origin(0,0)
-            DrawImg_xs = self.x_rb - int(self.img_xoffset)
-            DrawImg_ys = self.y_rb - int(self.img_yoffset)
-            #DrawImg_xs = self.x_rb
-            #DrawImg_ys = self.y_rb
-            DrawImg_ws = self.w_rb
-            DrawImg_hs = self.h_rb
-            DrawImg_sqrect = QRect(DrawImg_xs,DrawImg_ys,DrawImg_ws,DrawImg_hs)
-            print("Offset Scaled QRect = " + str(DrawImg_sqrect))
-            
-            # Up scale DrawLineBox QRect at LineBox Image previously offset from MainWindow origin(0,0)
-            self.x_rb_draw = int(round(DrawImg_xs / self.scale))
-            self.y_rb_draw = int(round(DrawImg_ys / self.scale))
-            self.w_rb_draw = int(round(DrawImg_ws / self.scale))
-            self.h_rb_draw = int(round(DrawImg_hs / self.scale))
-            DrawImg_uqrect = QRect(self.x_rb_draw,self.y_rb_draw,self.w_rb_draw,self.h_rb_draw)
-            print("Offset Upscaled QRect = " + str(DrawImg_uqrect))
-
-            print(f'x_rb_draw: {self.x_rb_draw} y_rb_draw: {self.y_rb_draw} w_rb_draw: {self.w_rb_draw} h_rb_draw: {self.h_rb_draw}')
-            self.drawRbLineBox()
-    
-    # Spinbox(Sb) Drawing Methods
-    def putSbLineBox(self):
-        row = self.ui.LineBoxTable.currentRow()
-        x = self.x_sb_draw
-        y = self.y_sb_draw
-        w = self.w_sb_draw
-        h = self.h_sb_draw
-        
-        # Update LineBoxText and LineBoxTable 
-        
-        self.line = int(self.ui.LineBoxTable.item(row,0).text())
-        print(f'Updating LineBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
-        self.update_LineBoxText(str(self.line),str(x),str(y),str(w),str(h))
-        self.LineBoxText2LineBoxTable()
-        self.drawLineBoxImage()
-        self.saveLineBoxImage()
-        self.ui.LineBoxTable.clearSelection()
-        #self.clearSpinBoxes()
-        # Save Line Image
-        roi = self.norm[y:y+h, x:x+w]
-        self.saveLineBoxImageLine(roi,self.line)
-        self.statusDrawingMode.setText("None")
-        self.ui.LineBoxTable.setSortingEnabled(True)
-        self.statusDrawingMode.setText("None")
-
-    def completeSbLineBox(self):
-        popup = qtw.QMessageBox(self)
-        popup.setWindowModality(Qt.NonModal)
-        popup.setIcon(qtw.QMessageBox.Information)
-        popup.setWindowTitle("Edit Line Box")
-        popup.setText("Press OK to keep the edited Line Box")
-        popup.setStandardButtons(qtw.QMessageBox.Ok|qtw.QMessageBox.Cancel)
-        popup.exec()
-        if popup.clickedButton() == qtw.QMessageBox.Ok:
-            self.putSbLineBox()
-        #elif popup.clickedButton() == qtw.QMessageBox.Cancel:
-        else:
-            #self.clearSpinBoxes()           
-            self.LineBoxText2LineBoxTable()
-
-    def drawSbLineBox(self):        
-        x = int(self.x_sb_draw)
-        y = int(self.y_sb_draw)
-        w = int(self.w_sb_draw)
-        h = int(self.h_sb_draw)
-        print(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
-        self.ui.statusbar.showMessage(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
-        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
-        pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)        
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(self.pixmap)
-
-    def getSpinBoxes(self):
-        self.row_selected = self.ui.LineBoxTable.currentRow()
-        row = self.row_selected
-        #self.col_selected = self.ui.LineBoxTable.currentColumn() 
-        #print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
-        for column in range(1,5):
-            value = self.ui.LineBoxTable.item(row,column).text()
-            spinbox = QSpinBox(self.ui.LineBoxTable) #changed parent from None to self.ui.LineBoxTable - could also be just self
-            #self.spinbox.setMaximum(6000)
-            aspect = round((self.ui.Image.width()/self.ui.Image.height()),2)
-            print(f'Aspect Ratio: {aspect}')
-            spinbox.setMaximum(self.ui.Image.width())
-            # setting step size to the reciprocal of the scale
-            stepsize = int((1/self.scale)/2)
-            # using scaled step size
-            #spinbox.setAccelerated(False)
-            spinbox.setSingleStep(stepsize)
-            #spinbox.setStepType(qtw.QAbstractSpinBox.DefaultStepType)
-            #spinbox.setStepType(qtw.QAbstractSpinBox.AdaptiveDecimalStepType)
-            #spinbox.setCorrectionMode(qtw.QAbstractSpinBox.CorrectToNearestValue)
-            
-            # getting font of the spin box
-            font = spinbox.font()
-            # setting point size
-            font.setPointSize(8)
-            # reassigning this font to the spin box
-            spinbox.setFont(font)
-        
-            spinbox.setFixedWidth(50)
-            spinbox.setValue(int(value))
-            self.ui.LineBoxTable.setCellWidget(row,column,spinbox)
-            self.ui.LineBoxTable.resizeRowToContents(row)
-            self.ui.LineBoxTable.resizeColumnToContents(column)
-            spinbox.valueChanged.connect(self.on_boxValueChanged)        
-
-    '''def getSpinBox(self):
-        self.row_selected = self.ui.LineBoxTable.currentRow()
-        self.col_selected = self.ui.LineBoxTable.currentColumn() 
-        print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
-        self.spinbox = QSpinBox(self.ui.LineBoxTable) #changed parent from None to self.ui.LineBoxTable - could also be just self
-        #self.spinbox.setMaximum(6000)
-        self.spinbox.setMaximum(int(self.scale*self.ui.Image.height()))
-        self.spinbox.setValue(int(self.cellvalue))
-        self.ui.LineBoxTable.setCellWidget(self.row_selected,self.col_selected,self.spinbox)
-        self.spinbox.valueChanged.connect(self.on_boxValueChanged)'''
-    
-    # LineBox Text Methods
-    def json2csv(self, csvFilePath, jsonFilePath):
-        columns = ['Line','X','Y','W','H']
-        df = pd.read_json (jsonFilePath)
-        df = df[columns]
-        df.to_csv(csvFilePath, sep='\t', header=True, index=False, encoding='utf-8')
-    
-    def csv2json(self, csvFilePath, jsonFilePath):
-        jsonArray = []
-        #read csv file
-        with open(csvFilePath, encoding='utf-8') as csvf: 
-            #load csv file data using csv library's dictionary reader
-            csvReader = csv.DictReader(csvf, delimiter = '\t') 
-
-            #convert each csv dictionary row into json array
-            for row in csvReader: 
-                #add this python dict to json array
-                jsonArray.append(row)
-    
-        #write jsonArray to file
-        with open(jsonFilePath, 'w', encoding='utf-8') as jsonf: 
-            json.dump(jsonArray, jsonf, indent=4)
- 
     # Make LineBox Method
     def linebox_make_split(self):
-            self.ui.LineBoxTable.verticalHeader().hide()
+            self.currentBoxTable.verticalHeader().hide()
             self.statusBoxMode.setText('Make')
             self.statusBoxType.setText('Line')
             self.statusDrawingMode.setText('Auto')
-            #If no page image present, then load one.
             
-            if self.ui.ImageLe.displayText() == "":
-                self.loadImage()
-            else:    
+            #If no page image present, then load one.
+            if self.ui.PageImage.pixmap():
+                # Activate the Page Image Tab
+                if self.ui.ImageTab.currentIndex() != 1:
+                    self.ui.ImageTab.setCurrentIndex(1)
+                # Get imglinebox source file
+                #if self.ui.ImageLe.displayText() == "": 
                 print('Open Make Image message dailog')
                 popup = qtw.QMessageBox(self)
                 popup.setIcon(qtw.QMessageBox.Information)
                 popup.setWindowTitle("Make LineBox File Pair")
-                popup.setText("'Make Current' linebox pair or load and 'Make Other'")
-                currentButton = popup.addButton('Make Current', qtw.QMessageBox.YesRole)
-                otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
+                popup.setText("Make LineBox from Current Page or load a New Page")
+                currentButton = popup.addButton('Use Current Page', qtw.QMessageBox.YesRole)
+                newButton = popup.addButton('Load New Page', qtw.QMessageBox.YesRole)
                 popup.exec()
                 if popup.clickedButton() == currentButton:
-                    pass      
-                elif popup.clickedButton() == otherButton:
+                    self.getImage(self.imgpath)     
+                elif popup.clickedButton() == newButton:
                     self.ui.ImageLe.clear()
-                    self.ui.Image.clear()
+                    self.currentBoxImage.clear()
+                    self.ui.PageImage.clear()
                     self.ui.TextLE.clear()
-                    self.ui.LineBoxText.clear()
-                    self.ui.LineBoxTable.clear()
-                    # Get imglinebox source file
-                    self.loadImage()
+                    #self.currentTextTable.clear()
+                    #self.currentBoxTable.clear()
+                    self.loadImage()                
+            else:
+                # Activate the Page Image Tab
+                if self.ui.ImageTab.currentIndex() != 1:
+                    self.ui.ImageTab.setCurrentIndex(1)
+                # Get imglinebox source file
+                self.loadImage() 
+            print(f'from Load Page Image: self.imgpath = {self.imgpath}')
+            # Activate the Line Box Tab
+            if self.ui.ImageTab.currentIndex() != 0:
+                self.ui.ImageTab.setCurrentIndex(0)
+            else:
+                self.on_tabChanged()
+            print(f'after tab changed to Line Box: self.imgpath = {self.imgpath}')
             # setting value to progress bar
             self.ui.progressBar.setValue(10)
-            # Make LineBox File Pair
             self.setBoxPaths()
+            print(f'from setBoxPaths: imgfilename = {self.imgfilename}')
+            # Make LineBox File Pair
             self.ui.ImageLe.clear()
-            self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
-            dosplit = True
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            # validate image as a LineBox Image 
+            '''pathsplit = self.imgpath.split('_')
+            tailsplit = pathsplit[1]
+            if tailsplit == "linebox.tif":
+                is_linebox = True
+                print("This is not a valid Page Image! Please try again") # need to throw error
+            else:
+                is_linebox = False'''
             self.normImage()
+            # Set normalized Page Image Path to point to Box Image Path before moving forward
+            self.imgpath = self.boximgpath
             # convert image to binary numpy array for finding contours
             ret,binary = cv2.threshold(self.gray,127,255,cv2.THRESH_BINARY)
             # binary numpy array inversion
@@ -4015,8 +3395,7 @@ class MainWindow(qtw.QMainWindow):
             (ctrs, boundingBoxes) = zip(*sorted(zip(ctrs, boundingBoxes),key=lambda b:b[1][i], reverse=reverse))
             # Set initial box count
             bnum = 1
-            self.ui.LineBoxText.clear()
-            self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+            self.currentTextTable.clear()
             if os.path.exists(self.txtpath):
                 print(f'Removing: {self.txtpath}')
                 os.remove(self.txtpath)
@@ -4047,25 +3426,25 @@ class MainWindow(qtw.QMainWindow):
                                     boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\t' + '\n'
                                     txtboxfile.write(boxlinestr)
                                     y = y + h
-                                    if dosplit:
-                                        self.saveLineBoxImageLine(roi,bnum)
+                                    #if dosplit:
+                                    self.saveLineBoxImageLine(roi,bnum)
                                     bnum += 1
                         # setting value to progress bar
                         self.ui.progressBar.setValue(bnum)
-            print(f'Created LineBox Text File: {self.txtpath}')
-            #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"                                  
+            #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt" 
+            print(f'Created LineBox Text File: {self.txtpath}')                                
             txtboxfile.close()
             self.ui.progressBar.setValue(50)
             
             # Write Text Box File to LineBoxTable TableWidget
-            self.LineBoxText2LineBoxTable()
+            self.BoxText2BoxTable()
             self.ui.progressBar.setValue(75)
 
             # Overwrite Text Box File from LineBoxTable TableWidget
             # Already wrote the txtboxfile, above; so,likely unecessary 
             self.LineBoxTable2csv()
             self.ui.progressBar.setValue(85)
-
+            
             # Write linebox image to file
             self.saveLineBoxImage()
             self.ui.ImageLe.clear()
@@ -4076,15 +3455,32 @@ class MainWindow(qtw.QMainWindow):
     # Edit LineBox Method
     def linebox_edit_split(self):
         self.ui.statusbar.showMessage('Loading the LineBox file pair for editing')
-        start = time.perf_counter()
-        self.ui.LineBoxTable.verticalHeader().hide()
+        start = time.perf_counter()        
+
+        # Activate the Line Box Tab
+        if self.ui.ImageTab.currentIndex() != 0:
+            self.ui.ImageTab.setCurrentIndex(0)
+        else:
+            self.on_tabChanged()  
+        self.setBoxPaths()
+        self.imgpath = self.boximgpath
+
+        self.currentBoxTable.verticalHeader().hide()
         self.statusBoxMode.setText("Edit")
         self.statusBoxType.setText("Line")
         self.statusSelectionMode.setText("Rows")
-        self.ui.LineBoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        print('Box Table Selection Mode: Single Selection (default)')
-        print('Box Table Selection Behavior: Select Rows (default)')
-        if self.ui.ImageLe.displayText() != "":
+        self.currentBoxTable.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        
+        def loadBoxImage():
+            self.ui.ImageLe.clear()
+            self.currentBoxImage.clear()
+            self.loadImage()
+            self.setBoxPaths()
+            self.imgpath = self.boximgpath
+            self.showImage(self.imgpath)
+ 
+        if self.currentBoxImage.pixmap():
+        #if self.ui.ImageLe.displayText() != "":
             popup = qtw.QMessageBox(self)
             popup.setIcon(qtw.QMessageBox.Information)
             popup.setWindowTitle("Edit Mode")
@@ -4093,27 +3489,26 @@ class MainWindow(qtw.QMainWindow):
             otherButton = popup.addButton('Edit Other', qtw.QMessageBox.YesRole)
             popup.exec()
             if popup.clickedButton() == currentButton:
-                pass
+                self.getImage(self.imgpath)
                 
             elif popup.clickedButton() == otherButton:
-                self.ui.ImageLe.clear()
-                self.ui.Image.clear()
-        
-        if self.ui.ImageLe.displayText() == "":
-            # Get imglinebox source file
-            self.loadImage()
-            self.setBoxPaths()
-            self.ui.ImageLe.clear()
-            self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
-            # Normalize indexed tif source file to RGB image
-            self.normImage()
-        else: 
-            self.showImage(self.imgpath)       
-            self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
-  
+                loadBoxImage()
+        else:
+            loadBoxImage()
+        self.normImage()      
+        self.ui.ImageLe.setText(os.path.basename(self.boximgpath))
+        print(f"From setBoxPaths: self.txtpath = {self.txtpath}")
         # setting value to progress bar
         self.ui.progressBar.setValue(10)
-
+    
+        # validate image as a LineBox Image 
+        '''pathsplit = self.imgpath.split('_')
+        tailsplit = pathsplit[1]
+        if tailsplit == "linebox.tif":
+            is_linebox = True
+        else:
+            is_linebox = False
+            print("This is not a valid LineBox Image! Please try again")  # need to throw error'''
         self.ui.TextLE.clear()
         self.ui.TextLE.setText(self.txtfilestr)
         imgfilename = self.ui.ImageLe.displayText().split(r".")[0]
@@ -4123,16 +3518,17 @@ class MainWindow(qtw.QMainWindow):
         if txtfilename == imgfilename:
             self.getText(self.txtpath)
             self.ui.progressBar.setValue(25)
-            self.drawLineBoxImage()
+            #if drawbox:
+                # self.drawLineBoxImage()
             self.ui.progressBar.setValue(50)
-            self.saveLineBoxImage()
+            #self.saveLineBoxImage()
             self.ui.progressBar.setValue(75)
-            self.LineBoxText2LineBoxTable()
+            self.BoxText2BoxTable()
             self.ui.progressBar.setValue(100)
             print("Waiting on LineBoxTable selection")
-            self.row_current = self.ui.LineBoxTable.currentRow()
+            self.row_current = self.currentBoxTable.currentRow()
             self.startEditLoop = True
-            self.ui.LineBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
+            self.currentBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
         else:   
             print(f'The linebox text: {txtfilename} does not match the linebox image: {imgfilename} -- Please try again!')        
 
@@ -4142,194 +3538,569 @@ class MainWindow(qtw.QMainWindow):
         self.ui.statusbar.showMessage(f"File load completed successfully in {finish - start:0.4f} seconds")
         print(f"File load completed successfully in {finish - start:0.4f} seconds")
 
-    # Mouse Controllers
-    def mousePressEvent(self, event):
-        #if self.rubberBand:
-            # Limit scope of rubberband starting position
-        if self.ui.ImageLe.displayText() != "":
-            self.run_event = True
-            x_min = int(self.img_xoffset) - 1
-            #print(f'xmin: {x_min}')
-            x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
-            #print(f'xmax: {x_max}')
-            y_min = int(self.img_yoffset) - 1
-            #print(f'ymin: {y_min}')
-            y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
-            #print(f'ymax: {y_max}')
-        else:
-            self.run_event = False
-            print('You cannot draw without a loaded image') 
-        if self.statusBoxMode.text() == "Edit":
-            if self.statusDrawingMode.text() == "Mouse":
-                self.event_x = event.pos().x()
-                self.event_y = event.pos().y()
-                self.start_pos = QPoint(self.event_x, self.event_y)
-                print(f'Mouse clicked at start position: {self.start_pos}')
-                if self.ui.ImageLe.displayText() != "":
-                    self.run_event = True
-                '''# Limit scope of rubberband starting position
-                if self.ui.ImageLe.displayText() != "":
-                    self.run_event = True
-                    x_min = int(self.img_xoffset) - 1
-                    #print(f'xmin: {x_min}')
-                    x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
-                    #print(f'xmax: {x_max}')
-                    y_min = int(self.img_yoffset) - 1
-                    #print(f'ymin: {y_min}')
-                    y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
-                    #print(f'ymax: {y_max}')
-                else:
-                    self.run_event = False
-                    print('You cannot draw without a loaded image')'''
-                
-                if event.button() == Qt.LeftButton and self.run_event == True:          
-                    if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
-                        #if self.rubberBand.w() != 0 and self.rubberBand.h() != 0:
-                        #self.rubberBand = ResizableRubberBand(self)
-                        self.run_event = True
-                        self.rubberBand.setGeometry(QRect(self.start_pos, QSize()).normalized())
-                        self.rubberBand.show()
-                    else:
-                        self.run_event = False
-                        print('You cannot draw outside the current image borders')
+
+############    Line Box Image Methods    #############
+
+    def on_acceptLineBoxEdit(self):
+        if self.statusDrawingMode.text() == 'Table':
+            self.putSbLineBox()
+            #self.completeSbLineBox
+        if self.statusDrawingMode.text() == 'Mouse':
+            self.getRbLineBox()
+        pass
+    
+    def on_rDrawSelection(self):
+        self.rubberBand = ResizableRubberBand(self)
+        self.rubberBand.hide()
+        #self.on_editLineBox(self.row_selected)
+        self.statusBoxMode.setText("Edit")
+        #self.statusBoxType.setText("Line")
+        self.statusSelectionMode.setText("Row")
+        self.statusDrawingMode.setText("Mouse")
+
+        self.currentBoxTable.setSortingEnabled(False)
+        self.row_selected = self.currentBoxTable.currentRow()        
+        #print("Editing LineBoxTable selection")
+        self.ui.ZoomComboBox.setCurrentText('Contents')        
+        self.setPrevLineBox()
+        # self.getPrevTextLineBox()
+        self.ui.statusbar.showMessage('Editing LineBox image using mouse and QRubberBand')
+        self.on_resetLineBox()
+        #self.currentBoxTable.clearSelection()
+
+    def on_sDrawSelection(self):
+        self.row_selected = self.currentBoxTable.currentRow()
+        # self.on_editLineBox(self.row_selected)
+        self.statusBoxMode.setText("Edit")
+        #self.statusBoxType.setText("Line")
+        self.statusSelectionMode.setText("Row")
+        self.statusDrawingMode.setText("Table")
+
+        self.currentBoxTable.setSortingEnabled(False)      
+        self.ui.ZoomComboBox.setCurrentText('Contents')        
+
+        self.setPrevLineBox()
+        #self.on_editLineBox(self.row_selected)
+        self.on_selectLineBox(self.row_selected)
+
+        print('Edit LineBox image using LineBoxTable spinboxes')
+        self.ui.statusbar.showMessage('Edit LineBox image using LineBoxTable spinboxes') 
+        # self.currentBoxTable.clearSelection()
+        self.currentBoxTable.setSortingEnabled(False)
+        colcount = self.currentBoxTable.columnCount() - 6
+        for col in range(colcount):
+            self.tableitem = self.currentBoxTable.item(self.row_selected, col)
+            self.cellwidget = self.currentBoxTable.cellWidget(self.row_selected, col)
+            self.cellvalue = self.currentBoxTable.item(self.row_selected, col).text()
+            print(f'Selected Cell Location:  Row: {self.row_selected} Column: {col}')
+            print(f'Current Cell Widget: {self.cellwidget}')
+            print(f'Current Cell Value: {self.cellvalue}')
+            if col == 0:
+                self.tableitem.setFlags(qtc.Qt.ItemIsEditable)
+            elif col == 1:                   
+                self.currx = int(self.cellvalue)
+            elif col == 2:
+                self.curry = int(self.cellvalue)
+            elif col == 3:
+                self.currw = int(self.cellvalue)
+            elif col == 4:
+                self.currh = int(self.cellvalue)
+
+        print(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh}')
+        print(f'Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}')
+        self.ui.statusbar.showMessage(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh} --- Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}') 
+        #self.getSpinBox()
+        self.getSpinBoxes()   
+
+    def on_insertRowAbove(self):  
+        row = self.currentBoxTable.currentRow()
+        self.on_editLineBox(row)
+        if row:
+            self.currentBoxTable.insertRow(row)
+            self.renumberRows()
+            self.LineBoxTable2csv() 
+    
+    def on_insertRowBelow(self):
+        row = self.currentBoxTable.currentRow()
+        self.on_editLineBox(row)
+        if row:
+            self.currentBoxTable.insertRow(row+1)
+            self.renumberRows()
+            self.LineBoxTable2csv() 
+
+    def on_deleteRowSelection(self):
+        row = self.currentBoxTable.currentRow()
+        self.on_drawLineBox(row)
+        if row:
+            popup = qtw.QMessageBox(self)
+            popup.setIcon(qtw.QMessageBox.Information)
+            popup.setWindowTitle("Are you sure?")
+            popup.setText("This will delete the current row! This cannot be undone!")
+            popup.setStandardButtons(qtw.QMessageBox.Ok|qtw.QMessageBox.Cancel)
+            #popup.exec()
+            #if popup.buttonClicked() == qtw.QMessageBox.Ok:
+            returnValue = popup.exec()
+            if returnValue == qtw.QMessageBox.Ok:
+                print('OK clicked')
+                self.setPrevLineBox()
+                self.on_resetLineBox()
+                self.currentBoxTable.removeRow(row)
+                self.renumberRows()
+                self.LineBoxTable2csv()
+                self.drawLineBoxImage
+                self.saveLineBoxImage()
+                self.BoxText2BoxTable()        
             else:
-                # If in Edit mode, select Row from LineBox Image
-                self.run_event = False
-                if event.button() == Qt.LeftButton:
-                    event_x = event.pos().x()
-                    grid_x = event_x - int(self.img_xoffset)
-                    event_y = event.pos().y()
-                    grid_y = event_y - int(self.img_yoffset)
-                    scaled_x = int(round(grid_x / self.scale))
-                    scaled_y = int(round(grid_y / self.scale))
-                    if event_x >= x_min and event_x <= x_max and event_y >= y_min and event_y <= y_max:
-                        rowcount = self.ui.LineBoxTable.rowCount()
-                        for row in range(rowcount):
-                            y = int(self.ui.LineBoxTable.item(row,2).text())
-                            h = int(self.ui.LineBoxTable.item(row,4).text())
-                            y_h = y + h
-                            if y <= scaled_y and scaled_y <= y_h:
-                                self.ui.LineBoxTable.selectRow(row)
+                pass
 
-    def mouseMoveEvent(self, event):
-        if self.statusBoxMode.text() == "Edit" and self.run_event: 
-            self.end_pos = event.pos()
-            self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
-            row = self.ui.LineBoxTable.currentRow()
-            geo = self.rubberBand.geometry()
-            #while self.run_event:
-            self.x_rb = self.rubberBand.x()
-            self.y_rb = self.rubberBand.y()
-            self.w_rb = self.rubberBand.width()
-            self.h_rb = self.rubberBand.height()
-            self.ui.LineBoxTable.item(row,1).setText(str(int(round((self.x_rb - int(self.img_xoffset))/self.scale))))
-            self.ui.LineBoxTable.item(row,2).setText(str(int(round((self.y_rb - int(self.img_yoffset))/self.scale))))
-            self.ui.LineBoxTable.item(row,3).setText(str(int(round(self.w_rb/self.scale))))
-            self.ui.LineBoxTable.item(row,4).setText(str(int(round(self.h_rb/self.scale))))
-            self.ui.statusbar.showMessage(f'x:{self.x_rb} y:{self.y_rb} w:{self.w_rb} h:{self.h_rb}')
-    
-    #def mouseReleaseEvent(self, event):
+    def on_currentRowChanged(self,current,previous):
+        # Indexes Selected
+        self.ix_selected = current
+        self.prev_ix_selected = previous
         
-    # Utility Methods
-    def renameimages(source, destination):
-            def sorted_alphanumeric(data):
-                    convert = lambda text: int(text) if text.isdigit() else text.lower()
-                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
-                    return sorted(data, key=alphanum_key)
-                    #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
+        # Row Selected
+        self.row_selected = current.row()        
+        # Previous Row Selected
+        self.prev_row_selected = previous.row()
+        
+        self.run_event = False
+        
+        print(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
+        self.ui.statusbar.showMessage(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
+        
+        # clear the CellWidgets
+        rowcount = self.currentBoxTable.rowCount()
+        colcount = self.currentBoxTable.columnCount()
+        for row in range(rowcount):
+            for col in range(colcount):
+                self.currentBoxTable.removeCellWidget(row,col)
+                 
+        self.showEditButtons()
+        self.currentBoxTable.setSortingEnabled(False)
+        self.row_selected = self.currentBoxTable.currentRow()        
+        print("Editing LineBoxTable selection")
+        self.ui.ZoomComboBox.setCurrentText('Contents')
+        self.currentBoxTable.resizeRowsToContents()
+        if self.prev_row_selected >= 0:
+            self.on_editLineBox(self.prev_row_selected)
+        if self.ui.LineCheckBox.isChecked():
+            self.getLineBoxImageLines()      
+        self.on_selectLineBox(self.row_selected)
+        
+    def on_boxValueChanged(self):
+        print('This is the handler for the selected spinbox value that is changed')
+        #self.spinbox.valueChanged.disconnect(self.on_boxValueChanged)
+        self.on_resetLineBox()
+        row = self.currentBoxTable.currentRow()
+        col = self.currentBoxTable.currentColumn()
+        xval = int(self.currentBoxTable.item(row,1).text())
+        yval = int(self.currentBoxTable.item(row,2).text())
+        wval = int(self.currentBoxTable.item(row,3).text())
+        hval = int(self.currentBoxTable.item(row,4).text())
+        if col == 1:
+            xval = self.currentBoxTable.cellWidget(row, 1).value()
+            self.currentBoxTable.item(row,1).setText(str(xval))
+        elif col == 2:
+            yval = self.currentBoxTable.cellWidget(row, 2).value()
+            self.currentBoxTable.item(row,2).setText(str(yval))
+        elif col == 3:
+            wval = self.currentBoxTable.cellWidget(row, 3).value()
+            self.currentBoxTable.item(row,3).setText(str(wval))
+        elif col == 4:
+            hval = self.currentBoxTable.cellWidget(row, 4).value()
+            self.currentBoxTable.item(row,4).setText(str(hval))
+        #self.spinbox.valueChanged.connect(self.on_boxValueChanged)
+        self.setPrevLineBox()
 
-            path_of_images = source
-            dest_of_images = destination
-            list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
+        #For printing purposes
+        line = int(self.currentBoxTable.item(row,0).text())
+        print(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
+        self.ui.statusbar.showMessage(f'Line: {str(line)} X:{str(xval)} Y:{str(yval)} W:{str(wval)} H:{str(hval)}')
+        #Scaled
+        #scaled_x,scaled_y,scaled_w,scaled_h = int(self.xval/self.scale),int(self.yval/self.scale),int(self.wval/self.scale),int(self.hval/self.scale)
+        #self.drawSbLineBox(scaled_x,scaled_y,scaled_w,scaled_h)
+        
+        #Not Scaled
+        self.x_sb_draw = xval
+        self.y_sb_draw = yval
+        self.w_sb_draw = wval
+        self.h_sb_draw = hval
+        self.drawSbLineBox()
+        #self.drawSbLineBox(self.xval,self.yval,self.wval,self.hval)
 
-            print(list_of_images)
+    def on_selectLineBox(self,row):
+        # Draw/Redraw green LineBox
+        print('Setting selected linebox to green')
+        self.ui.statusbar.showMessage('Setting selected linebox to green')
+        if row:
+            x = int(self.currentBoxTable.item(row,1).text())
+            y = int(self.currentBoxTable.item(row,2).text())
+            w = int(self.currentBoxTable.item(row,3).text())
+            h = int(self.currentBoxTable.item(row,4).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),2)
+            pil_img = Image.fromarray(self.norm)
+            qimage = ImageQt.ImageQt(pil_img)        
+            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.currentBoxImage.setPixmap(self.pixmap)
+            print("Selected linebox should be green")
+            self.ui.statusbar.showMessage("Selected linebox should be green")
+            self.box_color = "green"
 
-            newpagenum = 1
-            newlinenum = 1
+    def on_editLineBox(self,prevrow):
+        if prevrow:
+            x = int(self.currentBoxTable.item(prevrow,1).text())
+            y = int(self.currentBoxTable.item(prevrow,2).text())
+            w = int(self.currentBoxTable.item(prevrow,3).text())
+            h = int(self.currentBoxTable.item(prevrow,4).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            pil_img = Image.fromarray(self.norm)
+            qimage = ImageQt.ImageQt(pil_img)        
+            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.currentBoxImage.setPixmap(self.pixmap)
 
-            for image in list_of_images:
-                    img = cv2.imread(os.path.join(path_of_images, image))
-                    height, width = img.shape[:2]
-                    filestr = os.path.basename(os.path.join(path_of_images, image))
-                    filesplit = os.path.splitext(filestr)
-                    filename = filesplit[0]
-                    fileext = filesplit[1]
-                    namesplit = filename.split("_")
-                    versionref = namesplit[0]
-                    pagestr = namesplit[2]
-                    pagenum = int(pagestr)
-                    linestr = namesplit[3]
-                    #print(versionref,pagenum,linestr)
-                    print(f"namesplit: {namesplit} versionref: {versionref} pagestr: {pagestr} pagenum: {pagenum} linestr: {linestr}")
-                    linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
-                    #print("Last digits of "+filename+" are "+last_digits)
-                    if pagenum > newpagenum:
-                            newlinenum = 1
-                            newpagenum = pagenum
-                    print("pagenum: " + pagestr + "  newpagenum: " + str(newpagenum) + "  linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
-                    shutil.copy(path_of_images + filestr, dest_of_images + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
-                    newlinenum += 1 
-                    print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+    def on_drawLineBox(self,row):
+        # Draw/Redraw red LineBox
+        print('Resetting previous linebox to red')
+        self.ui.statusbar.showMessage('Resetting linebox to red')
+        if row:
+            x = int(self.currentBoxTable.item(row,1).text())
+            y = int(self.currentBoxTable.item(row,2).text())
+            w = int(self.currentBoxTable.item(row,3).text())
+            h = int(self.currentBoxTable.item(row,4).text())
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            pil_img = Image.fromarray(self.norm)
+            qimage = ImageQt.ImageQt(pil_img)
+            self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+            self.currentBoxImage.setPixmap(self.pixmap)
+            self.box_color = "red"
+            print('Selected linebox should be red')
+            self.ui.statusbar.showMessage('Selected linebox should be red')
 
-    def moveimages(source, destination):
-            def sorted_alphanumeric(data):
-                    convert = lambda text: int(text) if text.isdigit() else text.lower()
-                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
-                    return sorted(data, key=alphanum_key)
-                    #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
+    def on_resetLineBox(self):
+        # Draw/Redraw white LineBox
+        print('Resetting previous linebox to white')
+        self.ui.statusbar.showMessage('Resetting previous linebox to white')
+        x = self.prevx
+        y = self.prevy
+        w = self.prevw
+        h = self.prevh
+        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),2)
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)      
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.currentBoxImage.setPixmap(self.pixmap)
+        self.box_color = "white"
+        print('Selected linebox should be removed (i.e. white, blank or background)')
+        self.ui.statusbar.showMessage('Selected linebox should be removed (i.e. white, blank or background)')
 
-            path_of_images = source
-            dest_of_groundtruth = destination
-            #sorted(os.listdir(os.getcwd()), key=len) does not work
+    def normImage(self):
+        img = cv2.imread(self.imgpath)
+        # convert image to grayscale and normalized rgb
+        self.gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-            list_of_images = sorted_alphanumeric(os.listdir(path_of_images))
+        # normalize to Black and White
+        norm = cv2.normalize(self.gray, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+        #print(norm.shape, norm.dtype)
 
-            #print(list_of_images)
+        # convert to 3 channel
+        self.norm = cv2.cvtColor(norm, cv2.COLOR_GRAY2BGR)
+        #print(self.norm.shape, self.norm.dtype)
+        #print(np.amin(self.norm),np.amax(self.norm))
 
-            newpagenum = 1
-            newlinenum = 1
+    def morphImage(self):
+        print("Setting image morpholgy with enabled sliders")
 
-            for image in list_of_images:
+    # LineBox Drawing Methods
+    # Rubberband(Rb) LineBox Drawing Methods
+    def putRbLineBox(self):
+        self.run_event = False
+        if self.rubberBand:
+            self.rubberBand.hide()
+            self.rubberBand = None
+        x = str(self.x_rb_draw)
+        y = str(self.y_rb_draw)
+        w = str(self.w_rb_draw)
+        h = str(self.h_rb_draw)
+
+        if self.statusBoxType.text() == "Line":
+            self.line = int(self.currentBoxTable.item(self.row_selected,0).text())
+            print(f'Updating LineBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
+            self.update_LineBoxText(str(self.line),x,y,w,h)
+        elif self.statusBoxType.text() == "Page":
+            self.page = int(self.currentBoxTable.item(self.row_selected,0).text())
+            print(f'Updating PageBoxText JSON and CSV files for page:{str(self.page)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
+            self.update_PageBoxText(str(self.page),x,y,w,h)
+        
+        self.BoxText2BoxTable()
+        
+        self.drawLineBoxImage()
+        
+        if self.statusBoxType.text() == "Line":
+            self.saveLineBoxImage()
+        elif self.statusBoxType.text() == "Page":
+            self.savePageBoxImage()        
+        
+        self.currentBoxTable.clearSelection()
+        self.startEditLoop = True
+        # Save Line Image
+        x = int(x)
+        y = int(y)
+        w = int(w)
+        h = int(h)
+        roi = self.norm[y:y+h, x:x+w]
+        
+        if self.statusBoxType.text() == "Line":
+            self.saveLineBoxImageLine(roi,self.line)
+        elif self.statusBoxType.text() == "Page":
+            self.savePageBoxImagePage(roi,self.page)
+        self.statusDrawingMode.setText("None")
+
+    def drawRbLineBox(self):    
+        if self.statusDrawingMode.text() == "Mouse":
+            x = self.x_rb_draw 
+            y = self.y_rb_draw
+            w = self.w_rb_draw
+            h = self.h_rb_draw
+            # Draw/Redraw red Linebox
+            cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+            #self.saveLineBoxImage()
+            self.showImage(self.boximgpath)
+            self.putRbLineBox()
+        
+        if self.rubberBand:
+            self.rubberBand.hide()
+            self.rubberBand = None
+
+    def getRbLineBox(self):
+        #self.rubberBand.hide()
+        self.run_event = True       
+        if self.statusDrawingMode.text() == "Mouse":
+            # At scale DrawLineBox QRect at LineBox Image offset from MainWindow origin(0,0)
+            DrawImg_xs = self.x_rb
+            DrawImg_ys = self.y_rb
+            #DrawImg_xs = self.x_rb
+            #DrawImg_ys = self.y_rb
+            DrawImg_ws = self.w_rb
+            DrawImg_hs = self.h_rb
+            DrawImg_sqrect = QRect(DrawImg_xs,DrawImg_ys,DrawImg_ws,DrawImg_hs)
+            print("Offset Scaled QRect = " + str(DrawImg_sqrect))
             
-                    img = cv2.imread(os.path.join(path_of_images, image))
+            # Up scale DrawLineBox QRect at LineBox Image previously offset from MainWindow origin(0,0)
+            self.x_rb_draw = int(round(DrawImg_xs / self.scale))
+            self.y_rb_draw = int(round(DrawImg_ys / self.scale))
+            self.w_rb_draw = int(round(DrawImg_ws / self.scale))
+            self.h_rb_draw = int(round(DrawImg_hs / self.scale))
+            DrawImg_uqrect = QRect(self.x_rb_draw,self.y_rb_draw,self.w_rb_draw,self.h_rb_draw)
+            print("Offset Upscaled QRect = " + str(DrawImg_uqrect))
 
-                    height, width = img.shape[:2]
-                    
-                    filestr = os.path.basename(os.path.join(path_of_images, image))
-                    
-                    filesplit = os.path.splitext(filestr)
-                    
-                    filename = filesplit[0]
-                    
-                    fileext = filesplit[1]
-                    
-                    namesplit = filename.split("_")
-                    
-                    versionref = namesplit[0]
-                    
-                    pagestr = namesplit[2]
-                    
-                    pagenum = int(pagestr)
-                    
-                    linestr = namesplit[3]
-                    #print(versionref,pagenum,linestr)
-                    
-                    linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
-                    #print("Last digits of "+filename+" are "+last_digits)
-                    
-                    if pagenum > newpagenum:
-                            
-                            newlinenum = 1
-                            
-                            newpagenum = pagenum
-                    
-                    print("pagenum: " + pagestr + "  newpagenum: " + str(newpagenum) + "  linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
-                            
-                    shutil.move(path_of_images + filestr, dest_of_groundtruth + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
-                    
-                    newlinenum += 1 
-                            #print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
+            print(f'x_rb_draw: {self.x_rb_draw} y_rb_draw: {self.y_rb_draw} w_rb_draw: {self.w_rb_draw} h_rb_draw: {self.h_rb_draw}')
+            self.drawRbLineBox()
     
+    # Spinbox(Sb) Drawing Methods
+    def putSbLineBox(self):
+        row = self.currentBoxTable.currentRow()
+        x = self.x_sb_draw
+        y = self.y_sb_draw
+        w = self.w_sb_draw
+        h = self.h_sb_draw
+        
+        # Update LineBoxText and LineBoxTable 
+   
+        if self.statusBoxType.text() == "Line":
+            self.line = int(self.currentBoxTable.item(self.row_selected,0).text())
+            print(f'Updating LineBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
+            self.update_LineBoxText(str(self.line),x,y,w,h)
+        elif self.statusBoxType.text() == "Page":
+            self.page = int(self.currentBoxTable.item(self.row_selected,0).text())
+            print(f'Updating PageBoxText JSON and CSV files for page:{str(self.page)} with str values: x:{x}, y:{y}, w:{w}, h:{h}')
+            self.update_PageBoxText(str(self.page),x,y,w,h)
+        #self.line = int(self.currentBoxTable.item(row,0).text())
+        #print(f'Updating LineBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
+        #self.update_LineBoxText(str(self.line),str(x),str(y),str(w),str(h))
+        self.BoxText2BoxTable()
+        self.drawLineBoxImage()
+        
+        if self.statusBoxType.text() == "Line":
+            self.saveLineBoxImage()
+        elif self.statusBoxType.text() == "Page":
+            self.savePageBoxImage()  
+
+        #self.saveLineBoxImage()
+        self.currentBoxTable.clearSelection()
+        #self.clearSpinBoxes()
+        # Save Line Image
+        roi = self.norm[y:y+h, x:x+w]
+        if self.statusBoxType.text() == "Line":
+            self.saveLineBoxImageLine(roi,self.line)
+        elif self.statusBoxType.text() == "Page":
+            self.savePageBoxImagePage(roi,self.page)
+        self.statusDrawingMode.setText("None")
+        self.currentBoxTable.setSortingEnabled(True)
+        self.statusDrawingMode.setText("None")
+
+    def completeSbLineBox(self):
+        popup = qtw.QMessageBox(self)
+        popup.setWindowModality(Qt.NonModal)
+        popup.setIcon(qtw.QMessageBox.Information)
+        popup.setWindowTitle("Edit Line Box")
+        popup.setText("Press OK to keep the edited Line Box")
+        popup.setStandardButtons(qtw.QMessageBox.Ok|qtw.QMessageBox.Cancel)
+        popup.exec()
+        if popup.clickedButton() == qtw.QMessageBox.Ok:
+            self.putSbLineBox()
+        #elif popup.clickedButton() == qtw.QMessageBox.Cancel:
+        else:
+            #self.clearSpinBoxes()           
+            self.BoxText2BoxTable()
+
+    def drawSbLineBox(self):        
+        x = int(self.x_sb_draw)
+        y = int(self.y_sb_draw)
+        w = int(self.w_sb_draw)
+        h = int(self.h_sb_draw)
+        print(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
+        self.ui.statusbar.showMessage(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
+        cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)        
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.currentBoxImage.setPixmap(self.pixmap)
+
+    def getSpinBoxes(self):
+        self.row_selected = self.currentBoxTable.currentRow()
+        row = self.row_selected
+        #self.col_selected = self.currentBoxTable.currentColumn() 
+        #print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
+        for column in range(1,5):
+            value = self.currentBoxTable.item(row,column).text()
+            spinbox = QSpinBox(self.currentBoxTable) #changed parent from None to self.currentBoxTable - could also be just self
+            #self.spinbox.setMaximum(6000)
+            aspect = round((self.currentBoxImage.width()/self.currentBoxImage.height()),2)
+            print(f'Aspect Ratio: {aspect}')
+            spinbox.setMaximum(self.currentBoxImage.width())
+            # setting step size to the reciprocal of the scale
+            stepsize = int((1/self.scale)/2)
+            # using scaled step size
+            #spinbox.setAccelerated(False)
+            spinbox.setSingleStep(stepsize)
+            #spinbox.setStepType(qtw.QAbstractSpinBox.DefaultStepType)
+            #spinbox.setStepType(qtw.QAbstractSpinBox.AdaptiveDecimalStepType)
+            #spinbox.setCorrectionMode(qtw.QAbstractSpinBox.CorrectToNearestValue)
+            
+            # getting font of the spin box
+            font = spinbox.font()
+            # setting point size
+            font.setPointSize(8)
+            # reassigning this font to the spin box
+            spinbox.setFont(font)
+        
+            spinbox.setFixedWidth(50)
+            spinbox.setValue(int(value))
+            self.currentBoxTable.setCellWidget(row,column,spinbox)
+            self.currentBoxTable.resizeRowToContents(row)
+            self.currentBoxTable.resizeColumnToContents(column)
+            spinbox.valueChanged.connect(self.on_boxValueChanged)        
+
+    '''def getSpinBox(self):
+        self.row_selected = self.currentBoxTable.currentRow()
+        self.col_selected = self.currentBoxTable.currentColumn() 
+        print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
+        self.spinbox = QSpinBox(self.currentBoxTable) #changed parent from None to self.currentBoxTable - could also be just self
+        #self.spinbox.setMaximum(6000)
+        self.spinbox.setMaximum(int(self.scale*self.ui.Image.height()))
+        self.spinbox.setValue(int(self.cellvalue))
+        self.currentBoxTable.setCellWidget(self.row_selected,self.col_selected,self.spinbox)
+        self.spinbox.valueChanged.connect(self.on_boxValueChanged)'''
+  
+    def getLineBoxImageLines(self):
+        rowcount = self.currentBoxTable.rowCount()
+        for row in range(rowcount):
+            line = self.currentBoxTable.item(row,0).text()
+            x = int(self.currentBoxTable.item(row,1).text())
+            y = int(self.currentBoxTable.item(row,2).text())
+            w = int(self.currentBoxTable.item(row,3).text())
+            h = int(self.currentBoxTable.item(row,4).text())
+            linex = x+w-80
+            liney = y+h-4
+            if self.ui.LineCheckBox.isChecked():
+                print(f'Placing line number at : {linex},{liney}')
+                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),3)
+            else:
+                print(f'Removing line number at : {linex},{liney}')
+                cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),3)
+        pil_img = Image.fromarray(self.norm)
+        qimage = ImageQt.ImageQt(pil_img)        
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+        self.currentBoxImage.setPixmap(self.pixmap)
+
+    def saveLineBoxImageLine(self,roi,bnum):
+        PILimage = Image.fromarray(roi)
+        thresh = 127
+        fn = lambda x : 255 if x > thresh else 0
+        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
+        tif_outfile = self.path_of_imgautosplit + self.imgfilename + "_Line" + str(bnum) + ".tif"
+        print("Generating: " + tif_outfile)
+        PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))    
+    
+    def saveLineBoxImage(self):
+        #self.imgboxfile = self.path_of_imglinebox + self.imgfilename + "_linebox" + self.imgfileext
+        #self.ui.statusbar.showMessage(f'Saving LineBox file: {self.imgboxfile}')
+        print(f'Saving LineBox file: {self.imgpath}')
+        cv2.imwrite(self.imgpath, self.norm)
+        self.boximgpath = self.imgpath
+        self.showImage(self.boximgpath)
+        if self.ui.LineCheckBox.isChecked():
+            self.getLineBoxImageLines() 
+
+    def drawLineBoxImage(self):
+        print(f'Drawing Linebox Image from LineBoxText: \n {self.txtpath}')
+        # Set initial box count
+        bnum = 1
+        with open(self.txtpath, "r") as txtboxfile:
+            reader = list(csv.reader(txtboxfile, delimiter = '\t'))
+            # Remove column header from list of rows
+            lineboxes = reader[1:]
+            self.rowCount = len(lineboxes)
+            for linebox in lineboxes:
+                # Extract x,y,w,h from each row
+                line = str(linebox[0])
+                x = int(linebox[1])
+                y = int(linebox[2])
+                w = int(linebox[3])
+                h = int(linebox[4])
+                roi = self.norm[y:y+h, x:x+w]
+                print(f'Placing line box at : {x},{y},{w},{h}')
+                #self.on_drawLineBox(x,y,w,h)
+                cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
+                if self.statusBoxType.text() == "Line":
+                    # Save Line Image
+                    self.saveLineBoxImageLine(roi,bnum)
+                elif self.statusBoxType.text() == "Page":
+                    # Save Page Image
+                    self.savePageBoxImagePage(roi,bnum)                   
+                bnum += 1
+        txtboxfile.close()
+ 
+###########    Line Box Text Methods    #############  
+    
+    def actionRenameGreek_text_lines_old(self):
+        print("renaming Greek textlines for ground truth")
+        # usage: tr.text2groundtruth(source, destination)
+        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
+        tr.text2groundtruth(r"Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/", "Model/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/greek_book_40_Matthew/")
+    
+    def actionSplit_Latin_Text_Lines(self):
+        print("splitting Latin textlines for ground truth")
+        # usage: tr.splittextlines(source, destination)
+        # tr.splittextlines(r"/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+        tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+
+    def actionRename_Latin_Text_Lines(self):
+        print("renaming Latin textlines for ground truth")
+        # usage: tr.text2groundtruth(source, destination)
+        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+        tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+     
     def splittextlines(self, source, destination):
                 dest_of_textlinefiles = destination
                 path_of_textfiles = source
@@ -4400,6 +4171,383 @@ class MainWindow(qtw.QMainWindow):
         
                     shutil.move(path_of_textfiles + filestr, dest_of_groundtruth + font_name + versionref + "_Page_" + pagestr + "_" + linestr + fileext)   
 
+    # Table Methods
+
+    def LineBoxTable2csv(self):
+        #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+        print(f'Path of linebox.txt: {self.txtpath}')
+        if os.path.exists(self.txtpath):
+            print(f'Removing: {self.txtpath}')
+            os.remove(self.txtpath)
+            self.currentTextTable.clear()
+        colCount = range(self.currentBoxTable.columnCount()- 6)
+        header = [self.currentBoxTable.horizontalHeaderItem(column).text() for column in colCount]
+        with open(self.txtpath, 'w') as csvfile:
+            #writer = csv.writer(csvfile, dialect='excel', lineterminator='\n')
+            writer = csv.writer(csvfile, dialect='excel', delimiter='\t', lineterminator='\n')
+            writer.writerow(header)
+            for row in range(self.currentBoxTable.rowCount()):
+                writer.writerow(self.currentBoxTable.item(row, column).text() for column in colCount)
+        self.getText(self.txtpath)
+
+    def update_LineBoxText(self,line,x,y,w,h):
+        print(f'From getRbLineBox method - Line: {line}  X: {x}  Y: {y}  W: {w} H: {h}')
+        self.jsonpath = self.path_of_jsonlinebox + self.imgfilename + "_linebox.json"
+        
+        jsonfilepath = self.jsonpath
+        #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
+        csvfilepath = self.txtpath
+        self.csv2json(csvfilepath,jsonfilepath)
+        with open(jsonfilepath, 'r') as f:
+            data = json.load(f)
+            # Iterating through the json
+            for Line in data:
+                print(f'Line from json file: {Line} -- line from putRbLineBox: {line} ')
+                if Line['Line'] == line:
+                    Line['X'] = x
+                    Line['Y'] = y
+                    Line['W'] = w
+                    Line['H'] = h
+                    print(f'Updating Line: {line} found in JSON file. Dimensions :  X: {x}  Y: {y}  W: {w}  H: {h}')
+                else:
+                    print(f'Line: {line} not found in JSON file.')
+            # Closing file
+            f.close()
+            os.remove(jsonfilepath)
+            with open(jsonfilepath, 'w') as f:
+                json.dump(data, f, indent=4)
+            f.close()
+        self.json2csv(csvfilepath,jsonfilepath)
+        self.showText(csvfilepath)
+
+    def showEditButtons(self):
+        if self.statusBoxMode.text() == 'Edit':
+            rowcount = self.currentBoxTable.rowCount()
+            selected_row = self.currentBoxTable.currentRow()
+            print(f'selected_row: {selected_row}')
+            colcount = self.currentBoxTable.columnCount()
+            self.currentBoxTable.horizontalHeader().resizeSection(0, 25)
+            insertAButton = qtw.QPushButton(self.currentBoxTable)
+            insertBButton = qtw.QPushButton(self.currentBoxTable)
+            deleteButton = qtw.QPushButton(self.currentBoxTable)
+            rDrawButton = qtw.QPushButton(self.currentBoxTable)
+            sDrawButton = qtw.QPushButton(self.currentBoxTable)
+            acceptButton = qtw.QPushButton(self.currentBoxTable)
+
+            for row in range(rowcount):
+                if row == selected_row:
+                    print(f'Row {row} matched!')
+                    for col in range(colcount):
+                        if col == 5:
+                            insertAButton.setEnabled(True)
+                            insertAButton.show()
+                            insertAIcon = qtg.QIcon()
+                            insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+                            insertAButton.setIcon(insertAIcon)
+                            insertAButton.setIconSize(QSize(12,12))
+                            self.currentBoxTable.setCellWidget(row,col,insertAButton)
+                            self.inslocation = "above"
+                            insertAButton.clicked.connect(self.on_insertRowAbove)
+                        elif col == 6:
+                            insertBButton.setEnabled(True)
+                            insertBButton.show()
+                            insertBIcon = qtg.QIcon()
+                            insertBIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+                            insertBButton.setIcon(insertBIcon)
+                            insertBButton.setIconSize(QSize(12,12))
+                            self.currentBoxTable.setCellWidget(row,col,insertBButton)
+                            self.inslocation = "below"
+                            insertBButton.clicked.connect(self.on_insertRowBelow)
+                        elif col == 7:
+                            deleteButton.setEnabled(True)
+                            deleteButton.show() 
+                            deleteIcon = qtg.QIcon()
+                            deleteIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/deleterow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+                            deleteButton.setIcon(deleteIcon)
+                            deleteButton.setIconSize(QSize(12,12))
+                            self.currentBoxTable.setCellWidget(row,col,deleteButton)
+                            deleteButton.clicked.connect(self.on_deleteRowSelection)                                 
+                        elif col == 8:
+                            rDrawButton.setEnabled(True)
+                            rDrawButton.show()
+                            rDrawIcon = qtg.QIcon()
+                            rDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/rubberband.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+                            rDrawButton.setIcon(rDrawIcon)
+                            rDrawButton.setIconSize(QSize(12,12))
+                            self.currentBoxTable.setCellWidget(row,col,rDrawButton)
+                            rDrawButton.clicked.connect(self.on_rDrawSelection)
+                        elif col == 9:
+                            sDrawButton.setEnabled(True)
+                            sDrawButton.show()
+                            sDrawIcon = qtg.QIcon()
+                            sDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/spinbox4.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+                            sDrawButton.setIcon(sDrawIcon)
+                            sDrawButton.setIconSize(QSize(16,16))
+                            self.currentBoxTable.setCellWidget(row,col,sDrawButton)
+                            sDrawButton.clicked.connect(self.on_sDrawSelection)
+                        elif col == 10:
+                            acceptButton.setEnabled(True)
+                            acceptButton.show()
+                            acceptButton = qtw.QPushButton(self.currentBoxTable)
+                            acceptIcon = qtg.QIcon()
+                            acceptIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/Valid.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+                            acceptButton.setIcon(acceptIcon)
+                            acceptButton.setIconSize(QSize(12,12))
+                            self.currentBoxTable.setCellWidget(row,col,acceptButton)
+                            acceptButton.clicked.connect(self.on_acceptLineBoxEdit)
+                        
+    def LineBoxText2LineBoxTable(self):
+        #self.currentBoxTable.clearContents()
+        boxes = []
+        reader = csv.reader(open(self.txtpath), delimiter = '\t')
+        
+        for row in reader:
+            boxes.append(row)
+        
+        if self.statusBoxMode.text() == "Make":
+            boxes = boxes[0:]
+        else:
+            boxes = boxes[1:]
+
+        rowCount = len(boxes)
+        self.currentBoxTable.setRowCount(rowCount)
+        colcount = self.currentBoxTable.columnCount()
+        print(f'LineBoxTable column count: {colcount}')              
+        self.currentBoxTable.setSortingEnabled(False)
+        #self.currentBoxTable.clearContents()
+        for row, boxes in enumerate(boxes):
+            for column, value in enumerate(boxes):
+                if column == 0:
+                    tableitem = qtw.QTableWidgetItem()
+                    tableitem.setFlags(qtc.Qt.ItemIsEditable)
+                    newItem = qtw.QTableWidgetItem(value)
+                    self.currentBoxTable.setItem(row, column, newItem)
+                elif column >= 1 and column <= 4:
+                    #print(f'Updating LineBoxTable column: {column}')
+                    newItem = qtw.QTableWidgetItem(value)
+                    
+                    #Scaled
+                    #newVal = int(newItem.text())
+                    #scaledVal = int(newVal * self.scale)
+                    #newItem.setText(str(scaledVal))
+                    
+                    #Not Scaled
+                    newVal = int(newItem.text())
+                    newItem.setText(str(newVal))
+                    self.currentBoxTable.setItem(row, column, newItem)
+        self.showEditButtons()
+        self.currentBoxTable.resizeColumnsToContents()
+        self.currentBoxTable.resizeRowsToContents()
+        self.currentBoxTable.setSortingEnabled(True)
+
+    def renumberRows(self):
+        print('Renumbering rows')
+        rowcount = self.currentBoxTable.rowCount()
+        colcount = self.currentBoxTable.columnCount() - 6
+        for row in range(rowcount):
+            item = self.currentBoxTable.item(row, 0)
+            if not item:
+                self.newrow = row
+                print(f'Inserted row number: {row}')
+                for column in range(colcount):
+                    itemwidget = qtw.QTableWidgetItem()
+                    self.currentBoxTable.setItem(row, column,itemwidget)
+                    item = self.currentBoxTable.item(row, column)
+                    if column == 0:
+                        item.setText(str(row+1))
+                    else:
+                        item.setText(str(0))
+            else:
+                item.setText(str(row+1))
+            self.currentBoxTable.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
+    
+    def openTableMenu(self,position):
+        tableMenu = QMenu()
+
+        undoAction = tableMenu.addAction("Undo")
+        iconUndo = qtg.QIcon()
+        iconUndo.addPixmap(qtg.QPixmap(":/Icons/Icons/Undo-icon.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        undoAction.setIcon(iconUndo)
+
+        redoAction = tableMenu.addAction("Redo")
+        iconRedo = qtg.QIcon()
+        iconRedo.addPixmap(qtg.QPixmap(":/Icons/Icons/Redo-icon.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        redoAction.setIcon(iconRedo)
+
+        insertAboveAction = tableMenu.addAction("Insert Row Above")
+        iconA = qtg.QIcon()
+        iconA.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        insertAboveAction.setIcon(iconA)
+
+        insertBelowAction = tableMenu.addAction("Insert Row Below")
+        iconB = qtg.QIcon()
+        iconB.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        insertBelowAction.setIcon(iconB)
+
+        deleteRowAction = tableMenu.addAction("Delete Current Row")
+        iconD = qtg.QIcon()
+        iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
+        deleteRowAction.setIcon(iconD)
+
+        action = tableMenu.exec_(self.currentBoxTable.mapToGlobal(position))
+        if action == undoAction:
+            qtw.QUndoStack.undo()
+        elif action == redoAction:
+            qtw.QUndoStack.redo()
+        elif action == insertAboveAction:
+            self.on_insertRowAbove()
+        elif action == insertBelowAction:
+            self.on_insertRowBelow()
+        elif action == deleteRowAction:
+            self.on_deleteRowSelection()
+
+    def setPrevLineBox(self):
+        self.currentBoxTable.setSortingEnabled(False)
+        self.row_selected = self.currentBoxTable.currentRow()
+        row = self.row_selected
+        #self.currentBoxTable.setCellWidget(self.row_selected,0,self.currentBoxTable)
+        self.line = int(self.currentBoxTable.item(self.row_selected,0).text())
+        # get dimensions of selected row/linebox
+        self.prevx = int(self.currentBoxTable.item(row,1).text())
+        self.prevy = int(self.currentBoxTable.item(row,2).text())
+        self.prevw = int(self.currentBoxTable.item(row,3).text())
+        self.prevh = int(self.currentBoxTable.item(row,4).text())
+     
+    def getPrevTextLineBox(self):
+        self.currentBoxTable.setSortingEnabled(False)
+        self.row_selected = self.currentBoxTable.currentRow()
+        self.line = int(self.currentBoxTable.item(self.row_selected,0).text())
+        # get dimensions of selected csv row/linebox
+        with open(self.txtpath,'r') as csvfile:
+            lines = csv.reader(csvfile, delimiter = '\t')
+            for csvline in lines:
+                if csvline[0] == str(self.line):
+                    self.prevx = int(csvline[1])
+                    self.prevy = int(csvline[2])
+                    self.prevw = int(csvline[3])
+                    self.prevh = int(csvline[4])
+
+    # Text Methods
+
+    def json2csv(self, csvFilePath, jsonFilePath):
+        if self.statusBoxType.text() == "Line":
+            columns = ['Line','X','Y','W','H']
+        elif self.statusBoxType.text() == "Page":
+            columns = ['Page','X','Y','W','H']
+        df = pd.read_json (jsonFilePath)
+        df = df[columns]
+        df.to_csv(csvFilePath, sep='\t', header=True, index=False, encoding='utf-8')
+    
+    def csv2json(self, csvFilePath, jsonFilePath):
+        jsonArray = []
+        #read csv file
+        with open(csvFilePath, encoding='utf-8') as csvf: 
+            #load csv file data using csv library's dictionary reader
+            csvReader = csv.DictReader(csvf, delimiter = '\t') 
+
+            #convert each csv dictionary row into json array
+            for row in csvReader: 
+                #add this python dict to json array
+                jsonArray.append(row)
+    
+        #write jsonArray to file
+        with open(jsonFilePath, 'w', encoding='utf-8') as jsonf: 
+            json.dump(jsonArray, jsonf, indent=4)
+ 
+    # Mouse Controllers
+    def mousePressEvent(self, event):
+        #if self.rubberBand:
+            # Limit scope of rubberband starting position
+        if self.ui.ImageLe.displayText() != "":
+            self.run_event = True
+            x_min = int(self.img_xoffset) - 1
+            #print(f'xmin: {x_min}')
+            x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
+            #print(f'xmax: {x_max}')
+            y_min = int(self.img_yoffset) - 1
+            #print(f'ymin: {y_min}')
+            y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
+            #print(f'ymax: {y_max}')
+        else:
+            self.run_event = False
+            print('You cannot draw without a loaded image') 
+        if self.statusBoxMode.text() == "Edit":
+            if self.statusDrawingMode.text() == "Mouse":
+                self.event_x = event.pos().x()
+                self.event_y = event.pos().y()
+                self.start_pos = QPoint(self.event_x, self.event_y)
+                print(f'Mouse clicked at start position: {self.start_pos}')
+                if self.ui.ImageLe.displayText() != "":
+                    self.run_event = True
+                if event.button() == Qt.LeftButton and self.run_event == True:
+                    self.rubberBand.setGeometry(QRect(self.start_pos, QSize()).normalized())
+                    self.rubberBand.show()
+                '''# Limit scope of rubberband starting position
+                if self.ui.ImageLe.displayText() != "":
+                    self.run_event = True
+                    x_min = int(self.img_xoffset) - 1
+                    #print(f'xmin: {x_min}')
+                    x_max = (int(self.img_xoffset) + self.scaled_pixmap.width()) + 1
+                    #print(f'xmax: {x_max}')
+                    y_min = int(self.img_yoffset) - 1
+                    #print(f'ymin: {y_min}')
+                    y_max = (int(self.img_yoffset) + self.scaled_pixmap.height()) + 1
+                    #print(f'ymax: {y_max}')
+                else:
+                    self.run_event = False
+                    print('You cannot draw without a loaded image')'''
+                
+                '''if event.button() == Qt.LeftButton and self.run_event == True:          
+                    if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
+                        #if self.rubberBand.w() != 0 and self.rubberBand.h() != 0:
+                        #self.rubberBand = ResizableRubberBand(self)
+                        self.run_event = True
+                        self.rubberBand.setGeometry(QRect(self.start_pos, QSize()).normalized())
+                        self.rubberBand.show()
+                    else:
+                        self.run_event = False
+                        print('You cannot draw outside the current image borders')'''
+                
+            else:
+                # If in Edit mode, select Row from LineBox Image
+                self.run_event = False
+                if event.button() == Qt.LeftButton:
+                    event_x = event.pos().x()
+                    grid_x = event_x - int(self.img_xoffset)
+                    event_y = event.pos().y()
+                    grid_y = event_y - int(self.img_yoffset)
+                    scaled_x = int(round(grid_x / self.scale))
+                    scaled_y = int(round(grid_y / self.scale))
+                    if event_x >= x_min and event_x <= x_max and event_y >= y_min and event_y <= y_max:
+                        rowcount = self.currentBoxTable.rowCount()
+                        for row in range(rowcount):
+                            y = int(self.currentBoxTable.item(row,2).text())
+                            h = int(self.currentBoxTable.item(row,4).text())
+                            y_h = y + h
+                            if y <= scaled_y and scaled_y <= y_h:
+                                self.currentBoxTable.selectRow(row)
+
+    def mouseMoveEvent(self, event):
+        if self.statusBoxMode.text() == "Edit" and self.run_event: 
+            self.end_pos = event.pos()
+            self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
+            row = self.currentBoxTable.currentRow()
+            geo = self.rubberBand.geometry()
+            #while self.run_event:
+            self.x_rb = self.rubberBand.x() - int(self.img_xoffset)
+            self.y_rb = self.rubberBand.y() - int(self.img_yoffset)
+            self.w_rb = self.rubberBand.width()
+            self.h_rb = self.rubberBand.height()
+            self.currentBoxTable.item(row,1).setText(str(int(round(self.x_rb/self.scale))))
+            self.currentBoxTable.item(row,2).setText(str(int(round(self.y_rb/self.scale))))
+            self.currentBoxTable.item(row,3).setText(str(int(round(self.w_rb/self.scale))))
+            self.currentBoxTable.item(row,4).setText(str(int(round(self.h_rb/self.scale))))
+            self.ui.statusbar.showMessage(f'x:{self.x_rb} y:{self.y_rb} w:{self.w_rb} h:{self.h_rb}')
+    
+    #def mouseReleaseEvent(self, event):
+        
+    # Utility Methods
+
     # Style Sheets
     def darkOrange(self):
         app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_orange.qss').read_text())
@@ -4413,6 +4561,7 @@ class MainWindow(qtw.QMainWindow):
     def standardUI(self):
         app.setStyleSheet("")
 
+###########    Other Classes and Subclasses    ############
 class ResizableRubberBand(QWidget):
     """Wrapper to make QRubberBand mouse-resizable using QSizeGrip
 
@@ -4448,7 +4597,7 @@ class ResizableRubberBand(QWidget):
         self.parent().ui.statusbar.showMessage(f'Resizing to x:{self.parent().x_rb} y:{self.parent().y_rb} w:{self.parent().w_rb} h:{self.parent().h_rb}')
         #super(ResizableRubberBand, self).resizeEvent(event)
 
-# Only run this code if I am actually running this script
+########### Only run this code if actually running this application
 if __name__ == '__main__': 
     app = qtw.QApplication(sys.argv)
     w = MainWindow()

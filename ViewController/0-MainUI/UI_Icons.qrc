@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/BiblionServer.png</file>
     <file>Icons/BiblionLexer.png</file>
     <file>Icons/BiblionProfile.png</file>
     <file>Icons/decrease_blue.png</file>

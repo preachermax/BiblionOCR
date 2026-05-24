@@ -1160,7 +1160,7 @@
      <rect>
       <x>730</x>
       <y>33</y>
-      <width>620</width>
+      <width>621</width>
       <height>830</height>
      </rect>
     </property>
@@ -1176,7 +1176,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1190,6 +1190,48 @@
     <property name="tabBarAutoHide">
      <bool>true</bool>
     </property>
+    <widget class="QWidget" name="LineText">
+     <attribute name="title">
+      <string>Line Text Table</string>
+     </attribute>
+     <widget class="QTextEdit" name="LineBoxText">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>580</width>
+        <height>826</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="LineTable">
      <attribute name="title">
       <string>Line Box Table</string>
@@ -1410,17 +1452,17 @@
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="LineText">
+    <widget class="QWidget" name="PageText">
      <attribute name="title">
-      <string>Line Box Text</string>
+      <string>Page Box Text</string>
      </attribute>
-     <widget class="QTextEdit" name="LineBoxText">
+     <widget class="QTextEdit" name="PageBoxText">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
         <width>580</width>
-        <height>826</height>
+        <height>825</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -1672,90 +1714,6 @@
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="PageText">
-     <attribute name="title">
-      <string>Page Box Text</string>
-     </attribute>
-     <widget class="QTextEdit" name="PageBoxText">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>593</width>
-        <height>825</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>FROMVS</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
-      </property>
-      <property name="lineWrapMode">
-       <enum>QTextEdit::NoWrap</enum>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="SourceText">
-     <attribute name="title">
-      <string>Source Text</string>
-     </attribute>
-     <widget class="QTextEdit" name="SourcePageText">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>593</width>
-        <height>825</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>FROMVS</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
-      </property>
-      <property name="lineWrapMode">
-       <enum>QTextEdit::NoWrap</enum>
-      </property>
-     </widget>
-    </widget>
    </widget>
    <widget class="QCheckBox" name="LineCheckBox">
     <property name="enabled">
@@ -1796,13 +1754,13 @@
      <enum>QTabWidget::West</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="LineBoxPage">
      <attribute name="title">
       <string>Line Box</string>
      </attribute>
-     <widget class="QScrollArea" name="LineImagescrollArea">
+     <widget class="QScrollArea" name="LineBoxscrollArea">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -1832,7 +1790,7 @@
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
-      <widget class="QWidget" name="LineImagescrollAreaWidgetContents_3">
+      <widget class="QWidget" name="LineBoxscrollAreaWidgetContents">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -1868,7 +1826,7 @@
        <property name="mouseTracking">
         <bool>false</bool>
        </property>
-       <widget class="QLabel" name="LineImage">
+       <widget class="QLabel" name="LineBoxImage">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -1914,9 +1872,9 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="PageBoxPage">
+    <widget class="QWidget" name="PageImagePage">
      <attribute name="title">
-      <string>Page Box</string>
+      <string>Page Image</string>
      </attribute>
      <widget class="QScrollArea" name="PageImagescrollArea">
       <property name="geometry">
@@ -1948,7 +1906,7 @@
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
-      <widget class="QWidget" name="PageImagescrollAreaWidgetContents_2">
+      <widget class="QWidget" name="PageImagescrollAreaWidgetContents">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2030,17 +1988,17 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="SourceImagePage">
+    <widget class="QWidget" name="PageBoxPage">
      <attribute name="title">
-      <string>Source Image</string>
+      <string>Page Box</string>
      </attribute>
-     <widget class="QScrollArea" name="ImagescrollArea">
+     <widget class="QScrollArea" name="PageBoxscrollArea">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
         <width>544</width>
-        <height>828</height>
+        <height>831</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -2064,7 +2022,7 @@
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
-      <widget class="QWidget" name="ImagescrollAreaWidgetContents">
+      <widget class="QWidget" name="PageBoxscrollAreaWidgetContents">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2100,7 +2058,7 @@
        <property name="mouseTracking">
         <bool>false</bool>
        </property>
-       <widget class="QLabel" name="Image">
+       <widget class="QLabel" name="PageBoxImage">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -2126,6 +2084,125 @@
           <width>520</width>
           <height>700</height>
          </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="SourceImagePage">
+     <attribute name="title">
+      <string>Source Image</string>
+     </attribute>
+     <widget class="QScrollArea" name="SourceImagescrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>544</width>
+        <height>828</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="SourceImagescrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="SourceImage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -2778,6 +2855,7 @@
     <addaction name="actionProject_Explorer"/>
     <addaction name="actionSource_Image"/>
     <addaction name="menuSelect_Language"/>
+    <addaction name="actionPage_Image"/>
     <addaction name="menuOpen_Box_Image"/>
     <addaction name="menuOpen_Box_File"/>
     <addaction name="menuSave_Box_Image"/>
@@ -2807,8 +2885,8 @@
      <property name="title">
       <string>Edit PageBox</string>
      </property>
-     <addaction name="actionAdjust_Page_Boxes"/>
-     <addaction name="actionEdit_Latin_Page"/>
+     <addaction name="actionEdit_Greek_PageBox"/>
+     <addaction name="actionEdit_Latin_PageBox"/>
      <addaction name="actionDeskew_Greek_tiff"/>
      <addaction name="actionDeskew_Latin"/>
     </widget>
@@ -2851,11 +2929,6 @@
     <addaction name="action_Grounder"/>
     <addaction name="action_Glypher"/>
     <addaction name="action_Lexer"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuSplit">
     <property name="title">
@@ -2930,7 +3003,6 @@
    <addaction name="menuStage"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="sizePolicy">
@@ -3038,6 +3110,8 @@
    </attribute>
    <addaction name="actionDeskewPage"/>
    <addaction name="actionManually_Crop_Page"/>
+   <addaction name="actionEdit_Greek_PageBox"/>
+   <addaction name="actionEdit_Latin_PageBox"/>
   </widget>
   <widget class="QToolBar" name="GreekEditBoxesToolBar">
    <property name="windowTitle">
@@ -4728,7 +4802,11 @@
     <string>Maually Crop Language Page</string>
    </property>
   </action>
-  <action name="actionAdjust_Page_Boxes">
+  <action name="actionEdit_Greek_PageBox">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
+   </property>
    <property name="text">
     <string>Edit Greek Page Box</string>
    </property>
@@ -4794,7 +4872,11 @@
     <string>Βιβλιον Lexer</string>
    </property>
   </action>
-  <action name="actionEdit_Latin_Page">
+  <action name="actionEdit_Latin_PageBox">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
+   </property>
    <property name="text">
     <string>Edit Latin Page Box</string>
    </property>
@@ -4815,6 +4897,15 @@
    </property>
    <property name="text">
     <string>Rotate</string>
+   </property>
+  </action>
+  <action name="actionPage_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Page Image</string>
    </property>
   </action>
  </widget>

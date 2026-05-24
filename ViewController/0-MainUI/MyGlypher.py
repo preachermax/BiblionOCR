@@ -4,6 +4,8 @@ import json
 import os
 import re
 from pathlib import Path
+from HelpSystem import add_help_menu
+from SessionManager import SessionManager
 
 #import glob
 import shutil
@@ -99,7 +101,8 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
-
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyGlypher')
         self.ui.GlyphImgTab.currentChanged.connect(self.on_tabChanged)
         
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
@@ -286,292 +289,141 @@ class MainWindow(qtw.QMainWindow):
 
 
     def get_session_settings(self):
-        # get session settings        
-        # Define json data        
         print("loading session")
-        with open(self.projecthome + 'Model/Project/Data/json/GlypherSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            jsondir_key = r"self.jsondir"
-            session_key = r"self.session"
-            workflow_key = r"self.workflow"
-            booksmarkdown_key = r"self.booksmarkdown"
-            booksabbr_key = r"self.booksabbr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            ocrlang_key = r"self.ocrlang"
-            ocrmodel_key = r"self.ocrmodel"
-            bookabbr_key = r"self.bookabbr"
-            chapter_key = r"self.chapter"
-            verse_key = r"self.verse"
-            word_key = r"self.word"
-            chr_key = r"self.chr"
+        session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('GlypherSession.json')
 
-            glyphboxgreekimgdir_key = r"self.glyphboxgreekimgdir"
-            glyphboxgreekimgpath_key = r"self.glyphboxgreekimgpath"
-            glyphboxlatinimgdir_key = r"self.glyphboxlatinimgdir"
-            glyphboxlatinimgpath_key = r"self.glyphboxlatinimgpath"
-            glyphboximgfileList_key = r"self.glyphboximgfileList"
-            glyphboxgreektxtpath_key = r"self.glyphboxgreektxtpath"
-            glyphboxgreektxtdir_key = r"self.glyphboxgreektxtdir"
-            glyphboxgreekjsondir_key = r"self.glyphboxgreekjsondir"
-            glyphboxlatintxtpath_key = r"self.glyphboxlatintxtpath"
-            glyphboxlatintxtdir_key = r"self.glyphboxlatintxtdir"
-            glyphboxlatinjsondir_key = r"self.glyphboxlatinjsondir"
-            glyphboxtxtfileList_key = r"self.glyphboxtxtfileList"
-            glyphboxzoom_key = r"self.glyphboxzoom"
-            glyphboxzoomslidervalue_key = r"self.glyphboxzoomslidervalue"
-            
-            glyphtifsourcedir_key = r"self.glyphtifsourcedir"
-            glyphtifgreekdir_key = r"self.glyphtifgreekdir"
-            glyphtiflatindir_key = r"self.glyphtiflatindir"
-            glyphbmpsourcedir_key = r"self.glyphbmpsourcedir"
-            glyphbmpgreekdir_key = r"self.glyphbmpgreekdir"
-            glyphbmplatindir_key = r"self.glyphbmplatindir"
-            glyphbmp_key = r"self.glyphbmp"
-            glyphmapgreekdir_key = r"self.glyphmapgreekdir"
-            glyphmaplatindir_key = r"self.glyphmaplatindir"
-            glyphcode_key = r"self.glyphcode"
-            glyphsfddir_key = r"self.glyphsfddir"
-            glyphgreeksfddir_key = r"self.glyphgreeksfddir"
-            glyphlatinsfddir_key = r"self.sourceimgdir"
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
 
+        self.jsondir = get_setting('jsondir', '')
+        self.session = get_setting('session', '')
+        self.workflow = get_setting('workflow', '')
+        self.booksmarkdown = get_setting('booksmarkdown', '')
+        self.booksabbr = get_setting('booksabbr', '')
+        self.font = get_setting('font', '')
+        self.fontsize = get_setting('fontsize', '20')
+        self.ocrlang = get_setting('ocrlang', '')
+        self.ocrmodel = get_setting('ocrmodel', '')
+        self.bookabbr = get_setting('bookabbr', '')
+        self.chapter = get_setting('chapter', '1')
+        self.verse = get_setting('verse', '1')
+        self.word = get_setting('word', '1')
+        self.chr = get_setting('chr', '1')
+        self.glyphboxgreekimgdir = get_setting('glyphboxgreekimgdir', '')
+        self.glyphboxgreekimgpath = get_setting('glyphboxgreekimgpath', '')
+        self.glyphboxlatinimgdir = get_setting('glyphboxlatinimgdir', '')
+        self.glyphboxlatinimgpath = get_setting('glyphboxlatinimgpath', '')
+        self.glyphboximgfileList = get_setting('glyphboximgfileList', [])
+        self.glyphboxgreektxtpath = get_setting('glyphboxgreektxtpath', '')
+        self.glyphboxgreektxtdir = get_setting('glyphboxgreektxtdir', '')
+        self.glyphboxgreekjsondir = get_setting('glyphboxgreekjsondir', '')
+        self.glyphboxlatintxtpath = get_setting('glyphboxlatintxtpath', '')
+        self.glyphboxlatintxtdir = get_setting('glyphboxlatintxtdir', '')
+        self.glyphboxlatinjsondir = get_setting('glyphboxlatinjsondir', '')
+        self.glyphboxtxtfileList = get_setting('glyphboxtxtfileList', [])
+        self.glyphboxzoom = get_setting('glyphboxzoom', '')
+        self.glyphboxzoomslidervalue = get_setting('glyphboxzoomslidervalue', '')
+        self.glyphtifsourcedir = get_setting('glyphtifsourcedir', '')
+        self.glyphtifgreekdir = get_setting('glyphtifgreekdir', '')
+        self.glyphtiflatindir = get_setting('glyphtiflatindir', '')
+        self.glyphbmpsourcedir = get_setting('glyphbmpsourcedir', '')
+        self.glyphbmpgreekdir = get_setting('glyphbmpgreekdir', '')
+        self.glyphbmplatindir = get_setting('glyphbmplatindir', '')
+        self.glyphbmp = get_setting('glyphbmp', '')
+        self.glyphmapgreekdir = get_setting('glyphmapgreekdir', '')
+        self.glyphmaplatindir = get_setting('glyphmaplatindir', '')
+        self.glyphcode = get_setting('glyphcode', '')
+        self.glyphsfddir = get_setting('glyphsfddir', '')
+        self.glyphgreeksfddir = get_setting('glyphgreeksfddir', '')
+        self.glyphlatinsfddir = get_setting('glyphlatinsfddir', '')
+        self.sourceimgdir = get_setting('sourceimgdir', '')
+        self.sourceimgpath = get_setting('sourceimgpath', '')
+        self.glyphname = get_setting('glyphname', '')
+        self.glyphencode = get_setting('glyphencode', '')
+        self.charimgdir = get_setting('charimgdir', '')
+        self.charimgpath = get_setting('charimgpath', '')
+        self.charimgfileList = get_setting('charimgfileList', [])
+        self.charmappath = get_setting('charmappath', '')
+        self.linespacing = get_setting('linespacing', '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.firstpage = get_setting('firstpage', '1')
+        self.lastpage = get_setting('lastpage', '1')
+        self.deltapages = get_setting('deltapages', '1')
+        self.imgpath = get_setting('imgpath', '')
+        self.imgdir = get_setting('imgdir', '')
+        self.imgfileList = get_setting('imgfileList', [])
+        self.pixmap = get_setting('pixmap', None)
+        self.qimage = get_setting('qimage', None)
+        self.zoom = get_setting('zoom', '')
+        self.zoomslidervalue = get_setting('zoomslidervalue', '')
+        self.img_xoffset = get_setting('img_xoffset', 0)
+        self.img_yoffset = get_setting('img_yoffset', 0)
+        self.txtpath = get_setting('txtpath', '')
+        self.txtgreeklinebox = get_setting('txtgreeklinebox', '')
+        self.jsongreeklinebox = get_setting('jsongreeklinebox', '')
+        self.txtlatinlinebox = get_setting('txtlatinlinebox', '')
+        self.txtdir = get_setting('txtdir', '')
+        self.txtfileList = get_setting('txtfileList', [])
+        self.greekpages = get_setting('greekpages', '')
+        self.greeklinesbox = get_setting('greeklinesbox', '')
+        self.latinpages = get_setting('latinpages', '')
+        self.latinlinesbox = get_setting('latinlinesbox', '')
 
-            glyphname_key = r"self.glyphname"
-            glyphencode_key = r"self.glyphencode"
-            charimgdir_key = r"self.charimgdir"
-            charimgpath_key = r"self.charimgpath"
-            charimgfileList_key = r"self.charimgfileList"
-            charmappath_key = r"self.charmappath"
-            
-            sourceimgdir_key = r"self.sourceimgdir"
-            sourceimgpath_key = r"self.sourceimgpath"
+        def _join_project_path(value: str) -> str:
+            if not value:
+                return ''
+            return os.path.join(self.projecthome, value.lstrip('/\\'))
 
-            linespacing_key = r"self.linespacing"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            
-            firstpage_key = r"self.firstpage"
-            lastpage_key = r"self.lastpage"            
-            deltapages_key = r"self.deltapages"
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            imgfileList_key = r"self.imgfileList"
-            pixmap_key = r"self.pixmap"
-            qimage_key = r"self.qimage"
-            zoom_key = r"self.zoom"
-            zoomslidervalue_key = r"self.zoomslidervalue"
-            img_xoffset_key = r"self.img_xoffset"
-            img_yoffset_key = r"self.img_yoffset"
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            txtfileList_key = r"self.txtfileList"
-            txtgreeklinebox_key = r"self.txtgreeklinebox"
-            jsongreeklinebox_key = r"self.jsongreeklinebox"
-            txtlatinlinebox_key = r"self.txtlatinlinebox"
-            greekpages_key = r"self.greekpages"
-            greeklinesbox_key = r"self.greeklinesbox"
-            latinpages_key = r"self.latinpages"
-            latinlinesbox_key = r"self.latinlinesbox"
+        def _join_json_path(value: str) -> str:
+            if not value:
+                return ''
+            return os.path.join(self.projecthome, self.jsondir.lstrip('/\\'), value.lstrip('/\\'))
 
+        self.session = _join_json_path(self.session)
+        self.workflow = _join_json_path(self.workflow)
+        self.booksmarkdown = _join_json_path(self.booksmarkdown)
+        self.booksabbr = _join_json_path(self.booksabbr)
+        self.glyphboxgreekimgdir = _join_project_path(self.glyphboxgreekimgdir)
+        self.glyphboxgreekimgpath = _join_project_path(self.glyphboxgreekimgpath)
+        self.glyphboxlatinimgdir = _join_project_path(self.glyphboxlatinimgdir)
+        self.glyphboxlatinimgpath = _join_project_path(self.glyphboxlatinimgpath)
+        self.glyphboxgreektxtpath = _join_project_path(self.glyphboxgreektxtpath)
+        self.glyphboxgreektxtdir = _join_project_path(self.glyphboxgreektxtdir)
+        self.glyphboxgreekjsondir = _join_project_path(self.glyphboxgreekjsondir)
+        self.glyphboxlatintxtpath = _join_project_path(self.glyphboxlatintxtpath)
+        self.glyphboxlatintxtdir = _join_project_path(self.glyphboxlatintxtdir)
+        self.glyphboxlatinjsondir = _join_project_path(self.glyphboxlatinjsondir)
+        self.glyphtifgreekdir = _join_project_path(self.glyphtifgreekdir)
+        self.glyphtiflatindir = _join_project_path(self.glyphtiflatindir)
+        self.glyphbmpsourcedir = _join_project_path(self.glyphbmpsourcedir)
+        self.glyphbmpgreekdir = _join_project_path(self.glyphbmpgreekdir)
+        self.glyphbmplatindir = _join_project_path(self.glyphbmplatindir)
+        self.glyphmapgreekdir = _join_project_path(self.glyphmapgreekdir)
+        self.glyphmaplatindir = _join_project_path(self.glyphmaplatindir)
+        self.glyphsfddir = _join_project_path(self.glyphsfddir)
+        self.glyphgreeksfddir = _join_project_path(self.glyphgreeksfddir)
+        self.glyphlatinsfddir = _join_project_path(self.glyphlatinsfddir)
+        self.sourceimgdir = _join_project_path(self.sourceimgdir)
+        self.sourceimgpath = _join_project_path(self.sourceimgpath)
+        self.charimgdir = _join_project_path(self.charimgdir)
+        self.charimgpath = _join_project_path(self.charimgpath)
+        self.charmappath = _join_project_path(self.charmappath)
 
-            print(bookabbr_key,chapter_key)
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == jsondir_key:
-                    self.jsondir = Setting['CurrentValue']
-                elif Setting['Setting'] == session_key:
-                    self.session = Setting['CurrentValue']
-                    self.session = self.projecthome + self.jsondir + "/" + self.session
-                elif Setting['Setting'] == workflow_key: 
-                    self.workflow = Setting['CurrentValue']
-                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
-                elif Setting['Setting'] == booksmarkdown_key:
-                    self.booksmarkdown = Setting['CurrentValue']
-                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
-                elif Setting['Setting'] == booksabbr_key:
-                    self.booksabbr = Setting['CurrentValue']
-                    self.booksabbr = self.projecthome + self.jsondir + "/" + self.booksabbr
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                    self.ui.fontComboBox.setCurrentText(self.font)
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']
-                    self.ui.fontSizeBox.setValue(int(self.fontsize))
-                elif Setting['Setting'] == ocrlang_key:
-                    self.ocrlang = Setting['CurrentValue']
-                    self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-                elif Setting['Setting'] == ocrmodel_key:
-                    self.ocrmodel = Setting['CurrentValue']
-                    self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                    self.ui.bookComboBox.setCurrentText(self.bookabbr)            
-                elif Setting['Setting'] == chapter_key:  
-                    self.chapter = Setting['CurrentValue']          
-                elif Setting['Setting'] == verse_key:
-                    self.verse = Setting['CurrentValue']
-                elif Setting['Setting'] == word_key:
-                    self.word = Setting['CurrentValue'] 
-                elif Setting['Setting'] == chr_key:
-                    self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphboxgreekimgdir_key:
-                    self.glyphboxgreekimgdir = Setting['CurrentValue']
-                    self.glyphboxgreekimgdir = self.projecthome + self.glyphboxgreekimgdir
-                elif Setting['Setting'] == glyphboxgreekimgpath_key:
-                    self.glyphboxgreekimgpath = Setting['CurrentValue']
-                    self.glyphboxgreekimgpath = self.projecthome + self.glyphboxgreekimgpath
-                elif Setting['Setting'] == glyphboxlatinimgdir_key:
-                    self.glyphboxlatinimgdir = Setting['CurrentValue']
-                    self.glyphboxlatinimgdir = self.projecthome + self.glyphboxlatinimgdir
-                elif Setting['Setting'] == glyphboxlatinimgpath_key:
-                    self.glyphboxlatinimgpath = Setting['CurrentValue']
-                    self.glyphboxlatinimgpath = self.projecthome + self.glyphboxlatinimgpath
-                elif Setting['Setting'] == glyphboximgfileList_key:
-                    self.glyphboximgfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphboxgreektxtpath_key:
-                    self.glyphboxgreektxtpath = Setting['CurrentValue']
-                    self.glyphboxgreektxtpath = self.projecthome + self.glyphboxgreektxtpath
-                elif Setting['Setting'] == glyphboxgreektxtdir_key:
-                    self.glyphboxgreektxtdir = Setting['CurrentValue']
-                    self.glyphboxgreektxtdir = self.projecthome + self.glyphboxgreektxtdir
-                elif Setting['Setting'] == glyphboxgreekjsondir_key:
-                    self.glyphboxgreekjsondir = Setting['CurrentValue']
-                    self.glyphboxgreekjsondir = self.projecthome + self.glyphboxgreekjsondir
-                elif Setting['Setting'] == glyphboxlatintxtpath_key:
-                    self.glyphboxlatintxtpath = Setting['CurrentValue']
-                    self.glyphboxlatintxtpath = self.projecthome + self.glyphboxlatintxtpath
-                elif Setting['Setting'] == glyphboxlatintxtdir_key:
-                    self.glyphboxlatintxtdir = Setting['CurrentValue']
-                    self.glyphboxlatintxtdir = self.projecthome + self.glyphboxlatintxtdir
-                elif Setting['Setting'] == glyphboxlatinjsondir_key:
-                    self.glyphboxlatinjsondir = Setting['CurrentValue']
-                    self.glyphboxlatinjsondir = self.projecthome + self.glyphboxlatinjsondir
-                elif Setting['Setting'] == glyphboxtxtfileList_key:
-                    self.glyphboxtxtfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphboxzoom_key:
-                    self.glyphboxzoom = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphboxzoomslidervalue_key:
-                    self.glyphboxzoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphtifsourcedir_key:
-                    self.glyphtifsourcedir = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphtifgreekdir_key:
-                    self.glyphtifgreekdir = Setting['CurrentValue']
-                    self.glyphtifgreekdir = self.projecthome + self.glyphtifgreekdir
-                elif Setting['Setting'] == glyphtiflatindir_key:
-                    self.glyphtiflatindir = Setting['CurrentValue']
-                    self.glyphtiflatindir = self.projecthome + self.glyphtiflatindir
-                elif Setting['Setting'] == glyphbmpsourcedir_key:
-                    self.glyphbmpsourcedir = Setting['CurrentValue']
-                    self.glyphbmpsourcedir = self.projecthome + self.glyphbmpsourcedir
-                elif Setting['Setting'] == glyphbmpgreekdir_key:
-                    self.glyphbmpgreekdir = Setting['CurrentValue']
-                    self.glyphbmpgreekdir = self.projecthome + self.glyphbmpgreekdir
-                elif Setting['Setting'] == glyphbmplatindir_key:
-                    self.glyphbmplatindir = Setting['CurrentValue']
-                    self.glyphbmplatindir = self.projecthome + self.glyphbmplatindir
-                elif Setting['Setting'] == glyphbmp_key:
-                    self.glyphbmp = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphmapgreekdir_key:
-                    self.glyphmapgreekdir = Setting['CurrentValue']
-                    self.glyphmapgreekdir = self.projecthome + self.glyphmapgreekdir
-                elif Setting['Setting'] == glyphmaplatindir_key:
-                    self.glyphmaplatindir = Setting['CurrentValue']
-                    self.glyphmaplatindir = self.projecthome + self.glyphmaplatindir
-                elif Setting['Setting'] == glyphcode_key:
-                    self.glyphcode = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphsfddir_key:
-                    self.glyphsfddir = Setting['CurrentValue']
-                    self.glyphsfddir = self.projecthome + self.glyphsfddir
-                elif Setting['Setting'] == glyphgreeksfddir_key:
-                    self.glyphgreeksfddir = Setting['CurrentValue']
-                    self.glyphgreeksfddir = self.projecthome + self.glyphgreeksfddir
-                elif Setting['Setting'] == glyphlatinsfddir_key:
-                    self.glyphlatinsfddir = Setting['CurrentValue']
-                    self.glyphlatinsfddir = self.projecthome + self.glyphlatinsfddir
-                elif Setting['Setting'] == sourceimgdir_key:
-                    self.sourceimgdir = Setting['CurrentValue']
-                    self.sourceimgdir = self.projecthome + self.sourceimgdir
-                elif Setting['Setting'] == sourceimgpath_key:
-                    self.sourceimgpath = Setting['CurrentValue']
-                    self.sourceimgpath = self.projecthome + self.sourceimgpath
-                elif Setting['Setting'] == glyphname_key:
-                    self.glyphname = Setting['CurrentValue']
-                elif Setting['Setting'] == glyphencode_key:
-                    self.glyphencode = Setting['CurrentValue']
-                elif Setting['Setting'] == charimgdir_key:
-                    self.charimgdir = Setting['CurrentValue']
-                    self.charimgdir = self.projecthome + self.charimgdir
-                elif Setting['Setting'] == charimgpath_key:
-                    self.charimgpath = Setting['CurrentValue']
-                    self.charimgpath = self.projecthome + self.charimgpath
-                elif Setting['Setting'] == charimgfileList_key:
-                    self.charimgfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == charmappath_key:
-                    self.charmappath = Setting['CurrentValue']
-                    self.charmappath = self.projecthome + self.charmappath
-                elif Setting['Setting'] == linespacing_key:
-                    self.linespacing = Setting['CurrentValue']
-                    self.ui.LHlineEdit.setText(self.linespacing)
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == firstpage_key:  
-                    self.firstpage = Setting['CurrentValue']
-                elif Setting['Setting'] == lastpage_key:  
-                    self.lastpage = Setting['CurrentValue']
-                elif Setting['Setting'] == deltapages_key:
-                    self.deltapages = Setting['CurrentValue']
-                elif Setting['Setting'] == imgpath_key:
-                    self.imgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == imgdir_key:  
-                    self.imgdir = Setting['CurrentValue']
-                elif Setting['Setting'] == imgfileList_key:  
-                    self.imgfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixmap_key:  
-                    self.pixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == qimage_key:  
-                    self.qimage = Setting['CurrentValue']
-                elif Setting['Setting'] == zoom_key:  
-                    self.zoom = Setting['CurrentValue']
-                    self.ui.ZoomComboBox.setCurrentText(self.zoom)
-                elif Setting['Setting'] == zoomslidervalue_key:
-                    self.zoomslidervalue = Setting['CurrentValue']
-                    self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
-                elif Setting['Setting'] == img_xoffset_key:
-                    self.img_xoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == img_yoffset_key:
-                    self.img_yoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == txtpath_key:  
-                    self.txtpath = Setting['CurrentValue'] 
-                elif Setting['Setting'] == txtgreeklinebox_key:  
-                    self.txtgreeklinebox = Setting['CurrentValue']
-                elif Setting['Setting'] == jsongreeklinebox_key:  
-                    self.jsongreeklinebox = Setting['CurrentValue']
-                elif Setting['Setting'] == txtlatinlinebox_key:  
-                    self.txtlatinlinebox = Setting['CurrentValue']
-                elif Setting['Setting'] == txtdir_key:  
-                    self.txtdir = Setting['CurrentValue']
-                elif Setting['Setting'] == txtfileList_key:
-                    self.txtfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == greekpages_key:  
-                    self.greekpages = Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinesbox_key:  
-                    self.greeklinesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpages_key:  
-                    self.latinpages = Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinesbox_key:  
-                    self.latinlinesbox = Setting['CurrentValue'] 
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        if hasattr(self, 'ui'):
+            self.ui.fontComboBox.setCurrentText(self.font)
+            if str(self.fontsize).isdigit():
+                self.ui.fontSizeBox.setValue(int(self.fontsize))
+            self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+            self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+            self.ui.bookComboBox.setCurrentText(self.bookabbr)
+            self.ui.LHlineEdit.setText(self.linespacing)
+            self.ui.ZoomComboBox.setCurrentText(self.zoom)
+            if str(self.zoomslidervalue).isdigit():
+                self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
 
     def get_workflow_settings(self):
 
@@ -689,31 +541,13 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = self.session
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                bookabbr_key = r"self.bookabbr"
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == bookabbr_key:
-                        Setting['CurrentValue'] = self.bookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-            
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            from SessionManager import SessionManager
+            SessionManager().update('GlypherSession.json', {
+                'self.bookabbr': self.bookabbr,
+                'self.sourcebookmarkdown': self.sourcebookmarkdown,
+                'self.greekbookmarkdown': self.greekbookmarkdown,
+                'self.latinbookmarkdown': self.latinbookmarkdown,
+            })
             
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
@@ -821,26 +655,10 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.Image.setPixmap(self.pixmap) -- moved out to resize_image
 
         self.imgdir = os.path.dirname(self.imgpath)
-
-        jsonfile = self.session
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            for Setting in data:
-                if Setting['Setting'] == imgpath_key:
-                    Setting['CurrentValue'] = self.imgpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imgdir_key:  
-                    Setting['CurrentValue'] = self.imgdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager().update('GlypherSession.json', {
+            'self.imgpath': self.imgpath,
+            'self.imgdir': self.imgdir,
+        })
 
     def sortImgFiles(self):
         #print(f'Image File List: {self.imgfileList}')
@@ -1038,25 +856,10 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            for Setting in data:
-                if Setting['Setting'] == txtpath_key:
-                    Setting['CurrentValue'] = self.txtpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
-                    Setting['CurrentValue'] = self.txtdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager().update('GlypherSession.json', {
+            'self.txtpath': self.txtpath,
+            'self.txtdir': self.txtdir,
+        })
 
     def sortTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()

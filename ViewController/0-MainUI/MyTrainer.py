@@ -12,6 +12,7 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 
+from SessionManager import SessionManager
 from ext import *
 from ext import versifiercount, versefind, reffind
 # Custom imports
@@ -27,47 +28,41 @@ class Ui_MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Trainer()
         self.ui.setupUi(self)
-        
-        ChrRefText = open('c:/users/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+
+        self.projecthome = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
+
+        chr_ref_path = os.path.join(self.projecthome, 'ViewController', 'Application', '3-ConductOCR', 'FROMVS ChrReference.txt')
+        with open(chr_ref_path, encoding='utf-8') as f:
+            ChrRefText = f.read()
         self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
         
         # Restore Session settings
         self.get_session_settings()
 
-        
         self.show()
 
     def get_session_settings(self):
-        # get session settings
-        # Define json data        
+        # get session settings from shared manager
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            f.close()
+        session = self.session_manager.values('VersifierSession.json')
+        for setting, value in session.items():
+            if setting.startswith('self.'):
+                setattr(self, setting[5:], value)
 
     def get_workflow_settings(self):
-
-        # Opening JSON file
-        with open('c:/users/max/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
-            # returns JSON object as
-            # a dictionary
+        workflow_path = os.path.join(self.projecthome, 'Model', 'SQLite', 'json', 'Workflow.json')
+        with open(workflow_path, encoding='utf-8') as f:
             data = json.load(f)
-        
-        # Iterating through the json
-        # list
         for Sequence in data:
-            print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
-        
-        # Closing file
-        f.close()
+            print(Sequence['Sequence'], Sequence['DialogUi'], Sequence['DefaultSource'])
 
     def save_session_settings(self):
         print("Saving Trainer session settings")  
 
     def OpenWithMyWriter(self):
-        mw_cmd = "python3 c:/users/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        mw_file = os.path.join(self.projecthome, 'ViewController', 'Application', '0-MainUI', 'MyWriter.py')
+        mw_cmd = f"python3 {mw_file}"
         print(mw_cmd)
         os.system(mw_cmd)
 

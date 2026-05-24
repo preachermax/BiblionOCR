@@ -32,7 +32,9 @@ import json
 import shutil
 from decimal import Decimal
 from tempfile import NamedTemporaryFile
+from HelpSystem import add_help_menu
 import platform
+from HelpSystem import add_help_menu
 
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
@@ -53,6 +55,7 @@ import MyBoxer as boxer
 import MyScanner as scanner
 import MyExplorer as explorer
 import ChrReference as chrref
+from SessionManager import SessionManager
 
 #import PageVerseCrossReference as xref
 
@@ -140,7 +143,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Grounder()
         self.ui.setupUi(self)           
-
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyGrounder')
         # Applications
         self.ui.actionScanner.triggered.connect(self.OpenWithMyScanner)
         self.ui.actionVersifier.triggered.connect(self.OpenWithMyVersifier)
@@ -222,9 +226,10 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
-        self.bookmarkdown = self.greekbookmarkdown
+        #self.bookmarkdown = self.greekbookmarkdown
         self.get_xref_last_image()
         #self.get_xref_settings()
+        self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
         self.dirIterator = None
         self.findirection = None
         self.lastverse = None
@@ -276,177 +281,174 @@ class Ui_MainWindow(qtw.QMainWindow):
         # get session settings        
         # Define json data        
         print("loading session")
-        with open(self.projecthome + 'Model/Project/Data/json/GrounderSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            jsondir_key = r"self.jsondir"
-            session_key = r"self.session"
-            workflow_key = r"self.workflow"
-            crossref_key = r"self.crossref"
-            booksmarkdown_key = r"self.booksmarkdown"
-            bookchapter_key = r"self.bookchapter"
-            bookchapterverse_key = r"self.bookchapterverse"
-            ocrlang_key = r"self.ocrlang"
-            ocrmodel_key = r"self.ocrmodel"
-            bookabbr_key = r"self.bookabbr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            sourcefile_key = r"self.sourcefile"
-            firstpage_key = r"self.firstpage"
-            lastpage_key = r"self.lastpage"            
-            imagepath_key = r"self.imagepath"
-            imagedir_key = r"self.imagedir"
-            imagepage_key = r"self.imagepage"
-            imageline_key = r"self.imageline"
-            imagefileList_key = r"self.imagefileList"
-            imagezoom_key = r"self.imagezoom"
-            imagezoomslidervalue_key = r"self.imagezoomslidervalue"
-            dirIterator_key = r"self.dirIterator"
-            pixmap_key = r"self.pixmap"
-            qimage_key = r"self.qimage"
-            textpath_key = r"self.textpath"
-            textdir_key = r"self.textdir"
-            textfileList_key = r"self.textfileList"
-            PagelastStart_key = r"self.PagelastStart"       
-            pagetextpath_key = r"self.pagetextpath"
-            pagetextdir_key = r"self.pagetextdir"
-            pagetextfileList_key = r"self.pagetextfileList"
-            pagetextpage_key = r"self.pagetextpage"
-            VerseStart_key = r"self.VerseStart"
-            VerseLastEnd_key = r"self.VerseLastEnd"
-            versetextpath_key = r"self.versetextpath"
-            versetextdir_key = r"self.versetextdir"
-            startbookabbr_key = r"self.startbookabbr"
-            startchapter_key = r"self.startchapter"
-            startverse_key = r"self.startverse"
-            startverseline_key = r"self.startverseline"
-            ocraccuracy_key = r"self.ocraccuracy"
-            gtvalid_key = r"self.gtvalid"
-            gtreview_key = r"self.gtreview"
+        sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
+        data = list(sm.load('GrounderSession.json').values())
 
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == jsondir_key:
-                    self.jsondir = Setting['CurrentValue']
-                elif Setting['Setting'] == session_key:
-                    self.session = Setting['CurrentValue']
-                    self.session = self.projecthome + self.jsondir + "/" + self.session
-                elif Setting['Setting'] == workflow_key: 
-                    self.workflow = Setting['CurrentValue']
-                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
-                elif Setting['Setting'] == crossref_key:
-                    self.crossref = Setting['CurrentValue']
-                    self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
-                elif Setting['Setting'] == booksmarkdown_key:
-                    self.booksmarkdown = Setting['CurrentValue']
-                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
-                elif Setting['Setting'] == bookchapter_key:
-                    self.bookchapter = Setting['CurrentValue']
-                    self.bookchapter = self.projecthome + self.jsondir + "/" + self.bookchapter
-                elif Setting['Setting'] == bookchapterverse_key:
-                    self.bookchapterverse = Setting['CurrentValue']
-                    self.bookchapterverse = self.projecthome + self.jsondir + "/" + self.bookchapterverse
-                elif Setting['Setting'] == ocrlang_key:
-                    self.ocrlang = Setting['CurrentValue']
-                    self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-                elif Setting['Setting'] == ocrmodel_key:
-                    self.ocrmodel = Setting['CurrentValue']
-                    self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                    self.ui.fontComboBox.setCurrentText(self.font)
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']
-                    self.ui.fontSizeBox.setValue(int(self.fontsize))           
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                    if self.ocrlang == "Ancient Greek" or self.ocrlang == "Middle Greek" or self.ocrlang == "Modern Greek":
-                        self.language = "greek"
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                    if self.ocrlang == "Latin":
-                        self.language = "latin"
-                elif Setting['Setting'] == sourcefile_key:   
-                    self.sourcefile = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == firstpage_key:  
-                    self.firstpage = Setting['CurrentValue']
-                elif Setting['Setting'] == lastpage_key:  
-                    self.lastpage = Setting['CurrentValue']
-                elif Setting['Setting'] == imagepath_key:
-                    self.imagepath = self.projecthome + Setting['CurrentValue']
-                    self.imgpath = self.imagepath
-                elif Setting['Setting'] == imagedir_key:
-                    self.imagedir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == imagepage_key:
-                    self.imagepage = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == imageline_key:
-                    self.imageline = self.projecthome + Setting['CurrentValue'] 
-                elif Setting['Setting'] == imagefileList_key:
-                    self.imagefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == imagezoom_key:
-                    self.imagezoom = Setting['CurrentValue']
-                elif Setting['Setting'] == imagezoomslidervalue_key:
-                    self.imagezoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == dirIterator_key:  
-                    self.dirIterator = Setting['CurrentValue']
-                elif Setting['Setting'] == pixmap_key:  
-                    self.pixmap = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == qimage_key:  
-                    self.qimage = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == textpath_key:  
-                    self.textpath = self.projecthome + Setting['CurrentValue'] 
-                elif Setting['Setting'] == textdir_key:  
-                    self.textdir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == textfileList_key:
-                    self.textfileList = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == PagelastStart_key:
-                    self.PagelastStart = Setting['CurrentValue']
-                elif Setting['Setting'] == pagetextpath_key:
-                    self.pagetextpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pagetextdir_key:
-                    self.pagetextdir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == pagetextfileList_key:
-                    self.pagetextfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pagetextpage_key:
-                    self.pagetextpage = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == VerseStart_key:
-                    self.VerseStart = int(Setting['CurrentValue'])
-                elif Setting['Setting'] == VerseLastEnd_key:
-                    self.VerseLastEnd = int(Setting['CurrentValue'])
-                elif Setting['Setting'] == versetextpath_key:
-                    self.versetextpath = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == versetextdir_key:
-                    self.versetextdir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == startbookabbr_key:
-                    self.startbookabbr = Setting['CurrentValue']
-                elif Setting['Setting'] == startchapter_key:
-                    self.startchapter = Setting['CurrentValue']
-                elif Setting['Setting'] == startverse_key:
-                    self.startverse = Setting['CurrentValue']
-                elif Setting['Setting'] == startverseline_key:
-                    self.startverseline = Setting['CurrentValue']
-                elif Setting['Setting'] == ocraccuracy_key:
-                    self.ocraccuracy = Setting['CurrentValue']
-                elif Setting['Setting'] == gtvalid_key:
-                    self.gtvalid = Setting['CurrentValue']
-                elif Setting['Setting'] == gtreview_key:
-                    self.gtreview = Setting['CurrentValue']
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
-      
-            print(f'Absolute Path to Project Directory: {self.projecthome}')
+        # Set json key values
+        jsondir_key = r"self.jsondir"
+        session_key = r"self.session"
+        workflow_key = r"self.workflow"
+        crossref_key = r"self.crossref"
+        booksmarkdown_key = r"self.booksmarkdown"
+        bookchapter_key = r"self.bookchapter"
+        bookchapterverse_key = r"self.bookchapterverse"
+        ocrlang_key = r"self.ocrlang"
+        ocrmodel_key = r"self.ocrmodel"
+        bookabbr_key = r"self.bookabbr"
+        font_key = r"self.font"
+        fontsize_key = r"self.fontsize"
+        source_book_markdown_key = r"self.sourcebookmarkdown"
+        greek_book_markdown_key = r"self.greekbookmarkdown"
+        latin_book_markdown_key = r"self.latinbookmarkdown"
+        sourcefile_key = r"self.sourcefile"
+        firstpage_key = r"self.firstpage"
+        lastpage_key = r"self.lastpage"            
+        imagepath_key = r"self.imagepath"
+        imagedir_key = r"self.imagedir"
+        imagepage_key = r"self.imagepage"
+        imageline_key = r"self.imageline"
+        imagefileList_key = r"self.imagefileList"
+        imagezoom_key = r"self.imagezoom"
+        imagezoomslidervalue_key = r"self.imagezoomslidervalue"
+        dirIterator_key = r"self.dirIterator"
+        pixmap_key = r"self.pixmap"
+        qimage_key = r"self.qimage"
+        textpath_key = r"self.textpath"
+        textdir_key = r"self.textdir"
+        textfileList_key = r"self.textfileList"
+        PagelastStart_key = r"self.PagelastStart"       
+        pagetextpath_key = r"self.pagetextpath"
+        pagetextdir_key = r"self.pagetextdir"
+        pagetextfileList_key = r"self.pagetextfileList"
+        pagetextpage_key = r"self.pagetextpage"
+        VerseStart_key = r"self.VerseStart"
+        VerseLastEnd_key = r"self.VerseLastEnd"
+        versetextpath_key = r"self.versetextpath"
+        versetextdir_key = r"self.versetextdir"
+        startbookabbr_key = r"self.startbookabbr"
+        startchapter_key = r"self.startchapter"
+        startverse_key = r"self.startverse"
+        startverseline_key = r"self.startverseline"
+        ocraccuracy_key = r"self.ocraccuracy"
+        gtvalid_key = r"self.gtvalid"
+        gtreview_key = r"self.gtreview"
 
+        # Find the json key values using 'in' operator
+        # Define session variables from json key values
+        for Setting in data:
+            print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
+            if Setting['Setting'] == jsondir_key:
+                self.jsondir = Setting['CurrentValue']
+            elif Setting['Setting'] == session_key:
+                self.session = Setting['CurrentValue']
+                self.session = self.projecthome + self.jsondir + "/" + self.session
+            elif Setting['Setting'] == workflow_key: 
+                self.workflow = Setting['CurrentValue']
+                self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
+            elif Setting['Setting'] == crossref_key:
+                self.crossref = Setting['CurrentValue']
+                self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
+            elif Setting['Setting'] == booksmarkdown_key:
+                self.booksmarkdown = Setting['CurrentValue']
+                self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
+            elif Setting['Setting'] == bookchapter_key:
+                self.bookchapter = Setting['CurrentValue']
+                self.bookchapter = self.projecthome + self.jsondir + "/" + self.bookchapter
+            elif Setting['Setting'] == bookchapterverse_key:
+                self.bookchapterverse = Setting['CurrentValue']
+                self.bookchapterverse = self.projecthome + self.jsondir + "/" + self.bookchapterverse
+            elif Setting['Setting'] == ocrlang_key:
+                self.ocrlang = Setting['CurrentValue']
+                self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+            elif Setting['Setting'] == ocrmodel_key:
+                self.ocrmodel = Setting['CurrentValue']
+                self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
+            elif Setting['Setting'] == bookabbr_key:  
+                self.bookabbr = Setting['CurrentValue']
+            elif Setting['Setting'] == font_key:
+                self.font = Setting['CurrentValue']
+                self.ui.fontComboBox.setCurrentText(self.font)
+            elif Setting['Setting'] == fontsize_key:
+                self.fontsize = Setting['CurrentValue']
+                self.ui.fontSizeBox.setValue(int(self.fontsize))           
+            elif Setting['Setting'] == source_book_markdown_key:  
+                self.sourcebookmarkdown = Setting['CurrentValue']
+            elif Setting['Setting'] == greek_book_markdown_key:  
+                self.greekbookmarkdown = Setting['CurrentValue']
+                if self.ocrlang == "Ancient Greek" or self.ocrlang == "Middle Greek" or self.ocrlang == "Modern Greek":
+                    self.language = "greek"
+            elif Setting['Setting'] == latin_book_markdown_key:  
+                self.latinbookmarkdown = Setting['CurrentValue']
+                if self.ocrlang == "Latin":
+                    self.language = "latin"
+            elif Setting['Setting'] == sourcefile_key:   
+                self.sourcefile = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == firstpage_key:  
+                self.firstpage = Setting['CurrentValue']
+            elif Setting['Setting'] == lastpage_key:  
+                self.lastpage = Setting['CurrentValue']
+            elif Setting['Setting'] == imagepath_key:
+                self.imagepath = self.projecthome + Setting['CurrentValue']
+                self.imgpath = self.imagepath
+            elif Setting['Setting'] == imagedir_key:
+                self.imagedir = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == imagepage_key:
+                self.imagepage = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == imageline_key:
+                self.imageline = self.projecthome + Setting['CurrentValue'] 
+            elif Setting['Setting'] == imagefileList_key:
+                self.imagefileList = Setting['CurrentValue']
+            elif Setting['Setting'] == imagezoom_key:
+                self.imagezoom = Setting['CurrentValue']
+            elif Setting['Setting'] == imagezoomslidervalue_key:
+                self.imagezoomslidervalue = Setting['CurrentValue']
+            elif Setting['Setting'] == dirIterator_key:  
+                self.dirIterator = Setting['CurrentValue']
+            elif Setting['Setting'] == pixmap_key:  
+                self.pixmap = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == qimage_key:  
+                self.qimage = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == textpath_key:  
+                self.textpath = self.projecthome + Setting['CurrentValue'] 
+            elif Setting['Setting'] == textdir_key:  
+                self.textdir = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == textfileList_key:
+                self.textfileList = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == PagelastStart_key:
+                self.PagelastStart = Setting['CurrentValue']
+            elif Setting['Setting'] == pagetextpath_key:
+                self.pagetextpath = Setting['CurrentValue']
+            elif Setting['Setting'] == pagetextdir_key:
+                self.pagetextdir = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == pagetextfileList_key:
+                self.pagetextfileList = Setting['CurrentValue']
+            elif Setting['Setting'] == pagetextpage_key:
+                self.pagetextpage = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == VerseStart_key:
+                self.VerseStart = int(Setting['CurrentValue'])
+            elif Setting['Setting'] == VerseLastEnd_key:
+                self.VerseLastEnd = int(Setting['CurrentValue'])
+            elif Setting['Setting'] == versetextpath_key:
+                self.versetextpath = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == versetextdir_key:
+                self.versetextdir = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == startbookabbr_key:
+                self.startbookabbr = Setting['CurrentValue']
+            elif Setting['Setting'] == startchapter_key:
+                self.startchapter = Setting['CurrentValue']
+            elif Setting['Setting'] == startverse_key:
+                self.startverse = Setting['CurrentValue']
+            elif Setting['Setting'] == startverseline_key:
+                self.startverseline = Setting['CurrentValue']
+            elif Setting['Setting'] == ocraccuracy_key:
+                self.ocraccuracy = Setting['CurrentValue']
+            elif Setting['Setting'] == gtvalid_key:
+                self.gtvalid = Setting['CurrentValue']
+            elif Setting['Setting'] == gtreview_key:
+                self.gtreview = Setting['CurrentValue']
+            print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
+        
+        print(f'Absolute Path to Project Directory: {self.projecthome}')
  
     def get_workflow_settings(self):
 
@@ -465,6 +467,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         f.close()
 
     def get_xref_last_image(self):
+        
         imgdir = self.projecthome + "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
         xrefjsonfile = self.crossref
         #markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
@@ -1670,32 +1673,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(self.bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = self.session
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                bookabbr_key = r"self.bookabbr"
-                
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == bookabbr_key:
-                        Setting['CurrentValue'] = self.bookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-            
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
+                'self.bookabbr': self.bookabbr,
+                'self.sourcebookmarkdown': self.sourcebookmarkdown,
+                'self.greekbookmarkdown': self.greekbookmarkdown,
+                'self.latinbookmarkdown': self.latinbookmarkdown,
+            })
 
             # Opening JSON file
             '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
@@ -1777,21 +1760,9 @@ class Ui_MainWindow(qtw.QMainWindow):
             # cycle through the reverse iterator until the current file is found
             if next(self.pagedirRevIterator) == self.pagetextpath:
                 break
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            pagetextfileList_key = r"self.pagetextfileList"
-            for Setting in data:
-                if Setting['Setting'] == pagetextfileList_key:
-                    Setting['CurrentValue'] = self.pagetextfileList
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
+            'self.pagetextfileList': self.pagetextfileList,
+        })
     
     def showPageText(self,txtfilename):       
         #self.pagetextfile = txtfilename
@@ -1860,32 +1831,15 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.pagetextpath = self.pagetextdir + "/" + self.greekbookmarkdown + "/" + versionref + "_" + "Page" + "_" + self.pagenumstr + fileext
         print(f'Page text file path: {self.pagetextpath}')
         
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            pagetextpath_key = r"self.pagetextpath"
-            pagetextdir_key = r"self.pagetextdir"
-            pagetextpage_key = r"self.pagetextpage"
-            pagetextpath = self.pagetextpath
-            pagetextpath = pagetextpath.replace(self.projecthome,"")
-            pagetextdir = self.pagetextdir
-            pagetextdir = pagetextdir.replace(self.projecthome,"")
-            for Setting in data:
-                if Setting['Setting'] == pagetextpath_key:
-                    Setting['CurrentValue'] = pagetextpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == pagetextdir_key:  
-                    Setting['CurrentValue'] = pagetextdir
-                elif Setting['Setting'] == pagetextpage_key:  
-                    Setting['CurrentValue'] = self.pagenumstr
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        pagetextpath = self.pagetextpath
+        pagetextpath = pagetextpath.replace(self.projecthome,"")
+        pagetextdir = self.pagetextdir
+        pagetextdir = pagetextdir.replace(self.projecthome,"")
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
+            'self.pagetextpath': pagetextpath,
+            'self.pagetextdir': pagetextdir,
+            'self.pagetextpage': self.pagenumstr,
+        })
 
     def SavePageTextDialog(self):
         
@@ -1995,35 +1949,13 @@ class Ui_MainWindow(qtw.QMainWindow):
     
     def updatesession(self):
 
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            versetextpath_key = r"self.versetextpath"
-            versetextdir_key = r"self.versetextdir"
-            startbookabbr_key = r"self.startbookabbr"
-            startchapter_key = r"self.startchapter"
-            startverse_key = r"startverse_key "
-            for Setting in data:
-                if Setting['Setting'] == versetextpath_key:
-                    Setting['CurrentValue'] = self.versetextpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == versetextdir_key:  
-                    Setting['CurrentValue'] = self.versetextdir
-                elif Setting['Setting'] == startbookabbr_key:
-                    Setting['CurrentValue'] = self.book
-                elif Setting['Setting'] == startchapter_key:
-                    Setting['CurrentValue'] = self.chapter
-                elif Setting['Setting'] == startverse_key:
-                    Setting['CurrentValue'] = self.verse
-                    print(Setting['CurrentValue'])
-
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
+            'self.versetextpath': self.versetextpath,
+            'self.versetextdir': self.versetextdir,
+            'self.startbookabbr': self.book,
+            'self.startchapter': self.chapter,
+            'self.startverse': self.verse,
+        })
 
     def reconnectStartComboBoxes(self):
         self.ui.StartbookComboBox.currentTextChanged.connect(self.selectBookCombo)
@@ -2192,26 +2124,10 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.reconnectStartComboBoxes()
             return
         
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            
-            VerseStart_key = r"self.VerseStart"
-            VerseLastEnd_key = r"self.VerseLastEnd"       
-
-            for Setting in data:
-                if Setting['Setting'] == VerseStart_key:
-                    Setting['CurrentValue'] = self.VerseStart   
-                elif Setting['Setting'] == VerseLastEnd_key:
-                    Setting['CurrentValue'] = self.VerseLastEnd
-                    print(f'Final cursor end position: {self.VerseLastEnd}')
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
+            'self.VerseStart': self.VerseStart,
+            'self.VerseLastEnd': self.VerseLastEnd,
+        })
 
     def SaveVerseTextDialog(self):
         

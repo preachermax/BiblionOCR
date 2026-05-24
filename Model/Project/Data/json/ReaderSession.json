@@ -2,609 +2,381 @@
     {
         "Setting": "self.ocrlang",
         "CurrentValue": "Middle Greek",
-        "DefaultValue": "Middle Greek",
-        "UI": "MainUI",
-        "Widget": "OCR",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "Middle Greek"
     },
     {
         "Setting": "self.ocrmodel",
         "CurrentValue": "feg",
-        "DefaultValue": "feg",
-        "UI": "MainUI",
-        "Widget": "OCR",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "feg"
     },
     {
         "Setting": "self.tessdatadir",
-        "CurrentValue": "/usr/local/share/tessdata",
-        "DefaultValue": "/usr/local/share/tessdata",
-        "UI": "MainUI",
-        "Widget": "OCR",
-        "WidgetClass": ""
+        "CurrentValue": "c:/Program Files/Tesseract-OCR/tessdata",
+        "DefaultValue": "c:/Program Files/Tesseract-OCR/tessdata"
     },
     {
         "Setting": "self.tesseract",
-        "CurrentValue": "/home/max/tessract",
-        "DefaultValue": "/home/max/tessract",
-        "UI": "MainUI",
-        "Widget": "OCR",
-        "WidgetClass": ""
+        "CurrentValue": "c:/Program Files/Tesseract-OCR",
+        "DefaultValue": "c:/Program Files/Tesseract-OCR"
     },
     {
         "Setting": "self.tesstrain",
-        "CurrentValue": "/home/max/tessract/tesstrain_raw_72-2-Matthew",
-        "DefaultValue": "/home/max/tessract/tesstrain",
-        "UI": "MainUI",
-        "Widget": "OCR",
-        "WidgetClass": ""
+        "CurrentValue": "c:/Program Files/Tesseract-OCR/tesstrain-raw-Gospels",
+        "DefaultValue": "c:/Program Files/Tesseract-OCR/tesstrain"
     },
     {
         "Setting": "self.bookabbr",
         "CurrentValue": "Joh",
-        "DefaultValue": "Mat",
-        "UI": "MainUI",
-        "Widget": "Session",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "Mat"
     },
     {
         "Setting": "self.chapter",
         "CurrentValue": "1",
-        "DefaultValue": "1",
-        "UI": "MainUI",
-        "Widget": "Session",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "1"
     },
     {
         "Setting": "self.verse",
         "CurrentValue": "1",
-        "DefaultValue": "1",
-        "UI": "MainUI",
-        "Widget": "Session",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "1"
     },
     {
         "Setting": "self.word",
         "CurrentValue": "1",
-        "DefaultValue": "1",
-        "UI": "MainUI",
-        "Widget": "Session",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "1"
     },
     {
         "Setting": "self.chr",
         "CurrentValue": "1",
-        "DefaultValue": "1",
-        "UI": "MainUI",
-        "Widget": "Session",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "1"
     },
     {
         "Setting": "self.font",
-        "CurrentValue": "FROMVS(MAXR)",
-        "DefaultValue": "FROMVS(MAXR)",
-        "UI": "MainUI",
-        "Widget": "Text",
-        "WidgetClass": "GroupBox"
+        "CurrentValue": "FROMVS",
+        "DefaultValue": "FROMVS"
     },
     {
         "Setting": "self.fontsize",
         "CurrentValue": "20",
-        "DefaultValue": "20",
-        "UI": "MainUI",
-        "Widget": "Text",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "20"
     },
     {
         "Setting": "self.fontinstallpath",
-        "CurrentValue": "/home/max/.fonts",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "c:/Windows/fonts/FROMVS",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.homefontinstallpath",
-        "CurrentValue": "/home/max/.local/share/fonts",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "c:/Windows/fonts/FROMVS",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.usrfontinstallpath",
-        "CurrentValue": "/usr/share/fonts/truetype/FROMVS",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "c:/Windows/fonts/FROMVS",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.tessfont",
-        "CurrentValue": "/home/max/tesseract/tesstrain-raw-72-2-Matthew/fonts/FROMVS",
-        "DefaultValue": "",
-        "UI": "Trainer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "c:/users/max/tesseract/tesstrain-raw-Gospels/fonts/FROMVS",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.tessdir",
-        "CurrentValue": "/home/max/tesseract/tesstrain-raw-72-2-Matthew/fonts",
-        "DefaultValue": "",
-        "UI": "Trainer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "c:/users/max/tesseract/tesstrain-raw-Gospels/fonts",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.sfd",
-        "CurrentValue": "/home/max/Documents/My Forge/FROMVS.sfd",
-        "DefaultValue": "",
-        "UI": "GlyphTracer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "/Documents/MyForge/FROMVS.sfd",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.sfddir",
-        "CurrentValue": "/home/max/Documents/My Forge",
-        "DefaultValue": "",
-        "UI": "GlyphTracer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "/Documents/MyForge",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.glyph",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "GlyphTracer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.glyphname",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "GlyphTracer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.glyphencode",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "GlyphTracer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.glyphsourcedir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_source",
-        "DefaultValue": "",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_source",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.glyphgreekdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/sfd_greek",
-        "DefaultValue": "",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/GlyphTracer/sfd_greek",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.linespacing",
         "CurrentValue": "150",
-        "DefaultValue": "150",
-        "UI": "MainUI",
-        "Widget": "Text",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "150"
     },
     {
         "Setting": "self.verselinespacing",
         "CurrentValue": "105",
-        "DefaultValue": "105",
-        "UI": "Versifier",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "105"
     },
     {
         "Setting": "self.reflinespacing",
         "CurrentValue": "105",
-        "DefaultValue": "105",
-        "UI": "Versifier",
-        "Widget": "Text",
-        "WidgetClass": "GroupBox"
+        "DefaultValue": "105"
     },
     {
         "Setting": "self.sourcebookmarkdown",
         "CurrentValue": "source_book_43_John",
-        "DefaultValue": "source_book_40_Matthew",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "source_book_40_Matthew"
     },
     {
         "Setting": "self.greekbookmarkdown",
         "CurrentValue": "greek_book_43_John",
-        "DefaultValue": "greek_book_40_Matthew",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "greek_book_40_Matthew"
     },
     {
         "Setting": "self.latinbookmarkdown",
         "CurrentValue": "latin_book_43_John",
-        "DefaultValue": "latin_book_40_Matthew",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "latin_book_40_Matthew"
     },
     {
         "Setting": "self.sourcefile",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
-        "UI": "ExtractDialog",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "DefaultValue": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf"
     },
     {
         "Setting": "self.firstpage",
         "CurrentValue": "100",
-        "DefaultValue": "1",
-        "UI": "ExtractDialog",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "1"
     },
     {
         "Setting": "self.lastpage",
         "CurrentValue": "110",
-        "DefaultValue": "10",
-        "UI": "ExtractDialog",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "10"
     },
     {
         "Setting": "self.deltapages",
         "CurrentValue": "10",
-        "DefaultValue": "10",
-        "UI": "ExtractDialog",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "10"
     },
     {
         "Setting": "self.imgpath",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages"
     },
     {
         "Setting": "self.dirIterator",
         "CurrentValue": "None",
-        "DefaultValue": "None",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "None"
     },
     {
         "Setting": "self.imgfileList",
         "CurrentValue": "[]",
-        "DefaultValue": "[]",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "[]"
     },
     {
         "Setting": "self.pixmap",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.qimage",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.bmpsourcedir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_source",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/GlyphTracer/bmp_source",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.bmpgreekdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/GlyphTracer/bmp_greek",
-        "DefaultValue": "",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/GlyphTracer/bmp_greek",
+        "DefaultValue": ""
     },
     {
         "Setting": "self.zoom",
         "CurrentValue": "25 %",
-        "DefaultValue": "25",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "25"
     },
     {
         "Setting": "self.zoomslidervalue",
         "CurrentValue": "25",
-        "DefaultValue": "25",
-        "UI": "MainUI",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "25"
     },
     {
         "Setting": "self.txtpath",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.txtdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek_txt_pages",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages"
     },
     {
         "Setting": "self.txtfileList",
         "CurrentValue": "[]",
-        "DefaultValue": "[]",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "[]"
     },
     {
         "Setting": "self.reftxtpath",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.reftxtdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Text/EstablishTruth/TR",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/TR"
     },
     {
         "Setting": "self.reftxtfileList",
         "CurrentValue": "[]",
-        "DefaultValue": "[]",
-        "UI": "Writer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "[]"
     },
     {
         "Setting": "self.refimgpath",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.refimgdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Complete/Greek/tif_greek_pages",
+        "DefaultValue": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
         "Setting": "self.refimgtfileList",
         "CurrentValue": "[]",
-        "DefaultValue": "[]",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "[]"
     },
     {
         "Setting": "self.refimgzoom",
         "CurrentValue": "25 %",
-        "DefaultValue": "25",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "25"
     },
     {
         "Setting": "self.refimgzoomslidervalue",
         "CurrentValue": "25",
-        "DefaultValue": "25",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "25"
     },
     {
         "Setting": "self.imagepath",
         "CurrentValue": "",
-        "DefaultValue": "",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": ""
     },
     {
         "Setting": "self.imagetdir",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/TR",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Text/EstablishTruth/TR",
+        "DefaultValue": "Model/Project/Text/EstablishTruth/TR"
     },
     {
         "Setting": "self.imagefileList",
         "CurrentValue": "[]",
-        "DefaultValue": "[]",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "[]"
     },
     {
         "Setting": "self.imagezoom",
         "CurrentValue": "25 %",
-        "DefaultValue": "25",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "25"
     },
     {
         "Setting": "self.imagezoomslidervalue",
         "CurrentValue": "25",
-        "DefaultValue": "25",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "DefaultValue": "25"
     },
     {
         "Setting": "self.greekpagesrotated",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_rotated"
     },
     {
         "Setting": "self.greekpagesdeskewed",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_deskewed"
     },
     {
         "Setting": "self.greekpagescropped",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_cropped"
     },
     {
         "Setting": "self.greekpagescleaned",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_cleaned"
     },
     {
         "Setting": "self.greekpagesbox",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages_box",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages_box"
     },
     {
         "Setting": "self.greeklinescropped",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped"
     },
     {
         "Setting": "self.greeklinescleaned",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned"
     },
     {
         "Setting": "self.greeklinesbox",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
     },
     {
         "Setting": "self.latinpagesrotated",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_rotated"
     },
     {
         "Setting": "self.latinpagesdeskewed",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_deskewed"
     },
     {
         "Setting": "self.latinpagescropped",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cropped"
     },
     {
         "Setting": "self.latinpagescleaned",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned"
     },
     {
         "Setting": "self.latinpagesbox",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_pages_box",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_box"
     },
     {
         "Setting": "self.latinlinescropped",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped"
     },
     {
         "Setting": "self.latinlinescleaned",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned"
     },
     {
         "Setting": "self.latinlinesbox",
-        "CurrentValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
-        "DefaultValue": "/home/max/Projects/BiblionOCR/Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
-        "UI": "Pixer",
-        "Widget": "",
-        "WidgetClass": ""
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box"
     }
 ]

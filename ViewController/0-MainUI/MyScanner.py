@@ -13,6 +13,7 @@ import tiffcapture
 import qimage2ndarray
 from queue import Queue
 from ext import mainfind
+from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
@@ -28,6 +29,7 @@ import QtCropImage as cropimg
 import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
 from Training import Train as tr
+from SessionManager import SessionManager
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -35,6 +37,7 @@ import MyBoxer as boxer
 import MyPixler as pixler
 import MyExplorer as explorer
 import ChrReference as chrref
+from SessionManager import SessionManager
 #import MyResolver as resolver
 #import MyGrounder as grounder
 
@@ -145,6 +148,9 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Scanner()
         self.ui.setupUi(self)
+        self.session_manager = SessionManager()
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyScanner')
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
         self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
@@ -331,128 +337,60 @@ class MainWindow(qtw.QMainWindow):
         self.ui.OutputText.append(text)'''
   
     def get_session_settings(self):
-        # get session settings
-        # Define json data        
+        # get session settings from shared manager
         print("loading session")
-        with open('Model/Project/Data/json/ScannerSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            ocrlang_key = r"self.ocrlang"
-            ocrmodel_key = r"self.ocrmodel"
-            tessdatadir_key = r"self.tessdatadir"
-            tesseract_key = r"self.tesserac"
-            tesstrain_key = r"self.tesstrain"
-            bookabbr_key = r"self.bookabbr"
-            chapter_key = r"self.chapter"
-            verse_key = r"self.verse"
-            word_key = r"self.word"
-            chr_key = r"self.chr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            linespacing_key = r"self.linespacing"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            sourcefile_key = r"self.sourcefile"
-            firstpage_key = r"self.firstpage"
-            lastpage_key = r"self.lastpage"            
-            deltapages_key = r"self.deltapages"
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            dirIterator_key = r"self.dirIterator"
-            imgfileList_key = r"self.imgfileList"
-            pixmap_key = r"self.pixmap"
-            qimage_key = r"self.qimage"
-            zoom_key = r"self.zoom"
-            zoomslidervalue_key = r"self.zoomslidervalue"
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            txtfileList_key = r"self.txtfileList"
-            glyph_key = r"self.glyph"
-            glyphname_key = r"self.glyphname"
-            glyphencode_key = r"self.glyphencode"
+        session = self.session_manager.values('ScannerSession.json')
 
-            print(bookabbr_key,chapter_key)
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                
-                if Setting['Setting'] == ocrlang_key:
-                    self.ocrlang = Setting['CurrentValue']
-                    self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-                elif Setting['Setting'] == ocrmodel_key:
-                    self.ocrmodel = Setting['CurrentValue']
-                    self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-                elif Setting['Setting'] == tessdatadir_key:
-                    self.tessdatadir = Setting['CurrentValue']
-                elif Setting['Setting'] == tesseract_key:
-                    self.tesseract = Setting['CurrentValue']
-                elif Setting['Setting'] == tesstrain_key:
-                    self.tesstrain = Setting['CurrentValue']
-                elif Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                    self.ui.bookComboBox.setCurrentText(self.bookabbr)            
-                elif Setting['Setting'] == chapter_key:  
-                    self.chapter = Setting['CurrentValue']          
-                elif Setting['Setting'] == verse_key:
-                    self.verse = Setting['CurrentValue']
-                elif Setting['Setting'] == word_key:
-                    self.word = Setting['CurrentValue'] 
-                elif Setting['Setting'] == chr_key:
-                    self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                    self.ui.fontComboBox.setCurrentText(self.font)
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']
-                    self.ui.fontSizeBox.setValue(int(self.fontsize))           
-                elif Setting['Setting'] == linespacing_key:
-                    self.linespacing = Setting['CurrentValue']
-                    self.ui.LHlineEdit.setText(self.linespacing)
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == sourcefile_key:   
-                    self.sourcefile = Setting['CurrentValue']
-                elif Setting['Setting'] == firstpage_key:  
-                    self.firstpage = Setting['CurrentValue']
-                elif Setting['Setting'] == lastpage_key:  
-                    self.lastpage = Setting['CurrentValue']
-                elif Setting['Setting'] == deltapages_key:
-                    self.deltapages = Setting['CurrentValue']
-                elif Setting['Setting'] == imgpath_key:
-                    self.imgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == imgdir_key:  
-                    self.imgdir = Setting['CurrentValue']
-                elif Setting['Setting'] == dirIterator_key:  
-                    self.dirIterator = Setting['CurrentValue']
-                elif Setting['Setting'] == imgfileList_key:  
-                    self.imgfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixmap_key:  
-                    self.pixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == qimage_key:  
-                    self.qimage = Setting['CurrentValue']
-                elif Setting['Setting'] == zoom_key:  
-                    self.zoom = Setting['CurrentValue']
-                    self.ui.ZoomComboBox.setCurrentText(self.zoom)
-                elif Setting['Setting'] == zoomslidervalue_key:
-                    self.zoomslidervalue = Setting['CurrentValue']
-                    self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
-                elif Setting['Setting'] == txtpath_key:  
-                    self.txtpath = Setting['CurrentValue'] 
-                elif Setting['Setting'] == txtdir_key:  
-                    self.txtdir = Setting['CurrentValue']
-                
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
 
+        self.ocrlang = get_setting('ocrlang', '')
+        self.ocrmodel = get_setting('ocrmodel', '')
+        self.tessdatadir = get_setting('tessdatadir', '')
+        self.tesseract = get_setting('tesseract', '')
+        self.tesstrain = get_setting('tesstrain', '')
+        self.bookabbr = get_setting('bookabbr', '')
+        self.chapter = get_setting('chapter', '1')
+        self.verse = get_setting('verse', '1')
+        self.word = get_setting('word', '1')
+        self.chr = get_setting('chr', '1')
+        self.font = get_setting('font', '')
+        self.fontsize = get_setting('fontsize', '20')
+        self.linespacing = get_setting('linespacing', '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.sourcefile = get_setting('sourcefile', '')
+        self.firstpage = get_setting('firstpage', '1')
+        self.lastpage = get_setting('lastpage', '1')
+        self.deltapages = get_setting('deltapages', '1')
+        self.imgpath = get_setting('imgpath', '')
+        self.imgdir = get_setting('imgdir', '')
+        self.dirIterator = get_setting('dirIterator', None)
+        self.imgfileList = get_setting('imgfileList', [])
+        self.pixmap = get_setting('pixmap', None)
+        self.qimage = get_setting('qimage', None)
+        self.zoom = get_setting('zoom', '')
+        self.zoomslidervalue = get_setting('zoomslidervalue', 0)
+        self.txtpath = get_setting('txtpath', '')
+        self.txtdir = get_setting('txtdir', '')
+        self.txtfileList = get_setting('txtfileList', [])
+        self.glyph = get_setting('glyph', '')
+        self.glyphname = get_setting('glyphname', '')
+        self.glyphencode = get_setting('glyphencode', '')
 
+        self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+        self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+        self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        self.ui.fontComboBox.setCurrentText(self.font)
+        if str(self.fontsize).isdigit():
+            self.ui.fontSizeBox.setValue(int(self.fontsize))
+        self.ui.LHlineEdit.setText(self.linespacing)
+        self.ui.ZoomComboBox.setCurrentText(self.zoom)
+        if str(self.zoomslidervalue).isdigit():
+            self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
     def get_workflow_settings(self):
 
         # Opening JSON file
@@ -507,31 +445,12 @@ class MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = 'Model/Project/Data/json/Session.json'
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                bookabbr_key = r"self.bookabbr"
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == bookabbr_key:
-                        Setting['CurrentValue'] = self.bookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-            
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            SessionManager().update('Session.json', {
+                'self.bookabbr': self.bookabbr,
+                'self.sourcebookmarkdown': self.sourcebookmarkdown,
+                'self.greekbookmarkdown': self.greekbookmarkdown,
+                'self.latinbookmarkdown': self.latinbookmarkdown,
+            })
 
             # Opening JSON file
             '''with open('Model/Project/Data/json/BooksAbbrName.json') as f:
@@ -894,25 +813,10 @@ class MainWindow(qtw.QMainWindow):
                     #json.dump(data, f, indent=2)
                 
 
-                jsonfile = 'Model/Project/Data/json/Session.json'
-                
-                with open(jsonfile, 'r') as f:
-                    data = json.load(f)
-                    imgpath_key = r"self.imgpath"
-                    imgdir_key = r"self.imgdir"
-                    for Setting in data:
-                        if Setting['Setting'] == imgpath_key:
-                            Setting['CurrentValue'] = self.imgpath
-                            print(Setting['CurrentValue'])
-                        elif Setting['Setting'] == imgdir_key:  
-                            Setting['CurrentValue'] = self.imgdir
-                            print(Setting['CurrentValue'])
-                f.close()
-
-                os.remove(jsonfile)
-                with open(jsonfile, 'w') as f:
-                    json.dump(data, f, indent=4)
-                f.close()
+                SessionManager().update('Session.json', {
+                    'self.imgpath': self.imgpath,
+                    'self.imgdir': self.imgdir,
+                })
 
         self.imgfileList = []
         for i in os.listdir(self.imgdir):
@@ -966,25 +870,10 @@ class MainWindow(qtw.QMainWindow):
         
         self.imgdir = os.path.dirname(imgfilename)
         self.ui.ImageLe.setText(filestr)
-        jsonfile = 'Model/Project/Data/json/Session.json'
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            for Setting in data:
-                if Setting['Setting'] == imgpath_key:
-                    Setting['CurrentValue'] = self.imgpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imgdir_key:  
-                    Setting['CurrentValue'] = self.imgdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager().update('Session.json', {
+            'self.imgpath': self.imgpath,
+            'self.imgdir': self.imgdir,
+        })
         
         self.imgfileList = []
         for i in os.listdir(self.imgdir):
@@ -1199,28 +1088,16 @@ class MainWindow(qtw.QMainWindow):
                 
                 file.close()
         
-        jsonfile = 'Model/Project/Data/json/Session.json'
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            for Setting in data:
-                if Setting['Setting'] == txtpath_key:
-                    Setting['CurrentValue'] = self.txtpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
-                    Setting['CurrentValue'] = self.txtdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager().update('Session.json', {
+            'self.txtpath': self.txtpath,
+            'self.txtdir': self.txtdir,
+        })
 
         #txtdirpath = self.txtdir
-        self.txtfileList = []
+        SessionManager().update('Session.json', {
+            'self.txtpath': self.txtpath,
+            'self.txtdir': self.txtdir,
+        })
         for t in os.listdir(self.txtdir):
             tpath = os.path.join(self.txtdir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
@@ -1255,32 +1132,10 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        jsonfile = 'Model/Project/Data/json/Session.json'
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            for Setting in data:
-                if Setting['Setting'] == txtpath_key:
-                    Setting['CurrentValue'] = self.txtpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
-                    Setting['CurrentValue'] = self.txtdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
-
-        self.txtfileList = []
-        for t in os.listdir(self.txtdir):
-            tpath = os.path.join(self.txtdir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.txtfileList.append(tpath)
-
+        SessionManager().update('Session.json', {
+            'self.txtpath': self.txtpath,
+            'self.txtdir': self.txtdir,
+        })
         self.sortTextFiles()
 
     def sortTextFiles(self):

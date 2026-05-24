@@ -3,7 +3,8 @@
 import sys
 import os
 import json
-
+from HelpSystem import add_help_menu
+from SessionManager import SessionManager
 from PyQt5 import QtPrintSupport
 #from PyQt5 import QPrintPreviewDialog, QPrintDialog
 from PyQt5 import QtWidgets as qtw
@@ -27,6 +28,9 @@ class Main(qtw.QMainWindow):
 
         self.ui = Ui_MyWriterUI()
         self.ui.setupUi(self)
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyWriter')
+        self.session_manager = SessionManager()
         self.initUI()
         
         self.ui.TextDocument = qtg.QTextDocument(self.ui.textEdit)
@@ -43,72 +47,46 @@ class Main(qtw.QMainWindow):
 
     def get_session_settings(self):
         # get session settings
-        # Define json data        
         print("loading session")
-        with open('Model/Project/Data/json/Session.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            bookabbr_key = r"self.bookabbr"
-            chapter_key = r"self.chapter"
-            verse_key = r"self.verse"
-            word_key = r"self.word"
-            chr_key = r"self.chr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            linespacing_key = r"self.verselinespacing"
-            reflinespacing_key = r"self.reflinespacing"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            txtfileList_key = r"self.txtfileList"
-            reftxtpath_key = r"self.reftxtpath"
-            reftxtdir_key = r"self.reftxtdir"
-            reftxtfileList_key = r"self.reftxtfileList"
+        session = self.session_manager.values('Session.json')
 
-            print(bookabbr_key,chapter_key)
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                
-                if Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                    #self.ui.bookComboBox.setCurrentText(self.bookabbr)            
-                elif Setting['Setting'] == chapter_key:  
-                    self.chapter = Setting['CurrentValue']          
-                elif Setting['Setting'] == verse_key:
-                    self.verse = Setting['CurrentValue']
-                elif Setting['Setting'] == word_key:
-                    self.word = Setting['CurrentValue'] 
-                elif Setting['Setting'] == chr_key:
-                    self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']
-                    #  self.ui.fontSizeBox.setValue(int(self.fontsize))           
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == txtpath_key:  
-                    self.txtpath = Setting['CurrentValue'] 
-                elif Setting['Setting'] == txtdir_key:  
-                    self.txtdir = Setting['CurrentValue']
-                elif Setting['Setting'] == reftxtpath_key:  
-                    self.reftxtpath = Setting['CurrentValue'] 
-                elif Setting['Setting'] == reftxtdir_key:  
-                    self.reftxtdir = Setting['CurrentValue']
-                
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
-   
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
+
+        self.bookabbr = get_setting('bookabbr', '')
+        self.chapter = get_setting('chapter', '1')
+        self.verse = get_setting('verse', '1')
+        self.word = get_setting('word', '1')
+        self.chr = get_setting('chr', '1')
+        self.font = get_setting('font', self.font if hasattr(self, 'font') else '')
+        self.fontsize = get_setting('fontsize', self.fontsize if hasattr(self, 'fontsize') else 20)
+        self.linespacing = get_setting('verselinespacing', self.linespacing if hasattr(self, 'linespacing') else '')
+        self.reflinespacing = get_setting('reflinespacing', self.reflinespacing if hasattr(self, 'reflinespacing') else '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.txtpath = get_setting('txtpath', '')
+        self.txtdir = get_setting('txtdir', '')
+        self.txtfileList = get_setting('txtfileList', [])
+        self.reftxtpath = get_setting('reftxtpath', '')
+        self.reftxtdir = get_setting('reftxtdir', '')
+        self.reftxtfileList = get_setting('reftxtfileList', [])
+
+        if hasattr(self, 'ui'):
+            if hasattr(self.ui, 'bookComboBox'):
+                self.ui.bookComboBox.setCurrentText(self.bookabbr)
+            if hasattr(self.ui, 'fontComboBox'):
+                self.ui.fontComboBox.setCurrentText(self.font)
+            if hasattr(self.ui, 'fontSizeBox') and str(self.fontsize).isdigit():
+                self.ui.fontSizeBox.setValue(int(self.fontsize))
+            if hasattr(self, 'LHlineEdit'):
+                self.LHlineEdit.setText(self.linespacing)
+
+    def save_session_settings(self, **updates):
+        self.session_manager.update('Session.json', updates)
+
     def initToolbar(self):
         # new widgets       
         self.textLineEdit = qtw.QLineEdit(self)
@@ -869,9 +847,9 @@ class Main(qtw.QMainWindow):
         cursor = self.ui.textEdit.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
-        bf = self.ui.TextCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.TextBlockFormat.ProportionalHeight) 
-        cursor.mergeBlockFormat(bf)
+        #bf = self.ui.TextCursor.blockFormat()
+        #bf.setLineHeight(lineSpacing, self.ui.TextBlockFormat.ProportionalHeight) 
+        #cursor.mergeBlockFormat(bf)
     
     def on_font_update(self):
         # update font to selection and size       

@@ -18,7 +18,9 @@ import numpy as np
 from scipy import ndimage
 import math
 from copy import deepcopy
+from HelpSystem import add_help_menu
 import platform
+from SessionManager import SessionManager
 
 # PyQt5 imports
 from PyQt5 import uic
@@ -120,6 +122,8 @@ class PixlerMain(qtw.QMainWindow):
 
         self.ui = Ui_Pixler()
         self.ui.setupUi(self)
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyPixler')
         self.initUI()
 
         # extended slots code
@@ -179,220 +183,93 @@ class PixlerMain(qtw.QMainWindow):
 
     def get_session_settings(self):
         # get session settings
-        # Define json data
-        print("importing Scanner session settings: imgpath and imgdir")
-        with open(self.projecthome + 'Model/Project/Data/json/ScannerSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == imgpath_key:
-                    self.imgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == imgdir_key:  
-                    self.imgdir = Setting['CurrentValue']
+        sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
 
-            print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        print("loading scanner session")
+        scanner_session = sm.values('ScannerSession.json')
+        self.imgpath = scanner_session.get('self.imgpath', getattr(self, 'imgpath', ''))
+        self.imgdir = scanner_session.get('self.imgdir', getattr(self, 'imgdir', ''))
 
-        print("loading session")
-        with open(self.projecthome + 'Model/Project/Data/json/PixlerSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            jsondir_key = r"self.jsondir"
-            session_key = r"self.session"
-            workflow_key = r"self.workflow"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            ocrlang_key = r"self.ocrlang"
-            ocrmodel_key = r"self.ocrmodel"
-            bookabbr_key = r"self.bookabbr"
-            chr_key = r"self.chr"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            pixmap_key = r"self.pixmap"
-            qimage_key = r"self.qimage"
-            bmpsourcedir_key = r"self.bmpsourcedir"
-            bmpgreekdir_key = r"self.bmpgreekdir"
-            refimgpath_key = r"self.refimgpath"
-            refimgdir_key = r"self.refimgdir"
-            refimg_xoffset_key = r"self.refimg_xoffset"
-            refimg_yoffset_key = r"self.refimg_yoffset"
-            refimgtfileList_key = r"self.refimgtfileList"
-            refimgzoom_key = r"self.refimgzoom"
-            refimgzoomslidervalue_key = r"self.refimgzoomslidervalue"
-            imagepath_key = r"self.imagepath"
-            imagedir_key = r"self.imagedir"
-            image_xoffset_key = r"self.image_xoffset"
-            image_yoffset_key = r"self.image_yoffset"
-            imagefileList_key = r"self.imagefileList"
-            imagezoom_key = r"self.imagezoom"
-            imagezoomslidervalue_key = r"self.imagezoomslidervalue"
-            pixlerpagesrotatedir_key = r"self.pixlerpagesrotatedir"
-            greekpages_key = r"self.greekpages"
-            greekpagesrotated_key = r"self.greekpagesrotated"
-            greekpagesdeskewed_key = r"self.greekpagesdeskewed"
-            greekpagescropped_key = r"self.greekpagescropped"
-            greekpagescleaned_key = r"self.greekpagescleaned"
-            greekpagesbox_key = r"self.greekpagesbox"
-            greeklinescropped_key = r"self.greeklinescropped"
-            greeklinescleaned_key = r"self.greeklinescleaned"
-            greeklinesbox_key = r"self.greeklinesbox"
-            latinpages_key = r"self.latinpages"
-            latinpagesrotated_key = r"self.latinpagesrotated"
-            latinpagesdeskewed_key = r"self.latinpagesdeskewed"
-            latinpagescropped_key = r"self.latinpagescroppe"
-            latinpagescleaned_key = r"self.latinpagescleaned"
-            latinpagesbox_key = r"self.latinpagesbox"
-            latinlinescropped_key = r"self.latinlinescropped"
-            latinlinescleaned_key = r"self.latinlinescleaned"
-            latinlinesbox_key = r"self.latinlinesbox"
-            hebrewpagesdenoised_key = r"self.hebrewpagesdenoised"           
-            hebrewpagesrotated_key = r"self.hebrewpagesrotated"
-            hebrewpagesdeskewed_key = r"self.hebrewpagesdeskewed"
-            hebrewpagescropped_key = r"self.hebrewpagescroppe"
-            hebrewpagescleaned_key = r"self.hebrewpagescleaned"
-            hebrewpagesbox_key = r"self.hebrewpagesbox"
-            hebrewlinescropped_key = r"self.hebrewlinescropped"
-            hebrewlinescleaned_key = r"self.hebrewlinescleaned"
-            hebrewlinesbox_key = r"self.hebrewlinesbox"
+        print("loading pixler session")
+        session = sm.values('PixlerSession.json')
 
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
 
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == jsondir_key:
-                    self.jsondir = Setting['CurrentValue']
-                elif Setting['Setting'] == session_key:
-                    self.session = Setting['CurrentValue']
-                    self.session = self.projecthome + self.jsondir + "/" + self.session
-                elif Setting['Setting'] == workflow_key: 
-                    self.workflow = Setting['CurrentValue']
-                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue'] 
-                elif Setting['Setting'] == ocrlang_key:
-                    self.ocrlang = Setting['CurrentValue']
-                elif Setting['Setting'] == ocrmodel_key:
-                    self.ocrmodel = Setting['CurrentValue']
-                elif Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                    #self.ui.bookComboBox.setCurrentText(self.bookabbr)            
-                elif Setting['Setting'] == chr_key:
-                    self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == pixmap_key:
-                    self.pixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == qimage_key:
-                    self.qimage = Setting['CurrentValue']
-                elif Setting['Setting'] == bmpsourcedir_key:
-                    self.bmpsourcedir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == bmpgreekdir_key:
-                    self.bmpgreekdir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == refimgpath_key:
-                    self.refimgpath = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == refimgdir_key:
-                    self.refimgdir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == refimg_xoffset_key:
-                    self.refimg_xoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == refimg_yoffset_key:
-                    self.refimg_yoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgtfileList_key:
-                    self.refimgtfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgzoom_key:
-                    self.refimgzoom = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgzoomslidervalue_key:
-                    self.refimgzoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == imagepath_key:
-                    self.imagepath = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == imagedir_key:
-                    self.imagedir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == image_xoffset_key:
-                    self.image_xoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == image_yoffset_key:
-                    self.image_yoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == imagefileList_key:
-                    self.imagefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == imagezoom_key:
-                    self.imagezoom = Setting['CurrentValue']
-                elif Setting['Setting'] == imagezoomslidervalue_key:
-                    self.imagezoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == pixlerpagesrotatedir_key:
-                    self.pixlerpagesrotatedir = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpages_key:
-                    self.greekpages = self.projecthome + Setting['CurrentValue']          
-                elif Setting['Setting'] == greekpagesrotated_key:
-                    self.greekpagesrotated = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagesdeskewed_key:
-                    self.greekpagesdeskewed = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagescropped_key:
-                    self.greekpagescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagescleaned_key:
-                    self.greekpagescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagesbox_key:
-                    self.greekpagesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinescropped_key:
-                    self.greeklinescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinescleaned_key:
-                    self.greeklinescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinesbox_key:
-                    self.greeklinesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpages_key:
-                    self.latinpages = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesrotated_key:
-                    self.latinpagesrotated = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesdeskewed_key:
-                    self.latinpagesdeskewed = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagescropped_key:
-                    self.latinpagescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagescleaned_key:
-                    self.latinpagescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesbox_key:
-                    self.latinpagesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinescropped_key:
-                    self.latinlinescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinescleaned_key:
-                    self.latinlinescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinesbox_key:
-                    self.latinlinesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesdenoised_key:
-                    self.hebrewpagesdenoised = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesrotated_key:
-                    self.hebrewpagesrotated = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesdeskewed_key:
-                    self.hebrewpagesdeskewed = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagescropped_key:
-                    self.hebrewpagescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagescleaned_key:
-                    self.hebrewpagescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesbox_key:
-                    self.hebrewpagesbox = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewlinescropped_key:
-                    self.hebrewlinescropped = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewlinescleaned_key:
-                    self.hebrewlinescleaned = self.projecthome + Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewlinesbox_key:
-                    self.hebrewlinesbox = self.projecthome + Setting['CurrentValue']
-                
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
-            
-            print(f'Absolute Path to Project Directory: {self.projecthome}')
+        def abs_project_path(name: str, default=''):
+            value = session.get(f'self.{name}')
+            if value:
+                return self.projecthome + value
+            return getattr(self, name, default)
+
+        def data_path(name: str, default=''):
+            value = session.get(f'self.{name}')
+            if value:
+                return self.projecthome + self.jsondir + "/" + value
+            return getattr(self, name, default)
+
+        self.jsondir = get_setting('jsondir', '')
+        self.session = data_path('session')
+        self.workflow = data_path('workflow')
+        self.font = get_setting('font', '')
+        self.fontsize = get_setting('fontsize', 20)
+        self.ocrlang = get_setting('ocrlang', '')
+        self.ocrmodel = get_setting('ocrmodel', '')
+        self.bookabbr = get_setting('bookabbr', '')
+        self.chr = get_setting('chr', '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.pixmap = get_setting('pixmap', None)
+        self.qimage = get_setting('qimage', None)
+        self.bmpsourcedir = abs_project_path('bmpsourcedir')
+        self.bmpgreekdir = abs_project_path('bmpgreekdir')
+        self.refimgpath = abs_project_path('refimgpath')
+        self.refimgdir = abs_project_path('refimgdir')
+        self.refimg_xoffset = get_setting('refimg_xoffset', 0)
+        self.refimg_yoffset = get_setting('refimg_yoffset', 0)
+        self.refimgtfileList = get_setting('refimgtfileList', [])
+        self.refimgzoom = get_setting('refimgzoom', '')
+        self.refimgzoomslidervalue = get_setting('refimgzoomslidervalue', 0)
+        self.imagepath = abs_project_path('imagepath')
+        self.imagedir = abs_project_path('imagedir')
+        self.image_xoffset = get_setting('image_xoffset', 0)
+        self.image_yoffset = get_setting('image_yoffset', 0)
+        self.imagefileList = get_setting('imagefileList', [])
+        self.imagezoom = get_setting('imagezoom', '')
+        self.imagezoomslidervalue = get_setting('imagezoomslidervalue', 0)
+        self.pixlerpagesrotatedir = abs_project_path('pixlerpagesrotatedir')
+        self.greekpages = abs_project_path('greekpages')
+        self.greekpagesrotated = abs_project_path('greekpagesrotated')
+        self.greekpagesdeskewed = abs_project_path('greekpagesdeskewed')
+        self.greekpagescropped = abs_project_path('greekpagescropped')
+        self.greekpagescleaned = abs_project_path('greekpagescleaned')
+        self.greekpagesbox = abs_project_path('greekpagesbox')
+        self.greeklinescropped = abs_project_path('greeklinescropped')
+        self.greeklinescleaned = abs_project_path('greeklinescleaned')
+        self.greeklinesbox = abs_project_path('greeklinesbox')
+        self.latinpages = abs_project_path('latinpages')
+        self.latinpagesrotated = abs_project_path('latinpagesrotated')
+        self.latinpagesdeskewed = abs_project_path('latinpagesdeskewed')
+        self.latinpagescropped = abs_project_path('latinpagescropped')
+        self.latinpagescleaned = abs_project_path('latinpagescleaned')
+        self.latinpagesbox = abs_project_path('latinpagesbox')
+        self.latinlinescropped = abs_project_path('latinlinescropped')
+        self.latinlinescleaned = abs_project_path('latinlinescleaned')
+        self.latinlinesbox = abs_project_path('latinlinesbox')
+        self.hebrewpagesdenoised = abs_project_path('hebrewpagesdenoised')
+        self.hebrewpagesrotated = abs_project_path('hebrewpagesrotated')
+        self.hebrewpagesdeskewed = abs_project_path('hebrewpagesdeskewed')
+        self.hebrewpagescropped = abs_project_path('hebrewpagescropped')
+        self.hebrewpagescleaned = abs_project_path('hebrewpagescleaned')
+        self.hebrewpagesbox = abs_project_path('hebrewpagesbox')
+        self.hebrewlinescropped = abs_project_path('hebrewlinescropped')
+        self.hebrewlinescleaned = abs_project_path('hebrewlinescleaned')
+        self.hebrewlinesbox = abs_project_path('hebrewlinesbox')
+
+        print(f'Absolute Path to Project Directory: {self.projecthome}')
 
     def get_workflow_settings(self):
 
@@ -599,33 +476,10 @@ class PixlerMain(qtw.QMainWindow):
         
         self.refimgdir = os.path.dirname(imgfilename)
         self.ui.RefImgLE.setText(filestr)
-        jsonfile = self.session
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            refimgpath_key = r"self.refimgpath"
-            refimgdir_key = r"self.refimgdir"
-            #refimgpixmap_key = r"self.refimgpixmap"
-            #refimgqimage_key = r"self.refimgqimage"
-            for Setting in data:
-                if Setting['Setting'] == refimgpath_key:
-                    Setting['CurrentValue'] = self.refimgpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == refimgdir_key:  
-                    Setting['CurrentValue'] = self.refimgdir
-                    print(Setting['CurrentValue'])
-                '''elif Setting['Setting'] == refimgpixmap_key:
-                    Setting['CurrentValue'] = self.refimgpixmap
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == refimgqimage_key:
-                    Setting['CurrentValue'] = self.refimgqimage
-                    print(Setting['CurrentValue'])'''
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
+            'self.refimgpath': self.refimgpath,
+            'self.refimgdir': self.refimgdir,
+        })
         
         self.refimgfileList = []
         for i in os.listdir(self.refimgdir):
@@ -677,33 +531,10 @@ class PixlerMain(qtw.QMainWindow):
         
         self.imagedir = os.path.dirname(imgfilename)
         self.ui.ImageLE.setText(filestr)
-        jsonfile = self.session
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            imagepath_key = r"self.imagepath"
-            imagedir_key = r"self.imagedir"
-            #imagepixmap_key = r"self.imagepixmap"
-            #imageqimage_key = r"self.imageqimage"
-            for Setting in data:
-                if Setting['Setting'] == imagepath_key:
-                    Setting['CurrentValue'] = self.imagepath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imagedir_key:  
-                    Setting['CurrentValue'] = self.imagedir
-                    print(Setting['CurrentValue'])
-                '''elif Setting['Setting'] == imagepixmap_key:
-                    Setting['CurrentValue'] = self.imagepixmap
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imageqimage_key:
-                    Setting['CurrentValue'] = self.imageqimage
-                    print(Setting['CurrentValue'])'''
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
+            'self.imagepath': self.imagepath,
+            'self.imagedir': self.imagedir,
+        })
         
         self.imagefileList = []
         for i in os.listdir(self.imagedir):
@@ -798,29 +629,11 @@ class PixlerMain(qtw.QMainWindow):
             print("pdf page extraction complete")
         
 
-            jsonfile = self.projecthome + 'Model/Project/Data/json/Session.json'
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                sourcefile_key = r"self.sourcefile"
-                firstpage_key = r"self.firstpage"
-                lastpage_key = r"self.lastpage"
-                for Setting in data:
-                    if Setting['Setting'] == sourcefile_key:
-                        Setting['CurrentValue'] = self.sourcefile
-                        print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == firstpage_key:  
-                        Setting['CurrentValue'] = self.firstpage
-                        print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == lastpage_key:  
-                        Setting['CurrentValue'] = self.lastpage
-                        print(Setting['CurrentValue'])
-            f.close()
-
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('Session.json', {
+                'self.sourcefile': self.sourcefile,
+                'self.firstpage': self.firstpage,
+                'self.lastpage': self.lastpage,
+            })
         
         def reject():
             pass
@@ -3529,7 +3342,7 @@ class Adjust(QWidget):
             hflip_ct += 1
             self.flip[1] = hflip_ct % 2 == 1
 
-        crop_frame = Crop()
+        #crop_frame = click_crop()  ---don't have the right function defined
         crop_frame.n_btn.clicked.connect(click_n1)
         crop_frame.y_btn.clicked.connect(click_y1)
         crop_frame.rotate.clicked.connect(add_90)

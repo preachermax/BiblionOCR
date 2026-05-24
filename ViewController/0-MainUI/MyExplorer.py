@@ -2,7 +2,11 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 import os
+import shlex
 import sys
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
 
 import MyExplorerUI
 
@@ -19,7 +23,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.populate()
 
     def populate(self):
-        dir_path = r'Model/Project/'
+        dir_path = os.path.join(project_root, 'Model', 'Project')
         self.model = QtWidgets.QFileSystemModel()
         self.model.setRootPath(dir_path)
         self.treeView.setModel(self.model)
@@ -36,8 +40,8 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
     def open_file(self):
         index = self.treeView.currentIndex()
         file_path = self.model.filePath(index)
-        #For Windows: os.startfile(file_path)
-        os.system("xdg-open " + file_path)
+        # For Windows: os.startfile(file_path)
+        os.system("xdg-open " + shlex.quote(file_path))
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])

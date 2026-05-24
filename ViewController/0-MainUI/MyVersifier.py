@@ -7,6 +7,7 @@ import json
 import csv
 import time
 import platform
+from HelpSystem import add_help_menu
 
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
@@ -17,6 +18,7 @@ from ext import *
 from ext import versifiercount, versefind, reffind
 # Custom imports
 from MyVersifierUI import Ui_Versifier
+from SessionManager import SessionManager
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 import ChrReference as chrref
@@ -48,7 +50,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
-
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyVersifier')
         self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
 
         self.ui.BothPrevBookButton.clicked.connect(self.findPrevVerseBook)
@@ -186,268 +189,110 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.getstarted()
 
     def get_session_settings(self):
-        # get session settings        
-        # Define json data        
+        # get session settings
         print("loading session")
-        with open(self.projecthome + 'Model/Project/Data/json/VersifierSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            jsondir_key = r"self.jsondir"
-            session_key = r"self.session"
-            workflow_key = r"self.workflow"
-            crossref_key = r"self.crossref"
-            booksmarkdown_key = r"self.booksmarkdown"
-            bookchapter_key = r"self.bookchapter"
-            bookchapterverse_key = r"self.bookchapterverse"
-            linebookchapterverse_key = r"self.linebookchapterverse"
-            booksabbrnamenumindex_key = r"self.booksabbrnamenumindex"
-            projectsdir_key = r'self.projectsdir'
-            projectname_key = r'self.projectname'  
-            ocrlang_key = r"self.ocrlang"
-            ocrmodel_key = r"self.ocrmodel"
-            sqldir_key = r"self.sqldir"
-            bothbookabbr_key = r"self.bothbookabbr"
-            bothchapter_key = r"self.bothchapter"
-            bothverse_key = r"self.bothverse"
-            anchorbook_key = r"self.anchorbook"
-            anchorchapter_key = r"self.anchorchapter"
-            anchorverse_key = r"self.anchorverse"
-            anchorline_key = r"self.anchorline"
-            versebookabbr_key = r"self.versebookabbr"
-            versechapter_key = r"self.versechapter"
-            verseverse_key = r"self.verseverse"
-            verseline_key = r"self.verseline"
-            verselastbook_key = r"self.verselastbook"
-            verselastchapter_key = r"self.verselastchapter"
-            verselastverse_key = r"self.verselastverse"
-            verselastline_key = r"self.verselastline"
-            refbookabbr_key = r"self.refbookabbr"
-            refchapter_key = r"self.refchapter"
-            refverse_key = r"self.refverse"
-            refline_key = r"self.refline"
-            sourcebookmarkdown_key = r"self.sourcebookmarkdown"
-            greekbookmarkdown_key = r"self.greekbookmarkdown"
-            latinbookmarkdown_key = r"self.latinbookmarkdown"
-            variantdb_key = r"self.variantdb"
-            variantcorrected_key = r"self.variantcorrected"
-            variantpreserved_key = r"self.variantpreserved"
-            variantkey_key = r"self.variantkey"
-            versedbpath_key = r"self.versedbpath"
-            versetable_key = r"self.versetable"
-            versepath_key = r"self.versepath"
-            versedir_key = r"self.versedir"
-            versenormpathsel_key = r"self.versenormpathsel"
-            versenormpath_key = r"self.versenormpath"
-            versenormdir_key = r"self.versenormdir"
-            versefont_key = r"self.versefont"
-            versefontsize_key = r"self.versefontsize"
-            versewordnumber_key = r"self.versewordnumber"
-            verseword_key = r"self.verseword"
-            selverseword_key = r"self.selverseword"
-            verselineheight_key = r"self.verselineheight"
-            refdbpath_key = r"self.refdbpath"
-            reftable_key = r"self.reftable"
-            refpath_key = r"self.refpath"
-            refdir_key = r"self.refdir"
-            refnormpathsel_key = r"self.refnormpathsel"
-            refnormpath_key = r"self.refnormpath"
-            refnormdir_key = r"self.refnormdir"
-            reffont_key = r"self.reffont"
-            reffontsize_key = r"self.reffontsize"
-            refwordnumber_key = r"self.refwordnumber"
-            refword_key = r"self.refword"
-            selrefword_key = r"self.selrefword"
-            reflineheight_key = r"self.reflineheight"
+        session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('VersifierSession.json')
 
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
 
-            #print(bookabbr_key,chapter_key)
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == jsondir_key:
-                    self.jsondir = Setting['CurrentValue']
-                elif Setting['Setting'] == session_key:
-                    self.session = Setting['CurrentValue']
-                    self.session = self.projecthome + self.jsondir + "/" + self.session
-                elif Setting['Setting'] == workflow_key: 
-                    self.workflow = Setting['CurrentValue']
-                    self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
-                elif Setting['Setting'] == crossref_key:
-                    self.crossref = Setting['CurrentValue']
-                    self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
-                elif Setting['Setting'] == booksmarkdown_key:
-                    self.booksmarkdown = Setting['CurrentValue']
-                    self.booksmarkdown = self.projecthome + self.jsondir + "/" + self.booksmarkdown
-                elif Setting['Setting'] == bookchapter_key:
-                    self.bookchapter = Setting['CurrentValue']
-                    self.bookchapter = self.projecthome + self.jsondir + "/" + self.bookchapter
-                elif Setting['Setting'] == bookchapterverse_key:
-                    self.bookchapterverse = Setting['CurrentValue']
-                    self.bookchapterverse = self.projecthome + self.jsondir + "/" + self.bookchapterverse
-                elif Setting['Setting'] == linebookchapterverse_key:
-                    self.linebookchapterverse = Setting['CurrentValue']
-                    self.linebookchapterverse = self.projecthome + self.jsondir + "/" + self.linebookchapterverse
-                elif Setting['Setting'] == booksabbrnamenumindex_key:
-                    self.booksabbrnamenumindex = Setting['CurrentValue']
-                    self.booksabbrnamenumindex = self.projecthome + self.jsondir + "/" + self.booksabbrnamenumindex
-                elif Setting['Setting'] == projectsdir_key:
-                    self.projectsdir = Setting['CurrentValue']
-                elif Setting['Setting'] == projectname_key:
-                    self.projectname = Setting['CurrentValue']
-                elif Setting['Setting'] == ocrlang_key:
-                    self.ocrlang = Setting['CurrentValue']
-                    self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-                elif Setting['Setting'] == ocrmodel_key:
-                    self.ocrmodel= Setting['CurrentValue']
-                    self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
-                elif Setting['Setting'] == sqldir_key:
-                    self.sqldir = Setting['CurrentValue']
-                    self.sqldir = self.projecthome + self.sqldir
-                elif Setting['Setting'] == bothbookabbr_key:
-                    self.bothbookabbr = Setting['CurrentValue']
-                    self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
-                elif Setting['Setting'] == bothchapter_key:  
-                    self.bothchapter = Setting['CurrentValue']
-                    self.ui.chapterComboBox.setCurrentText(self.bothchapter)
-                    print('chapter type: ' + str(type(self.bothchapter)))
-                elif Setting['Setting'] == bothverse_key:
-                    self.bothverse = Setting['CurrentValue']
-                    self.ui.verseComboBox.setCurrentText(self.bothverse)
-                    print('verse type: ' + str(type(self.bothverse)))
-                elif Setting['Setting'] == anchorbook_key:
-                    self.anchorbook = Setting['CurrentValue']
-                elif Setting['Setting'] == anchorchapter_key:
-                    self.anchorchapter = Setting['CurrentValue']
-                elif Setting['Setting'] == anchorverse_key:
-                    self.anchorverse = Setting['CurrentValue']
-                elif Setting['Setting'] == anchorline_key:
-                    self.anchorline = Setting['CurrentValue']
-                elif Setting['Setting'] == versebookabbr_key:
-                    self.versebookabbr = Setting['CurrentValue']
-                    self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
-                elif Setting['Setting'] == versechapter_key:  
-                    self.versechapter = Setting['CurrentValue']
-                    self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
-                    print('chapter type: ' + str(type(self.versechapter)))
-                elif Setting['Setting'] == verseverse_key:
-                    self.verseverse = Setting['CurrentValue']
-                    self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
-                    print('verse type: ' + str(type(self.verseverse)))
-                elif Setting['Setting'] == verseline_key:
-                    self.verseline = Setting['CurrentValue']
-                    self.ui.VerselineComboBox.setCurrentText(self.verseline)
-                    print('verse type: ' + str(type(self.verseverse)))
-                elif Setting['Setting'] == verselastbook_key:
-                    self.verselastbook = Setting['CurrentValue']
-                elif Setting['Setting'] == verselastchapter_key:
-                    self.verselastchapter = Setting['CurrentValue']
-                elif Setting['Setting'] == verselastverse_key:
-                    self.verselastverse = Setting['CurrentValue']
-                elif Setting['Setting'] == verselastline_key:
-                    self.verselastline = Setting['CurrentValue']
-                elif Setting['Setting'] == refbookabbr_key:
-                    self.refbookabbr = Setting['CurrentValue']
-                    self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
-                elif Setting['Setting'] == refchapter_key:  
-                    self.refchapter = Setting['CurrentValue']
-                    self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
-                    print('ref chapter: ' + str(type(self.refchapter)))
-                elif Setting['Setting'] == refverse_key:
-                    self.refverse = Setting['CurrentValue']
-                    self.ui.RefverseComboBox.setCurrentText(self.refverse)
-                    print('ref verse: ' + str(type(self.refverse)))
-                elif Setting['Setting'] == refline_key:
-                    self.refline = Setting['CurrentValue']
-                    self.ui.ReflineComboBox.setCurrentText(self.refline)
-                    print('ref line: ' + str(type(self.refline)))
-                elif Setting['Setting'] == sourcebookmarkdown_key:
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greekbookmarkdown_key:
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latinbookmarkdown_key:
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == variantdb_key:
-                    self.variantdb = Setting['CurrentValue']
-                    self.variantdb = self.projecthome + self.variantdb 
-                elif Setting['Setting'] == variantcorrected_key:
-                    self.variantcorrected = Setting['CurrentValue']
-                elif Setting['Setting'] == variantpreserved_key:
-                    self.variantpreserved = Setting['CurrentValue']
-                elif Setting['Setting'] == variantkey_key:
-                    self.variantkey = Setting['CurrentValue']
-                elif Setting['Setting'] == versedbpath_key:
-                    self.versedbpath = Setting['CurrentValue']
-                    self.versedbpath = self.projecthome + self.versedbpath
-                elif Setting['Setting'] == versetable_key:
-                    self.versetable = Setting['CurrentValue']
-                elif Setting['Setting'] == versepath_key:
-                    self.versepath = Setting['CurrentValue']
-                    self.versepath = self.projecthome + self.versepath
-                    self.ui.VerseTextLE.setText(os.path.basename(self.versepath))
-                elif Setting['Setting'] == versedir_key:
-                    self.versedir = Setting['CurrentValue']
-                    self.versedir = self.projecthome + self.versedir
-                elif Setting['Setting'] == versenormpathsel_key:
-                    self.versenormpathsel = Setting['CurrentValue']
-                elif Setting['Setting'] == versenormpath_key:
-                    self.versenormpath = Setting['CurrentValue']
-                    self.versenormpath = self.projecthome + self.versenormpath
-                elif Setting['Setting'] == versenormdir_key:
-                    self.versenormdir = Setting['CurrentValue']
-                    self.versenormdir = self.projecthome + self.versenormdir
-                elif Setting['Setting'] == versefont_key:
-                    self.versefont = Setting['CurrentValue']
-                elif Setting['Setting'] == versefontsize_key:
-                    self.versefontsize = Setting['CurrentValue']
-                elif Setting['Setting'] == versewordnumber_key:
-                    self.versewordnumber = Setting['CurrentValue']
-                elif Setting['Setting'] == verseword_key:
-                    self.verseword = Setting['CurrentValue']
-                elif Setting['Setting'] == selverseword_key:
-                    self.selverseword = Setting['CurrentValue']
-                elif Setting['Setting'] == verselineheight_key:
-                    self.verselineheight = Setting['CurrentValue']
-                elif Setting['Setting'] == refdbpath_key:
-                    self.refdbpath = Setting['CurrentValue']
-                    self.refdbpath = self.projecthome + self.refdbpath
-                elif Setting['Setting'] == reftable_key:
-                    self.reftable = Setting['CurrentValue']
-                elif Setting['Setting'] == refpath_key:
-                    self.refpath = Setting['CurrentValue']
-                    self.refpath = self.projecthome + self.refpath
-                    self.ui.RefTextLE.setText(os.path.basename(self.refpath))
-                elif Setting['Setting'] == refdir_key:
-                    self.refdir = Setting['CurrentValue']
-                    self.refdir = self.projecthome + self.refdir
-                elif Setting['Setting'] == refnormpathsel_key:
-                    self.refnormpathsel = Setting['CurrentValue']
-                elif Setting['Setting'] == refnormpath_key:
-                    self.refnormpath = Setting['CurrentValue']
-                    self.refnormpath = self.projecthome + self.refnormpath
-                elif Setting['Setting'] == refnormdir_key:
-                    self.refnormdir = Setting['CurrentValue']
-                    self.refnormdir = self.projecthome + self.refnormdir
-                elif Setting['Setting'] == reffont_key:
-                    self.reffont = Setting['CurrentValue']
-                elif Setting['Setting'] == reffontsize_key:
-                    self.reffontsize = Setting['CurrentValue']
-                elif Setting['Setting'] == refwordnumber_key:
-                    self.refwordnumber = Setting['CurrentValue']
-                elif Setting['Setting'] == refword_key:
-                    self.refword = Setting['CurrentValue']
-                elif Setting['Setting'] == selrefword_key:
-                    self.selrefword = Setting['CurrentValue']
-                elif Setting['Setting'] == reflineheight_key:
-                    self.reflineheight = Setting['CurrentValue']
-                
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        def abs_project_path(name: str, default=''):
+            value = session.get(f'self.{name}')
+            if value:
+                return os.path.join(self.projecthome, value.lstrip('/'))
+            return getattr(self, name, default)
 
-            # Update Project paths
+        def data_path(name: str, default=''):
+            value = session.get(f'self.{name}')
+            if value:
+                return os.path.join(self.projecthome, self.jsondir.lstrip('/'), value.lstrip('/'))
+            return getattr(self, name, default)
 
+        self.jsondir = get_setting('jsondir', '')
+        self.session = data_path('session')
+        self.workflow = data_path('workflow')
+        self.crossref = data_path('crossref')
+        self.booksmarkdown = data_path('booksmarkdown')
+        self.bookchapter = data_path('bookchapter')
+        self.bookchapterverse = data_path('bookchapterverse')
+        self.linebookchapterverse = data_path('linebookchapterverse')
+        self.booksabbrnamenumindex = data_path('booksabbrnamenumindex')
+        self.projectsdir = get_setting('projectsdir', '')
+        self.projectname = get_setting('projectname', '')
+        self.ocrlang = get_setting('ocrlang', '')
+        self.ocrmodel = get_setting('ocrmodel', '')
+        self.sqldir = abs_project_path('sqldir')
+        self.bothbookabbr = get_setting('bothbookabbr', '')
+        self.bothchapter = get_setting('bothchapter', '')
+        self.bothverse = get_setting('bothverse', '')
+        self.anchorbook = get_setting('anchorbook', '')
+        self.anchorchapter = get_setting('anchorchapter', '')
+        self.anchorverse = get_setting('anchorverse', '')
+        self.anchorline = get_setting('anchorline', '')
+        self.versebookabbr = get_setting('versebookabbr', '')
+        self.versechapter = get_setting('versechapter', '')
+        self.verseverse = get_setting('verseverse', '')
+        self.verseline = get_setting('verseline', '')
+        self.verselastbook = get_setting('verselastbook', '')
+        self.verselastchapter = get_setting('verselastchapter', '')
+        self.verselastverse = get_setting('verselastverse', '')
+        self.verselastline = get_setting('verselastline', '')
+        self.refbookabbr = get_setting('refbookabbr', '')
+        self.refchapter = get_setting('refchapter', '')
+        self.refverse = get_setting('refverse', '')
+        self.refline = get_setting('refline', '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.variantdb = abs_project_path('variantdb')
+        self.variantcorrected = get_setting('variantcorrected', '')
+        self.variantpreserved = get_setting('variantpreserved', '')
+        self.variantkey = get_setting('variantkey', '')
+        self.versedbpath = abs_project_path('versedbpath')
+        self.versetable = get_setting('versetable', '')
+        self.versepath = abs_project_path('versepath')
+        self.versedir = abs_project_path('versedir')
+        self.versenormpathsel = get_setting('versenormpathsel', '')
+        self.versenormpath = abs_project_path('versenormpath')
+        self.versenormdir = abs_project_path('versenormdir')
+        self.versefont = get_setting('versefont', '')
+        self.versefontsize = get_setting('versefontsize', '')
+        self.versewordnumber = get_setting('versewordnumber', '')
+        self.verseword = get_setting('verseword', '')
+        self.selverseword = get_setting('selverseword', '')
+        self.verselineheight = get_setting('verselineheight', '')
+        self.refdbpath = abs_project_path('refdbpath')
+        self.reftable = get_setting('reftable', '')
+        self.refpath = abs_project_path('refpath')
+        self.refdir = abs_project_path('refdir')
+        self.refnormpathsel = get_setting('refnormpathsel', '')
+        self.refnormpath = abs_project_path('refnormpath')
+        self.refnormdir = abs_project_path('refnormdir')
+        self.reffont = get_setting('reffont', '')
+        self.reffontsize = get_setting('reffontsize', '')
+        self.refwordnumber = get_setting('refwordnumber', '')
+        self.refword = get_setting('refword', '')
+        self.selrefword = get_setting('selrefword', '')
+        self.reflineheight = get_setting('reflineheight', '')
+
+        if hasattr(self, 'ui'):
+            self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+            self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+            self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
+            self.ui.chapterComboBox.setCurrentText(self.bothchapter)
+            self.ui.verseComboBox.setCurrentText(self.bothverse)
+            self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
+            self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
+            self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
+            self.ui.VerselineComboBox.setCurrentText(self.verseline)
+            self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
+            self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
+            self.ui.RefverseComboBox.setCurrentText(self.refverse)
+            self.ui.ReflineComboBox.setCurrentText(self.refline)
+            self.ui.VerseTextLE.setText(os.path.basename(self.versepath))
+            self.ui.RefTextLE.setText(os.path.basename(self.refpath))
 
     def getstarted(self):
         print(f'Reference File Path: {self.refpath}')
@@ -566,34 +411,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionAnchor(self):
         print(f'Updating the anchor session setting')
-        jsonfile = self.session
-        # Opening JSON file
-        with open(jsonfile, 'r') as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)  
-        # Iterating through the json
-        # list
-            anchorbook_key = r"self.anchorbook"
-            anchorchapter_key = r"self.anchorchapter"
-            anchorverse_key = r"self.anchorverse"
-            anchorline_key = r"self.anchorline"
-            for Setting in data:
-                    if Setting['Setting'] == anchorbook_key:
-                        Setting['CurrentValue'] = self.ui.VersebookComboBox.currentText()
-                    elif Setting['Setting'] == anchorchapter_key:
-                        Setting['CurrentValue'] = self.ui.VersechapterComboBox.currentText()
-                    elif Setting['Setting'] == anchorverse_key:
-                        Setting['CurrentValue'] = self.ui.VerseverseComboBox.currentText()
-                    elif Setting['Setting'] == anchorline_key:
-                        self.anchorline = self.ui.VerselineComboBox.currentText()
-                        Setting['CurrentValue'] = self.anchorline
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()  
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.anchorbook': self.ui.VersebookComboBox.currentText(),
+            'self.anchorchapter': self.ui.VersechapterComboBox.currentText(),
+            'self.anchorverse': self.ui.VerseverseComboBox.currentText(),
+            'self.anchorline': self.ui.VerselineComboBox.currentText(),
+        })  
 
     def addVerse(self):
         if self.ui.VerseNormcheckBox.isChecked():
@@ -679,34 +502,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionLastVerse(self):
         print(f'Updating the last verse session setting')
-        jsonfile = self.session
-        # Opening JSON file
-        with open(jsonfile, 'r') as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)  
-        # Iterating through the json
-        # list
-            verselastbook_key = r"self.verselastbook"
-            verselastchapter_key = r"self.verselastchapter"
-            verselastverse_key = r"self.verselastverse"
-            verselastline_key = r"self.verselastline"
-            for Setting in data:
-                    if Setting['Setting'] == verselastbook_key:
-                        Setting['CurrentValue'] = self.verselastbook
-                    elif Setting['Setting'] == verselastchapter_key:
-                        Setting['CurrentValue'] = self.verselastchapter
-                    elif Setting['Setting'] == verselastverse_key:
-                        Setting['CurrentValue'] = self.verselastverse
-                    elif Setting['Setting'] == verselastline_key:
-                        self.verselastline = self.ui.VerselineComboBox.currentText()
-                        Setting['CurrentValue'] = self.verselastline
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()        
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.verselastbook': self.verselastbook,
+            'self.verselastchapter': self.verselastchapter,
+            'self.verselastverse': self.verselastverse,
+            'self.verselastline': self.ui.VerselineComboBox.currentText(),
+        })        
 
     '''def getLastVerse(self):
         print(f'Finding the last verse:')
@@ -1345,31 +1146,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = self.session
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                versebookabbr_key = r"self.versebookabbr"
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == versebookabbr_key:
-                        Setting['CurrentValue'] = self.veersebookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-            
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+                'self.versebookabbr': self.versebookabbr,
+                'self.sourcebookmarkdown': self.sourcebookmarkdown,
+                'self.greekbookmarkdown': self.greekbookmarkdown,
+                'self.latinbookmarkdown': self.latinbookmarkdown,
+            })
 
             # Opening JSON file
             '''with open(self.booksabbr) as f:
@@ -1490,31 +1272,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
             
-            jsonfile = self.session
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                refbookabbr_key = r"self.bookabbr"
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == refbookabbr_key:
-                        Setting['CurrentValue'] = self.refbookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-            
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+                'self.bookabbr': self.refbookabbr,
+                'self.sourcebookmarkdown': self.sourcebookmarkdown,
+                'self.greekbookmarkdown': self.greekbookmarkdown,
+                'self.latinbookmarkdown': self.latinbookmarkdown,
+            })
 
             # Opening JSON file
             '''with open(self.booksabbr) as f:
@@ -1961,30 +1724,11 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionBothVerse(self):
         print(f'Updating the both verse session settings')
-        jsonfile = self.session
-        # Opening JSON file
-        with open(jsonfile, 'r') as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)  
-        # Iterating through the json
-        # list
-            bothbookabbr_key = r"self.bothbookabbr"
-            bothchapter_key = r"self.bothchapter"
-            bothverse_key = r"self.bothverse"
-            for Setting in data:
-                    if Setting['Setting'] == bothbookabbr_key:
-                        Setting['CurrentValue'] = self.bothbookabbr
-                    elif Setting['Setting'] == bothchapter_key:
-                        Setting['CurrentValue'] = self.bothchapter
-                    elif Setting['Setting'] == bothverse_key:
-                        Setting['CurrentValue'] = self.bothverse
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close() 
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.bothbookabbr': self.bothbookabbr,
+            'self.bothchapter': self.bothchapter,
+            'self.bothverse': self.bothverse,
+        }) 
 
     def findVerseVerse(self):
 
@@ -2046,34 +1790,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionVerseVerse(self):
         print(f'Updating the verse text session settings')
-        jsonfile = self.session
-        # Opening JSON file
-        with open(jsonfile, 'r') as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)  
-        # Iterating through the json
-        # list
-            versebookabbr_key = r"self.versebookabbr"
-            versechapter_key = r"self.versechapter"
-            verseverse_key = r"self.verseverse"
-            verseline_key = r"self.verseline"
-            for Setting in data:
-                    if Setting['Setting'] == versebookabbr_key:
-                        Setting['CurrentValue'] = self.versebookabbr
-                    elif Setting['Setting'] == versechapter_key:
-                        Setting['CurrentValue'] = self.versechapter
-                    elif Setting['Setting'] == verseverse_key:
-                        Setting['CurrentValue'] = self.verseverse
-                    elif Setting['Setting'] == verseline_key:
-                        self.verseline = self.ui.VerselineComboBox.currentText()
-                        Setting['CurrentValue'] = self.verseline
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close() 
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.versebookabbr': self.versebookabbr,
+            'self.versechapter': self.versechapter,
+            'self.verseverse': self.verseverse,
+            'self.verseline': self.ui.VerselineComboBox.currentText(),
+        }) 
 
     def findNextVerseVerse(self):
         self.ui.VerseverseComboBox.setCurrentText(str(int(self.ui.VerseverseComboBox.currentText()) + 1))
@@ -2454,34 +2176,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateSessionRefVerse(self):
         print(f'Updating the reference text session settings')
-        jsonfile = self.session
-        # Opening JSON file
-        with open(jsonfile, 'r') as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)  
-        # Iterating through the json
-        # list
-            refbookabbr_key = r"self.refbookabbr"
-            refchapter_key = r"self.refchapter"
-            refverse_key = r"self.refverse"
-            refline_key = r"self.refline"
-            for Setting in data:
-                    if Setting['Setting'] == refbookabbr_key:
-                        Setting['CurrentValue'] = self.refbookabbr
-                    elif Setting['Setting'] == refchapter_key:
-                        Setting['CurrentValue'] = self.refchapter
-                    elif Setting['Setting'] == refverse_key:
-                        Setting['CurrentValue'] = self.refverse
-                    elif Setting['Setting'] == refline_key:
-                        self.refline = self.ui.VerselineComboBox.currentText()
-                        Setting['CurrentValue'] = self.refline
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close() 
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.refbookabbr': self.refbookabbr,
+            'self.refchapter': self.refchapter,
+            'self.refverse': self.refverse,
+            'self.refline': self.ui.VerselineComboBox.currentText(),
+        }) 
 
     def findNextRefVerse(self):
         self.ui.RefverseComboBox.setCurrentText(str(int(self.ui.RefverseComboBox.currentText()) + 1))
@@ -2814,30 +2514,13 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetVerseLineSpacing()      
             self.versefile.close()
        
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            versepath_key = r"self.versepath"
-            versedir_key = r"self.versedir"
-            self.versepath = self.versepath.replace(self.projecthome, "")
-            self.versedir = self.versedir.replace(self.projecthome, "")
-            for Setting in data:
-                if Setting['Setting'] == versepath_key:
-                    Setting['CurrentValue'] = self.versepath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == versedir_key:  
-                    Setting['CurrentValue'] = self.versedir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.versepath': self.versepath.replace(self.projecthome, ""),
+            'self.versedir': self.versedir.replace(self.projecthome, ""),
+        })
 
         self.versetxtfileList = []
-        for t in os.listdir(self.projecthome + self.versedir):
+        for t in os.listdir(self.versedir):
             tpath = os.path.join(self.versedir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
                 self.versetxtfileList.append(tpath)
@@ -3147,30 +2830,13 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.SetRefLineSpacing()
             #self.reffile.close()
        
-        jsonfile = self.session
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            refpath_key = r"self.refpath"
-            refdir_key = r"self.refdir"
-            self.refpath = self.refpath.replace(self.projecthome,"")
-            self.refdir = self.refdir.replace(self.projecthome,"")
-            for Setting in data:
-                if Setting['Setting'] == refpath_key:
-                    Setting['CurrentValue'] = self.refpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == refdir_key:  
-                    Setting['CurrentValue'] = self.refdir
-                    print(Setting['CurrentValue'])
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
+            'self.refpath': self.refpath.replace(self.projecthome, ""),
+            'self.refdir': self.refdir.replace(self.projecthome, ""),
+        })
 
         self.reftxtfileList = []
-        for t in os.listdir(self.projecthome + self.refdir):
+        for t in os.listdir(self.refdir):
             tpath = os.path.join(self.refdir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
                 self.reftxtfileList.append(tpath)
