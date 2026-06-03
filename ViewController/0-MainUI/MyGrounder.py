@@ -123,7 +123,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
         self.mod_abspath = os.path.abspath(self.mod_realpath) 
         self.mod_relpath = os.path.relpath(self.mod_abspath)
-        self.projecthome = self.mod_abspath + r'/'
+        self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path up one folder: {up_once}')
         #print(f'OS Path up two folders: {up_twice}')
@@ -1400,7 +1400,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
-        #defaultdir = r"c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/"
+        #defaultdir = r"~/Projects/Python/EstablishTruth/Greek lines4groundtruth/"
         defaultdir = self.projecthome + "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/" + self.greekbookmarkdown + "/"
        
         
@@ -1430,7 +1430,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.renumber_greeklines_ui = Ui_renumbergreektextlinesDialog()
         self.renumber_greeklines_ui.setupUi(self.renumber_greek_text_linesDialog)
         self.renumber_greek_text_linesDialog.show()
-        #tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
+        #tr.sortcroplines(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
 
         def setdefault():
             if self.renumber_greeklines_ui.defaultsrcBox.isChecked():

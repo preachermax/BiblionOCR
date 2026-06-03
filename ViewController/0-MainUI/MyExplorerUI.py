@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './QtDesignerUI/MyExplorerUI.ui'
+# Form implementation generated from reading ui file '/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/MyExplorerUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Explorer(object):
     def setupUi(self, Explorer):
         Explorer.setObjectName("Explorer")
+        Explorer.setWindowModality(QtCore.Qt.NonModal)
         Explorer.resize(800, 600)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionExplorer.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -44,8 +47,8 @@ class Ui_Explorer(object):
     def retranslateUi(self, Explorer):
         _translate = QtCore.QCoreApplication.translate
         Explorer.setWindowTitle(_translate("Explorer", "Project Explorer"))
-
 import UI_Icons
+
 
 if __name__ == "__main__":
     import sys
@@ -55,4 +58,3 @@ if __name__ == "__main__":
     ui.setupUi(Explorer)
     Explorer.show()
     sys.exit(app.exec_())
-

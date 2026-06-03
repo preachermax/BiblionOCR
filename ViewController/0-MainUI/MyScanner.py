@@ -13,6 +13,9 @@ import tiffcapture
 import qimage2ndarray
 from queue import Queue
 from ext import mainfind
+import subprocess
+
+
 from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
@@ -43,6 +46,13 @@ from SessionManager import SessionManager
 
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 #print(len(locals()))
 
@@ -181,6 +191,7 @@ class MainWindow(qtw.QMainWindow):
 
         #self.ui.OpenImageFilebutton.clicked.connect(self.OpenImageFileDialog)
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.actionExternally_Scan_Imsge.triggered.connect(self.ExternalScan)
         self.ui.actionEdit_Image_tb.triggered.connect(self.actionGimpEdit)
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
@@ -519,6 +530,19 @@ class MainWindow(qtw.QMainWindow):
             self.ReloadImage()
         print("Deskew current image complete")
 
+    def run_child_module(self, filename):
+        module_path = os.path.join(script_dir, filename)
+        subprocess.Popen(['python3', module_path])
+
+    def OpenWithMyReader(self):
+        self.run_child_module('MyReader.py')
+    
+    def ExternalScan(self):
+        self.run_child_module('advancd_scanner.py')
+
+
+    
+    
     def actionGimpEdit(self):
         #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"
         gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.imgpath + " @@"
@@ -552,8 +576,8 @@ class MainWindow(qtw.QMainWindow):
         if self.crop_greeklinesDialog.Accepted:
             tr.sortcroplines(self.crop_greeklines_ui.SourceLineEdit.text(),self.crop_greeklines_ui.BoxFolderLineEdit.text(),self.crop_greeklines_ui.DestGreekLineEdit.text())
             print("completed creating cropped language tif files")
-        #tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
-        #tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
+        #tr.sortcroplines(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
+        #tr.sortcroplines(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
         
     def actionRename_Greek_tiff_Lines(self):
         print("renaming Greek tif lines for ground truth")
@@ -572,8 +596,8 @@ class MainWindow(qtw.QMainWindow):
             tr.renameimages(self.greekrenamelines_ui.SourceLineEdit.text(), self.greekrenamelines_ui.DestinationLineEdit.text())
             
             print("completed renaming Greek tif lines for ground truth")
-        # tr.renameimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.renameimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+        # tr.renameimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.renameimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
        
     def actionMove_Greek_tiff_Lines(self):
         print("moving Greek tif lines for ground truth")
@@ -593,7 +617,7 @@ class MainWindow(qtw.QMainWindow):
             print("completed moving Greek tif lines for ground truth")
         
         # tr.renameimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        #tr.renameimages("c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
+        #tr.renameimages("~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "~/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
         #pass
 
     def actionCrop_Latin_To_tiff_Lines(self):
@@ -613,8 +637,10 @@ class MainWindow(qtw.QMainWindow):
         if self.crop_latinlinesDialog.Accepted:
             tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
             print("completed creating cropped Latin tif lines")
-        #tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","c:/users/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","c:/users/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
-        tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","c:/users/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","c:/users/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
+        #tr.sortcroplines(r"~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
+        tr.sortcroplines(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'Images', 'Latin', 'png_latin_deskew', 'latin_book_41_Mark') + os.sep,
+                  os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'Images', 'Latin', 'tif_latin_autosplit', 'latin_book_41_Mark') + os.sep,
+                  os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'Images', 'Latin', 'tif_latin_linebox', 'latin_book_41_Mark') + os.sep)
 
     def actionRename_Latin_tiff_Lines(self):
         print("renaming Latin tiff lines for ground truth")
@@ -634,8 +660,8 @@ class MainWindow(qtw.QMainWindow):
             
             print("completed renaming Greek tif lines for ground truth")
         
-        # tr.renameimages(r"c:/users/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
-        #tr.renameimages(r"c:/users/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "c:/users/max/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
+        # tr.renameimages(r"~/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "~/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
+        #tr.renameimages(r"~/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
 
     def actionMove_Latin_tiff_Lines(self):
         print("moving Latin tif lines for ground truth")
@@ -658,25 +684,29 @@ class MainWindow(qtw.QMainWindow):
         print("splitting Greek textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
         # tr.splittextlines(r"c:/users/max/Projects/Python/EstablishTruth/Greek txt4linesplit/", "c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
-        tr.splittextlines("c:/users/max/Projects/Python/EstablishTruth/Greek txt4linesplit/", "c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
+        tr.splittextlines(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek txt4linesplit') + os.sep,
+                  os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek lines4groundtruth') + os.sep)
         
     def actionRenameGreek_text_lines(self):
         print("renaming Greek textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
         #tr.text2groundtruth(r"c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "c:/users/max/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
-        tr.text2groundtruth(r"c:/users/max/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "c:/users/max/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
+        tr.text2groundtruth(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek lines4groundtruth') + os.sep,
+                    os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek lines2groundtruth') + os.sep)
     
     def actionSplit_Latin_Text_Lines(self):
         print("splitting Latin textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
         # tr.splittextlines(r"c:/users/max/Projects/Python/EstablishTruth/Latin txt4linesplit/", "c:/users/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
-        tr.splittextlines("c:/users/max/Projects/Python/EstablishTruth/Latin txt4linesplit/", "c:/users/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
+        tr.splittextlines(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin txt4linesplit') + os.sep,
+                  os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin lines4groundtruth') + os.sep)
 
     def actionRename_Latin_Text_Lines(self):
         print("renaming Latin textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
         #tr.text2groundtruth(r"c:/users/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "c:/users/max/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
-        tr.text2groundtruth(r"c:/users/max/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "c:/users/max/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
+        tr.text2groundtruth(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin lines4groundtruth') + os.sep,
+                    os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin lines2groundtruth') + os.sep)
     
     '''def actionReview_Ground_Truth(self):
         gtr.MainWindow = qtw.QMainWindow()
@@ -1423,7 +1453,7 @@ class MainWindow(qtw.QMainWindow):
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
-            #defaultdir = r"c:/users/max/Projects/Python/EstablishTruth/Greek_txt_pages/"
+            #defaultdir = r"~/Projects/Python/EstablishTruth/Greek_txt_pages/"
         
         defaultdir = self.txtdir + r"/" 
         defaultfile = self.ui.TextLE.displayText()

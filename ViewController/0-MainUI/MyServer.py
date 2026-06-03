@@ -34,6 +34,15 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from MyServerUI import Ui_MainUI
 from PreProcess import PreProcess as pp
 
+# Dialog Imports
+from Dialogs.ExtractDialog import Ui_ExtractDialog
+from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
+from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
+from Dialogs.tif2monoDialog import Ui_tif2monoDialog
+from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
+from Dialogs.mono2pngDialog import Ui_mono2pngDialog
+from Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
+
 #import MyPixler as pixler
 #import CropTif as croptif
 #import QtCropImage as cropimg

@@ -174,7 +174,7 @@ class MainWindow(qtw.QMainWindow):
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
         self.mod_abspath = os.path.abspath(self.mod_realpath) 
         self.mod_relpath = os.path.relpath(self.mod_abspath)
-        self.projecthome = self.mod_abspath + r'/'
+        self.projecthome = self.mod_abspath + os.sep
         self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path rootdir: {self.mod_rootdir}')
@@ -1589,8 +1589,8 @@ class MainWindow(qtw.QMainWindow):
         rsp = self.deskew_greekmonoDialog.exec_()
         
         
-        #dsk.deskewfiles("c:/users/max/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
-        #pp.deskewfiles("c:/users/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
+        #dsk.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
+        #pp.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
 
     def actionCrop_Languages(self):
         print("creating cropped language tif files")

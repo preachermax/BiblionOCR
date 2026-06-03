@@ -223,10 +223,10 @@ class MainWindow(qtw.QMainWindow):
         
         self.ui.BoxText.setDocument(self.ui.BoxDocument)
 
-        #ChrRefText = open('c:/users/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        #ChrRefText = open('~/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 
-        #self.imgdir = r"c:/users/max/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
+        #self.imgdir = r"~/Projects/BiblionOCR/Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
 
         # Restore BoxerSession settings
         self.get_session_settings()
@@ -303,7 +303,7 @@ class MainWindow(qtw.QMainWindow):
         # get session settings
         # Define json data        
         print("loading session")
-        with open('c:/users/max/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json') as f:
+        with open('~/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
             

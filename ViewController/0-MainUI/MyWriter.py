@@ -541,7 +541,7 @@ class Main(qtw.QMainWindow):
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
-            #defaultdir = r"c:/users/max/Projects/Python/EstablishTruth/Greek_txt_pages/"
+            #defaultdir = r"~/Projects/Python/EstablishTruth/Greek_txt_pages/"
         
         defaultdir = self.txtdir + r"/" 
         defaultfile = self.filename

@@ -1327,6 +1327,7 @@
      <string>File</string>
     </property>
     <addaction name="actionProject_Browser"/>
+    <addaction name="actionExternally_Scan_Imsge"/>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Text"/>
     <addaction name="actionSave_Image"/>
@@ -2473,6 +2474,11 @@
    </property>
    <property name="text">
     <string>Character Reference</string>
+   </property>
+  </action>
+  <action name="actionExternally_Scan_Imsge">
+   <property name="text">
+    <string>Externally Scan Imsge</string>
    </property>
   </action>
  </widget>

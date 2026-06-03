@@ -106,7 +106,7 @@ class PixlerMain(qtw.QMainWindow):
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
         self.mod_abspath = os.path.abspath(self.mod_realpath) 
         self.mod_relpath = os.path.relpath(self.mod_abspath)
-        self.projecthome = self.mod_abspath + r'/'
+        self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path up one folder: {up_once}')
         #print(f'OS Path up two folders: {up_twice}')
@@ -1447,8 +1447,8 @@ class PixlerMain(qtw.QMainWindow):
 
         rsp = self.greekmono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"c:/users/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"c:/users/max/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
 
     def actionDeskew_Greek_tiff(self):
         print("deskewing Greek tiff files")
@@ -1591,8 +1591,8 @@ class PixlerMain(qtw.QMainWindow):
         rsp = self.deskew_greekmonoDialog.exec_()
         
         
-        #dsk.deskewfiles("c:/users/max/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
-        #pp.deskewfiles("c:/users/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
+        #dsk.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
+        #pp.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
 
 
     def actionResize_Greek_png(self):
@@ -1683,11 +1683,11 @@ class PixlerMain(qtw.QMainWindow):
 
         rsp = self.greekresizepngDialog.exec_()
         print("completed resizing indexed(BW) png")
-        #pp.tiff2pngidx(r"c:/users/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"c:/users/max/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
 
-        #pp.resizepngs(r"c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
-        #pp.resizepngs(r"c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
 
     def actionConvert_Latin_tiff_To_png(self):
         print("creating indexed(BW) Latin png files")
@@ -1705,8 +1705,8 @@ class PixlerMain(qtw.QMainWindow):
         if self.latinmono2pngDialog.Accepted:
             pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"c:/users/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"c:/users/max/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "c:/users/max/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
 
     def actionDeskew_Latin_tiff(self):
         print("deskewing Latin tiff files")
@@ -1725,8 +1725,8 @@ class PixlerMain(qtw.QMainWindow):
         if self.deskew_latinmonoDialog.Accepted:
             pp.deskewfiles(self.deskew_latinmono_ui.SourceLineEdit.text(), self.deskew_latinmono_ui.DestPngLineEdit.text(),self.deskew_latinmono_ui.DestTifLineEdit.text())
             print("completed deskewing monochrome tiff and png files")
-        #dsk.deskewfiles("c:/users/max/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","c:/users/max/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
-        #pp.deskewfiles("c:/users/max/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "c:/users/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","c:/users/max/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
+        #dsk.deskewfiles("~/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
+        #pp.deskewfiles("~/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","~/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
     
     def actionResize_Latin_png(self):
         print("resizing Latin png files")
@@ -1744,8 +1744,8 @@ class PixlerMain(qtw.QMainWindow):
         if self.latinresizepngDialog.Accepted:
             pp.resizepngs(self.latinresizepng_ui.SourceLineEdit.text(), self.latinresizepng_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.resizepngs(r"c:/users/max/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","c:/users/max/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
-        #pp.resizepngs(r"c:/users/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","c:/users/max/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","~/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
 
     # Dialog Controllers
 
@@ -2155,7 +2155,7 @@ class PixlerMain(qtw.QMainWindow):
 
     '''def OverwriteRefImg(self):
     
-        #defaultdir = r"c:/users/max/Projects/Python/EstablishTruth/Greek txt pages/greek_book_41_Mark/"
+        #defaultdir = r"~/Projects/Python/EstablishTruth/Greek txt pages/greek_book_41_Mark/"
         defaultpath = self.refimgpath
         filename = os.path.basename(defaultpath)
         

@@ -8,6 +8,7 @@ import csv
 import time
 import platform
 from HelpSystem import add_help_menu
+import subprocess
 
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
@@ -36,7 +37,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
         self.mod_abspath = os.path.abspath(self.mod_realpath) 
         self.mod_relpath = os.path.relpath(self.mod_abspath)
-        self.projecthome = self.mod_abspath + r'/'
+        self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path up one folder: {up_once}')
         #print(f'OS Path up two folders: {up_twice}')
@@ -703,9 +704,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def OpenResolver(self):
         print("Starting up QT5ResolveVariants")
-        mw_cmd = "python3 " + self.projecthome + "ViewController/0-MainUI/Qt5ResolveVariants.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "Qt5ResolveVariants.py")
+        print(f'Launching: {sys.executable} {script}')
+        try:
+            subprocess.Popen([sys.executable, script], close_fds=True)
+        except Exception as e:
+            qtw.QMessageBox.warning(self, "Launch failed", f"Failed to launch resolver: {e}")
     
     '''def popupbox(self):
 
@@ -732,7 +736,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             break'''
     
     def loadVarWordCombo(self):
-        #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
+        #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
         #print(varwords)
@@ -745,7 +749,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def selectVarWordCombo(self):
         
         selvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
-        #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
+        #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
         
@@ -756,7 +760,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(varfields[0])
 
     def loadReplaceWordCombo(self):
-        #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
+        #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         replacewords = helper.select("SELECT DISTINCT Word FROM Bible UNION SELECT DISTINCT Word FROM IntBibleWords ORDER BY Word ASC")
         #print(varwords)
@@ -2350,19 +2354,32 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'selected position: {cursor.position()} selected word: {self.refword}')
 
     def OpenWithMyWriter(self):
-        mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "MyWriter.py")
+        print(f'Launching: {sys.executable} {script}')
+        try:
+            subprocess.Popen([sys.executable, script], close_fds=True)
+        except Exception as e:
+            qtw.QMessageBox.warning(self, "Launch failed", f"Failed to open MyWriter: {e}")
 
     def OpenWithLibreCalc(self):
-        lo_cmd = 'libreoffice --calc ' + self.versepath
-        print(lo_cmd)
-        os.system(lo_cmd)
+        lo = shutil.which('libreoffice') or shutil.which('soffice')
+        if lo:
+            try:
+                subprocess.Popen([lo, '--calc', self.versepath], close_fds=True)
+            except Exception as e:
+                qtw.QMessageBox.warning(self, "Launch failed", f"Failed to open LibreOffice: {e}")
+        else:
+            qtw.QMessageBox.warning(self, "LibreOffice not found", "LibreOffice/soffice not found on PATH.")
 
     def OpenWithLibreWriter(self):
-        lo_cmd = 'libreoffice --writer ' + self.versepath
-        print(lo_cmd)
-        os.system(lo_cmd)
+        lo = shutil.which('libreoffice') or shutil.which('soffice')
+        if lo:
+            try:
+                subprocess.Popen([lo, '--writer', self.versepath], close_fds=True)
+            except Exception as e:
+                qtw.QMessageBox.warning(self, "Launch failed", f"Failed to open LibreOffice: {e}")
+        else:
+            qtw.QMessageBox.warning(self, "LibreOffice not found", "LibreOffice/soffice not found on PATH.")
 
     def on_versefont_update(self):
         # update font to selection and size       
@@ -2689,9 +2706,12 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.ui.VerseNormcheckBox.setChecked(False)            
 
     def VerseNormalize(self):
-        mw_cmd = "python3 ViewController/0-MainUI/NormalizeVerseText.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "NormalizeVerseText.py")
+        print(f'Launching: {sys.executable} {script}')
+        try:
+            subprocess.Popen([sys.executable, script], close_fds=True)
+        except Exception as e:
+            qtw.QMessageBox.warning(self, "Launch failed", f"Failed to run NormalizeVerseText: {e}")
 
     def sortVerseTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -2974,9 +2994,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.sortRefTextFiles()
 
     def RefNormalize(self):
-        mw_cmd = "python3 ViewController/0-MainUI/NormalizeRefText.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "NormalizeRefText.py")
+        print(f'Launching: {sys.executable} {script}')
+        try:
+            subprocess.Popen([sys.executable, script], close_fds=True)
+        except Exception as e:
+            qtw.QMessageBox.warning(self, "Launch failed", f"Failed to run NormalizeRefText: {e}")
 
     def sortRefTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()

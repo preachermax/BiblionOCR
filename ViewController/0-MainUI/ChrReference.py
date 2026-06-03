@@ -54,8 +54,15 @@ class CharacterReference(qtw.QMainWindow):
         self.ui = Ui_CharRef()
         self.ui.setupUi(self)
         self.ucoderange = []
-        self.fontpath = '/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/fonts/FROMVS.ttf'
-        self.xmlpath = '/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/fonts/FROMVS.xml'
+        
+        # Set Project Home (cross-platform)
+        self.mod_dirname = os.path.dirname(__file__)
+        up_once = os.path.join(self.mod_dirname, "..")
+        up_twice = os.path.join(up_once, "..")
+        self.mod_abspath = os.path.abspath(os.path.realpath(os.path.join(up_once, "..")))
+        
+        self.fontpath = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'fonts', 'FROMVS.ttf')
+        self.xmlpath = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'fonts', 'FROMVS.xml')
         fontxml = ttFont.TTFont(self.fontpath)
         # fontxml.saveXML(self.xmlpath)
         print(f'FROMVS.xml => {fontxml}')
@@ -76,7 +83,8 @@ class CharacterReference(qtw.QMainWindow):
 
     def initUCodeRangeCombo(self):
         # Opening JSON file
-        with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/ProjectUnicodeRanges.json') as f:
+        json_path = os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json')
+        with open(json_path) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -94,7 +102,8 @@ class CharacterReference(qtw.QMainWindow):
         self.ucoderange = self.ui.uCodeRangeComboBox.currentText()
         # self.ui.uCodeRangeComboBox.setEditText(self.ucoderange)
         # Reopening JSON file
-        with open('/home/jetson/Projects/BiblionOCR/Model/Project/Data/json/ProjectUnicodeRanges.json') as f:
+        json_path = os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json')
+        with open(json_path) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -204,7 +213,8 @@ class CharacterReference(qtw.QMainWindow):
     def get_glyphname(self, glyphcode):
         print(f'Glyph Code: {glyphcode}')
         glyphname = ""
-        with open('/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/fonts/FROMVS_cmap.json') as f:
+        cmap_path = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'fonts', 'FROMVS_cmap.json')
+        with open(cmap_path) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)

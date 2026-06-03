@@ -883,6 +883,8 @@ class Ui_Scanner(object):
         icon62.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionGlypher.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionCharacter_Reference.setIcon(icon62)
         self.actionCharacter_Reference.setObjectName("actionCharacter_Reference")
+        self.actionExternally_Scan_Imsge = QtWidgets.QAction(Scanner)
+        self.actionExternally_Scan_Imsge.setObjectName("actionExternally_Scan_Imsge")
         self.menuSelect_Language.addAction(self.actionGreek_2)
         self.menuSelect_Language.addAction(self.actionHebrew_4)
         self.menuSelect_Language.addAction(self.actionLatin_2)
@@ -891,6 +893,7 @@ class Ui_Scanner(object):
         self.menuOCR.addAction(self.actionSelect_Image)
         self.menuOCR.addAction(self.actionCorrect_OCR_tb)
         self.menuFile.addAction(self.actionProject_Browser)
+        self.menuFile.addAction(self.actionExternally_Scan_Imsge)
         self.menuFile.addAction(self.actionOpen_Image)
         self.menuFile.addAction(self.actionOpen_Text)
         self.menuFile.addAction(self.actionSave_Image)
@@ -1205,6 +1208,7 @@ class Ui_Scanner(object):
         self.actionBoxer.setText(_translate("Scanner", "Boxer"))
         self.actionProject_Browser.setText(_translate("Scanner", "Project Browser"))
         self.actionCharacter_Reference.setText(_translate("Scanner", "Character Reference"))
+        self.actionExternally_Scan_Imsge.setText(_translate("Scanner", "Externally Scan Imsge"))
 import UI_Icons
 
 

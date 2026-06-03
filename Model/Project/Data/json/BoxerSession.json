@@ -106,12 +106,12 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_black_white/source_book_42_Luke/1516_Page_172.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "Model/Project/Images/Complete/Source/tif_black_white",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Source/tif_black_white/source_book_42_Luke",
         "DefaultValue": "Model/Project/Images/Workflow"
     },
     {
@@ -390,21 +390,6 @@
         "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_autosplit"
     },
     {
-        "Setting": "self.greeklinescropped",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cropped"
-    },
-    {
-        "Setting": "self.greeklinescleaned",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_cleaned"
-    },
-    {
-        "Setting": "self.greeklinesbox",
-        "CurrentValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box",
-        "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_lines_box"
-    },
-    {
         "Setting": "self.latinlinescropped",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped"
@@ -423,16 +408,6 @@
         "Setting": "self.latinlinesautosplit",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit",
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_autosplit"
-    },
-    {
-        "Setting": "self.latinlinescropped",
-        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped",
-        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cropped"
-    },
-    {
-        "Setting": "self.latinlinescleaned",
-        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned",
-        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_cleaned"
     },
     {
         "Setting": "LINE TEXT",

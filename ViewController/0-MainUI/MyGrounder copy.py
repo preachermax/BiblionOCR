@@ -248,15 +248,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 # Session functions
     def get_session_settings(self):
         # get session settings
-        self.homedir = '/home'
-        self.user = '/jetson'
-        if platform.system() == 'Linux':
-            self.userdir = '/home/jetson'
-        elif platform.system() == 'Windows':
-            self.userdir = 'c:/users/max'
-        self.projectsdir = '/Projects'
-        self.projectname = '/BiblionOCR'
-        self.projecthome = self.userdir + self.projectsdir + self.projectname + '/'
+        self.homedir = os.path.expanduser('~')
+        self.user = os.path.basename(self.homedir)
+        self.userdir = os.path.expanduser('~')
+        self.projectsdir = 'Projects'
+        self.projectname = 'BiblionOCR'
+        self.projecthome = os.path.join(self.userdir, self.projectsdir, self.projectname) + os.sep
         
         # Define json data        
         print("loading session")
@@ -1103,8 +1100,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         
             
         print("completed renumbering Greek tif lines for ground truth")
-        # tr.renumberimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.renumberimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+        # tr.renumberimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.renumberimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
 
     def GreekRenumberLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))

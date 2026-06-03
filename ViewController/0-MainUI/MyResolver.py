@@ -73,7 +73,7 @@ def loadTableView(rowid):
                 varui.VarianceTable.selectRow(0)
 
 def loadVarWordsCombo():
-    #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
+    #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "TRiBibleWords.db"))
     varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
     #print(varwords)
@@ -86,7 +86,7 @@ def loadVarWordsCombo():
 def selectVarWordsCombo():
     
     selvarword = varui.VarWordSelCombo.currentText()
-    #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
+    #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "TRiBibleWords.db"))
     varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
     

@@ -89,7 +89,7 @@ class MainWindow(qtw.QMainWindow):
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
         self.mod_abspath = os.path.abspath(self.mod_realpath) 
         self.mod_relpath = os.path.relpath(self.mod_abspath)
-        self.projecthome = self.mod_abspath + r'/'
+        self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path rootdir: {self.mod_rootdir}')
         print(f'OS Path realpath: {self.mod_realpath}')

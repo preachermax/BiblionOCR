@@ -443,15 +443,12 @@ class MainWindow(qtw.QMainWindow):
 
     def get_session_settings(self):
         # get session settings
-        self.homedir = '/home'
-        self.user = '/jetson'
-        if platform.system() == 'Linux':
-            self.userdir = '/home/jetson'
-        elif platform.system() == 'Windows':
-            self.userdir = 'c:/users/max'
-        self.projectsdir = '/Projects'
-        self.projectname = '/BiblionOCR'
-        self.projecthome = self.userdir + self.projectsdir + self.projectname + '/'
+        self.homedir = os.path.expanduser('~')
+        self.user = os.path.basename(self.homedir)
+        self.userdir = os.path.expanduser('~')
+        self.projectsdir = 'Projects'
+        self.projectname = 'BiblionOCR'
+        self.projecthome = os.path.join(self.userdir, self.projectsdir, self.projectname) + os.sep
 
         
         # Define json data        
@@ -978,8 +975,8 @@ class MainWindow(qtw.QMainWindow):
         
             
         print("completed staging Greek tif lines for ground truth")
-        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+        # tr.stageimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+        # tr.stageimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
 
     '''def actionStage_Greek_tiff_Lines(self):
         print("staging Greek tif lines for ground truth")
