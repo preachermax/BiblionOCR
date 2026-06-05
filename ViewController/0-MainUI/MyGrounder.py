@@ -155,10 +155,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         #self.ui.actionPage_Verse_Cross_Reference.triggered.connect(self.PageVerseXref)
 
         # Synchronize
-        self.ui.BothPrevButton.clicked.connect(self.prevImage)
-        self.ui.BothPrevButton.clicked.connect(self.prevText)
-        self.ui.BothNextButton.clicked.connect(self.nextImage)
-        self.ui.BothNextButton.clicked.connect(self.nextText)
+        self.ui.BothPrevButton.clicked.connect(self.bothPrev)
+        self.ui.BothNextButton.clicked.connect(self.bothNext)
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
         self.ui.BothDiscardButton.clicked.connect(self.discardImage)
         self.ui.BothDiscardButton.clicked.connect(self.discardText)
@@ -449,6 +447,23 @@ class Ui_MainWindow(qtw.QMainWindow):
             print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
         
         print(f'Absolute Path to Project Directory: {self.projecthome}')
+        if not hasattr(self, 'font') or not self.font:
+            self.font = 'FROMVS'
+            try:
+                self.ui.fontComboBox.setCurrentText(self.font)
+            except Exception:
+                pass
+            self.on_font_update()
+        try:
+            self.ui.PagefontComboBox.setCurrentText('FROMVS')
+            self.on_page_font_update()
+        except Exception:
+            pass
+        try:
+            self.ui.VersefontComboBox.setCurrentText('FROMVS')
+            self.on_verse_font_update()
+        except Exception:
+            pass
  
     def get_workflow_settings(self):
 
@@ -588,23 +603,27 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.showImage(self.imgpath)'''
     
     def getImage(self, imgpath):
-            self.imgpath = imgpath
-            #create file list 
-            if self.imgpath:
-                self.ui.ImageFileName.setText(os.path.basename(self.imgpath))       
-                self.imgfile = qtc.QFile(self.imgpath)
-                self.imgfilename = os.path.basename(self.imgpath)
-                self.imgdirname = os.path.dirname(self.imgpath)
-                self.imgfileList = []
+            # normalize incoming path and build robust file list
+            if not imgpath:
+                return
+            self.imgpath = os.path.normpath(imgpath)
+            #create file list
+            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))       
+            self.imgfile = qtc.QFile(self.imgpath)
+            self.imgfilename = os.path.basename(self.imgpath)
+            self.imgdirname = os.path.normpath(os.path.dirname(self.imgpath))
+            self.imgfileList = []
             for i in os.listdir(self.imgdirname):
-                ipath = os.path.join(self.imgdirname, i)
-                if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                ipath = os.path.normpath(os.path.join(self.imgdirname, i))
+                if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
                     self.imgfileList.append(ipath)
             self.sortImgFiles()
             self.showImage(self.imgpath)
          
     def showImage(self,imgpath):
-        self.imgpath = imgpath
+        if not imgpath:
+            return
+        self.imgpath = os.path.normpath(imgpath)
         if self.imgpath.endswith('.tif'):
             self.loadImageStackFromFile(self.imgpath)
             self.showFrame(0)
@@ -617,11 +636,11 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.pixmap.isNull():
             return
         self.ui.ImageView.setPixmap(self.pixmap)
-        self.imgdirname = os.path.dirname(self.imgpath)
+        self.imgdirname = os.path.normpath(os.path.dirname(self.imgpath))
         self.imgfileList = []
         for i in os.listdir(self.imgdirname):
-            ipath = os.path.join(self.imgdirname, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            ipath = os.path.normpath(os.path.join(self.imgdirname, i))
+            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 self.imgfileList.append(ipath)
         #print(list(self.imgfileList))
         #self.sortImgFiles()
@@ -648,23 +667,62 @@ class Ui_MainWindow(qtw.QMainWindow):
     def sortImgFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
+        # sort using the basename so paths/drive letters don't affect ordering
+        self.sorted_imgfilelist = sorted(self.imgfileList, key=lambda p: alphanum_key(os.path.basename(p)))
         
         #self.setFwdImgDirIterator()
         #self.setRevImgDirIterator()
 
     
     def nextImage(self):
-        if self.imgpath:
-            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) + 1) % len(self.sorted_imgfilelist)]
-            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
-            self.getImage(self.imgpath)
+        if not self.imgpath or not self.sorted_imgfilelist:
+            return
+        try:
+            # compare normalized, case-insensitive paths
+            def _norm(p):
+                return os.path.normcase(os.path.normpath(p))
+            cur = _norm(self.imgpath)
+            idx = next(i for i, p in enumerate(self.sorted_imgfilelist) if _norm(p) == cur)
+        except StopIteration:
+            # current path not found -> refresh list and try to open first
+            if self.sorted_imgfilelist:
+                self.imgpath = self.sorted_imgfilelist[0]
+                self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
+                self.getImage(self.imgpath)
+            return
+        nextidx = (idx + 1) % len(self.sorted_imgfilelist)
+        self.imgpath = self.sorted_imgfilelist[nextidx]
+        self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
+        self.getImage(self.imgpath)
     
     def prevImage(self):
-        if self.imgpath:
-            self.imgpath = self.sorted_imgfilelist[(self.sorted_imgfilelist.index(self.imgpath) - 1) % len(self.sorted_imgfilelist)]
-            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
-            self.getImage(self.imgpath)
+        if not self.imgpath or not self.sorted_imgfilelist:
+            return
+        try:
+            def _norm(p):
+                return os.path.normcase(os.path.normpath(p))
+            cur = _norm(self.imgpath)
+            idx = next(i for i, p in enumerate(self.sorted_imgfilelist) if _norm(p) == cur)
+        except StopIteration:
+            if self.sorted_imgfilelist:
+                self.imgpath = self.sorted_imgfilelist[-1]
+                self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
+                self.getImage(self.imgpath)
+            return
+        previdx = (idx - 1) % len(self.sorted_imgfilelist)
+        self.imgpath = self.sorted_imgfilelist[previdx]
+        self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
+        self.getImage(self.imgpath)
+    
+    def bothNext(self):
+        # Advance both text and image independently.
+        self.nextText()
+        self.nextImage()
+
+    def bothPrev(self):
+        # Move both text and image independently.
+        self.prevText()
+        self.prevImage()
        
     '''
     def nextImage(self):
@@ -721,84 +779,96 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.getText(self.textpath)
 
     def getText(self,textpath):
-            self.textpath = textpath
-            self.txtdirname = os.path.dirname(self.textpath)
-            #create file list 
-            if self.textpath:
+            if not textpath:
+                return
+            self.textpath = os.path.normpath(textpath)
+            self.txtdirname = os.path.normpath(os.path.dirname(self.textpath))
+            # create file list only if the directory changed or if it is missing
+            if not getattr(self, 'txtfileList', None) or getattr(self, '_txtdirname_cached', None) != self.txtdirname:
                 self.ui.TextFileName.setText(os.path.basename(self.textpath))       
                 self.txtfile = qtc.QFile(self.textpath)
                 self.txtfilename = os.path.basename(self.textpath)
-                self.txtdirname = os.path.dirname(self.textpath)
                 self.txtfileList = []
-            for t in os.listdir(self.txtdirname):
-                tpath = os.path.join(self.txtdirname, t)
-                if os.path.isfile(tpath) and t.endswith(('.txt')):
-                    self.txtfileList.append(tpath)
-            self.sortTextFiles()
+                for t in os.listdir(self.txtdirname):
+                    tpath = os.path.normpath(os.path.join(self.txtdirname, t))
+                    if os.path.isfile(tpath) and t.lower().endswith('.txt'):
+                        self.txtfileList.append(tpath)
+                self.sortTextFiles()
+                self._txtdirname_cached = self.txtdirname
+            else:
+                self.ui.TextFileName.setText(os.path.basename(self.textpath))       
+                self.txtfile = qtc.QFile(self.textpath)
+                self.txtfilename = os.path.basename(self.textpath)
             self.showText(self.textpath)
             
     def showText(self,txtpath):        
         self.textpath = txtpath
-        #self.ui.TextFileEdit.clear()
+        if not self.textpath:
+            return
+
+        self.ui.TextFileEdit.clear()
         self.txtdirname = os.path.dirname(self.textpath)
         print(f'first txtdirname: {self.txtdirname}')
-        #self.textfile = txtfilename
-        if self.txtfile.open(qtc.QIODevice.ReadOnly):
-            stream = qtc.QTextStream(self.txtfile)
-            stream.setCodec("UTF-8")
-            text = stream.readAll()
-            info = qtc.QFileInfo(self.textpath)
-            if info.completeSuffix() == 'txt':
-                #self.ui.editor_text.setHtml(text
-                self.ui.TextFileEdit.insertPlainText(text)
-            else:
-                self.ui.TextFileEdit.setPlainText(text)
-            self.ui.TextFileName.setText(self.txtfilename)
-            self.txtdirname = os.path.dirname(self.textpath)
-            print(f'second txtdirname: {self.txtdirname}')
+        try:
+            with open(self.textpath, 'r', encoding='utf-8') as f:
+                text = f.read()
+        except UnicodeDecodeError:
+            with open(self.textpath, 'r', encoding='latin-1', errors='replace') as f:
+                text = f.read()
+        except Exception as e:
+            print(f'Failed to read text file {self.textpath}: {e}')
+            return
+
+        self.ui.TextFileEdit.setPlainText(text)
+        self.ui.TextFileName.setText(self.txtfilename)
+        self.txtdirname = os.path.normpath(os.path.dirname(self.textpath))
+        print(f'second txtdirname: {self.txtdirname}')
+        if not getattr(self, 'txtfileList', None):
             self.txtfileList = []
-        for t in os.listdir(self.txtdirname):
-            tpath = os.path.join(self.txtdirname, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.txtfileList.append(tpath)
-        #self.sortTextFiles()
+            for t in os.listdir(self.txtdirname):
+                tpath = os.path.normpath(os.path.join(self.txtdirname, t))
+                if os.path.isfile(tpath) and t.lower().endswith('.txt'):
+                    self.txtfileList.append(tpath)
+            self.sortTextFiles()
         self.on_font_update()
 
-        # Update Line comboBox
-        txtfilnamesplit = self.txtfilename.split("_")
-        print(f'Text file name split: {txtfilnamesplit}')
-        linenumstr = txtfilnamesplit[3]
-        print(f'Line number string: {linenumstr}')
-        linenum = linenumstr[4:6]
-        linenum = linenum.replace(".","")
-        print(f'Line number: {linenum}')
-        self.ui.LinecomboBox.setCurrentText(linenum)
+        # Update Line comboBox (robustly extract last numeric group from filename)
+        filename_noext = os.path.splitext(self.txtfilename)[0]
+        nums = re.findall(r'\d+', filename_noext)
+        if nums:
+            linenum = str(int(nums[-1])).zfill(2)
+            print(f'Line number: {linenum}')
+            try:
+                self.ui.LinecomboBox.setCurrentText(linenum)
+            except Exception:
+                pass
 
-        # Update Book comboBox
-        bookdirsplit = self.txtdirname.split("/")
-        print(f'book directory split: {bookdirsplit}')
-        bookdir = bookdirsplit[11]
+        # Update Book comboBox (use basename of text directory)
+        bookdir = os.path.basename(self.txtdirname)
         print(f'Text directory path: {self.txtdirname}  book directory: {bookdir}')
-        dirsplit = bookdir.split("_")
-        
-        lang =  dirsplit[0]
-        booknum = dirsplit[2]
-        bookstr = dirsplit[3]
-        bookabbr = bookstr[:3]
-        print(f'Book abbreviation: {bookabbr}')
-        self.ui.bookComboBox.setCurrentText(bookabbr)
+        dirsplit = bookdir.split("_") if bookdir else []
+        if len(dirsplit) >= 4:
+            lang = dirsplit[0]
+            booknum = dirsplit[2]
+            bookstr = dirsplit[3]
+            bookabbr = bookstr[:3]
+            print(f'Book abbreviation: {bookabbr}')
+            try:
+                self.ui.bookComboBox.setCurrentText(bookabbr)
+            except Exception:
+                pass
 
-        self.loadPageText()        
+        self.loadPageText()
 
-        #if self.ui.Imagelabel.pixmap():
         if self.ui.OCRTextEdit.text():
             self.OCRAccuracy()
 
-        self.loadVerseText()
-        try:
-            self.verseAutoSeek()
-        except:
-            print("verseAutoSeek out of range error")
+        if self.ui.VerseAutoSeekcheckBox.isChecked():
+            self.loadVerseText()
+            try:
+                self.verseAutoSeek()
+            except:
+                print("verseAutoSeek out of range error")
     '''
     def setFwdTxtDirIterator(self):
         self.txtdirIterator = iter(self.sorted_txtfilelist)
@@ -821,22 +891,48 @@ class Ui_MainWindow(qtw.QMainWindow):
     def sortTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)     
-        
-        #self.setFwdTxtDirIterator()
-        #self.setRevTxtDirIterator()
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=lambda p: alphanum_key(os.path.basename(p)))
+        def _norm(p):
+            return os.path.normcase(os.path.normpath(p))
+        self._text_index_map = { _norm(p): i for i, p in enumerate(self.sorted_txtfilelist) }
 
     def nextText(self):
-        if self.textpath:
-            self.textpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.textpath) + 1) % len(self.sorted_txtfilelist)]
-            self.ui.TextFileName.setText(os.path.basename(self.textpath))
-            self.getText(self.textpath)
+        if not self.textpath or not getattr(self, 'sorted_txtfilelist', None):
+            return
+        cur = os.path.normcase(os.path.normpath(self.textpath))
+        idx = getattr(self, '_text_index_map', {}).get(cur)
+        if idx is None:
+            self.sortTextFiles()
+            idx = self._text_index_map.get(cur)
+        if idx is None:
+            if self.sorted_txtfilelist:
+                self.textpath = self.sorted_txtfilelist[0]
+                self.ui.TextFileName.setText(os.path.basename(self.textpath))
+                self.getText(self.textpath)
+            return
+        nextidx = (idx + 1) % len(self.sorted_txtfilelist)
+        self.textpath = self.sorted_txtfilelist[nextidx]
+        self.ui.TextFileName.setText(os.path.basename(self.textpath))
+        self.getText(self.textpath)
 
     def prevText(self):
-        if self.textpath:
-            self.textpath = self.sorted_txtfilelist[(self.sorted_txtfilelist.index(self.textpath) - 1) % len(self.sorted_txtfilelist)]
-            self.ui.TextFileName.setText(os.path.basename(self.textpath))
-            self.getText(self.textpath)
+        if not self.textpath or not getattr(self, 'sorted_txtfilelist', None):
+            return
+        cur = os.path.normcase(os.path.normpath(self.textpath))
+        idx = getattr(self, '_text_index_map', {}).get(cur)
+        if idx is None:
+            self.sortTextFiles()
+            idx = self._text_index_map.get(cur)
+        if idx is None:
+            if self.sorted_txtfilelist:
+                self.textpath = self.sorted_txtfilelist[-1]
+                self.ui.TextFileName.setText(os.path.basename(self.textpath))
+                self.getText(self.textpath)
+            return
+        previdx = (idx - 1) % len(self.sorted_txtfilelist)
+        self.textpath = self.sorted_txtfilelist[previdx]
+        self.ui.TextFileName.setText(os.path.basename(self.textpath))
+        self.getText(self.textpath)
     
     '''
     def nextText(self):
@@ -1541,15 +1637,42 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.directory:
             self.renumber_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
 
+    def _cached_font(self, font_name):
+        if not hasattr(self, '_font_cache'):
+            self._font_cache = {}
+        if not font_name:
+            return qtg.QFont()
+        cache_key = font_name.lower()
+        if cache_key in self._font_cache:
+            return qtg.QFont(self._font_cache[cache_key])
+
+        font = None
+        if cache_key == 'fromvs' or cache_key.endswith('.ttf'):
+            if cache_key == 'fromvs':
+                fontpath = os.path.join(self.mod_dirname, 'fonts', 'FROMVS.ttf')
+            else:
+                fontpath = font_name
+                if not os.path.isabs(fontpath):
+                    fontpath = os.path.join(self.mod_dirname, 'fonts', fontpath)
+            fontpath = os.path.normpath(fontpath)
+            if os.path.exists(fontpath):
+                font_id = qtg.QFontDatabase.addApplicationFont(fontpath)
+                if font_id != -1:
+                    families = qtg.QFontDatabase.applicationFontFamilies(font_id)
+                    if families:
+                        self._font_cache[cache_key] = families[0]
+                        return qtg.QFont(families[0])
+            self._font_cache[cache_key] = os.path.splitext(os.path.basename(fontpath))[0]
+            return qtg.QFont(self._font_cache[cache_key])
+
+        self._font_cache[cache_key] = font_name
+        return qtg.QFont(font_name)
+
     def on_font_update(self):
-        # update font to selection and size       
-        #font = qtg.QFont()
-        #font.setFamily(self.ui.fontComboBox.currentFont())
-        #print(self.ui.fontComboBox.currentFont())
-        font = qtg.QFont(self.ui.fontComboBox.currentFont())
+        # update font to selection and size
+        font_name = self.ui.fontComboBox.currentText()
+        font = self._cached_font(font_name)
         font.setPointSize(self.ui.fontSizeBox.value())
-        #font = qtg.QFont(self.font)
-        #font.setPointSize(int(self.fontsize))
         self.ui.TextFileEdit.setFont(font)
         self.ui.OCRTextEdit.setFont(font)
 
@@ -1740,9 +1863,13 @@ class Ui_MainWindow(qtw.QMainWindow):
     def loadPageText(self):
         self.getPage()
         if self.pagetextpath:
-            self.pagetextfile = qtc.QFile(self.pagetextpath)
-            self.pagetextfilename = os.path.basename(self.pagetextpath)
-            self.showPageText(self.pagetextpath) 
+            if getattr(self, '_cached_pagetextpath', None) != self.pagetextpath:
+                self.pagetextfile = qtc.QFile(self.pagetextpath)
+                self.pagetextfilename = os.path.basename(self.pagetextpath)
+                self.showPageText(self.pagetextpath)
+                self._cached_pagetextpath = self.pagetextpath
+            else:
+                self.pageAutoSeek()
     
     def sortPageFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -1765,21 +1892,21 @@ class Ui_MainWindow(qtw.QMainWindow):
         })
     
     def showPageText(self,txtfilename):       
-        #self.pagetextfile = txtfilename
-        if self.pagetextfile.open(qtc.QIODevice.ReadOnly):
-            stream = qtc.QTextStream(self.pagetextfile)
-            stream.setCodec("UTF-8")
-            pagetext = stream.readAll()
-            info = qtc.QFileInfo(self.pagetextpath)
-            if info.completeSuffix() == 'txt':
-                #self.ui.editor_pagetext.setHtml(pagetext
-                self.ui.PageText.insertPlainText(pagetext)
-            else:
-                self.ui.PageText.setPlainText(pagetext)
-            self.pagetext = self.ui.PageText.toPlainText()
-            self.on_page_font_update()
+        self.ui.PageText.clear()
+        try:
+            with open(self.pagetextpath, 'r', encoding='utf-8') as f:
+                pagetext = f.read()
+        except UnicodeDecodeError:
+            with open(self.pagetextpath, 'r', encoding='latin-1', errors='replace') as f:
+                pagetext = f.read()
+        except Exception as e:
+            print(f'Failed to read page text file {self.pagetextpath}: {e}')
+            return
 
-            self.pageAutoSeek()
+        self.ui.PageText.setPlainText(pagetext)
+        self.pagetext = pagetext
+        self.on_page_font_update()
+        self.pageAutoSeek()
     
     def pageAutoSeek(self):
 
@@ -1865,8 +1992,9 @@ class Ui_MainWindow(qtw.QMainWindow):
         file.close()
     
     def on_page_font_update(self):
-        # update Verse font to selection and size       
-        font = qtg.QFont(self.ui.PagefontComboBox.currentFont())
+        # update Page font to selection and size
+        font_name = self.ui.PagefontComboBox.currentText()
+        font = self._cached_font(font_name)
         font.setPointSize(self.ui.PagefontSizeBox.value())
         self.ui.PageText.setFont(font)
 
@@ -1875,26 +2003,27 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 # Verse fuctions
     def loadVerseText(self):
-         if self.versetextpath:
-            self.versetextfile = qtc.QFile(self.versetextpath)
-            self.versetxtfilename = os.path.basename(self.versetextpath)
-            self.showVerseText(self.versetextpath)       
+        if self.versetextpath:
+            if getattr(self, '_cached_versetextpath', None) != self.versetextpath:
+                self.versetextfile = qtc.QFile(self.versetextpath)
+                self.versetxtfilename = os.path.basename(self.versetextpath)
+                self.showVerseText(self.versetextpath)
+                self._cached_versetextpath = self.versetextpath
 
     def showVerseText(self,txtfilename):       
-        #self.versetextfile = txtfilename
         self.ui.VerseText.clear()
-        if self.versetextfile.open(qtc.QIODevice.ReadOnly):
-            stream = qtc.QTextStream(self.versetextfile)
-            stream.setCodec("UTF-8")
-            versetext = stream.readAll()
-            info = qtc.QFileInfo(self.versetextpath)
-            if info.completeSuffix() == 'txt':
-                #self.ui.editor_versetext.setHtml(versetext
-                self.ui.VerseText.insertPlainText(versetext)
-            else:
-                self.ui.VerseText.setPlainText(versetext)          
+        try:
+            with open(self.versetextpath, 'r', encoding='utf-8') as f:
+                versetext = f.read()
+        except UnicodeDecodeError:
+            with open(self.versetextpath, 'r', encoding='latin-1', errors='replace') as f:
+                versetext = f.read()
+        except Exception as e:
+            print(f'Failed to read verse text file {self.versetextpath}: {e}')
+            return
 
-            self.on_verse_font_update()
+        self.ui.VerseText.setPlainText(versetext)
+        self.on_verse_font_update()
         
     def getVerse(self,find_end):
         print('Getting the book, chapter, and verse cross references ')
@@ -2152,7 +2281,8 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def on_verse_font_update(self):
         # update Verse font to selection and size       
-        font = qtg.QFont(self.ui.VersefontComboBox.currentFont())
+        font_name = self.ui.VersefontComboBox.currentText()
+        font = self._cached_font(font_name)
         font.setPointSize(self.ui.VersefontSizeBox.value())
         self.ui.VerseText.setFont(font)
 
