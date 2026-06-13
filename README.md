@@ -15,7 +15,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
    - Handles session settings and workflow configuration
 
 2. **MyBoxer.py** - Main UI for box creation and editing
-   - Standalone application that can launch from Qt5BiblionOCR
+   - Standalone application that can launch from MyServer
    - Core tool for creating and editing character/word/line boxes
 
 ### Desktop Launch Files
