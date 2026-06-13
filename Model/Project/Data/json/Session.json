@@ -181,7 +181,7 @@
     },
     {
         "Setting": "self.bookabbr",
-        "CurrentValue": "Joh",
+        "CurrentValue": "Luk",
         "DefaultValue": "Mat"
     },
     {
@@ -246,17 +246,17 @@
     },
     {
         "Setting": "self.sourcebookmarkdown",
-        "CurrentValue": "source_book_43_John",
+        "CurrentValue": "source_book_42_Luke",
         "DefaultValue": "source_book_40_Matthew"
     },
     {
         "Setting": "self.greekbookmarkdown",
-        "CurrentValue": "greek_book_43_John",
+        "CurrentValue": "greek_book_42_Luke",
         "DefaultValue": "greek_book_40_Matthew"
     },
     {
         "Setting": "self.latinbookmarkdown",
-        "CurrentValue": "latin_book_43_John",
+        "CurrentValue": "latin_book_42_Luke",
         "DefaultValue": "latin_book_40_Matthew"
     },
     {
@@ -281,12 +281,12 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages (copy)/greek1516_Page_242.tif",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages/greek1516_Page_173.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages (copy)",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Workflow/Greek/tif_greek_pages"
     },
     {
@@ -331,12 +331,12 @@
     },
     {
         "Setting": "self.txtpath",
-        "CurrentValue": "",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages/greek_book_42_Luke/greek1516_Page_173.txt",
         "DefaultValue": ""
     },
     {
         "Setting": "self.txtdir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages/greek_book_42_Luke",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages"
     },
     {

@@ -8,7 +8,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 1. MAIN ENTRY POINTS
 
 ### Primary Entry Points
-1. **Qt5BiblionOCR.py** - Main OCR workflow manager
+1. **MyServer.py** - Main OCR workflow manager
    - Central hub for the entire OCR pipeline
    - Manages image/text loading and display
    - Coordinates all preprocessing and OCR operations

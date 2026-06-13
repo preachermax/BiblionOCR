@@ -607,171 +607,6 @@ class MainWindow(qtw.QMainWindow):
     def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference()
         self.chrrefmain.show()
-
-    def actionCrop_Greek_To_tiff_Lines(self):
-        print("cropping and sorting Greek tiff lines")
-        #usage: tr.sortcroplines(source, splitdir, linebox)
-        self.crop_greeklinesDialog = qtw.QDialog()
-        self.crop_greeklines_ui = Ui_crop_greek_linesDialog()
-        self.crop_greeklines_ui.setupUi(self.crop_greeklinesDialog)
-        self.crop_greeklinesDialog.show()
-
-        self.crop_greeklines_ui.SourceButton.clicked.connect(self.CropGreekLinesDialog)
-        self.crop_greeklines_ui.BoxFolderButton.clicked.connect(self.LineBoxFolderDialog)
-        self.crop_greeklines_ui.DestGreekButton.clicked.connect(self.DestGreekLinesDialog)
-
-        rsp = self.crop_greeklinesDialog.exec_()
-        
-        if self.crop_greeklinesDialog.Accepted:
-            tr.sortcroplines(self.crop_greeklines_ui.SourceLineEdit.text(),self.crop_greeklines_ui.BoxFolderLineEdit.text(),self.crop_greeklines_ui.DestGreekLineEdit.text())
-            print("completed creating cropped language tif files")
-        #tr.sortcroplines(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
-        #tr.sortcroplines(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
-        
-    def actionRename_Greek_tiff_Lines(self):
-        print("renaming Greek tif lines for ground truth")
-        # usage: tr.renameimages(source, destination)
-        self.greekrenamelinesDialog = qtw.QDialog()
-        self.greekrenamelines_ui = Ui_tifgreekrenamelinesDialog()
-        self.greekrenamelines_ui.setupUi(self.greekrenamelinesDialog)
-        self.greekrenamelinesDialog.show()
-
-        self.greekrenamelines_ui.SourceButton.clicked.connect(self.GreekRenameLinesDialog)
-        self.greekrenamelines_ui.DestinationButton.clicked.connect(self.DestGreekRenameLinesDialog)
-
-        rsp = self.greekrenamelinesDialog.exec_()
-        
-        if self.greekrenamelinesDialog.Accepted:
-            tr.renameimages(self.greekrenamelines_ui.SourceLineEdit.text(), self.greekrenamelines_ui.DestinationLineEdit.text())
-            
-            print("completed renaming Greek tif lines for ground truth")
-        # tr.renameimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.renameimages(r"~/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
-       
-    def actionMove_Greek_tiff_Lines(self):
-        print("moving Greek tif lines for ground truth")
-        # usage: tr.renameimages(source, destination)
-        self.greekmovelinesDialog = qtw.QDialog()
-        self.greekmovelines_ui = Ui_tifgreekmovelinesDialog()
-        self.greekmovelines_ui.setupUi(self.greekmovelinesDialog)
-        self.greekmovelinesDialog.show()
-
-        self.greekmovelines_ui.SourceButton.clicked.connect(self.GreekMovelinesDialog)
-        self.greekmovelines_ui.DestinationButton.clicked.connect(self.DestGreekMovelinesDialog)
-
-        rsp = self.greekmovelinesDialog.exec_()
-        
-        if self.greekmovelinesDialog.Accepted:
-            tr.renameimages(self.greekmovelines_ui.SourceLineEdit.text(), self.greekmovelines_ui.DestinationLineEdit.text())
-            print("completed moving Greek tif lines for ground truth")
-        
-        # tr.renameimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        #tr.renameimages("~/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "~/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
-        #pass
-
-    def actionCrop_Latin_To_tiff_Lines(self):
-        print("cropping and sorting Latin tiff lines")
-        #usage: tr.sortcroplines(source, splitdir, linebox)
-        self.crop_latinlinesDialog = qtw.QDialog()
-        self.crop_latinlines_ui = Ui_crop_latin_linesDialog()
-        self.crop_latinlines_ui.setupUi(self.crop_latinlinesDialog)
-        self.crop_latinlinesDialog.show()
-
-        self.crop_latinlines_ui.SourceButton.clicked.connect(self.CroplatinLinesDialog)
-        self.crop_latinlines_ui.BoxFolderButton.clicked.connect(self.LineBoxFolderDialog)
-        self.crop_latinlines_ui.DestlatinButton.clicked.connect(self.DestlatinLinesDialog)
-
-        rsp = self.crop_latinlinesDialog.exec_()
-        
-        if self.crop_latinlinesDialog.Accepted:
-            tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
-            print("completed creating cropped Latin tif lines")
-        #tr.sortcroplines(r"~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
-        tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","c:/users/max/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","c:/users/max/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
-
-    def actionRename_Latin_tiff_Lines(self):
-        print("renaming Latin tiff lines for ground truth")
-        # usage: tr.renameimages(source, destination)
-        self.latinrenamelinesDialog = qtw.QDialog()
-        self.latinrenamelines_ui = Ui_tiflatinrenamelinesDialog()
-        self.latinrenamelines_ui.setupUi(self.latinrenamelinesDialog)
-        self.latinrenamelinesDialog.show()
-
-        self.latinrenamelines_ui.SourceButton.clicked.connect(self.LatinRenameLinesDialog)
-        self.latinrenamelines_ui.DestinationButton.clicked.connect(self.DestLatinRenameLinesDialog)
-
-        rsp = self.latinrenamelinesDialog.exec_()
-        
-        if self.latinrenamelinesDialog.Accepted:
-            tr.renameimages(self.latinrenamelines_ui.SourceLineEdit.text(), self.latinrenamelines_ui.DestinationLineEdit.text())
-            
-            print("completed renaming Greek tif lines for ground truth")
-        
-        # tr.renameimages(r"~/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "~/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
-        #tr.renameimages(r"~/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
-
-    def actionMove_Latin_tiff_Lines(self):
-        print("moving Latin tif lines for ground truth")
-        # usage: tr.renameimages(source, destination)
-        self.latinmovelinesDialog = qtw.QDialog()
-        self.latinmovelines_ui = Ui_tiflatinmovelinesDialog()
-        self.latinmovelines_ui.setupUi(self.latinmovelinesDialog)
-        self.latinmovelinesDialog.show()
-
-        self.latinmovelines_ui.SourceButton.clicked.connect(self.LatinMovelinesDialog)
-        self.latinmovelines_ui.DestinationButton.clicked.connect(self.DestLatinMovelinesDialog)
-
-        rsp = self.latinmovelinesDialog.exec_()
-        
-        if self.latinmovelinesDialog.Accepted:
-            tr.renameimages(self.latinmovelines_ui.SourceLineEdit.text(), self.latinmovelines_ui.DestinationLineEdit.text())
-            print("completed moving Latin tif lines for ground truth")
-
-    def actionSplitGreek_text_lines(self):
-        print("splitting Greek textlines for ground truth")
-        # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"~/Projects/Python/EstablishTruth/Greek txt4linesplit/", "~/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
-        tr.splittextlines(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek txt4linesplit') + os.sep,
-                  os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek lines4groundtruth') + os.sep)
-        
-    def actionRenameGreek_text_lines(self):
-        print("renaming Greek textlines for ground truth")
-        # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"~/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "~/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
-        tr.text2groundtruth(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek lines4groundtruth') + os.sep,
-                    os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Greek lines2groundtruth') + os.sep)
-    
-    def actionSplit_Latin_Text_Lines(self):
-        print("splitting Latin textlines for ground truth")
-        # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"~/Projects/Python/EstablishTruth/Latin txt4linesplit/", "~/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
-        tr.splittextlines(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin txt4linesplit') + os.sep,
-                  os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin lines4groundtruth') + os.sep)
-
-    def actionRename_Latin_Text_Lines(self):
-        print("renaming Latin textlines for ground truth")
-        # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"~/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "~/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
-        tr.text2groundtruth(os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin lines4groundtruth') + os.sep,
-                    os.path.join(os.path.expanduser('~'), 'Projects', 'Python', 'EstablishTruth', 'Latin lines2groundtruth') + os.sep)
-    
-    def actionReview_Ground_Truth(self):
-        gtr.MainWindow = qtw.QMainWindow()
-        gtr.ui = gtr.Ui_MainWindow()
-        gtr.ui.setupUi(gtr.MainWindow)
-        gtr.MainWindow.show()
-
-    def actionVerse_Correction(self):
-        versify.MainWindow = qtw.QMainWindow()
-        versify.ui = versify.Ui_MainWindow()
-        versify.ui.setupUi(versify.MainWindow)
-        versify.MainWindow.show()
-    
-    def actionUpdate_Wordlist(self):
-        pass
-    
-    def actionTrain_Tesseract(self):
-        pass
     
     def actionCorrect_OCR(self):
         print("performing OCR on current image")
@@ -792,11 +627,6 @@ class MainWindow(qtw.QMainWindow):
         Without any arguments, loadImageStackFromFile() will popup a file dialog to choose the image file.
         With a fileName argument, loadImageStackFromFile(fileName) will attempt to load the specified file directly.
         """
-        if len(fileName) == 0:
-            if QT_VERSION_STR[0] == '4':
-                fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
-            elif QT_VERSION_STR[0] == '5':
-                fileName, dummy = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
         fileName = str(fileName)
         if len(fileName) and os.path.isfile(fileName):
             self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
@@ -973,94 +803,47 @@ class MainWindow(qtw.QMainWindow):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
         self.sorted_imgfilelist = sorted(self.imgfileList, key=lambda p: alphanum_key(os.path.basename(p)))
-        #self.fileList.sort()
-        #print(self.sorted_imgfilelist)
-        self.imgdirIterator = iter(self.sorted_imgfilelist)
-        self.nextimage = next(self.imgdirIterator)
-        self.imgdirRevIterator = reversed(self.sorted_imgfilelist)
-        self.previmage = next(self.imgdirRevIterator)
-        while True:
-            # cycle through the iterator until the current file is found
-            if next(self.imgdirIterator) == self.imgpath:
-                break
-        while True:
-            # cycle through the reverse iterator until the current file is found
-            if next(self.imgdirRevIterator) == self.imgpath:
-                break
+        def _norm(p):
+            return os.path.normcase(os.path.normpath(p))
+        self._img_index_map = { _norm(p): i for i, p in enumerate(self.sorted_imgfilelist) }
     
     def nextImage(self):      
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.imgpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.imgfileList:
-            try:
-                imgfilename = self.imgpath
-                nextimgfilename = next(self.imgdirIterator)
-                self.ui.ImageLe.setText(os.path.basename(nextimgfilename))
-                if fileext == '.tif':
-                    print(nextimgfilename)
-                    self.loadImageStackFromFile(nextimgfilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(nextimgfilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
-
-            except:
-                # the iterator has finished, restart it
-                self.imgdirIterator = iter(self.imgfileList)
-                #self.imgdirRevIterator = reversed(self.imgfileList)
-                #print(self.imgfileList)
-                self.prevImage()
-            
-            self.imgpath = nextimgfilename
-            self.showImage(nextimgfilename)            
-
-        else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadImage()
+        if not self.imgpath or not getattr(self, 'sorted_imgfilelist', None):
+            return
+        def _norm(p):
+            return os.path.normcase(os.path.normpath(p))
+        cur = _norm(self.imgpath)
+        idx = getattr(self, '_img_index_map', {}).get(cur)
+        if idx is None:
+            self.sortImgFiles()
+            idx = self._img_index_map.get(cur)
+        if idx is None:
+            if self.sorted_imgfilelist:
+                self.imgpath = self.sorted_imgfilelist[0]
+                self.showImage(self.imgpath)
+            return
+        nextidx = (idx + 1) % len(self.sorted_imgfilelist)
+        self.imgpath = self.sorted_imgfilelist[nextidx]
+        self.showImage(self.imgpath)
 
     def prevImage(self):
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.imgpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.imgfileList:
-            try:
-                imgfilename = self.imgpath
-                previmgfilename = next(self.imgdirRevIterator)
-                self.ui.ImageLe.setText(os.path.basename(previmgfilename))
-                if fileext == '.tif':
-                    print(previmgfilename)
-                    self.loadImageStackFromFile(previmgfilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(previmgfilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
-
-            except:
-                # the iterator has finished, restart it
-                self.imgdirRevIterator = reversed(self.imgfileList)
-                #self.imgdirIterator = iter(self.imgfileList)
-                #self.nextImage()
-            
-            self.imgpath = previmgfilename
-            self.showImage(previmgfilename)
-            
-
-        else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadImage()
+        if not self.imgpath or not getattr(self, 'sorted_imgfilelist', None):
+            return
+        def _norm(p):
+            return os.path.normcase(os.path.normpath(p))
+        cur = _norm(self.imgpath)
+        idx = getattr(self, '_img_index_map', {}).get(cur)
+        if idx is None:
+            self.sortImgFiles()
+            idx = self._img_index_map.get(cur)
+        if idx is None:
+            if self.sorted_imgfilelist:
+                self.imgpath = self.sorted_imgfilelist[-1]
+                self.showImage(self.imgpath)
+            return
+        previdx = (idx - 1) % len(self.sorted_imgfilelist)
+        self.imgpath = self.sorted_imgfilelist[previdx]
+        self.showImage(self.imgpath)
 
     def ReloadImage(self):
         if self.imgpath:
@@ -1197,10 +980,10 @@ class MainWindow(qtw.QMainWindow):
             self.SetLineSpacing()
             file.close()
        
-        self.save_shared_session(**{
-            'self.txtpath': self.txtpath,
-            'self.txtdir': self.txtdir,
-        })
+        #self.save_shared_session(**{
+            #self.txtpath': self.txtpath,
+            #self.txtdir': self.txtdir,
+        #})
 
         self.txtfileList = []
         for t in os.listdir(self.txtdir):
@@ -1213,84 +996,44 @@ class MainWindow(qtw.QMainWindow):
     def sortTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)
-        #self.fileList.sort()
-        #print(self.sorted_txtfilelist)
-        self.txtdirIterator = iter(self.sorted_txtfilelist)
-        self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
-        while True:
-            # cycle through the iterator until the current file is found
-            if next(self.txtdirIterator) == self.txtpath:
-                break
-        while True:
-            # cycle through the reverse iterator until the current file is found
-            if next(self.txtdirRevIterator) == self.txtpath:
-                break
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=lambda p: alphanum_key(os.path.basename(p)))
+        def _norm(p):
+            return os.path.normcase(os.path.normpath(p))
+        self._text_index_map = { _norm(p): i for i, p in enumerate(self.sorted_txtfilelist) }
 
     def nextText(self):
-        # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.txtpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.txtfileList:
-            try:
-                txtfile = next(self.txtdirIterator)
-                self.ui.TextLE.setText(os.path.basename(txtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
-                    #QtCore.Qt.KeepAspectRatio)
-                self.txtfile = qtc.QFile(txtfile)
-                self.txtfilename = os.path.basename(txtfile)
-                self.dirname = os.path.dirname(self.txtpath)
-                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
-                self.txtpath = txtfile
-                print(txtfile,"\t",self.txtpath,"\t",self.txtfile,"\t",self.txtfilename)
-                #print(self.txtfilename)
-                self.showText(self.txtfilename)
-            except:
-                # the iterator has finished, restart it
-                self.txtdirIterator = iter(self.sorted_txtfilelist)
-                self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
-                self.prevText()
-            self.txtpath = txtfile
-            self.showText(txtfile)
-        else:
-            # no file list found, load an image
-            self.loadText()
-    
+        if not self.txtpath or not getattr(self, 'sorted_txtfilelist', None):
+            return
+        cur = os.path.normcase(os.path.normpath(self.txtpath))
+        idx = getattr(self, '_text_index_map', {}).get(cur)
+        if idx is None:
+            self.sortTextFiles()
+            idx = self._text_index_map.get(cur)
+        if idx is None:
+            if self.sorted_txtfilelist:
+                self.txtpath = self.sorted_txtfilelist[0]
+                self.showText(self.txtpath)
+            return
+        nextidx = (idx + 1) % len(self.sorted_txtfilelist)
+        self.txtpath = self.sorted_txtfilelist[nextidx]
+        self.showText(self.txtpath)
+
     def prevText(self):
-        # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.txtpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.txtfileList:
-            try:
-                #txtfile = self.textfile
-                txtfile = next(self.txtdirRevIterator)
-                self.ui.TextLE.setText(os.path.basename(txtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
-                    #QtCore.Qt.KeepAspectRatio)
-                self.txtfile = qtc.QFile(txtfile)
-                self.txtfilename = os.path.basename(txtfile)
-                self.dirname = os.path.dirname(self.txtpath)
-                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
-                self.txtpath = txtfile
-                print(txtfile,"\t",self.txtpath,"\t",self.txtfile,"\t",self.txtfilename)
-                #print(self.txtfilename)
-                self.showText(self.txtfilename)
-            except:
-                # the iterator has finished, restart it
-                self.txtdirRevIterator = reversed(sorted_txtfilelist)
-                self.txtdirIterator = iter(sorted_txtfilelist)
-                self.nextText()
-            self.txtpath = txtfile
-            self.showText(txtfile)    
-        else:
-            # no file list found, load an image
-            self.loadText()      
+        if not self.txtpath or not getattr(self, 'sorted_txtfilelist', None):
+            return
+        cur = os.path.normcase(os.path.normpath(self.txtpath))
+        idx = getattr(self, '_text_index_map', {}).get(cur)
+        if idx is None:
+            self.sortTextFiles()
+            idx = self._text_index_map.get(cur)
+        if idx is None:
+            if self.sorted_txtfilelist:
+                self.txtpath = self.sorted_txtfilelist[-1]
+                self.showText(self.txtpath)
+            return
+        previdx = (idx - 1) % len(self.sorted_txtfilelist)
+        self.txtpath = self.sorted_txtfilelist[previdx]
+        self.showText(self.txtpath)
 
     def ReloadText(self):
         if self.txtpath:
