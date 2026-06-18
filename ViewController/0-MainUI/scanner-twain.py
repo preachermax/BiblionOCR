@@ -1,5 +1,5 @@
 import sys
-import twain
+#import twain
 from io import BytesIO
 import PIL.Image
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QFileDialog
@@ -26,35 +26,35 @@ class TwainScannerApp(QMainWindow):
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
-
-    def start_scan(self):
-        try:
-            with twain.SourceManager(None) as sm:
-                # This presents the native TWAIN source selection dialog
-                src = sm.open_source()
-                if src:
-                    # Request acquire; show_ui=False suppresses the manufacturer's pop-up window
-                    src.request_acquire(show_ui=False, modal_ui=False)
+# Note: The following code is a placeholder. Actual TWAIN scanning requires the twain module and compatible hardware.
+    # def start_scan(self):
+    #     try:
+    #         with twain.SourceManager(None) as sm:
+    #             # This presents the native TWAIN source selection dialog
+    #             src = sm.open_source()
+    #             if src:
+    #                 # Request acquire; show_ui=False suppresses the manufacturer's pop-up window
+    #                 src.request_acquire(show_ui=False, modal_ui=False)
                     
-                    # Native image transfer
-                    (handle, remaining_count) = src.xfer_image_natively()
+    #                 # Native image transfer
+    #                 (handle, remaining_count) = src.xfer_image_natively()
                     
-                    if handle:
-                        # Convert the TWAIN DIB memory handle to a BMP byte stream
-                        bmp_bytes = twain.dib_to_bm_file(handle)
-                        image = PIL.Image.open(BytesIO(bmp_bytes))
+    #                 if handle:
+    #                     # Convert the TWAIN DIB memory handle to a BMP byte stream
+    #                     bmp_bytes = twain.dib_to_bm_file(handle)
+    #                     image = PIL.Image.open(BytesIO(bmp_bytes))
                         
-                        # Convert to QImage for PyQt5
-                        image = image.convert("RGBA")
-                        data = image.tobytes("raw", "RGBA")
-                        qimage = QImage(data, image.size[0], image.size[1], QImage.Format_RGBA8888)
+    #                     # Convert to QImage for PyQt5
+    #                     image = image.convert("RGBA")
+    #                     data = image.tobytes("raw", "RGBA")
+    #                     qimage = QImage(data, image.size[0], image.size[1], QImage.Format_RGBA8888)
                         
-                        # Display in GUI
-                        pixmap = QPixmap.fromImage(qimage)
-                        self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), 1, 1))
+    #                     # Display in GUI
+    #                     pixmap = QPixmap.fromImage(qimage)
+    #                     self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), 1, 1))
                         
-        except Exception as e:
-            self.image_label.setText(f"Scan failed: {str(e)}")
+    #     except Exception as e:
+    #         self.image_label.setText(f"Scan failed: {str(e)}")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -21,12 +21,12 @@ from copy import deepcopy
 from HelpSystem import add_help_menu
 import platform
 from SessionManager import SessionManager
-
+print("[Pixler argv]:", sys.argv)
 # PyQt5 imports
 from PyQt5 import uic
-from PyQt5.QtWidgets import QRubberBand, QWidget, QVBoxLayout, QHBoxLayout, QSizeGrip, QPushButton, QMessageBox, QFrame
+from PyQt5.QtWidgets import QRubberBand, QWidget, QVBoxLayout, QHBoxLayout, QSizeGrip, QPushButton, QMessageBox, QFrame, QLabel
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtGui import QPainter, QBrush, QPen, QIcon
+from PyQt5.QtGui import QPainter, QBrush, QPen, QIcon, QPixmap
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, QPoint, QRect, QSize, Qt, QUrl
 from PyQt5 import QtCore as qtc
@@ -39,6 +39,8 @@ from MySlidersUI import Ui_SliderDialog
 from PreProcess import PreProcess as pp
 #from MyScanner import Ui_Scanner
 from MyPixlerUI import Ui_Pixler
+from Adjust import crop_processor, get_processor, rotate_processor, threshold_processor, PROCESSORS
+
 
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
@@ -95,80 +97,133 @@ class ThreadConsoleTextQueueReceiver(qtc.QObject):
 
 
 class PixlerMain(qtw.QMainWindow):
-# Application View
-    def __init__(self,parent=None):
-        qtw.QMainWindow.__init__(self,parent)
-        
-        self.mod_dirname = os.path.dirname(__file__)
-        up_once = os.path.join(self.mod_dirname,"..")
-        up_twice = os.path.join(up_once,"..")
-        self.mod_rootdir = up_twice
-        self.mod_realpath = os.path.realpath(self.mod_rootdir)
-        self.mod_abspath = os.path.abspath(self.mod_realpath) 
-        self.mod_relpath = os.path.relpath(self.mod_abspath)
-        self.projecthome = self.mod_abspath + os.sep
-        print(f'OS Path dirname: {self.mod_dirname}')
-        print(f'OS Path up one folder: {up_once}')
-        #print(f'OS Path up two folders: {up_twice}')
-        print(f'OS Path rootdir: {self.mod_rootdir}')
-        print(f'OS Path realpath: {self.mod_realpath}')
-        print(f'OS Path abspath: {self.mod_abspath}')
-        print(f'OS Path relpath: {self.mod_dirname}')
-        print(f'Project Home: {self.projecthome}')
-        
-        self.imgpath = ""
-        self.imgdir = ""
+# Application Viewdef __init__(self, imgpath=None, parent=None):
+    def __init__(self, imgpath=None, parent=None):
+        super().__init__(parent)
+
+        print("=== INIT START ===")
+
+        # -------------------------
+        # Phase 1 — STATE ONLY (ALWAYS DEFINE)
+        # -------------------------
+        self.imgpath = None
+        self.refimgpath = None
+
+        if imgpath:
+            imgpath = os.path.abspath(os.path.normpath(imgpath))
+            self.imgpath = imgpath
+            self.refimgpath = imgpath
+
+        self.refimgdir = os.path.dirname(self.refimgpath) if self.refimgpath else ""
+        self.imagedir = ""
+
+        self.refimgfiles = []
+        self.refimgindex = -1
+        self.imagefiles = []
+        self.imageindex = -1
+
         self.RefImgchangesSaved = True
 
+        print(f"[INIT] imgpath: {self.imgpath}")
+        print(f"[INIT] refimgpath: {self.refimgpath}")
+
+        # -------------------------
+        # Phase 2 — PATH SYSTEM
+        # -------------------------
+        self.mod_dirname = os.path.dirname(__file__)
+        self.mod_rootdir = os.path.join(self.mod_dirname, "..", "..")
+        self.mod_realpath = os.path.realpath(self.mod_rootdir)
+        self.mod_abspath = os.path.abspath(self.mod_realpath)
+        self.projecthome = os.path.normpath(self.mod_abspath)
+
+        print(f"[PATH] Project Home: {self.projecthome}")
+
+        # -------------------------
+        # Phase 2.5 — PATH SANITY GUARD
+        # -------------------------
+        def _assert_clean_path(label, path):
+            if path and os.path.isabs(path):
+                tail = path[len(self.projecthome):] if path.startswith(self.projecthome) else ""
+                if ":" in tail:
+                    print(f"[PATH ERROR] {label} appears double-prefixed: {path}")
+
+        _assert_clean_path("refimgpath", self.refimgpath)
+
+        # -------------------------
+        # Phase 3 — UI SETUP
+        # -------------------------
         self.ui = Ui_Pixler()
         self.ui.setupUi(self)
-        #Implement Co-pilot Help system
+
         add_help_menu(self, 'MyPixler')
         self.initUI()
 
-        # extended slots code
-       
-        self.ui.actionExtract_pdf.triggered.connect(self.actionextract_pdf)      
+        print("[INIT] UI READY")
+
+        # -------------------------
+        # Phase 4 — IMAGE STATE INIT
+        # -------------------------
+        self.origin = QPoint()
+        self.refimgscale = 1
+        self.imagescale = 1
+
+        self.refimgpixmap = qtg.QPixmap()
+        self.refimgqimage = qtg.QImage()
+        self.imagepixmap = qtg.QPixmap()
+        self.imageqimage = qtg.QImage()
+
+        # -------------------------
+        # Phase 5 — SIGNALS
+        # -------------------------
+        self.ui.actionExtract_pdf.triggered.connect(self.actionextract_pdf)
         self.ui.actionpdf_For_tiff.triggered.connect(self.actionpdf_for_tiff)
         self.ui.actionpdf_To_tiff.triggered.connect(self.actionpdf_to_tiff)
         self.ui.actiontiff_indexed.triggered.connect(self.actiontiff_to_mono)
-        #self.ui.actiondeskew_mono.triggered.connect(self.actiondeskew_mono)
         self.ui.actionpng_indexed.triggered.connect(self.actionmono_to_png)
         self.ui.actionAuto_Crop_Languages.triggered.connect(self.actionCrop_Languages)
-        
-        self.ui.actionManually_Crop_Language_Pages.triggered.connect(self.crop)
-        
-        self.ui.actionEdit_Image_tb.triggered.connect(self.actionGimpEdit) 
+        #self.ui.actionManually_Crop_Language_Pages.triggered.connect(self.crop)
+        self.ui.actionManually_Crop_Language_Pages.triggered.connect(self.actionCropPreview)
+        self.ui.actionEdit_Image_tb.triggered.connect(self.actionGimpEdit)
         self.ui.actionConvert_Greek_tiff_To_png.triggered.connect(self.actionConvert_Greek_tiff_To_png)
         self.ui.actionDeskew_Greek_tiff.triggered.connect(self.actionDeskew_Greek_tiff)
         self.ui.actionResize_Greek_png_pages.triggered.connect(self.actionResize_Greek_png)
         self.ui.actionConvert_Latin_tiff_To_png.triggered.connect(self.actionConvert_Latin_tiff_To_png)
         self.ui.actionDeskew_Latin_tiff.triggered.connect(self.actionDeskew_Latin_tiff)
         self.ui.actionResize_Latin_png_pages.triggered.connect(self.actionResize_Latin_png)
+        
+        # Establish Panel focus policy for keypress events (arrows for next/prev)
+        self.ui.RefImg.setFocusPolicy(qtc.Qt.StrongFocus)
+        self.ui.Image.setFocusPolicy(qtc.Qt.StrongFocus)
+        self.ui.RefImgLE.setFocusPolicy(qtc.Qt.ClickFocus)
+        self.ui.ImageLE.setFocusPolicy(qtc.Qt.ClickFocus)
+        
+        self.rubberBand = ResizableRubberBand(self)
+        self.rubberBand.hide()
+        
+        # -------------------------
+        # Phase 6 — STARTUP FLAG
+        # -------------------------
+        print(f"[INIT CHECK] refimgpath exists? {self.refimgpath} -> {os.path.exists(self.refimgpath) if self.refimgpath else 'None'}")
 
-        
-        #self.refimg_xoffset = self.ui.RefImg.x()
-        #self.refimg_yoffset = self.ui.RefImg.y()
-        
-        #self.rubberBand = ResizableRubberBand(self)
-        
-        #self.origin = QPoint(int(self.refimg_xoffset),int(self.refimg_yoffset))
-        self.origin = QPoint()
-        self.refimgscale = 1
-        self.imagescale = 1
-        self.refimgdir=""
-        self.imagedir=""
-        self.refimgpath=""
-        self.imagepath=""
+        self._startup_load = bool(self.refimgpath and os.path.isfile(self.refimgpath))
 
-        self.refimgsize = 1
-        self.refimgpixmap = qtg.QPixmap()
-        self.refimgqimage = qtg.QImage()
-        self.imagesize = 1
-        self.imagepixmap = qtg.QPixmap()
-        self.imageqimage = qtg.QImage()
-        #self.currentQRect = self.rubberBand.geometry()
-    
+        if self._startup_load:
+            print("[INIT] Valid startup image detected")
+        else:
+            print("[INIT] No valid startup image")
+
+        # -------------------------
+        # Phase 7 — SINGLE DEFERRED LOAD (ONLY ONE)
+        # -------------------------
+        if self._startup_load:
+            def _startup():
+                print("[INIT] Deferred startup executing")
+                self.setupRefImages()              # index only
+                self.showRefImg(self.refimgpath)   # render once
+
+            qtc.QTimer.singleShot(0, _startup)
+
+        print("=== INIT COMPLETE ===")
     @qtc.pyqtSlot(str)
     def append_text(self,text):
         #self.ui.OutputText.moveCursor(QTextCursor.End)
@@ -178,21 +233,41 @@ class PixlerMain(qtw.QMainWindow):
 #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
     def output_terminal_written(self, text):
         self.ui.OutputText.append(text)
-  
-# Session View
+    
+    # Session View
 
     def get_session_settings(self):
-        # get session settings
-        sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
+        base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
+        sm = SessionManager(base)
 
         print("loading scanner session")
         scanner_session = sm.values('ScannerSession.json')
-        self.imgpath = scanner_session.get('self.imgpath', getattr(self, 'imgpath', ''))
-        self.imgdir = scanner_session.get('self.imgdir', getattr(self, 'imgdir', ''))
+
+        # -------------------------
+        # Preserve runtime values FIRST
+        # -------------------------
+        runtime_imgpath = getattr(self, 'imgpath', '')
+        runtime_refimgpath = getattr(self, 'refimgpath', '')
+
+        # -------------------------
+        # Scanner session (fallback only)
+        # -------------------------
+        session_imgpath = scanner_session.get('self.imgpath', '')
+        session_imgdir = scanner_session.get('self.imgdir', '')
+
+        if not runtime_imgpath and session_imgpath:
+            self.imgpath = os.path.normpath(session_imgpath)
+        else:
+            self.imgpath = os.path.normpath(runtime_imgpath) if runtime_imgpath else ""
+
+        self.imgdir = os.path.normpath(session_imgdir) if session_imgdir else ""
 
         print("loading pixler session")
         session = sm.values('PixlerSession.json')
 
+        # -------------------------
+        # Helpers
+        # -------------------------
         def get_setting(name: str, default=None):
             if default is None:
                 default = getattr(self, name, None)
@@ -200,71 +275,117 @@ class PixlerMain(qtw.QMainWindow):
 
         def abs_project_path(name: str, default=''):
             value = session.get(f'self.{name}')
-            if value:
-                return self.projecthome + value
-            return getattr(self, name, default)
+            if not value:
+                return getattr(self, name, default)
+
+            value = os.path.normpath(value)
+
+            if os.path.isabs(value):
+                return value
+
+            return os.path.normpath(os.path.join(self.projecthome, value))
 
         def data_path(name: str, default=''):
             value = session.get(f'self.{name}')
-            if value:
-                return self.projecthome + self.jsondir + "/" + value
-            return getattr(self, name, default)
+            if not value:
+                return getattr(self, name, default)
 
+            value = os.path.normpath(value)
+
+            if os.path.isabs(value):
+                return value
+
+            return os.path.normpath(os.path.join(self.projecthome, self.jsondir, value))
+
+        # -------------------------
+        # Load simple settings
+        # -------------------------
         self.jsondir = get_setting('jsondir', '')
         self.session = data_path('session')
         self.workflow = data_path('workflow')
+
         self.font = get_setting('font', '')
         self.fontsize = get_setting('fontsize', 20)
         self.ocrlang = get_setting('ocrlang', '')
         self.ocrmodel = get_setting('ocrmodel', '')
         self.bookabbr = get_setting('bookabbr', '')
         self.chr = get_setting('chr', '')
+
         self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
         self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
         self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+
         self.pixmap = get_setting('pixmap', None)
         self.qimage = get_setting('qimage', None)
-        self.bmpsourcedir = abs_project_path('bmpsourcedir')
-        self.bmpgreekdir = abs_project_path('bmpgreekdir')
-        self.refimgpath = abs_project_path('refimgpath')
+
+        # -------------------------
+        # CRITICAL: Controlled path restore
+        # -------------------------
+
+        session_ref = abs_project_path('refimgpath')
+        if not runtime_refimgpath and session_ref:
+            self.refimgpath = session_ref
+        # else: KEEP runtime value
+
         self.refimgdir = abs_project_path('refimgdir')
+
+        session_img = abs_project_path('imagepath')
+        if not runtime_imgpath and session_img:
+            self.imagepath = session_img
+        # else: KEEP runtime
+
+        self.imagedir = abs_project_path('imagedir')
+
+        # -------------------------
+        # Remaining settings
+        # -------------------------
         self.refimg_xoffset = get_setting('refimg_xoffset', 0)
         self.refimg_yoffset = get_setting('refimg_yoffset', 0)
         self.refimgtfileList = get_setting('refimgtfileList', [])
         self.refimgzoom = get_setting('refimgzoom', '')
         self.refimgzoomslidervalue = get_setting('refimgzoomslidervalue', 0)
-        self.imagepath = abs_project_path('imagepath')
-        self.imagedir = abs_project_path('imagedir')
+
         self.image_xoffset = get_setting('image_xoffset', 0)
         self.image_yoffset = get_setting('image_yoffset', 0)
         self.imagefileList = get_setting('imagefileList', [])
         self.imagezoom = get_setting('imagezoom', '')
         self.imagezoomslidervalue = get_setting('imagezoomslidervalue', 0)
+
+        # Bulk paths (safe now)
+        self.bmpsourcedir = abs_project_path('bmpsourcedir')
+        self.bmpgreekdir = abs_project_path('bmpgreekdir')
+
         self.pixlerpagesrotatedir = abs_project_path('pixlerpagesrotatedir')
+
         self.greekpages = abs_project_path('greekpages')
         self.greekpagesrotated = abs_project_path('greekpagesrotated')
         self.greekpagesdeskewed = abs_project_path('greekpagesdeskewed')
         self.greekpagescropped = abs_project_path('greekpagescropped')
         self.greekpagescleaned = abs_project_path('greekpagescleaned')
         self.greekpagesbox = abs_project_path('greekpagesbox')
+
         self.greeklinescropped = abs_project_path('greeklinescropped')
         self.greeklinescleaned = abs_project_path('greeklinescleaned')
         self.greeklinesbox = abs_project_path('greeklinesbox')
+
         self.latinpages = abs_project_path('latinpages')
         self.latinpagesrotated = abs_project_path('latinpagesrotated')
         self.latinpagesdeskewed = abs_project_path('latinpagesdeskewed')
         self.latinpagescropped = abs_project_path('latinpagescropped')
         self.latinpagescleaned = abs_project_path('latinpagescleaned')
         self.latinpagesbox = abs_project_path('latinpagesbox')
+
         self.latinlinescropped = abs_project_path('latinlinescropped')
         self.latinlinescleaned = abs_project_path('latinlinescleaned')
         self.latinlinesbox = abs_project_path('latinlinesbox')
+
         self.hebrewpagesdenoised = abs_project_path('hebrewpagesdenoised')
         self.hebrewpagesrotated = abs_project_path('hebrewpagesrotated')
         self.hebrewpagesdeskewed = abs_project_path('hebrewpagesdeskewed')
         self.hebrewpagescropped = abs_project_path('hebrewpagescropped')
         self.hebrewpagescleaned = abs_project_path('hebrewpagescleaned')
         self.hebrewpagesbox = abs_project_path('hebrewpagesbox')
+
         self.hebrewlinescropped = abs_project_path('hebrewlinescropped')
         self.hebrewlinescleaned = abs_project_path('hebrewlinescleaned')
         self.hebrewlinesbox = abs_project_path('hebrewlinesbox')
@@ -286,10 +407,10 @@ class PixlerMain(qtw.QMainWindow):
         
         # Closing file
         f.close() 
-
+    
     def initToolbar(self):
         # Signals(Slots)
-        self.ui.actionCropRefImg.triggered.connect(self.crop)
+        #self.ui.actionCropRefImg.triggered.connect(actionCropPreview)
         self.ui.actionDeskewRefImg.triggered.connect(self.deskewRefImg)
         self.ui.actionRotateRefImg_360_deg.triggered.connect(self.rotateRefImg)
         #self.ui.actionDenoise.triggered.connect()
@@ -344,15 +465,15 @@ class PixlerMain(qtw.QMainWindow):
         self.ui.RefImgzoomslider.sliderReleased.connect(self.disable_RefImgzoomslider)
         self.ui.RefImgzoomslider.hide()
         
-        self.ui.NextRefImgbutton.clicked.connect(self.nextRefImg)
-        self.ui.PrevRefImgbutton.clicked.connect(self.prevRefImg)
+        self.ui.NextRefImgbutton.clicked.connect(self.nextRefImage)
+        self.ui.PrevRefImgbutton.clicked.connect(self.prevRefImage)
         
         # Both
         '''
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
-        self.ui.BothNextImageButton.clicked.connect(nextRefImg)
+        self.ui.BothNextImageButton.clicked.connect(nextRefImage)
         self.ui.BothNextImageButton.clicked.connect(nextImage)        
-        self.ui.BothPrevImageButton.clicked.connect(prevRefImg)
+        self.ui.BothPrevImageButton.clicked.connect(prevRefImage)
         self.ui.BothPrevImageButton.clicked.connect(prevImage)'''
         
         self.ui.reloadImagebutton.clicked.connect(self.reloadImage)
@@ -385,7 +506,7 @@ class PixlerMain(qtw.QMainWindow):
                 raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
             self._tiffCaptureHandle = tiffCaptureHandle
             self.showFrame(0)
-
+    
     def loadStackFromFile(self,fileName=''):
         """ Load an image stack from file.
         Without any arguments, loadStackFromFile() will popup a file dialog to choose the image file.
@@ -431,68 +552,204 @@ class PixlerMain(qtw.QMainWindow):
         # Convert frame ndarray to a QImage.
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
 
-    def showRefImg(self,imgfilename):
-        # Get reference image size
-        PILRefImg = pilimg.open(imgfilename)
-        self.RefImg_width = PILRefImg.width
-        self.RefImg_height = PILRefImg.height
-        self.RefImg_size = PILRefImg.size
-        PILRefImg.close()
-        
-        #self.imgfilename = self.imgpath
-        file = qtc.QFile(imgfilename)
-        filestr = os.path.basename(imgfilename)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        if file.open(qtc.QIODevice.ReadOnly):
-            info = qtc.QFileInfo(imgfilename)
-            '''if self.imgpath.endswith('.tif'):
-                self.loadStackFromFile(imgfilename)
-                self.showFrame(0)
-                self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation) 
-            else:
-                self.refimgpixmap = qtg.QPixmap(imgfilename).scaled(self.ui.Image.size(), 
-                    qtc.Qt.KeepAspectRatio)'''       
+    def showRefImg(self, imgpath):
+        print(f"[SHOW] Called with: {imgpath}")
 
-            if fileext == '.tif':
-                self.loadStackFromFile(imgfilename)
-                self.showFrame(0)
-                self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-                self.ui.RefImg.setPixmap(qtg.QPixmap(self.origpixmap))
-                #self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage)                
-                self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
-            else:
-                self.origpixmap = qtg.QPixmap(self.refimgpath)
-                self.refimgpixmap = qtg.QPixmap(self.refimgpath)
-        
-        self.pixmap = self.origpixmap
-        file.close()
-
-        if self.refimgpixmap.isNull():
+        if not imgpath:
+            print("[SHOW] No path provided")
             return
-        
-        self.on_RefImgzoom()
-        
-        self.refimgdir = os.path.dirname(imgfilename)
-        self.ui.RefImgLE.setText(filestr)
-        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
-            'self.refimgpath': self.refimgpath,
-            'self.refimgdir': self.refimgdir,
-        })
-        
-        self.refimgfileList = []
-        for i in os.listdir(self.refimgdir):
-            ipath = os.path.normpath(os.path.join(self.refimgdir, i))
-            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.refimgfileList.append(ipath)        
-        '''self.imgfileList = []
-        for i in os.listdir(self.imgdir):
-            ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)'''
 
-        self.sortRefImgFiles()
+        imgpath = os.path.normpath(imgpath)
+
+        if not os.path.isfile(imgpath):
+            print(f"[SHOW] Invalid file: {imgpath}")
+            return
+
+        self.refimgpath = imgpath  # ✅ sync state
+
+        print(f"[SHOW] Rendering: {imgpath}")
+
+        if imgpath.lower().endswith('.tif'):
+            print("[SHOW] TIFF detected")
+
+            self.loadStackFromFile(imgpath)
+            self.showFrame(0)
+
+            # ✅ CRITICAL: persist qimage
+            self.refimgqimage = self.qimage
+
+            self.refimgpixmap = qtg.QPixmap.fromImage(self.refimgqimage)
+
+        else:
+            print("[SHOW] Standard image")
+
+            self.refimgpixmap = qtg.QPixmap(imgpath)
+
+            # ✅ CRITICAL: create qimage from pixmap
+            self.refimgqimage = self.refimgpixmap.toImage()
+
+        # ✅ display
+        self.ui.RefImg.setPixmap(
+            self.refimgpixmap.scaled(
+                self.ui.RefImg.size(),
+                qtc.Qt.KeepAspectRatio,
+                transformMode=qtc.Qt.SmoothTransformation
+            )
+        )
+
+        print("[SHOW] Render complete")
+    
+    # def showRefImg(self, imgpath):
+    #     print(f"[SHOW] Called with: {imgpath}")
+
+    #     if not imgpath:
+    #         print("[SHOW] No path provided")
+    #         return
+
+    #     imgpath = os.path.normpath(imgpath)
+
+    #     if not os.path.isfile(imgpath):
+    #         print(f"[SHOW] Invalid file: {imgpath}")
+    #         return
+
+    #     # Sync state
+    #     self.refimgpath = imgpath
+    #     self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
+    #     print(f"[SHOW] Rendering: {imgpath}")
+
+    #     # -------------------------
+    #     # Load image
+    #     # -------------------------
+    #     try:
+    #         if imgpath.lower().endswith(('.tif', '.tiff')):
+    #             print("[SHOW] TIFF detected")
+
+    #             self.loadStackFromFile(imgpath)
+
+    #             if not hasattr(self, "qimage") or self.qimage is None:
+    #                 print("[SHOW ERROR] qimage not set after TIFF load")
+    #                 return
+
+    #             self.showFrame(0)
+
+    #             self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage)
+
+    #         else:
+    #             print("[SHOW] Standard image load")
+
+    #             self.refimgpixmap = qtg.QPixmap(imgpath)
+
+    #     except Exception as e:
+    #         print(f"[SHOW ERROR] Exception during load: {e}")
+    #         return
+
+    #     # -------------------------
+    #     # Validate pixmap
+    #     # -------------------------
+    #     if self.refimgpixmap.isNull():
+    #         print("[SHOW ERROR] Pixmap is NULL")
+    #         return
+
+    #     # -------------------------
+    #     # Render to UI
+    #     # -------------------------
+    #     if not hasattr(self, "ui") or not hasattr(self.ui, "RefImg"):
+    #         print("[SHOW ERROR] UI not ready")
+    #         return
+
+    #     self.ui.RefImg.setPixmap(
+    #         self.refimgpixmap.scaled(
+    #             self.ui.RefImg.size(),
+    #             qtc.Qt.KeepAspectRatio,
+    #             transformMode=qtc.Qt.SmoothTransformation
+    #         )
+    #     )
+
+    #     print("[SHOW] Render complete")
+
+    #     self.ui.RefImg.setPixmap(self.refimgpixmap)
+    # def showRefImg(self, path):
+        
+    #     print(f"[SHOW] Rendering: {imgpath}")
+    #     if not path or not os.path.exists(path):
+    #         return
+
+    #     self.refimgpath = path
+
+    #     if path.lower().endswith('.tif'):
+    #         self.loadStackFromFile(path)
+    #         self.showFrame(0)
+    #         self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage)
+    #     else:
+    #         self.refimgpixmap = qtg.QPixmap(path)
+
+    #     self.ui.RefImg.setPixmap(self.refimgpixmap)
+
+        # 🔑 ALWAYS rebuild list after loading
+        # self.setupRefImages()
+        
+    # def showRefImg(self,imgfilename):
+    #     # Get reference image size
+    #     PILRefImg = pilimg.open(imgfilename)
+    #     self.RefImg_width = PILRefImg.width
+    #     self.RefImg_height = PILRefImg.height
+    #     self.RefImg_size = PILRefImg.size
+    #     PILRefImg.close()
+        
+    #     #self.imgfilename = self.imgpath
+    #     file = qtc.QFile(imgfilename)
+    #     filestr = os.path.basename(imgfilename)           
+    #     filesplit = os.path.splitext(filestr)
+    #     filename = filesplit[0]
+    #     fileext = filesplit[1]
+    #     if file.open(qtc.QIODevice.ReadOnly):
+    #         info = qtc.QFileInfo(imgfilename)
+    #         '''if self.imgpath.endswith('.tif'):
+    #             self.loadStackFromFile(imgfilename)
+    #             self.showFrame(0)
+    #             self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation) 
+    #         else:
+    #             self.refimgpixmap = qtg.QPixmap(imgfilename).scaled(self.ui.Image.size(), 
+    #                 qtc.Qt.KeepAspectRatio)'''       
+
+    #         if fileext == '.tif':
+    #             self.loadStackFromFile(imgfilename)
+    #             self.showFrame(0)
+    #             self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
+    #             self.ui.RefImg.setPixmap(qtg.QPixmap(self.origpixmap))
+    #             #self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage)                
+    #             self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
+    #         else:
+    #             self.origpixmap = qtg.QPixmap(self.refimgpath)
+    #             self.refimgpixmap = qtg.QPixmap(self.refimgpath)
+        
+    #     self.pixmap = self.origpixmap
+    #     file.close()
+
+    #     if self.refimgpixmap.isNull():
+    #         return
+        
+    #     self.on_RefImgzoom()
+        
+    #     self.refimgdir = os.path.dirname(imgfilename)
+    #     self.ui.RefImgLE.setText(filestr)
+    #     SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
+    #         'self.refimgpath': self.refimgpath,
+    #         'self.refimgdir': self.refimgdir,
+    #     })
+        
+    #     self.refimgfileList = []
+    #     for i in os.listdir(self.refimgdir):
+    #         ipath = os.path.normpath(os.path.join(self.refimgdir, i))
+    #         if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
+    #             self.refimgfileList.append(ipath)        
+    #     '''self.imgfileList = []
+    #     for i in os.listdir(self.imgdir):
+    #         ipath = os.path.join(self.imgdir, i)
+    #         if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+    #             self.imgfileList.append(ipath)'''
+
+    #     self.sortRefImgFiles()
 
     def showImage(self,imgfilename):
         #self.imgfilename = self.imgpath
@@ -518,9 +775,10 @@ class PixlerMain(qtw.QMainWindow):
                 self.showFrame(0)
                 #self.imagepixmap = qtg.QPixmap.fromImage(self.qimage)                
                 self.imagepixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
+            # else:
+            #     self.imagepixmap = qtg.QPixmap(self.imagepath)
             else:
-                self.imagepixmap = qtg.QPixmap(self.imagepath)
-        
+                self.imagepixmap = qtg.QPixmap(imgfilename)
         file.close()
         
         if self.imagepixmap.isNull():
@@ -529,13 +787,25 @@ class PixlerMain(qtw.QMainWindow):
         self.on_Imagezoom()
         #self.ui.Image.setPixmap(self.refimgpixmap)
         
+        # self.imagedir = os.path.dirname(imgfilename)
+        # self.ui.ImageLE.setText(filestr)
+        # SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
+        #     'self.imagepath': self.imagepath,
+        #     'self.imagedir': self.imagedir,
+        # })
+        
+        # self.imagefileList = []
+        
+        base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
+
         self.imagedir = os.path.dirname(imgfilename)
         self.ui.ImageLE.setText(filestr)
-        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
-            'self.imagepath': self.imagepath,
-            'self.imagedir': self.imagedir,
+
+        SessionManager(base).update('PixlerSession.json', {
+            'self.imagepath': os.path.normpath(self.imagepath),
+            'self.imagedir': os.path.normpath(self.imagedir),
         })
-        
+
         self.imagefileList = []
         for i in os.listdir(self.imagedir):
             ipath = os.path.normpath(os.path.join(self.imagedir, i))
@@ -628,12 +898,29 @@ class PixlerMain(qtw.QMainWindow):
                         shutil.copy2(source, destination)
             print("pdf page extraction complete")
         
+            base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
 
-            SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('Session.json', {
-                'self.sourcefile': self.sourcefile,
+            # SessionManager(base).update('Session.json', {
+            #     'self.sourcefile': os.path.normpath(self.sourcefile) if self.sourcefile else "",
+            #     'self.firstpage': self.firstpage,
+            #     'self.lastpage': self.lastpage,
+            # })
+            
+            source = self.sourcefile
+
+            if source:
+                source = os.path.normpath(source)
+
+            SessionManager(base).update('Session.json', {
+                'self.sourcefile': source or "",
                 'self.firstpage': self.firstpage,
                 'self.lastpage': self.lastpage,
             })
+            # SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('Session.json', {
+            #     'self.sourcefile': self.sourcefile,
+            #     'self.firstpage': self.firstpage,
+            #     'self.lastpage': self.lastpage,
+            # })
         
         def reject():
             pass
@@ -1967,20 +2254,33 @@ class PixlerMain(qtw.QMainWindow):
 
 
     # Mouse Controllers
-    def mousePressEvent(self, event):
-    
-        if event.button() == Qt.LeftButton:
-            '''self.refimg_xoffset = self.ui.RefImg.x()
-            self.refimg_yoffset = self.ui.RefImg.y()
-            (x,y) = event.pos()
-            x = self.refimg_xoffset + x
-            y = self.refimg_yoffset + y
-            self.origin = QPoint(x,y)
+    def wheelEvent(self, event):
+        delta = event.angleDelta().y()
 
-            self.rubberBand.setGeometry(QRect(self.origin, QSize()))
-            self.rubberBand.show()'''
-            self.rubberBand = ResizableRubberBand(self)
-            self.origin = QPoint(event.pos())
+        if delta > 0:
+            self.zoom_factor *= 1.1
+        else:
+            self.zoom_factor *= 0.9
+
+        # Clamp zoom
+        self.zoom_factor = max(0.25, min(2.0, self.zoom_factor))
+
+        # Sync slider
+        self.zoom_slider.setValue(int(self.zoom_factor * 100))
+
+        self.update_preview()
+    
+    def mousePressEvent(self, event):
+
+        # ---- Focus routing (GOOD as-is) ----
+        if self.ui.RefImg.geometry().contains(event.pos()):
+            self.ui.RefImg.setFocus()
+        elif self.ui.Image.geometry().contains(event.pos()):
+            self.ui.Image.setFocus()
+
+        # ---- Rubber band start ----
+        if event.button() == Qt.LeftButton:
+            self.origin = event.pos()
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
             self.rubberBand.show()
 
@@ -2000,7 +2300,7 @@ class PixlerMain(qtw.QMainWindow):
 
     def mouseReleaseEvent(self, event):
     
-        if self.rubberband and event.button() == Qt.LeftButton:
+        if self.rubberBand and event.button() == Qt.LeftButton:
             geo = self.rubberBand.geometry()
             h = self.rubberBand.height()
             w = self.rubberBand.width()
@@ -2033,7 +2333,10 @@ class PixlerMain(qtw.QMainWindow):
             self.refimgpath = self.imgpath
             self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
             #with open(self.filename) as file:  
-            self.showRefImg(self.refimgpath)
+            
+            # self.showRefImg(self.refimgpath)
+            print("[Pixler] Ref image indexed")
+            
             #self.sortRefImgFiles()
 
     def loadRefImg(self):     
@@ -2041,7 +2344,11 @@ class PixlerMain(qtw.QMainWindow):
         self.refimgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.refimgdir,'Images (*.png *.jpeg *.jpg *.bmp *.gif *.tif)')[0]
         if self.refimgpath:
             self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
-            self.showRefImg(self.refimgpath)
+            
+            
+            #self.showRefImg(self.refimgpath)
+            print("[Pixler] Ref image indexed")
+            
             #self.sortRefImgFiles()       
         
         
@@ -2053,104 +2360,352 @@ class PixlerMain(qtw.QMainWindow):
             self.imgfilename = imgfilename'''
 
     def sortRefImgFiles(self):
-        convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_refimgfilelist = sorted(self.refimgfileList, key=alphanum_key)
-        #self.fileList.sort()
-        #print(self.sorted_refimgfilelist)
-        self.refimgdirIterator = iter(self.sorted_refimgfilelist)
-        self.nextimage = next(self.refimgdirIterator)
-        self.refimgdirRevIterator = reversed(self.sorted_refimgfilelist)
-        self.previmage = next(self.refimgdirRevIterator)
-        while True:
-            # cycle through the iterator until the current file is found
-            if next(self.refimgdirIterator) == self.refimgpath:
-                break
-        while True:
-            # cycle through the reverse iterator until the current file is found
-            if next(self.refimgdirRevIterator) == self.refimgpath:
-                break
-    
-    def nextRefImg(self):      
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.refimgpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.refimgfileList:
-            try:
-                refimgfilename = self.refimgpath
-                nextrefimgfilename = next(self.refimgdirIterator)
-                self.ui.RefImgLE.setText(os.path.basename(nextrefimgfilename))
-                if fileext == '.tif':
-                    print(nextrefimgfilename)
-                    self.loadStackFromFile(nextrefimgfilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(nextrefimgfilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
- 
-            except:
-                # the iterator has finished, restart it
-                self.refimgdirIterator = iter(self.refimgfileList)
-                #self.imgdirRevIterator = reversed(self.imgfileList)
-                #print(self.imgfileList)
-                self.prevImage()
+        import os
 
-            self.refimgpath = nextrefimgfilename
-            self.showRefImg(nextrefimgfilename)           
+        # --- Case 1: Single-image mode (from MyServer) ---
+        if getattr(self, "refimgpath", None):
+            if os.path.isfile(self.refimgpath):
+                self.refimgfiles = [self.refimgpath]
+                self.refimgindex = 0
+                print("[Pixler] Single image mode")
+                return
+
+        # --- Case 2: Directory mode ---
+        if not getattr(self, "refimgdir", None):
+            print("[Pixler] No reference image directory set")
+            self.refimgfiles = []
+            self.refimgindex = -1
+            return
+
+        if not os.path.isdir(self.refimgdir):
+            print(f"[Pixler] Invalid directory: {self.refimgdir}")
+            self.refimgfiles = []
+            self.refimgindex = -1
+            return
+
+        # --- Build file list ---
+        valid_ext = ('.png', '.jpg', '.jpeg', '.tif', '.tiff')
+
+        self.refimgfiles = sorted([
+            os.path.join(self.refimgdir, f)
+            for f in os.listdir(self.refimgdir)
+            if f.lower().endswith(valid_ext)
+        ])
+
+        print(f"[Pixler DEBUG] imgpath: {self.imgpath}")
+
+        # --- Find current index ---
+        if self.refimgpath in self.refimgfiles:
+            self.refimgindex = self.refimgfiles.index(self.refimgpath)
+        else:
+            self.refimgindex = 0 if self.refimgfiles else -1
+
+        print(f"[Pixler DEBUG] imgpath: {self.imgpath}")
+        
+    # def sortRefImgFiles(self):
+    #     convert = lambda text: int(text) if text.isdigit() else text.lower()
+    #     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    #     self.sorted_refimgfilelist = sorted(self.refimgfileList, key=alphanum_key)
+    #     #self.fileList.sort()
+    #     #print(self.sorted_refimgfilelist)
+    #     self.refimgdirIterator = iter(self.sorted_refimgfilelist)
+    #     self.nextimage = next(self.refimgdirIterator)
+    #     self.refimgdirRevIterator = reversed(self.sorted_refimgfilelist)
+    #     self.previmage = next(self.refimgdirRevIterator)
+    #     while True:
+    #         # cycle through the iterator until the current file is found
+    #         if next(self.refimgdirIterator) == self.refimgpath:
+    #             break
+    #     while True:
+    #         # cycle through the reverse iterator until the current file is found
+    #         if next(self.refimgdirRevIterator) == self.refimgpath:
+    #             break
+    
+    
+    def build_file_list(self, directory):
+        if not os.path.isdir(directory):
+            return []
+
+        valid_ext = ('.png', '.jpg', '.jpeg', '.tif', '.tiff')
+
+        files = [
+            os.path.join(directory, f)
+            for f in os.listdir(directory)
+            if f.lower().endswith(valid_ext)
+        ]
+
+        # natural sort
+        import re
+        def convert(text):
+            return int(text) if text.isdigit() else text.lower()
+
+        def key_func(key):
+            return [convert(c) for c in re.split('([0-9]+)', key)]
+
+        return sorted(files, key=key_func)
+    
+    def setupRefImages(self):
+        
+        if getattr(self, "_in_setup", False):
+            print("[GUARD] setupRefImages re-entry blocked")
+            return
+
+        self._in_setup = True
+        
+        print("=== setupRefImages START ===")
+        import traceback
+
+        print("=== setupRefImages CALLED FROM ===")
+        traceback.print_stack(limit=6)
+        # --- 1. HARD GUARD: UI must exist ---
+        if not hasattr(self, "ui") or self.ui is None:
+            print("[Pixler ERROR] UI not initialized")
+            return
+
+        # --- 2. HARD GUARD: path must exist ---
+        if not self.refimgpath:
+            print("[Pixler] No input image")
+            return
+
+        # Normalize early (prevents mixed path bugs)
+        self.refimgpath = os.path.normpath(self.refimgpath)
+
+        if not os.path.isfile(self.refimgpath):
+            print(f"[Pixler] Invalid file: {self.refimgpath}")
+            return
+
+        print(f"[Pixler DEBUG] Using refimgpath: {self.refimgpath}")
+
+        # --- 3. DIRECTORY RESOLUTION (SAFE) ---
+        self.refimgdir = os.path.dirname(self.refimgpath)
+
+        if not os.path.isdir(self.refimgdir):
+            print(f"[Pixler ERROR] Directory does not exist: {self.refimgdir}")
+            return
+
+        # --- 4. BUILD FILE LIST SAFELY ---
+        valid_ext = ('.png', '.jpg', '.jpeg', '.tif', '.tiff')
+
+        try:
+            files = os.listdir(self.refimgdir)
+        except Exception as e:
+            print(f"[Pixler ERROR] Failed to list directory: {e}")
+            return
+
+        self.refimgfiles = sorted([
+            os.path.normpath(os.path.join(self.refimgdir, f))
+            for f in files
+            if f.lower().endswith(valid_ext)
+        ])
+
+        if not self.refimgfiles:
+            print("[Pixler WARNING] No valid images found in directory")
+            return
+
+        # --- 5. INDEX RESOLUTION (SAFE) ---
+        try:
+            self.refimgindex = self.refimgfiles.index(self.refimgpath)
+        except ValueError:
+            print("[Pixler WARNING] Current image not in list, defaulting to first")
+            self.refimgindex = 0
+            self.refimgpath = self.refimgfiles[0]
+
+        print(f"[Pixler] Loaded {len(self.refimgfiles)} images")
+        print(f"[Pixler DEBUG] Index: {self.refimgindex}")
+
+        # --- 6. FINAL RENDER (UI SAFE POINT) ---
+        #self.showRefImg(self.refimgpath)
+        
+        print("[Pixler] Ref image indexed")
+        
+        print("=== setupRefImages END ===")
+            
+    # def setupRefImages(self):
+    #     print("[Pixler] setupRefImages")
+
+    #     if self.refimgpath and os.path.isfile(self.refimgpath):
+    #         self.refimgdir = os.path.dirname(self.refimgpath)
+
+    #         self.refimgfiles = self.build_file_list(self.refimgdir)
+
+    #         if self.refimgpath in self.refimgfiles:
+    #             self.refimgindex = self.refimgfiles.index(self.refimgpath)
+    #         else:
+    #             self.refimgindex = 0
+
+    #         print(f"[Pixler DEBUG] imgpath: {self.imgpath}")
+    #         print(f"[Pixler] Index = {self.refimgindex}")
+
+    #         self.showRefImg(self.refimgpath)
+
+    #     else:
+    #         print("[Pixler] No valid reference image")
+    #         self.refimgfiles = []
+    #         self.refimgindex = -1
+    
+    def nextRefImage(self):
+        if not self.refimgfiles:
+            return
+
+        self.refimgindex = (self.refimgindex + 1) % len(self.refimgfiles)
+        self.refimgpath = self.refimgfiles[self.refimgindex]
+
+        print(f"[NAV] Next → {self.refimgpath}")
+        self.showRefImg(self.refimgpath)
+    
+    # def nextRefImage(self):
+    #     if not self.refimgfiles:
+    #         return
+
+    #     self.refimgindex = (self.refimgindex + 1) % len(self.refimgfiles)
+    #     self.refimgpath = self.refimgfiles[self.refimgindex]
+
+    #     #self.showRefImg(self.refimgpath)
+    #     print("[Pixler] Ref image indexed")
+    
+    
+    # def nextRefImage(self):      
+    #     # ensure that the file list has not been cleared due to missing files     
+    #     filestr = os.path.basename(self.refimgpath)           
+    #     filesplit = os.path.splitext(filestr)
+    #     filename = filesplit[0]
+    #     fileext = filesplit[1]
+        
+    #     if self.refimgfileList:
+    #         try:
+    #             refimgfilename = self.refimgpath
+    #             nextRefImagefilename = next(self.refimgdirIterator)
+    #             self.ui.RefImgLE.setText(os.path.basename(nextRefImagefilename))
+    #             if fileext == '.tif':
+    #                 print(nextRefImagefilename)
+    #                 self.loadStackFromFile(nextRefImagefilename)
+    #                 self.showFrame(0)
+    #                 pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
+    #                     qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+    #             else:
+    #                 pixmap = qtg.QPixmap(nextRefImagefilename).scaled(self.ui.Image.size(), 
+    #                     qtc.Qt.KeepAspectRatio)
+ 
+    #         except:
+    #             # the iterator has finished, restart it
+    #             self.refimgdirIterator = iter(self.refimgfileList)
+    #             #self.imgdirRevIterator = reversed(self.imgfileList)
+    #             #print(self.imgfileList)
+    #             self.prevImage()
+
+    #         self.refimgpath = nextRefImagefilename
+    #         self.showRefImg(nextRefImagefilename)           
            
 
-        else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadRefImg()
+    #     else:
+    #         # no file list found, load an image
+    #         # self.OpenImageFileDialog()
+    #         self.loadRefImg()
+    
+    def prevRefImage(self):
+        if not self.refimgfiles:
+            return
 
-    def prevRefImg(self):
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.refimgpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
+        self.refimgindex = (self.refimgindex - 1) % len(self.refimgfiles)
+        self.refimgpath = self.refimgfiles[self.refimgindex]
+
+        print(f"[NAV] Prev → {self.refimgpath}")
+        self.showRefImg(self.refimgpath)
+    
+    # def prevRefImage(self):
+    #     if not self.refimgfiles:
+    #         return
+
+    #     self.refimgindex = (self.refimgindex - 1) % len(self.refimgfiles)
+    #     self.refimgpath = self.refimgfiles[self.refimgindex]
+
+    #     #self.showRefImg(self.refimgpath)
+    #     print("[Pixler] Ref image indexed")
+    
+    
+    # def prevRefImage(self):
+    #     # ensure that the file list has not been cleared due to missing files     
+    #     filestr = os.path.basename(self.refimgpath)           
+    #     filesplit = os.path.splitext(filestr)
+    #     filename = filesplit[0]
+    #     fileext = filesplit[1]
         
-        if self.refimgfileList:
-            try:
-                refimgfilename = self.refimgpath
-                prevrefimgfilename = next(self.refimgdirRevIterator)
-                self.ui.RefImgLE.setText(os.path.basename(prevrefimgfilename))
-                if fileext == '.tif':
-                    print(prevrefimgfilename)
-                    self.loadStackFromFile(prevrefimgfilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(prevrefimgfilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
+    #     if self.refimgfileList:
+    #         try:
+    #             refimgfilename = self.refimgpath
+    #             prevRefImagefilename = next(self.refimgdirRevIterator)
+    #             self.ui.RefImgLE.setText(os.path.basename(prevRefImagefilename))
+    #             if fileext == '.tif':
+    #                 print(prevRefImagefilename)
+    #                 self.loadStackFromFile(prevRefImagefilename)
+    #                 self.showFrame(0)
+    #                 pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
+    #                     qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+    #             else:
+    #                 pixmap = qtg.QPixmap(prevRefImagefilename).scaled(self.ui.Image.size(), 
+    #                     qtc.Qt.KeepAspectRatio)
 
-            except:
-                # the iterator has finished, restart it
-                self.refimgdirRevIterator = reversed(self.refimgfileList)
-                #self.refimgdirIterator = iter(self.imgfileList)
-                #self.nextImage()
+    #         except:
+    #             # the iterator has finished, restart it
+    #             self.refimgdirRevIterator = reversed(self.refimgfileList)
+    #             #self.refimgdirIterator = iter(self.imgfileList)
+    #             #self.nextImage()
 
-            self.refimgpath = prevrefimgfilename
-            self.showRefImg(prevrefimgfilename)            
+    #         self.refimgpath = prevRefImagefilename
+    #         self.showRefImg(prevRefImagefilename)            
 
             
 
-        else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadRefImg()
+    #     else:
+    #         # no file list found, load an image
+    #         # self.OpenImageFileDialog()
+    #         self.loadRefImg()
 
+    def keyPressEvent(self, event):
+        key = event.key()
+
+        focus_widget = self.focusWidget()
+
+        # --- LEFT PANEL (Reference Image) ---
+        if focus_widget in (self.ui.RefImg, self.ui.RefImgLE):
+            if key == qtc.Qt.Key_Right:
+                self.nextRefImage()
+                return
+            elif key == qtc.Qt.Key_Left:
+                self.prevRefImage()
+                return
+
+        # --- RIGHT PANEL (Working Image) ---
+        elif focus_widget in (self.ui.Image, self.ui.ImageLE):
+            if key == qtc.Qt.Key_Right:
+                self.nextImg()
+                return
+            elif key == qtc.Qt.Key_Left:
+                self.prevImg()
+                return
+
+        # --- FALLBACK (optional) ---
+        # If nothing focused, default to ref panel (or do nothing)
+        if key == qtc.Qt.Key_Right:
+            self.nextRefImage()
+        elif key == qtc.Qt.Key_Left:
+            self.prevRefImage()
+    
+    # def keyPressEvent(self, event):
+    #     if event.key() == qtc.Qt.Key_Right:
+    #         self.nextRefImage()
+    #     elif event.key() == qtc.Qt.Key_Left:
+    #         self.prevRefImage()
+    
     def reloadRefImg(self):
         if self.refimgpath:
+            self.refimgdir = os.path.dirname(self.refimgpath)
             self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
-            self.showRefImg(self.refimgpath)
+            
+            
+            #self.showRefImg(self.refimgpath)
+            print("[Pixler] Ref image indexed")
+            
             #self.sortRefImgFiles()  
 
     '''def OverwriteRefImg(self):
@@ -2224,24 +2779,30 @@ class PixlerMain(qtw.QMainWindow):
 
     # Image Controllers
 
+    def setupImages(self):
+        if not self.imagepath or not os.path.isfile(self.imagepath):
+            return
+
+        self.imagedir = os.path.dirname(self.imagepath)
+
+        valid_ext = ('.png', '.jpg', '.jpeg', '.tif', '.tiff')
+
+        self.imagefileList = sorted([
+            os.path.join(self.imagedir, f)
+            for f in os.listdir(self.imagedir)
+            if f.lower().endswith(valid_ext)
+        ])
+
+        self.imageindex = self.imagefileList.index(self.imagepath)
+
+        print(f"[Pixler] Loaded {len(self.imagefileList)} working images")
+
     def sortImageFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
         self.sorted_imagefilelist = sorted(self.imagefileList, key=alphanum_key)
         #self.fileList.sort()
         #print(self.sorted_imagefilelist)
-        self.imagedirIterator = iter(self.sorted_imagefilelist)
-        self.nextimage = next(self.imagedirIterator)
-        self.imagedirRevIterator = reversed(self.sorted_imagefilelist)
-        self.previmage = next(self.imagedirRevIterator)
-        while True:
-            # cycle through the iterator until the current file is found
-            if next(self.imagedirIterator) == self.imagepath:
-                break
-        while True:
-            # cycle through the reverse iterator until the current file is found
-            if next(self.imagedirRevIterator) == self.imagepath:
-                break
 
     def get_Imagezoom(self):
         self.ui.Imagezoomslider.setEnabled(True)
@@ -2277,84 +2838,75 @@ class PixlerMain(qtw.QMainWindow):
         
         self.resize_Image()
 
-    def nextImage(self):      
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.imagepath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.imagefileList:
-            try:
-                imagefilename = self.imagepath
-                nextimagefilename = next(self.imagedirIterator)
-                self.ui.ImageLe.setText(os.path.basename(nextimagefilename))
-                if fileext == '.tif':
-                    print(nextimagefilename)
-                    self.loadStackFromFile(nextimagefilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(nextimagefilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
+    def setupImageList(self):
+        if not self.imagepath:
+            return
 
-            except:
-                # the iterator has finished, restart it
-                self.imagedirIterator = iter(self.imagefileList)
-                #self.imgdirRevIterator = reversed(self.imgfileList)
-                #print(self.imgfileList)
-                self.prevImage()
+        self.imagedir = os.path.dirname(self.imagepath)
+        self.imagefiles = self.build_file_list(self.imagedir)
 
-            self.imagepath = nextimagefilename
-            self.showImage(nextimagefilename)            
-            
-
+        if self.imagepath in self.imagefiles:
+            self.imageindex = self.imagefiles.index(self.imagepath)
         else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadRefImg()
+            self.imageindex = 0
+
+    def nextImage(self):
+        if not self.imagefileList:
+            print("[NAV] No images loaded")
+            return
+
+        self.imageindex = (self.imageindex + 1) % len(self.imagefileList)
+        self.imagepath = self.imagefileList[self.imageindex]
+
+        print(f"[NAV] Next (right) → {self.imagepath}")
+        self.showImage(self.imagepath)
+    
+    # def nextImage(self):
+    #     if not self.imagefiles:
+    #         return
+
+    #     self.imageindex = (self.imageindex + 1) % len(self.imagefiles)
+    #     self.imagepath = self.imagefiles[self.imageindex]
+
+    #     self.showImage(self.imagepath)      
+
+    # def nextImage(self):
+    #     if not self.imagefiles:
+    #         return
+
+    #     self.imageindex = (self.imageindex + 1) % len(self.imagefiles)
+    #     self.imagepath = self.imagefiles[self.imageindex]
+
+    #     self.showImage(self.imagepath)
 
     def prevImage(self):
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.imagepath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.imagefileList:
-            try:
-                imagefilename = self.imagepath
-                previmagefilename = next(self.imagedirRevIterator)
-                self.ui.ImageLe.setText(os.path.basename(previmagefilename))
-                if fileext == '.tif':
-                    print(previmagefilename)
-                    self.loadStackFromFile(previmagefilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(previmagefilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
+        if not self.imagefileList:
+            print("[NAV] No images loaded")
+            return
 
-            except:
-                # the iterator has finished, restart it
-                self.imagedirRevIterator = reversed(self.imagefileList)
-                #self.imagedirIterator = iter(self.imagefileList)
-                #self.nextImage()
-            
-            self.imagepath = previmagefilename
-            self.showImage(previmagefilename) 
+        self.imageindex = (self.imageindex - 1) % len(self.imagefileList)
+        self.imagepath = self.imagefileList[self.imageindex]
 
-        else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadRefImg()
+        print(f"[NAV] Prev (right) → {self.imagepath}")
+        self.showImage(self.imagepath)
+    
+    # def prevImage(self):
+    #     if not self.imagefiles:
+    #         return
+
+    #     self.imageindex = (self.imageindex - 1) % len(self.imagefiles)
+    #     self.imagepath = self.imagefiles[self.imageindex]
+
+    #     self.showImage(self.imagepath)
+
 
     def reloadImage(self):
-        if self.imagepath:
-            self.ui.ImageLe.setText(os.path.basename(self.imagepath))
-            self.showImage(self.imagepath)
+        if self.imgpath:
+            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            
+            #self.showRefImg(self.refimgpath)
+            print("[Pixler] Ref image indexed")
+            
             self.sortImgFiles()  
 
     def resize_Image(self):
@@ -2524,76 +3076,142 @@ class PixlerMain(qtw.QMainWindow):
         painter = QPainter(self)
         painter.setPen(QPen(Qt.white,7,Qt.SolidLine))
 
+    def applyProcessedImage(self, qimage):
+        if qimage is None or qimage.isNull():
+            print("[APPLY] Invalid processed image")
+            return
 
-    def crop(self):
-        # RefImg QRect
-        print("This is the new crop method of the Pixler class")
-        
-        # Initialize RefImg QRect
-        RefImg_qimage = qtg.QPixmap.toImage(self.ui.RefImg.pixmap())
-        RefImg_qimage_size = RefImg_qimage.size()
-        RefImg_xr = self.ui.RefImg.geometry().x()
-        RefImg_yr = self.ui.RefImg.geometry().y()
-        RefImg_wr = self.RefImg_width
-        RefImg_hr = self.RefImg_height
-        #RefImg_wr = self.ui.RefImg.pixmap().width()
-        #RefImg_hr = self.ui.RefImg.pixmap().height()
-        RefImg_qrect = QRect(RefImg_xr, RefImg_yr, RefImg_wr, RefImg_hr)
-        print("Reference Image QRect = " + str(RefImg_qrect))
+        print("[APPLY] Applying processed image")
 
-        # Initialize Scaled RefImg QRect
-        RefImg_xs = 0
-        RefImg_ys = 0
-        RefImg_ws = 0
-        RefImg_hs = 0
-        RefImg_xs = RefImg_xr * self.refimgscale
-        RefImg_ys = RefImg_yr * self.refimgscale
-        RefImg_ws = RefImg_wr * self.refimgscale
-        RefImg_hs = RefImg_hr * self.refimgscale
-        RefImg_sqrect = QRect(RefImg_xs,RefImg_ys,RefImg_ws,RefImg_hs)
-        print("Reference Image Scaled QRect = " + str(RefImg_sqrect))
-        
-        # CropImg QRect
+        # Update internal state
+        self.refimgqimage = qimage
+        self.refimgpixmap = qtg.QPixmap.fromImage(qimage)
 
-        # Get CropImg QRect from event.pos()
-        CropImg_xc = self.rubberBand.x() 
-        CropImg_yc = self.rubberBand.y()
-        CropImg_wc = self.rubberBand.width()
-        CropImg_hc = self.rubberBand.height()
-        CropImg_cqrect = QRect(CropImg_xc,CropImg_yc,CropImg_wc,CropImg_hc)
-        print("Reference Image Cropped QRect = " + str(CropImg_cqrect))
+        # Render to UI
+        self.ui.RefImg.setPixmap(
+            self.refimgpixmap.scaled(
+                self.ui.RefImg.size(),
+                qtc.Qt.KeepAspectRatio,
+                transformMode=qtc.Qt.SmoothTransformation
+            )
+        )
+    
+    def actionCropPreview(self, checked=False):
+    
+        print("[ACTION] Crop Preview triggered")
+
+        if not self.refimgqimage or self.refimgqimage.isNull():
+            print("[ACTION] No image loaded")
+            return
+
+        dialog = ImagePreviewDialog(
+            self.refimgqimage,
+            crop_processor,
+            {},        # params (placeholder for now)
+            self       # parent
+        )
+
+        if dialog.exec_():
+            result = dialog.get_result()
+            self.applyProcessedImage(result)
+    
+    # def actionCropPreview(self, checked=False):
+    #     print("[ACTION] Crop Preview triggered")
+
+    #     if not self.refimgqimage or self.refimgqimage.isNull():
+    #         print("[ACTION] No image loaded")
+    #         return
+
+    #     dialog = ImagePreviewDialog(
+    #         self,
+    #         self.refimgqimage,
+    #         crop_processor
+    #     )
+
+    #     if dialog.exec_():
+    #         result = dialog.get_result()
+    #         self.applyProcessedImage(result)
+    
+    # def actionCropPreview(self):
+    #     if self.refimgqimage.isNull():
+    #         print("[Crop] No image loaded")
+    #         return
+
+    #     dialog = ImagePreviewDialog(
+    #         self,
+    #         self.refimgqimage,
+    #         crop_processor
+    #     )
+
+    # def crop(self):
+    #     # RefImg QRect
+    #     print("This is the new crop method of the Pixler class")
         
-        # Move CropImg QRect to RefImg MainWindow origin(0,0)
-        CropImg_xm = self.rubberBand.x() - int(self.refimg_xoffset) 
-        CropImg_ym= self.rubberBand.y() - int(self.refimg_yoffset)
-        CropImg_wm = self.rubberBand.width()
-        CropImg_hm = self.rubberBand.height()
-        CropImg_mqrect = QRect(CropImg_xm,CropImg_ym,CropImg_wm,CropImg_hm)
-        print("Crop Image Cropped2Main QRect = " + str(CropImg_mqrect))
+    #     # Initialize RefImg QRect
+    #     RefImg_qimage = qtg.QPixmap.toImage(self.ui.RefImg.pixmap())
+    #     RefImg_qimage_size = RefImg_qimage.size()
+    #     RefImg_xr = self.ui.RefImg.geometry().x()
+    #     RefImg_yr = self.ui.RefImg.geometry().y()
+    #     RefImg_wr = self.RefImg_width
+    #     RefImg_hr = self.RefImg_height
+    #     #RefImg_wr = self.ui.RefImg.pixmap().width()
+    #     #RefImg_hr = self.ui.RefImg.pixmap().height()
+    #     RefImg_qrect = QRect(RefImg_xr, RefImg_yr, RefImg_wr, RefImg_hr)
+    #     print("Reference Image QRect = " + str(RefImg_qrect))
+
+    #     # Initialize Scaled RefImg QRect
+    #     RefImg_xs = 0
+    #     RefImg_ys = 0
+    #     RefImg_ws = 0
+    #     RefImg_hs = 0
+    #     RefImg_xs = RefImg_xr * self.refimgscale
+    #     RefImg_ys = RefImg_yr * self.refimgscale
+    #     RefImg_ws = RefImg_wr * self.refimgscale
+    #     RefImg_hs = RefImg_hr * self.refimgscale
+    #     RefImg_sqrect = QRect(RefImg_xs,RefImg_ys,RefImg_ws,RefImg_hs)
+    #     print("Reference Image Scaled QRect = " + str(RefImg_sqrect))
+        
+    #     # CropImg QRect
+
+    #     # Get CropImg QRect from event.pos()
+    #     CropImg_xc = self.rubberBand.x() 
+    #     CropImg_yc = self.rubberBand.y()
+    #     CropImg_wc = self.rubberBand.width()
+    #     CropImg_hc = self.rubberBand.height()
+    #     CropImg_cqrect = QRect(CropImg_xc,CropImg_yc,CropImg_wc,CropImg_hc)
+    #     print("Reference Image Cropped QRect = " + str(CropImg_cqrect))
+        
+    #     # Move CropImg QRect to RefImg MainWindow origin(0,0)
+    #     CropImg_xm = self.rubberBand.x() - int(self.refimg_xoffset) 
+    #     CropImg_ym= self.rubberBand.y() - int(self.refimg_yoffset)
+    #     CropImg_wm = self.rubberBand.width()
+    #     CropImg_hm = self.rubberBand.height()
+    #     CropImg_mqrect = QRect(CropImg_xm,CropImg_ym,CropImg_wm,CropImg_hm)
+    #     print("Crop Image Cropped2Main QRect = " + str(CropImg_mqrect))
             
-        # Upscale CropImg QRect at RefImg MainWindow origin(0,0)
-        CropImg_xu = 0
-        CropImg_yu = 0
-        CropImg_wu = 0
-        CropImg_hu = 0
-        CropImg_xu = CropImg_xm / self.refimgscale
-        CropImg_yu = CropImg_ym / self.refimgscale
-        CropImg_wu = CropImg_wm / self.refimgscale
-        CropImg_hu = CropImg_hm / self.refimgscale
-        CropImg_uqrect = QRect(CropImg_xu,CropImg_yu,CropImg_wu,CropImg_hu)
-        print("Crop Image Upscaled QRect = " + str(CropImg_uqrect))
+    #     # Upscale CropImg QRect at RefImg MainWindow origin(0,0)
+    #     CropImg_xu = 0
+    #     CropImg_yu = 0
+    #     CropImg_wu = 0
+    #     CropImg_hu = 0
+    #     CropImg_xu = CropImg_xm / self.refimgscale
+    #     CropImg_yu = CropImg_ym / self.refimgscale
+    #     CropImg_wu = CropImg_wm / self.refimgscale
+    #     CropImg_hu = CropImg_hm / self.refimgscale
+    #     CropImg_uqrect = QRect(CropImg_xu,CropImg_yu,CropImg_wu,CropImg_hu)
+    #     print("Crop Image Upscaled QRect = " + str(CropImg_uqrect))
 
-        # Show Cropped Image
-        #self.ui.RefImg.setPixmap(self.origpixmap)
-        self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
-        self.croppixmap = self.refimgpixmap.copy(CropImg_uqrect)
-        print("Cropped Image Size = " + str(self.croppixmap.size()))       
-        #self.croppixmap = self.ui.RefImg.pixmap().copy(CropImg_uqrect)
-        #print("Cropped Image Size = " + str(self.ui.RefImg.pixmap().size()))
-        self.imagepixmap = self.croppixmap
-        self.ui.Image.setPixmap(self.imagepixmap)
-        self.resize_Image()
-        self.rubberBand.hide()
+    #     # Show Cropped Image
+    #     #self.ui.RefImg.setPixmap(self.origpixmap)
+    #     self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
+    #     self.croppixmap = self.refimgpixmap.copy(CropImg_uqrect)
+    #     print("Cropped Image Size = " + str(self.croppixmap.size()))       
+    #     #self.croppixmap = self.ui.RefImg.pixmap().copy(CropImg_uqrect)
+    #     #print("Cropped Image Size = " + str(self.ui.RefImg.pixmap().size()))
+    #     self.imagepixmap = self.croppixmap
+    #     self.ui.Image.setPixmap(self.imagepixmap)
+    #     self.resize_Image()
+    #     self.rubberBand.hide()
 
 
     def actionGimpEdit(self):
@@ -3245,12 +3863,30 @@ class Adjust(QWidget):
 
         self.y_btn.clicked.connect(lambda _: self.click_y())
         self.n_btn.clicked.connect(lambda _: self.click_n())
-        self.crop_btn.clicked.connect(lambda _: self.click_crop())
+        #self.crop_btn.clicked.connect(lambda _: self.click_crop())
         self.rotate_btn.clicked.connect(lambda _: self.click_crop(rotate=True))
         self.brightness_btn.clicked.connect(lambda _: self.click_brightness())
         self.contrast_btn.clicked.connect(lambda _: self.click_brightness(mode=1))
         self.saturation_btn.clicked.connect(lambda _: self.click_brightness(mode=2))
         self.mask_btn.clicked.connect(lambda _: self.click_brightness(mode=3))
+    
+        # Add controls (simple first pass)
+        dialog.add_slider("x", 0, self.refimgqimage.width(), 0)
+        dialog.add_slider("y", 0, self.refimgqimage.height(), 0)
+        dialog.add_slider("w", 1, self.refimgqimage.width(), self.refimgqimage.width())
+        dialog.add_slider("h", 1, self.refimgqimage.height(), self.refimgqimage.height())
+
+        if dialog.exec_() == qtw.QDialog.Accepted:
+            result = dialog.get_result()
+
+            if result:
+                print("[Crop] Applying result")
+
+                # 🔥 IMPORTANT: integrate with your pipeline
+                self.refimgqimage = result
+                self.refimgpixmap = qtg.QPixmap.fromImage(result)
+
+                self.ui.RefImg.setPixmap(self.refimgpixmap)
 
     def click_crop(self, rotate=False):
         def click_y1():
@@ -3272,7 +3908,7 @@ class Adjust(QWidget):
             self.img_class.img_copy = deepcopy(self.img_class.img)
             self.slider.setParent(None)
             self.slider.valueChanged.disconnect()
-            crop_frame.frame.setParent(None)
+            #crop_frame.frame.setParent(None)
             self.vbox.addWidget(self.frame)
             self.rb.close()
 
@@ -3289,7 +3925,7 @@ class Adjust(QWidget):
 
             self.slider.setParent(None)
             self.slider.valueChanged.disconnect()
-            crop_frame.frame.setParent(None)
+            #crop_frame.frame.setParent(None)
             self.vbox.addWidget(self.frame)
             self.rb.close()
 
@@ -3343,18 +3979,18 @@ class Adjust(QWidget):
             self.flip[1] = hflip_ct % 2 == 1
 
         #crop_frame = click_crop()  ---don't have the right function defined
-        crop_frame.n_btn.clicked.connect(click_n1)
-        crop_frame.y_btn.clicked.connect(click_y1)
-        crop_frame.rotate.clicked.connect(add_90)
-        crop_frame.rotatect.clicked.connect(subtract_90)
-        crop_frame.vflip.clicked.connect(vertical_flip)
-        crop_frame.hflip.clicked.connect(horizontal_flip)
+        # crop_frame.n_btn.clicked.connect(click_n1)
+        # crop_frame.y_btn.clicked.connect(click_y1)
+        # crop_frame.rotate.clicked.connect(add_90)
+        # crop_frame.rotatect.clicked.connect(subtract_90)
+        # crop_frame.vflip.clicked.connect(vertical_flip)
+        # crop_frame.hflip.clicked.connect(horizontal_flip)
         self.flip = [False, False]
         vflip_ct = 2
         hflip_ct = 2
 
         self.frame.setParent(None)
-        self.vbox.addWidget(crop_frame.frame)
+        # self.vbox.addWidget(crop_frame.frame)
         self.zoom_factor = self.get_zoom_factor()
 
         self.rb = ResizableRubberBand(self)
@@ -3366,8 +4002,8 @@ class Adjust(QWidget):
 
         if not rotate:
             self.update_img()
-            crop_frame.rotate.setParent(None)
-            crop_frame.rotatect.setParent(None)
+            # crop_frame.rotate.setParent(None)
+            # crop_frame.rotatect.setParent(None)
         else:
             self.vbox1.insertWidget(1, self.slider)
             self.slider.setRange(0, 360)
@@ -3422,10 +4058,10 @@ class Adjust(QWidget):
             self.img_class.change_b_c(alpha=self.saturation_value)
             self.update_img()
 
-        def color_dialog():
-            color = QColorDialog.getColor()
-            self.img_class.remove_color(color.name())
-            self.update_img()
+        # def color_dialog():
+        #     #color = QColorDialog.getColor()
+        #     self.img_class.remove_color(color.name())
+        #     self.update_img()
 
         brightness_frame = Brightness()
         brightness_frame.y_btn.clicked.connect(click_y1)
@@ -3446,10 +4082,10 @@ class Adjust(QWidget):
             self.slider.valueChanged.connect(change_slide_sat)
         elif mode == 3:
             btnn = QPushButton("Select color", brightness_frame)
-            btnn.setFont(QFont("Neue Haas Grotesk Text Pro Medi", 14))
+            #btnn.setFont(QFont("Neue Haas Grotesk Text Pro Medi", 14))
             btnn.setStyleSheet("QPushButton{border: 0px solid;}")
             btnn.setMaximumHeight(50)
-            btnn.clicked.connect(color_dialog)
+            #btnn.clicked.connect(color_dialog)
             brightness_frame.vbox2.insertWidget(0, btnn)
         else:
             self.vbox1.insertWidget(1, self.slider)
@@ -3477,6 +4113,357 @@ class Adjust(QWidget):
         self.update_img()
         self.vbox.addWidget(self.base_frame)
 
+class ImagePreviewDialog(qtw.QDialog):
+    def __init__(self, original_qimage, processor, params=None, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Preview")
+
+        # -------------------------
+        # Phase 1 — Store data ONLY
+        # -------------------------
+        self.original = original_qimage
+        self.processor = processor
+        self.params = params or {}
+
+        # -------------------------
+        # Phase 2 — Build UI FIRST
+        # -------------------------
+        layout = qtw.QVBoxLayout(self)
+
+        image_layout = qtw.QHBoxLayout()
+
+        self.left_label = qtw.QLabel("Original")
+        self.right_label = qtw.QLabel("Preview")
+
+        self.left_label.setAlignment(qtc.Qt.AlignCenter)
+        self.right_label.setAlignment(qtc.Qt.AlignCenter)
+
+        image_layout.addWidget(self.left_label)
+        image_layout.addWidget(self.right_label)
+
+        layout.addLayout(image_layout)
+
+        # Buttons
+        btn_layout = qtw.QHBoxLayout()
+        self.apply_btn = qtw.QPushButton("Apply")
+        self.cancel_btn = qtw.QPushButton("Cancel")
+
+        btn_layout.addWidget(self.apply_btn)
+        btn_layout.addWidget(self.cancel_btn)
+
+        layout.addLayout(btn_layout)
+        # zoom state
+        self.zoom_factor = 0.5
+
+        # slider creation
+        self.zoom_slider = qtw.QSlider(qtc.Qt.Horizontal)
+        self.zoom_slider.setMinimum(25)
+        self.zoom_slider.setMaximum(200)
+        self.zoom_slider.setValue(50)
+
+        # connect signal
+        self.zoom_slider.valueChanged.connect(self.on_zoom_changed)
+
+        # -------------------------
+        # Zoom Slider
+        # -------------------------
+        zoom_layout = qtw.QHBoxLayout()
+
+        zoom_label = qtw.QLabel("Zoom:")
+        self.zoom_slider = qtw.QSlider(qtc.Qt.Horizontal)
+
+        self.zoom_slider.setMinimum(25)    # 0.25x
+        self.zoom_slider.setMaximum(200)   # 2.0x
+        self.zoom_slider.setValue(50)      # 0.5x default
+
+        zoom_layout.addWidget(zoom_label)
+        zoom_layout.addWidget(self.zoom_slider)
+
+        layout.addLayout(zoom_layout)
+        
+        # -------------------------
+        # Phase 3 — Signals
+        # -------------------------
+        self.apply_btn.clicked.connect(self.accept)
+        self.cancel_btn.clicked.connect(self.reject)
+
+        # -------------------------
+        # Phase 4 — NOW safe to process
+        # -------------------------
+        self.update_preview()
+    def on_zoom_changed(self, value):
+        self.zoom_factor = value / 100.0
+        self.update_preview()   
+    def update_preview(self):
+        if not self.original or self.original.isNull():
+            print("[PREVIEW] No valid original image")
+            return
+
+        # Base size (relative to dialog)
+        dialog_size = self.size()
+        base_width = int(dialog_size.width() * 0.4)
+        base_height = int(dialog_size.height() * 0.8)
+
+        # Apply zoom factor
+        target_width = int(base_width * self.zoom_factor)
+        target_height = int(base_height * self.zoom_factor)
+
+        max_size = qtc.QSize(target_width, target_height)
+
+        # -------------------------
+        # LEFT (original)
+        # -------------------------
+        orig_pix = qtg.QPixmap.fromImage(self.original)
+        orig_scaled = orig_pix.scaled(
+            max_size,
+            qtc.Qt.KeepAspectRatio,
+            qtc.Qt.SmoothTransformation
+        )
+        self.left_label.setPixmap(orig_scaled)
+
+        # -------------------------
+        # RIGHT (processed)
+        # -------------------------
+        processed = self.processor(self.original, self.params)
+
+        if processed and not processed.isNull():
+            proc_pix = qtg.QPixmap.fromImage(processed)
+            proc_scaled = proc_pix.scaled(
+                max_size,
+                qtc.Qt.KeepAspectRatio,
+                qtc.Qt.SmoothTransformation
+            )
+            self.right_label.setPixmap(proc_scaled)
+    
+    # # def update_preview(self):
+    #     if not self.original or self.original.isNull():
+    #         print("[PREVIEW] No valid original image")
+    #         return
+
+    #     # Get available space from dialog
+    #     dialog_size = self.size()
+    #     target_width = int(dialog_size.width() * 0.4)   # 👈 40% per image (side-by-side)
+    #     target_height = int(dialog_size.height() * 0.8)
+
+    #     max_size = qtc.QSize(target_width, target_height)
+
+    #     # -------------------------
+    #     # LEFT (original)
+    #     # -------------------------
+    #     orig_pix = qtg.QPixmap.fromImage(self.original)
+    #     orig_scaled = orig_pix.scaled(
+    #         max_size,
+    #         qtc.Qt.KeepAspectRatio,
+    #         qtc.Qt.SmoothTransformation
+    #     )
+    #     self.left_label.setPixmap(orig_scaled)
+
+    #     # -------------------------
+    #     # RIGHT (processed)
+    #     # -------------------------
+    #     processed = self.processor(self.original, self.params)
+
+    #     if processed and not processed.isNull():
+    #         proc_pix = qtg.QPixmap.fromImage(processed)
+    #         proc_scaled = proc_pix.scaled(
+    #             max_size,
+    #             qtc.Qt.KeepAspectRatio,
+    #             qtc.Qt.SmoothTransformation
+    #         )
+    #         self.right_label.setPixmap(proc_scaled)
+
+    # def update_preview(self):
+    #     if not self.original or self.original.isNull():
+    #         print("[PREVIEW] No valid original image")
+    #         return
+
+    #     max_size = qtc.QSize(600, 600)  # ✅ adjust as needed
+
+    #     # LEFT (original)
+    #     orig_pix = qtg.QPixmap.fromImage(self.original)
+    #     orig_scaled = orig_pix.scaled(
+    #         max_size,
+    #         qtc.Qt.KeepAspectRatio,
+    #         qtc.Qt.SmoothTransformation
+    #     )
+    #     self.left_label.setPixmap(orig_scaled)
+
+    #     # RIGHT (processed)
+    #     processed = self.processor(self.original, self.params)
+
+    #     if processed and not processed.isNull():
+    #         proc_pix = qtg.QPixmap.fromImage(processed)
+    #         proc_scaled = proc_pix.scaled(
+    #             max_size,
+    #             qtc.Qt.KeepAspectRatio,
+    #             qtc.Qt.SmoothTransformation
+    #         )
+    #         self.right_label.setPixmap(proc_scaled)
+    
+
+    # #def update_preview(self):
+    #     if not self.original or self.original.isNull():
+    #         print("[PREVIEW] No valid original image")
+    #         return
+
+    #     # LEFT (original)
+    #     self.left_label.setPixmap(qtg.QPixmap.fromImage(self.original))
+
+    #     # RIGHT (processed)
+    #     processed = self.processor(self.original, self.params)
+
+    #     if processed and not processed.isNull():
+    #         self.right_label.setPixmap(qtg.QPixmap.fromImage(processed))
+
+    def get_result(self):
+        return self.processor(self.original, self.params)
+# class ImagePreviewDialog(qtw.QDialog):
+#     def __init__(self, original_qimage, processor, params=None, parent=None):
+#         super().__init__(parent)
+
+#         self.setWindowTitle("Preview")
+
+#         # ✅ CRITICAL FIX — store inputs FIRST
+#         self.original_qimage = original_qimage
+#         self.processor = processor
+#         self.params = params or {}
+
+#         # -------------------------
+#         # UI
+#         # -------------------------
+#         layout = QVBoxLayout(self)
+
+#         self.label_original = QLabel()
+#         self.label_processed = QLabel()
+
+#         hlayout = QHBoxLayout()
+#         hlayout.addWidget(self.label_original)
+#         hlayout.addWidget(self.label_processed)
+
+#         layout.addLayout(hlayout)
+
+#         # -------------------------
+#         # INITIAL RENDER
+#         # -------------------------
+#         self.update_preview()
+
+#     def update_preview(self):
+#         if not self.original_qimage:
+#             print("[PREVIEW] No original image")
+#             return
+
+#         # Left: original
+#         self.label_original.setPixmap(QPixmap.fromImage(self.original_qimage))
+
+#         # Right: processed
+#         processed = self.processor(self.original_qimage, self.params)
+
+#         if processed:
+#             self.label_processed.setPixmap(QPixmap.fromImage(processed))
+
+#     # def __init__(self, parent, qimage, processor, initial_params=None):
+#     #     super().__init__(parent)
+
+#     #     self.setWindowTitle("Preview")
+#     #     self.resize(1200, 600)
+
+#     #     self.original = qimage
+#     #     self.processor = processor
+#     #     self.params = initial_params or {}
+
+#     #     # -------------------------
+#     #     # Layout
+#     #     # -------------------------
+#     #     layout = qtw.QVBoxLayout(self)
+
+#     #     # Image views
+#     #     self.processed_qimage = self.processor(self.original_qimage, self.params)
+        
+#     #     views = qtw.QHBoxLayout()
+
+#     #     self.left_label = qtw.QLabel()
+#     #     self.right_label = qtw.QLabel()
+
+#     #     self.left_label.setAlignment(qtc.Qt.AlignCenter)
+#     #     self.right_label.setAlignment(qtc.Qt.AlignCenter)
+
+#     #     views.addWidget(self.left_label)
+#     #     views.addWidget(self.right_label)
+
+#     #     layout.addLayout(views)
+
+#     #     # Controls
+#     #     self.controls_layout = qtw.QHBoxLayout()
+#     #     layout.addLayout(self.controls_layout)
+
+#     #     # Buttons
+#     #     btns = qtw.QHBoxLayout()
+#     #     self.apply_btn = qtw.QPushButton("Apply")
+#     #     self.cancel_btn = qtw.QPushButton("Cancel")
+
+#     #     btns.addWidget(self.apply_btn)
+#     #     btns.addWidget(self.cancel_btn)
+
+#     #     layout.addLayout(btns)
+
+#     #     # -------------------------
+#     #     # Signals
+#     #     # -------------------------
+#     #     self.apply_btn.clicked.connect(self.accept)
+#     #     self.cancel_btn.clicked.connect(self.reject)
+
+#     #     # Initial render
+#     #     print("[PREVIEW] update_preview called")
+#     #     self.update_preview()
+        
+#     # -------------------------
+#     # Public: add slider
+#     # -------------------------
+#     def add_slider(self, name, min_val, max_val, default):
+#         slider = qtw.QSlider(qtc.Qt.Horizontal)
+#         slider.setMinimum(min_val)
+#         slider.setMaximum(max_val)
+#         slider.setValue(default)
+
+#         label = qtw.QLabel(f"{name}: {default}")
+
+#         def on_change(val):
+#             self.params[name] = val
+#             label.setText(f"{name}: {val}")
+#             self.update_preview()
+
+#         slider.valueChanged.connect(on_change)
+
+#         self.controls_layout.addWidget(label)
+#         self.controls_layout.addWidget(slider)
+
+#         self.params[name] = default
+
+#     # -------------------------
+#     # Preview update
+#     # -------------------------
+#     def update_preview(self):
+        
+#         # Left = original
+#         self.left_label.setPixmap(qtg.QPixmap.fromImage(self.original))
+
+#         # Right = processed
+#         processed = self.processor(self.original, self.params)
+
+#         if processed is not None:
+#             self.right_label.setPixmap(qtg.QPixmap.fromImage(processed))
+
+#     # -------------------------
+#     # Result getter
+#     # -------------------------
+    
+#     def get_result(self):
+#         return getattr(self, "processed_qimage", None)
+    
+#     # def get_result(self):
+#     #     return self.processor(self.original, self.params)
+    
 class ResizableRubberBand(QWidget):
     """Wrapper to make QRubberBand mouse-resizable using QSizeGrip
 
@@ -3502,12 +4489,29 @@ class ResizableRubberBand(QWidget):
         self.rubberband.resize(self.size())
 
 def main():
+    import os
+    import sys
+    print("[Pixler DEBUG] sys.argv:", sys.argv)
+    image_path = None   # ✅ define it
+
+    if len(sys.argv) >= 2:
+        image_path = os.path.abspath(sys.argv[1])
+        print(f"[Pixler DEBUG] imgpath: {image_path}")
+
     app = qtw.QApplication(sys.argv)
 
-    main = PixlerMain()
+    main = PixlerMain(image_path)   # ✅ use image_path, not imgpath
     main.show()
 
     sys.exit(app.exec_())
+
+# def main():
+#     app = qtw.QApplication(sys.argv)
+
+#     main = PixlerMain()
+#     main.show()
+
+#     sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

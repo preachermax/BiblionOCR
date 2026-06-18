@@ -6,6 +6,7 @@ import os
 import re
 import json
 import io
+import pathlib
 import tiffcapture
 import qimage2ndarray
 from queue import Queue
@@ -17,11 +18,15 @@ import numpy as np
 from scipy import ndimage
 import math
 from copy import deepcopy
+from HelpSystem import add_help_menu
+import platform
+from SessionManager import SessionManager
 
 # PyQt5 imports
-from PyQt5.QtWidgets import QRubberBand, QWidget, QHBoxLayout, QSizeGrip
+from PyQt5 import uic
+from PyQt5.QtWidgets import QRubberBand, QWidget, QVBoxLayout, QHBoxLayout, QSizeGrip, QPushButton, QMessageBox, QFrame
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtGui import QPainter, QBrush, QPen
+from PyQt5.QtGui import QPainter, QBrush, QPen, QIcon
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, QPoint, QRect, QSize, Qt, QUrl
 from PyQt5 import QtCore as qtc
@@ -33,7 +38,7 @@ from PyQt5 import QtCore as qtc
 from MySlidersUI import Ui_SliderDialog
 from PreProcess import PreProcess as pp
 #from MyScanner import Ui_Scanner
-from MyPixlerGVUI import Ui_PixlerGV
+from MyPixlerUI import Ui_Pixler
 
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
@@ -93,16 +98,33 @@ class PixlerMain(qtw.QMainWindow):
 # Application View
     def __init__(self,parent=None):
         qtw.QMainWindow.__init__(self,parent)
-
+        
+        self.mod_dirname = os.path.dirname(__file__)
+        up_once = os.path.join(self.mod_dirname,"..")
+        up_twice = os.path.join(up_once,"..")
+        self.mod_rootdir = up_twice
+        self.mod_realpath = os.path.realpath(self.mod_rootdir)
+        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_relpath = os.path.relpath(self.mod_abspath)
+        self.projecthome = self.mod_abspath + os.sep
+        print(f'OS Path dirname: {self.mod_dirname}')
+        print(f'OS Path up one folder: {up_once}')
+        #print(f'OS Path up two folders: {up_twice}')
+        print(f'OS Path rootdir: {self.mod_rootdir}')
+        print(f'OS Path realpath: {self.mod_realpath}')
+        print(f'OS Path abspath: {self.mod_abspath}')
+        print(f'OS Path relpath: {self.mod_dirname}')
+        print(f'Project Home: {self.projecthome}')
+        
         self.imgpath = ""
         self.imgdir = ""
         self.RefImgchangesSaved = True
 
-        self.ui = Ui_PixlerGV()
+        self.ui = Ui_Pixler()
         self.ui.setupUi(self)
+        #Implement Co-pilot Help system
+        add_help_menu(self, 'MyPixler')
         self.initUI()
-        self.refscene = qtw.QGraphicsScene()
-        self.ui.RefImg.setScene(self.refscene)
 
         # extended slots code
        
@@ -161,399 +183,98 @@ class PixlerMain(qtw.QMainWindow):
 
     def get_session_settings(self):
         # get session settings
-        # Define json data
-        print("importing Scanner session settings: imgpath and imgdir")
-        with open('/home/max/Projects/BiblionOCR/Model/Project/Data/json/ScannerSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                if Setting['Setting'] == imgpath_key:
-                    self.imgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == imgdir_key:  
-                    self.imgdir = Setting['CurrentValue']
+        sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
 
-            print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        print("loading scanner session")
+        scanner_session = sm.values('ScannerSession.json')
+        self.imgpath = scanner_session.get('self.imgpath', getattr(self, 'imgpath', ''))
+        self.imgdir = scanner_session.get('self.imgdir', getattr(self, 'imgdir', ''))
 
-        print("loading session")
-        with open('/home/max/Projects/BiblionOCR/Model/Project/Data/json/PixlerSession.json') as f:
-            # returns JSON object as a dictionary
-            data = json.load(f)
-            
-            # Set json key values
-            bookabbr_key = r"self.bookabbr"
-            word_key = r"self.word"
-            chr_key = r"self.chr"
-            font_key = r"self.font"
-            fontsize_key = r"self.fontsize"
-            source_book_markdown_key = r"self.sourcebookmarkdown"
-            greek_book_markdown_key = r"self.greekbookmarkdown"
-            latin_book_markdown_key = r"self.latinbookmarkdown"
-            pixmap_key = r"self.pixmap"
-            qimage_key = r"self.qimage"
-            bmpsourcedir_key = r"self.bmpsourcedir"
-            bmpgreekdir_key = r"self.bmpgreekdir"
-            refimgpath_key = r"self.refimgpath"
-            refimgdir_key = r"self.refimgdir"
-            refimg_xoffset_key = r"self.refimg_xoffset"
-            refimg_yoffset_key = r"self.refimg_yoffset"
-            refimgtfileList_key = r"self.refimgtfileList"
-            refimgzoom_key = r"self.refimgzoom"
-            refimgzoomslidervalue_key = r"self.refimgzoomslidervalue"
-            imagepath_key = r"self.imagepath"
-            imagedir_key = r"self.imagedir"
-            image_xoffset_key = r"self.image_xoffset"
-            image_yoffset_key = r"self.image_yoffset"
-            imagefileList_key = r"self.imagefileList"
-            imagezoom_key = r"self.imagezoom"
-            imagezoomslidervalue_key = r"self.imagezoomslidervalue"
-            pixerrefimgpath_key = r"self.pixerrefimgpath"
-            pixerrefimgpixmap_key = r"self.pixerrefimgpixmap"
-            pixerrefimgqimage_key = r"self.pixerrefimgqimage"
-            pixerrefimgdir_key = r"self.pixerrefimgdir"
-            pixerpagesboxfileList_key = r"self.pixerpagesboxfileList"
-            pixerpagesboxpixmap_key = r"self.pixerpagesboxpixmap"
-            pixerpagesboxqimage_key = r"self.pixerpagesboxqimage"
-            pixerpagesboxpath_key = r"self.pixerpagesboxpath"
-            pixerpagesboxdir_key = r"self.pixerpagesboxdir"
-            pixerpagescropfileList_key = r"self.pixerpagescropfileList"
-            pixerpagescroppixmap_key = r"self.pixerpagescroppixmap"
-            pixerpagescropqimage_key = r"self.pixerpagescropqimage"
-            pixerpagescroppath_key = r"self.pixerpagescroppath"
-            pixerpagescropdir_key = r"self.pixerpagescropdir"
-            pixerpagesdeskewfileList_key = r"self.pixerpagesdeskewfileList"
-            pixerpagesdeskewpixmap_key = r"self.pixerpagesdeskewpixmap"
-            pixerpagesdeskewqimage_key = r"self.pixerpagesdeskewqimage"
-            pixerpagesdeskewpath_key = r"self.pixerpagesdeskewpath"
-            pixerpagesdeskewdir_key = r"self.pixerpagesdeskewdir"
-            pixerpagesdenoisefileList_key = r"self.pixerpagesdenoisefileList"
-            pixerpagesdenoisepixmap_key = r"self.pixerpagesdenoisepixmap"
-            pixerpagesdenoiseqimage_key = r"self.pixerpagesdenoiseqimage"
-            pixerpagesdenoisepath_key = r"self.pixerpagesdenoisepath"
-            pixerpagesdenoisedir_key = r"self.pixerpagesdenoisedir"
-            pixerpagesrotatefileList_key = r"self.pixerpagesrotatefileList"
-            pixerpagesrotatepixmap_key = r"self.pixerpagesrotatepixmap"
-            pixerpagesrotateqimage_key = r"self.pixerpagesrotateqimage"
-            pixerpagesrotatepath_key = r"self.pixerpagesrotatepath"
-            pixerpagesrotatedir_key = r"self.pixerpagesrotatedir"
-            pixerpagescleanfileList_key = r"self.pixerpagescleanfileList"
-            pixerpagescleanpixmap_key = r"self.pixerpagescleanpixmap"
-            pixerpagescleanqimage_key = r"self.pixerpagescleanqimage"
-            pixerpagescleanpath_key = r"self.pixerpagescleanpath"
-            pixerpagescleandir_key = r"self.pixerpagescleandir"
-            pixerlinesboxfileList_key = r"self.pixerlinesboxfileList"
-            pixerlinesboxpixmap_key = r"self.pixerlinesboxpixmap"
-            pixerlinesboxqimage_key = r"self.pixerlinesboxqimage"
-            pixerlinesboxpath_key = r"self.pixerlinesboxpath"
-            pixerlinesboxdir_key = r"self.pixerlinesboxdir"
-            pixerlinescropfileList_key = r"self.pixerlinescropfileList"
-            pixerlinescroppixmap_key = r"self.pixerlinescroppixmap"
-            pixerlinescropqimage_key = r"self.pixerlinescropqimage"
-            pixerlinescroppath_key = r"self.pixerlinescroppath"
-            pixerlinescropdir_key = r"self.pixerlinescropdir"
-            pixerlinesdeskewfileList_key = r"self.pixerlinesdeskewfileList"
-            pixerlinesdeskewpixmap_key = r"self.pixerlinesdeskewpixmap"
-            pixerlinesdeskewqimage_key = r"self.pixerlinesdeskewqimage"
-            pixerlinesdeskewpath_key = r"self.pixerlinesdeskewpath"
-            pixerlinesdeskewdir_key = r"self.pixerlinesdeskewdir"
-            pixerlinesdenoisefileList_key = r"self.pixerlinesdenoisefileList"
-            pixerlinesdenoisepixmap_key = r"self.pixerlinesdenoisepixmap"
-            pixerlinesdenoiseqimage_key = r"self.pixerlinesdenoiseqimage"
-            pixerlinesdenoisepath_key = r"self.pixerlinesdenoisepath"
-            pixerlinesdenoisedir_key = r"self.pixerlinesdenoisedir"
-            pixerlinesrotatefileList_key = r"self.pixerlinesrotatefileList"
-            pixerlinesrotatepixmap_key = r"self.pixerlinesrotatepixmap"
-            pixerlinesrotateqimage_key = r"self.pixerlinesrotateqimage"
-            pixerlinesrotatepath_key = r"self.pixerlinesrotatepath"
-            pixerlinesrotatedir_key = r"self.pixerlinesrotatedir"
-            pixerlinescleanfileList_key = r"self.pixerlinescleanfileList"
-            pixerlinescleanpixmap_key = r"self.pixerlinescleanpixmap"
-            pixerlinescleanqimage_key = r"self.pixerlinescleanqimage"
-            pixerlinescleanpath_key = r"self.pixerlinescleanpath"
-            pixerlinescleandir_key = r"self.pixerlinescleandir"
-            greekpagesdenoised_key = r"self.greekpagesdenoised"
-            greekpagesrotated_key = r"self.greekpagesrotated"
-            greekpagesdeskewed_key = r"self.greekpagesdeskewed"
-            greekpagescropped_key = r"self.greekpagescropped"
-            greekpagescleaned_key = r"self.greekpagescleaned"
-            greekpagesbox_key = r"self.greekpagesbox"
-            greeklinescropped_key = r"self.greeklinescropped"
-            greeklinescleaned_key = r"self.greeklinescleaned"
-            greeklinesbox_key = r"self.greeklinesbox"
-            latinpagesdenoised_key = r"self.latinpagesdenoised"
-            latinpagesrotated_key = r"self.latinpagesrotated"
-            latinpagesdeskewed_key = r"self.latinpagesdeskewed"
-            latinpagescropped_key = r"self.latinpagescroppe"
-            latinpagescleaned_key = r"self.latinpagescleaned"
-            latinpagesbox_key = r"self.latinpagesbox"
-            latinlinescropped_key = r"self.latinlinescropped"
-            latinlinescleaned_key = r"self.latinlinescleaned"
-            latinlinesbox_key = r"self.latinlinesbox"
-            hebrewpagesdenoised_key = r"self.hebrewpagesdenoised"           
-            hebrewpagesrotated_key = r"self.hebrewpagesrotated"
-            hebrewpagesdeskewed_key = r"self.hebrewpagesdeskewed"
-            hebrewpagescropped_key = r"self.hebrewpagescroppe"
-            hebrewpagescleaned_key = r"self.hebrewpagescleaned"
-            hebrewpagesbox_key = r"self.hebrewpagesbox"
-            hebrewlinescropped_key = r"self.hebrewlinescropped"
-            hebrewlinescleaned_key = r"self.hebrewlinescleaned"
-            hebrewlinesbox_key = r"self.hebrewlinesbox"
+        print("loading pixler session")
+        session = sm.values('PixlerSession.json')
 
+        def get_setting(name: str, default=None):
+            if default is None:
+                default = getattr(self, name, None)
+            return session.get(f'self.{name}', default)
 
-            # Find the json key values using 'in' operator
-            # Define session variables from json key values
-            for Setting in data:
-                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
-                
-                if Setting['Setting'] == bookabbr_key:  
-                    self.bookabbr = Setting['CurrentValue']
-                    #self.ui.bookComboBox.setCurrentText(self.bookabbr)            
-                elif Setting['Setting'] == word_key:
-                    self.word = Setting['CurrentValue'] 
-                elif Setting['Setting'] == chr_key:
-                    self.chr = Setting['CurrentValue']
-                elif Setting['Setting'] == font_key:
-                    self.font = Setting['CurrentValue']
-                elif Setting['Setting'] == fontsize_key:
-                    self.fontsize = Setting['CurrentValue']         
-                elif Setting['Setting'] == source_book_markdown_key:  
-                    self.sourcebookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == greek_book_markdown_key:  
-                    self.greekbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == latin_book_markdown_key:  
-                    self.latinbookmarkdown = Setting['CurrentValue']
-                elif Setting['Setting'] == pixmap_key:
-                    self.pixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == qimage_key:
-                    self.qimage = Setting['CurrentValue']
-                elif Setting['Setting'] == bmpsourcedir_key:
-                    self.bmpsourcedir = Setting['CurrentValue']
-                elif Setting['Setting'] == bmpgreekdir_key:
-                    self.bmpgreekdir = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgpath_key:
-                    self.refimgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgdir_key:
-                    self.refimgdir = Setting['CurrentValue']
-                elif Setting['Setting'] == refimg_xoffset_key:
-                    self.refimg_xoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == refimg_yoffset_key:
-                    self.refimg_yoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgtfileList_key:
-                    self.refimgtfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgzoom_key:
-                    self.refimgzoom = Setting['CurrentValue']
-                elif Setting['Setting'] == refimgzoomslidervalue_key:
-                    self.refimgzoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == imagepath_key:
-                    self.imagepath = Setting['CurrentValue']
-                elif Setting['Setting'] == imagedir_key:
-                    self.imagedir = Setting['CurrentValue']
-                elif Setting['Setting'] == image_xoffset_key:
-                    self.image_xoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == image_yoffset_key:
-                    self.image_yoffset = Setting['CurrentValue']
-                elif Setting['Setting'] == imagefileList_key:
-                    self.imagefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == imagezoom_key:
-                    self.imagezoom = Setting['CurrentValue']
-                elif Setting['Setting'] == imagezoomslidervalue_key:
-                    self.imagezoomslidervalue = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerrefimgpath_key:
-                    self.pixerrefimgpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerrefimgpixmap_key:
-                    self.pixerrefimgpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerrefimgqimage_key:
-                    self.pixerrefimgqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerrefimgdir_key:
-                    self.pixerrefimgdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesboxfileList_key:
-                    self.pixerpagesboxfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesboxpixmap_key:
-                    self.pixerpagesboxpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesboxqimage_key:
-                    self.pixerpagesboxqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesboxpath_key:
-                    self.pixerpagesboxpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesboxdir_key:
-                    self.pixerpagesboxdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescropfileList_key:
-                    self.pixerpagescropfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescroppixmap_key:
-                    self.pixerpagescroppixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescropqimage_key:
-                    self.pixerpagescropqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescroppath_key:
-                    self.pixerpagescroppath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescropdir_key:
-                    self.pixerpagescropdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdeskewfileList_key:
-                    self.pixerpagesdeskewfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdeskewpixmap_key:
-                    self.pixerpagesdeskewpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdeskewqimage_key:
-                    self.pixerpagesdeskewqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdeskewpath_key:
-                    self.pixerpagesdeskewpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdeskewdir_key:
-                    self.pixerpagesdeskewdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdenoisefileList_key:
-                    self.pixerpagesdenoisefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdenoisepixmap_key:
-                    self.pixerpagesdenoisepixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdenoiseqimage_key:
-                    self.pixerpagesdenoiseqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdenoisepath_key:
-                    self.pixerpagesdenoisepath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesdenoisedir_key:
-                    self.pixerpagesdenoisedir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesrotatefileList_key:
-                    self.pixerpagesrotatefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesrotatepixmap_key:
-                    self.pixerpagesrotatepixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesrotateqimage_key:
-                    self.pixerpagesrotateqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesrotatepath_key:
-                    self.pixerpagesrotatepath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagesrotatedir_key:
-                    self.pixerpagesrotatedir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescleanfileList_key:
-                    self.pixerpagescleanfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescleanpixmap_key:
-                    self.pixerpagescleanpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescleanqimage_key:
-                    self.pixerpagescleanqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescleanpath_key:
-                    self.pixerpagescleanpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerpagescleandir_key:
-                    self.pixerpagescleandir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesboxfileList_key:
-                    self.pixerlinesboxfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesboxpixmap_key:
-                    self.pixerlinesboxpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesboxqimage_key:
-                    self.pixerlinesboxqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesboxpath_key:
-                    self.pixerlinesboxpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesboxdir_key:
-                    self.pixerlinesboxdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescropfileList_key:
-                    self.pixerlinescropfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescroppixmap_key:
-                    self.pixerlinescroppixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescropqimage_key:
-                    self.pixerlinescropqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescroppath_key:
-                    self.pixerlinescroppath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescropdir_key:
-                    self.pixerlinescropdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdeskewfileList_key:
-                    self.pixerlinesdeskewfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdeskewpixmap_key:
-                    self.pixerlinesdeskewpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdeskewqimage_key:
-                    self.pixerlinesdeskewqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdeskewpath_key:
-                    self.pixerlinesdeskewpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdeskewdir_key:
-                    self.pixerlinesdeskewdir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdenoisefileList_key:
-                    self.pixerlinesdenoisefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdenoisepixmap_key:
-                    self.pixerlinesdenoisepixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdenoiseqimage_key:
-                    self.pixerlinesdenoiseqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdenoisepath_key:
-                    self.pixerlinesdenoisepath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesdenoisedir_key:
-                    self.pixerlinesdenoisedir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesrotatefileList_key:
-                    self.pixerlinesrotatefileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesrotatepixmap_key:
-                    self.pixerlinesrotatepixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesrotateqimage_key:
-                    self.pixerlinesrotateqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesrotatepath_key:
-                    self.pixerlinesrotatepath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinesrotatedir_key:
-                    self.pixerlinesrotatedir = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescleanfileList_key:
-                    self.pixerlinescleanfileList = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescleanpixmap_key:
-                    self.pixerlinescleanpixmap = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescleanqimage_key:
-                    self.pixerlinescleanqimage = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescleanpath_key:
-                    self.pixerlinescleanpath = Setting['CurrentValue']
-                elif Setting['Setting'] == pixerlinescleandir_key:
-                    self.pixerlinescleandir = Setting['CurrentValue']               
-                elif Setting['Setting'] == greekpagesdenoised_key:
-                    self.greekpagesdenoised = Setting['CurrentValue']          
-                elif Setting['Setting'] == greekpagesrotated_key:
-                    self.greekpagesrotated = Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagesdeskewed_key:
-                    self.greekpagesdeskewed = Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagescropped_key:
-                    self.greekpagescropped = Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagescleaned_key:
-                    self.greekpagescleaned = Setting['CurrentValue']
-                elif Setting['Setting'] == greekpagesbox_key:
-                    self.greekpagesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinescropped_key:
-                    self.greeklinescropped = Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinescleaned_key:
-                    self.greeklinescleaned = Setting['CurrentValue']
-                elif Setting['Setting'] == greeklinesbox_key:
-                    self.greeklinesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesdenoised_key:
-                    self.latinpagesdenoised = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesrotated_key:
-                    self.latinpagesrotated = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesdeskewed_key:
-                    self.latinpagesdeskewed = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagescropped_key:
-                    self.latinpagescropped = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagescleaned_key:
-                    self.latinpagescleaned = Setting['CurrentValue']
-                elif Setting['Setting'] == latinpagesbox_key:
-                    self.latinpagesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinescropped_key:
-                    self.latinlinescropped = Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinescleaned_key:
-                    self.latinlinescleaned = Setting['CurrentValue']
-                elif Setting['Setting'] == latinlinesbox_key:
-                    self.latinlinesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesdenoised_key:
-                    self.hebrewpagesdenoised = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesrotated_key:
-                    self.hebrewpagesrotated = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesdeskewed_key:
-                    self.hebrewpagesdeskewed = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagescropped_key:
-                    self.hebrewpagescropped = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagescleaned_key:
-                    self.hebrewpagescleaned = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewpagesbox_key:
-                    self.hebrewpagesbox = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewlinescropped_key:
-                    self.hebrewlinescropped = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewlinescleaned_key:
-                    self.hebrewlinescleaned = Setting['CurrentValue']
-                elif Setting['Setting'] == hebrewlinesbox_key:
-                    self.hebrewlinesbox = Setting['CurrentValue']
-                
-                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-            f.close()
+        def abs_project_path(name: str, default=''):
+            value = session.get(f'self.{name}')
+            if value:
+                return self.projecthome + value
+            return getattr(self, name, default)
+
+        def data_path(name: str, default=''):
+            value = session.get(f'self.{name}')
+            if value:
+                return self.projecthome + self.jsondir + "/" + value
+            return getattr(self, name, default)
+
+        self.jsondir = get_setting('jsondir', '')
+        self.session = data_path('session')
+        self.workflow = data_path('workflow')
+        self.font = get_setting('font', '')
+        self.fontsize = get_setting('fontsize', 20)
+        self.ocrlang = get_setting('ocrlang', '')
+        self.ocrmodel = get_setting('ocrmodel', '')
+        self.bookabbr = get_setting('bookabbr', '')
+        self.chr = get_setting('chr', '')
+        self.sourcebookmarkdown = get_setting('sourcebookmarkdown', '')
+        self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
+        self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
+        self.pixmap = get_setting('pixmap', None)
+        self.qimage = get_setting('qimage', None)
+        self.bmpsourcedir = abs_project_path('bmpsourcedir')
+        self.bmpgreekdir = abs_project_path('bmpgreekdir')
+        self.refimgpath = abs_project_path('refimgpath')
+        self.refimgdir = abs_project_path('refimgdir')
+        self.refimg_xoffset = get_setting('refimg_xoffset', 0)
+        self.refimg_yoffset = get_setting('refimg_yoffset', 0)
+        self.refimgtfileList = get_setting('refimgtfileList', [])
+        self.refimgzoom = get_setting('refimgzoom', '')
+        self.refimgzoomslidervalue = get_setting('refimgzoomslidervalue', 0)
+        self.imagepath = abs_project_path('imagepath')
+        self.imagedir = abs_project_path('imagedir')
+        self.image_xoffset = get_setting('image_xoffset', 0)
+        self.image_yoffset = get_setting('image_yoffset', 0)
+        self.imagefileList = get_setting('imagefileList', [])
+        self.imagezoom = get_setting('imagezoom', '')
+        self.imagezoomslidervalue = get_setting('imagezoomslidervalue', 0)
+        self.pixlerpagesrotatedir = abs_project_path('pixlerpagesrotatedir')
+        self.greekpages = abs_project_path('greekpages')
+        self.greekpagesrotated = abs_project_path('greekpagesrotated')
+        self.greekpagesdeskewed = abs_project_path('greekpagesdeskewed')
+        self.greekpagescropped = abs_project_path('greekpagescropped')
+        self.greekpagescleaned = abs_project_path('greekpagescleaned')
+        self.greekpagesbox = abs_project_path('greekpagesbox')
+        self.greeklinescropped = abs_project_path('greeklinescropped')
+        self.greeklinescleaned = abs_project_path('greeklinescleaned')
+        self.greeklinesbox = abs_project_path('greeklinesbox')
+        self.latinpages = abs_project_path('latinpages')
+        self.latinpagesrotated = abs_project_path('latinpagesrotated')
+        self.latinpagesdeskewed = abs_project_path('latinpagesdeskewed')
+        self.latinpagescropped = abs_project_path('latinpagescropped')
+        self.latinpagescleaned = abs_project_path('latinpagescleaned')
+        self.latinpagesbox = abs_project_path('latinpagesbox')
+        self.latinlinescropped = abs_project_path('latinlinescropped')
+        self.latinlinescleaned = abs_project_path('latinlinescleaned')
+        self.latinlinesbox = abs_project_path('latinlinesbox')
+        self.hebrewpagesdenoised = abs_project_path('hebrewpagesdenoised')
+        self.hebrewpagesrotated = abs_project_path('hebrewpagesrotated')
+        self.hebrewpagesdeskewed = abs_project_path('hebrewpagesdeskewed')
+        self.hebrewpagescropped = abs_project_path('hebrewpagescropped')
+        self.hebrewpagescleaned = abs_project_path('hebrewpagescleaned')
+        self.hebrewpagesbox = abs_project_path('hebrewpagesbox')
+        self.hebrewlinescropped = abs_project_path('hebrewlinescropped')
+        self.hebrewlinescleaned = abs_project_path('hebrewlinescleaned')
+        self.hebrewlinesbox = abs_project_path('hebrewlinesbox')
+
+        print(f'Absolute Path to Project Directory: {self.projecthome}')
 
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('/home/max/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
+        with open(self.workflow) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -583,7 +304,6 @@ class PixlerMain(qtw.QMainWindow):
     def initMenubar(self):
         
         # File menu Signals(Slots)
- 
         self.ui.actionOpen_Reference_Image.triggered.connect(self.loadRefImg)
         #self.ui.actionOpen_Image.triggered.connect(self.x)
         self.ui.actionSave_Image.triggered.connect(self.SaveImage)
@@ -671,11 +391,11 @@ class PixlerMain(qtw.QMainWindow):
         Without any arguments, loadStackFromFile() will popup a file dialog to choose the image file.
         With a fileName argument, loadStackFromFile(fileName) will attempt to load the specified file directly.
         """
-        if len(fileName) == 0:
+        '''if len(fileName) == 0:
             if QT_VERSION_STR[0] == '4':
                 fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
             elif QT_VERSION_STR[0] == '5':
-                fileName, dummy = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
+                fileName, dummy = qtw.QFileDialog.getOpenFileName(self, "Open TIFF stack file.")'''
         fileName = str(fileName)
         if len(fileName) and os.path.isfile(fileName):
             self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
@@ -739,7 +459,7 @@ class PixlerMain(qtw.QMainWindow):
                 self.loadStackFromFile(imgfilename)
                 self.showFrame(0)
                 self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-                #self.ui.RefImg.setPixmap(qtg.QPixmap(self.origpixmap))
+                self.ui.RefImg.setPixmap(qtg.QPixmap(self.origpixmap))
                 #self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage)                
                 self.refimgpixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
             else:
@@ -756,38 +476,15 @@ class PixlerMain(qtw.QMainWindow):
         
         self.refimgdir = os.path.dirname(imgfilename)
         self.ui.RefImgLE.setText(filestr)
-        jsonfile = '/home/max/Projects/BiblionOCR/Model/Project/Data/json/PixlerSession.json'
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            refimgpath_key = r"self.refimgpath"
-            refimgdir_key = r"self.refimgdir"
-            #refimgpixmap_key = r"self.refimgpixmap"
-            #refimgqimage_key = r"self.refimgqimage"
-            for Setting in data:
-                if Setting['Setting'] == refimgpath_key:
-                    Setting['CurrentValue'] = self.refimgpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == refimgdir_key:  
-                    Setting['CurrentValue'] = self.refimgdir
-                    print(Setting['CurrentValue'])
-                '''elif Setting['Setting'] == refimgpixmap_key:
-                    Setting['CurrentValue'] = self.refimgpixmap
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == refimgqimage_key:
-                    Setting['CurrentValue'] = self.refimgqimage
-                    print(Setting['CurrentValue'])'''
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
+            'self.refimgpath': self.refimgpath,
+            'self.refimgdir': self.refimgdir,
+        })
         
         self.refimgfileList = []
         for i in os.listdir(self.refimgdir):
-            ipath = os.path.join(self.refimgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            ipath = os.path.normpath(os.path.join(self.refimgdir, i))
+            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 self.refimgfileList.append(ipath)        
         '''self.imgfileList = []
         for i in os.listdir(self.imgdir):
@@ -834,38 +531,15 @@ class PixlerMain(qtw.QMainWindow):
         
         self.imagedir = os.path.dirname(imgfilename)
         self.ui.ImageLE.setText(filestr)
-        jsonfile = '/home/max/Projects/BiblionOCR/Model/Project/Data/json/PixlerSession.json'
-                
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            imagepath_key = r"self.imagepath"
-            imagedir_key = r"self.imagedir"
-            #imagepixmap_key = r"self.imagepixmap"
-            #imageqimage_key = r"self.imageqimage"
-            for Setting in data:
-                if Setting['Setting'] == imagepath_key:
-                    Setting['CurrentValue'] = self.imagepath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imagedir_key:  
-                    Setting['CurrentValue'] = self.imagedir
-                    print(Setting['CurrentValue'])
-                '''elif Setting['Setting'] == imagepixmap_key:
-                    Setting['CurrentValue'] = self.imagepixmap
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imageqimage_key:
-                    Setting['CurrentValue'] = self.imageqimage
-                    print(Setting['CurrentValue'])'''
-        f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('PixlerSession.json', {
+            'self.imagepath': self.imagepath,
+            'self.imagedir': self.imagedir,
+        })
         
         self.imagefileList = []
         for i in os.listdir(self.imagedir):
-            ipath = os.path.join(self.imagedir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            ipath = os.path.normpath(os.path.join(self.imagedir, i))
+            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 self.imagefileList.append(ipath)        
         '''self.imgfileList = []
         for i in os.listdir(self.imgdir):
@@ -883,26 +557,26 @@ class PixlerMain(qtw.QMainWindow):
 
         else:
         
-            popup = qtw.QMessageBox(self)
+            popup = QMessageBox(self)
 
-            popup.setIcon(qtw.QMessageBox.Warning)
+            popup.setIcon(QMessageBox.Warning)
             
             popup.setText("The document has been modified")
             
             popup.setInformativeText("Do you want to save your changes?")
             
-            popup.setStandardButtons(qtw.QMessageBox.Save   |
-                                      qtw.QMessageBox.Cancel |
-                                      qtw.QMessageBox.Discard)
+            popup.setStandardButtons(QMessageBox.Save   |
+                                      QMessageBox.Cancel |
+                                      QMessageBox.Discard)
             
-            popup.setDefaultButton(qtw.QMessageBox.Save)
+            popup.setDefaultButton(QMessageBox.Save)
 
             answer = popup.exec_()
 
-            if answer == qtw.QMessageBox.Save:
+            if answer == QMessageBox.Save:
                 self.save()
 
-            elif answer == qtw.QMessageBox.Discard:
+            elif answer == QMessageBox.Discard:
                 event.accept()
 
             else:
@@ -955,29 +629,11 @@ class PixlerMain(qtw.QMainWindow):
             print("pdf page extraction complete")
         
 
-            jsonfile = '/home/max/Projects/BiblionOCR/Model/Project/Data/json/Session.json'
-            
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                sourcefile_key = r"self.sourcefile"
-                firstpage_key = r"self.firstpage"
-                lastpage_key = r"self.lastpage"
-                for Setting in data:
-                    if Setting['Setting'] == sourcefile_key:
-                        Setting['CurrentValue'] = self.sourcefile
-                        print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == firstpage_key:  
-                        Setting['CurrentValue'] = self.firstpage
-                        print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == lastpage_key:  
-                        Setting['CurrentValue'] = self.lastpage
-                        print(Setting['CurrentValue'])
-            f.close()
-
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+            SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('Session.json', {
+                'self.sourcefile': self.sourcefile,
+                'self.firstpage': self.firstpage,
+                'self.lastpage': self.lastpage,
+            })
         
         def reject():
             pass
@@ -1008,7 +664,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Project/Data/json/Workflow.json') as f:
+            with open(self.workflow) as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1093,7 +749,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1178,7 +834,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1270,7 +926,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1361,7 +1017,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1466,7 +1122,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1503,7 +1159,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1663,7 +1319,7 @@ class PixlerMain(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+                with open('Model/Data/json/Workflow.json') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1773,7 +1429,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1791,8 +1447,8 @@ class PixlerMain(qtw.QMainWindow):
 
         rsp = self.greekmono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
 
     def actionDeskew_Greek_tiff(self):
         print("deskewing Greek tiff files")
@@ -1879,7 +1535,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1916,7 +1572,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1935,8 +1591,8 @@ class PixlerMain(qtw.QMainWindow):
         rsp = self.deskew_greekmonoDialog.exec_()
         
         
-        #dsk.deskewfiles("/home/max/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
-        #pp.deskewfiles("/home/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
+        #dsk.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
+        #pp.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
 
 
     def actionResize_Greek_png(self):
@@ -2009,7 +1665,7 @@ class PixlerMain(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('/home/max/Projects/BiblionOCR/Model/Data/json/Workflow.json') as f:
+            with open('Model/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -2027,11 +1683,11 @@ class PixlerMain(qtw.QMainWindow):
 
         rsp = self.greekresizepngDialog.exec_()
         print("completed resizing indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/max/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
 
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/max/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
 
     def actionConvert_Latin_tiff_To_png(self):
         print("creating indexed(BW) Latin png files")
@@ -2049,8 +1705,8 @@ class PixlerMain(qtw.QMainWindow):
         if self.latinmono2pngDialog.Accepted:
             pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/max/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/max/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "/home/max/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+        #pp.tiff2pngidx(r"~/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
 
     def actionDeskew_Latin_tiff(self):
         print("deskewing Latin tiff files")
@@ -2069,8 +1725,8 @@ class PixlerMain(qtw.QMainWindow):
         if self.deskew_latinmonoDialog.Accepted:
             pp.deskewfiles(self.deskew_latinmono_ui.SourceLineEdit.text(), self.deskew_latinmono_ui.DestPngLineEdit.text(),self.deskew_latinmono_ui.DestTifLineEdit.text())
             print("completed deskewing monochrome tiff and png files")
-        #dsk.deskewfiles("/home/max/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
-        #pp.deskewfiles("/home/max/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
+        #dsk.deskewfiles("~/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
+        #pp.deskewfiles("~/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","~/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
     
     def actionResize_Latin_png(self):
         print("resizing Latin png files")
@@ -2088,8 +1744,8 @@ class PixlerMain(qtw.QMainWindow):
         if self.latinresizepngDialog.Accepted:
             pp.resizepngs(self.latinresizepng_ui.SourceLineEdit.text(), self.latinresizepng_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","/home/max/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
-        #pp.resizepngs(r"/home/max/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/max/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
+        #pp.resizepngs(r"~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","~/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
 
     # Dialog Controllers
 
@@ -2344,7 +2000,7 @@ class PixlerMain(qtw.QMainWindow):
 
     def mouseReleaseEvent(self, event):
     
-        if event.button() == Qt.LeftButton:
+        if self.rubberband and event.button() == Qt.LeftButton:
             geo = self.rubberBand.geometry()
             h = self.rubberBand.height()
             w = self.rubberBand.width()
@@ -2362,10 +2018,8 @@ class PixlerMain(qtw.QMainWindow):
             print(x,":",x+w,",",y,":",y+h)
             #self.cropregion(x,y,w,h)'''
             self.currentQRect = self.rubberBand.geometry()
-            #self.croppixmap = self.ui.RefImg.pixmap().copy(self.currentQRect)
-            self.croppixmap = self.refscenepixmap(self.currentQRect)
+            self.croppixmap = self.ui.RefImg.pixmap().copy(self.currentQRect)
             
-            #self.croppixmap = self.refimgpixmap(self.currentQRect)
             #self.ui.Image.setPixmap(self.imagepixmap)
             
             #croppedimg = self.ui.Image[x:x+w,y:y+h]
@@ -2453,7 +2107,7 @@ class PixlerMain(qtw.QMainWindow):
         else:
             # no file list found, load an image
             # self.OpenImageFileDialog()
-            loadRefImg()
+            self.loadRefImg()
 
     def prevRefImg(self):
         # ensure that the file list has not been cleared due to missing files     
@@ -2501,7 +2155,7 @@ class PixlerMain(qtw.QMainWindow):
 
     '''def OverwriteRefImg(self):
     
-        #defaultdir = r"/home/max/Projects/Python/EstablishTruth/Greek txt pages/greek_book_41_Mark/"
+        #defaultdir = r"~/Projects/Python/EstablishTruth/Greek txt pages/greek_book_41_Mark/"
         defaultpath = self.refimgpath
         filename = os.path.basename(defaultpath)
         
@@ -2563,14 +2217,7 @@ class PixlerMain(qtw.QMainWindow):
         self.origheight = self.refimgpixmap.height
         self.origwidth = self.refimgpixmap.width
         scaled_pixmap = self.refimgpixmap.scaled(self.refimgscale * self.refimgsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        
-        # Display scaled ref image file in Graphics View
-        self.refscene.clear()
-        self.refscenepixmap = qtw.QGraphicsPixmapItem()
-        self.refscenepixmap.setPixmap(scaled_pixmap)
-        self.refscene.addItem(self.refscenepixmap)
-
-        #self.ui.RefImg.setPixmap(scaled_pixmap)
+        self.ui.RefImg.setPixmap(scaled_pixmap)
  
     def changed_RefImg(self):
         self.RefImgchangesSaved = False
@@ -2666,7 +2313,7 @@ class PixlerMain(qtw.QMainWindow):
         else:
             # no file list found, load an image
             # self.OpenImageFileDialog()
-            loadRefImg()
+            self.loadRefImg()
 
     def prevImage(self):
         # ensure that the file list has not been cleared due to missing files     
@@ -2702,7 +2349,7 @@ class PixlerMain(qtw.QMainWindow):
         else:
             # no file list found, load an image
             # self.OpenImageFileDialog()
-            loadRefImg()
+            self.loadRefImg()
 
     def reloadImage(self):
         if self.imagepath:
@@ -2874,7 +2521,13 @@ class PixlerMain(qtw.QMainWindow):
 
     def eraser(self):
         # RefImg QRect
-        print("This is the new eraser method of the Pixler class")
+        painter = QPainter(self)
+        painter.setPen(QPen(Qt.white,7,Qt.SolidLine))
+
+
+    def crop(self):
+        # RefImg QRect
+        print("This is the new crop method of the Pixler class")
         
         # Initialize RefImg QRect
         RefImg_qimage = qtg.QPixmap.toImage(self.ui.RefImg.pixmap())
@@ -2942,82 +2595,11 @@ class PixlerMain(qtw.QMainWindow):
         self.resize_Image()
         self.rubberBand.hide()
 
-    def crop(self):
-        # RefImg QRect
-        print("This is the new crop method of the Pixler class")
-        
-        # Initialize RefImg QRect
-        #self.refimgpixmap
-        RefImg_qimage = qtg.QPixmap.toImage(self.refscene.pixmap())
-        RefImg_qimage_size = RefImg_qimage.size()
-        RefImg_xr = self.ui.RefImg.geometry().x()
-        RefImg_yr = self.ui.RefImg.geometry().y()
-        RefImg_wr = self.RefImg_width
-        RefImg_hr = self.RefImg_height
-        #RefImg_wr = self.ui.RefImg.pixmap().width()
-        #RefImg_hr = self.ui.RefImg.pixmap().height()
-        RefImg_qrect = QRect(RefImg_xr, RefImg_yr, RefImg_wr, RefImg_hr)
-        print("Reference Image QRect = " + str(RefImg_qrect))
-
-        # Initialize Scaled RefImg QRect
-        RefImg_xs = 0
-        RefImg_ys = 0
-        RefImg_ws = 0
-        RefImg_hs = 0
-        RefImg_xs = RefImg_xr * self.refimgscale
-        RefImg_ys = RefImg_yr * self.refimgscale
-        RefImg_ws = RefImg_wr * self.refimgscale
-        RefImg_hs = RefImg_hr * self.refimgscale
-        RefImg_sqrect = QRect(RefImg_xs,RefImg_ys,RefImg_ws,RefImg_hs)
-        print("Reference Image Scaled QRect = " + str(RefImg_sqrect))
-        
-        # CropImg QRect
-
-        # Get CropImg QRect from event.pos()
-        CropImg_xc = self.rubberBand.x() 
-        CropImg_yc = self.rubberBand.y()
-        CropImg_wc = self.rubberBand.width()
-        CropImg_hc = self.rubberBand.height()
-        CropImg_cqrect = QRect(CropImg_xc,CropImg_yc,CropImg_wc,CropImg_hc)
-        print("Reference Image Cropped QRect = " + str(CropImg_cqrect))
-        
-        # Move CropImg QRect to RefImg MainWindow origin(0,0)
-        CropImg_xm = self.rubberBand.x() - int(self.refimg_xoffset) 
-        CropImg_ym= self.rubberBand.y() - int(self.refimg_yoffset)
-        CropImg_wm = self.rubberBand.width()
-        CropImg_hm = self.rubberBand.height()
-        CropImg_mqrect = QRect(CropImg_xm,CropImg_ym,CropImg_wm,CropImg_hm)
-        print("Crop Image Cropped2Main QRect = " + str(CropImg_mqrect))
-            
-        # Upscale CropImg QRect at RefImg MainWindow origin(0,0)
-        CropImg_xu = 0
-        CropImg_yu = 0
-        CropImg_wu = 0
-        CropImg_hu = 0
-        CropImg_xu = CropImg_xm / self.refimgscale
-        CropImg_yu = CropImg_ym / self.refimgscale
-        CropImg_wu = CropImg_wm / self.refimgscale
-        CropImg_hu = CropImg_hm / self.refimgscale
-        CropImg_uqrect = QRect(CropImg_xu,CropImg_yu,CropImg_wu,CropImg_hu)
-        print("Crop Image Upscaled QRect = " + str(CropImg_uqrect))
-
-        # Show Cropped Image
-        #self.ui.RefImg.setPixmap(self.origpixmap)
-        self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
-        self.croppixmap = self.refimgpixmap.copy(CropImg_uqrect)
-        print("Cropped Image Size = " + str(self.croppixmap.size()))       
-        #self.croppixmap = self.ui.RefImg.pixmap().copy(CropImg_uqrect)
-        #print("Cropped Image Size = " + str(self.ui.RefImg.pixmap().size()))
-        self.imagepixmap = self.croppixmap
-        self.ui.Image.setPixmap(self.imagepixmap)
-        self.resize_Image()
-        self.rubberBand.hide()
-
 
     def actionGimpEdit(self):
         #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"
-        gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.refimgpath + " @@"
-        
+        #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.refimgpath + " @@"
+        gimp_cmd = "gimp " + self.imgpath
         '''if 'self.refimgpath' in locals():
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.refimgpath + " @@"
             print(self.refimgpath)
@@ -3036,7 +2618,7 @@ class PixlerMain(qtw.QMainWindow):
     
     '''def deskewRefImgold(self):
         print("Auto deskewing reference image")
-        self.workflowdir = self.pixerpagesdeskewdir
+        self.workflowdir = self.pixlerpagesdeskewdir
         # Calculate skew angle of an image
         def getSkewAngle(cvImage) -> float:
             # Prep image, copy, convert to gray scale, blur, and threshold
@@ -3149,7 +2731,7 @@ class PixlerMain(qtw.QMainWindow):
         #self.cvleft, self.cvright, self.cvtop, self.cvbottom = None, None, None, None
 
     def rotateRefImg(self):           
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         def on_Spinner():
             self.rotateDialog_ui.Sliderhorizontal.setValue(self.rotateDialog_ui.SliderspinBox.value())
             angle = self.rotateDialog_ui.Sliderhorizontal.value()
@@ -3203,7 +2785,7 @@ class PixlerMain(qtw.QMainWindow):
         #self.initcvimg()
 
     def rotateRefImg90CW(self):
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         # Reading an image in default mode
         src = cv2.imread(self.refimgpath)
         
@@ -3218,7 +2800,7 @@ class PixlerMain(qtw.QMainWindow):
         fn = lambda x : 255 if x > thresh else 0
         PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
 
-        outfile = self.pixerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
+        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
         print("Converting cv2 image to PIL image: " + outfile)
         self.imagepath = outfile
         
@@ -3249,7 +2831,7 @@ class PixlerMain(qtw.QMainWindow):
         print("Auto rotation by 90 degrees clockwise complete")
 
     def rotateRefImg90CCW(self):
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         # Reading an image in default mode
         src = cv2.imread(self.refimgpath)
 
@@ -3265,7 +2847,7 @@ class PixlerMain(qtw.QMainWindow):
         fn = lambda x : 255 if x > thresh else 0
         PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
         
-        outfile = self.pixerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
+        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
         print("Converting cv2 image to PIL image: " + outfile)
         self.imagepath = outfile
         
@@ -3295,7 +2877,7 @@ class PixlerMain(qtw.QMainWindow):
         print("Auto rotation by 90 degrees counter-clockwise complete")
 
     def rotateRefImg180CW(self):
-        self.workflowdir = self.pixerpagesrotatedir
+        self.workflowdir = self.pixlerpagesrotatedir
         # Reading an image in default mode
         src = cv2.imread(self.refimgpath)
 
@@ -3311,7 +2893,7 @@ class PixlerMain(qtw.QMainWindow):
         fn = lambda x : 255 if x > thresh else 0
         PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
         
-        outfile = self.pixerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
+        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath) 
         print("Converting cv2 image to PIL image: " + outfile)
         self.imagepath = outfile
         
@@ -3698,7 +3280,7 @@ class Adjust(QWidget):
             if not np.array_equal(img_copy, self.img_class.img):
                 msg = QMessageBox.question(self, "Cancel edits", "Confirm to discard all the changes?   ",
                                            QMessageBox.Yes | QMessageBox.No)
-                if msg != QMessageBox.Yes:
+                if msg != qtw.MessageBox.Yes:
                     return False
 
             self.img_class.reset()
@@ -3760,7 +3342,7 @@ class Adjust(QWidget):
             hflip_ct += 1
             self.flip[1] = hflip_ct % 2 == 1
 
-        crop_frame = Crop()
+        #crop_frame = click_crop()  ---don't have the right function defined
         crop_frame.n_btn.clicked.connect(click_n1)
         crop_frame.y_btn.clicked.connect(click_y1)
         crop_frame.rotate.clicked.connect(add_90)

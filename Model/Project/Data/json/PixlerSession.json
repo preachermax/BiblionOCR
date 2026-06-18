@@ -141,12 +141,12 @@
     },
     {
         "Setting": "self.refimgpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_box/1516_Page_202.tif",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages/greek1516_Page_239.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.refimgdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Source/tif_box",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
@@ -176,12 +176,12 @@
     },
     {
         "Setting": "self.imagepath",
-        "CurrentValue": "",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages\\greek1516_Page_173.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imagedir",
-        "CurrentValue": "",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages",
         "DefaultValue": ""
     },
     {
@@ -581,8 +581,8 @@
     },
     {
         "Setting": "self.latinlinesdenoised",
-        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_denoised",
-        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_denoised"
+        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_denoised",
+        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_denoised"
     },
     {
         "Setting": "self.latinpagesrotated",
@@ -603,11 +603,6 @@
         "Setting": "self.latinpagescleaned",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned",
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_pages_cleaned"
-    },
-    {
-        "Setting": "self.latinlinesdenoised",
-        "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_denoised",
-        "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_denoised"
     },
     {
         "Setting": "self.latinpagesbox",

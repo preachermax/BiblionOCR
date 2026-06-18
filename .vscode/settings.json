@@ -10,5 +10,9 @@
         "*test.py"
     ],
     "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true
+    "python.testing.unittestEnabled": true,
+    "continue.enableConsole": true,
+    "continue.enableQuickActions": true,
+    "continue.pauseCodebaseIndexOnStart": true,
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

@@ -1,0 +1,108 @@
+ Tag ,Meaning 
+A1,Interviewee.Primary author.
+A2,"Secondary author/editor/translator, e.g. editor, performers, sponsor, series editor, reporter, institution, name of file, producer, series director, department, interviewer, issuing organization, recipient, or narrator. The tag must be repeated for each person. Synonym of ED."
+A3,"Tertiary author/editor/translator, e.g. series editor/author, illustrator, editor, higher court, producer, director, international author, publisher, or advisor. The tag must be repeated for each person. Collaborators."
+A4,"Subsidiary/quaternary author/editor/translator, e.g. translator, counsel, sponsor, funding agency, performers, producer, department/division, or volume editor. The tag must be repeated for each person"
+A5,Quinary author / compiler.
+A6,Website editor.
+AB,Abstract or synopsis Notes. Synonym of N2.
+AD,"(Author/editor/inventor) address, e.g. postal address, email address, phone number, and/or fax number.Institution."
+AN,Accession number.
+AU,"(Primary) author/editor/translator, e.g. author, artist, created by, attribution, programmer, investigators, editor, director, interviewee, cartographer, composer, reporter, inventor, or institution. The tag must be repeated for each person. Synonym of A1."
+AV,Notes. Availability (description of where to find it). Location in archives.
+BT,"Primary/secondary title. For Whole Book (BOOK) and Unpublished Work (UNPB) references, this maps to T1 or TI; for all other types, this maps to T2.Subtitle. Book title."
+C1,"Custom 1, e.g. legal note, cast, author affiliation, section, place published, time period, term, year cited, government body, contact name, scale, format of music, column, or sender's e-mail."
+C2,"Custom 2, e.g. PMCID, credits, year published, unit of observation, date cited, congress number, contact address, area, form of composition, issue, issue date, recipients e-mail, or report number."
+C3,"Custom 3, e.g. size/length, title prefix, proceedings title, data type, PMCID, congress session, contact phone, size, music parts, or designated states."
+C4,"Custom 4, e.g. reviewer, dataset(s), genre, contact fax, target audience, or attorney/agent."
+C5,"Custom 5, e.g. format, packaging method, issue title, last update date, funding number, accompanying matter, format/length, references, or publisher."
+C6,"Custom 6, e.g. NIHMSID, CFDA number, legal status, issue, or volume."
+C7,"Custom 7, e.g. article number or PMCID"
+C8,"Custom 8, not used by any of the standard types."
+CA,Caption.
+CL,Classification.
+CN,Call number.
+CP,City/place of publication.Issue.
+CR,Cited references.
+CT,Caption. Primary title. Address. Title of unpublished reference.
+CY,"Place published, e.g. city, conference location, country, or activity location"
+DA,"Date, e.g. date accessed, last update date, date decided, date of collection, date released, deadline, date of code edition, or date enacted."
+DB,Name of database.
+DI,Digital Object Identifier (DOI).
+DO,"Digital Object Identifier (DOI).This used to be documented as ""Document Object Index""."
+DOI,Digital Object Identifier (DOI).
+DP,Database provider.
+DS,Data source.
+ED,Secondary author. Editor.Synonym of A2. Edition.
+EP,Pages.End page.
+ER,End of reference. Must be the last tag.
+ET,"Edition, e.g. epub (electronic publication?) date, date published, session, action of higher court, version, requirement, description of material, international patent classification, or description."
+FD,Free-form publication data.
+H1,Location (library).
+H2,Location (call number).
+ID,"Reference identifier, may be limited to 20 alphanumeric characters."
+IP,Identifying phrase.
+IS,"Number, e.g. issue or number of volumes."
+J1,Notes. User abbreviation 1 of journal/periodical name.
+J2,"Alternate title, e.g. alternate journal, abbreviated publication, abbreviation, or alternate magazine. If possible, it should be a standard abbreviation, preferably using the Index Medicus style including periods. This field is used for the abbreviated title of a book or journal name, the latter mapped to T2.
+User abbreviation 2 of journal/periodical name."
+JA,Standard abbreviation for journal/periodical name.
+JF,Full name of journal/periodical.
+JO,"Abbreviation (for journal/periodical name). ""Periodical name: full format. This is an alphanumeric field of up to 255 characters."""
+K1,Keyword.
+KW,Keyword/phrase. Must be at most 255 characters long. May be repeated any number of times to add multiple keywords.
+L1,"File attachments, e.g. figure. ""Link to PDF. There is no practical length limit to this field. URL addresses can be entered individually, one per tag or multiple addresses can be entered on one line using a semi-colon as a separator. These links should end with a file name, and not simply a landing page. Use the UR tag for URL links."" Internet link. Local file."
+L2,"URL. ""Link to Full-text. There is no practical length limit to this field. URL addresses can be entered individually, one per tag or multiple addresses can be entered on one line using a semi-colon as a separator."" Internet link."
+L3,DOI. Related records. Internet link.
+L4,"Figure, e.g. URL or file attachments. Images. Internet link. Local file."
+LA,Language.
+LB,Label.
+LK,Links.
+LL,Sponsoring library location.
+M1,"Number, publication number, text number, size, bill number, series volume, computer, issue, chapter, status, document number, start page, issue number, folio number, number of screens, application number, number of pages, public law number, or access date. Miscellaneous 1. A good place for type or genre information."
+M2,"Start page, notes, or number of pages. Miscellaneous 2."
+M3,"Type of work, e.g. type (of work/article/medium/image); citation of reversal; medium; funding, patent, or thesis type; format; or form of item. Miscellaneous 3. Suitable to hold the medium."
+N1,Notes.
+N2,Abstract. Synonym of AB.
+NO,Notes.
+NV,"Number of volumes, e.g. extent of work, reporter abbreviation, catalog number, study number, document number, version, amount received, session number, frequency, manuscript number, US patent classification, communication number, series volume, or statute number. Ignored for Press Release (PRESS)."
+OL,Output language (using one of the documented numeric codes).
+OP,"Original publication, e.g. contents, history, content, version history, original grant number, or priority numbers. Other pages. Original foreign title."
+PA,Personal notes.
+PB,"Publisher, e.g. court, distributor, sponsoring agency, library/archive, assignee, institution, source, or university / degree grantor."
+PMCID,PMCID.
+PMID,PMID.
+PP,Place of publication.
+PY,"(Primary) (publication) year/date, e.g. year decided, year of conference, or year released. Must always use 4 digits, with leading zeros if before 1000. Synonym of Y1."
+RD,Retrieved date.
+RI,"Reviewed item, geographic coverage, or article number."
+RN,Research notes.
+RP,"Reprint status, e.g. reprint edition, review date, or notes. Has three possible values: ""IN FILE"", ""NOT IN FILE"", or ""ON REQUEST"". ""ON REQUEST"" must be followed by an MM/DD/YY date in parentheses."
+RT,Reference type.
+SE,"Section, screens, code section, message number, pages, chapter, filed date, number of pages, original release date, version, e-pub date, duration of grant, section number, start page, international patent number, or running time."
+SF,Subfile/database.
+SL,Sponsoring library.
+SN,"ISSN, ISBN, or report/document/patent number."
+SP,"Pages, description, code pages, number of pages, first/start page, or running time."
+SR,Source type: Print(0) or Electronic(1).
+ST,Short title or abbreviated case name.
+SV,Series volume.
+T1,(Primary) title.
+T2,"Secondary title, journal, periodical, publication title, code, title of weblog, series title, book title, image source program, conference name, dictionary title, periodical title, encyclopedia title, committee, program, title number, magazine, collection title, album title, newspaper, published source, title of show, section title, academic department, or full journal name. Subtitle."
+T3,"Tertiary title, volume title, series title, legislative body, institution, decision, website title, location of work, supplement no., international title, paper number, international source, or department."
+TA,Translated author.
+TI,"(Primary) title, e.g. title of entry/grant/podcast/work, case name, or name of act."
+TT,Translated title.
+TY,Type of reference. Must be the first tag.
+U1,Notes. User definable 1.Thesis-type hint.
+U2–U5,Notes. User definable 2–5.
+U6–U15,User definable 6–15.
+UR,"Web/URL. Can be repeated for multiple tags, or multiple URLs can be entered in the same tag as a semicolon-separated list."
+VL,"Volume, code volume, access year, reporter volume, image size, edition, amount requested, rule number, volume/storage container, number, patent version number, code number, or degree."
+VO,Volume. Published Standard number.
+WP,Date of electronic publication.
+WT,Website title.
+WV,Website version.
+Y1,"""Year///Date"". Primary date/year. Synonym of PY."
+Y2,Access date or date enacted. Secondary date. Date of publication.
+YR,Publication year.

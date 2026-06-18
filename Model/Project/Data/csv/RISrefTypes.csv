@@ -1,0 +1,63 @@
+"Abbreviation (""Field Label"")","Type (""Ref Type"")",Category
+ABST,Abstract,Journal Article
+ADVS,Audiovisual (material),Audiovisual Material
+AGGR,Aggregated database,Aggregated Database
+ANCIENT,Ancient text,Ancient Text
+ART,Artwork,Artwork
+BILL,Bill/resolution,"Bill (was Bill, Unenacted Bill)"
+BLOG,Blog,Blog
+BOOK,Book (whole),Book
+CASE,Legal case and case notes,Case
+CHAP,Book section/chapter,Book Section
+CHART,Chart,Chart
+CLSWK,Classical work,Classical Work
+COMP,Computer program,Computer Program
+CONF,Conference proceedings,Conference Proceedings
+CPAPER,Conference paper,Conference Paper
+CTLG,Catalog,Catalog
+DATA,Data file / dataset,Dataset (was Data File) AND Computer Program
+DBASE,Online database,Online Database
+DICT,Dictionary,Dictionary
+EBOOK,Electronic book,Electronic Book
+ECHAP,Electronic book section,Electronic Book Section
+EDBOOK,Edited book,Edited Book
+EJOUR,Electronic article,Electronic Article
+ELEC,Web page / electronic citation,Web Page
+ENCYC,Encyclopedia,Encyclopedia
+EQUA,Equation,Equation
+FIGURE,Figure,Figure
+GEN,Generic,Generic
+GOVDOC,Government document,Government Document
+GRNT,Grant,Grant
+HEAR,Hearing,Hearing
+ICOMM,Internet communication,Personal Communication
+INPR,In press article,Journal Article
+INTV,Interview,Interview
+JFULL,Journal/periodical (full),Journal Article
+JOUR,Journal/periodical (article),Journal Article
+LEGAL,Legal rule (or regulation),Legal Rule
+MANSCPT,Manuscript,Manuscript
+MAP,Map or cartographic data,Map
+MGZN,Magazine (article),Magazine Article
+MPCT,Film or broadcast / motion picture,Film or Broadcast
+MULTI,Online multimedia,Online Multimedia
+MUSIC,Music (score),Music
+NEWS,Newspaper (article),Newspaper Article
+PAMP,Pamphlet,Pamphlet
+PAT,Patent,Patent
+PCOMM,Personal communication,Personal Communication
+POD,Podcast,Podcast
+PRESS,Press release,Press Release
+RPRT,Report,Report
+SER,"Serial (book, monograph)",Serial
+SLIDE,Slide,Audiovisual Material
+SOUND,Sound recording,Audiovisual Material
+STAND,Standard,Standard
+STAT,Statute,Statute
+STD,Generic,
+THES,Thesis/dissertation,Thesis
+UNBILL,Unenacted bill/resolution,"Bill (was Bill, Unenacted Bill)"
+UNPB,Unpublished work,Unpublished Work
+UNPD,Unpublished work,
+VIDEO,Video recording,Audiovisual Material
+WEB,Web page,

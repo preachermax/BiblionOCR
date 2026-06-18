@@ -265,18 +265,18 @@ class Ui_MainWindow(QtWidgets.QWidget):
         if self.pixmap.isNull():
             return
         self.ImageView.setPixmap(self.pixmap)
-        imgdirpath = os.path.dirname(self.imgfilename)
+        imgdirpath = os.path.normpath(os.path.dirname(self.imgfilename))
         self.imgfileList = []
         for i in os.listdir(imgdirpath):
-            ipath = os.path.join(imgdirpath, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            ipath = os.path.normpath(os.path.join(imgdirpath, i))
+            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 self.imgfileList.append(ipath)
         self.sortImgFiles(MainWindow)
 
     def sortImgFiles(self, MainWindow):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
+        self.sorted_imgfilelist = sorted(self.imgfileList, key=lambda p: alphanum_key(os.path.basename(p)))
         #self.fileList.sort()
         #print(self.sorted_imgfilelist)
         self.imgdirIterator = iter(self.sorted_imgfilelist)

@@ -56,7 +56,7 @@
     },
     {
         "Setting": "self.bookabbr",
-        "CurrentValue": "Joh",
+        "CurrentValue": "Luk",
         "DefaultValue": "Mat"
     },
     {
@@ -106,17 +106,17 @@
     },
     {
         "Setting": "self.sourcebookmarkdown",
-        "CurrentValue": "source_book_43_John",
+        "CurrentValue": "source_book_42_Luke",
         "DefaultValue": "source_book_40_Matthew"
     },
     {
         "Setting": "self.greekbookmarkdown",
-        "CurrentValue": "greek_book_43_John",
+        "CurrentValue": "greek_book_42_Luke",
         "DefaultValue": "greek_book_40_Matthew"
     },
     {
         "Setting": "self.latinbookmarkdown",
-        "CurrentValue": "latin_book_43_John",
+        "CurrentValue": "latin_book_42_Luke",
         "DefaultValue": "latin_book_40_Matthew"
     },
     {
@@ -336,12 +336,12 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_glyphs_box/greek1516_Page_140_glyphbox.tif",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages\\greek1516_Page_172.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imgdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Workflow/Greek/tif_greek_glyphs_box",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Workflow"
     },
     {
