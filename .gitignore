@@ -1,0 +1,21 @@
+# Python cache/bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python build/test artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+
+# IDE/local machine files
+.vs/
+.vscode/
+.idea/
+
+# OS metadata
+.DS_Store
+Thumbs.db
