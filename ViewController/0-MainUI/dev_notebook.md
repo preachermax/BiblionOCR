@@ -30,6 +30,17 @@
 
 ## 🔧 Current Stabilization State (CRITICAL)
 
+### ✅ Release Font Workflow
+
+* The cross-platform font refresh task (`release-font-refresh-and-smoke-test`) is now part of the release path
+* This is the first release step before any final build packaging
+* SessionManager now resolves the repo-local `ViewController/0-MainUI/fonts` path by default
+
+### ✅ Compilation Note
+
+* This release-font step will be reused as a stable release step for **MyTrainer**
+* MyTrainer is the final module planned for development, so its release compilation must include the current font installation path
+
 ### ✅ MyPixler
 
 * Standalone launch: **WORKING**
@@ -37,6 +48,11 @@
 * `start_image_load()` threading: **STABLE**
 * `on_image_loaded()` receiving `QImage`: **CONFIRMED**
 * RefImg display + `RefImgLE` sync: **WORKING**
+* Crop apply from `ImagePreviewDialog` returns a full-resolution QImage in original image coordinates
+* Applied crop is displayed directly in the MyPixler right-hand panel without an immediate second scaling pass
+* Crop result preserves source image resolution metadata (`dotsPerMeterX`, `dotsPerMeterY`, `devicePixelRatio`, and color space where supported)
+* TIFF return/save path now derives DPI from QImage dots-per-meter metadata instead of hard-coding 300 DPI
+* Subprocess return-path crop handoff back to MyServer: **CONFIRMED**
 
 ### ✅ ImagePreviewDialog
 
@@ -52,13 +68,32 @@
   * Right = processed
 * Crop apply:
 
+  * left mouse drag creates a crop rubberBand on the left/original preview
+  * rubberBand remains visible after mouse release
+  * 8 light-blue grip handles allow crop adjustment before Apply
+  * grip-handle release updates the right/processed preview
+  * Apply hides the rubberBand/handles and returns the processed crop to MyPixler
   * correctly updates **processed (right) panel**
+* Resolution behavior:
+
+  * crop coordinates are mapped from zoomed display space back to original image pixels
+  * preview zoom is display-only and does not determine the applied crop's pixel size
+  * `get_result()` returns the full-resolution processed crop
+  * QImage resolution metadata is copied from the source image through the crop result
+  * `get_preview_result()` remains available for exact visible-preview output, but MyPixler crop apply intentionally uses `get_result()`
 
 ### ⚠️ In Progress
 
 * Zoom interaction (especially right-hand preview)
 * MyServer → MyPixler parameter passing
 * Session synchronization across systems
+* Continued runtime testing of crop DPI/appearance across image formats and Windows ↔ Jetson environments
+
+### ✅ Closed-Loop Crop Return
+
+* MyPixler can run in subprocess mode and write its cropped result to a return file
+* MyServer can consume that returned crop and keep the overwrite decision on its side
+* The closed-loop smoke test completed successfully with `TEST_OK`
 
 ---
 
@@ -121,6 +156,10 @@
   * QImage-based processing
   * non-compounding zoom support
   * proper crop parameter handling
+  * editable crop rubberBand with 8 light-blue grip handles
+  * crop overlay stays visible until Apply/Cancel
+  * right preview refreshes after initial selection and grip-handle resize
+  * full-resolution crop result preserves source QImage DPI/resolution metadata
 * Removed legacy in-file preview dialog from MyPixler
 * Fixed stale `json.load(f)` usage patterns
 * Corrected workflow readers pointing to wrong JSON sources
@@ -145,6 +184,8 @@
 
      * no coordinate drift
      * no pixmap corruption
+      * applied crop size equals original pixel dimensions minus cropped-away margins
+      * source DPI/resolution metadata is preserved after Apply and after TIFF return/save
 
 3. **MyServer → MyPixler Launch Test**
 
@@ -308,6 +349,40 @@ DO NOT update for:
 * 2026-06-22 [Source: Copilot + Max]: Checkpoint commit prepared and executed. Staged files: .gitignore, dev_notebook.md, commit_checklist.md, AIcommitWorkflow.md, ImageLoadWorker.py, TiffStackWorker.py, ImagePreviewDialog.py, MyPixler.py, pycache bytecode removal. Excluded from this commit: MyServer.py, MyServerUI.py, Session.json, Continue.dev config, UI_Icons.py resource churn (held for separate integration/cleanup commits). Debug prints removed. Git hygiene improved. New branch Biblion-Branch2 created for continued integration work. Checkpoint message: "stabilize: checkpoint standalone MyPixler preview/crop/zoom workflow".
 
 ---
+
+## 📚 Documentation Classification
+
+### Release-Facing
+
+* update_fonts.py
+* update_fonts.txt
+* .vscode/tasks.json
+
+### Compilation Docs
+
+* dev_notebook.md
+* commit_checklist.md
+* AIcommitWorkflow.md
+* PROJECT_ARCHITECTURE.md
+* DEPENDENCIES_AND_RELATIONSHIPS.md
+
+### HelpSystem-Facing
+
+* README_HELP_SYSTEM.md
+* HELP_INTEGRATION_GUIDE.md
+* QUICK_REFERENCE.md
+* PROJECT_ARCHITECTURE.md
+* DEPENDENCIES_AND_RELATIONSHIPS.md
+
+### Development-Facing
+
+* dev_notebook.md
+* commit_checklist.md
+* AIcommitWorkflow.md
+
+### Reference-Only / Supporting
+
+* No strong standalone reference-only markdowns were identified in the current help bundle subset
 
 ## 📅 Last Updated
 

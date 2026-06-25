@@ -41,7 +41,7 @@ from SessionManager import SessionManager
 from PyQt5 import uic
 from PyQt5.QtWidgets import QRubberBand, QWidget, QVBoxLayout, QHBoxLayout, QSizeGrip, QPushButton, QMessageBox, QFrame, QLabel, QColorDialog
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtGui import QPainter, QPen, QIcon, QPixmap
+from PyQt5.QtGui import QPainter, QPen, QIcon, QPixmap, QColor, QBrush
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QUrl
 from PyQt5 import QtCore as qtc
@@ -112,7 +112,7 @@ from Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
 
 class PixlerMain(qtw.QMainWindow):
 
-    def __init__(self, imgpath=None, parent=None):
+    def __init__(self, imgpath=None, parent=None, launch_args=None):
         super().__init__(parent)
 
         print("=== INIT START ===")
@@ -122,6 +122,8 @@ class PixlerMain(qtw.QMainWindow):
         # -------------------------
         self.imgpath = None
         self.refimgpath = None
+        self.subprocess_mode = False
+        self.subprocess_return_path = ""
 
         self.refimgdir = ""
         self.imagedir = ""
@@ -141,14 +143,27 @@ class PixlerMain(qtw.QMainWindow):
         self.refimgqimage = qtg.QImage()
         self.imagepixmap = qtg.QPixmap()
         self.imageqimage = qtg.QImage()
+        self.rubberBand = None
+        self.return_to_server_button = None
+        self.crop_prompt_dialog = None
+        self.crop_selection_ready = False
+        self.crop_drawing_active = False
 
         # -------------------------
         # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ARGUMENT HANDLING (MyServer ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ MyPixler)
         # -------------------------
         import sys
 
-        if imgpath is None and len(sys.argv) > 1:
-            imgpath = sys.argv[1]
+        if launch_args is not None:
+            parsed_imgpath, subprocess_mode, return_path = self._parse_launch_arguments(launch_args)
+            self.subprocess_mode = subprocess_mode
+            self.subprocess_return_path = return_path
+            if parsed_imgpath:
+                imgpath = parsed_imgpath
+        elif imgpath is None and len(sys.argv) > 1:
+            imgpath, subprocess_mode, return_path = self._parse_launch_arguments(sys.argv[1:])
+            self.subprocess_mode = subprocess_mode
+            self.subprocess_return_path = return_path
 
         if imgpath:
             imgpath = os.path.abspath(os.path.normpath(imgpath))
@@ -204,10 +219,16 @@ class PixlerMain(qtw.QMainWindow):
             self.refimgpath and os.path.isfile(self.refimgpath)
         )
 
-        print(f"[INIT CHECK] startup load? {self._startup_load}")
-
+        if launch_args is not None:
+            parsed_imgpath, subprocess_mode, return_path = self._parse_launch_arguments(launch_args)
         # -------------------------
         # Phase 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DEFERRED STARTUP (CRITICAL)
+            if parsed_imgpath:
+                imgpath = parsed_imgpath
+        elif imgpath is None and len(sys.argv) > 1:
+            imgpath, subprocess_mode, return_path = self._parse_launch_arguments(sys.argv[1:])
+            self.subprocess_mode = subprocess_mode
+            self.subprocess_return_path = return_path
         # -------------------------
         if self._startup_load:
             def _startup():
@@ -224,6 +245,32 @@ class PixlerMain(qtw.QMainWindow):
             print("[INIT] No valid image to load")
 
         print("=== INIT COMPLETE ===")
+
+    def _parse_launch_arguments(self, argv):
+        imgpath = None
+        subprocess_mode = False
+        return_path = ""
+
+        index = 0
+        while index < len(argv):
+            token = argv[index]
+            if token == "--subprocess-mode":
+                subprocess_mode = True
+                index += 1
+                continue
+            if token == "--return-path" and index + 1 < len(argv):
+                return_path = os.path.abspath(os.path.normpath(argv[index + 1]))
+                subprocess_mode = True
+                index += 2
+                continue
+            if token.startswith("--"):
+                index += 1
+                continue
+            if imgpath is None:
+                imgpath = token
+            index += 1
+
+        return imgpath, subprocess_mode, return_path
 
 
 
@@ -780,8 +827,66 @@ class PixlerMain(qtw.QMainWindow):
         self.ui.RefImgzoomslider.hide()
         self.ui.Imagezoomslider.hide()
 
+        self.rubberBand = ResizableRubberBand(self)
+        self.rubberBand.hide()
+
+        self._init_subprocess_return_controls()
+        self._init_crop_prompt_dialog()
+
         # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ mark UI ready
         self._ui_ready = True
+
+    def _init_crop_prompt_dialog(self):
+        self.crop_prompt_dialog = qtw.QDialog(self)
+        self.crop_prompt_dialog.setWindowTitle("Finalize Crop")
+        self.crop_prompt_dialog.setWindowFlags(
+            self.crop_prompt_dialog.windowFlags() | qtc.Qt.Tool | qtc.Qt.WindowStaysOnTopHint
+        )
+        self.crop_prompt_dialog.setWindowModality(qtc.Qt.NonModal)
+
+        layout = qtw.QVBoxLayout(self.crop_prompt_dialog)
+        message = qtw.QLabel("Resize the handles as needed, then confirm the crop.")
+        message.setWordWrap(True)
+        layout.addWidget(message)
+
+        button_box = qtw.QDialogButtonBox(
+            qtw.QDialogButtonBox.Apply | qtw.QDialogButtonBox.Cancel
+        )
+        apply_button = button_box.button(qtw.QDialogButtonBox.Apply)
+        cancel_button = button_box.button(qtw.QDialogButtonBox.Cancel)
+        apply_button.setText("Apply Crop")
+        cancel_button.setText("Keep Editing")
+        apply_button.clicked.connect(self.apply_crop_selection)
+        cancel_button.clicked.connect(self.crop_prompt_dialog.hide)
+        layout.addWidget(button_box)
+
+    def _show_crop_prompt_dialog(self):
+        if self.crop_prompt_dialog is None:
+            self._init_crop_prompt_dialog()
+
+        self.crop_prompt_dialog.show()
+        self.crop_prompt_dialog.raise_()
+        self.crop_prompt_dialog.activateWindow()
+
+    def _init_subprocess_return_controls(self):
+        if not self.subprocess_mode or not self.subprocess_return_path:
+            return
+
+        self.return_to_server_button = qtw.QPushButton("Return Crop to MyServer")
+        self.return_to_server_button.setEnabled(False)
+        self.return_to_server_button.setFixedHeight(24)
+        self.return_to_server_button.setStyleSheet(
+            "QPushButton { background-color: #4a4a4a; color: white; border: 1px solid #2d2d2d; padding: 2px 8px; }"
+            "QPushButton:hover { background-color: #5a5a5a; }"
+            "QPushButton:pressed { background-color: #3b3b3b; }"
+        )
+        self.return_to_server_button.setToolTip(self.subprocess_return_path)
+        self.return_to_server_button.clicked.connect(self.returnCropToMyServer)
+        self.statusBar().addPermanentWidget(self.return_to_server_button)
+
+        self.statusBar().showMessage(
+            f"Subprocess return ready: {self.subprocess_return_path}"
+        )
     # def initUI(self):
 
     #     self.get_session_settings()
@@ -2509,10 +2614,16 @@ class PixlerMain(qtw.QMainWindow):
             self.ui.Image.setFocus()
 
         # ---- Rubber band start ----
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.ui.RefImg.geometry().contains(event.pos()):
+            print("[CROP UI] Begin crop selection with grip handles")
+            self.crop_drawing_active = True
             self.origin = event.pos()
             self.rubberBand.setGeometry(QRect(self.origin, QSize()))
             self.rubberBand.show()
+            self.rubberBand.raise_()
+            if hasattr(self.rubberBand, "_raise_handles"):
+                self.rubberBand._raise_handles()
+            self.crop_selection_ready = False
 
     def mouseMoveEvent(self, event):
 
@@ -2525,12 +2636,12 @@ class PixlerMain(qtw.QMainWindow):
             pos = QPoint(x,y)
             print(str(pos))
             self.rubberBand.setGeometry(QRect(self.origin, pos).normalized())'''
-        if not self.origin.isNull():
+        if self.crop_drawing_active and not self.origin.isNull():
             self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
 
     def mouseReleaseEvent(self, event):
 
-        if self.rubberBand and event.button() == Qt.LeftButton:
+        if self.rubberBand and event.button() == Qt.LeftButton and self.crop_drawing_active:
             geo = self.rubberBand.geometry()
             h = self.rubberBand.height()
             w = self.rubberBand.width()
@@ -2546,14 +2657,12 @@ class PixlerMain(qtw.QMainWindow):
             print("selection h = " + str(h))
             print("selection y+h = " + str(y+h))
             print(x,":",x+w,",",y,":",y+h)
-            #self.cropregion(x,y,w,h)'''
             self.currentQRect = self.rubberBand.geometry()
-            self.croppixmap = self.ui.RefImg.pixmap().copy(self.currentQRect)
-
-            #self.ui.Image.setPixmap(self.imagepixmap)
-
-            #croppedimg = self.ui.Image[x:x+w,y:y+h]
-            #self.rubberBand.hide()
+            self.crop_selection_ready = True
+            self.crop_drawing_active = False
+            self.origin = QPoint()
+            self.preview_crop_selection()
+            qtc.QTimer.singleShot(0, self._show_crop_prompt_dialog)
 
     # Reference Image Edit Controllers
     def start_image_load(self, path, target="ref"):
@@ -3230,8 +3339,103 @@ class PixlerMain(qtw.QMainWindow):
 
         RefImgchangesSaved = True
 
+    def _save_qimage_as_tiff(self, qimage, outfile):
+        buffer = qtc.QBuffer()
+        buffer.open(qtc.QBuffer.ReadWrite)
+        qimage.save(buffer, "PNG")
+        PILimage = pilimg.open(io.BytesIO(buffer.data()))
+        dpi_x = 300
+        dpi_y = 300
+        if qimage.dotsPerMeterX() > 0:
+            dpi_x = qimage.dotsPerMeterX() * 0.0254
+        if qimage.dotsPerMeterY() > 0:
+            dpi_y = qimage.dotsPerMeterY() * 0.0254
+        print("Generating: " + outfile)
+        PILimage.save(outfile, "TIFF", dpi=(dpi_x, dpi_y), compression="tiff_lzw")
+
+    def returnCropToMyServer(self):
+        if not self.subprocess_mode or not self.subprocess_return_path:
+            print("[CROP] No subprocess return path available")
+            return
+
+        payload = getattr(self, "cropped_qimage", None)
+        if payload is None or payload.isNull():
+            payload = getattr(self, "imageqimage", None)
+
+        if payload is None or payload.isNull():
+            print("[CROP] No crop result available to return")
+            return
+
+        self._save_qimage_as_tiff(payload, self.subprocess_return_path)
+        print(f"[CROP] Returned cropped result to MyServer: {self.subprocess_return_path}")
+
+        if self.return_to_server_button is not None:
+            self.return_to_server_button.setEnabled(False)
+
+        qtc.QTimer.singleShot(100, self.close)
+
     def changed_Image(self):
         self.ImagechangesSaved = False
+
+    def _crop_rect_from_rubberband(self):
+        if self.rubberBand is None or self.rubberBand.width() <= 0 or self.rubberBand.height() <= 0:
+            return QRect()
+
+        clip_x = self.rubberBand.x() - int(self.refimg_xoffset)
+        clip_y = self.rubberBand.y() - int(self.refimg_yoffset)
+        clip_w = self.rubberBand.width()
+        clip_h = self.rubberBand.height()
+
+        if self.refimgscale:
+            clip_x = int(round(clip_x / self.refimgscale))
+            clip_y = int(round(clip_y / self.refimgscale))
+            clip_w = int(round(clip_w / self.refimgscale))
+            clip_h = int(round(clip_h / self.refimgscale))
+
+        clip_x = max(0, clip_x)
+        clip_y = max(0, clip_y)
+        clip_w = max(1, clip_w)
+        clip_h = max(1, clip_h)
+
+        if not self.refimgpixmap.isNull():
+            clip_w = min(clip_w, self.refimgpixmap.width() - clip_x)
+            clip_h = min(clip_h, self.refimgpixmap.height() - clip_y)
+
+        return QRect(clip_x, clip_y, clip_w, clip_h)
+
+    def preview_crop_selection(self):
+        if self.rubberBand is None or not self.rubberBand.isVisible():
+            return
+
+        crop_rect = self._crop_rect_from_rubberband()
+        if crop_rect.isNull() or crop_rect.width() <= 0 or crop_rect.height() <= 0:
+            return
+
+        self.currentQRect = self.rubberBand.geometry()
+        self.clippixmap = self.refimgpixmap.copy(crop_rect)
+        if self.clippixmap.isNull():
+            print("[CROP] Preview crop pixmap is null")
+            return
+
+        print("[CROP] Preview QRect = " + str(crop_rect))
+        self.imagepixmap = self.clippixmap
+        self.imageqimage = self.clippixmap.toImage()
+        self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
+        self.ui.Image.setPixmap(self.imagepixmap)
+        self.resize_Image()
+
+    def _on_crop_overlay_changed(self):
+        self.crop_selection_ready = True
+        self.preview_crop_selection()
+
+    def apply_crop_selection(self):
+        self.preview_crop_selection()
+        if self.rubberBand is not None:
+            self.rubberBand.hide()
+        if self.crop_prompt_dialog is not None:
+            self.crop_prompt_dialog.hide()
+        self.crop_selection_ready = False
+        self.crop_drawing_active = False
 
     def clip(self):
         # RefImg QRect
@@ -3297,6 +3501,7 @@ class PixlerMain(qtw.QMainWindow):
         self.ui.Image.setPixmap(self.imagepixmap)
         self.resize_Image()
         self.rubberBand.hide()
+        self.crop_selection_ready = False
 
     def eraser(self):
         painter = QPainter(self)
@@ -3317,7 +3522,26 @@ class PixlerMain(qtw.QMainWindow):
         w = max(1, w)
         h = max(1, h)
 
-        return qimage.copy(x, y, w, h)
+        result = qimage.copy(x, y, w, h)
+        self._copy_qimage_resolution(qimage, result)
+        return result
+
+    @staticmethod
+    def _copy_qimage_resolution(source, target):
+        if source is None or target is None or source.isNull() or target.isNull():
+            return
+
+        target.setDotsPerMeterX(source.dotsPerMeterX())
+        target.setDotsPerMeterY(source.dotsPerMeterY())
+        target.setDevicePixelRatio(source.devicePixelRatio())
+
+        if hasattr(source, "colorSpace") and hasattr(target, "setColorSpace"):
+            try:
+                color_space = source.colorSpace()
+                if color_space.isValid():
+                    target.setColorSpace(color_space)
+            except Exception:
+                pass
 
 
     # def crop_processor(self, qimage, params):
@@ -3343,7 +3567,13 @@ class PixlerMain(qtw.QMainWindow):
         if dialog.exec_() == qtw.QDialog.Accepted:
             print("[CROP] Apply pressed")
 
+            # Apply the processor result in original image coordinates.  Do not
+            # use the zoomed dialog preview image here: preview zoom is only for
+            # display, while the applied crop should retain the source image's
+            # pixel resolution minus only the pixels actually cropped away.
             result = dialog.get_result()
+            if result is not None:
+                print("[CROP] Using full-resolution crop result: {}x{}".format(result.width(), result.height()))
 
             if result is None:
                 print("[CROP] No result returned")
@@ -3364,10 +3594,17 @@ class PixlerMain(qtw.QMainWindow):
             # right zoom slider scales from a real original pixmap.
             self.imageqimage = result
             self.imagepixmap = self.cropped_pixmap
-            self.imagescale = self.ui.Imagezoomslider.value() / 100
+            self.imagescale = 1.0
+
+            if self.subprocess_mode and self.subprocess_return_path:
+                if self.return_to_server_button is not None:
+                    self.return_to_server_button.setEnabled(True)
+                    self.statusBar().showMessage("Crop ready. Press Return Crop to MyServer.")
 
 
-            self.resize_Image()
+            self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
+            self.ui.Image.setPixmap(self.imagepixmap)
+            self.ui.Image.resize(self.imagepixmap.size())
             print("[CROP] Result displayed on right panel")
 
         else:
@@ -3941,7 +4178,6 @@ class Adjust(QWidget):
 
     def click_crop(self, rotate=False):
         def click_y1():
-            self.rb.update_dim()
             if rotate:
                 self.img_class.rotate_img(self.rotate_value, crop=True, flip=self.flip)
                 self.img_class.crop_img(int(self.rb.top * 2 / self.zoom_factor),
@@ -3990,7 +4226,8 @@ class Adjust(QWidget):
                                 int((self.img_class.right - self.img_class.left) * self.zoom_factor),
                                 int((self.img_class.bottom - self.img_class.top) * self.zoom_factor))
 
-            self.rb.update_dim()
+            self.rb.show()
+            self.rb.raise_()
             self.update_img(True)
 
         def add_90():
@@ -4045,8 +4282,10 @@ class Adjust(QWidget):
         self.zoom_factor = self.get_zoom_factor()
 
         self.rb = ResizableRubberBand(self)
-        self.rb.setGeometry(0, 0, self.img_class.img.shape[1] * self.zoom_factor,
-                            self.img_class.img.shape[0] * self.zoom_factor)
+        self.rb.setGeometry(0, 0, int(self.img_class.img.shape[1] * self.zoom_factor),
+                    int(self.img_class.img.shape[0] * self.zoom_factor))
+        self.rb.show()
+        self.rb.raise_()
         self.img_class.change_b_c(beta=-40)
         self.slider.valueChanged.connect(change_slide)
 
@@ -4061,6 +4300,8 @@ class Adjust(QWidget):
             self.img_class.rotate_img(0)
             self.rb.setGeometry(0, 0, int(self.img_class.img.shape[1] * self.zoom_factor),
                                 int(self.img_class.img.shape[0] * self.zoom_factor))
+            self.rb.show()
+            self.rb.raise_()
             self.update_img(True)
 
         img_copy = deepcopy(self.img_class.img)
@@ -4416,28 +4657,215 @@ class Adjust(QWidget):
 #         return self.processor(self.original, self.params)
 
 class ResizableRubberBand(QWidget):
-    """Wrapper to make QRubberBand mouse-resizable using QSizeGrip
+    """Crop overlay with sibling grip handles that stay visible above it.
 
-    Source: http://stackoverflow.com/a/19067132/435253
+    The previous child-handle approach could be clipped or hidden by the
+    translucent overlay on some Qt/Windows combinations.  These grips are
+    parented to the same MyPixler window as the overlay, so they are independent
+    widgets that can always be raised above the crop rectangle.
     """
+
+    HANDLE_SIZE = 18
+    MIN_SIZE = 24
+
     def __init__(self, parent=None):
         super(ResizableRubberBand, self).__init__(parent)
 
-        self.setWindowFlags(Qt.SubWindow)
-        self.layout = QHBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setMinimumSize(self.MIN_SIZE, self.MIN_SIZE)
+        self.setMouseTracking(True)
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet(
+            "border: 2px dashed #ffbf00;"
+            "background-color: rgba(255, 191, 0, 35);"
+        )
 
-        self.grip1 = QSizeGrip(self)
-        self.grip2 = QSizeGrip(self)
-        self.layout.addWidget(self.grip1, 0, Qt.AlignLeft | Qt.AlignTop)
-        self.layout.addWidget(self.grip2, 0, Qt.AlignRight | Qt.AlignBottom)
-        self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
-        self.rubberband.move(0, 0)
-        self.rubberband.show()
-        self.show()
+        self._drag_handle = None
+        self._drag_start_global = QPoint()
+        self._drag_start_geometry = QRect()
+        self._handles = {}
+        self._create_handles()
+        self._set_handles_visible(False)
+
+    def _create_handles(self):
+        parent = self.parentWidget()
+        cursor_map = {
+            "nw": Qt.SizeFDiagCursor,
+            "n": Qt.SizeVerCursor,
+            "ne": Qt.SizeBDiagCursor,
+            "e": Qt.SizeHorCursor,
+            "se": Qt.SizeFDiagCursor,
+            "s": Qt.SizeVerCursor,
+            "sw": Qt.SizeBDiagCursor,
+            "w": Qt.SizeHorCursor,
+        }
+
+        for name, cursor in cursor_map.items():
+            handle = QFrame(parent)
+            handle.setObjectName("cropGrip_{}".format(name))
+            handle.setCursor(cursor)
+            handle.setFixedSize(self.HANDLE_SIZE, self.HANDLE_SIZE)
+            handle.setStyleSheet(
+                "QFrame { background-color: #ff0000; border: 2px solid #ffffff; }"
+                "QFrame:hover { background-color: #ffff00; border: 2px solid #000000; }"
+            )
+            handle.setToolTip("Drag to resize crop ({})".format(name))
+            handle.setMouseTracking(True)
+            handle.installEventFilter(self)
+            self._handles[name] = handle
+
+    def setGeometry(self, *args):
+        super().setGeometry(*args)
+        self._position_handles()
+        self._raise_handles()
+
+    def show(self):
+        super().show()
+        self._position_handles()
+        self._set_handles_visible(True)
+        self._raise_handles()
+        print("[CROP UI] RubberBand shown with {} sibling grip handles".format(len(self._handles)))
+
+    def hide(self):
+        self._set_handles_visible(False)
+        super().hide()
+
+    def eventFilter(self, obj, event):
+        handle_name = None
+        for name, handle in self._handles.items():
+            if obj is handle:
+                handle_name = name
+                break
+
+        if handle_name is None:
+            return super().eventFilter(obj, event)
+
+        if event.type() == qtc.QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+            print("[CROP UI] Grip press: {}".format(handle_name))
+            self._drag_handle = handle_name
+            self._drag_start_global = event.globalPos()
+            self._drag_start_geometry = self.geometry()
+            event.accept()
+            return True
+
+        if event.type() == qtc.QEvent.MouseMove and self._drag_handle:
+            delta = event.globalPos() - self._drag_start_global
+            self._resize_from_handle(self._drag_handle, delta)
+            event.accept()
+            return True
+
+        if event.type() == qtc.QEvent.MouseButtonRelease and self._drag_handle:
+            print("[CROP UI] Grip release: {}".format(self._drag_handle))
+            self._drag_handle = None
+            parent = self.parentWidget()
+            if parent is not None and hasattr(parent, "_on_crop_overlay_changed"):
+                parent._on_crop_overlay_changed()
+            event.accept()
+            return True
+
+        return super().eventFilter(obj, event)
+
+    def _resize_from_handle(self, handle_name, delta):
+        rect = QRect(self._drag_start_geometry)
+
+        if "n" in handle_name:
+            rect.setTop(rect.top() + delta.y())
+        if "s" in handle_name:
+            rect.setBottom(rect.bottom() + delta.y())
+        if "w" in handle_name:
+            rect.setLeft(rect.left() + delta.x())
+        if "e" in handle_name:
+            rect.setRight(rect.right() + delta.x())
+
+        rect = self._normalized_minimum_rect(rect)
+        rect = self._clamped_to_parent(rect)
+        self.setGeometry(rect)
+
+    def _normalized_minimum_rect(self, rect):
+        rect = rect.normalized()
+
+        if rect.width() < self.MIN_SIZE:
+            if self._drag_handle and "w" in self._drag_handle:
+                rect.setLeft(rect.right() - self.MIN_SIZE + 1)
+            else:
+                rect.setRight(rect.left() + self.MIN_SIZE - 1)
+
+        if rect.height() < self.MIN_SIZE:
+            if self._drag_handle and "n" in self._drag_handle:
+                rect.setTop(rect.bottom() - self.MIN_SIZE + 1)
+            else:
+                rect.setBottom(rect.top() + self.MIN_SIZE - 1)
+
+        return rect
+
+    def _clamped_to_parent(self, rect):
+        parent = self.parentWidget()
+        if parent is None:
+            return rect
+
+        bounds = parent.rect()
+        if rect.left() < bounds.left():
+            rect.setLeft(bounds.left())
+        if rect.top() < bounds.top():
+            rect.setTop(bounds.top())
+        if rect.right() > bounds.right():
+            rect.setRight(bounds.right())
+        if rect.bottom() > bounds.bottom():
+            rect.setBottom(bounds.bottom())
+        return rect
+
+    def _set_handles_visible(self, visible):
+        for handle in self._handles.values():
+            handle.setVisible(visible)
+
+    def _raise_handles(self):
+        self.raise_()
+        for handle in self._handles.values():
+            handle.raise_()
+
+    def _position_handles(self):
+        if not self._handles:
+            return
+
+        rect = self.geometry()
+        size = self.HANDLE_SIZE
+        half = size // 2
+        center_x = rect.left() + rect.width() // 2
+        center_y = rect.top() + rect.height() // 2
+
+        positions = {
+            "nw": (rect.left() - half, rect.top() - half),
+            "n": (center_x - half, rect.top() - half),
+            "ne": (rect.right() - half, rect.top() - half),
+            "e": (rect.right() - half, center_y - half),
+            "se": (rect.right() - half, rect.bottom() - half),
+            "s": (center_x - half, rect.bottom() - half),
+            "sw": (rect.left() - half, rect.bottom() - half),
+            "w": (rect.left() - half, center_y - half),
+        }
+
+        parent = self.parentWidget()
+        bounds = parent.rect() if parent is not None else QRect()
+        for name, (x, y) in positions.items():
+            if parent is not None:
+                x = max(bounds.left(), min(x, bounds.right() - size + 1))
+                y = max(bounds.top(), min(y, bounds.bottom() - size + 1))
+            self._handles[name].move(x, y)
 
     def resizeEvent(self, event):
-        self.rubberband.resize(self.size())
+        self._position_handles()
+        self._raise_handles()
+        super().resizeEvent(event)
+
+    def moveEvent(self, event):
+        self._position_handles()
+        self._raise_handles()
+        super().moveEvent(event)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._position_handles()
+        self._set_handles_visible(True)
+        self._raise_handles()
 
 def main():
     import os
@@ -4449,7 +4877,7 @@ def main():
 
     app = qtw.QApplication(sys.argv)
 
-    main = PixlerMain(image_path)   # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ use image_path, not imgpath
+    main = PixlerMain(image_path, launch_args=sys.argv[1:])
     main.show()
 
     sys.exit(app.exec_())

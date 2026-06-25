@@ -43,6 +43,14 @@ class ImagePreviewDialog(qtw.QDialog):
         self.params = dict(initial_params or {})
         self.zoom_factor = 1.0
         self.origin = qtc.QPoint()
+        self.crop_drawing_active = False
+        self.crop_rect = qtc.QRect()
+        self._crop_handles = {}
+        self._active_handle = None
+        self._handle_start_global = qtc.QPoint()
+        self._handle_start_rect = qtc.QRect()
+        self._last_processed_result = qtg.QImage()
+        self._last_preview_result = qtg.QImage()
 
         self.setWindowTitle("Preview")
         self.resize(1200, 700)
@@ -113,7 +121,9 @@ class ImagePreviewDialog(qtw.QDialog):
         button_layout = qtw.QHBoxLayout()
         self.apply_btn = qtw.QPushButton("Apply")
         self.cancel_btn = qtw.QPushButton("Cancel")
+        self.apply_btn.clicked.connect(self._hide_crop_overlay)
         self.apply_btn.clicked.connect(self.accept)
+        self.cancel_btn.clicked.connect(self._hide_crop_overlay)
         self.cancel_btn.clicked.connect(self.reject)
         button_layout.addStretch(1)
         button_layout.addWidget(self.apply_btn)
@@ -121,7 +131,119 @@ class ImagePreviewDialog(qtw.QDialog):
         layout.addLayout(button_layout)
 
         self.rubberBand = qtw.QRubberBand(qtw.QRubberBand.Rectangle, self.left_label)
+        self._build_crop_handles()
         self.left_label.installEventFilter(self)
+
+    def _build_crop_handles(self):
+        cursor_map = {
+            "nw": qtc.Qt.SizeFDiagCursor,
+            "n": qtc.Qt.SizeVerCursor,
+            "ne": qtc.Qt.SizeBDiagCursor,
+            "e": qtc.Qt.SizeHorCursor,
+            "se": qtc.Qt.SizeFDiagCursor,
+            "s": qtc.Qt.SizeVerCursor,
+            "sw": qtc.Qt.SizeBDiagCursor,
+            "w": qtc.Qt.SizeHorCursor,
+        }
+
+        for name, cursor in cursor_map.items():
+            handle = qtw.QFrame(self.left_label)
+            handle.setObjectName("previewCropGrip_{}".format(name))
+            handle.setFixedSize(8, 8)
+            handle.setCursor(cursor)
+            handle.setStyleSheet(
+                "QFrame { background-color: #87cefa; border: 1px solid #1e90ff; }"
+                "QFrame:hover { background-color: #bfefff; border: 1px solid #0066cc; }"
+            )
+            handle.setToolTip("Drag to resize crop ({})".format(name))
+            handle.installEventFilter(self)
+            handle.hide()
+            self._crop_handles[name] = handle
+
+    def _set_handles_visible(self, visible):
+        for handle in self._crop_handles.values():
+            handle.setVisible(visible)
+
+    def _raise_crop_overlay(self):
+        self.rubberBand.raise_()
+        for handle in self._crop_handles.values():
+            handle.raise_()
+
+    def _position_crop_handles(self):
+        if not self._crop_handles or self.crop_rect.isNull():
+            return
+
+        rect = self.crop_rect.normalized()
+        size = 8
+        half = size // 2
+        cx = rect.left() + rect.width() // 2
+        cy = rect.top() + rect.height() // 2
+
+        positions = {
+            "nw": (rect.left() - half, rect.top() - half),
+            "n": (cx - half, rect.top() - half),
+            "ne": (rect.right() - half, rect.top() - half),
+            "e": (rect.right() - half, cy - half),
+            "se": (rect.right() - half, rect.bottom() - half),
+            "s": (cx - half, rect.bottom() - half),
+            "sw": (rect.left() - half, rect.bottom() - half),
+            "w": (rect.left() - half, cy - half),
+        }
+
+        bounds = self.left_label.rect()
+        for name, (x, y) in positions.items():
+            x = max(bounds.left(), min(x, bounds.right() - size + 1))
+            y = max(bounds.top(), min(y, bounds.bottom() - size + 1))
+            self._crop_handles[name].move(x, y)
+
+    def _show_crop_overlay(self, rect):
+        self.crop_rect = rect.normalized()
+        self.rubberBand.setGeometry(self.crop_rect)
+        self.rubberBand.show()
+        self._position_crop_handles()
+        self._set_handles_visible(True)
+        self._raise_crop_overlay()
+        print("[PREVIEW CROP] RubberBand shown with {} grip handles".format(len(self._crop_handles)))
+
+    def _hide_crop_overlay(self):
+        self.rubberBand.hide()
+        self._set_handles_visible(False)
+
+    def _clamp_display_rect(self, rect):
+        rect = rect.normalized()
+        pixmap = self.left_label.pixmap()
+        max_w = pixmap.width() if pixmap is not None and not pixmap.isNull() else self.left_label.width()
+        max_h = pixmap.height() if pixmap is not None and not pixmap.isNull() else self.left_label.height()
+
+        if rect.left() < 0:
+            rect.setLeft(0)
+        if rect.top() < 0:
+            rect.setTop(0)
+        if rect.right() >= max_w:
+            rect.setRight(max_w - 1)
+        if rect.bottom() >= max_h:
+            rect.setBottom(max_h - 1)
+
+        min_size = 8
+        if rect.width() < min_size:
+            if self._active_handle and "w" in self._active_handle:
+                rect.setLeft(rect.right() - min_size + 1)
+            else:
+                rect.setRight(rect.left() + min_size - 1)
+        if rect.height() < min_size:
+            if self._active_handle and "n" in self._active_handle:
+                rect.setTop(rect.bottom() - min_size + 1)
+            else:
+                rect.setBottom(rect.top() + min_size - 1)
+
+        return rect.normalized()
+
+    def _preview_crop_rect(self, rect):
+        rect = self._clamp_display_rect(rect)
+        self._show_crop_overlay(rect)
+        if self._set_crop_from_display_rect(rect):
+            self.update_preview()
+            self._show_crop_overlay(rect)
 
     def add_slider(self, name, min_val, max_val, default):
         label = qtw.QLabel("{}: {}".format(name, default))
@@ -141,23 +263,61 @@ class ImagePreviewDialog(qtw.QDialog):
         self.params[name] = default
 
     def eventFilter(self, obj, event):
+        handle_name = None
+        for name, handle in self._crop_handles.items():
+            if obj is handle:
+                handle_name = name
+                break
+
+        if handle_name is not None:
+            if event.type() == qtc.QEvent.MouseButtonPress and event.button() == qtc.Qt.LeftButton:
+                self._active_handle = handle_name
+                self._handle_start_global = event.globalPos()
+                self._handle_start_rect = qtc.QRect(self.crop_rect)
+                print("[PREVIEW CROP] Grip press: {}".format(handle_name))
+                event.accept()
+                return True
+
+            if event.type() == qtc.QEvent.MouseMove and self._active_handle:
+                delta = event.globalPos() - self._handle_start_global
+                rect = qtc.QRect(self._handle_start_rect)
+                if "n" in self._active_handle:
+                    rect.setTop(rect.top() + delta.y())
+                if "s" in self._active_handle:
+                    rect.setBottom(rect.bottom() + delta.y())
+                if "w" in self._active_handle:
+                    rect.setLeft(rect.left() + delta.x())
+                if "e" in self._active_handle:
+                    rect.setRight(rect.right() + delta.x())
+                self._show_crop_overlay(self._clamp_display_rect(rect))
+                event.accept()
+                return True
+
+            if event.type() == qtc.QEvent.MouseButtonRelease and self._active_handle:
+                print("[PREVIEW CROP] Grip release: {}".format(self._active_handle))
+                self._active_handle = None
+                self._preview_crop_rect(self.crop_rect)
+                event.accept()
+                return True
+
+            return super().eventFilter(obj, event)
+
         if obj == self.left_label:
             if event.type() == qtc.QEvent.MouseButtonPress and event.button() == qtc.Qt.LeftButton:
+                self.crop_drawing_active = True
                 self.origin = event.pos()
-                self.rubberBand.setGeometry(qtc.QRect(self.origin, qtc.QSize()))
-                self.rubberBand.show()
+                self._show_crop_overlay(qtc.QRect(self.origin, qtc.QSize()))
                 return True
 
-            if event.type() == qtc.QEvent.MouseMove and self.rubberBand.isVisible():
+            if event.type() == qtc.QEvent.MouseMove and self.crop_drawing_active:
                 rect = qtc.QRect(self.origin, event.pos()).normalized()
-                self.rubberBand.setGeometry(rect)
+                self._show_crop_overlay(rect)
                 return True
 
-            if event.type() == qtc.QEvent.MouseButtonRelease and self.rubberBand.isVisible():
-                self.rubberBand.hide()
+            if event.type() == qtc.QEvent.MouseButtonRelease and self.crop_drawing_active:
+                self.crop_drawing_active = False
                 rect = qtc.QRect(self.origin, event.pos()).normalized()
-                if self._set_crop_from_display_rect(rect):
-                    self.update_preview()
+                self._preview_crop_rect(rect)
                 return True
 
         return super().eventFilter(obj, event)
@@ -186,13 +346,56 @@ class ImagePreviewDialog(qtw.QDialog):
         original_scaled = self._scaled_pixmap(original_pixmap)
         processed_scaled = self._scaled_pixmap(processed_pixmap)
 
+        self._last_processed_result = qtg.QImage(processed)
+        self._last_preview_result = processed_scaled.toImage()
+        self._copy_image_resolution(processed, self._last_preview_result)
+
         self.left_label.setPixmap(original_scaled)
         self.left_label.resize(original_scaled.size())
         self.right_label.setPixmap(processed_scaled)
         self.right_label.resize(processed_scaled.size())
 
+        if self.rubberBand.isVisible() and not self.crop_rect.isNull():
+            self._show_crop_overlay(self.crop_rect)
+
     def get_result(self):
         return self._process()
+
+    def get_preview_result(self):
+        """Return the exact QImage currently represented by the right preview.
+
+        This preserves the user-visible preview dimensions/appearance when the
+        result is applied back to MyPixler instead of returning the unscaled
+        processor output and letting MyPixler rescale it differently.
+        """
+        if not self._last_preview_result.isNull():
+            return qtg.QImage(self._last_preview_result)
+
+        pixmap = self.right_label.pixmap()
+        if pixmap is not None and not pixmap.isNull():
+            result = pixmap.toImage()
+            if not self._last_processed_result.isNull():
+                self._copy_image_resolution(self._last_processed_result, result)
+            return result
+
+        return self.get_result()
+
+    @staticmethod
+    def _copy_image_resolution(source, target):
+        if source is None or target is None or source.isNull() or target.isNull():
+            return
+
+        target.setDotsPerMeterX(source.dotsPerMeterX())
+        target.setDotsPerMeterY(source.dotsPerMeterY())
+        target.setDevicePixelRatio(source.devicePixelRatio())
+
+        if hasattr(source, "colorSpace") and hasattr(target, "setColorSpace"):
+            try:
+                color_space = source.colorSpace()
+                if color_space.isValid():
+                    target.setColorSpace(color_space)
+            except Exception:
+                pass
 
     @staticmethod
     def _identity_processor(qimage, params):
@@ -207,6 +410,8 @@ class ImagePreviewDialog(qtw.QDialog):
 
         if isinstance(result, qtg.QPixmap):
             result = result.toImage()
+
+        self._copy_image_resolution(self.original, result)
         return result
 
     def _scaled_pixmap(self, pixmap):
