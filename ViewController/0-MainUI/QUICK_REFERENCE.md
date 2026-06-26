@@ -123,6 +123,11 @@ Model/Project/
 | Stylesheets | Stylesheets/ | Theme definitions |
 | Character Reference | ../3-ConductOCR/FROMVS ChrReference.txt | Character codes |
 
+### Release Font Update
+
+- Use `update_fonts.py` before a final release or after retraining the Tesseract font assets
+- The installer refreshes the project font path and then copies to the active user/system font locations when available
+
 ---
 
 ## Language Support
@@ -190,6 +195,8 @@ All applications use consistent patterns:
 7. **Correct**: MyVersifier → navigate verses, mark corrections
 8. **Resolve**: MyResolver → filter variants, update
 9. **Export**: MyWriter → save corrected text
+
+10. **Release**: MyTrainer → refresh fonts with `update_fonts.py` before final compilation
 
 ---
 
