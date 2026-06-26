@@ -1,0 +1,1719 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainUI</class>
+ <widget class="QMainWindow" name="MainUI">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1319</width>
+    <height>950</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>FROMVS</family>
+    <pointsize>11</pointsize>
+    <weight>50</weight>
+    <italic>false</italic>
+    <bold>false</bold>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>βϊϐλίον OCR</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../UI_Icons.qrc">
+    <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
+  </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+   <widget class="QTextEdit" name="OCRText">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>30</y>
+      <width>570</width>
+      <height>831</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>540</width>
+      <height>600</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>551</width>
+      <height>831</height>
+     </rect>
+    </property>
+    <widget class="QPushButton" name="MyScannerbutton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyScanner OCR scans project source images and produces working text..</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyWriterbutton">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string extracomment="This is a comment">MyWriter prepares completed text for export to external applications.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyGlypherbutton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>300</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyGlypher extracts glyphs from working images for the development of the project font used in the precise training of the OCR Engine.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyGrounderbutton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>120</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyGrounder ensures the integrity of the ground truth line files used by the OCR engine for training.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyReaderbutton">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Begin Here! MyReader reads in project source images.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionReader2.png</normaloff>:/Icons/Icons/BiblionReader2.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyLexerbutton">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyLexer consoladates the working tezt into a project lexicon.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionLexer.png</normaloff>:/Icons/Icons/BiblionLexer.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyResolverbutton">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyResolver resolves variations between the versified text and a known reference text. </string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyBoxerbutton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyBoxer further segments the workflow images into box files used in training the OCR engine.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyPixlerbutton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>390</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyPixler converts , segments ,cleans and prepares source images into workflow images.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyVersifierbutton">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>210</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyVersifier adds verses to unversed working text.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyTrainerbutton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>40</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MyTrainer tunes and retunes the OCR engine for precice recognition of the source images.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionTrainer1.png</normaloff>:/Icons/Icons/BiblionTrainer1.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyExplorerbutton">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>490</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Open current image</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="LatinTextLinesToolBar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Latin Text Lines Tool Bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Latin Text Lines Tool Bar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionSplit_Latin_Text_Lines_tb"/>
+   <addaction name="actionRename_Latin_Text_Lines_tb"/>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1319</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuPre_Process">
+    <property name="title">
+     <string>Pre Process</string>
+    </property>
+    <widget class="QMenu" name="menuExtract_pdf">
+     <property name="title">
+      <string>Source</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+     </property>
+     <addaction name="actionextract_pdf_tb"/>
+     <addaction name="separator"/>
+     <addaction name="actionpdf_for_tiff_tb"/>
+     <addaction name="actionpdf_to_tiff_tb"/>
+     <addaction name="actiontiff_to_mono_tb"/>
+     <addaction name="actionmono_to_png_tb"/>
+     <addaction name="actiondeskew_mono"/>
+    </widget>
+    <widget class="QMenu" name="menuPrepare">
+     <property name="title">
+      <string>Languages</string>
+     </property>
+     <widget class="QMenu" name="menuGreekDR">
+      <property name="title">
+       <string>Greek</string>
+      </property>
+      <addaction name="actionConvert_Greek_tiff_To_png"/>
+      <addaction name="actionDeskewGreek_tiff_tb"/>
+      <addaction name="actionResizeGreek_png_tb"/>
+     </widget>
+     <widget class="QMenu" name="menuLatinDR">
+      <property name="title">
+       <string>Latin</string>
+      </property>
+      <addaction name="actionConvert_Latin_tiff_To_png"/>
+      <addaction name="actionDeskewLatin_tiff_tb"/>
+      <addaction name="actionResizeLatin_png_tb"/>
+     </widget>
+     <addaction name="separator"/>
+     <addaction name="actionCrop_Languages_tb"/>
+     <addaction name="actionManual_Crop_Image_tb"/>
+     <addaction name="actionHebrew"/>
+     <addaction name="menuGreekDR"/>
+     <addaction name="menuLatinDR"/>
+     <addaction name="actionEnglishh"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="menuExtract_pdf"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="menuPrepare"/>
+    <addaction name="actionMy_Reader"/>
+    <addaction name="actionMy_Scanner"/>
+    <addaction name="actionMy_Pixler"/>
+    <addaction name="actionMy_Glypher"/>
+   </widget>
+   <widget class="QMenu" name="menuPost_Process">
+    <property name="title">
+     <string>Post Process</string>
+    </property>
+    <addaction name="actionDB_Browser_for_SQLite"/>
+    <addaction name="actionCreate_e_Sword_Bible_Module"/>
+    <addaction name="actionCreate_theWord_Bible_Module"/>
+    <addaction name="actionMy_Writer"/>
+   </widget>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>Project</string>
+    </property>
+    <addaction name="actionExplorer"/>
+    <addaction name="actionNew"/>
+    <addaction name="actionEdit"/>
+    <addaction name="actionPrefernces"/>
+   </widget>
+   <widget class="QMenu" name="menuProcess">
+    <property name="title">
+     <string>Process</string>
+    </property>
+    <addaction name="actionMy_Boxer"/>
+    <addaction name="actionMy_Versifier"/>
+    <addaction name="actionMy_Resolver"/>
+    <addaction name="actionMy_Lexer"/>
+   </widget>
+   <widget class="QMenu" name="menuTraining">
+    <property name="title">
+     <string>Training</string>
+    </property>
+    <addaction name="actionMy_Grounder"/>
+    <addaction name="actionMy_Trainer"/>
+   </widget>
+   <addaction name="menuProject"/>
+   <addaction name="menuPre_Process"/>
+   <addaction name="menuProcess"/>
+   <addaction name="menuTraining"/>
+   <addaction name="menuPost_Process"/>
+  </widget>
+  <action name="actionpdf_to_tiff">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Icons/Icons/ocr2.png</normaloff>:/Icons/Icons/ocr2.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionmove_pdf_for_tiff">
+   <property name="text">
+    <string>pdf to tiff</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono">
+   <property name="text">
+    <string>tiff to mono</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png">
+   <property name="text">
+    <string>mono to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionGreek">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_2">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff">
+   <property name="text">
+    <string>pdf for tiff</string>
+   </property>
+  </action>
+  <action name="actionpdf_for_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf4tiff.png</normaloff>:/Icons/Icons/pdf4tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf For tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage extracted pdf pages FOR tif conversion</string>
+   </property>
+   <property name="statusTip">
+    <string>Staging extracted pdf pages...</string>
+   </property>
+  </action>
+  <action name="actionpdf_to_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf2tiff.png</normaloff>:/Icons/Icons/pdf2tiff.png</iconset>
+   </property>
+   <property name="text">
+    <string>pdf To tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert staged pdf pages TO tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting staged pdf pages...</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_mono_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>tiff indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert tif pages TO black&amp;white indexed</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting tif pages to black&amp;white indexed...</string>
+   </property>
+  </action>
+  <action name="actionmono_to_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/png-file.png</normaloff>:/Icons/Icons/png-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>png indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert indexed tif pages TO png</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting indexed tif pages to png pages...</string>
+   </property>
+  </action>
+  <action name="actionLatin">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_3">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_4">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewGreek_tiff_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Greek tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Deskew Greek tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing Greek tif pages...</string>
+   </property>
+  </action>
+  <action name="actiontiff_to_png_5">
+   <property name="text">
+    <string>tiff to png</string>
+   </property>
+  </action>
+  <action name="actionDeskewLatin_tiff_tb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew Latin tif pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing Latin tif pages...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionResizeGreek_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Greek png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Resizing Greek png pages...</string>
+   </property>
+  </action>
+  <action name="actionResizeLatin_png_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize Latin png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Resizing Latin png pages</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCrop_Languages_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Crop Languages</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto crop language pages into separate tif files</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto cropping language pages...</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionextract_pdf_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/pdf-extract1.png</normaloff>:/Icons/Icons/pdf-extract1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Extract pdf</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract pdf pages from pdf source document</string>
+   </property>
+   <property name="statusTip">
+    <string>Extracting pdf pages...</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth">
+   <property name="text">
+    <string>tiff for Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCrop">
+   <property name="text">
+    <string>Crop to tiff lines</string>
+   </property>
+  </action>
+  <action name="actiontiff_for_Ground_Truth_2">
+   <property name="text">
+    <string>Move tiff lines</string>
+   </property>
+  </action>
+  <action name="actionSplit">
+   <property name="text">
+    <string>Split text lines</string>
+   </property>
+  </action>
+  <action name="actionRename_tiff_lines">
+   <property name="text">
+    <string>Rename tiff lines</string>
+   </property>
+  </action>
+  <action name="actionRename_text_lines">
+   <property name="text">
+    <string>Rename text lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionGreek_Wordlist_2">
+   <property name="text">
+    <string>Greek Wordlist</string>
+   </property>
+  </action>
+  <action name="actionLatin_Wordlist">
+   <property name="text">
+    <string>Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionText_Lines">
+   <property name="text">
+    <string>Text Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_2">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_2">
+   <property name="text">
+    <string>Update Wordlist</string>
+   </property>
+  </action>
+  <action name="actionCorrect_OCR_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ocr3.png</normaloff>:/Icons/Icons/ocr3.png</iconset>
+   </property>
+   <property name="text">
+    <string>OCR Image</string>
+   </property>
+   <property name="toolTip">
+    <string>OCR current image</string>
+   </property>
+   <property name="statusTip">
+    <string>Performing OCR on current image...</string>
+   </property>
+  </action>
+  <action name="actionVersify_Text">
+   <property name="text">
+    <string>Versify Text</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Verses">
+   <property name="text">
+    <string>Update Verses</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Words_Post">
+   <property name="text">
+    <string>Update Words</string>
+   </property>
+  </action>
+  <action name="actionNormalize">
+   <property name="text">
+    <string>Normalize</string>
+   </property>
+  </action>
+  <action name="actionLower_Case">
+   <property name="text">
+    <string>Lower Case</string>
+   </property>
+  </action>
+  <action name="actionRemove_Diacritics">
+   <property name="text">
+    <string>Remove Diacritics</string>
+   </property>
+  </action>
+  <action name="actionAlign_Strongs">
+   <property name="text">
+    <string>Align Strongs+RMAC</string>
+   </property>
+  </action>
+  <action name="actionAlign_Lemmas">
+   <property name="text">
+    <string>Align Lemmas</string>
+   </property>
+  </action>
+  <action name="actionAlign_English">
+   <property name="text">
+    <string>Align English</string>
+   </property>
+  </action>
+  <action name="actionVariants">
+   <property name="text">
+    <string>Resolve Variants</string>
+   </property>
+  </action>
+  <action name="actionTrain_Tesseract_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trainOCR4.png</normaloff>:/Icons/Icons/trainOCR4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Train Tesseract</string>
+   </property>
+   <property name="toolTip">
+    <string>Train Tesseract OCR with current Ground Truth</string>
+   </property>
+   <property name="statusTip">
+    <string>Training Tesseract OCR with current Ground Truth...</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/ground-truth1.png</normaloff>:/Icons/Icons/ground-truth1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Validate Ground Truth</string>
+   </property>
+   <property name="toolTip">
+    <string>Validate current Ground Truth image|text</string>
+   </property>
+   <property name="statusTip">
+    <string>Validating current Ground Truth image|text pairs...</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/update-greek-wordlist.png</normaloff>:/Icons/Icons/update-greek-wordlist.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Greek Wordlist</string>
+   </property>
+   <property name="toolTip">
+    <string>Update Greek Wordlist for OCR Training</string>
+   </property>
+   <property name="statusTip">
+    <string>Upadting Greek wordlist...</string>
+   </property>
+  </action>
+  <action name="actionAutoCrop_Greek_to_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Greek To tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto cropping Greek tif lines....</string>
+   </property>
+  </action>
+  <action name="actionRename_Greek_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Greek tif lines...</string>
+   </property>
+  </action>
+  <action name="actionMove_Greek_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Greek tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Moving Greek tif lines...</string>
+   </property>
+  </action>
+  <action name="actionSplitGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Greek Pages To Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Splitting Greek pages to text lines...</string>
+   </property>
+  </action>
+  <action name="actionRenameGreek_text_lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Greek Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Greek text lines...</string>
+   </property>
+  </action>
+  <action name="actionImage_Lines_3">
+   <property name="text">
+    <string>Image Lines</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_menu">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Wordlist_menu">
+   <property name="text">
+    <string>Update Latin Wordlist</string>
+   </property>
+  </action>
+  <action name="actionAutoCrop_Latin_To_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="iconText">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="toolTip">
+    <string>Crop Latin To tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Auto croping Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRename_Latin_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionMove_Latin_tif_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Latin tif Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Moving Latin tif lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionSplit_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Latin Pages To Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Splitting Latin pages to text lines...</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRename_Latin_Text_Lines_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Latin Text Lines</string>
+   </property>
+   <property name="statusTip">
+    <string>Renaming Latin text lines...</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actiondeskew_mono">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew indexed</string>
+   </property>
+   <property name="toolTip">
+    <string>Transform indexed tif pages To deskewed tif and png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Deskewing indexed tif pages...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Image">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+  </action>
+  <action name="actionVerse_Correction">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/versify.png</normaloff>:/Icons/Icons/versify.png</iconset>
+   </property>
+   <property name="text">
+    <string>Verse Correction</string>
+   </property>
+   <property name="toolTip">
+    <string>Book Chapter:Verse Text Assignment</string>
+   </property>
+   <property name="statusTip">
+    <string>Assigning Book Chapter:Verse to text lines</string>
+   </property>
+  </action>
+  <action name="actionConvert_Greek_tiff_To_png">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2png-greek.png</normaloff>:/Icons/Icons/tiff2png-greek.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Greek tif To png</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting Greek tif pages to png pages</string>
+   </property>
+  </action>
+  <action name="actionConvert_Latin_tiff_To_png">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2png-latin.png</normaloff>:/Icons/Icons/tiff2png-latin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Latin tif To png</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert Latin tif pages To png pages</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting Latin tif pages To png pages</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionExtract_Glyphs">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trace1.png</normaloff>:/Icons/Icons/trace1.png</iconset>
+   </property>
+   <property name="text">
+    <string>GlyphTracer</string>
+   </property>
+   <property name="toolTip">
+    <string>Extract and trace bitmap glyphs with GlyphTracer</string>
+   </property>
+   <property name="statusTip">
+    <string>Extracting and trace bitmap glyphs with GlyphTracer...</string>
+   </property>
+  </action>
+  <action name="actionLine_tif_to_bmp">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/tiff2bmp.png</normaloff>:/Icons/Icons/tiff2bmp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert tif To bmp</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert current tif image to bmp</string>
+   </property>
+   <property name="statusTip">
+    <string>Converting current tif image to bmp...</string>
+   </property>
+  </action>
+  <action name="actionFontForge">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+   </property>
+   <property name="text">
+    <string>FontForge</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit current GlyphTracer sfd file in FontForge</string>
+   </property>
+   <property name="statusTip">
+    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+   </property>
+  </action>
+  <action name="actionPrefernces">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionOpen_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Text</string>
+   </property>
+  </action>
+  <action name="actionSave_Image">
+   <property name="text">
+    <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Image">
+   <property name="text">
+    <string>Save As Image</string>
+   </property>
+  </action>
+  <action name="actionSave_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Text</string>
+   </property>
+  </action>
+  <action name="actionSave_As_Text">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save As Text</string>
+   </property>
+  </action>
+  <action name="actionConvert_Image_s">
+   <property name="text">
+    <string>Convert Image(s)</string>
+   </property>
+  </action>
+  <action name="actionReview_Ground_Truth_3">
+   <property name="text">
+    <string>Review Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionHebrew">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionHebrew_2">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Hebrew_Wordlist">
+   <property name="text">
+    <string>Update Hebrew Wordlist</string>
+   </property>
+  </action>
+  <action name="actionHebrew_3">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionOCR_Image">
+   <property name="text">
+    <string>OCR Image</string>
+   </property>
+  </action>
+  <action name="actionSelect_Image">
+   <property name="text">
+    <string>Select Image</string>
+   </property>
+  </action>
+  <action name="actionGreek_2">
+   <property name="text">
+    <string>Greek</string>
+   </property>
+  </action>
+  <action name="actionHebrew_4">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionLatin_2">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionSelect_Language_Model">
+   <property name="text">
+    <string>Select Language Model</string>
+   </property>
+  </action>
+  <action name="actionSelect_Fonts">
+   <property name="text">
+    <string>Select Fonts</string>
+   </property>
+  </action>
+  <action name="actionany">
+   <property name="text">
+    <string>any</string>
+   </property>
+  </action>
+  <action name="actionAny">
+   <property name="text">
+    <string>Any</string>
+   </property>
+  </action>
+  <action name="actionStage_Ground_Truth">
+   <property name="text">
+    <string>Stage Ground Truth</string>
+   </property>
+  </action>
+  <action name="actionCreate_e_Sword_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
+   </property>
+   <property name="text">
+    <string>e-Sword Bible Module</string>
+   </property>
+  </action>
+  <action name="actionCreate_theWord_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
+   </property>
+   <property name="text">
+    <string>theWord Bible Module</string>
+   </property>
+  </action>
+  <action name="actionEnglish">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglishh">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglish_2">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionEnglish_3">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionOnline">
+   <property name="text">
+    <string>Online</string>
+   </property>
+  </action>
+  <action name="actionManual_Crop_Image_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/image-crop.png</normaloff>:/Icons/Icons/image-crop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manual Crop</string>
+   </property>
+   <property name="toolTip">
+    <string>Manually crop current tif image</string>
+   </property>
+   <property name="statusTip">
+    <string>Manually cropping current tif image...</string>
+   </property>
+  </action>
+  <action name="actionEdit_Image_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gimp Image Editor</string>
+   </property>
+   <property name="statusTip">
+    <string>Editing image in Gimp...</string>
+   </property>
+  </action>
+  <action name="actionLibreOffice_Writer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-writer.png</normaloff>:/Icons/Icons/libreoffice-writer.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibreOffice Writer</string>
+   </property>
+  </action>
+  <action name="actionLibreOffice_Calc">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
+   </property>
+   <property name="text">
+    <string>LibreOffice Calc</string>
+   </property>
+  </action>
+  <action name="actionDB_Browser_for_SQLite">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/server.png</normaloff>:/Icons/Icons/server.png</iconset>
+   </property>
+   <property name="text">
+    <string>DB Browser for SQLite</string>
+   </property>
+  </action>
+  <action name="actionFind_and_Replace">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find and Replace</string>
+   </property>
+  </action>
+  <action name="actionInstall_Font">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
+   </property>
+   <property name="text">
+    <string>Install Font</string>
+   </property>
+  </action>
+  <action name="actionToggle_Greek_Toolbars">
+   <property name="text">
+    <string>Toggle Greek Toolbars</string>
+   </property>
+  </action>
+  <action name="actionToggle_Latin_Toolbars">
+   <property name="text">
+    <string>Toggle Latin Toolbars</string>
+   </property>
+  </action>
+  <action name="actionPrepare_Text">
+   <property name="text">
+    <string>Prepare Text</string>
+   </property>
+  </action>
+  <action name="actionEnglish_4">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
+  <action name="actionLatin_3">
+   <property name="text">
+    <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionHebrew_5">
+   <property name="text">
+    <string>Hebrew</string>
+   </property>
+  </action>
+  <action name="actionGimp">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gimp</string>
+   </property>
+  </action>
+  <action name="actionLibre_Office_Writer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-writer.png</normaloff>:/Icons/Icons/libreoffice-writer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Libre Office Writer</string>
+   </property>
+  </action>
+  <action name="actionLibre_Office_Calc">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
+   </property>
+   <property name="text">
+    <string>Libre Office Calc</string>
+   </property>
+  </action>
+  <action name="actionFont_Forge">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+   </property>
+   <property name="text">
+    <string>Font Forge</string>
+   </property>
+  </action>
+  <action name="actionDeveloper">
+   <property name="text">
+    <string>Developer</string>
+   </property>
+  </action>
+  <action name="actionAcademic">
+   <property name="text">
+    <string>Academic</string>
+   </property>
+  </action>
+  <action name="actionMistry">
+   <property name="text">
+    <string>Ministry</string>
+   </property>
+  </action>
+  <action name="actionPixler_Image_Editor">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/preview.png</normaloff>:/Icons/Icons/preview.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pixer Image Editor</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionExplorer">
+   <property name="text">
+    <string>Explorer</string>
+   </property>
+  </action>
+  <action name="actionMy_Reader">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionReader2.png</normaloff>:/Icons/Icons/BiblionReader2.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Reader</string>
+   </property>
+  </action>
+  <action name="actionMy_Scanner">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Scanner</string>
+   </property>
+  </action>
+  <action name="actionMy_Pixler">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Pixler</string>
+   </property>
+  </action>
+  <action name="actionMy_Glypher">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Glypher</string>
+   </property>
+  </action>
+  <action name="actionMy_Boxer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Boxer</string>
+   </property>
+  </action>
+  <action name="actionMy_Versifier">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Versifier</string>
+   </property>
+  </action>
+  <action name="actionMy_Resolver">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Resolver</string>
+   </property>
+  </action>
+  <action name="actionMy_Lexer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLexer.png</normaloff>:/Icons/Icons/BiblionLexer.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Lexer</string>
+   </property>
+  </action>
+  <action name="actionMy_Grounder">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Grounder</string>
+   </property>
+  </action>
+  <action name="actionMy_Trainer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionTrainer1.png</normaloff>:/Icons/Icons/BiblionTrainer1.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Trainer</string>
+   </property>
+  </action>
+  <action name="actionMy_Writer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Writer</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../UI_Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -159,10 +159,8 @@ class MainWindow(qtw.QMainWindow):
         self.ui = Ui_Scanner()
         self.ui.setupUi(self)
         self.session_manager = SessionManager()
-
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyScanner')
-
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
         self.ui.actionPixler_Image_Editor.triggered.connect(self.OpenWithMyPixler)
         self.ui.actionVersifier.triggered.connect(self.OpenWithMyVersifier)
@@ -223,11 +221,12 @@ class MainWindow(qtw.QMainWindow):
         
         # Show the Main user interface
         self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
-        registered_font = self._register_application_font('FROMVS')
-        font = qtg.QFont(registered_font)
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
         font.setPointSize(20)
         self.ui.OCRDocument.setDefaultFont(font)
-        self.ui.OCRText.setFont(font)
+        
+        self.ui.OCRDocument.setDefaultFont(font)
         self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
         self.ui.OCRTextFormat = qtg.QTextFormat()
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
@@ -863,22 +862,24 @@ class MainWindow(qtw.QMainWindow):
             return
 
         self.txtpath = os.path.normpath(os.path.abspath(txtfilename))
+        file = qtc.QFile(self.txtpath)
         filename = os.path.basename(self.txtpath)
         self.txtdir = os.path.dirname(self.txtpath)
         self.ui.TextLE.setText(filename)
 
-        try:
-            with open(self.txtpath, 'r', encoding='utf-8') as fh:
-                text = fh.read()
-        except UnicodeDecodeError:
-            with open(self.txtpath, 'r', encoding='latin-1', errors='replace') as fh:
-                text = fh.read()
-
-        self.ui.OCRText.clear()
-        if self.txtpath.lower().endswith('.txt'):
-            self.ui.OCRText.insertPlainText(text)
+        if file.open(qtc.QIODevice.ReadOnly | qtc.QIODevice.Text):
+            stream = qtc.QTextStream(file)
+            text = stream.readAll()
+            info = qtc.QFileInfo(self.txtpath)
+            self.ui.OCRText.clear()
+            if info.completeSuffix() == 'txt':
+                self.ui.OCRText.insertPlainText(text)
+            else:
+                self.ui.OCRText.setPlainText(text)
+            file.close()
         else:
-            self.ui.OCRText.setPlainText(text)
+            print(f"Unable to open text file: {self.txtpath}")
+            return
 
         # update font to selection and size       
         self.on_font_update()
@@ -890,30 +891,6 @@ class MainWindow(qtw.QMainWindow):
             'self.txtpath': self.txtpath,
             'self.txtdir': self.txtdir,
         })
-
-    def _register_application_font(self, font_name):
-        if not hasattr(self, '_font_cache'):
-            self._font_cache = {}
-        cache_key = font_name.lower() if font_name else ''
-        if cache_key in self._font_cache:
-            return self._font_cache[cache_key]
-
-        fontpath = font_name
-        if cache_key == 'fromvs':
-            fontpath = os.path.join(script_dir, 'fonts', 'FROMVS.ttf')
-        if fontpath and not os.path.isabs(fontpath):
-            fontpath = os.path.normpath(fontpath)
-
-        if fontpath and os.path.exists(fontpath):
-            font_id = qtg.QFontDatabase.addApplicationFont(fontpath)
-            if font_id != -1:
-                families = qtg.QFontDatabase.applicationFontFamilies(font_id)
-                if families:
-                    self._font_cache[cache_key] = families[0]
-                    return families[0]
-
-        self._font_cache[cache_key] = font_name
-        return font_name
 
         self.txtfileList = []
         if self.txtdir:
@@ -1135,27 +1112,25 @@ class MainWindow(qtw.QMainWindow):
     
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
-            self.ui.centralwidget, 'Save Raw text file', self.txtdir,
+            self.ui.centralwidget, 'Save Raw text file',self.txtdir,
             'Text files (*.txt)')[0]
-        if not path:
-            return
-        with open(path, 'w', encoding='utf-8') as file:
+        with open(path, 'w') as file:
             my_RawText = self.ui.OCRDocument.toPlainText()
             file.write(my_RawText)
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
+        file.close()
         
     def SaveAsCorrectedTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save Corrected text file', self.txtdir,
             'Text files (*.txt)')[0]
-        if not path:
-            return
-        with open(path, 'w', encoding='utf-8') as file:
+        with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()
             file.write(my_CorrectedText)
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
+        file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
         
@@ -1176,13 +1151,12 @@ class MainWindow(qtw.QMainWindow):
                 self.ui.centralwidget, 'Save Corrected text file', '',
                 'Text files (*.txt)')[0]
             filename = os.path.basename(path)
-        if not path:
-            return
-        with open(path, 'w', encoding='utf-8') as file:
+        with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()
             file.write(my_CorrectedText)
         
         self.ui.TextLE.setText(filename)
+        file.close()
 
     def get_zoom(self):
         self.ui.Zoomslider.setEnabled(True)
