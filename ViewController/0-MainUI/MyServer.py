@@ -1,23 +1,48 @@
+print("RUNNING:", __file__)
+# See dev_notebook.md for architecture + debugging notes
 #print(len(locals()))
-
+# Integrated with ChatGPT:
+# OCR Preprocess Tool (OpenCV morphology + tiffcapture bridge)
+# Next steps: OCR preview, multi-page TIFF, pipeline integration
 # Python imports 
 import sys
 import os
 import re
 import shlex
 import subprocess
+import tempfile
+from subprocess import Popen, PIPE, CalledProcessError
 #import glob
 import shutil
 import json
-
+import time
+import hashlib
+from enum import Enum
+# Path configuration and directory setup
 script_dir = os.path.dirname(os.path.realpath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
+project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+
+# Define directories
+model_dir = os.path.join(project_root, "Model")
+data_dir = os.path.join(model_dir, "Data")
+image_dir = os.path.join(model_dir, "Images")
+text_dir = os.path.join(model_dir, "Text")
+train_dir = os.path.join(model_dir, "Training")
+session_dir = os.path.join(data_dir, "json")
+
+# Add project root to path
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+# Debug (optional toggle)
+DEBUG_PATHS = True
+if DEBUG_PATHS:
+    print(f"project_root: {project_root}")
+    print(f"script_dir: {script_dir}")
+
+    
 from SessionManager import SessionManager
+from ocr_preprocess_tool import OCRPreprocessTool
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
 import tiffcapture
@@ -25,26 +50,32 @@ import qimage2ndarray
 from queue import Queue
 from ext import mainfind
 from HelpSystem import add_help_menu
+# ProjectCreationEngine and EventBus are defined below in this module.
+# Do not import MainWindow from MainUI.py; that file only contains the generated Ui_MainUI class.
 # PyQt5 imports
+
 from PyQt5 import QtWidgets as qtw
-from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5 import QtGui as qtg
+from PyQt5.QtCore import Qt
+
 # Custom imports
 from MyServerUI import Ui_MainUI
 from PreProcess import PreProcess as pp
 import ChrReference as chrref
-import MyVersifier as versifier
+import MyVersifier as versify
 import MyBoxer as boxer
 import MyScanner as scanner
 import MyExplorer as explorer
+import MyGrounder as gtr
+import ImageLoadWorker
 from Training import Train as tr
+from TiffStackWorker import TiffStackWorker
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
 from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
 from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
 from Dialogs.tif2monoDialog import Ui_tif2monoDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
 from Dialogs.mono2pngDialog import Ui_mono2pngDialog
 from Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
 from Dialogs.crop_languagesDialog import Ui_crop_languagesDialog
@@ -63,254 +94,429 @@ from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 
 #import MyPixler as pixler
-import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
+#import CropTif as croptif
+#import QtCropImage as cropimg
+from ImagePreviewDialog import ImagePreviewDialog
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
-#import Qt5GroundTruthReview as gtr
-#import Qt5VersifyText as versify
-#import MyWriter as writer
-#import MyPixler as pixler
-#import Qt5ResolveVariants as resolver
+def configure_tesseract():
+    
+    import pytesseract
+    import shutil
+    import platform
+    import os
 
-#print(len(locals()))
+    if shutil.which("tesseract"):
+        return
 
-# Define a stream, custom class, that reports data written to it, with a Qt signal
-'''Deprecated => class Streamer(qtc.QObject):
+    if platform.system() == "Windows":
+        possible_paths = [
+            r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+            r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
+        ]
 
-    textWritten = qtc.pyqtSignal(str)
+        for path in possible_paths:
+            if os.path.exists(path):
+                pytesseract.pytesseract.tesseract_cmd = path
+                print(f"Using Tesseract at: {path}")
+                return
 
-    def write(self, text):
-        self.textWritten.emit(str(text))'''
+    print("Ã¢Å¡Â Ã¯Â¸Â Tesseract not found.")
+
+
 
 # The new Stream Object which replaces the default stream associated with sys.stdout
 # This object just puts data in a queue!
-class WriteStream(object):
-    def __init__(self,queue):
-        self.queue = queue
+# class WriteStream(object):
+#     def __init__(self,queue):
+#         self.queue = queue
 
-    def write(self, text):
-        self.queue.put(text)
+#     def write(self, text):
+#         self.queue.put(text)
 
-    def flush(self):
-        """
-        Stream flush implementation
-        """
-        pass
+#     def flush(self):
+#         """
+#         Stream flush implementation
+#         """
+#         pass
     
 # A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
 # It blocks until data is available, and once it has got something from the queue, it sends
 # it to the "MainThread" by emitting a Qt Signal 
-class ThreadConsoleTextQueueReceiver(qtc.QObject):
+# class ThreadConsoleTextQueueReceiver(qtc.QObject):
     
-    queue_element_received_signal = qtc.pyqtSignal(str)
+#     queue_element_received_signal = qtc.pyqtSignal(str)
 
-    def __init__(self, q: Queue, *args, **kwargs):
-        qtc.QObject.__init__(self, *args, **kwargs)
-        self.queue = q
+#     def __init__(self, q: Queue, *args, **kwargs):
+#         qtc.QObject.__init__(self, *args, **kwargs)
+#         self.queue = q
 
-    @qtc.pyqtSlot()
-    def run(self):
-        self.queue_element_received_signal.emit('---> Console text queue reception Started <---\n')
-        while True:
-            text = self.queue.get()
-            self.queue_element_received_signal.emit(text)
+#     @qtc.pyqtSlot()
+#     def run(self):
+#         self.queue_element_received_signal.emit('---> Console text queue reception Started <---\n')
+#         while True:
+#             text = self.queue.get()
+#             self.queue_element_received_signal.emit(text)
 
-    @qtc.pyqtSlot()
-    def finished(self):
-        self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
-
-'''
-class Logging(qtc.QObject):
-    def setup_logging(log_prefix):
-        global __is_setup_done
-
-        if __is_setup_done:
-            pass
-        else:
-            __log_file_name = "{}-{}_log_file.txt".format(log_prefix,
-                                                        datetime.datetime.utcnow().isoformat().replace(":", "-"))
-
-            __log_format = '%(asctime)s - %(name)-30s - %(levelname)s - %(message)s'
-            __console_date_format = '%Y-%m-%d %H:%M:%S'
-            __file_date_format = '%Y-%m-%d %H-%M-%S'
-
-            root = logging.getLogger()
-            root.setLevel(logging.DEBUG)
-
-            console_formatter = logging.Formatter(__log_format, __console_date_format)
-
-            file_formatter = logging.Formatter(__log_format, __file_date_format)
-            file_handler = logging.FileHandler(__log_file_name, mode='a', delay=True)
-
-            file_handler.setLevel(logging.DEBUG)
-            file_handler.setFormatter(file_formatter)
-            root.addHandler(file_handler)
-
-            tqdm_handler = TqdmLoggingHandler()
-            tqdm_handler.setLevel(logging.DEBUG)
-            tqdm_handler.setFormatter(console_formatter)
-            root.addHandler(tqdm_handler)
-
-            __is_setup_done = True
-
-class TqdmLoggingHandler(logging.StreamHandler):
-
-    def __init__(self, level=logging.NOTSET):
-        logging.StreamHandler.__init__(self)
-
-    def emit(self, record):
-        msg = self.format(record)
-        tqdm.write(msg)
-        # from https://stackoverflow.com/questions/38543506/change-logging-print-function-to-tqdm-write-so-logging-doesnt-interfere-wit/38739634#38739634
-        self.flush()
-'''
+#     @qtc.pyqtSlot()
+#     def finished(self):
+#         self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
 
 class MainWindow(qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
-        # load the pre-compiled QtDesigner Ui_MainUI user interface
+
+        configure_tesseract()
+
+        # -------------------------
+        # Core State
+        # -------------------------
+        self.imgfileList = []
+        self.sorted_imgfilelist = []
+        self.current_img_index = -1
+
+        self._thread = None
+        self._worker = None
+
+        # -------------------------
+        # UI Setup
+        # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+
         self.session_manager = SessionManager()
-        #Implement Co-pilot Help system
+
+        # -------------------------
+        # Progress Bar (FIXED)
+        # -------------------------
+        self.progress_bar = qtw.QProgressBar()
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
+        self.progress_bar.setVisible(False)
+        self.statusBar().addPermanentWidget(self.progress_bar)
+
+        # -------------------------
+        # Help System
+        # -------------------------
         add_help_menu(self, 'MyServer')
+
+        # -------------------------
+        # Actions / Signals
+        # -------------------------
+        self.ui.actionNewProject.triggered.connect(self.on_new_project_clicked)
         
-        # extended slots code
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
-        self.ui.actionVerse_Correction.triggered.connect(self.actionVerse_Correction)
-        
-        self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)      
+        self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
         self.ui.actionpdf_for_tiff_tb.triggered.connect(self.actionpdf_for_tiff)
         self.ui.actionpdf_to_tiff_tb.triggered.connect(self.actionpdf_to_tiff)
         self.ui.actiontiff_to_mono_tb.triggered.connect(self.actiontiff_to_mono)
         self.ui.actiondeskew_mono.triggered.connect(self.actiondeskew_mono)
         self.ui.actionmono_to_png_tb.triggered.connect(self.actionmono_to_png)
         self.ui.actionCrop_Languages_tb.triggered.connect(self.actionCrop_Languages)
-        
-        self.ui.actionManual_Crop_Image_tb.triggered.connect(self.actionCropImage)
-        
-        self.ui.actionEdit_Image_tb.triggered.connect(self.actionGimpEdit) 
+        #self.ui.actionManual_Crop_Image_tb.triggered.connect(self.actionCropImage)
+
         self.ui.actionConvert_Greek_tiff_To_png.triggered.connect(self.actionConvert_Greek_tiff_To_png)
         self.ui.actionDeskewGreek_tiff_tb.triggered.connect(self.actionDeskewGreek_tiff)
         self.ui.actionResizeGreek_png_tb.triggered.connect(self.actionResizeGreek_png)
+
         self.ui.actionConvert_Latin_tiff_To_png.triggered.connect(self.actionConvert_Latin_tiff_To_png)
         self.ui.actionDeskewLatin_tiff_tb.triggered.connect(self.actionDeskewLatin_tiff)
         self.ui.actionResizeLatin_png_tb.triggered.connect(self.actionResizeLatin_png)
-        
+
         self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
         self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
-        
+
         self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
         self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
         self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
-        
+
         self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
         self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
-        
+
         self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.actionSplit_Latin_Text_Lines)
         self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.actionRename_Latin_Text_Lines)
-        
-        self.ui.actionReview_Ground_Truth_tb.triggered.connect(self.actionReview_Ground_Truth)
+
         self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
-        self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
+
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
+
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
 
-        #self.ui.OpenImageFilebutton.clicked.connect(self.OpenImageFileDialog)
+        # -------------------------
+        # Buttons / Navigation
+        # -------------------------
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
-        #self.ui.Gimpbutton.clicked.connect(self.actionGimpEdit)
-        self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
+
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
         self.ui.BothPrevButton.clicked.connect(self.prevImage)
         self.ui.BothPrevButton.clicked.connect(self.prevText)
         self.ui.BothNextButton.clicked.connect(self.nextImage)
         self.ui.BothNextButton.clicked.connect(self.nextText)
+
         self.ui.PrevImgButton.clicked.connect(self.prevImage)
         self.ui.NextImgButton.clicked.connect(self.nextImage)
         self.ui.PrevTxtButton.clicked.connect(self.prevText)
         self.ui.NextTxtButton.clicked.connect(self.nextText)
+
+        # -------------------------
+        # Zoom
+        # -------------------------
         self.ui.Zoombutton.clicked.connect(self.get_zoom)
         self.ui.ZoomComboBox.currentTextChanged.connect(self.on_zoom)
         self.ui.Zoomslider.valueChanged.connect(self.on_zoomslider)
         self.ui.Zoomslider.sliderReleased.connect(self.DisableZoomSlider)
         self.ui.Zoomslider.hide()
-        
-        self.ui.Cropbutton.clicked.connect(self.actionCropImage)
-        self.ui.Deskewbutton.clicked.connect(self.actionDeskewImage)
 
-        self.ui.OCRbutton.clicked.connect(self.GetRawOCRtext)       
+        # -------------------------
+        # Image Tools
+        # -------------------------
+        #self.ui.Cropbutton.clicked.connect(self.actionCropImage)
+        #self.ui.Deskewbutton.clicked.connect(self.actionDeskewImage)
+
+        # -------------------------
+        # OCR
+        # -------------------------
+        self.ui.OCRbutton.clicked.connect(self.GetRawOCRtext)
         self.ui.LHDialogtbutton.clicked.connect(self.GetLineSpacing)
         self.ui.LHslider.valueChanged.connect(self.SetLineSpacing)
         self.ui.LHslider.sliderReleased.connect(self.DisableLHSlider)
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
-        #self.ui.EditCorrectedTextbutton.clicked.connect(self.OpenTextFileDialog)
+
+        # -------------------------
+        # Text Editing
+        # -------------------------
         self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
         self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)         
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+
+        # -------------------------
+        # External Modules
+        # -------------------------
+        #self.ui.Calcbutton.clicked.connect(self.OpenWithCalc)
         
-        self.ui.Calcbutton.clicked.connect(self.OpenWithCalc)
-        self.ui.Writerbutton.clicked.connect(self.OpenWithWriter)
-        self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
+        # Menu Modules
+        self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
+        self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
+        self.ui.actionMyVersifier.triggered.connect(lambda: self.open_module("MyVersifier"))
+        self.ui.actionMyResolver.triggered.connect(lambda: self.open_module("MyResolver"))
+        self.ui.actionMyLexer.triggered.connect(lambda: self.open_module("MyLexer"))
+        self.ui.actionMyGrounder.triggered.connect(lambda: self.open_module("MyGrounder"))
+        self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
+        
+        # Button Modules
+        self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
+        self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
+
+        # -------------------------
+        # Misc UI
+        # -------------------------
         self.ui.reloadImagebutton.clicked.connect(self.ReloadImage)
         self.ui.reloadTextbutton.clicked.connect(self.ReloadText)
+
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
-        self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
 
+        self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
         self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
 
-        # UI and slots code ends here.
-        
-        # Show the Main user interface
+        # -------------------------
+        # OCR Document Setup
+        # -------------------------
         self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
-        font = qtg.QFont()
-        font.setFamily("FROMVS [MAXR]")
-        font.setPointSize(20)
+
+        font = self.session_manager.build_workflow_font(
+            "FROMVS [MAXR]",
+            20,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
+
         self.ui.OCRDocument.setDefaultFont(font)
-        
-        self.ui.OCRDocument.setDefaultFont(font)
+        self.ui.OCRText.setFont(font)
+
         self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
         self.ui.OCRTextFormat = qtg.QTextFormat()
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
-        
+
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
-        #ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt').read()
-        #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
-        
-        #self.initBookCombo()
-        #self.selectBookCombo()
-        
-        # Restore Session settings
+        self.ui.actionOCR_Preprocess.triggered.connect(self.open_preprocess_tool)
+
+        # -------------------------
+        # Session Restore
+        # -------------------------
         self.get_session_settings()
         self.OpenChrReference()
 
-        self.dirIterator = None
         self.imgfileList = []
         self.txtfileList = []
         self.imgdir = ""
         self.imgpath = ""
-        
-        #self.ui.bookComboBox.setCurrentText(self.bookabbr)
-        print('current book:',self.bookabbr)
+        self.pixler_return_path = ""
+        self.pending_pixler_source_path = ""
+        self._pixler_return_poll_timer = None
+        self.pixler_return_prompt_dialog = None
 
-        
+        print('current book:', self.bookabbr)
+
+        # -------------------------
+        # Final UI State
+        # -------------------------
         self.show()
+
         self.toggleLatinToolbars()
 
+        self.setWindowFlags(
+            Qt.Window |
+            Qt.WindowCloseButtonHint |
+            Qt.WindowMinMaxButtonsHint        )
+           # existing UI/event system (you said already exists)
+        self.event_bus = EventBus()
+
+                            # CORE ENGINE
+        self.project_engine = ProjectCreationEngine(
+            base_path=os.path.join(os.path.expanduser("~"), "Projects"),
+            event_bus=self.event_bus
+        )
+
+        # optional: hook events
+        self.event_bus.subscribe(
+            "project_created",
+            self.on_project_created
+        )
+
+    def on_new_project_clicked(self):
+        payload = self.collect_new_project_payload()
+        if payload is None:
+            return None
+
+        result = self.project_engine.create_project(payload)
+        if result.get("status") in {"success", "ok"}:
+            qtw.QMessageBox.information(
+                self,
+                "Project Created",
+                f"Project created: {payload['project_name']}"
+            )
+        else:
+            qtw.QMessageBox.warning(
+                self,
+                "Project Creation Failed",
+                result.get("error", "Unknown error")
+            )
+        return result
+
+    def collect_new_project_payload(self):
+        project_name = self.get_project_name()
+        if project_name is None:
+            return None
+
+        project_purpose = self.get_project_purpose()
+        if project_purpose is None:
+            return None
+
+        user_intent_summary = self.get_intent()
+        if user_intent_summary is None:
+            return None
+
+        return {
+            "project_name": project_name,
+            "project_purpose": project_purpose,
+            "creation_trigger": "MyServer_button",
+            "source_context": "MyServer_UI",
+            "user_intent_summary": user_intent_summary,
+        }
+
+    def get_project_name(self):
+        name, ok = qtw.QInputDialog.getText(
+            self,
+            "New Project",
+            "Project name:"
+        )
+        if not ok:
+            return None
+
+        name = name.strip()
+        if not name:
+            qtw.QMessageBox.warning(self, "New Project", "Project name is required.")
+            return None
+
+        safe_name = re.sub(r"[^A-Za-z0-9_. -]+", "_", name).strip(" .")
+        if not safe_name:
+            qtw.QMessageBox.warning(self, "New Project", "Project name is invalid.")
+            return None
+        if safe_name != name:
+            qtw.QMessageBox.information(
+                self,
+                "New Project",
+                f"Project name was normalized to: {safe_name}"
+            )
+        return safe_name
+
+    def get_project_purpose(self):
+        purpose, ok = qtw.QInputDialog.getMultiLineText(
+            self,
+            "New Project",
+            "Project purpose:"
+        )
+        if not ok:
+            return None
+
+        purpose = purpose.strip()
+        if not purpose:
+            qtw.QMessageBox.warning(self, "New Project", "Project purpose is required.")
+            return None
+        return purpose
+
+    def get_intent(self):
+        intent, ok = qtw.QInputDialog.getMultiLineText(
+            self,
+            "New Project",
+            "User intent summary:"
+        )
+        if not ok:
+            return None
+
+        intent = intent.strip()
+        if not intent:
+            qtw.QMessageBox.warning(self, "New Project", "User intent summary is required.")
+            return None
+        return intent
+    
+    def on_project_created(self, event):
+        print("UI: Project created!", event["project_name"])
+    
     @qtc.pyqtSlot(str)
-  
+    def on_zoom_combobox(self, text=None):
+        if text is None:
+            text = self.ui.ZoomComboBox.currentText()
+
+        print("[ZOOM HANDLER HIT] ComboBox")
+
+        try:
+            value = int(text.replace("%", ""))
+        except:
+            print("[ZOOM ERROR] Invalid text:", text)
+            return
+
+        self.ui.Zoomslider.setValue(value)  # drives everything
+    
+    # def on_zoom_combobox(self, text):
+    #     print("[ZOOM HANDLER HIT] ComboBox")
+
+    #     try:
+    #         value = int(text.replace("%", ""))
+    #     except:
+    #         print("[ZOOM ERROR] Invalid ComboBox value:", text)
+    #         return
+
+    #     # Sync slider (this will trigger on_zoomslider)
+    #     self.ui.Zoomslider.setValue(value)
+    
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
@@ -343,15 +549,14 @@ class MainWindow(qtw.QMainWindow):
         self.deltapages = get_setting('deltapages', '1')
         self.imgpath = get_setting('imgpath', '')
         self.imgdir = get_setting('imgdir', '')
-        self.dirIterator = get_setting('dirIterator', None)
         self.imgfileList = get_setting('imgfileList', [])
-        self.pixmap = get_setting('pixmap', None)
+        # self.pixmap = get_setting('pixmap', None)
         self.qimage = get_setting('qimage', None)
         self.zoom = get_setting('zoom', '')
         self.zoomslidervalue = get_setting('zoomslidervalue', 0)
         self.txtpath = get_setting('txtpath', '')
         self.txtdir = get_setting('txtdir', '')
-        self.origpixmap = qtg.QPixmap.fromImage(qtg.QImage())
+        #self.origpixmap = qtg.QPixmap.fromImage(qtg.QImage())
         if hasattr(self, 'ui'):
             self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
             self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
@@ -367,37 +572,32 @@ class MainWindow(qtw.QMainWindow):
     def get_workflow_settings(self):
 
         # Opening JSON file
-        with open('Model/SQLite/json/Workflow.json') as f:
-            # returns JSON object as
-            # a dictionary
+        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+        with open(jsonfile, 'r') as f:
             data = json.load(f)
         
-        # Iterating through the json
-        # list
-        for Sequence in data:
-            print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
+            # Iterating through the json
+            # list
+            for Sequence in data:
+                print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
         
         # Closing file
         f.close() 
     
-    def OpenChrReference(self):
-        
+    def OpenChrReference(self):  
         self.chrrefmain = chrref.CharacterReference()
         self.chrrefmain.show()  
     
     def initBookCombo(self):
-
         # Opening JSON file
-        with open('Model/Data/json/BooksAbbrName.json') as f:
-            # returns JSON object as
-            # a dictionary
+        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksAbbrName.json")
+        with open(jsonfile, 'r') as f:
             data = json.load(f)
-        
         # Iterating through the json
         # list
-        for booknumber in data:
-            print(booknumber['bookabbr'])
-            self.ui.bookComboBox.addItem(booknumber['bookabbr'])
+            for booknumber in data:
+                print(booknumber['bookabbr'])
+                self.ui.bookComboBox.addItem(booknumber['bookabbr'])
         
         # Closing file
         f.close()
@@ -410,21 +610,22 @@ class MainWindow(qtw.QMainWindow):
         
         if self.ui.bookComboBox.currentText() != oldbookabbr:
                   
-            jsonfile = 'Model/Data/json/BooksMarkDown.json'
+            # jsonfile = 'Model/Data/json/BooksMarkDown.json'
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksMarkDown.json")
             
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
                     if BookAbbr['BookAbbr'] == self.bookabbr:
                         bookmarkdown = BookAbbr['BookMarkdown']
-                        self.sourcebookmarkdown = 'source'+bookmarkdown
-                        self.greekbookmarkdown = 'greek'+bookmarkdown
-                        self.latinbookmarkdown = 'latin'+bookmarkdown
-                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
+                        self.sourcebookmarkdown = 'source' + bookmarkdown
+                        self.greekbookmarkdown = 'greek' + bookmarkdown
+                        self.latinbookmarkdown = 'latin' + bookmarkdown
             f.close()
             
-            jsonfile = 'Model/Data/json/Session.json'
-            
+            #jsonfile = 'Model/Data/json/Session.json'
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 bookabbr_key = r"self.bookabbr"
@@ -448,23 +649,6 @@ class MainWindow(qtw.QMainWindow):
             with open(jsonfile, 'w') as f:
                 json.dump(data, f, indent=4)
             f.close()
-
-            # Opening JSON file
-            '''with open('Model/Data/json/BooksAbbrName.json') as f:
-                # returns JSON object as
-                    # a dictionary
-                data = json.load(f)'''
-            
-            #self.ui.bookComboBox.clear()
-            
-            # Iterating through the json
-            # list          
-            '''for booknumber in data:
-                print(booknumber['bookabbr'])
-                self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-            
-            # Closing file
-            f.close()'''
             
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
@@ -494,7 +678,6 @@ class MainWindow(qtw.QMainWindow):
         print("extracting pdf pages from source pdf")
         
         def accept():
-        #if self.pdfxDialog.Accepted:
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
             for filename in os.listdir(workflow_folder):
@@ -516,11 +699,6 @@ class MainWindow(qtw.QMainWindow):
             print(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
             pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
             
-            
-            # Extract to default Complete folder
-            #if complete_folder:
-                #pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), complete_folder, self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
-            
             if complete_folder:
                 symlinks=False
                 ignore=None
@@ -533,9 +711,7 @@ class MainWindow(qtw.QMainWindow):
                         shutil.copy2(source, destination)
             print("pdf page extraction complete")
         
-
-            jsonfile = 'Model/Data/json/Session.json'
-            
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 sourcefile_key = r"self.sourcefile"
@@ -583,15 +759,10 @@ class MainWindow(qtw.QMainWindow):
         self.pdfx_ui.buttonBox.rejected.connect(reject)
 
         if self.pdfx_ui.defaultsrcBox.isChecked(): 
-            # disable source button (default)
-            
-            # get default folder
-            # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
-                data = json.load(f)
-                # Search the key value using 'in' operator
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)      
+               # Search the key value using 'in' operator
                 for Sequence in data:
                     print(Sequence['Sequence'])
                     if Sequence['Sequence'] == seq:
@@ -668,13 +839,10 @@ class MainWindow(qtw.QMainWindow):
         
 
         if self.pdf4tif_ui.defaultsrcBox.isChecked(): 
-            # disable source button (default)
-            
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
@@ -718,7 +886,6 @@ class MainWindow(qtw.QMainWindow):
             pp.pdf2tif(self.pdf2tif_ui.SourceLineEdit.text(), self.pdf2tif_ui.DestinationLineEdit.text(), self.pdf2tif_ui.StartPageLineEdit.text())
             # Copy Workflow folder to default Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
                 symlinks=False
                 ignore=None
                 for item in os.listdir(workflow_folder):
@@ -753,13 +920,10 @@ class MainWindow(qtw.QMainWindow):
         self.pdf2tif_ui.buttonBox.rejected.connect(reject)
 
         if self.pdf2tif_ui.defaultsrcBox.isChecked(): 
-            # disable source button (default)
-            
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
@@ -775,10 +939,8 @@ class MainWindow(qtw.QMainWindow):
                         self.pdf2tif_ui.StartPageLineEdit.setText(start_page)
                         print(source_folder,workflow_folder,complete_folder,start_page)
 
-        rsp = self.pdf2tifDialog.exec_()
-        
-
-            
+            rsp = self.pdf2tifDialog.exec_()
+                    
         print("tif pages conversion complete")
 
     def actiontiff_to_mono(self):
@@ -849,9 +1011,8 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
@@ -933,9 +1094,8 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
@@ -1042,9 +1202,8 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
@@ -1079,7 +1238,8 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1162,27 +1322,6 @@ class MainWindow(qtw.QMainWindow):
                     else:
                         shutil.copy2(source, destination)
 
-            '''if workflow_dup_greek_folder: 
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_greek_folder):
-                    source = os.path.join(workflow_greek_folder, item)
-                    destination = os.path.join(workflow_dup_greek_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-                    # enable section below to remove files from workflow_greek_folder
-                    file_path = os.path.join(workflow_greek_folder, filename)
-                    print('File Name:'+filename, 'File Path:'+file_path)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))'''
-
             if workflow_latin_folder:
                 symlinks=False
                 ignore=None
@@ -1193,25 +1332,6 @@ class MainWindow(qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
-            '''if workflow_dup_latin_folder:
-                #symlinks=False
-                #ignore=None
-                for item in os.listdir(workflow_latin_folder):
-                    source = os.path.join(workflow_latin_folder, item)
-                    destination = os.path.join(workflow_dup_latin_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-                    file_path = os.path.join(workflow_latin_folder, filename)
-                    print('File Name:'+filename, 'File Path:'+file_path)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))'''
 
         def reject():
             pass
@@ -1237,11 +1357,8 @@ class MainWindow(qtw.QMainWindow):
             # disable source button (default)
             
             for step in seq:
-
-                # Define json data        
-                with open('Model/Data/json/Workflow.json') as f:
-                    # returns JSON object as
-                    # a dictionary
+                jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+                with open(jsonfile, 'r') as f:
                     data = json.load(f)
 
                     # Search the key value using 'in' operator
@@ -1278,65 +1395,12 @@ class MainWindow(qtw.QMainWindow):
 
                 f.close()
         print(source_folder,workflow_box_folder,workflow_elim_folder,workflow_greek_folder,workflow_latin_folder)                  
-        rsp = self.crop_languagesDialog.exec_()
-
-    '''def actionCropImage(self):
-
-        self.CropWindow = qtw.QMainWindow()
-        self.cropui = croptif.Ui_MainWindow()
-        self.cropui.setupUi(self.CropWindow)
-        self.CropWindow.show()
-        
-        def setdefault():
-            if self.cropui.defaultsrcBox.isChecked():
-                self.cropui.SourceButton.setEnabled(False)
-                self.cropui.DestPngButton.setEnabled(False)
-            else:
-                self.cropui.SourceButton.setEnabled(True)
-                self.cropui.DestPngButton.setEnabled(True)
-
-        self.cropui.OpenImageFilebutton.clicked.connect(self.OpenCropFileDialog)
-        self.cropui.CropButton.clicked.connect(self.CropTif(self.cropui.Image))
-        self.cropui.SaveCroppedImgAsbutton.clicked.connect(self.DestLatinDialog)
-        self.cropui.SaveCroppedImgbutton.clicked.connect(self.DestLatinDialog)
-        self.cropui.buttonBox.accepted.connect(accept)
-        self.cropui.buttonBox.rejected.connect(reject)
-
-
-
-
-        rsp = self.CropWindow.exec_()'''   
-
-    '''def actionPixler(self):
-
-        self.PixlerWindow = qtw.QMainWindow()
-        self.pixlerui = pixler.Ui_Pixler()
-        self.pixlerui.setupUi(self.PixlerWindow)
-        self.PixlerWindow.show()
-
-        self.pixlerui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
-        self.pixlerui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
-        self.pixlerui.OverwriteRefImgbutton.clicked.connect(self.OverwriteRefImg)
-        self.pixlerui.ExportImageFilebutton.clicked.connect(self.ExportImage)
-        self.pixlerui.SaveImagebutton.clicked.connect(self.SaveImage)
-        self.pixlerui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
-        #self.pixlerui.OpenImageFilebutton.clicked.connect(self.OpenPixlerFileDialog)
-        #self.pixlerui.PixlerButton.clicked.connect(self.PixlerTif(self.pixlerui.Image))
-        #self.pixlerui.SavePixlerpedImgAsbutton.clicked.connect(self.DestLatinDialog)
-        #self.pixlerui.SaveImagebutton.clicked.connect(self.DestLatinDialog)
-        #self.pixlerui.buttonBox.accepted.connect(accept)
-        #self.pixlerui.buttonBox.rejected.connect(reject)
-
-
-
-
-        rsp = self.PixlerWindow.exec_()'''   
+        rsp = self.crop_languagesDialog.exec_()   
 
     def actionConvert_Greek_tiff_To_png(self):
         print("creating indexed(BW) Greek png files")
         #usage: pp.tiff2pngidx(source, destination)
         def accept():
-            # if self.mono2pngDialog.Accepted:
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
             for filename in os.listdir(workflow_folder):
@@ -1400,11 +1464,12 @@ class MainWindow(qtw.QMainWindow):
             # disable source button (default)
             
             # get default folder
-            # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            # Define json data 
+            
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
+                   
                 # Search the key value using 'in' operator
                 for Sequence in data:
                     print(Sequence['Sequence'])
@@ -1419,9 +1484,7 @@ class MainWindow(qtw.QMainWindow):
 
         rsp = self.greekmono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
-
+ 
     def actionDeskewGreek_tiff(self):
         print("deskewing Greek tiff files")
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
@@ -1507,9 +1570,8 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
@@ -1521,7 +1583,7 @@ class MainWindow(qtw.QMainWindow):
                         source_folder = Sequence['DefaultSource']+r'/'
                         tif_workflow_folder = Sequence['WorkflowFullPath']+r'/'
                         tif_complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,tif_workflow_folder,tif_complete_folder)  
+                        print(source_folder,tif_workflow_folder,tif_complete_folder)
             
         seq = "GP7"
         
@@ -1544,7 +1606,21 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                # Search the key value using 'in' operator
+                for Sequence in data:
+                    print(Sequence['Sequence'])
+                    if Sequence['Sequence'] == seq:
+                        # set source line edit to default workflow folder
+                        self.deskew_greekmono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+                        self.deskew_greekmono_ui.DestPngLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+                        source_folder = Sequence['DefaultSource']+r'/'
+                        png_workflow_folder = Sequence['WorkflowFullPath']+r'/'
+                        png_complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+                        print(source_folder,png_workflow_folder,png_complete_folder)
+            with open(jsonfile, 'r') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1636,7 +1712,21 @@ class MainWindow(qtw.QMainWindow):
             
             # get default folder
             # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")  
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                # Search the key value using 'in' operator
+                for Sequence in data:
+                    print(Sequence['Sequence'])
+                    if Sequence['Sequence'] == seq:
+                        # set source line edit to default workflow folder
+                        self.greekresizepng_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+                        self.greekresizepng_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+                        source_folder = Sequence['DefaultSource']+r'/'
+                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
+                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+                        print(source_folder,workflow_folder,complete_folder)
+            with open(jsonfile, 'r') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
@@ -1654,12 +1744,7 @@ class MainWindow(qtw.QMainWindow):
 
         rsp = self.greekresizepngDialog.exec_()
         print("completed resizing indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Greek/tif_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/")
-
-        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/png_greek_resize/greek_book_40_Matthew/")
-        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/png_greek_resize/greek_book_41_Mark/")
-
+ 
     def actionConvert_Latin_tiff_To_png(self):
         print("creating indexed(BW) Latin png files")
         #usage: pp.tiff2pngidx(source, destination)
@@ -1696,9 +1781,6 @@ class MainWindow(qtw.QMainWindow):
         if self.deskew_latinmonoDialog.Accepted:
             pp.deskewfiles(self.deskew_latinmono_ui.SourceLineEdit.text(), self.deskew_latinmono_ui.DestPngLineEdit.text(),self.deskew_latinmono_ui.DestTifLineEdit.text())
             print("completed deskewing monochrome tiff and png files")
-        #dsk.deskewfiles("/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
-        #pp.deskewfiles("/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
-    
     def actionResizeLatin_png(self):
         print("resizing Latin png files")
         #usage: pp.resizepngs(source, destination)
@@ -1715,58 +1797,46 @@ class MainWindow(qtw.QMainWindow):
         if self.latinresizepngDialog.Accepted:
             pp.resizepngs(self.latinresizepng_ui.SourceLineEdit.text(), self.latinresizepng_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
-        #pp.resizepngs(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
-
-    def actionCropImage(self):
-        print("Opening image in crop dialog")
-        cropimg.w = cropimg.MainWindow()
-        if self.imgpath != "":
-            cropimg.w.imgpath = self.imgpath
-            cropimg.w.origpixmap = self.origpixmap
-            cropimg.w.scale = 0.1
-            cropimg.w.ui.Image.setPixmap(self.origpixmap)
-            cropimg.w.ui.ImageLe.setText(self.imgpath)
-        cropimg.w.show()
-        print("Return from crop dialog")
     
-    def actionPixler(self):
-        print("Opening image in Pixler")
-        self.PixlerMain = qtw.QMainWindow()
-        self.pixlerui = pixler.Ui_Pixler()
-        self.pixlerui.setupUi(self.PixlerMain)
-        
-        #cropimg.w = cropimg.MainWindow()
-        if self.imgpath != "":
-            self.pixlerui.imgpath = self.imgpath
-            self.pixlerui.origpixmap = self.origpixmap
-            self.pixlerui.scale = 0.1
-            self.pixlerui.RefImg.setPixmap(self.origpixmap)
-            self.pixlerui.RefImgLE.setText(self.imgpath)
-        #self.pixlerui.show()
-        self.PixlerMain.show()
-        #rsp = self.PixlerWindow.main.show()
-        print("Return from Pixler")
-    
-    def actionDeskewImage(self):
-        print("Deskewing current image")
-        if self.imgpath != "":
-            pp.deskewimage(self.imgpath)
-            print("Reloading deskewed image")
-            self.ReloadImage()
-        print("Deskew current image complete")
+    def crop_processor(self, qimage, params):
+        if not params:
+            return qimage
 
-    def actionGimpEdit(self):
-        #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"
-        #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp "+self.imgpath+"--file-forwarding org.gimp.GIMP"
-        gimp_cmd = "gimp " + self.imgpath
-        '''if 'self.imgpath' in locals():
-            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --document-export =" + self.imgpath + "--command=gimp-2.10" + self.imgpath + "--file-forwarding org.gimp.GIMP"
-            print(self.imgpath)
-        else:
-            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''         
+        x = params.get("x", 0)
+        y = params.get("y", 0)
+        w = params.get("w", qimage.width())
+        h = params.get("h", qimage.height())
+
+        return qimage.copy(x, y, w, h)
+    
+    
+    # def actionCropImage(self):
+    #     print("[NEW CROP]")
+
+    #     if not hasattr(self, "imgqimage") or self.imgqimage.isNull():
+    #         print("[CROP ERROR] No image loaded")
+    #         return
         
-        os.system(gimp_cmd)
+    #     dialog = ImagePreviewDialog(
+    #         self.imgqimage,
+    #         self.crop_processor,
+    #         parent=self
+    #     )
+
+    #     if dialog.exec_():
+    #         result = dialog.get_result()
+
+    #         self.imgqimage = result
+    #         self.imagepixmap = qtg.QPixmap.fromImage(result)
+    #         self.ui.Image.setPixmap(self.imagepixmap)
+    
+    # def actionDeskewImage(self):
+    #     print("Deskewing current image")
+    #     if self.imgpath != "":
+    #         pp.deskewimage(self.imgpath)
+    #         print("Reloading deskewed image")
+    #         self.ReloadImage()
+    #     print("Deskew current image complete")
 
     def actionCrop_Greek_To_tiff_Lines(self):
         print("cropping and sorting Greek tiff lines")
@@ -1775,7 +1845,6 @@ class MainWindow(qtw.QMainWindow):
         self.crop_greeklines_ui = Ui_crop_greek_linesDialog()
         self.crop_greeklines_ui.setupUi(self.crop_greeklinesDialog)
         self.crop_greeklinesDialog.show()
-        #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
 
         def setdefault():
             if self.crop_greeklines_ui.defaultsrcBox.isChecked():
@@ -1788,7 +1857,6 @@ class MainWindow(qtw.QMainWindow):
                 self.crop_greeklines_ui.GreekBoxFolderButton.setEnabled(True)
 
         def accept():
-            # if self.crop_greeklinesDialog.Accepted:
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_dest_folder,'Complete Folder:'+ complete_dest_folder)
             for filename in os.listdir(workflow_dest_folder):
@@ -1852,7 +1920,29 @@ class MainWindow(qtw.QMainWindow):
             for step in seq:
 
                 # Define json data        
-                with open('Model/Data/json/Workflow.json') as f:
+                
+                jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+                with open(jsonfile, 'r') as f:
+                    # returns JSON object as
+                    # a dictionary
+                    data = json.load(f)
+
+                    # Search the key value using 'in' operator
+                    for Sequence in data:
+                        # print(Sequence['Sequence'])
+                        if Sequence['Sequence'] == step:
+                            # set line edits to their default workflow folders
+                            if step == "GL1":
+                                self.crop_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+                                source_folder = Sequence['DefaultSource']+r'/'
+                                self.crop_greeklines_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+                                workflow_dest_folder = Sequence['WorkflowFullPath']+r'/'
+                                complete_dest_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+                            elif step == "GL2":
+                                self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+                                workflow_box_folder = Sequence['WorkflowFullPath']+r'/'
+                                complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+                with open(jsonfile, 'r') as f:
                     # returns JSON object as
                     # a dictionary
                     data = json.load(f)
@@ -1874,75 +1964,9 @@ class MainWindow(qtw.QMainWindow):
                                 complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
                                 
                 f.close()
-
-
-        '''if self.crop_greeklines_ui.defaultsrcBox.isChecked(): 
-            # disable source button (default)
-            # get default folder
-            # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.crop_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.crop_greeklines_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
- 
-        
-        seq = "GL2"
-            # get default folder
-            # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        #self.crop_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
-
-        if self.crop_greeklines_ui.defaultsrcBox.isChecked(): 
-            # disable source button (default)
-            
-            # get default folder
-            # Define json data        
-            with open('Model/Data/json/Workflow.json') as f:
-                # returns JSON object as
-                # a dictionary
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.crop_greeklines_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)'''
-
-
             
         rsp = self.crop_greeklinesDialog.exec_()
         print("completed creating cropped language tif files")
-
-        #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
-        
     def actionRename_Greek_tiff_Lines(self):
         print("renaming Greek tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
@@ -1950,7 +1974,6 @@ class MainWindow(qtw.QMainWindow):
         self.greekrenamelines_ui = Ui_tifgreekrenamelinesDialog()
         self.greekrenamelines_ui.setupUi(self.greekrenamelinesDialog)
         self.greekrenamelinesDialog.show()
-
         self.greekrenamelines_ui.SourceButton.clicked.connect(self.GreekRenameLinesDialog)
         self.greekrenamelines_ui.DestinationButton.clicked.connect(self.DestGreekRenameLinesDialog)
 
@@ -1960,9 +1983,6 @@ class MainWindow(qtw.QMainWindow):
             tr.renameimages(self.greekrenamelines_ui.SourceLineEdit.text(), self.greekrenamelines_ui.DestinationLineEdit.text())
             
             print("completed renaming Greek tif lines for ground truth")
-        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
-       
     def actionMove_Greek_tiff_Lines(self):
         print("moving Greek tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
@@ -1979,10 +1999,6 @@ class MainWindow(qtw.QMainWindow):
         if self.greekmovelinesDialog.Accepted:
             tr.renameimages(self.greekmovelines_ui.SourceLineEdit.text(), self.greekmovelines_ui.DestinationLineEdit.text())
             print("completed moving Greek tif lines for ground truth")
-        
-        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        #tr.renameimages("/home/jetson/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/", "/home/jetson/Projects/Python/Images/Greek/tif_greek_tif2groundtruth/")
-        #pass
 
     def actionCrop_Latin_To_tiff_Lines(self):
         print("cropping and sorting Latin tiff lines")
@@ -2001,7 +2017,6 @@ class MainWindow(qtw.QMainWindow):
         if self.crop_latinlinesDialog.Accepted:
             tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
             print("completed creating cropped Latin tif lines")
-        #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
         tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
 
     def actionRename_Latin_tiff_Lines(self):
@@ -2011,7 +2026,6 @@ class MainWindow(qtw.QMainWindow):
         self.latinrenamelines_ui = Ui_tiflatinrenamelinesDialog()
         self.latinrenamelines_ui.setupUi(self.latinrenamelinesDialog)
         self.latinrenamelinesDialog.show()
-
         self.latinrenamelines_ui.SourceButton.clicked.connect(self.LatinRenameLinesDialog)
         self.latinrenamelines_ui.DestinationButton.clicked.connect(self.DestLatinRenameLinesDialog)
 
@@ -2022,9 +2036,6 @@ class MainWindow(qtw.QMainWindow):
             
             print("completed renaming Greek tif lines for ground truth")
         
-        # tr.renameimages(r"/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
-        #tr.renameimages(r"/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/tif_latin_tif4groundtruth/")
-
     def actionMove_Latin_tiff_Lines(self):
         print("moving Latin tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
@@ -2032,7 +2043,6 @@ class MainWindow(qtw.QMainWindow):
         self.latinmovelines_ui = Ui_tiflatinmovelinesDialog()
         self.latinmovelines_ui.setupUi(self.latinmovelinesDialog)
         self.latinmovelinesDialog.show()
-
         self.latinmovelines_ui.SourceButton.clicked.connect(self.LatinMovelinesDialog)
         self.latinmovelines_ui.DestinationButton.clicked.connect(self.DestLatinMovelinesDialog)
 
@@ -2045,25 +2055,21 @@ class MainWindow(qtw.QMainWindow):
     def actionSplitGreek_text_lines(self):
         print("splitting Greek textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"/home/jetson/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
         tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
         
     def actionRenameGreek_text_lines(self):
         print("renaming Greek textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
         tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
     
     def actionSplit_Latin_Text_Lines(self):
         print("splitting Latin textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
-        # tr.splittextlines(r"/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
         tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Latin txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/")
 
     def actionRename_Latin_Text_Lines(self):
         print("renaming Latin textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
-        #tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
         tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
     
     def actionReview_Ground_Truth(self):
@@ -2088,30 +2094,160 @@ class MainWindow(qtw.QMainWindow):
         print("performing OCR on current image")
         self.GetRawOCRtext()
 
-    def setImageStack(self, tiffCaptureHandle):
-            """ Set the scene's current TIFF image stack to the input TiffCapture object.
-            Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
-            :type tiffCaptureHandle: TiffCapture
-            """
-            if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
-                raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
-            self._tiffCaptureHandle = tiffCaptureHandle
-            self.showFrame(0)
+    
+    def start_image_load(self, path, target="ref"):
+        print(f"[THREAD] Start load Ã¢â€ â€™ {path} ({target})")
 
-    def loadImageStackFromFile(self,fileName=''):
-        """ Load an image stack from file.
-        Without any arguments, loadImageStackFromFile() will popup a file dialog to choose the image file.
-        With a fileName argument, loadImageStackFromFile(fileName) will attempt to load the specified file directly.
-        """
-        if len(fileName) == 0:
-            if QT_VERSION_STR[0] == '4':
-                fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
-            elif QT_VERSION_STR[0] == '5':
-                fileName, dummy = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
+        # store target so handler knows where to route image
+        self._load_target = target
+
+        self._thread = qtc.QThread()
+        self._worker = ImageLoadWorker(self.image_load_path)
+
+        self._worker.moveToThread(self._thread)
+
+        # --- signals
+        self._thread.started.connect(self._worker.run)
+        self._worker.progress.connect(self.on_load_progress)
+        self._worker.finished.connect(self.on_image_loaded)
+        self._worker.error.connect(self.on_load_error)
+
+        # --- cleanup
+        self._worker.finished.connect(self._thread.quit)
+        self._worker.finished.connect(self._worker.deleteLater)
+        self._thread.finished.connect(self._thread.deleteLater)
+
+        # --- start
+        self._thread.start()
+
+        # show progress immediately
+        if hasattr(self, "progress_bar"):
+            self.progress_bar.setValue(0)
+            self.progress_bar.setVisible(True)
+    
+    
+    def on_image_loaded(self, qimage):
+        print("[LOAD] Complete")
+
+        if hasattr(self, "progress_bar"):
+            self.progress_bar.setValue(100)
+            self.progress_bar.setVisible(False)
+
+        # -------------------------
+        # STORE BOTH VERSIONS
+        # -------------------------
+        self.imgqimage = qimage
+        self.imagepixmap = qtg.QPixmap.fromImage(qimage)   # Ã°Å¸â€Â¥ for zoom/display
+        self.origpixmap  = qtg.QPixmap.fromImage(qimage)   # Ã°Å¸â€Â§ for preprocess tool
+
+        if getattr(self, "_stack_path", ""):
+            self.imgpath = self._stack_path
+            print(f"[DEBUG] imgpath synced to loaded stack: {self.imgpath}")
+
+        print("[DEBUG] imagepixmap isNull?", self.imagepixmap.isNull())
+
+        # -------------------------
+        # DISPLAY (no scaling here)
+        # -------------------------
+        self.ui.Image.setPixmap(self.imagepixmap)
+    
+    def on_load_progress(self, value):
+         print(f"[LOAD] {value}%")
+         if hasattr(self, "progress_bar"):
+            self.progress_bar.setValue(value)
+
+    def on_load_error(self, msg):
+        print(f"[LOAD ERROR] {msg}")
+
+        if hasattr(self, "progress_bar"):
+            self.progress_bar.setVisible(False)
+
+        # Ã°Å¸â€Â´ invalidate image state
+        self.imagepixmap = qtg.QPixmap()
+        self.origpixmap  = qtg.QPixmap()
+        
+        # I attempted to paste this back into the method, but setImageStack reflected that it was not being called. So, I commented it out.
+        # def setImageStack(self, tiffCaptureHandle):
+        #     """ Set the scene's current TIFF image stack to the input TiffCapture object.
+        #     Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
+        #     :type tiffCaptureHandle: TiffCapture
+        #     """
+        #     if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
+        #         raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
+        #     self._tiffCaptureHandle = tiffCaptureHandle
+    # def on_load_error(self, msg):
+    #     print(f"[LOAD ERROR] {msg}")
+
+    #     if hasattr(self, "progress_bar"):
+    #         self.progress_bar.setVisible(False)
+    #     def setImageStack(self, tiffCaptureHandle):
+    #             """ Set the scene's current TIFF image stack to the input TiffCapture object.
+    #             Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
+    #             :type tiffCaptureHandle: TiffCapture
+    #             """
+    #             if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
+    #                 raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
+    #             self._tiffCaptureHandle = tiffCaptureHandle
+    #             # self.showFrame(0)
+
+    
+    def loadImage(self):
+        fileName, _ = qtw.QFileDialog.getOpenFileName(
+            self,
+            "Open Image",
+            "",
+            "Images (*.png *.jpg *.jpeg *.tif *.tiff)"
+        )
+        if fileName:
+            filestr = os.path.basename(fileName) 
+            self.ui.ImageLE.setText(filestr)
+            self.loadImageStackFromFile(fileName)
+    
+    def loadImageStackFromFile(self, fileName=''):
         fileName = str(fileName)
-        if len(fileName) and os.path.isfile(fileName):
-            self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
-            
+
+        if not fileName or not os.path.isfile(fileName):
+            print("[STACK LOAD] Invalid file")
+            return
+
+        print(f"[STACK LOAD] Requested: {fileName}")
+
+        self._stack_path = fileName
+        self._load_target = "main"  # or "ref" if needed
+
+        # -------------------------
+        # Thread setup
+        # -------------------------
+        self._thread = qtc.QThread()
+        self._worker = TiffStackWorker(fileName)
+
+        self._worker.moveToThread(self._thread)
+
+        # --- execution
+        self._thread.started.connect(self._worker.run)
+
+        # --- signals (ONLY ONCE)
+        self._worker.progress.connect(self.on_load_progress)
+        self._worker.finished.connect(self.on_image_loaded)
+        self._worker.error.connect(self.on_load_error)
+
+        # --- cleanup (CRITICAL)
+        self._worker.finished.connect(self._thread.quit)
+        self._worker.finished.connect(self._worker.deleteLater)
+        self._thread.finished.connect(self._thread.deleteLater)
+
+        # -------------------------
+        # Start thread
+        # -------------------------
+        self._thread.start()
+
+        # -------------------------
+        # Progress bar
+        # -------------------------
+        if hasattr(self, "progress_bar"):
+            self.progress_bar.setValue(0)
+            self.progress_bar.setVisible(True)
+    
     def numFrames(self):
         """ Return the number of image frames in the stack.
         """
@@ -2142,143 +2278,45 @@ class MainWindow(qtw.QMainWindow):
             return
         # Convert frame ndarray to a QImage.
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
-    
-    def loadImage(self):     
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        if self.imgpath:
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.showImage(self.imgpath)
-            self.sortImgFiles()       
-        '''imgfilename, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Select Image', '', 'Image Files (*.png *.jpg *.jpeg *.bmp *.tif)')
-        
-        if imgfilename:
-            self.ui.ImageLe.setText(os.path.basename(imgfilename))       
-            self.imgfilename = imgfilename'''
 
-    def OpenImageFileDialog(self):
-        self.imgpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Open image file', self.imgdir,
-            'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-                
-        if self.imgpath:
-            self.imgdir = os.path.dirname(self.imgpath)
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-           
-            #self.showImage(self.imgpath)
-            #self.sortImgFiles() 
+    #def open_preprocess_tool(self, checked=False):
+    def open_preprocess_tool(self, checked=False):
+        initial_pixmap = getattr(self, "origpixmap", None)
+        if initial_pixmap is None or initial_pixmap.isNull():
+            initial_pixmap = getattr(self, "imagepixmap", None)
 
-            file = qtc.QFile(self.imgpath)
-            filestr = os.path.basename(self.imgpath)           
-            filesplit = os.path.splitext(filestr)
-            filename = filesplit[0]
-            fileext = filesplit[1]          
-            
-            if file.open(qtc.QIODevice.ReadOnly):
-                info = qtc.QFileInfo(self.imgpath)
-                #print(qtg.QImage.size(self.qimage))
-                #print(self.qimage.size())
-                #pmsize = qtg.QPixmap.fromImage(self.qimage).size()
-                #print(pmsize)
-
-                if fileext == '.tif':
-                    self.loadImageStackFromFile(str(self.imgpath))
-                    self.showFrame(0)
-                    
-                    #w,h = qtg.QImage.size(self.qimage)
-                    #print(qtg.QImage.size(self.qimage))
-                    '''pmsize = qtg.QPixmap.fromImage(self.qimage).size()
-                    print(pmsize)'''
-                    self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                    #pixmap = qtg.QPixmap.fromImage(self.qimage)   
-                    self.ui.Image.setPixmap(qtg.QPixmap(pixmap))
-                else:
-                    
-                    self.ui.Image.setPixmap(qtg.QPixmap(self.imgpath))
-                
-                file.close()
-                
-                #self.get_session_settings()
-                
-                #with open('Model/Data/json/Session.json', 'w') as f:
-                    #json.dump(data, f, indent=2)
-                
-
-                jsonfile = 'Model/Data/json/Session.json'
-                
-                with open(jsonfile, 'r') as f:
-                    data = json.load(f)
-                    imgpath_key = r"self.imgpath"
-                    imgdir_key = r"self.imgdir"
-                    for Setting in data:
-                        if Setting['Setting'] == imgpath_key:
-                            Setting['CurrentValue'] = self.imgpath
-                            print(Setting['CurrentValue'])
-                        elif Setting['Setting'] == imgdir_key:  
-                            Setting['CurrentValue'] = self.imgdir
-                            print(Setting['CurrentValue'])
-                f.close()
-
-                os.remove(jsonfile)
-                with open(jsonfile, 'w') as f:
-                    json.dump(data, f, indent=4)
-                f.close()
-
-        self.imgfileList = []
-        for i in os.listdir(self.imgdir):
-            ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tif')):
-                self.imgfileList.append(ipath)
-        print(self.imgfileList)
-        self.sortImgFiles()
-
+        self.preprocess_window = OCRPreprocessTool(self, initial_pixmap=initial_pixmap)
+        self.preprocess_window.exec_()
     def showImage(self,imgfilename):
-        #self.imgfilename = self.imgpath
+        self.imgpath = imgfilename
+        print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
+        self.imgfilename = self.imgpath
         file = qtc.QFile(imgfilename)
         filestr = os.path.basename(imgfilename)           
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        
+  
         if file.open(qtc.QIODevice.ReadOnly):
-            info = qtc.QFileInfo(imgfilename)
-        
-            '''if self.imgpath.endswith('.tif'):
-                self.loadImageStackFromFile(imgfilename)
-                self.showFrame(0)
-                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation) 
-            else:
-                self.pixmap = qtg.QPixmap(imgfilename).scaled(self.ui.Image.size(), 
-                    qtc.Qt.KeepAspectRatio)'''       
+            info = qtc.QFileInfo(imgfilename)      
 
             if fileext == '.tif':
                 self.loadImageStackFromFile(imgfilename)
-                self.showFrame(0)
-                self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-                '''self.origsize = self.origpixmap.size()       
-                self.origheight = self.origpixmap.height
-                self.origwidth = self.origpixmap.width
-                self.pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)'''
+                self.imgdir = os.path.dirname(imgfilename)
+                print("[DEBUG] imagepixmap will be populated by on_image_loaded")
                 
-                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
-                #self.ui.Image.setPixmap(self.pixmap) -- moved out below
             else:
-                self.pixmap = qtg.QPixmap(self.imgpath)
-                #self.ui.Image.setPixmap(self.pixmap) -- moved out below
-        
+                self.imagepixmap = qtg.QPixmap(self.imgpath)
+                self.origpixmap  = self.imagepixmap
+                self.ui.Image.setPixmap(self.imagepixmap)
+            
         file.close()
+            
+        self.on_zoom_combobox()
+       
         
-        if self.pixmap.isNull():
-            return
-        
-        self.on_zoom()
-        #self.ui.Image.setPixmap(self.pixmap)
-        
-        self.imgdir = os.path.dirname(imgfilename)
-        self.ui.ImageLe.setText(filestr)
-        jsonfile = 'Model/Data/json/Session.json'
-                
+        # jsonfile = 'Model/Project/Data/json/Session.json'
+        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")       
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             imgpath_key = r"self.imgpath"
@@ -2298,370 +2336,188 @@ class MainWindow(qtw.QMainWindow):
         f.close()
         
         self.imgfileList = []
-        for i in os.listdir(self.imgdir):
+        for i in sorted(os.listdir(self.imgdir)):
             ipath = os.path.join(self.imgdir, i)
             if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 self.imgfileList.append(ipath)        
-        '''self.imgfileList = []
-        for i in os.listdir(self.imgdir):
-            ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)'''
-
         self.sortImgFiles()
-
     def sortImgFiles(self):
-        convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        import re
+
+        def convert(text):
+            return int(text) if text.isdigit() else text.lower()
+
+        def alphanum_key(key):
+            return [convert(c) for c in re.split('([0-9]+)', key)]
+
         self.sorted_imgfilelist = sorted(self.imgfileList, key=alphanum_key)
-        #self.fileList.sort()
-        #print(self.sorted_imgfilelist)
-        self.imgdirIterator = iter(self.sorted_imgfilelist)
-        self.nextimage = next(self.imgdirIterator)
-        self.imgdirRevIterator = reversed(self.sorted_imgfilelist)
-        self.previmage = next(self.imgdirRevIterator)
-        while True:
-            # cycle through the iterator until the current file is found
-            if next(self.imgdirIterator) == self.imgpath:
-                break
-        while True:
-            # cycle through the reverse iterator until the current file is found
-            if next(self.imgdirRevIterator) == self.imgpath:
-                break
-    
-    def nextImage(self):      
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.imgpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.imgfileList:
-            try:
-                imgfilename = self.imgpath
-                nextimgfilename = next(self.imgdirIterator)
-                self.ui.ImageLe.setText(os.path.basename(nextimgfilename))
-                if fileext == '.tif':
-                    print(nextimgfilename)
-                    self.loadImageStackFromFile(nextimgfilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(nextimgfilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
 
-            except:
-                # the iterator has finished, restart it
-                self.imgdirIterator = iter(self.imgfileList)
-                #self.imgdirRevIterator = reversed(self.imgfileList)
-                #print(self.imgfileList)
-                self.prevImage()
-            
-            self.imgpath = nextimgfilename
-            self.showImage(nextimgfilename)            
-
+        # Set current index safely
+        if self.imgpath in self.sorted_imgfilelist:
+            self.current_img_index = self.sorted_imgfilelist.index(self.imgpath)
         else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadImage()
+            self.current_img_index = 0   
+    
+    def nextImage(self):
+        if not self.sorted_imgfilelist:
+            return
+
+        self.current_img_index = (self.current_img_index + 1) % len(self.sorted_imgfilelist)
+        nextimg = self.sorted_imgfilelist[self.current_img_index]
+
+        self.imgpath = nextimg
+        self.showImage(nextimg)
 
     def prevImage(self):
-        # ensure that the file list has not been cleared due to missing files     
-        filestr = os.path.basename(self.imgpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.imgfileList:
-            try:
-                imgfilename = self.imgpath
-                previmgfilename = next(self.imgdirRevIterator)
-                self.ui.ImageLe.setText(os.path.basename(previmgfilename))
-                if fileext == '.tif':
-                    print(previmgfilename)
-                    self.loadImageStackFromFile(previmgfilename)
-                    self.showFrame(0)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                else:
-                    pixmap = qtg.QPixmap(previmgfilename).scaled(self.ui.Image.size(), 
-                        qtc.Qt.KeepAspectRatio)
+        if not self.sorted_imgfilelist:
+            return
 
-            except:
-                # the iterator has finished, restart it
-                self.imgdirRevIterator = reversed(self.imgfileList)
-                #self.imgdirIterator = iter(self.imgfileList)
-                #self.nextImage()
-            
-            self.imgpath = previmgfilename
-            self.showImage(previmgfilename)
-            
+        self.current_img_index = (self.current_img_index - 1) % len(self.sorted_imgfilelist)
+        previmg = self.sorted_imgfilelist[self.current_img_index]
 
-        else:
-            # no file list found, load an image
-            # self.OpenImageFileDialog()
-            self.loadImage()
+        self.imgpath = previmg
+        self.showImage(previmg)
 
     def ReloadImage(self):
         if self.imgpath:
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
+            self.ui.ImageLE.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
             self.sortImgFiles()  
-        '''if self.imgpath:
-            file = qtc.QFile(self.imgpath)
-            filestr = os.path.basename(self.imgpath)
-            self.imgdir = os.path.dirname(self.imgpath)
-            self.ui.ImageLe.setText(filestr)
-            filesplit = os.path.splitext(filestr)
-            filename = filesplit[0]
-            fileext = filesplit[1]
-                        
-           if file.open(qtc.QIODevice.ReadOnly):
-                info = qtc.QFileInfo(self.imgpath)
-                #print(qtg.QImage.size(self.qimage))
-                #print(self.qimage.size())
-                #pmsize = qtg.QPixmap.fromImage(self.qimage).size()
-                #print(pmsize)
-
-                if fileext == '.tif':
-                    self.loadImageStackFromFile(str(self.imgpath))
-                    self.showFrame(0)
-                    
-                    #w,h = qtg.QImage.size(self.qimage)
-                    #print(qtg.QImage.size(self.qimage))
-                    #pmsize = qtg.QPixmap.fromImage(self.qimage).size()
-                    #print(pmsize)
-                    self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-                    pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                    #pixmap = qtg.QPixmap.fromImage(self.qimage)   
-                    self.ui.Image.setPixmap(qtg.QPixmap(pixmap))
-                else:
-                    
-                    self.ui.Image.setPixmap(qtg.QPixmap(self.imgpath))
-        
-                self.imgfileList = []
-                for i in os.listdir(self.imgdir):
-                    ipath = os.path.join(self.imgdir, i)
-                    if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                        self.imgfileList.append(ipath)
-
-                self.sortImgFiles(MainWindow)'''
-  
     def loadText(self):
-        '''self.textpath = QtWidgets.QFileDialog.getOpenFileName(
-            self.centralwidget, 'Open text file', '',
-            'Text files (*.txt)')[0]
-        if self.textpath:
-            self.textfile = QtCore.QFile(self.textpath)
-            self.txtfilename = os.path.basename(self.textpath)
-            self.showText(MainWindow,self.txtfilename)'''
-        
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-        self.ui.centralwidget, 'Open text file',self.txtdir,
-        'Text files (*.txt *.csv)')[0]
-        
-        if self.txtpath:
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.txtdir = os.path.dirname(self.txtpath)
-            self.ui.TextLE.setText(filename)
-            #self.sortTextFiles(MainWindow)
-            self.showText(self.txtpath)
-            self.sortTextFiles()
+        from PyQt5 import QtWidgets as qtw
+
+        txtpath = qtw.QFileDialog.getOpenFileName(
+            self.ui.centralwidget,
+            'Open text file',
+            self.txtdir if hasattr(self, 'txtdir') else '',
+            'Text files (*.txt *.csv)'
+        )[0]
+
+        if not txtpath:
+            return
+
+        # Ã¢Å“â€¦ Single source of truth
+        self.showText(txtpath)
 
     def OpenTextFileDialog(self, MainWindow):
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Open text file',self.txtdir,
-            'Text files (*.txt *.csv)')[0]
-        
-        if self.txtpath:
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.txtdir = os.path.dirname(self.txtpath)
-            self.ui.TextLE.setText(filename)
-            
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
-                text = stream.readAll()
-                info = qtc.QFileInfo(self.txtpath)
-                self.ui.OCRText.clear()
-                if info.completeSuffix() == 'txt':
-                    #self.ui.editor_text.setHtml(text
-                    self.ui.OCRText.insertPlainText(text)
-                else:
-                    self.ui.OCRText.setPlainText(text)
-                
-                # update font to selection and size       
-                self.on_font_update()
-                
-                file.close()
-        
-        jsonfile = 'Model/Data/json/Session.json'
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
-            for Setting in data:
-                if Setting['Setting'] == txtpath_key:
-                    Setting['CurrentValue'] = self.txtpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
-                    Setting['CurrentValue'] = self.txtdir
-                    print(Setting['CurrentValue'])
-        f.close()
+        from PyQt5 import QtWidgets as qtw
+        import os
 
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        txtpath = qtw.QFileDialog.getOpenFileName(
+            self.ui.centralwidget,
+            'Open text file',
+            self.txtdir if hasattr(self, 'txtdir') else '',
+            'Text files (*.txt *.csv)'
+        )[0]
 
-        #txtdirpath = self.txtdir
-        self.txtfileList = []
-        for t in os.listdir(self.txtdir):
-            tpath = os.path.join(self.txtdir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.txtfileList.append(tpath)
-        self.sortTextFiles()
+        if not txtpath:
+            return
+        else:
+            # Ã¢Å“â€¦ Delegate everything to showText (single source of truth)
+            self.showText(txtpath)
 
-    def showText(self, txtfilename):        
-        #self.textfile = txtfilename
-        if self.txtpath:
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.txtdir = os.path.dirname(self.txtpath)
-            self.ui.TextLE.setText(filename)
-        
-            if file.open(qtc.QIODevice.ReadOnly):
-                stream = qtc.QTextStream(file)
-                text = stream.readAll()
-                info = qtc.QFileInfo(self.txtpath)
-                self.ui.OCRText.clear()
-                if info.completeSuffix() == 'txt':
-                    #self.ui.editor_text.setHtml(text
-                    self.ui.OCRText.insertPlainText(text)
-                else:
-                    self.ui.OCRText.setPlainText(text)
-            #textfile.close()
-            #txtdirpath = os.path.dirname(self.textpath)
+    def showText(self, txtfilename):
+        if not txtfilename:
+            return
 
-            # update font to selection and size       
+        import os
+        import json
+        from PyQt5 import QtCore as qtc
+
+        # Ã¢Å“â€¦ Always sync internal state
+        self.txtpath = txtfilename
+        filename = os.path.basename(self.txtpath)
+        self.txtdir = os.path.dirname(self.txtpath)
+
+        self.ui.TextLE.setText(filename)
+
+        file = qtc.QFile(self.txtpath)
+
+        if file.open(qtc.QIODevice.ReadOnly):
+            stream = qtc.QTextStream(file)
+
+            # Ã¢Å“â€¦ Force UTF-8 (cross-platform safe)
+            stream.setCodec("UTF-8")
+
+            text = stream.readAll()
+            info = qtc.QFileInfo(self.txtpath)
+
+            self.ui.OCRText.clear()
+
+            if info.completeSuffix().lower() == 'txt':
+                self.ui.OCRText.insertPlainText(text)
+            else:
+                self.ui.OCRText.setPlainText(text)
+
+            # Ã¢Å“â€¦ formatting updates
             self.on_font_update()
-            
-            # update line spacing
             self.SetLineSpacing()
+
             file.close()
-       
-        jsonfile = 'Model/Data/json/Session.json'
-        
-        with open(jsonfile, 'r') as f:
-            data = json.load(f)
-            txtpath_key = r"self.txtpath"
-            txtdir_key = r"self.txtdir"
+
+        # Ã¢Å“â€¦ Update session JSON safely
+        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
+        if os.path.exists(jsonfile):
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+
             for Setting in data:
-                if Setting['Setting'] == txtpath_key:
+                if Setting['Setting'] == r"self.txtpath":
                     Setting['CurrentValue'] = self.txtpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == r"self.txtdir":
                     Setting['CurrentValue'] = self.txtdir
-                    print(Setting['CurrentValue'])
-        f.close()
 
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+            with open(jsonfile, 'w') as f:
+                json.dump(data, f, indent=4)
 
+        # Ã¢Å“â€¦ Build file list (FIXED for Windows + CSV)
         self.txtfileList = []
         for t in os.listdir(self.txtdir):
             tpath = os.path.join(self.txtdir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
+            if os.path.isfile(tpath) and t.lower().endswith(('.txt', '.csv')):
                 self.txtfileList.append(tpath)
 
+        # Ã¢Å“â€¦ Sort + set index
         self.sortTextFiles()
 
     def sortTextFiles(self):
-        convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)
-        #self.fileList.sort()
-        #print(self.sorted_txtfilelist)
-        self.txtdirIterator = iter(self.sorted_txtfilelist)
-        self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
-        while True:
-            # cycle through the iterator until the current file is found
-            if next(self.txtdirIterator) == self.txtpath:
-                break
-        while True:
-            # cycle through the reverse iterator until the current file is found
-            if next(self.txtdirRevIterator) == self.txtpath:
-                break
+        import re
 
+        def convert(text):
+            return int(text) if text.isdigit() else text.lower()
+
+        def alphanum_key(key):
+            return [convert(c) for c in re.split('([0-9]+)', key)]
+
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)
+
+        try:
+            self.txt_index = self.sorted_txtfilelist.index(self.txtpath)
+        except ValueError:
+            self.txt_index = 0
     def nextText(self):
-        # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.txtpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.txtfileList:
-            try:
-                txtfile = next(self.txtdirIterator)
-                self.ui.TextLE.setText(os.path.basename(txtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
-                    #QtCore.Qt.KeepAspectRatio)
-                self.txtfile = qtc.QFile(txtfile)
-                self.txtfilename = os.path.basename(txtfile)
-                self.dirname = os.path.dirname(self.txtpath)
-                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
-                self.txtpath = txtfile
-                print(txtfile,"\t",self.txtpath,"\t",self.txtfile,"\t",self.txtfilename)
-                #print(self.txtfilename)
-                self.showText(self.txtfilename)
-            except:
-                # the iterator has finished, restart it
-                self.txtdirIterator = iter(self.sorted_txtfilelist)
-                self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
-                self.prevText()
-            self.txtpath = txtfile
-            self.showText(txtfile)
-        else:
-            # no file list found, load an image
+        if not self.sorted_txtfilelist:
             self.loadText()
+            return
+
+        self.txt_index = (self.txt_index + 1) % len(self.sorted_txtfilelist)
+
+        txtfile = self.sorted_txtfilelist[self.txt_index]
+
+        self.txtpath = txtfile
+        self.showText(txtfile)
     
     def prevText(self):
-        # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.txtpath)           
-        filesplit = os.path.splitext(filestr)
-        filename = filesplit[0]
-        fileext = filesplit[1]
-        
-        if self.txtfileList:
-            try:
-                #txtfile = self.textfile
-                txtfile = next(self.txtdirRevIterator)
-                self.ui.TextLE.setText(os.path.basename(txtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
-                    #QtCore.Qt.KeepAspectRatio)
-                self.txtfile = qtc.QFile(txtfile)
-                self.txtfilename = os.path.basename(txtfile)
-                self.dirname = os.path.dirname(self.txtpath)
-                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
-                self.txtpath = txtfile
-                print(txtfile,"\t",self.txtpath,"\t",self.txtfile,"\t",self.txtfilename)
-                #print(self.txtfilename)
-                self.showText(self.txtfilename)
-            except:
-                # the iterator has finished, restart it
-                self.txtdirRevIterator = reversed(sorted_txtfilelist)
-                self.txtdirIterator = iter(sorted_txtfilelist)
-                self.nextText()
-            self.txtpath = txtfile
-            self.showText(txtfile)    
-        else:
-            # no file list found, load an image
-            self.loadText()      
+        if not self.sorted_txtfilelist:
+            self.loadText()
+            return
+
+        self.txt_index = (self.txt_index - 1) % len(self.sorted_txtfilelist)
+
+        txtfile = self.sorted_txtfilelist[self.txt_index]
+
+        self.txtpath = txtfile
+        self.showText(txtfile)   
 
     def ReloadText(self):
         if self.txtpath:
@@ -2689,63 +2545,84 @@ class MainWindow(qtw.QMainWindow):
     def bothLoad(self):
         ''' load the matching file for either the current image or the current text '''
         def accept():
-            #if self.ImageTextPairDialog.Accepted:
-            if self.ImageTextPairDialog_ui.MatchTxt2Imgbutton.isChecked():
-                print("matching text file to current image file")
-                print(self.imgpath)
-                if self.imgpath:
-                    print("finding matched text file for " + self.imgpath)
-                    imgfilename = self.imgpath
-                    file = qtc.QFile(imgfilename)
-                    filestr = os.path.basename(imgfilename)           
-                    filedir = os.path.dirname(imgfilename)
-                    filesplit = os.path.splitext(filestr)
-                    filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
-                    versionref = namesplit[0]
-                    pagestr = namesplit[2]
-                    pagenum = int(pagestr)
-                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
-                else:
-                    print(self.imgpath + " does not exist")
-                
-                self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
-                if self.trytxtpath:
-                    print("opening " + self.trytxtpath)
-                    self.txtpath = self.trytxtpath
-                    self.showText(self.txtpath)
-                    #self.ReloadText()
-                else:
-                    print(self.trytxtpath + " does not exist")
+            import os
 
+            def parse_filename(path):
+                filename = os.path.splitext(os.path.basename(path))[0]
+                parts = filename.split("_")
+
+                if len(parts) < 3:
+                    return None, None
+
+                return parts[0], parts[2]  # versionref, pagestr
+
+            # -------------------------------
+            # TEXT Ã¢â€ Â IMAGE
+            # -------------------------------
+            if self.ImageTextPairDialog_ui.MatchTxt2Imgbutton.isChecked():
+
+                if not self.imgpath:
+                    print("No image loaded")
+                    return
+
+                versionref, pagestr = parse_filename(self.imgpath)
+
+                if not versionref:
+                    print("Filename format invalid")
+                    return
+
+                txt_path = os.path.join(
+                    self.txtdir,
+                    f"{versionref}_Page_{pagestr}.txt"
+                )
+
+                if os.path.exists(txt_path):
+                    print("Opening:", txt_path)
+                    self.txtpath = txt_path
+                    self.showText(txt_path)
+
+                    # Ã¢Å“â€¦ Sync index
+                    if hasattr(self, "sorted_txtfilelist"):
+                        try:
+                            self.txt_index = self.sorted_txtfilelist.index(txt_path)
+                        except ValueError:
+                            pass
+                else:
+                    print("File does not exist:", txt_path)
+
+            # -------------------------------
+            # IMAGE Ã¢â€ Â TEXT
+            # -------------------------------
             elif self.ImageTextPairDialog_ui.MatchImg2Txtbutton.isChecked():
-                print("matching image file to current text file")
-                print(self.txtpath)
-                if self.txtpath:
-                    print("finding matched image file for " + self.txtpath)
-                    txtfilename = self.txtpath
-                    file = qtc.QFile(txtfilename)
-                    filestr = os.path.basename(txtfilename)           
-                    filedir = os.path.dirname(txtfilename)
-                    filesplit = os.path.splitext(filestr)
-                    filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
-                    versionref = namesplit[0]
-                    pagestr = namesplit[2]
-                    pagenum = int(pagestr)
-                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+
+                if not self.txtpath:
+                    print("No text loaded")
+                    return
+
+                versionref, pagestr = parse_filename(self.txtpath)
+
+                if not versionref:
+                    print("Filename format invalid")
+                    return
+
+                imgpath = os.path.join(
+                    self.imgdir,
+                    f"{versionref}_Page_{pagestr}.tif"
+                )
+
+                if os.path.exists(imgpath):
+                    print("Opening:", imgpath)
+                    self.imgpath = imgpath
+                    self.showImage(imgpath)
+
+                    # Ã¢Å“â€¦ Sync index
+                    if hasattr(self, "sorted_imgfilelist"):
+                        try:
+                            self.current_index = self.sorted_imgfilelist.index(imgpath)
+                        except ValueError:
+                            pass
                 else:
-                    print(self.txtpath + " does not exist")
-                
-                self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
-                if self.tryimgpath:
-                    print("opening " + self.tryimgpath)
-                    self.imgpath = self.tryimgpath
-                    self.showImage(self.imgpath)
-                else:
-                    print(self.tryimgpath + " does not exist")
+                    print("File does not exist:", imgpath)
 
 
         def reject():
@@ -2754,7 +2631,7 @@ class MainWindow(qtw.QMainWindow):
         self.ImageTextPairDialog = qtw.QDialog()
         self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
-        self.ImageTextPairDialog.show()
+        self.ImageTextPairDialog.exec_()
 
         self.ImageTextPairDialog_ui.buttonBox.accepted.connect(accept)
         self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
@@ -3015,7 +2892,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.OCRText.clear()
         my_OCR_rawtext = pytesseract.image_to_string(self.imgpath,lang="feg")
         self.ui.OCRText.insertPlainText(my_OCR_rawtext)
-        imgfilename = self.ui.ImageLe.text()
+        imgfilename = self.ui.ImageLE.text()
         imgbasename = imgfilename.split(".")[0]
         self.ui.TextLE.setText(imgbasename + ".txt")
     
@@ -3033,14 +2910,6 @@ class MainWindow(qtw.QMainWindow):
         self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
     
     def SetLineSpacing(self):
-                
-        '''num,ok = qtw.QInputDialog.getInt(self.ui.centralwidget,"Proportional Line Spacing","Enter a percent value from 0-200")  
-        
-        if ok:
-            lineSpacing = num
-        else:
-            lineSpacing = 145'''
-
         lineSpacing = self.ui.LHslider.value()
         self.ui.LHlineEdit.setText(str(lineSpacing))
             
@@ -3074,12 +2943,7 @@ class MainWindow(qtw.QMainWindow):
         file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
-        
-        #if self.txtdir:
-            #defaultdir = self.txtdir
-        #else:
-            #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
-        
+  
         defaultdir = self.txtdir + r"/" 
         defaultfile = self.ui.TextLE.displayText()
 
@@ -3110,98 +2974,847 @@ class MainWindow(qtw.QMainWindow):
 
     def MoveZoomSlider(self):
         self.ui.Zoomslider.setEnabled(True)
-        self.ui.Zoomslider.setValue(int(self.ui.ZoomComboBox.currentText()[0]))
+        try:
+            value = int(self.ui.ZoomComboBox.currentText().replace('%', '').strip())
+        except ValueError:
+            return
+
+        self.ui.Zoomslider.setValue(value)
 
     def show_combo(self):
         self.ui.ZoomComboBox.show()
 
-    def on_zoomslider(self):
-        #if self.ui.Zoomslider.isEnabled():
-        zoomValue = self.ui.Zoomslider.value()
-        self.ui.ZoomComboBox.setCurrentText(str(zoomValue) + " %")
-        print(zoomValue)
-        self.scale = zoomValue/100
-        print(self.scale)
+    def on_zoom(self, text):
+        try:
+            value = int(text.replace('%', '').strip())
+        except:
+            return
+
+        self.ui.Zoomslider.setValue(value)
+
+    def on_zoomslider(self, value):
+        print("[ZOOM HANDLER HIT]")  # confirm it fires
+
+        combo_text = f"{value} %"
+        if self.ui.ZoomComboBox.currentText() != combo_text:
+            self.ui.ZoomComboBox.blockSignals(True)
+            self.ui.ZoomComboBox.setCurrentText(combo_text)
+            self.ui.ZoomComboBox.blockSignals(False)
+
+        scale = value / 100.0
+        print(value)
+        print(scale)
+
+        if not hasattr(self, "imagepixmap") or self.imagepixmap.isNull():
+            print("[ZOOM ERROR] No valid pixmap")
+            return
+
+        scaled = self.imagepixmap.scaled(
+            self.imagepixmap.size() * scale,
+            qtc.Qt.KeepAspectRatio,
+            qtc.Qt.SmoothTransformation
+        )
+
+        self.ui.Image.setPixmap(scaled)
     
-    def on_zoom(self):
-        seltext = self.ui.ZoomComboBox.currentText()
-        if self.ui.Zoomslider.isEnabled():
-            self.on_zoomslider()
-        #elif seltext != "Best_Fit":
-            #print("Best fit not selected")
-        selnumtext = seltext.split(" ")
-        print(selnumtext[0])
-        self.scale = float(selnumtext[0])/100
-        print(self.scale)
-        
-        self.resize_image()
+    
+    def run_child_module(self, filename, *args):
+        module_path = os.path.abspath(os.path.join(script_dir, filename))
+        cmd = [sys.executable, module_path]
 
-    def resize_image(self):
+        if args and args[0]:
+            image_path = os.path.abspath(os.path.normpath(args[0]))
+            cmd.append(image_path)
 
-        '''if self.ui.ZoomComboBox.currentText(): == "Best_Fit": 
-            print("Best fit selected")
-            
-            self.ui.Zoomslider.setEnabled(False)
-            self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-            self.origsize = self.origpixmap.size()       
-            self.origheight = self.origpixmap.height
-            self.origwidth = self.origpixmap.width           
-            
-            bestheight = self.origheight
-            bestwidth = self.ui.ImagescrollArea.width
-            bestfit = qtc.QSize(self.origpixmap.height(),self.ui.ImagescrollArea.width())
-            
-            scaled_pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImagescrollArea.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)   
-            self.ui.Image.setPixmap(qtg.QPixmap(scaled_pixmap))
-        else:'''
-        self.origsize = self.origpixmap.size()       
-        self.origheight = self.origpixmap.height
-        self.origwidth = self.origpixmap.width
-        scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        self.ui.Image.setPixmap(scaled_pixmap)
-        
-        #self.ui.ImagescrollArea.adjustsize()
+        print(f"[CMD] {cmd}")
+        if not os.path.exists(module_path):
+            print(f"[ERROR] File not found: {module_path}")
+            return
 
+        try:
+            process = subprocess.Popen(cmd)                       
+            print(f"[LAUNCH] {filename} (PID: {process.pid})")
+        except Exception as e:
+            print(f"[Subprocess Error] {e}")
+
+    def _create_pixler_return_path(self):
+        temp_dir = tempfile.mkdtemp(prefix="biblion_pixler_return_")
+        return os.path.join(temp_dir, "pixler_return.tif")
+
+    def _start_pixler_return_monitor(self):
+        if not self.pixler_return_path:
+            return
+
+        if self._pixler_return_poll_timer is None:
+            self._pixler_return_poll_timer = qtc.QTimer(self)
+            self._pixler_return_poll_timer.timeout.connect(self._poll_pixler_return)
+
+        self._pixler_return_poll_timer.start(250)
+
+    def _stop_pixler_return_monitor(self):
+        if self._pixler_return_poll_timer is not None:
+            self._pixler_return_poll_timer.stop()
+
+    def _poll_pixler_return(self):
+        if not self.pixler_return_path:
+            self._stop_pixler_return_monitor()
+            return
+
+        if not os.path.exists(self.pixler_return_path):
+            return
+
+        if os.path.getsize(self.pixler_return_path) <= 0:
+            return
+
+        if self.consume_pixler_return(
+            self.pixler_return_path,
+            source_path=self.pending_pixler_source_path,
+            overwrite=False,
+        ):
+            self._stop_pixler_return_monitor()
+
+    def preview_pixler_return(self, return_path):
+        if not return_path or not os.path.exists(return_path):
+            return False
+
+        pixmap = qtg.QPixmap(return_path)
+        if pixmap.isNull():
+            image = qtg.QImage(return_path)
+            if image.isNull():
+                print(f"[MyServer RETURN] Could not preview returned crop: {return_path}")
+                return False
+            pixmap = qtg.QPixmap.fromImage(image)
+
+        self.imagepixmap = pixmap
+        self.origpixmap = pixmap
+        ui = None
+        try:
+            ui = self.ui
+        except Exception:
+            ui = None
+
+        if ui is not None and hasattr(ui, "Image"):
+            ui.Image.setPixmap(self.imagepixmap)
+            ui.ImageLE.setText(os.path.basename(return_path))
+        print(f"[MyServer RETURN] Previewed returned crop in MyServer: {return_path}")
+        return True
+
+    def _ensure_pixler_return_prompt(self):
+        if self.pixler_return_prompt_dialog is not None:
+            return self.pixler_return_prompt_dialog
+
+        dialog = qtw.QDialog(self)
+        dialog.setWindowTitle("Return Crop")
+        dialog.setWindowFlags(dialog.windowFlags() | qtc.Qt.Tool | qtc.Qt.WindowStaysOnTopHint)
+        dialog.setModal(False)
+        dialog.setAttribute(qtc.Qt.WA_ShowWithoutActivating, True)
+        dialog.setFocusPolicy(qtc.Qt.NoFocus)
+
+        layout = qtw.QVBoxLayout(dialog)
+        message = qtw.QLabel(
+            "MyPixler returned a crop. Inspect the preview, then decide whether to overwrite the source image."
+        )
+        message.setWordWrap(True)
+        layout.addWidget(message)
+
+        button_row = qtw.QHBoxLayout()
+        overwrite_button = qtw.QPushButton("Overwrite Source")
+        keep_button = qtw.QPushButton("Keep Preview")
+        close_button = qtw.QPushButton("Close")
+        button_row.addWidget(overwrite_button)
+        button_row.addWidget(keep_button)
+        button_row.addWidget(close_button)
+        layout.addLayout(button_row)
+
+        def do_overwrite():
+            if self.pixler_return_path and self.pending_pixler_source_path:
+                self.consume_pixler_return(
+                    self.pixler_return_path,
+                    source_path=self.pending_pixler_source_path,
+                    overwrite=True,
+                )
+
+        def do_keep_preview():
+            dialog.setWindowTitle("Return Crop - Preview Kept")
+            self.statusBar().showMessage("Returned crop preview kept. Close this dialog when finished.")
+
+        overwrite_button.clicked.connect(do_overwrite)
+        keep_button.clicked.connect(do_keep_preview)
+        close_button.clicked.connect(dialog.close)
+
+        dialog.adjustSize()
+        self.pixler_return_prompt_dialog = dialog
+        return dialog
+
+    def prompt_pixler_return_action(self):
+        ui = None
+        try:
+            ui = self.ui
+        except Exception:
+            ui = None
+
+        if ui is None:
+            return False
+
+        dialog = self._ensure_pixler_return_prompt()
+        dialog.show()
+        dialog.raise_()
+        self.statusBar().showMessage("Returned crop preview ready. Inspect and close the floating prompt when done.")
+        return True
+
+    def consume_pixler_return(self, return_path, source_path=None, overwrite=False):
+        if not return_path or not os.path.exists(return_path):
+            print(f"[MyServer RETURN] Missing returned file: {return_path}")
+            return False
+
+        self.pixler_return_path = os.path.normpath(return_path)
+        if source_path:
+            self.pending_pixler_source_path = os.path.normpath(source_path)
+
+        print(f"[MyServer RETURN] Received from MyPixler: {self.pixler_return_path}")
+
+        if not overwrite:
+            if not self.preview_pixler_return(self.pixler_return_path):
+                return False
+
+            should_overwrite = self.prompt_pixler_return_action()
+            if should_overwrite:
+                return self.consume_pixler_return(
+                    self.pixler_return_path,
+                    source_path=self.pending_pixler_source_path,
+                    overwrite=True,
+                )
+
+            return True
+
+        if overwrite and self.pending_pixler_source_path:
+            shutil.copy2(self.pixler_return_path, self.pending_pixler_source_path)
+            self.imgpath = self.pending_pixler_source_path
+            self.showImage(self.imgpath)
+            print(f"[MyServer RETURN] Overwrote source with returned crop: {self.imgpath}")
+        return True
+
+    def OpenWithMyReader(self):
+        self.run_child_module('MyReader.py')
+
+    def OpenWithMyScanner(self):
+        self.run_child_module('MyScanner.py')
+
+    def OpenWithMyGlypher(self):
+        self.run_child_module('MyGlypher.py')
+
+    def OpenWithMyBoxer(self):
+        self.run_child_module('MyBoxer.py')
+
+    def OpenWithMyPixler(self):
+        source_path = getattr(self, "imgpath", "") or getattr(self, "_stack_path", "")
+
+        if not source_path:
+            self.run_child_module('MyPixler.py')
+            return
+
+        source_path = os.path.abspath(os.path.normpath(source_path))
+        self.pending_pixler_source_path = source_path
+        create_return_path = getattr(self, '_create_pixler_return_path', None)
+        if callable(create_return_path):
+            self.pixler_return_path = create_return_path()
+        else:
+            temp_dir = tempfile.mkdtemp(prefix="biblion_pixler_return_")
+            self.pixler_return_path = os.path.join(temp_dir, "pixler_return.tif")
+        module_path = os.path.abspath(os.path.join(script_dir, 'MyPixler.py'))
+        cmd = [
+            sys.executable,
+            module_path,
+            source_path,
+            '--subprocess-mode',
+            '--return-path',
+            self.pixler_return_path,
+        ]
+
+        print(f"[CMD] {cmd}")
+        if not os.path.exists(module_path):
+            print(f"[ERROR] File not found: {module_path}")
+            return
+
+        try:
+            process = subprocess.Popen(cmd)
+            print(f"[LAUNCH] MyPixler.py (PID: {process.pid})")
+            self._start_pixler_return_monitor()
+        except Exception as e:
+            print(f"[Subprocess Error] {e}")
+
+    def OpenWithMyVersifier(self):
+        self.run_child_module('MyVersifier.py')
+
+    def OpenWithMyResolver(self):
+        self.run_child_module('MyResolver.py')
+
+    def OpenWithMyLexer(self):
+        self.run_child_module('MyLexer.py')
+
+    def OpenWithMyGrounder(self):
+        self.run_child_module('MyGrounder.py')
+
+    def OpenWithMyTrainer(self):
+        self.run_child_module('MyTrainer.py')
+
+    def OpenWithMyWriter(self):
+        self.run_child_module('MyWriter.py')
+
+    def OpenWithMyExplorer(self):
+        self.run_child_module('MyExplorer.py')
+    
     def OpenWithCalc(self):
         lo_cmd = 'libreoffice --calc ' + self.txtpath
         print(lo_cmd)
         os.system(lo_cmd)
 
-    def OpenWithWriter(self):
-        lo_cmd = 'libreoffice --writer ' + self.txtpath
-        print(lo_cmd)
-        os.system(lo_cmd)
-
-    def OpenWithMyPixler(self):
-        mw_cmd = "python3 ViewController/0-MainUI/MyPixler.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
-
-    def OpenWithMyWriter(self):
-        
-        mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
-        '''
-        writer.MainWindow = qtw.QMainWindow()
-        writer.ui = writer.Ui_MyWriterUI()
-        writer.ui.setupUi(writer.MainWindow)
-        writer.MainWindow.show()'''
-
     def on_font_update(self):
         # update font to selection and size       
-        #font = qtg.QFont()
-        #font.setFamily(self.ui.fontComboBox.currentFont())
-        #print(self.ui.fontComboBox.currentFont())
         font = qtg.QFont(self.ui.fontComboBox.currentFont())
         font.setPointSize(self.ui.fontSizeBox.value())
-        #font = qtg.QFont(self.font)
-        #font.setPointSize(int(self.fontsize))
         
         self.ui.OCRText.setFont(font)
 
     def on_lang_select(self):
         pass
+
+# Must install python-sane and have SANE-compatible scanner hardware to use this feature
+
+# class ScanWorker(QThread):
+#     import python-sane as sane
+    
+#     """Handles the scanning process in a background thread."""
+#     scan_complete = pyqtSignal(bytes)
+#     scan_failed = pyqtSignal(str)
+
+#     def __init__(self, device_name):
+#         super().__init__()
+#         self.device_name = device_name
+
+#     def run(self):
+#         try:
+#             # Initialize SANE inside the worker thread
+#             sane.init()
+#             dev = sane.open(self.device_name)
+            
+#             # Start scanning and capture the PIL Image object
+#             pil_img = dev.start()
+            
+#             if pil_img:
+#                 # Save PIL image to a byte buffer as a PNG
+#                 buffer = io.BytesIO()
+#                 pil_img.save(buffer, format="PNG")
+#                 self.scan_complete.emit(buffer.getvalue())
+#             else:
+#                 self.scan_failed.emit("No image data received from scanner.")
+            
+#             dev.close()
+#         except Exception as e:
+#             self.scan_failed.emit(str(e))
+#         finally:
+#             sane.exit()
+
+# class ScannerApp(QMainWindow):
+#     import sys
+#     import io
+#     import sane
+#     from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
+#                                 QHBoxLayout, QPushButton, QComboBox, QLabel, 
+#                                 QMessageBox)
+#     from PyQt5.QtGui import QPixmap, QImage
+#     from PyQt5.QtCore import Qt, QThread, pyqtSignal
+    
+#     def __init__(self):
+#         super().__init__()
+#         self.setWindowTitle("PyQt5 Open Source Scanner")
+#         self.resize(600, 500)
+#         self.init_ui()
+#         self.refresh_devices()
+
+#     def init_ui(self):
+#         # Main Layout
+#         central_widget = QWidget()
+#         self.setCentralWidget(central_widget)
+#         main_layout = QVBoxLayout(central_widget)
+
+#         # Controls Layout (Top)
+#         controls_layout = QHBoxLayout()
+        
+#         self.device_combo = QComboBox()
+#         controls_layout.addWidget(QLabel("Scanner:"))
+#         controls_layout.addWidget(self.device_combo)
+
+#         self.refresh_btn = QPushButton("Refresh")
+#         self.refresh_btn.clicked.connect(self.refresh_devices)
+#         controls_layout.addWidget(self.refresh_btn)
+
+#         self.scan_btn = QPushButton("Scan Document")
+#         self.scan_btn.setStyleSheet("background-color: #007ACC; color: white; font-weight: bold;")
+#         self.scan_btn.clicked.connect(self.start_scan)
+#         controls_layout.addWidget(self.scan_btn)
+
+#         main_layout.addLayout(controls_layout)
+
+#         # Preview Area (Center)
+#         self.preview_label = QLabel("No document scanned yet.")
+#         self.preview_label.setAlignment(Qt.AlignCenter)
+#         self.preview_label.setStyleSheet("border: 2px dashed #999; background-color: #F0F0F0;")
+#         main_layout.addWidget(self.preview_label, stretch=1)
+
+#     def refresh_devices(self):
+#         """Detects connected hardware scanners."""
+#         self.device_combo.clear()
+#         try:
+#             sane.init()
+#             devices = sane.get_devices()
+#             sane.exit()
+
+#             if not devices:
+#                 self.device_combo.addItem("No scanners found")
+#                 self.scan_btn.setEnabled(False)
+#                 return
+
+#             for device in devices:
+#                 # device format: (device_name, vendor, model, type)
+#                 display_name = f"{device[1]} {device[2]}"
+#                 self.device_combo.addItem(display_name, device[0])
+            
+#             self.scan_btn.setEnabled(True)
+#         except Exception as e:
+#             QMessageBox.critical(self, "SANE Error", f"Could not initialize SANE:\n{str(e)}")
+
+#     def start_scan(self):
+#         """Prepares UI and triggers the background thread."""
+#         device_name = self.device_combo.currentData()
+#         if not device_name:
+#             return
+
+#         self.scan_btn.setEnabled(False)
+#         self.scan_btn.setText("Scanning...")
+#         self.preview_label.setText("Reading from scanner... Please wait.")
+
+#         # Start the background worker thread
+#         self.worker = ScanWorker(device_name)
+#         self.worker.scan_complete.connect(self.on_scan_success)
+#         self.worker.scan_failed.connect(self.on_scan_error)
+#         self.worker.start()
+
+#     def on_scan_success(self, img_bytes):
+#         """Displays the resulting image data in the UI layout."""
+#         self.scan_btn.setEnabled(True)
+#         self.scan_btn.setText("Scan Document")
+
+#         # Convert byte data to QPixmap
+#         qimage = QImage.fromData(img_bytes)
+#         pixmap = QPixmap.fromImage(qimage)
+
+#         # Scale the image smoothly to fit the preview window
+#         scaled_pixmap = pixmap.scaled(self.preview_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+#         self.preview_label.setPixmap(scaled_pixmap)
+
+#     def on_scan_error(self, error_msg):
+#         """Handles scan failures gracefully."""
+#         self.scan_btn.setEnabled(True)
+#         self.scan_btn.setText("Scan Document")
+#         self.preview_label.setText("Scan failed.")
+#         QMessageBox.warning(self, "Scan Error", f"An error occurred during scanning:\n{error_msg}")
+
+
+
+# ================================
+# PROJECT CREATION STATE MACHINE
+# MyServer.py - Core Implementation
+# ================================
+
+# -------------------------------
+# STATE DEFINITIONS
+# -------------------------------
+
+class ProjectState(Enum):
+    INIT = "INIT"
+    VALIDATE_INPUT = "VALIDATE_INPUT"
+    PROVENANCE_REQUIRED = "PROVENANCE_REQUIRED"
+    PROVENANCE_CAPTURED = "PROVENANCE_CAPTURED"
+    RIS_GENERATION = "RIS_GENERATION"
+    FILESYSTEM_WRITE = "FILESYSTEM_WRITE"
+    REGISTRATION = "REGISTRATION"
+    COMPLETE = "COMPLETE"
+    FAILED = "FAILED"
+
+# -------------------------------
+# CORE ENGINE
+# -------------------------------
+
+class ProjectCreationEngine:
+    def __init__(self, base_path=None, event_bus=None):
+        self.base_path = base_path or os.path.join(os.path.expanduser("~"), "Projects")
+        self.state = ProjectState.INIT
+        self.context = {}
+        self.ris = None
+        self.events = []
+
+        # NEW: shared event bus (or create default one)
+        self.event_bus = event_bus if event_bus else EventBus()
+
+    # ---------------------------
+    # EVENT EMITTER
+    # ---------------------------
+
+    def emit_event(self, event_name, metadata=None):
+        event = {
+            "event": event_name,
+            "timestamp": time.time(),
+            "state": self.state.value,
+            "project_name": self.context.get("project_name"),
+            "metadata": metadata or {}
+        }
+
+        # store locally (for replay/debug)
+        self.events.append(event)
+
+        # console debug
+        print(f"[EVENT] {event_name}")
+
+        # NEW: broadcast globally
+        if self.event_bus:
+            self.event_bus.emit(event)
+
+        return event
+
+    # ---------------------------
+    # STATE TRANSITION CORE
+    # ---------------------------
+
+    def transition(self, next_state):
+        self.state = next_state
+        self.emit_event(f"state_{next_state.value.lower()}")
+
+    # ---------------------------
+    # ENTRY POINT
+    # ---------------------------
+
+    def create_project(self, payload):
+        try:
+            self.context = payload
+            self.transition(ProjectState.INIT)
+
+            self.validate_input()
+            self.capture_provenance()
+            self.generate_ris()
+            self.write_filesystem()
+            self.register_project()
+
+            self.transition(ProjectState.COMPLETE)
+            self.emit_event("project_created")
+
+            return {
+                "status": "success",
+                "project": self.context.get("project_name")
+            }
+
+        except Exception as e:
+            self.rollback()
+            self.state = ProjectState.FAILED
+            self.emit_event("project_failed", {"error": str(e)})
+            return {"status": "failed", "error": str(e)}
+
+    # ---------------------------
+    # VALIDATION
+    # ---------------------------
+
+    def validate_input(self):
+        self.transition(ProjectState.VALIDATE_INPUT)
+
+        name = self.context.get("project_name")
+
+        if not name or not isinstance(name, str):
+            raise ValueError("Invalid project name")
+
+        project_path = os.path.join(self.base_path, name)
+
+        if os.path.exists(project_path):
+            raise ValueError("Project already exists")
+
+        self.emit_event("validation_passed")
+
+    # ---------------------------
+    # PROVENANCE CAPTURE
+    # ---------------------------
+
+    def capture_provenance(self):
+        self.transition(ProjectState.PROVENANCE_REQUIRED)
+
+        required_fields = [
+            "project_name",
+            "project_purpose",
+            "creation_trigger",
+            "source_context",
+            "user_intent_summary"
+        ]
+
+        for field in required_fields:
+            if field not in self.context:
+                raise ValueError(f"Missing RIS field: {field}")
+
+        self.ris = self.context.copy()
+
+        self.transition(ProjectState.PROVENANCE_CAPTURED)
+
+        # lock step (immutability simulation)
+        self.ris["_locked"] = True
+        self.ris["_hash"] = self._hash_ris(self.ris)
+
+        self.emit_event("provenance_captured")
+
+    # ---------------------------
+    # RIS GENERATION
+    # ---------------------------
+
+    def generate_ris(self):
+        self.transition(ProjectState.RIS_GENERATION)
+
+        self.ris.update({
+            "ris_version": "1.1",
+            "timestamp_created": time.time(),
+            "creator": "Max",
+            "environment": {
+                "platform": "MyPixler",
+                "server": "MyServer"
+            }
+        })
+
+        self.emit_event("ris_generated")
+
+    # ---------------------------
+    # FILESYSTEM WRITE (ATOMIC)
+    # ---------------------------
+
+    def write_filesystem(self):
+        self.transition(ProjectState.FILESYSTEM_WRITE)
+
+        project_name = self.context["project_name"]
+        final_path = os.path.join(self.base_path, project_name)
+        temp_path = final_path + "_tmp"
+
+        os.makedirs(self.base_path, exist_ok=True)
+
+        # clean temp
+        if os.path.exists(temp_path):
+            shutil.rmtree(temp_path)
+
+        os.makedirs(temp_path)
+
+                # write RIS
+        with open(os.path.join(temp_path, "project.ris.json"), "w") as f:
+            json.dump(self.ris, f, indent=2)
+
+        # create structure
+        os.makedirs(os.path.join(temp_path, "src"))
+        os.makedirs(os.path.join(temp_path, "assets"))
+        os.makedirs(os.path.join(temp_path, "logs"))
+        os.makedirs(os.path.join(temp_path, "output"))
+        self._write_git_support_files(temp_path)
+
+        # atomic commit
+        if os.path.exists(final_path):
+            raise ValueError("Final path collision")
+
+        os.rename(temp_path, final_path)
+        self._initialize_git_repository(final_path)
+
+        self.emit_event("filesystem_written")
+
+    # ---------------------------
+    # GIT REPOSITORY INITIALIZATION
+    # ---------------------------
+
+    def _write_git_support_files(self, project_path):
+        readme_path = os.path.join(project_path, "README.md")
+        gitignore_path = os.path.join(project_path, ".gitignore")
+
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(f"# {self.context['project_name']}\n\n")
+            f.write("Local BiblionOCR project repository.\n")
+
+        with open(gitignore_path, "w", encoding="utf-8") as f:
+            f.write("__pycache__/\n")
+            f.write("*.pyc\n")
+            f.write("*.tmp\n")
+            f.write("*.log\n")
+            f.write(".DS_Store\n")
+            f.write("Thumbs.db\n")
+
+    def _initialize_git_repository(self, project_path):
+        git_executable = shutil.which("git")
+        if not git_executable:
+            raise RuntimeError("Git executable not found; cannot initialize local repository.")
+
+        result = subprocess.run(
+            [git_executable, "init"],
+            cwd=project_path,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"Git repository initialization failed: {result.stderr.strip()}")
+
+        branch_result = subprocess.run(
+            [git_executable, "branch", "-M", "main"],
+            cwd=project_path,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if branch_result.returncode != 0:
+            raise RuntimeError(f"Git default branch setup failed: {branch_result.stderr.strip()}")
+
+        self.emit_event("git_repository_initialized", {"path": project_path})
+
+    # ---------------------------
+    # REGISTRATION
+    # ---------------------------
+
+    def register_project(self):
+        self.transition(ProjectState.REGISTRATION)
+
+        registry_path = os.path.join(self.base_path, "_registry.json")
+
+        registry = []
+
+        if os.path.exists(registry_path):
+            with open(registry_path, "r") as f:
+                registry = json.load(f)
+            if isinstance(registry, dict):
+                registry = [registry]
+            elif not isinstance(registry, list):
+                registry = []
+
+        registry = [item for item in registry if item.get("project_name") != self.context["project_name"]]
+        registry.append({"project_name": self.context["project_name"],"timestamp": time.time(),"path": os.path.join(self.base_path, self.context["project_name"]),"git_repository": True})
+        with open(registry_path, "w") as f:
+            json.dump(registry, f, indent=2)
+
+        self.emit_event("project_registered")
+
+    # ---------------------------
+    # ROLLBACK
+    # ---------------------------
+
+    def rollback(self):
+        project_name = self.context.get("project_name")
+        if not project_name:
+            return
+
+        path = os.path.join(self.base_path, project_name)
+        tmp_path = path + "_tmp"
+
+        for p in [path, tmp_path]:
+            if os.path.exists(p):
+                shutil.rmtree(p)
+
+        self.emit_event("rollback_complete")
+
+    # ---------------------------
+    # HASH FUNCTION
+    # ---------------------------
+
+    def _hash_ris(self, ris):
+        raw = json.dumps(ris, sort_keys=True).encode()
+        return hashlib.sha256(raw).hexdigest()
+
+# ================================
+# 0-MainUI - RIS Dialog Controller
+# ================================
+
+class RISDialogController:
+
+    def __init__(self, engine):
+        self.engine = engine
+
+    def launch_dialog(self):
+        """
+        UI must BLOCK until RIS payload is complete
+        """
+
+        self.engine.emit_event("provenance_required")
+
+        ris_payload = self.collect_user_input()
+
+        self.engine.context.update(ris_payload)
+
+        return ris_payload
+
+    def collect_user_input(self):
+        """
+        Replace with real UI bindings.
+        This is the contract layer.
+        """
+
+        return {
+            "project_name": input("Project Name: "),
+            "project_purpose": input("Purpose: "),
+            "creation_trigger": "manual",
+            "source_context": "0-MainUI",
+            "user_intent_summary": input("Intent Summary: ")
+        }
+# ================================
+# EVENT BUS
+# ================================
+
+class EventBus:
+
+    def __init__(self):
+        self.listeners = {}
+
+    def subscribe(self, event_name, callback):
+        if event_name not in self.listeners:
+            self.listeners[event_name] = []
+        self.listeners[event_name].append(callback)
+
+    def emit(self, event):
+        name = event["event"]
+
+        if name in self.listeners:
+            for cb in self.listeners[name]:
+                cb(event)
+
+# ================================
+# PROJECT REPLAY ENGINE
+# ================================
+
+class ProjectReplayEngine:
+
+    def __init__(self, event_log):
+        self.events = event_log
+
+    def replay(self):
+        state = {}
+
+        for e in self.events:
+            print(f"Replaying: {e['event']}")
+
+            if e["event"] == "validation_passed":
+                state["validated"] = True
+
+            if e["event"] == "provenance_captured":
+                state["ris_locked"] = True
+
+            if e["event"] == "filesystem_written":
+                state["written"] = True
+
+            if e["event"] == "project_created":
+                state["complete"] = True
+
+        return state
+
+    def reconstruct_timeline(self):
+        return [
+            (e["timestamp"], e["event"], e["state"])
+            for e in self.events
+        ]
+
 
 # Only run this code if I am actually running this script
 if __name__ == '__main__': 
