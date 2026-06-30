@@ -30,6 +30,68 @@
 
 ---
 
+
+## 📠 Scanner Acquisition Architecture
+
+### Design Philosophy
+
+BiblionOCR separates scanner discovery from image acquisition.
+
+Architecture:
+
+    Discovery
+        ↓
+    Capability Detection
+        ↓
+    Image Acquisition
+
+Discovery identifies devices. Acquisition retrieves images.
+
+### Discovery Layer
+
+* Scapy (ARP discovery)
+* ICMP reachability
+* TCP probing
+* mDNS / Bonjour (planned)
+* SNMP capability detection (planned)
+* Existing `NetworkScanner` in `MyServer.py` belongs in this layer, but today it only emits IP/MAC discovery results and does not yet identify scanner protocol capabilities
+
+### Capability Detection Layer
+
+* Capability detection should remain distinct from raw network discovery
+* For network scanners, this layer should probe for eSCL/AirScan first, then other advertised protocols
+* For local Windows devices, capability selection may depend on OS-accessible backends such as TWAIN or WIA rather than network advertisement alone
+* `ScannerManager` should eventually choose a backend from normalized capability data instead of calling WIA directly
+
+### Acquisition Backends
+
+Preferred order:
+
+1. eSCL / AirScan
+2. SANE (Linux)
+3. TWAIN (Windows)
+4. WIA (Windows)
+5. Mock backend for tests and UI validation when no hardware is attached
+
+Future implementations should derive from a common `ScannerBackend` interface so MyServer receives a stable scan result contract that preserves the persisted TIFF path used by the existing workflow, with optional in-memory image/metadata when helpful.
+
+### Current Windows Runtime Path
+
+* The active scan entrypoint in `MyServer.py` is `actionScanNetwork()` even though the current behavior is local hardware acquisition, not network image retrieval
+* `MyServer.__init__()` instantiates `Core.Scanner.manager.ScannerManager` directly and wires the UI scanner action/button to that path
+* `ScannerManager` is currently a thin wrapper around `WIAScanner`; it does not yet select among multiple backends at runtime
+* `WIAScanner.acquire(destination_folder)` uses `win32com.client.Dispatch("WIA.CommonDialog")` and `WIA.DeviceManager`, saves a temporary PNG, converts it to grayscale `QImage`, then writes the final numbered TIFF into the scanned folder
+* `MyServer` currently displays the saved TIFF by passing `result["path"]` into `showImage()`; this disk-backed TIFF handoff is deliberate design because it fits the existing MyServer workflow
+* Because of that current contract, the layered scanner plan should normalize result shape around a persisted TIFF output before broad backend rollout rather than treating file output as legacy behavior
+
+### Helper Formatting Pattern
+
+* The current scanner helpers follow the same pragmatic formatting style used elsewhere: short section-divider comments, thin wrapper classes, and simple return dictionaries like `{ "path": ..., "dir": ... }`
+* Discovery and acquisition helpers are present but not yet unified behind a stable backend-selection contract
+
+
+---
+
 ## ⚠️ Critical UI / Import Correction
 
 ### ✅ Actual Current Runtime Model
@@ -65,18 +127,29 @@ These imports caused recent startup tracebacks because those names do not exist 
 ### ✅ Current Working State
 
 * The **New Project** action can create a project successfully
-* Missing UI helper methods were added to `MainWindow`:
+* `collect_new_project_payload()` now opens a guided two-step modal dialog instead of chained text prompts
+* The wizard currently supports:
 
-  * `get_project_name()`
-  * `get_project_purpose()`
-  * `get_intent()`
-  * `collect_new_project_payload()`
+  * step 1: optional provenance import
+  * step 2: project details + review summary
+  * required-field validation before final submission
+  * visible project-name normalization before creation
 
 * `on_new_project_clicked()` now:
 
-  * collects required RIS payload fields from dialogs
+  * collects required project/RIS payload fields from the wizard
   * handles Cancel cleanly
+  * prompts before replacing an existing project
   * reports success/failure with message boxes
+
+* Supported provenance import formats in the wizard:
+
+  * `project.ris.json`
+  * standard RIS text exports such as Primo `.ris`
+  * `.txt` provenance files containing RIS, JSON text, or simple key/value pairs
+  * `.csv` provenance files with either key/value rows or a header row plus one data row
+
+* Imported provenance metadata is preserved into the final project RIS payload under source-provenance fields when available
 
 ### ✅ Project Creation Location
 
@@ -93,6 +166,13 @@ These imports caused recent startup tracebacks because those names do not exist 
 * The project registry was normalized to:
 
   * `C:/Users/Max/Projects/_registry.json`
+
+* Current manual test staging state:
+
+  * `Erasmus1519` content has replaced `Erasmus1516`
+  * `Erasmus1519` has been removed
+  * `Erasmus1522` has been removed so it can be recreated through the wizard
+  * Windows held an open handle on the `Erasmus1516` root directory, so the successful reset path was: clear `Erasmus1516` contents, then move `Erasmus1519` contents into that existing folder
 
 ### ⚠️ Temporary Architecture Drift
 
@@ -137,9 +217,13 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Continue.dev YAML/config sensitive to formatting
 * Cross-platform path contamination (Jetson ↔ Windows)
 * `MyServer.py` still has too much project-creation business logic
-* `Core/engine.py` currently has a debug side effect: `print("ENGINE MODULE LOADING")`
+* `Core/engine.py` now compiles without the prior debug side effect `print("ENGINE MODULE LOADING")`
 * `Core/__init__.py` / `Core` imports must be validated before switching `MyServer.py` to Core imports
 * Event replay from SQLite is not yet implemented
+* Scanner backend abstraction layer not yet implemented
+* Discovery and acquisition remain separate responsibilities
+* eSCL backend pending implementation
+* `ScannerManager.acquire_qimage()` is stale relative to `WIAScanner`: it calls `self.wia.acquire_qimage()` without a destination folder, while `WIAScanner.acquire_qimage(destination_folder)` expects one and tries to return `result["image"]` even though `acquire()` currently returns only `path` and `dir`
 
 ---
 
@@ -158,6 +242,20 @@ These imports caused recent startup tracebacks because those names do not exist 
   * `ProjectFolderList.txt`
   * `ViewController/0-MainUI/ProjectFolderList.txt`
 
+* `Core/engine.py` can now generate new project folder structures from `ProjectFolderList.txt`
+* Core treats file entries in `ProjectFolderList.txt` as parent-directory requirements
+* Core adds `.gitkeep` placeholders to empty directories so local project Git repos can track the structure
+* Core copies the folder list into `src/manifests/ProjectFolderList.txt`
+* Core writes a structure rebuild log to `logs/processing/project_folder_list_structure_rebuild.md`
+* Core emits `project_structure_created` after folder generation
+
+* Current future-project manifest baseline:
+
+  * include current ViewController runtime files
+  * include `Model/Project/Data` csv/json/SQLite folders and file contents
+  * include minimal `Model/Project/Images` folder skeleton only
+  * exclude deep image trees and image files themselves
+
 * Deprecated references are excluded or redirected:
 
   * `Model/Utilities` → `Model/Project/Utilities`
@@ -172,12 +270,26 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Required `ViewController/0-MainUI` files and selected module folders are explicitly restored during regeneration
 
-### ✅ MyServer Project Creation
+### ✅ MyServer / Core Project Creation
 
 * New project action no longer crashes on missing helper methods
 * Project creation target is now `~/Projects`
+* New projects are required to initialize as local Git repositories
+* `Core/engine.py` now supports ProjectFolderList-driven structure generation
+* Event-store SQLite lock failures are now treated as non-fatal for project creation
+* Project creation temp directories are now unique per run to avoid stale temp-dir collisions
+* `Core/engine.py` smoke test confirmed:
+
+  * `.git/` initialization
+  * `Model/Project/Data/json`
+  * `Model/Project/Images/Workflow/pixler/pixler_pages_cropped`
+  * `ViewController/0-MainUI`
+  * `src/manifests/ProjectFolderList.txt`
+  * `logs/processing/project_folder_list_structure_rebuild.md`
+
 * `Erasmus1516` has been moved to `C:/Users/Max/Projects/Erasmus1516`
 * `_registry.json` now lives under `C:/Users/Max/Projects`
+* `Erasmus1522` creation was validated successfully with the trimmed manifest through the storeless path
 
 ### ✅ MyPixler
 
@@ -328,12 +440,21 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 ## 🎯 Next Safe Development Steps
 
-1. **Core Import Stabilization**
+1. **Scanner Framework**
 
-   * Remove debug side effect from `Core/engine.py`
-   * Confirm `Core.engine.ProjectCreationEngine` can be imported cleanly
+   * Create `Core/scanner_manager.py`
+   * Create backend modules (`escl_backend.py`, `sane_backend.py`, `twain_backend.py`, `wia_backend.py`)
+  * Add a `mock_backend.py` for no-hardware tests and UI validation
+   * Separate discovery from acquisition
+  * Add an explicit capability-detection step between discovery and backend selection
+   * Keep MyServer backend-agnostic
+
+2. **Core / MyServer Unification**
+
+   * Wire `MyServer.py` to use `Core.engine.ProjectCreationEngine`
    * Confirm `Core.event_bus.EventBus` can be imported cleanly
    * Confirm `Core.event_store.SQLiteEventStore` can be imported cleanly
+   * Keep local `MyServer.py` engine classes until Core-driven UI project creation is runtime-tested
 
 2. **Move Project Logic Out of MyServer**
 
@@ -486,7 +607,7 @@ DO NOT update for:
 ### Remaining Risk Areas
 
 * `MyServer.py` still contains duplicate Core-style classes
-* `Core/engine.py` and `MyServer.py` engine behavior are not yet unified
+* `Core/engine.py` now supports ProjectFolderList-driven folder generation, but `MyServer.py` and Core engine behavior are not yet fully unified
 * SQLite replay support is incomplete
 * Generated UI files should not be hand-edited casually
 * Cross-system path handling remains important
@@ -530,6 +651,17 @@ DO NOT update for:
 * 2026-06-26: Corrected new project destination to `C:/Users/Max/Projects`
 * 2026-06-26: Moved `Erasmus1516` from `Model/Project` to `C:/Users/Max/Projects`
 * 2026-06-26: ProjectFolderList generator updated to include required ViewController references while excluding external/system paths and `Model/Project/Utilities/Reference`
+* 2026-06-26: `Core/engine.py` updated to generate project folder structures from `ProjectFolderList.txt`, add `.gitkeep` placeholders, copy the folder list into `src/manifests`, write a structure rebuild log, and emit `project_structure_created`
+
+---
+
+* 2026-06-30: Adopted layered scanner architecture
+* 2026-06-30: Scapy designated for discovery only
+* 2026-06-30: eSCL/AirScan designated preferred cross-platform acquisition protocol
+* 2026-06-30: SANE selected for Linux backend; TWAIN/WIA for Windows
+* 2026-06-30: Confirmed current Windows runtime scan path is `MyServer.actionScanNetwork()` → `Core.Scanner.manager.ScannerManager` → `Core.Scanner.wia_scanner.WIAScanner.acquire()` → saved grayscale TIFF
+* 2026-06-30: Identified stale `acquire_qimage` helper contract mismatch in the current WIA path
+* 2026-06-30: Confirmed existing `NetworkScanner` belongs to discovery only; capability detection must remain a separate layer before backend selection
 
 ---
 
@@ -570,8 +702,18 @@ DO NOT update for:
 
 ---
 
+## 🤖 Copilot Familiarization Notes — 2026-06-30
+
+* Current runtime center of gravity is still `ViewController/0-MainUI/MyServer.py`, but project-creation ownership is intended to converge into `Core/engine.py`
+* The safest boundary for future edits is: `MyServer.py` wires UI/runtime behavior, `Core/` owns lifecycle logic, and `MyPixler`/`ImagePreviewDialog` own image processing and preview state
+* After any project-creation change, the first validation target should be the external project root at `C:/Users/Max/Projects`, the `_registry.json` update path, and ProjectFolderList-driven structure generation
+* The highest-risk refactor remains removing duplicate engine/event classes from `MyServer.py` before Core imports, runtime wiring, and replay behavior are fully validated
+* There are currently multiple notebook copies in circulation; the repo-tracked notebook should stay intentionally synchronized with the working copy when architecture notes are updated
+
+---
+
 ## 📅 Last Updated
 
-2026-06-26
+2026-06-30
 
 ---
