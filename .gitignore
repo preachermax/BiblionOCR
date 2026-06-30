@@ -19,3 +19,8 @@ dist/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# BiblionOCR local runtime artifacts
+Model/Project/Data/json/Session.json
+ViewController/0-MainUI/__pycache__/
+Core/Scanner/TWAINDSM.dll
