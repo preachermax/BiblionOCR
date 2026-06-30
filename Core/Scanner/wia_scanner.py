@@ -1,141 +1,108 @@
-import win32com.client
-import tempfile
+try:
+    import pythoncom
+    import win32com.client
+except ImportError:
+    pythoncom = None
+    win32com = None
+
 import os
-import uuid
 from PyQt5.QtGui import QImage
-print("[WIA SCANNER LOADED]")
-class WIAScanner:
+from .device import ScannerDevice
+
+
+class WIAScanner(ScannerDevice):
+    backend_name = "WIA"
+
+    @classmethod
+    def is_supported_platform(cls, platform_name):
+        return platform_name == "windows"
+
+    @classmethod
+    def is_available(cls):
+        return win32com is not None and pythoncom is not None
 
     def __init__(self):
-        self.wia = win32com.client.Dispatch("WIA.CommonDialog")
-        self.device_manager = win32com.client.Dispatch("WIA.DeviceManager")
+        if win32com is None or pythoncom is None:
+            raise RuntimeError(
+                "WIA scanning requires pywin32 and is only supported on Windows"
+            )
 
     # -------------------------
     # Device discovery
     # -------------------------
     def list_devices(self):
-        devices = []
-        for i, dev in enumerate(self.device_manager.DeviceInfos):
-            devices.append(dev.Properties("Name").Value)
-        return devices
+        pythoncom.CoInitialize()
+        try:
+            device_manager = win32com.client.Dispatch("WIA.DeviceManager")
+            devices = []
+            for dev in device_manager.DeviceInfos:
+                devices.append(dev.Properties("Name").Value)
+            return devices
+        finally:
+            pythoncom.CoUninitialize()
 
     # -------------------------
     # Scan acquisition
     # -------------------------
 
-    def acquire(self, destination_folder):
-
-        device_manager = win32com.client.Dispatch("WIA.DeviceManager")
-        device = device_manager.DeviceInfos[0].Connect()
-
-        wia = win32com.client.Dispatch("WIA.CommonDialog")
-
-        WIA_FORMAT_PNG = "{B96B3CAB-0728-11D3-9D7B-0000F81EF32E}"
-        WIA_INTENT_COLOR = 1
-
-        image = wia.ShowAcquireImage(
-            1,
-            WIA_INTENT_COLOR,
-            0,
-            WIA_FORMAT_PNG,
-            False,
-            True,
-            False
-        )
-
-        # -------------------------
-        # SAVE UNIQUE FILE
-        # -------------------------
-        # Save the WIA image temporarily
-        temp_png = os.path.join(destination_folder, "__scan_temp.png")
-        image.SaveFile(temp_png)
-
-        # Load into Qt
-        qimg = QImage(temp_png)
-
-        # Convert to grayscale
-        qimg = qimg.convertToFormat(QImage.Format_Grayscale8)
-
-        # Find the next available scan number
-        scan_number = 1
-        while True:
-            filename = f"scan_{scan_number:06d}.tif"
-            path = os.path.join(destination_folder, filename)
-            if not os.path.exists(path):
-                break
-            scan_number += 1
-
-        # Save as TIFF
-        qimg.save(path, "TIFF")
-
-        # Remove temporary PNG
+    def acquire(self, destination_folder, request=None):
+        pythoncom.CoInitialize()
         try:
-            os.remove(temp_png)
-        except OSError:
-            pass
+            device_manager = win32com.client.Dispatch("WIA.DeviceManager")
+            devices = list(device_manager.DeviceInfos)
+            if not devices:
+                raise RuntimeError("WIA did not report any scanner devices")
 
-        return {
-            "path": path,
-            "dir": destination_folder
-        }
-        
-        
-        
-        # filename = f"scan_{uuid.uuid4().hex}.png"
-        # path = os.path.join(destination_folder, filename)
+            wia = win32com.client.Dispatch("WIA.CommonDialog")
+            WIA_FORMAT_PNG = "{B96B3CAB-0728-11D3-9D7B-0000F81EF32E}"
+            WIA_INTENT_COLOR = 1
 
-        # image.SaveFile(path)
+            image = wia.ShowAcquireImage(
+                1,
+                WIA_INTENT_COLOR,
+                0,
+                WIA_FORMAT_PNG,
+                False,
+                True,
+                False
+            )
 
-        # # -------------------------
-        # # CREATE QIMAGE (LOCAL ONLY)
-        # # -------------------------
-        # qimg = QImage(path)
+            if image is None:
+                raise RuntimeError("WIA scan did not return an image")
 
-        # # -------------------------
-        # # RETURN STRUCTURE
-        # # -------------------------
-        # return {
-        #     "image": qimg,
-        #     "path": path,
-        #     "dir": os.path.dirname(path)
-        # } 
-    
-    
-#     def acquire(self):
-#         device = self.device_manager.DeviceInfos[0].Connect()
+            temp_png = os.path.join(destination_folder, "__scan_temp.png")
+            image.SaveFile(temp_png)
 
-#         WIA_FORMAT_PNG = "{B96B3CAB-0728-11D3-9D7B-0000F81EF32E}"
-#         WIA_INTENT_COLOR = 1
+            qimg = QImage(temp_png)
+            if qimg.isNull():
+                raise RuntimeError("WIA returned an unreadable temporary image")
 
-#         image = self.wia.ShowAcquireImage(
-#             1,
-#             WIA_INTENT_COLOR,
-#             0,
-#             WIA_FORMAT_PNG,
-#             False,
-#             True,
-#             False
-#         )
+            qimg = qimg.convertToFormat(QImage.Format_Grayscale8)
 
-#         import uuid
-#         import tempfile
-#         import os
+            scan_number = 1
+            while True:
+                filename = f"scan_{scan_number:06d}.tif"
+                path = os.path.join(destination_folder, filename)
+                if not os.path.exists(path):
+                    break
+                scan_number += 1
 
-#         filename = f"scan_{uuid.uuid4().hex}.png"
-#         path = os.path.join(tempfile.gettempdir(), filename)
+            if not qimg.save(path, "TIFF"):
+                raise RuntimeError(f"Failed to save scanned TIFF to {path}")
 
-#         image.SaveFile(path)
+            try:
+                os.remove(temp_png)
+            except OSError:
+                pass
 
-#         #return path
-#         return {
-#             "image": self.qimage,
-#             "path": path,
-#             "dir": os.path.dirname(path)
-# }
-#     # -------------------------
+            return {
+                "path": path,
+                "dir": destination_folder
+            }
+        finally:
+            pythoncom.CoUninitialize()
+
     # Convert to Qt image
     # -------------------------
-    
     def acquire_qimage(self, destination_folder):
-        result = self.acquire(destination_folder)
-        return result["image"]
+        return super().acquire_qimage(destination_folder)

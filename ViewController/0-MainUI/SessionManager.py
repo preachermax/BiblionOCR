@@ -36,6 +36,11 @@ class SessionManager:
         path = self.session_path(filename)
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+        normalized_data = self._normalize_session_data(data)
+        if normalized_data != data:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(normalized_data, f, indent=4)
+        data = normalized_data
         session = {item['Setting']: item for item in data}
         if keys is None:
             return session
@@ -65,6 +70,43 @@ class SessionManager:
         if changed:
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(list(session.values()), f, indent=4)
+
+    def _normalize_session_data(self, data: Any) -> list[JSONItem]:
+        if isinstance(data, list):
+            normalized_items = []
+            for item in data:
+                if not isinstance(item, dict):
+                    continue
+                setting = item.get('Setting')
+                if not setting:
+                    continue
+                normalized_items.append(
+                    {
+                        'Setting': setting,
+                        'CurrentValue': item.get('CurrentValue'),
+                        'DefaultValue': item.get('DefaultValue', item.get('CurrentValue')),
+                    }
+                )
+            return normalized_items
+
+        if isinstance(data, dict):
+            legacy_key_map = {
+                'path': 'self.imgpath',
+                'dir': 'self.imgdir',
+            }
+            normalized_items = []
+            for key, value in data.items():
+                setting = legacy_key_map.get(key, key)
+                normalized_items.append(
+                    {
+                        'Setting': setting,
+                        'CurrentValue': value,
+                        'DefaultValue': value,
+                    }
+                )
+            return normalized_items
+
+        return []
 
     def load_object(self, filename: str, target: object, mapping: SettingMap) -> None:
         values = self.values(filename)

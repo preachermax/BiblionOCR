@@ -61,7 +61,7 @@ Discovery identifies devices. Acquisition retrieves images.
 * Capability detection should remain distinct from raw network discovery
 * For network scanners, this layer should probe for eSCL/AirScan first, then other advertised protocols
 * For local Windows devices, capability selection may depend on OS-accessible backends such as TWAIN or WIA rather than network advertisement alone
-* `ScannerManager` should eventually choose a backend from normalized capability data instead of calling WIA directly
+* `ScanManager` now owns backend selection, but capability normalization is still incomplete and should continue moving away from backend-specific assumptions
 
 ### Acquisition Backends
 
@@ -78,16 +78,55 @@ Future implementations should derive from a common `ScannerBackend` interface so
 ### Current Windows Runtime Path
 
 * The active scan entrypoint in `MyServer.py` is `actionScanNetwork()` even though the current behavior is local hardware acquisition, not network image retrieval
-* `MyServer.__init__()` instantiates `Core.Scanner.manager.ScannerManager` directly and wires the UI scanner action/button to that path
-* `ScannerManager` is currently a thin wrapper around `WIAScanner`; it does not yet select among multiple backends at runtime
-* `WIAScanner.acquire(destination_folder)` uses `win32com.client.Dispatch("WIA.CommonDialog")` and `WIA.DeviceManager`, saves a temporary PNG, converts it to grayscale `QImage`, then writes the final numbered TIFF into the scanned folder
-* `MyServer` currently displays the saved TIFF by passing `result["path"]` into `showImage()`; this disk-backed TIFF handoff is deliberate design because it fits the existing MyServer workflow
-* Because of that current contract, the layered scanner plan should normalize result shape around a persisted TIFF output before broad backend rollout rather than treating file output as legacy behavior
+* `MyServer.__init__()` now uses `Core.Scanner.ScanManager` and the scan wizard path
+* Scan wizard values are persisted and restored through `SessionManager`, including backend, device, DPI, mode, source type, duplex, destination folder, and persist format
+* `ScanManager` now selects among platform-supported backends in priority order: eSCL / AirScan, SANE, TWAIN, WIA
+* All active backends now follow the same persisted-result contract and return numbered TIFF output under the destination folder
+* `MyServer.showImage()` displays the saved TIFF, updates the image line edit with the scanned filename, and persists image path/dir through `SessionManager.update()` instead of rewriting `Session.json` directly
+
+### Current Backend State
+
+* **AirScan / eSCL**
+
+  * real backend implemented in `Core/Scanner/escl_scanner.py`
+  * supports mDNS `_uscan` / `_uscans` discovery
+  * supports direct IP / URL entry in the wizard device field
+  * falls back to Scapy ARP sweep plus `/eSCL/ScannerCapabilities` probing when mDNS advertisements are missing
+  * validated against Canon device at `192.168.2.21`
+
+* **WIA**
+
+  * working on Windows
+  * COM initialization moved into thread-local backend calls to fix `CoInitialize has not been called`
+  * saves TIFF output reliably through the shared scan-result contract
+
+* **TWAIN**
+
+  * backend code now exists in `Core/Scanner/twain_scanner.py`
+  * project-local `twaindsm.dll` loading is supported
+  * current Canon TS3700 state: 64-bit DSM loads, but no 64-bit TWAIN sources are registered; Canon source artifacts present on this machine remain under the 32-bit `C:\Windows\twain_32` tree
+  * treat TWAIN as unavailable for the current Canon path until a real 64-bit source or a 32-bit helper runtime is introduced
+
+* **SANE**
+
+  * Linux/macOS backend extracted from old `MyServer` commented prototype and moved into `Core/Scanner/sane_scanner.py`
+  * supports device enumeration, request-aware device matching, mode/DPI configuration, simple ADF hints, and TIFF persistence
+  * not testable on this Windows machine because `python-sane` is not installed here
+
+### Recent Scanner Stabilization
+
+* Scan wizard settings are now persisted through `SessionManager` and restored on reopen
+* AirScan is the default backend selection, and backend options are filtered by platform support
+* Scan button/menu icon visibility was restored by regenerating the Qt resource module rather than changing the UI asset path
+* `actionImageScanner_tb` is now wired to the scan workflow
+* `Session.json` normalization was added so legacy dict-shaped files no longer crash startup
+* `showImage()` now updates the image filename line edit and persists image path/dir through `SessionManager.update()`
+* The scan wizard now blocks unavailable backends and provides a direct IP/URL path for AirScan when automatic discovery fails
 
 ### Helper Formatting Pattern
 
 * The current scanner helpers follow the same pragmatic formatting style used elsewhere: short section-divider comments, thin wrapper classes, and simple return dictionaries like `{ "path": ..., "dir": ... }`
-* Discovery and acquisition helpers are present but not yet unified behind a stable backend-selection contract
+* Discovery and acquisition helpers are now routed through `ScanManager`, but capability modeling and backend-specific diagnostics still need cleanup
 
 
 ---
@@ -220,10 +259,10 @@ These imports caused recent startup tracebacks because those names do not exist 
 * `Core/engine.py` now compiles without the prior debug side effect `print("ENGINE MODULE LOADING")`
 * `Core/__init__.py` / `Core` imports must be validated before switching `MyServer.py` to Core imports
 * Event replay from SQLite is not yet implemented
-* Scanner backend abstraction layer not yet implemented
-* Discovery and acquisition remain separate responsibilities
-* eSCL backend pending implementation
-* `ScannerManager.acquire_qimage()` is stale relative to `WIAScanner`: it calls `self.wia.acquire_qimage()` without a destination folder, while `WIAScanner.acquire_qimage(destination_folder)` expects one and tries to return `result["image"]` even though `acquire()` currently returns only `path` and `dir`
+* Discovery and acquisition remain separate responsibilities by design, but capability normalization between them is still incomplete
+* TWAIN is intentionally unavailable for the current Canon TS3700 path because the machine exposes a usable 64-bit DSM but no 64-bit TWAIN source registration
+* Canon TS3700 evidence on this machine indicates: 64-bit `twaindsm.dll` can load, but the installed Canon scan package registers WIA/STI files rather than a 64-bit TWAIN source, while Canon TWAIN source artifacts remain under the 32-bit `C:\Windows\twain_32` tree
+* SANE backend is implemented but unvalidated on a real Linux runtime in this repo session
 
 ---
 
@@ -442,12 +481,11 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 1. **Scanner Framework**
 
-   * Create `Core/scanner_manager.py`
-   * Create backend modules (`escl_backend.py`, `sane_backend.py`, `twain_backend.py`, `wia_backend.py`)
+  * Keep `MyServer` backend-agnostic and continue pushing backend details into `Core/Scanner`
   * Add a `mock_backend.py` for no-hardware tests and UI validation
-   * Separate discovery from acquisition
-  * Add an explicit capability-detection step between discovery and backend selection
-   * Keep MyServer backend-agnostic
+  * Add explicit backend diagnostics/capability reporting instead of only device-name lists
+  * Validate `SaneScanner` on a real Linux machine with `python-sane`
+  * Decide whether TWAIN should remain best-effort/optional or gain a future 32-bit helper process path
 
 2. **Core / MyServer Unification**
 
