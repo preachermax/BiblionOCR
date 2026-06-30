@@ -39,7 +39,7 @@
    <widget class="QPushButton" name="SaveAsImagebutton">
     <property name="geometry">
      <rect>
-      <x>1240</x>
+      <x>1050</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -49,6 +49,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -65,7 +68,7 @@
    <widget class="QPushButton" name="SaveImagebutton">
     <property name="geometry">
      <rect>
-      <x>1270</x>
+      <x>1020</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -75,10 +78,13 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
-     <string>Overwrite reference image</string>
+     <string>Save Image</string>
     </property>
     <property name="text">
      <string/>
@@ -158,7 +164,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -233,7 +243,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -446,7 +460,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -493,6 +511,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -511,7 +532,7 @@
      <rect>
       <x>190</x>
       <y>0</y>
-      <width>61</width>
+      <width>71</width>
       <height>26</height>
      </rect>
     </property>
@@ -523,7 +544,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -695,46 +720,6 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QPushButton" name="PrevImagebutton">
-    <property name="geometry">
-     <rect>
-      <x>990</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Previous Image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="NextImagebutton">
-    <property name="geometry">
-     <rect>
-      <x>1020</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Next Image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
-    </property>
-   </widget>
    <widget class="QPushButton" name="ImageZoombutton">
     <property name="enabled">
      <bool>true</bool>
@@ -749,7 +734,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -768,7 +757,7 @@
      <rect>
       <x>1100</x>
       <y>0</y>
-      <width>61</width>
+      <width>91</width>
       <height>26</height>
      </rect>
     </property>
@@ -780,7 +769,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -867,6 +860,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1019,7 +1015,7 @@
    <widget class="QPushButton" name="OverwriteRefImgbutton">
     <property name="geometry">
      <rect>
-      <x>1180</x>
+      <x>990</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1029,6 +1025,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1076,6 +1075,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -1130,6 +1132,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -1152,6 +1157,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -1188,6 +1196,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1214,6 +1225,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1234,12 +1248,16 @@
      <x>0</x>
      <y>0</y>
      <width>1306</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>FROMVS [MAXR]</family>
+     <pointsize>11</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
     </font>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1247,6 +1265,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -1327,6 +1348,10 @@
     <property name="font">
      <font>
       <family>FROMVS [MAXR]</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -1336,6 +1361,10 @@
      <property name="font">
       <font>
        <family>FROMVS [MAXR]</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="title">
@@ -1356,6 +1385,10 @@
      <property name="font">
       <font>
        <family>FROMVS [MAXR]</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="title">
@@ -1365,6 +1398,10 @@
       <property name="font">
        <font>
         <family>FROMVS [MAXR]</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="title">

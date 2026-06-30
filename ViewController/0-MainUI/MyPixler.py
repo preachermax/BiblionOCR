@@ -809,8 +809,8 @@ class PixlerMain(qtw.QMainWindow):
         # -------------------------
         self.ui.ImageLE.textChanged.connect(self.changed_RefImg)
 
-        self.ui.PrevImagebutton.clicked.connect(self.prevImage)
-        self.ui.NextImagebutton.clicked.connect(self.nextImage)
+        #self.ui.PrevImagebutton.clicked.connect(self.prevImage)
+        #elf.ui.NextImagebutton.clicked.connect(self.nextImage)
 
         self.ui.Imagezoomslider.valueChanged.connect(self.on_Imagezoomslider)
         self.ui.ImageZoomComboBox.currentTextChanged.connect(self.on_Imagezoom)
