@@ -1,320 +1,243 @@
-# PROJECT_CREATION_ARCHITECTURE.md
+# Project Creation Architecture
 
-## Version: 1.1 (Full-Fidelity Execution Spec)
-Status: Canonical Runtime Contract  
-Scope: MyServer / MyPixler Project Creation Engine  
-Mode: Implementation-Ready Specification (NOT descriptive only)
+## Version 1.4 — ProjectFolderList Runtime Contract
 
----
-
-# 1. System Definition
-
-A project creation is a **state-driven, RIS-enforced transactional workflow** that produces a deterministic filesystem artifact with immutable provenance.
-
-A project is invalid unless:
-
-- RIS exists
-- RIS is captured BEFORE filesystem write
-- State machine reaches COMPLETE
-- Event log is fully emitted
+**Status:** Active implementation contract  
+**Scope:** MyServer, Core project engine, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation  
+**Last updated:** 2026-06-27
 
 ---
 
-# 2. Hard Constraints (Runtime-Enforced)
+## 1. Current Runtime State
 
-These are not guidelines. They are **execution blockers**:
+New project creation is being normalized around `Core/engine.py`.
 
-### C1 — RIS Before Write
-No filesystem write may occur before:
+Current rules:
 
----
+* Projects are created under the user Projects folder.
+* Windows target: `C:/Users/Max/Projects`.
+* Runtime expression: `os.path.join(os.path.expanduser("~"), "Projects")`.
+* Each project must be initialized as a local Git repository.
+* Project folder structure should be generated from `ProjectFolderList.txt`.
+* File entries in `ProjectFolderList.txt` are treated as parent-directory requirements.
+* Empty directories receive `.gitkeep` placeholders so Git can track them.
 
-### C2 — Immutability Lock
-Once RIS is captured:
+Temporary implementation note:
 
-- It becomes read-only
-- Any change requires FORK operation
-
----
-
-### C3 — No Silent Execution
-Every transition MUST emit an event.
-
-If event emission fails → system must abort.
-
----
-
-### C4 — Deterministic Output
-Same inputs → identical:
-
-- folder structure
-- RIS metadata (except timestamps)
-- registry state
+* `MyServer.py` still contains local Core-style project creation classes.
+* Long-term target is to make `Core/engine.py` the single source of truth and reduce `MyServer.py` to UI/controller wiring.
+* The current `MyServer` entry path now uses a guided two-step modal dialog instead of chained text prompts.
+* New project dialogs should follow the same stacked-label, direct-action format already used by existing BiblionOCR custom dialogs.
+* The dialog supports optional loading of user-provided provenance files in `json`, `ris`, `txt`, or `csv` format to prefill required provenance fields before project creation starts.
+* The provenance file picker now opens from the filesystem root rather than defaulting to `Downloads`.
+* The second step includes an in-dialog review summary before project creation is dispatched to the worker.
 
 ---
 
-# 3. Execution State Machine (Formal)
+## 2. Required Project Creation Output
+
+A valid project should include:
+
+```text
+<ProjectName>/
+├── .git/
+├── .gitignore
+├── README.md
+├── project.ris.json
+├── src/
+│   └── manifests/
+│       └── ProjectFolderList.txt
+├── assets/
+├── logs/
+│   └── processing/
+│       └── project_folder_list_structure_rebuild.md
+├── output/
+├── Model/
+│   └── Project/
+└── ViewController/
+```
+
+The full `Model/Project/...` and `ViewController/...` directory tree is derived from `ProjectFolderList.txt`.
 
 ---
 
-## 3.1 State Transition Contract
+## 3. Core Engine Structure Generation
 
-Each state transition MUST satisfy:
+`Core/engine.py` now supports:
 
-Failure at any step triggers:
+* optional `folder_list_path` constructor argument
+* automatic discovery of `ProjectFolderList.txt`
+* default scaffold folders if no list is found
+* ProjectFolderList-driven directory creation
+* `.gitkeep` placeholder creation for empty folders
+* copying the source folder list into `src/manifests/ProjectFolderList.txt`
+* writing a rebuild log to `logs/processing/project_folder_list_structure_rebuild.md`
+* emitting `project_structure_created`
+
+Folder list search order:
+
+1. explicit `folder_list_path`
+2. `ProjectFolderList.txt` under current working directory
+3. `ViewController/0-MainUI/ProjectFolderList.txt` under current working directory
+4. `ProjectFolderList.txt` under repository root
+5. `ViewController/0-MainUI/ProjectFolderList.txt` under repository root
 
 ---
 
-## 4. State Definitions (Executable Semantics)
+## 4. Required RIS Payload Fields
 
----
-
-### INIT
-
-**Input:**
-- create_project request
-
-**Output:**
-- session context initialized
-
-**Allowed actions:**
-- none (no filesystem access)
-
-Event: project_init
----
-
-### VALIDATE_INPUT
-
-**Checks:**
-
-- project_name not null
-- project_name regex valid
-- project_name not exists
-- permissions OK
-
-Failure → TERMINATE
-
-Event: validation_failed
----
-
-### PROVENANCE_REQUIRED
-
-System enters blocking capture mode.
-
-Allowed inputs:
-
-- UI dialog payload
-- API-provided RIS
-- template-derived RIS
-
-No transition allowed without valid RIS payload.
-
-Event: provenance_required
----
-
-### PROVENANCE_CAPTURED
-
-RIS payload is:
-
-- validated
-- normalized
-- locked (immutable)
-
-System computes:
-
-Event: provenance_captured
----
-
-### RIS_GENERATION
-
-System writes:
-Rules:
-
-- must match locked RIS
-- must include system fields
-- must embed ris_hash
-
-Event: ris_generated
----
-
-### FILESYSTEM_WRITE
-
-Creates:
-Atomic requirements:
-
-- write temp dir first
-- validate structure
-- rename atomic commit
-
-Failure → full rollback
-
-Event: filesystem_written
----
-
-### REGISTRATION
-
-Registers project in:
-
-- MyServer registry
-- project index
-- UI cache
-
-Event: project_registered
----
-
-### COMPLETE
-
-Final state reached only if:
-
-- all previous states succeeded
-- no pending rollback flag
-
-Event: project_created
----
-
-# 5. RIS SPECIFICATION (Immutable Contract)
-
-## 5.1 Core Schema
+The project creation payload must include:
 
 ```json
 {
-  "ris_version": "1.0",
-  "project_name": "",
-  "timestamp_created": "",
-  "creator": "Max",
-  "environment": {
-    "platform": "MyPixler",
-    "server": "MyServer"
-  },
-  "creation_context": {
-    "trigger": "",
-    "source_context": "",
-    "user_intent_summary": ""
-  },
-  "dependencies": [],
-  "linked_files": [],
-  "audit_trail": [
-    {
-      "event": "created",
-      "timestamp": ""
-    }
-  ],
-  "ris_hash": ""
+  "project_name": "ProjectName",
+  "project_purpose": "Purpose text",
+  "creation_trigger": "MyServer_button",
+  "source_context": "MyServer_UI",
+  "user_intent_summary": "Intent summary"
 }
+```
 
-user/Max/Projects/<ProjectName>/
-│
-├── project.ris.json
-├── project_config.json
-├── /src
-├── /assets
-├── /logs
-└── /output
-``` id="fs_exec_v11"
+The engine adds runtime metadata such as:
 
-Atomic creation requirement:
+* `ris_version`
+* `timestamp`
+* `_locked`
+* `_hash`
 
-- staging directory required
-- commit rename required
-- partial writes forbidden
+UI collection notes:
+
+* `project_name`, `project_purpose`, and `user_intent_summary` remain required before creation starts.
+* `creation_trigger` and `source_context` default to `MyServer_button` and `MyServer_UI` but may be overridden by a loaded RIS file.
+* `creator` is optional and is preserved when present in a loaded RIS file.
+* Current UI flow: RIS import step, then project details and review step.
+* Required fields should show in-dialog validation cues and block final submission until the payload is complete.
+* Imported provenance metadata should be preserved in the final project RIS payload under source-provenance fields when available.
+* Project name normalization should be visible inside the dialog before submission so the final folder name is not a surprise.
 
 ---
 
-# 7. Event System (Required Runtime Bus)
+## 5. State Machine
 
-All transitions emit structured events:
+Current intended lifecycle:
+
+```text
+INIT
+  ↓
+VALIDATE
+  ↓
+PROVENANCE
+  ↓
+RIS
+  ↓
+WRITE
+  ↓
+COMPLETE
+```
+
+Failure at any step should transition to:
+
+```text
+FAILED
+```
+
+Rollback support still needs to be normalized between `MyServer.py` and `Core/engine.py`.
+
+---
+
+## 6. Event Contract
+
+Events should follow this shape:
 
 ```json
 {
   "event": "event_name",
-  "timestamp": "",
-  "state": "",
-  "project_name": "",
+  "timestamp": 0.0,
+  "state": "STATE_NAME",
+  "project_name": "ProjectName",
   "metadata": {}
 }
+```
 
-| Event               | Trigger              |
-| ------------------- | -------------------- |
-| project_init        | request received     |
-| validation_passed   | input OK             |
-| validation_failed   | input rejected       |
-| provenance_required | RIS needed           |
-| provenance_captured | RIS locked           |
-| ris_generated       | metadata written     |
-| filesystem_written  | disk commit complete |
-| project_registered  | indexed              |
-| project_created     | success              |
-| project_failed      | failure              |
+Expected events include:
 
-# 8. Rollback System
-Trigger conditions:
-filesystem write failure
-event emission failure
-invalid RIS detected post-capture
-state inconsistency
-Rollback behavior:
-delete temp directories
-invalidate session
-emit:
-project_failed
-
-
-# 9. Component Responsibilities
-# 9.1 MyServer.py (Execution Engine)
-
-Must implement:
-
-run_state_machine()
-transition_state()
-validate_project_name()
-capture_provenance()
-freeze_ris()
-write_project_atomic()
-register_project()
-emit_event()
-rollback()
-
-9.2 0-MainUI (Control Surface)
-
-Responsibilities:
-
-collect RIS input
-enforce blocking dialog
-submit structured payload
-display state (optional debug mode)
-
-
-# 10. Forking Model (Reserved Extension)
-
-Future behavior:
-
-new project inherits RIS lineage pointer
-new RIS hash always generated
-original RIS remains immutable
-
-# 11. Audit Guarantees
-
-System guarantees:
-
-full origin traceability
-deterministic reconstruction of creation
-event-level audit replay capability
-
-# 12. Philosophy (Enforcement-Level)
-
-This system enforces:
-
-No artifact exists without origin, and no origin exists without proof.
-
-END OF EXECUTION SPEC
+| Event | Meaning |
+| --- | --- |
+| `validation_passed` | Project name and destination passed validation |
+| `provenance_captured` | RIS/provenance payload captured and locked |
+| `ris_generated` | Runtime RIS metadata generated |
+| `project_structure_created` | ProjectFolderList/default folder structure created |
+| `git_repository_initialized` | Local Git repository initialized |
+| `filesystem_written` | Project folder committed to disk |
+| `project_created` | Project creation complete |
+| `project_failed` | Project creation failed |
 
 ---
 
-If you want the next real upgrade step, I recommend one of these (all now directly implementable):
+## 7. Git Requirement
 
-1. **:contentReference[oaicite:0]{index=0}**
-2. **:contentReference[oaicite:1]{index=1}**
-3. **:contentReference[oaicite:2]{index=2}**
-4. **:contentReference[oaicite:3]{index=3}**
+Every new project must be a local Git repository.
 
-Just tell me which layer you want to make real first.
+Required commands during project creation:
+
+```text
+git init
+git branch -M main
+```
+
+The engine writes:
+
+* `README.md`
+* `.gitignore`
+
+---
+
+## 8. Import / UI Guardrails
+
+Do not reintroduce invalid generated-UI imports.
+
+`MainUI.py` does **not** define:
+
+* `MainWindow`
+* `MainUI`
+* `RISDialogController`
+
+Current correct runtime model:
+
+* `MainWindow` lives in `MyServer.py`.
+* Generated UI class comes from `MyServerUI.py`.
+
+---
+
+## 9. Testing Checklist
+
+For each new project creation test:
+
+* [ ] `Core/engine.py` imports and compiles.
+* [ ] New project appears under `C:/Users/Max/Projects`.
+* [ ] `.git/` exists.
+* [ ] `project.ris.json` exists.
+* [ ] `README.md` exists.
+* [ ] `.gitignore` exists.
+* [ ] `src/manifests/ProjectFolderList.txt` exists.
+* [ ] `logs/processing/project_folder_list_structure_rebuild.md` exists.
+* [ ] `Model/Project/Data/json` exists.
+* [ ] `Model/Project/Images/Workflow/pixler/pixler_pages_cropped` exists.
+* [ ] `ViewController/0-MainUI` exists.
+* [ ] Empty directories contain `.gitkeep` where needed.
+
+---
+
+## 10. Next Implementation Steps
+
+1. Add per-step validation cues and field-level feedback inside the new project dialog.
+2. Remove duplicate project engine logic from `MyServer.py`.
+3. Add registry writing to Core or define a Core registry event consumed by MyServer.
+4. Add rollback cleanup to Core project creation failures.
+5. Add SQLite event loading and replay.
+
+---
+
+## 11. Design Statement
+
+Project creation must produce a traceable, RIS-backed, locally version-controlled project artifact with a deterministic folder structure generated from `ProjectFolderList.txt`.

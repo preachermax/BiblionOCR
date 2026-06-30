@@ -5,6 +5,8 @@ print("RUNNING:", __file__)
 # OCR Preprocess Tool (OpenCV morphology + tiffcapture bridge)
 # Next steps: OCR preview, multi-page TIFF, pipeline integration
 # Python imports 
+import ipaddress
+import socket
 import sys
 import os
 import re
@@ -15,9 +17,12 @@ from subprocess import Popen, PIPE, CalledProcessError
 #import glob
 import shutil
 import json
+import csv
 import time
 import hashlib
 from enum import Enum
+
+
 # Path configuration and directory setup
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
@@ -40,7 +45,17 @@ if DEBUG_PATHS:
     print(f"project_root: {project_root}")
     print(f"script_dir: {script_dir}")
 
-    
+
+SCANNED_FOLDER = os.path.join(
+    project_root,
+    "Model",
+    "Project",
+    "Images",
+    "Scanned"
+)
+os.makedirs(SCANNED_FOLDER, exist_ok=True)
+
+  
 from SessionManager import SessionManager
 from ocr_preprocess_tool import OCRPreprocessTool
 #from subprocess import Popen, PIPE, CalledProcessError
@@ -50,14 +65,37 @@ import qimage2ndarray
 from queue import Queue
 from ext import mainfind
 from HelpSystem import add_help_menu
-# ProjectCreationEngine and EventBus are defined below in this module.
+from Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
+from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
+# EventBus is still defined below in this module during the Core migration.
+# ProjectCreationEngine remains below as a temporary fallback, but runtime wiring now uses CoreProjectCreationEngine.
 # Do not import MainWindow from MainUI.py; that file only contains the generated Ui_MainUI class.
-# PyQt5 imports
 
+# PyQt5 imports
+import platform
+if 'Windows' in platform.system():
+    print("Platform:  ", platform.system())
+    print("Windows platform detected. AirScan, TWAIN or WIA scanning will be used.")
+elif 'Linux' in platform.system():
+    print("Platform:  ", platform.system())
+    print("Linux platform detected. Airscan or sane will be used for scanning.")
+    #import sane
+else:
+    print("Platform:  ", platform.system(), platform.release(), platform.version())
+    print("Unsupported platform. Some features may not work as expected.")
+    
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from scapy.all import ARP, Ether, srp
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QBuffer, QIODevice
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import QFileInfo
+import numpy as np
+import tifffile
 
 # Custom imports
 from MyServerUI import Ui_MainUI
@@ -69,6 +107,7 @@ import MyScanner as scanner
 import MyExplorer as explorer
 import MyGrounder as gtr
 import ImageLoadWorker
+from ProjectCreationWorker import ProjectCreationWorker
 from Training import Train as tr
 from TiffStackWorker import TiffStackWorker
 # Dialog Imports
@@ -123,49 +162,710 @@ def configure_tesseract():
     print("Ã¢Å¡Â Ã¯Â¸Â Tesseract not found.")
 
 
+class ProjectCreationWizardDialog(qtw.QDialog):
 
-# The new Stream Object which replaces the default stream associated with sys.stdout
-# This object just puts data in a queue!
-# class WriteStream(object):
-#     def __init__(self,queue):
-#         self.queue = queue
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("New Project")
+        self.setModal(True)
+        self.resize(640, 420)
+        self._page_titles = [
+            "Step 1 of 2: RIS import",
+            "Step 2 of 2: Project details",
+        ]
+        self.imported_provenance = {}
+        self._build_ui()
+        self._update_page_state()
 
-#     def write(self, text):
-#         self.queue.put(text)
+    def _build_ui(self):
+        layout = qtw.QVBoxLayout(self)
+        layout.setSpacing(10)
 
-#     def flush(self):
-#         """
-#         Stream flush implementation
-#         """
-#         pass
-    
-# A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
-# It blocks until data is available, and once it has got something from the queue, it sends
-# it to the "MainThread" by emitting a Qt Signal 
-# class ThreadConsoleTextQueueReceiver(qtc.QObject):
-    
-#     queue_element_received_signal = qtc.pyqtSignal(str)
+        intro_label = qtw.QLabel(
+            "Create a new project from the current trimmed manifest. You can also load provenance from JSON, RIS, TXT, or CSV before creation starts."
+        )
+        intro_label.setWordWrap(True)
+        layout.addWidget(intro_label)
 
-#     def __init__(self, q: Queue, *args, **kwargs):
-#         qtc.QObject.__init__(self, *args, **kwargs)
-#         self.queue = q
+        self.page_title_label = qtw.QLabel("")
+        layout.addWidget(self.page_title_label)
 
-#     @qtc.pyqtSlot()
-#     def run(self):
-#         self.queue_element_received_signal.emit('---> Console text queue reception Started <---\n')
-#         while True:
-#             text = self.queue.get()
-#             self.queue_element_received_signal.emit(text)
+        self.page_stack = qtw.QStackedWidget(self)
+        layout.addWidget(self.page_stack, 1)
 
-#     @qtc.pyqtSlot()
-#     def finished(self):
-#         self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
+        ris_page = qtw.QWidget()
+        ris_layout = qtw.QVBoxLayout(ris_page)
+        ris_layout.setSpacing(10)
+
+        ris_label = qtw.QLabel("Optional: load an existing RIS file")
+        ris_layout.addWidget(ris_label)
+
+        ris_help = qtw.QLabel(
+            "If you already have provenance metadata, load it here to prefill the project fields before continuing."
+        )
+        ris_help.setWordWrap(True)
+        ris_layout.addWidget(ris_help)
+
+        ris_row = qtw.QHBoxLayout()
+        self.ris_path_edit = qtw.QLineEdit()
+        self.ris_path_edit.setPlaceholderText("project.ris.json, Primo_RIS_Export.ris, or similar")
+        self.ris_path_edit.setReadOnly(True)
+        ris_row.addWidget(self.ris_path_edit, 1)
+
+        self.ris_browse_button = qtw.QPushButton("Load RIS...")
+        self.ris_browse_button.clicked.connect(self._browse_for_ris)
+        ris_row.addWidget(self.ris_browse_button)
+
+        self.ris_clear_button = qtw.QPushButton("Clear RIS")
+        self.ris_clear_button.clicked.connect(self._clear_ris)
+        ris_row.addWidget(self.ris_clear_button)
+
+        ris_layout.addLayout(ris_row)
+
+        self.status_label = qtw.QLabel("")
+        self.status_label.setWordWrap(True)
+        ris_layout.addWidget(self.status_label)
+
+        ris_layout.addStretch(1)
+        self.page_stack.addWidget(ris_page)
+
+        details_page = qtw.QWidget()
+        details_layout = qtw.QVBoxLayout(details_page)
+        details_layout.setSpacing(10)
+
+        details_label = qtw.QLabel("Project details")
+        details_layout.addWidget(details_label)
+
+        self.project_name_label = qtw.QLabel("Project name")
+        self.project_name_edit = qtw.QLineEdit()
+        self.project_name_edit.setPlaceholderText("Erasmus1523")
+        details_layout.addWidget(self.project_name_label)
+        details_layout.addWidget(self.project_name_edit)
+
+        self.project_name_hint_label = qtw.QLabel("")
+        self.project_name_hint_label.setWordWrap(True)
+        details_layout.addWidget(self.project_name_hint_label)
+
+        self.project_purpose_label = qtw.QLabel("Project purpose")
+        self.project_purpose_edit = qtw.QPlainTextEdit()
+        self.project_purpose_edit.setPlaceholderText("Create a readable text version of the source file with duplicate font")
+        self.project_purpose_edit.setFixedHeight(72)
+        details_layout.addWidget(self.project_purpose_label)
+        details_layout.addWidget(self.project_purpose_edit)
+
+        self.user_intent_label = qtw.QLabel("User intent summary")
+        self.user_intent_edit = qtw.QPlainTextEdit()
+        self.user_intent_edit.setPlaceholderText("Describe the user intent for this project")
+        self.user_intent_edit.setFixedHeight(72)
+        details_layout.addWidget(self.user_intent_label)
+        details_layout.addWidget(self.user_intent_edit)
+
+        metadata_row = qtw.QHBoxLayout()
+
+        trigger_column = qtw.QVBoxLayout()
+        trigger_column.addWidget(qtw.QLabel("Creation trigger"))
+        self.creation_trigger_edit = qtw.QLineEdit("MyServer_button")
+        trigger_column.addWidget(self.creation_trigger_edit)
+        metadata_row.addLayout(trigger_column)
+
+        context_column = qtw.QVBoxLayout()
+        context_column.addWidget(qtw.QLabel("Source context"))
+        self.source_context_edit = qtw.QLineEdit("MyServer_UI")
+        context_column.addWidget(self.source_context_edit)
+        metadata_row.addLayout(context_column)
+
+        details_layout.addLayout(metadata_row)
+
+        details_layout.addWidget(qtw.QLabel("Creator (optional)"))
+        self.creator_edit = qtw.QLineEdit()
+        self.creator_edit.setPlaceholderText("Optional")
+        details_layout.addWidget(self.creator_edit)
+
+        details_layout.addWidget(qtw.QLabel("Review"))
+        self.review_label = qtw.QLabel("")
+        self.review_label.setWordWrap(True)
+        details_layout.addWidget(self.review_label)
+
+        self.details_status_label = qtw.QLabel("")
+        self.details_status_label.setWordWrap(True)
+        details_layout.addWidget(self.details_status_label)
+
+        details_layout.addStretch(1)
+        self.page_stack.addWidget(details_page)
+
+        button_row = qtw.QHBoxLayout()
+        self.back_button = qtw.QPushButton("Back")
+        self.back_button.clicked.connect(self._go_back)
+        button_row.addWidget(self.back_button)
+
+        self.next_button = qtw.QPushButton("Next")
+        self.next_button.clicked.connect(self._go_next)
+        button_row.addWidget(self.next_button)
+
+        button_row.addStretch(1)
+        self.cancel_button = qtw.QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        button_row.addWidget(self.cancel_button)
+
+        self.create_button = qtw.QPushButton("Create Project")
+        self.create_button.clicked.connect(self._attempt_accept)
+        button_row.addWidget(self.create_button)
+        layout.addLayout(button_row)
+
+        self.project_name_edit.textChanged.connect(self._update_validation_state)
+        self.project_purpose_edit.textChanged.connect(self._update_validation_state)
+        self.user_intent_edit.textChanged.connect(self._update_validation_state)
+        self.creation_trigger_edit.textChanged.connect(self._update_validation_state)
+        self.source_context_edit.textChanged.connect(self._update_validation_state)
+        self.creator_edit.textChanged.connect(self._update_validation_state)
+
+    def _go_back(self):
+        index = self.page_stack.currentIndex()
+        if index > 0:
+            self.page_stack.setCurrentIndex(index - 1)
+            self._update_page_state()
+
+    def _go_next(self):
+        index = self.page_stack.currentIndex()
+        if index < self.page_stack.count() - 1:
+            self.page_stack.setCurrentIndex(index + 1)
+            self._update_page_state()
+
+    def _update_page_state(self):
+        index = self.page_stack.currentIndex()
+        self.page_title_label.setText(self._page_titles[index])
+        self.back_button.setEnabled(index > 0)
+        self.next_button.setVisible(index < self.page_stack.count() - 1)
+        self.create_button.setVisible(index == self.page_stack.count() - 1)
+        self._update_validation_state()
+
+    def _required_field_errors(self):
+        errors = []
+        if not self.project_name_edit.text().strip():
+            errors.append("Project name is required.")
+        if not self.project_purpose_edit.toPlainText().strip():
+            errors.append("Project purpose is required.")
+        if not self.user_intent_edit.toPlainText().strip():
+            errors.append("User intent summary is required.")
+        return errors
+
+    def _update_validation_state(self):
+        errors = self._required_field_errors()
+        entered_name = self.project_name_edit.text().strip()
+        sanitized_name = self._sanitize_project_name(entered_name)
+        self._refresh_review()
+        self._apply_required_field_state(self.project_name_edit, self.project_name_label, not self.project_name_edit.text().strip())
+        self._apply_required_field_state(self.project_purpose_edit, self.project_purpose_label, not self.project_purpose_edit.toPlainText().strip())
+        self._apply_required_field_state(self.user_intent_edit, self.user_intent_label, not self.user_intent_edit.toPlainText().strip())
+
+        if not entered_name:
+            self.project_name_hint_label.setText("Enter the project name you want to create.")
+            self.project_name_hint_label.setStyleSheet("")
+        elif sanitized_name != entered_name:
+            self.project_name_hint_label.setText(f"Project will be created as: {sanitized_name}")
+            self.project_name_hint_label.setStyleSheet("color: #8a6d1f;")
+        else:
+            self.project_name_hint_label.setText(f"Project will be created as: {sanitized_name}")
+            self.project_name_hint_label.setStyleSheet("color: #2f6b3b;")
+
+        if errors:
+            self.details_status_label.setText("Complete the required fields before creating the project.")
+            self.details_status_label.setStyleSheet("color: #9f3a38;")
+        else:
+            self.details_status_label.setText("Required fields are complete. Review the summary and create the project when ready.")
+            self.details_status_label.setStyleSheet("color: #2f6b3b;")
+
+        self.create_button.setEnabled(not errors)
+
+    def _apply_required_field_state(self, widget, label, is_missing):
+        if is_missing:
+            label.setStyleSheet("color: #9f3a38;")
+            widget.setStyleSheet("border: 1px solid #9f3a38;")
+        else:
+            label.setStyleSheet("")
+            widget.setStyleSheet("")
+
+    def _attempt_accept(self):
+        errors = self._required_field_errors()
+        if errors:
+            self._update_validation_state()
+            return
+        self.accept()
+
+    def _sanitize_project_name(self, name):
+        stripped = name.strip()
+        if not stripped:
+            return ""
+        return re.sub(r"[^A-Za-z0-9_. -]+", "_", stripped).strip(" .")
+
+    def _refresh_review(self):
+        creator = self.creator_edit.text().strip() or "Not set"
+        entered_name = self.project_name_edit.text().strip()
+        sanitized_name = self._sanitize_project_name(entered_name) or "Not set"
+        name_line = f"Project name: {entered_name or 'Not set'}"
+        if entered_name and sanitized_name != entered_name:
+            name_line += f" -> {sanitized_name}"
+        review_lines = [
+            name_line,
+            f"Purpose: {self.project_purpose_edit.toPlainText().strip() or 'Not set'}",
+            f"Intent: {self.user_intent_edit.toPlainText().strip() or 'Not set'}",
+            f"Trigger: {self.creation_trigger_edit.text().strip() or 'MyServer_button'}",
+            f"Source context: {self.source_context_edit.text().strip() or 'MyServer_UI'}",
+            f"Creator: {creator}",
+        ]
+        self.review_label.setText("\n".join(review_lines))
+
+    def _browse_for_ris(self):
+        start_dir = qtc.QDir.rootPath()
+        path, _ = qtw.QFileDialog.getOpenFileName(
+            self,
+            "Select Provenance File",
+            start_dir,
+            "Provenance files (*.json *.ris *.txt *.csv);;JSON files (*.json);;RIS text files (*.ris *.txt);;CSV files (*.csv);;All Files (*.*)"
+        )
+        if not path:
+            return
+
+        try:
+            payload = self._load_provenance_file(path)
+        except (OSError, ValueError, json.JSONDecodeError, csv.Error) as exc:
+            qtw.QMessageBox.warning(self, "Load Provenance", f"Could not load provenance file.\n\n{exc}")
+            return
+
+        self.ris_path_edit.setText(path)
+        self._apply_ris_payload(payload)
+        self.status_label.setText("Provenance loaded. You can adjust any field before creating the project.")
+        self.page_stack.setCurrentIndex(1)
+        self._update_page_state()
+
+    def _clear_ris(self):
+        self.ris_path_edit.clear()
+        self.imported_provenance = {}
+        self.status_label.setText("Imported provenance cleared. Continue with manual entry.")
+
+    def _apply_ris_payload(self, payload):
+        self.imported_provenance = {
+            key: value
+            for key, value in payload.items()
+            if key not in {
+                "project_name",
+                "project_purpose",
+                "creation_trigger",
+                "source_context",
+                "user_intent_summary",
+                "creator",
+            }
+        }
+
+        if not self.project_name_edit.text().strip():
+            self.project_name_edit.setText(str(payload.get("project_name", "")))
+        if not self.project_purpose_edit.toPlainText().strip():
+            self.project_purpose_edit.setPlainText(str(payload.get("project_purpose", "")))
+        if not self.user_intent_edit.toPlainText().strip():
+            self.user_intent_edit.setPlainText(str(payload.get("user_intent_summary", "")))
+        self.creation_trigger_edit.setText(str(payload.get("creation_trigger", "MyServer_button")))
+        self.source_context_edit.setText(str(payload.get("source_context", "MyServer_UI")))
+        if payload.get("creator") and not self.creator_edit.text().strip():
+            self.creator_edit.setText(str(payload.get("creator", "")))
+        self._refresh_review()
+
+    def _load_provenance_file(self, path):
+        extension = os.path.splitext(path)[1].lower()
+        if extension == ".json":
+            payload = self._load_json_provenance(path)
+        elif extension == ".csv":
+            payload = self._load_csv_provenance(path)
+        elif extension in {".ris", ".txt"}:
+            payload = self._load_text_provenance(path)
+        else:
+            raise ValueError(f"Unsupported provenance file type: {extension}")
+
+        payload.setdefault("creation_trigger", "MyServer_button")
+        payload.setdefault("source_context", "MyServer_UI")
+        payload.setdefault("user_intent_summary", "Create project using imported provenance")
+        payload.setdefault("project_name", self._project_name_from_source(path, payload))
+        payload.setdefault("project_purpose", self._project_purpose_from_source(payload))
+        payload["source_provenance_path"] = path
+        return payload
+
+    def _load_json_provenance(self, path):
+        with open(path, "r", encoding="utf-8-sig") as handle:
+            payload = json.load(handle)
+        if isinstance(payload, list):
+            if not payload:
+                raise ValueError("JSON provenance file is empty.")
+            payload = payload[0]
+        if not isinstance(payload, dict):
+            raise ValueError("JSON provenance file must contain an object.")
+        payload = dict(payload)
+        payload.setdefault("source_provenance_format", "json")
+        return payload
+
+    def _load_csv_provenance(self, path):
+        with open(path, "r", encoding="utf-8-sig", newline="") as handle:
+            sample = handle.read()
+        if not sample.strip():
+            raise ValueError("CSV provenance file is empty.")
+
+        rows = list(csv.reader(sample.splitlines()))
+        if not rows:
+            raise ValueError("CSV provenance file is empty.")
+
+        payload = {"source_provenance_format": "csv"}
+        normalized_rows = [row for row in rows if any(cell.strip() for cell in row)]
+        if not normalized_rows:
+            raise ValueError("CSV provenance file is empty.")
+
+        is_key_value = all(len(row) >= 2 for row in normalized_rows) and any(
+            row[0].strip().lower() in {
+                "project_name", "project_purpose", "title", "creator", "author", "user_intent_summary", "source_context", "creation_trigger"
+            }
+            for row in normalized_rows
+        )
+
+        if is_key_value:
+            for row in normalized_rows:
+                key = row[0].strip()
+                value = row[1].strip() if len(row) > 1 else ""
+                if key:
+                    payload[key] = value
+        else:
+            with open(path, "r", encoding="utf-8-sig", newline="") as handle:
+                reader = csv.DictReader(handle)
+                first_row = next(reader, None)
+            if not first_row:
+                raise ValueError("CSV provenance file must contain at least one data row.")
+            payload.update({key: value for key, value in first_row.items() if key})
+
+        return self._normalize_imported_payload(payload)
+
+    def _load_text_provenance(self, path):
+        with open(path, "r", encoding="utf-8-sig") as handle:
+            text = handle.read()
+        if not text.strip():
+            raise ValueError("Text provenance file is empty.")
+
+        stripped = text.lstrip()
+        if stripped.startswith("{"):
+            payload = json.loads(text)
+            if not isinstance(payload, dict):
+                raise ValueError("JSON text provenance file must contain an object.")
+            payload = dict(payload)
+            payload.setdefault("source_provenance_format", "json-text")
+            return payload
+
+        if self._looks_like_ris_text(text):
+            return self._parse_ris_text(text)
+
+        payload = self._parse_key_value_text(text)
+        if payload:
+            payload.setdefault("source_provenance_format", "text-key-value")
+            return self._normalize_imported_payload(payload)
+
+        return {
+            "source_provenance_format": "plain-text",
+            "source_provenance_raw_text": text,
+        }
+
+    def _looks_like_ris_text(self, text):
+        return bool(re.search(r"^([A-Z0-9]{2})\s{1,2}-\s", text, re.MULTILINE))
+
+    def _parse_ris_text(self, text):
+        tags = {}
+        current_tag = None
+        for raw_line in text.splitlines():
+            line = raw_line.rstrip()
+            if not line.strip():
+                continue
+            match = re.match(r"^([A-Z0-9]{2})\s{1,2}-\s(.*)$", line)
+            if match:
+                current_tag = match.group(1)
+                tags.setdefault(current_tag, []).append(match.group(2).strip())
+            elif current_tag is not None:
+                tags[current_tag][-1] = (tags[current_tag][-1] + " " + line.strip()).strip()
+
+        payload = {
+            "source_provenance_format": "ris",
+            "source_provenance_tags": tags,
+        }
+        if tags.get("T1"):
+            payload["title"] = tags["T1"][0]
+        elif tags.get("TI"):
+            payload["title"] = tags["TI"][0]
+        if tags.get("AU"):
+            payload["authors"] = tags["AU"]
+        if tags.get("A1"):
+            payload.setdefault("authors", tags["A1"])
+        if tags.get("Y1"):
+            payload["publication_year"] = tags["Y1"][0]
+        elif tags.get("PY"):
+            payload["publication_year"] = tags["PY"][0]
+        if tags.get("DO"):
+            payload["doi"] = tags["DO"][0]
+        if tags.get("PB"):
+            payload["publisher"] = tags["PB"][0]
+        if tags.get("CY"):
+            payload["publication_place"] = tags["CY"][0]
+        if tags.get("ID"):
+            payload["source_identifier"] = tags["ID"][0]
+        return self._normalize_imported_payload(payload)
+
+    def _parse_key_value_text(self, text):
+        payload = {}
+        for raw_line in text.splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            match = re.match(r"^([^:=\t]+)\s*[:=\t]\s*(.+)$", line)
+            if not match:
+                continue
+            key = match.group(1).strip()
+            value = match.group(2).strip()
+            if key:
+                payload[key] = value
+        return payload
+
+    def _normalize_imported_payload(self, payload):
+        normalized = dict(payload)
+        lowered = {str(key).strip().lower(): value for key, value in payload.items()}
+
+        title = lowered.get("title") or lowered.get("t1") or lowered.get("ti")
+        if title:
+            normalized.setdefault("project_purpose", str(title))
+
+        project_name = lowered.get("project_name") or lowered.get("name")
+        if project_name:
+            normalized.setdefault("project_name", str(project_name))
+
+        creator = lowered.get("creator")
+        if creator:
+            normalized.setdefault("creator", str(creator))
+
+        intent = lowered.get("user_intent_summary") or lowered.get("intent")
+        if intent:
+            normalized.setdefault("user_intent_summary", str(intent))
+
+        source_context = lowered.get("source_context")
+        if source_context:
+            normalized.setdefault("source_context", str(source_context))
+
+        creation_trigger = lowered.get("creation_trigger")
+        if creation_trigger:
+            normalized.setdefault("creation_trigger", str(creation_trigger))
+
+        return normalized
+
+    def _project_name_from_source(self, path, payload):
+        title = payload.get("title") or payload.get("project_name") or ""
+        if title:
+            sanitized = re.sub(r"[^A-Za-z0-9_. -]+", "_", str(title)).strip(" .")
+            if sanitized:
+                words = sanitized.split()
+                if len(words) > 6:
+                    sanitized = " ".join(words[:6])
+                return sanitized
+        return os.path.splitext(os.path.basename(path))[0]
+
+    def _project_purpose_from_source(self, payload):
+        title = payload.get("title") or payload.get("project_purpose")
+        if title:
+            return str(title)
+        return "Create project using imported provenance"
+
+    def get_payload(self):
+        sanitized_name = self._sanitize_project_name(self.project_name_edit.text())
+        payload = {
+            "project_name": sanitized_name,
+            "project_purpose": self.project_purpose_edit.toPlainText().strip(),
+            "creation_trigger": self.creation_trigger_edit.text().strip() or "MyServer_button",
+            "source_context": self.source_context_edit.text().strip() or "MyServer_UI",
+            "user_intent_summary": self.user_intent_edit.toPlainText().strip(),
+        }
+        creator = self.creator_edit.text().strip()
+        if creator:
+            payload["creator"] = creator
+        if self.imported_provenance:
+            payload.update(self.imported_provenance)
+        return payload
+
+# network_scanner.py
+# PyQt5 + Scapy threaded network scanner
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't have to succeed; just forces OS routing decision
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+
+    return ip
+
+def get_subnet():
+    ip = get_local_ip()
+    net = ipaddress.ip_network(ip + "/24", strict=False)
+    return str(net)
+
+import socket
+import ipaddress
+
+from PyQt5 import QtCore as qtc
+from scapy.all import ARP, Ether, srp
+class NetworkScanner(qtc.QThread):
+
+    deviceFound = qtc.pyqtSignal(dict)
+    progress = qtc.pyqtSignal(int)
+    finished = qtc.pyqtSignal()
+
+    def __init__(self, subnet=None, timeout=2.0, parent=None):
+        super().__init__(parent)
+        self.timeout = timeout
+        self._running = True
+        self.subnet = subnet or self.get_subnet()
+
+    def stop(self):
+        self._running = False
+
+    def run(self):
+        try:
+            print(f"[NETWORK] Scanning subnet: {self.subnet}")
+
+            arp = ARP(pdst=self.subnet)
+            ether = Ether(dst="ff:ff:ff:ff:ff:ff")
+            packet = ether / arp
+
+            answered, _ = srp(
+                packet,
+                timeout=5,
+                retry=2,
+                verbose=False
+            )
+
+            total = max(len(answered), 1)
+            print("===== ARP Responses =====")
+
+            for _, received in answered:
+                print(received.psrc, received.hwsrc)
+                
+            for i, (sent, received) in enumerate(answered):
+
+                if not self._running:
+                    break
+
+                device = {
+                    "ip": received.psrc,
+                    "mac": received.hwsrc
+                }
+
+                print("[FOUND]", device)
+                self.deviceFound.emit(device)
+
+                self.progress.emit(int((i + 1) / total * 100))
+
+        except Exception as e:
+            print("[NETWORK ERROR]", e)
+
+        finally:
+            self._running = True
+            self.finished.emit()
+
+    def get_subnet(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+
+            net = ipaddress.ip_network(ip + "/24", strict=False)
+            return str(net)
+
+        except Exception:
+            return "192.168.2.0/24"
+# network_scanner.py
+# PyQt5 + Scapy threaded network scanner
+# assume your scanner already exists:
+# from your_scanner_file import NetworkScanner
+
+from PyQt5 import QtCore as qtc
+from PyQt5.QtWidgets import (
+    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
+    QPushButton, QLabel, QHeaderView
+)
+class NetworkScanDialog(QDialog):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Network Scanner")
+        self.resize(600, 400)
+
+        # ---------------- UI ----------------
+        self.layout = QVBoxLayout(self)
+
+        self.statusLabel = QLabel("Ready")
+        self.layout.addWidget(self.statusLabel)
+
+        self.table = QTableWidget(0, 2)
+        self.table.setHorizontalHeaderLabels(["IP", "MAC"])
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.layout.addWidget(self.table)
+
+        self.scanButton = QPushButton("Start Scan")
+        self.layout.addWidget(self.scanButton)
+
+        # ---------------- Scanner ----------------
+        self.scanner = None
+
+        # ---------------- Signals ----------------
+        self.scanButton.clicked.connect(self.startScan)
+
+    # ---------------- Core Actions ----------------
+
+    def startScan(self):
+
+        # stop old scan safely
+        if self.scanner and self.scanner.isRunning():
+            self.scanner.stop()
+            self.scanner.wait()
+
+        # create fresh scanner EVERY run (important)
+        self.scanner = NetworkScanner()
+
+        self.scanner.deviceFound.connect(self.onDeviceFound)
+        self.scanner.progress.connect(self.onProgress)
+        self.scanner.finished.connect(self.onFinished)
+
+        self.table.setRowCount(0)
+        self.statusLabel.setText("Scanning...")
+
+        self.scanner.start()
+
+    # ---------------- Slots ----------------
+
+    def onDeviceFound(self, device):
+        row = self.table.rowCount()
+        self.table.insertRow(row)
+
+        self.table.setItem(row, 0, QTableWidgetItem(device["ip"]))
+        self.table.setItem(row, 1, QTableWidgetItem(device["mac"]))
+
+    def onProgress(self, value):
+        self.statusLabel.setText(f"Scanning... {value}%")
+
+    def onFinished(self):
+        self.statusLabel.setText("Scan complete")
+
 
 class MainWindow(qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self._progress_bar_scale = 10
 
         configure_tesseract()
 
@@ -178,20 +878,36 @@ class MainWindow(qtw.QMainWindow):
 
         self._thread = None
         self._worker = None
+        self._project_thread = None
+        self._project_worker = None
+        self._project_success_title = ""
+        self._project_success_message = ""
+
+        # self.networkScanner = NetworkScanner()
+        # self.networkScanner.deviceFound.connect(self.onDeviceFound)
+        # self.networkScanner.progress.connect(self.onScanProgress)
+        # self.networkScanner.finished.connect(self.onScanFinished)
 
         # -------------------------
         # UI Setup
         # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
-
+        # self.ui.NetworkTable = QTableWidget(self.ui.centralwidget)
+        # self.ui.NetworkTable.setGeometry(10, 10, 600, 300)   
+        # self.ui.NetworkTable.setColumnCount(2)
+        # self.ui.NetworkTable.setHorizontalHeaderLabels(["IP", "MAC"])
+        # self.ui.verticalLayout.addWidget(self.ui.NetworkTable)
+        from Core.Scanner.manager import ScannerManager  # adjust path if needed
+        self.scannerManager = ScannerManager()
+        
         self.session_manager = SessionManager()
 
         # -------------------------
         # Progress Bar (FIXED)
         # -------------------------
         self.progress_bar = qtw.QProgressBar()
-        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setRange(0, 100 * self._progress_bar_scale)
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
         self.statusBar().addPermanentWidget(self.progress_bar)
@@ -204,6 +920,7 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         # Actions / Signals
         # -------------------------
+        self.ui.actionNewProject.setText("New Project")
         self.ui.actionNewProject.triggered.connect(self.on_new_project_clicked)
         
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
@@ -242,6 +959,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
 
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
+        self.ui.actionPrefernces.triggered.connect(self.open_project_settings_dialog)
 
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
@@ -249,6 +967,8 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         # Buttons / Navigation
         # -------------------------
+        self.ui.imageScannerbutton.clicked.connect(self.actionScanNetwork)
+        
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
 
@@ -298,9 +1018,10 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         # External Modules
         # -------------------------
-        #self.ui.Calcbutton.clicked.connect(self.OpenWithCalc)
         
         # Menu Modules
+        self.ui.actionImageScanner.triggered.connect(self.actionScanNetwork)
+        
         self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
         self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
         self.ui.actionMyVersifier.triggered.connect(lambda: self.open_module("MyVersifier"))
@@ -375,13 +1096,14 @@ class MainWindow(qtw.QMainWindow):
             Qt.Window |
             Qt.WindowCloseButtonHint |
             Qt.WindowMinMaxButtonsHint        )
-           # existing UI/event system (you said already exists)
+        # existing UI/event system
         self.event_bus = EventBus()
 
-                            # CORE ENGINE
-        self.project_engine = ProjectCreationEngine(
+        # CORE ENGINE
+        self.project_engine = CoreProjectCreationEngine(
             base_path=os.path.join(os.path.expanduser("~"), "Projects"),
-            event_bus=self.event_bus
+            event_bus=self.event_bus,
+            folder_list_path=os.path.join(script_dir, "ProjectFolderList.txt")
         )
 
         # optional: hook events
@@ -395,12 +1117,71 @@ class MainWindow(qtw.QMainWindow):
         if payload is None:
             return None
 
-        result = self.project_engine.create_project(payload)
+        project_path = os.path.join(self.project_engine.base_path, payload["project_name"])
+        if os.path.exists(project_path):
+            answer = qtw.QMessageBox.question(
+                self,
+                "Replace Existing Project",
+                f"Project {payload['project_name']} already exists. Delete it and recreate it?",
+                qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+                qtw.QMessageBox.No,
+            )
+            if answer != qtw.QMessageBox.Yes:
+                return None
+            payload["overwrite_existing"] = True
+
+        self._start_project_creation(
+            payload,
+            success_title="Project Created",
+            success_message=f"Project created: {payload['project_name']}"
+        )
+        return payload
+
+    def _start_project_creation(self, payload, success_title, success_message):
+        if self._project_thread is not None:
+            qtw.QMessageBox.information(
+                self,
+                "Project Creation In Progress",
+                "Wait for the current project creation task to finish."
+            )
+            return None
+
+        self._project_success_title = success_title
+        self._project_success_message = success_message
+
+        self._project_thread = qtc.QThread()
+        self._project_worker = ProjectCreationWorker(self.project_engine, payload)
+        self._project_worker.moveToThread(self._project_thread)
+
+        self._project_thread.started.connect(self._project_worker.run)
+        self._project_worker.progress.connect(self.on_project_progress)
+        self._project_worker.finished.connect(self.on_project_created_result)
+        self._project_worker.error.connect(self.on_project_creation_error)
+
+        self._project_worker.finished.connect(self._project_thread.quit)
+        self._project_worker.finished.connect(self._project_worker.deleteLater)
+        self._project_worker.error.connect(self._project_thread.quit)
+        self._project_worker.error.connect(self._project_worker.deleteLater)
+        self._project_thread.finished.connect(self._project_thread.deleteLater)
+        self._project_thread.finished.connect(self._on_project_thread_finished)
+
+        self._project_thread.start()
+
+        self._show_progress(0)
+
+        return payload
+
+    def on_project_progress(self, value):
+        self._set_progress_percent(value)
+
+    def on_project_created_result(self, result):
+        self._hide_progress(100)
+
         if result.get("status") in {"success", "ok"}:
             qtw.QMessageBox.information(
                 self,
-                "Project Created",
-                f"Project created: {payload['project_name']}"
+                self._project_success_title,
+                self._project_success_message,
             )
         else:
             qtw.QMessageBox.warning(
@@ -408,41 +1189,69 @@ class MainWindow(qtw.QMainWindow):
                 "Project Creation Failed",
                 result.get("error", "Unknown error")
             )
-        return result
+
+    def on_project_creation_error(self, msg):
+        self._hide_progress()
+
+        qtw.QMessageBox.warning(
+            self,
+            "Project Creation Failed",
+            msg,
+        )
+
+    def _on_project_thread_finished(self):
+        self._project_thread = None
+        self._project_worker = None
+
+    def _set_progress_percent(self, value):
+        if not hasattr(self, "progress_bar"):
+            return
+
+        bounded = max(0, min(100, int(value)))
+        self.progress_bar.setValue(bounded * self._progress_bar_scale)
+
+    def _show_progress(self, value=0):
+        if not hasattr(self, "progress_bar"):
+            return
+
+        self._set_progress_percent(value)
+        self.progress_bar.setVisible(True)
+
+    def _hide_progress(self, value=None):
+        if not hasattr(self, "progress_bar"):
+            return
+
+        if value is not None:
+            self._set_progress_percent(value)
+        self.progress_bar.setVisible(False)
+
+    def open_project_settings_dialog(self):
+        dialog = ProjectSettingsDialog(project_root, self.session_manager, self)
+        dialog.exec_()
 
     def collect_new_project_payload(self):
-        project_name = self.get_project_name()
+        dialog = ProjectCreationWizardDialog(self)
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            return None
+
+        payload = dialog.get_payload()
+        project_name = self._normalize_project_name(payload.get("project_name", ""))
         if project_name is None:
+            qtw.QMessageBox.warning(self, "New Project", "Project name is required.")
             return None
 
-        project_purpose = self.get_project_purpose()
-        if project_purpose is None:
+        payload["project_name"] = project_name
+        if not payload.get("project_purpose"):
+            qtw.QMessageBox.warning(self, "New Project", "Project purpose is required.")
             return None
-
-        user_intent_summary = self.get_intent()
-        if user_intent_summary is None:
+        if not payload.get("user_intent_summary"):
+            qtw.QMessageBox.warning(self, "New Project", "User intent summary is required.")
             return None
+        return payload
 
-        return {
-            "project_name": project_name,
-            "project_purpose": project_purpose,
-            "creation_trigger": "MyServer_button",
-            "source_context": "MyServer_UI",
-            "user_intent_summary": user_intent_summary,
-        }
-
-    def get_project_name(self):
-        name, ok = qtw.QInputDialog.getText(
-            self,
-            "New Project",
-            "Project name:"
-        )
-        if not ok:
-            return None
-
+    def _normalize_project_name(self, name):
         name = name.strip()
         if not name:
-            qtw.QMessageBox.warning(self, "New Project", "Project name is required.")
             return None
 
         safe_name = re.sub(r"[^A-Za-z0-9_. -]+", "_", name).strip(" .")
@@ -456,40 +1265,65 @@ class MainWindow(qtw.QMainWindow):
                 f"Project name was normalized to: {safe_name}"
             )
         return safe_name
-
-    def get_project_purpose(self):
-        purpose, ok = qtw.QInputDialog.getMultiLineText(
-            self,
-            "New Project",
-            "Project purpose:"
-        )
-        if not ok:
-            return None
-
-        purpose = purpose.strip()
-        if not purpose:
-            qtw.QMessageBox.warning(self, "New Project", "Project purpose is required.")
-            return None
-        return purpose
-
-    def get_intent(self):
-        intent, ok = qtw.QInputDialog.getMultiLineText(
-            self,
-            "New Project",
-            "User intent summary:"
-        )
-        if not ok:
-            return None
-
-        intent = intent.strip()
-        if not intent:
-            qtw.QMessageBox.warning(self, "New Project", "User intent summary is required.")
-            return None
-        return intent
     
     def on_project_created(self, event):
         print("UI: Project created!", event["project_name"])
+
+    # def actionScanNetwork(self):
+    #     self.ui.imageScannerbutton.setEnabled(False)
+    #     self.networkScanner = NetworkScanner()
+    #     self.networkScanner.deviceFound.connect(self.onDeviceFound)
+    #     self.networkScanner.progress.connect(self.onScanProgress)
+    #     self.networkScanner.finished.connect(self.onScanFinished)
+    #     self.networkScanner.start()
+    def actionScanNetwork(self):
+        # img = self.scannerManager.acquire_qimage()
+        # self.showImage(img)
+        
+        # result = self.scannerManager.acquire()
+
+        # img = result["image"]
+        # self.imgpath = result["path"]
+        # self.imgdir = result["dir"]
+
+        # self.showImage(img)
+        
+        
+        result = self.scannerManager.acquire(SCANNED_FOLDER)
+
+        if result is None:
+            return
+
+        self.showImage(result["path"])
+        
+        
+            
+        # self.netDialog = NetworkScanDialog(self)
+        # self.netDialog.show()
+        
+    # def onDeviceFound(self, device):
+    #     row = self.ui.NetworkTable.rowCount()
+    #     self.ui.NetworkTable.insertRow(row)
+
+    #     self.ui.NetworkTable.setItem(row, 0,
+    #         qtw.QTableWidgetItem(device["ip"]))
+
+    #     self.ui.NetworkTable.setItem(row, 1,
+    #         qtw.QTableWidgetItem(device["mac"]))
     
+    # # def onDeviceFound(self, device):
+    # #     print(f"[FOUND] {device['ip']}   {device['mac']}")
+        
+    # def onScanProgress(self, value):
+    #     print(f"[SCAN] {value}%")
+
+    #     if hasattr(self.ui, "progressBar"):
+    #         self.ui.progressBar.setValue(value) 
+            
+    # def onScanFinished(self):
+    #     print("[NETWORK] Scan complete.")
+    #     self.ui.imageScannerbutton.setEnabled(True)
+        
     @qtc.pyqtSlot(str)
     def on_zoom_combobox(self, text=None):
         if text is None:
@@ -601,8 +1435,6 @@ class MainWindow(qtw.QMainWindow):
         
         # Closing file
         f.close()
-        
-        #self.ui.bookComboBox.setEditText(self.bookabbr)'''
 
     def selectBookCombo(self):
         oldbookabbr = self.bookabbr
@@ -741,7 +1573,7 @@ class MainWindow(qtw.QMainWindow):
         self.pdfx_ui = Ui_ExtractDialog()
         self.pdfx_ui.setupUi(self.pdfxDialog)
         self.pdfxDialog.show()
-        #self.pdfxDialog.exec_()
+        
         seq = "SP1"
         
         def setdefault():
@@ -800,8 +1632,6 @@ class MainWindow(qtw.QMainWindow):
             print(source_file_path, workflow_folder)
             pp.pdf4tif(source_file_path, workflow_folder)
             # Extract to default Complete folder
-            #if complete_folder:
-                #pp.pdf4tif(source_file_path, complete_folder)
             if complete_folder:
                 symlinks=False
                 ignore=None
@@ -1059,7 +1889,6 @@ class MainWindow(qtw.QMainWindow):
             pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
             # Copy Workflow folder to default Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
                 symlinks=False
                 ignore=None
                 for item in os.listdir(workflow_folder):
@@ -1809,35 +2638,6 @@ class MainWindow(qtw.QMainWindow):
 
         return qimage.copy(x, y, w, h)
     
-    
-    # def actionCropImage(self):
-    #     print("[NEW CROP]")
-
-    #     if not hasattr(self, "imgqimage") or self.imgqimage.isNull():
-    #         print("[CROP ERROR] No image loaded")
-    #         return
-        
-    #     dialog = ImagePreviewDialog(
-    #         self.imgqimage,
-    #         self.crop_processor,
-    #         parent=self
-    #     )
-
-    #     if dialog.exec_():
-    #         result = dialog.get_result()
-
-    #         self.imgqimage = result
-    #         self.imagepixmap = qtg.QPixmap.fromImage(result)
-    #         self.ui.Image.setPixmap(self.imagepixmap)
-    
-    # def actionDeskewImage(self):
-    #     print("Deskewing current image")
-    #     if self.imgpath != "":
-    #         pp.deskewimage(self.imgpath)
-    #         print("Reloading deskewed image")
-    #         self.ReloadImage()
-    #     print("Deskew current image complete")
-
     def actionCrop_Greek_To_tiff_Lines(self):
         print("cropping and sorting Greek tiff lines")
         #usage: tr.sortcroplines(source, splitdir, linebox)
@@ -2121,17 +2921,13 @@ class MainWindow(qtw.QMainWindow):
         self._thread.start()
 
         # show progress immediately
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(0)
-            self.progress_bar.setVisible(True)
+        self._show_progress(0)
     
     
     def on_image_loaded(self, qimage):
         print("[LOAD] Complete")
 
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(100)
-            self.progress_bar.setVisible(False)
+        self._hide_progress(100)
 
         # -------------------------
         # STORE BOTH VERSIONS
@@ -2153,43 +2949,16 @@ class MainWindow(qtw.QMainWindow):
     
     def on_load_progress(self, value):
          print(f"[LOAD] {value}%")
-         if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(value)
+         self._set_progress_percent(value)
 
     def on_load_error(self, msg):
         print(f"[LOAD ERROR] {msg}")
 
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setVisible(False)
+        self._hide_progress()
 
         # Ã°Å¸â€Â´ invalidate image state
         self.imagepixmap = qtg.QPixmap()
         self.origpixmap  = qtg.QPixmap()
-        
-        # I attempted to paste this back into the method, but setImageStack reflected that it was not being called. So, I commented it out.
-        # def setImageStack(self, tiffCaptureHandle):
-        #     """ Set the scene's current TIFF image stack to the input TiffCapture object.
-        #     Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
-        #     :type tiffCaptureHandle: TiffCapture
-        #     """
-        #     if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
-        #         raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
-        #     self._tiffCaptureHandle = tiffCaptureHandle
-    # def on_load_error(self, msg):
-    #     print(f"[LOAD ERROR] {msg}")
-
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setVisible(False)
-    #     def setImageStack(self, tiffCaptureHandle):
-    #             """ Set the scene's current TIFF image stack to the input TiffCapture object.
-    #             Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
-    #             :type tiffCaptureHandle: TiffCapture
-    #             """
-    #             if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
-    #                 raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
-    #             self._tiffCaptureHandle = tiffCaptureHandle
-    #             # self.showFrame(0)
-
     
     def loadImage(self):
         fileName, _ = qtw.QFileDialog.getOpenFileName(
@@ -2287,6 +3056,13 @@ class MainWindow(qtw.QMainWindow):
 
         self.preprocess_window = OCRPreprocessTool(self, initial_pixmap=initial_pixmap)
         self.preprocess_window.exec_()
+    
+
+    from PyQt5.QtGui import QPixmap, QImage
+    from PyQt5.QtCore import QFileInfo
+    import tifffile
+    import numpy as np
+
     def showImage(self,imgfilename):
         self.imgpath = imgfilename
         print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
@@ -2317,19 +3093,31 @@ class MainWindow(qtw.QMainWindow):
         
         # jsonfile = 'Model/Project/Data/json/Session.json'
         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")       
-        with open(jsonfile, 'r') as f:
+        #with open(jsonfile, 'r') as f:
+        #     data = json.load(f)
+        #     imgpath_key = r"self.imgpath"
+        #     imgdir_key = r"self.imgdir"
+        #     for Setting in data:
+        #         if Setting['Setting'] == imgpath_key:
+        #             Setting['CurrentValue'] = self.imgpath
+        #             print(Setting['CurrentValue'])
+        #         elif Setting['Setting'] == imgdir_key:  
+        #             Setting['CurrentValue'] = self.imgdir
+        #             print(Setting['CurrentValue'])
+        # f.close()
+        with open(jsonfile, "r") as f:
             data = json.load(f)
-            imgpath_key = r"self.imgpath"
-            imgdir_key = r"self.imgdir"
-            for Setting in data:
-                if Setting['Setting'] == imgpath_key:
-                    Setting['CurrentValue'] = self.imgpath
-                    print(Setting['CurrentValue'])
-                elif Setting['Setting'] == imgdir_key:  
-                    Setting['CurrentValue'] = self.imgdir
-                    print(Setting['CurrentValue'])
-        f.close()
 
+        # ensure structure
+        if not isinstance(data, dict):
+            data = {}
+
+        data["path"] = self.imgpath if self.imgpath is not None else ""
+        data["dir"] = self.imgdir if self.imgdir is not None else ""
+
+        with open(jsonfile, "w") as f:
+            json.dump(data, f, indent=4)
+            
         os.remove(jsonfile)
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
@@ -2341,6 +3129,198 @@ class MainWindow(qtw.QMainWindow):
             if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
                 self.imgfileList.append(ipath)        
         self.sortImgFiles()
+
+
+
+#     def showImage(self, img):
+
+#         # -------------------------------------------------
+#         # DEBUG (only safe for file-based paths)
+#         # -------------------------------------------------
+
+# # ---- SAFE METADATA HANDLING ----
+#         if isinstance(img, str):
+#             self.imgpath = img
+#             self.imgdir = QFileInfo(img).absolutePath()
+#         else:
+#             # QImage case (scanner)
+#             self.imgpath = None
+#             self.imgdir = None
+            
+#         print(f"[showImage DEBUG] self.imgpath set to: {self.imgpath}")
+
+#         if isinstance(img, str):
+#             print(f"[showImage DEBUG] self.imgdir set to: {self.imgdir}")
+#         else:
+#             print(f"[showImage DEBUG] self.imgdir set to: <scanner image - no filesystem>")
+
+#         pixmap = None
+
+#         # -------------------------------------------------
+#         # CASE 1: QImage (WIA scanner path)
+#         # -------------------------------------------------
+#         if isinstance(img, QImage):
+#             pixmap = QPixmap.fromImage(img)
+
+#         # -------------------------------------------------
+#         # CASE 2: file path (PNG/JPG/TIFF/etc.)
+#         # -------------------------------------------------
+#         elif isinstance(img, str):
+
+#             suffix = QFileInfo(img).suffix().lower()
+
+#             # ---- TIFF stack handling (your existing feature) ----
+#             if suffix in ["tif", "tiff"]:
+#                 try:
+#                     pages = tifffile.imread(img)
+
+#                     # If multi-page TIFF, take first page for preview
+#                     if pages.ndim == 3:
+#                         frame = pages[0]
+#                     else:
+#                         frame = pages
+
+#                     if frame.dtype != np.uint8:
+#                         frame = (255 * (frame / frame.max())).astype(np.uint8)
+
+#                     h, w = frame.shape[:2]
+
+#                     if len(frame.shape) == 2:
+#                         qimg = QImage(frame.data, w, h, w, QImage.Format_Grayscale8)
+#                     else:
+#                         qimg = QImage(frame.data, w, h, w * 3, QImage.Format_RGB888)
+
+#                     pixmap = QPixmap.fromImage(qimg)
+
+#                 except Exception as e:
+#                     print("[TIFF ERROR]", e)
+#                     pixmap = QPixmap(img)
+
+#             # ---- normal image files ----
+#             else:
+#                 pixmap = QPixmap(img)
+
+#         # -------------------------------------------------
+#         # CASE 3: fallback / error
+#         # -------------------------------------------------
+#         else:
+#             print("[showImage ERROR] Unsupported type:", type(img))
+#             return
+
+#         # -------------------------------------------------
+#         # DISPLAY
+#         # -------------------------------------------------
+#         if hasattr(self.ui, "Image"):
+#             self.ui.Image.setPixmap(pixmap)
+#             self.ui.Image.setScaledContents(True)
+#         else:
+#             print("[showImage ERROR] Image not found")
+
+    # def showImage(self, img):
+
+    #     # -----------------------------
+    #     # CASE 1: already a QImage (NEW WIA pipeline)
+    #     # -----------------------------
+    #     if isinstance(img, QImage):
+    #         pixmap = QPixmap.fromImage(img)
+
+    #     # -----------------------------
+    #     # CASE 2: file path (OLD pipeline still supported)
+    #     # -----------------------------
+        
+    #     elif isinstance(img, str):
+    #         pixmap = QPixmap(img)
+
+    #     # -----------------------------
+    #     # CASE 3: invalid input
+    #     # -----------------------------
+    #     else:
+    #         print("[showImage ERROR] Unsupported type:", type(img))
+    #         return
+
+    #     # -----------------------------
+    #     # DISPLAY (adjust label name if needed)
+    #     # -----------------------------
+    #     if hasattr(self.ui, "imageLabel"):
+    #         self.ui.imageLabel.setPixmap(pixmap)
+    #         self.ui.imageLabel.setScaledContents(True)
+    #     else:
+    #         print("[showImage ERROR] imageLabel not found in UI")
+    
+    # def showImage(self,imgfilename):
+    #     self.imgpath = imgfilename
+    #     print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
+    #     self.imgfilename = self.imgpath
+    #     file = qtc.QFile(imgfilename)
+    #     filestr = os.path.basename(imgfilename)           
+    #     filesplit = os.path.splitext(filestr)
+    #     filename = filesplit[0]
+    #     fileext = filesplit[1]
+  
+    #     if file.open(qtc.QIODevice.ReadOnly):
+    #         info = qtc.QFileInfo(imgfilename)      
+
+    #         if fileext == '.tif':
+    #             self.loadImageStackFromFile(imgfilename)
+    #             self.imgdir = os.path.dirname(imgfilename)
+    #             print("[DEBUG] imagepixmap will be populated by on_image_loaded")
+                
+    #         else:
+    #             self.imagepixmap = qtg.QPixmap(self.imgpath)
+    #             self.origpixmap  = self.imagepixmap
+    #             self.ui.Image.setPixmap(self.imagepixmap)
+            
+    #     file.close()
+            
+        self.on_zoom_combobox()
+       
+        
+        # jsonfile = 'Model/Project/Data/json/Session.json'
+        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")       
+        with open(jsonfile, 'r') as f:
+            # data = json.load(f)
+            # imgpath_key = r"self.imgpath"
+            # imgdir_key = r"self.imgdir"
+            data = {
+            "path": self.imgpath if isinstance(self.imgpath, str) else str(self.imgpath),
+            "dir": self.imgdir if isinstance(self.imgdir, str) else str(self.imgdir)
+}
+            
+            
+            for Setting in data:
+                # -------------------------------------------------
+                # SAFE SESSION CHECK (NO CRASH VERSION)
+                # -------------------------------------------------
+                Setting = locals().get("Setting", None)
+
+                if isinstance(Setting, dict):
+                    setting_value = Setting.get("Setting")
+                else:
+                    setting_value = None
+
+                imgpath_key = getattr(self, "imgpath", None)
+                imgdir_key = getattr(self, "imgdir", None)
+
+                # SAFE COMPARE ONLY IF VALID
+                if setting_value == imgpath_key:
+                    pass
+                                #if Setting['Setting'] == imgpath_key:
+
+                f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()
+        
+        self.imgfileList = []
+        
+        for i in sorted(os.listdir(self.imgdir)):
+            ipath = os.path.join(self.imgdir, i)
+            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+                self.imgfileList.append(ipath)        
+        self.sortImgFiles()
+    
     def sortImgFiles(self):
         import re
 
@@ -2907,8 +3887,11 @@ class MainWindow(qtw.QMainWindow):
 
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
-    
+        #self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+        text = self.ui.LHlineEdit.text().strip()
+        value = int(text) if text.isdigit() else 0
+        self.ui.LHslider.setValue(value)
+        
     def SetLineSpacing(self):
         lineSpacing = self.ui.LHslider.value()
         self.ui.LHlineEdit.setText(str(lineSpacing))
@@ -3177,14 +4160,7 @@ class MainWindow(qtw.QMainWindow):
             if not self.preview_pixler_return(self.pixler_return_path):
                 return False
 
-            should_overwrite = self.prompt_pixler_return_action()
-            if should_overwrite:
-                return self.consume_pixler_return(
-                    self.pixler_return_path,
-                    source_path=self.pending_pixler_source_path,
-                    overwrite=True,
-                )
-
+            self.prompt_pixler_return_action()
             return True
 
         if overwrite and self.pending_pixler_source_path:
@@ -3772,6 +4748,15 @@ class EventBus:
         if event_name not in self.listeners:
             self.listeners[event_name] = []
         self.listeners[event_name].append(callback)
+
+    def unsubscribe(self, event_name, callback):
+        callbacks = self.listeners.get(event_name)
+        if not callbacks:
+            return
+
+        self.listeners[event_name] = [cb for cb in callbacks if cb != callback]
+        if not self.listeners[event_name]:
+            del self.listeners[event_name]
 
     def emit(self, event):
         name = event["event"]
