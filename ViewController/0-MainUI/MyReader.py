@@ -66,12 +66,12 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
         Stream flush implementation
         """
         pass'''
-    
+
 # A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
 # It blocks until data is available, and once it has got something from the queue, it sends
-# it to the "MainThread" by emitting a Qt Signal 
+# it to the "MainThread" by emitting a Qt Signal
 '''class ThreadConsoleTextQueueReceiver(qtc.QObject):
-    
+
     queue_element_received_signal = qtc.pyqtSignal(str)
 
     def __init__(self, q: Queue, *args, **kwargs):
@@ -136,13 +136,13 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 
 class MainWindow(qtw.QMainWindow):
 
-# Menu and Toolbar Action Methods 
+# Menu and Toolbar Action Methods
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setAcceptDrops(True)
         #self.setDropIndicatorShown(True)
-        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Reader()
         self.ui.setupUi(self)
@@ -154,17 +154,17 @@ class MainWindow(qtw.QMainWindow):
         self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
         self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
-        
+
         self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
         self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
         self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
-        
+
         self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
         self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
-        
+
         self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.actionSplit_Latin_Text_Lines)
         self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.actionRename_Latin_Text_Lines)
-        
+
         self.ui.actionReview_Ground_Truth_tb.triggered.connect(self.actionReview_Ground_Truth)
         self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
@@ -192,11 +192,11 @@ class MainWindow(qtw.QMainWindow):
         self.ui.Zoomslider.valueChanged.connect(self.on_zoomslider)
         self.ui.Zoomslider.sliderReleased.connect(self.DisableZoomSlider)
         self.ui.Zoomslider.hide()
-        
+
         #self.ui.Cropbutton.clicked.connect(self.actionCropImage)
         self.ui.Deskewbutton.clicked.connect(self.actionDeskewImage)
 
-        self.ui.OCRbutton.clicked.connect(self.GetRawOCRtext)       
+        self.ui.OCRbutton.clicked.connect(self.GetRawOCRtext)
         self.ui.LHDialogtbutton.clicked.connect(self.GetLineSpacing)
         self.ui.LHslider.valueChanged.connect(self.SetLineSpacing)
         self.ui.LHslider.sliderReleased.connect(self.DisableLHSlider)
@@ -205,8 +205,8 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.EditCorrectedTextbutton.clicked.connect(self.OpenTextFileDialog)
         self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
         self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)         
-        
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+
         self.ui.Calcbutton.clicked.connect(self.OpenWithCalc)
         self.ui.Writerbutton.clicked.connect(self.OpenWithWriter)
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
@@ -219,28 +219,29 @@ class MainWindow(qtw.QMainWindow):
         self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
 
         # UI and slots code ends here.
-        
+
         # Show the Main user interface
         self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
-        font = qtg.QFont()
-        font.setFamily("FROMVS [MAXR]")
-        font.setPointSize(20)
+        font = self.session_manager.build_workflow_font(
+            "FROMVS [MAXR]",
+            20,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
         self.ui.OCRDocument.setDefaultFont(font)
-        
-        self.ui.OCRDocument.setDefaultFont(font)
+        self.ui.OCRText.setFont(font)
         self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
         self.ui.OCRTextFormat = qtg.QTextFormat()
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
-        
+
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
         self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
         #ChrRefText = open('ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding = 'UTF-8').read()
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
-        
+
         #self.initBookCombo()
         #self.selectBookCombo()
-        
+
         # Restore Session settings
         self.get_session_settings()
 
@@ -266,32 +267,32 @@ class MainWindow(qtw.QMainWindow):
         sys.stdout = output_stream
 
         #self.thread_initialize = qtc.QThread()
-        
+
         #self.init_procedure_object = InitializationProcedures(self)
 
         # create console text read thread + receiver object
         self.thread_queue_listener = qtc.QThread()
         self.console_text_receiver = ThreadConsoleTextQueueReceiver(self.queue_console_text)
-        
+
         # connect receiver object to widget for text update
         self.console_text_receiver.queue_element_received_signal.connect(self.append_text)
-        
+
         # attach console text receiver to console text thread
         self.console_text_receiver.moveToThread(self.thread_queue_listener)
-        
+
         # attach to start / stop methods
         self.thread_queue_listener.started.connect(self.console_text_receiver.run)
         self.thread_queue_listener.finished.connect(self.console_text_receiver.finished)
         self.thread_queue_listener.start()
         #'''
-                
-        
+
+
         # Install a custom output stream by connecting sys.stdout to instance of Streamer.
         #sys.stdout = Streamer(textWritten=self.output_terminal_written)
-        
+
         self.show()
         #self.toggleLatinToolbars()
-    
+
     def dragEnterEvent(self, event):
         m = event.mimeData()
         if m.hasUrls():
@@ -300,7 +301,7 @@ class MainWindow(qtw.QMainWindow):
                     event.accept()
                     return
         event.ignore()
-              
+
         #if event.mimeData().hasImage:
             #event.accept()
         #if event.mimeData().hasText:
@@ -347,11 +348,11 @@ class MainWindow(qtw.QMainWindow):
         #self.ui.OutputText.moveCursor(QTextCursor.End)
         #self.ui.OutputText.insertPlainText(text)
         self.ui.OutputText.append(text)
-      
+
     #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
     def output_terminal_written(self, text):
         self.ui.OutputText.append(text)
-  
+
     def get_session_settings(self):
         print("loading session")
         session = self.session_manager.values('ReaderSession.json')
@@ -471,15 +472,15 @@ class MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json
         # list
         for Sequence in data:
             print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
-        
+
         # Closing file
         f.close()
-       
+
     def initBookCombo(self):
 
         # Opening JSON file
@@ -487,26 +488,26 @@ class MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json
         # list
         for booknumber in data:
             print(booknumber['bookabbr'])
             self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-        
+
         # Closing file
         f.close()
-        
+
         #self.ui.bookComboBox.setEditText(self.bookabbr)'''
 
     def selectBookCombo(self):
         oldbookabbr = self.bookabbr
         self.bookabbr = self.ui.bookComboBox.currentText()
-        
+
         if self.ui.bookComboBox.currentText() != oldbookabbr:
-                  
+
             jsonfile = 'Model/Data/json/BooksMarkDown.json'
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -517,7 +518,7 @@ class MainWindow(qtw.QMainWindow):
                         self.latinbookmarkdown = 'latin'+bookmarkdown
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
-            
+
             self.save_shared_session(**{
                 'self.bookabbr': self.bookabbr,
                 'self.sourcebookmarkdown': self.sourcebookmarkdown,
@@ -530,26 +531,26 @@ class MainWindow(qtw.QMainWindow):
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
-            
+
             #self.ui.bookComboBox.clear()
-            
+
             # Iterating through the json
-            # list          
+            # list
             '''for booknumber in data:
                 print(booknumber['bookabbr'])
                 self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-            
+
             # Closing file
             f.close()'''
-            
+
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
     '''def toggleGreekToolbars(self):
 
         greekimgpagesstate = self.ui.GreekImagePagesToolBar.isVisible()
         greekimglinesstate = self.ui.GreekImageLinesToolBar.isVisible()
-        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()        
-        
+        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()
+
         # Set the visibility to its inverse
         self.ui.GreekImagePagesToolBar.setVisible(not greekimgpagesstate)
         self.ui.GreekImageLinesToolBar.setVisible(not greekimglinesstate)
@@ -559,19 +560,19 @@ class MainWindow(qtw.QMainWindow):
 
         #latinimgpagesstate = self.ui.LatinImagePagesToolBar.isVisible()
         latinimglinesstate = self.ui.LatinImageLinesToolBar.isVisible()
-        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()        
-        
+        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()
+
         # Set the visibility to its inverse
         #self.ui.LatinImagePagesToolBar.setVisible(not latinimgpagesstate)
         self.ui.LatinImageLinesToolBar.setVisible(not latinimglinesstate)
         self.ui.LatinTextLinesToolBar.setVisible(not latintxtlinesstate)'''
-  
+
     def actionPixler(self):
         print("Opening image in Pixler")
         self.PixlerMain = qtw.QMainWindow()
         self.pixlerui = pixler.Ui_Pixler()
         self.pixlerui.setupUi(self.PixlerMain)
-        
+
         #cropimg.w = cropimg.MainWindow()
         if self.imgpath != "":
             self.pixlerui.imgpath = self.imgpath
@@ -583,7 +584,7 @@ class MainWindow(qtw.QMainWindow):
         self.PixlerMain.show()
         #rsp = self.PixlerWindow.main.show()
         print("Return from Pixler")
-    
+
     def actionDeskewImage(self):
         print("Deskewing current image")
         if self.imgpath != "":
@@ -600,14 +601,14 @@ class MainWindow(qtw.QMainWindow):
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --document-export =" + self.imgpath + "--command=gimp-2.10" + self.imgpath + "--file-forwarding org.gimp.GIMP"
             print(self.imgpath)
         else:
-            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''         
-        
+            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''
+
         os.system(gimp_cmd)
 
     def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference()
         self.chrrefmain.show()
-    
+
     def actionCorrect_OCR(self):
         print("performing OCR on current image")
         self.GetRawOCRtext()
@@ -630,7 +631,7 @@ class MainWindow(qtw.QMainWindow):
         fileName = str(fileName)
         if len(fileName) and os.path.isfile(fileName):
             self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
-            
+
     def numFrames(self):
         """ Return the number of image frames in the stack.
         """
@@ -661,38 +662,38 @@ class MainWindow(qtw.QMainWindow):
             return
         # Convert frame ndarray to a QImage.
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
-    
-    def loadImage(self):     
+
+    def loadImage(self):
         self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
         if self.imgpath:
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
-            self.sortImgFiles()       
+            self.sortImgFiles()
         '''imgfilename, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Select Image', '', 'Image Files (*.png *.jpg *.jpeg *.bmp *.tif)')
-        
+
         if imgfilename:
-            self.ui.ImageLe.setText(os.path.basename(imgfilename))       
+            self.ui.ImageLe.setText(os.path.basename(imgfilename))
             self.imgfilename = imgfilename'''
 
     def OpenImageFileDialog(self):
         self.imgpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open image file', self.imgdir,
             'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-                
+
         if self.imgpath:
             self.imgdir = os.path.dirname(self.imgpath)
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-           
+
             #self.showImage(self.imgpath)
-            #self.sortImgFiles() 
+            #self.sortImgFiles()
 
             file = qtc.QFile(self.imgpath)
-            filestr = os.path.basename(self.imgpath)           
+            filestr = os.path.basename(self.imgpath)
             filesplit = os.path.splitext(filestr)
             filename = filesplit[0]
-            fileext = filesplit[1]          
-            
+            fileext = filesplit[1]
+
             if file.open(qtc.QIODevice.ReadOnly):
                 info = qtc.QFileInfo(self.imgpath)
                 #print(qtg.QImage.size(self.qimage))
@@ -703,26 +704,26 @@ class MainWindow(qtw.QMainWindow):
                 if fileext == '.tif':
                     self.loadImageStackFromFile(str(self.imgpath))
                     self.showFrame(0)
-                    
+
                     #w,h = qtg.QImage.size(self.qimage)
                     #print(qtg.QImage.size(self.qimage))
                     '''pmsize = qtg.QPixmap.fromImage(self.qimage).size()
                     print(pmsize)'''
                     self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
                     pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                    #pixmap = qtg.QPixmap.fromImage(self.qimage)   
+                    #pixmap = qtg.QPixmap.fromImage(self.qimage)
                     self.ui.Image.setPixmap(qtg.QPixmap(pixmap))
                 else:
-                    
+
                     self.ui.Image.setPixmap(qtg.QPixmap(self.imgpath))
-                
+
                 file.close()
-                
+
                 #self.get_session_settings()
-                
+
                 #with open('Model/Data/json/Session.json', 'w') as f:
                     #json.dump(data, f, indent=2)
-                
+
 
                 self.save_shared_session(**{
                     'self.imgpath': self.imgpath,
@@ -740,57 +741,57 @@ class MainWindow(qtw.QMainWindow):
     def showImage(self,imgfilename):
         #self.imgfilename = self.imgpath
         file = qtc.QFile(imgfilename)
-        filestr = os.path.basename(imgfilename)           
+        filestr = os.path.basename(imgfilename)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        
+
         if file.open(qtc.QIODevice.ReadOnly):
             info = qtc.QFileInfo(imgfilename)
-        
+
             '''if self.imgpath.endswith('.tif'):
                 self.loadImageStackFromFile(imgfilename)
                 self.showFrame(0)
-                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation) 
+                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             else:
-                self.pixmap = qtg.QPixmap(imgfilename).scaled(self.ui.Image.size(), 
-                    qtc.Qt.KeepAspectRatio)'''       
+                self.pixmap = qtg.QPixmap(imgfilename).scaled(self.ui.Image.size(),
+                    qtc.Qt.KeepAspectRatio)'''
 
             if fileext == '.tif':
                 self.loadImageStackFromFile(imgfilename)
                 self.showFrame(0)
                 self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-                '''self.origsize = self.origpixmap.size()       
+                '''self.origsize = self.origpixmap.size()
                 self.origheight = self.origpixmap.height
                 self.origwidth = self.origpixmap.width
                 self.pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)'''
-                
-                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)  
+
+                self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
                 #self.ui.Image.setPixmap(self.pixmap) -- moved out below
             else:
                 self.pixmap = qtg.QPixmap(self.imgpath)
                 #self.ui.Image.setPixmap(self.pixmap) -- moved out below
-        
+
         file.close()
-        
+
         if self.pixmap.isNull():
             return
-        
+
         self.on_zoom()
         #self.ui.Image.setPixmap(self.pixmap)
-        
+
         self.imgdir = os.path.dirname(imgfilename)
         self.ui.ImageLe.setText(filestr)
         self.save_shared_session(**{
             'self.imgpath': self.imgpath,
             'self.imgdir': self.imgdir,
         })
-        
+
         self.imgfileList = []
         for i in os.listdir(self.imgdir):
             ipath = os.path.normpath(os.path.join(self.imgdir, i))
             if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)        
+                self.imgfileList.append(ipath)
         '''self.imgfileList = []
         for i in os.listdir(self.imgdir):
             ipath = os.path.join(self.imgdir, i)
@@ -806,8 +807,8 @@ class MainWindow(qtw.QMainWindow):
         def _norm(p):
             return os.path.normcase(os.path.normpath(p))
         self._img_index_map = { _norm(p): i for i, p in enumerate(self.sorted_imgfilelist) }
-    
-    def nextImage(self):      
+
+    def nextImage(self):
         if not self.imgpath or not getattr(self, 'sorted_imgfilelist', None):
             return
         def _norm(p):
@@ -849,7 +850,7 @@ class MainWindow(qtw.QMainWindow):
         if self.imgpath:
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
-            self.sortImgFiles()  
+            self.sortImgFiles()
         '''if self.imgpath:
             file = qtc.QFile(self.imgpath)
             filestr = os.path.basename(self.imgpath)
@@ -858,7 +859,7 @@ class MainWindow(qtw.QMainWindow):
             filesplit = os.path.splitext(filestr)
             filename = filesplit[0]
             fileext = filesplit[1]
-                        
+
            if file.open(qtc.QIODevice.ReadOnly):
                 info = qtc.QFileInfo(self.imgpath)
                 #print(qtg.QImage.size(self.qimage))
@@ -869,19 +870,19 @@ class MainWindow(qtw.QMainWindow):
                 if fileext == '.tif':
                     self.loadImageStackFromFile(str(self.imgpath))
                     self.showFrame(0)
-                    
+
                     #w,h = qtg.QImage.size(self.qimage)
                     #print(qtg.QImage.size(self.qimage))
                     #pmsize = qtg.QPixmap.fromImage(self.qimage).size()
                     #print(pmsize)
                     self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
                     pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-                    #pixmap = qtg.QPixmap.fromImage(self.qimage)   
+                    #pixmap = qtg.QPixmap.fromImage(self.qimage)
                     self.ui.Image.setPixmap(qtg.QPixmap(pixmap))
                 else:
-                    
+
                     self.ui.Image.setPixmap(qtg.QPixmap(self.imgpath))
-        
+
                 self.imgfileList = []
                 for i in os.listdir(self.imgdir):
                     ipath = os.path.join(self.imgdir, i)
@@ -889,7 +890,7 @@ class MainWindow(qtw.QMainWindow):
                         self.imgfileList.append(ipath)
 
                 self.sortImgFiles(MainWindow)'''
-  
+
     def loadText(self):
         '''self.textpath = QtWidgets.QFileDialog.getOpenFileName(
             self.centralwidget, 'Open text file', '',
@@ -898,11 +899,11 @@ class MainWindow(qtw.QMainWindow):
             self.textfile = QtCore.QFile(self.textpath)
             self.txtfilename = os.path.basename(self.textpath)
             self.showText(MainWindow,self.txtfilename)'''
-        
+
         self.txtpath = qtw.QFileDialog.getOpenFileName(
         self.ui.centralwidget, 'Open text file',self.txtdir,
         'Text files (*.txt *.csv)')[0]
-        
+
         if self.txtpath:
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
@@ -916,13 +917,13 @@ class MainWindow(qtw.QMainWindow):
         self.txtpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open text file',self.txtdir,
             'Text files (*.txt *.csv)')[0]
-        
+
         if self.txtpath:
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
-            
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -933,12 +934,12 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.OCRText.insertPlainText(text)
                 else:
                     self.ui.OCRText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_font_update()
-                
+
                 file.close()
-        
+
         self.save_shared_session(**{
             'self.txtpath': self.txtpath,
             'self.txtdir': self.txtdir,
@@ -952,14 +953,14 @@ class MainWindow(qtw.QMainWindow):
                 self.txtfileList.append(tpath)
         self.sortTextFiles()
 
-    def showText(self, txtfilename):        
+    def showText(self, txtfilename):
         #self.textfile = txtfilename
         if self.txtpath:
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
-        
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -973,13 +974,13 @@ class MainWindow(qtw.QMainWindow):
             #textfile.close()
             #txtdirpath = os.path.dirname(self.textpath)
 
-            # update font to selection and size       
+            # update font to selection and size
             self.on_font_update()
-            
+
             # update line spacing
             self.SetLineSpacing()
             file.close()
-       
+
         #self.save_shared_session(**{
             #self.txtpath': self.txtpath,
             #self.txtdir': self.txtdir,
@@ -1051,10 +1052,10 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.OCRText.insertPlainText(text)
                 else:
                     self.ui.OCRText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_font_update()
-                
+
                 # update line spacing
                 self.SetLineSpacing()
 
@@ -1069,19 +1070,19 @@ class MainWindow(qtw.QMainWindow):
                     print("finding matched text file for " + self.imgpath)
                     imgfilename = self.imgpath
                     file = qtc.QFile(imgfilename)
-                    filestr = os.path.basename(imgfilename)           
+                    filestr = os.path.basename(imgfilename)
                     filedir = os.path.dirname(imgfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
+                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")
                 else:
                     print(self.imgpath + " does not exist")
-                
+
                 self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
                 if self.trytxtpath:
                     print("opening " + self.trytxtpath)
@@ -1098,19 +1099,19 @@ class MainWindow(qtw.QMainWindow):
                     print("finding matched image file for " + self.txtpath)
                     txtfilename = self.txtpath
                     file = qtc.QFile(txtfilename)
-                    filestr = os.path.basename(txtfilename)           
+                    filestr = os.path.basename(txtfilename)
                     filedir = os.path.dirname(txtfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")
                 else:
                     print(self.txtpath + " does not exist")
-                
+
                 self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
                 if self.tryimgpath:
                     print("opening " + self.tryimgpath)
@@ -1121,8 +1122,8 @@ class MainWindow(qtw.QMainWindow):
 
 
         def reject():
-            pass        
-        
+            pass
+
         self.ImageTextPairDialog = qtw.QDialog()
         self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
@@ -1139,13 +1140,13 @@ class MainWindow(qtw.QMainWindow):
 
     def GreekLineBoxFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
-        
+
         if self.directory:
             self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestGreekLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
-        
+
         if self.directory:
             self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
@@ -1157,15 +1158,15 @@ class MainWindow(qtw.QMainWindow):
 
     def LatinLineBoxFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
-        
+
         if self.directory:
             self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestLatinLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
-        
+
         if self.directory:
-            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')            
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
     def GetRawOCRtext(self):
         self.ui.OCRText.clear()
@@ -1174,7 +1175,7 @@ class MainWindow(qtw.QMainWindow):
         imgfilename = self.ui.ImageLe.text()
         imgbasename = imgfilename.split(".")[0]
         self.ui.TextLE.setText(imgbasename + ".txt")
-    
+
     def GetLineSpacing(self):
         self.ui.LHslider.setEnabled(True)
         self.ui.LHslider.show()
@@ -1187,11 +1188,11 @@ class MainWindow(qtw.QMainWindow):
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
         self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
-    
+
     def SetLineSpacing(self):
-                
-        '''num,ok = qtw.QInputDialog.getInt(self.ui.centralwidget,"Proportional Line Spacing","Enter a percent value from 0-200")  
-        
+
+        '''num,ok = qtw.QInputDialog.getInt(self.ui.centralwidget,"Proportional Line Spacing","Enter a percent value from 0-200")
+
         if ok:
             lineSpacing = num
         else:
@@ -1199,14 +1200,14 @@ class MainWindow(qtw.QMainWindow):
 
         lineSpacing = self.ui.LHslider.value()
         self.ui.LHlineEdit.setText(str(lineSpacing))
-            
+
         cursor = self.ui.OCRText.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         bf = self.ui.OCRCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight) 
+        bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
-    
+
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save Raw text file',self.txtdir,
@@ -1217,7 +1218,7 @@ class MainWindow(qtw.QMainWindow):
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
         file.close()
-        
+
     def SaveAsCorrectedTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save Corrected text file', self.txtdir,
@@ -1230,13 +1231,13 @@ class MainWindow(qtw.QMainWindow):
         file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
-        
+
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
             #defaultdir = r"~/Projects/Python/EstablishTruth/Greek_txt_pages/"
-        
-        defaultdir = self.txtdir + r"/" 
+
+        defaultdir = self.txtdir + r"/"
         defaultfile = self.ui.TextLE.displayText()
 
         if defaultfile:
@@ -1251,7 +1252,7 @@ class MainWindow(qtw.QMainWindow):
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()
             file.write(my_CorrectedText)
-        
+
         self.ui.TextLE.setText(filename)
         file.close()
 
@@ -1259,14 +1260,19 @@ class MainWindow(qtw.QMainWindow):
         self.ui.Zoomslider.setEnabled(True)
         self.ui.Zoomslider.show()
         zoomValue = self.ui.Zoomslider.value()
-        
+
     def DisableZoomSlider(self):
         self.ui.Zoomslider.hide()
         self.ui.Zoomslider.setEnabled(False)
 
     def MoveZoomSlider(self):
         self.ui.Zoomslider.setEnabled(True)
-        self.ui.Zoomslider.setValue(int(self.ui.ZoomComboBox.currentText()[0]))
+        try:
+            value = int(self.ui.ZoomComboBox.currentText().replace('%', '').strip())
+        except ValueError:
+            return
+
+        self.ui.Zoomslider.setValue(value)
 
     def show_combo(self):
         self.ui.ZoomComboBox.show()
@@ -1278,7 +1284,7 @@ class MainWindow(qtw.QMainWindow):
         print(zoomValue)
         self.scale = zoomValue/100
         print(self.scale)
-    
+
     def on_zoom(self):
         seltext = self.ui.ZoomComboBox.currentText()
         if self.ui.Zoomslider.isEnabled():
@@ -1289,34 +1295,34 @@ class MainWindow(qtw.QMainWindow):
         print(selnumtext[0])
         self.scale = float(selnumtext[0])/100
         print(self.scale)
-        
+
         self.resize_image()
 
     def resize_image(self):
 
-        '''if self.ui.ZoomComboBox.currentText(): == "Best_Fit": 
+        '''if self.ui.ZoomComboBox.currentText(): == "Best_Fit":
             print("Best fit selected")
-            
+
             self.ui.Zoomslider.setEnabled(False)
             self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
-            self.origsize = self.origpixmap.size()       
+            self.origsize = self.origpixmap.size()
             self.origheight = self.origpixmap.height
-            self.origwidth = self.origpixmap.width           
-            
+            self.origwidth = self.origpixmap.width
+
             bestheight = self.origheight
             bestwidth = self.ui.ImagescrollArea.width
             bestfit = qtc.QSize(self.origpixmap.height(),self.ui.ImagescrollArea.width())
-            
-            scaled_pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImagescrollArea.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)   
+
+            scaled_pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImagescrollArea.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(qtg.QPixmap(scaled_pixmap))
         else:'''
         if self.qimage:
-            self.origsize = self.origpixmap.size()       
+            self.origsize = self.origpixmap.size()
             self.origheight = self.origpixmap.height
             self.origwidth = self.origpixmap.width
             scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(scaled_pixmap)
-        
+
         #self.ui.ImagescrollArea.adjustsize()
 
     def OpenWithCalc(self):
@@ -1335,7 +1341,7 @@ class MainWindow(qtw.QMainWindow):
         os.system(mw_cmd)
 
     def OpenWithMyWriter(self):
-        
+
         mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
         print(mw_cmd)
         os.system(mw_cmd)
@@ -1346,7 +1352,7 @@ class MainWindow(qtw.QMainWindow):
         writer.MainWindow.show()'''
 
     def on_font_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         #font = qtg.QFont()
         #font.setFamily(self.ui.fontComboBox.currentFont())
         #print(self.ui.fontComboBox.currentFont())
@@ -1354,14 +1360,14 @@ class MainWindow(qtw.QMainWindow):
         font.setPointSize(self.ui.fontSizeBox.value())
         #font = qtg.QFont(self.font)
         #font.setPointSize(int(self.fontsize))
-        
+
         self.ui.OCRText.setFont(font)
 
     def on_lang_select(self):
         pass
 
 # Only run this code if I am actually running this script
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
     w.show()

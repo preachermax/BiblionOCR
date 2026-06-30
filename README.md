@@ -516,6 +516,8 @@ BiblionOCR/
 ### Fonts
 - FROMVS [MAXR]: Main display font (Greek-specific)
 - Located in: `ViewController/0-MainUI/fonts/`
+- Reinstall after each Tesseract font-training update with `ViewController/0-MainUI/update_fonts.py`
+- The installer is cross-platform and copies the font into the current user's font locations on Windows, macOS, and Linux
 
 ### Stylesheets
 - Located in: `ViewController/0-MainUI/Stylesheets/`

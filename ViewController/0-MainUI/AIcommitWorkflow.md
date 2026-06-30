@@ -75,6 +75,8 @@ Developer Notebook → single source of truth (project memory)
 4. Validate with Continue.dev (codebase awareness)
 5. Commit locally
 6. IF behavior/state changed → update notebook
+
+For release builds, include the `update_fonts.py` refresh step before final MyTrainer compilation so the deployed font path stays aligned with the trained model assets.
 ```
 
 ---
@@ -154,6 +156,7 @@ This workflow represents:
 
 * Formalize **MyServer → MyPixler parameter contract**
 * Maintain commit discipline during integration phase
+* Keep the MyTrainer release path tied to the cross-platform font refresh workflow
 
 ---
 

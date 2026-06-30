@@ -35,7 +35,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         up_twice = os.path.join(up_once,"..")
         self.mod_rootdir = up_twice
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
-        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
@@ -47,7 +47,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'OS Path relpath: {self.mod_dirname}')
         print(f'Project Home: {self.projecthome}')
 
-        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
@@ -72,7 +72,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.BothNextBookButton.clicked.connect(self.findNextRefBook)
         self.ui.BothNextBookButton.clicked.connect(self.updateBothVerse)
         self.ui.BothNextChapterButton.clicked.connect(self.findNextVerseChapter)
-        self.ui.BothNextChapterButton.clicked.connect(self.findNextRefChapter)       
+        self.ui.BothNextChapterButton.clicked.connect(self.findNextRefChapter)
         self.ui.BothNextChapterButton.clicked.connect(self.updateBothVerse)
         self.ui.BothNextVerseButton.clicked.connect(self.findNextVerseVerse)
         self.ui.BothNextVerseButton.clicked.connect(self.findNextRefVerse)
@@ -88,15 +88,15 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.chapterComboBox.currentTextChanged.connect(self.loadVerseCombo)
         self.ui.AnchorCkBox.stateChanged.connect(self.weighAnchor)
         self.ui.Anchorbutton.clicked.connect(self.dropAnchor)
-        self.ui.AddVersebutton.clicked.connect(self.addVerse)        
+        self.ui.AddVersebutton.clicked.connect(self.addVerse)
         self.ui.Synchronizebutton.clicked.connect(self.findBothVerse)
         self.ui.Recorderbutton.clicked.connect(self.VarianceRecorder)
         self.ui.Resolvebutton.clicked.connect(self.OpenResolver)
         self.ui.NormcheckBox.stateChanged.connect(self.bothNormCheckbox)
- 
+
         self.ui.VersebookComboBox.currentTextChanged.connect(self.loadVerseChapterCombo)
-        self.ui.VersechapterComboBox.currentTextChanged.connect(self.loadVerseVerseCombo)       
-        self.ui.VersechapterComboBox.currentTextChanged.connect(self.loadVerseLineCombo) 
+        self.ui.VersechapterComboBox.currentTextChanged.connect(self.loadVerseVerseCombo)
+        self.ui.VersechapterComboBox.currentTextChanged.connect(self.loadVerseLineCombo)
         self.ui.VerseverseComboBox.currentTextChanged.connect(self.updateVerseLineCombo)
         self.ui.VersefindPushButton.clicked.connect(self.findVerseVerse)
 
@@ -104,18 +104,18 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefchapterComboBox.currentTextChanged.connect(self.loadRefVerseCombo)
         self.ui.RefchapterComboBox.currentTextChanged.connect(self.loadRefLineCombo)
         self.ui.RefverseComboBox.currentTextChanged.connect(self.updateRefLineCombo)
-        self.ui.ReffindPushButton.clicked.connect(self.findRefVerse) 
+        self.ui.ReffindPushButton.clicked.connect(self.findRefVerse)
 
         #Setup Verse Text
         self.ui.VersePrevBookButton.clicked.connect(self.findPrevVerseBook)
         self.ui.VerseNextBookButton.clicked.connect(self.findNextVerseBook)
         self.ui.VersePrevChapterButton.clicked.connect(self.findPrevVerseChapter)
-        self.ui.VerseNextChapterButton.clicked.connect(self.findNextVerseChapter)        
+        self.ui.VerseNextChapterButton.clicked.connect(self.findNextVerseChapter)
         self.ui.PrevVerseButton.clicked.connect(self.findPrevVerseVerse)
         self.ui.NextVerseButton.clicked.connect(self.findNextVerseVerse)
         self.ui.PrevVerseWordButton.clicked.connect(self.findPrevVerseWord)
-        self.ui.NextVerseWordButton.clicked.connect(self.findNextVerseWord)       
-        
+        self.ui.NextVerseWordButton.clicked.connect(self.findNextVerseWord)
+
         self.ui.VerseLHDialogtbutton.clicked.connect(self.GetVerseLineSpacing)
         self.ui.VerseLHslider.valueChanged.connect(self.SetVerseLineSpacing)
         self.ui.VerseLHslider.sliderReleased.connect(self.DisableVerseLHSlider)
@@ -127,15 +127,17 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.VerseNormButton.clicked.connect(self.VerseNormalize)
         self.ui.VerseTextbutton.clicked.connect(self.loadVerseText)
         self.ui.SaveAsVerseTextbutton.clicked.connect(self.SaveAsVerseTextDialog)
-        self.ui.SaveVerseTextbutton.clicked.connect(self.SaveVerseTextDialog)         
+        self.ui.SaveVerseTextbutton.clicked.connect(self.SaveVerseTextDialog)
         self.ui.VerseMyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         self.ui.reloadVerseTextbutton.clicked.connect(self.ReloadVerseText)
         self.ui.VersefontComboBox.currentFontChanged.connect(self.on_versefont_update)
-        self.ui.VersefontSizeBox.valueChanged.connect(self.on_versefont_update)        
+        self.ui.VersefontSizeBox.valueChanged.connect(self.on_versefont_update)
         self.ui.VerseDocument = qtg.QTextDocument(self.ui.VerseText)
-        font = qtg.QFont()
-        font.setFamily("FROMVS")
-        font.setPointSize(20)
+        font = SessionManager().build_workflow_font(
+            "FROMVS",
+            20,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
         self.ui.VerseDocument.setDefaultFont(font)
         self.ui.VerseBlockFormat = qtg.QTextBlockFormat()
         self.ui.VerseTextFormat = qtg.QTextFormat()
@@ -164,14 +166,16 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefNormcheckBox.stateChanged.connect(self.showRefNormText)
         self.ui.RefNormcheckBox.stateChanged.connect(self.showRefText)
         self.ui.RefNormButton.clicked.connect(self.RefNormalize)
-        self.ui.RefTextbutton.clicked.connect(self.loadRefText)    
+        self.ui.RefTextbutton.clicked.connect(self.loadRefText)
         self.ui.reloadRefTextbutton.clicked.connect(self.ReloadRefText)
         self.ui.ReffontComboBox.currentFontChanged.connect(self.on_reffont_update)
-        self.ui.ReffontSizeBox.valueChanged.connect(self.on_reffont_update)        
+        self.ui.ReffontSizeBox.valueChanged.connect(self.on_reffont_update)
         self.ui.ReferenceDocument = qtg.QTextDocument(self.ui.RefText)
-        font = qtg.QFont()
-        font.setFamily("FROMVS")
-        font.setPointSize(20)
+        font = SessionManager().build_workflow_font(
+            "FROMVS",
+            20,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
         self.ui.ReferenceDocument.setDefaultFont(font)
         self.ui.ReferenceBlockFormat = qtg.QTextBlockFormat()
         self.ui.ReferenceTextFormat = qtg.QTextFormat()
@@ -181,7 +185,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ReffontMetrics = qtg.QFontMetricsF(self.Reffont)
         self.RefspaceWidth = self.ReffontMetrics.width(' ')
         self.ui.RefText.setTabStopWidth(int(self.RefspaceWidth * 4))
-               
+
         # Restore Session settings
         self.get_session_settings()
         #print(f'Reference File Path: {self.refpath}')
@@ -298,15 +302,15 @@ class Ui_MainWindow(qtw.QMainWindow):
     def getstarted(self):
         print(f'Reference File Path: {self.refpath}')
         print(f'Verse File Path: {self.versepath}')
-        self.getRefText(self.refpath)       
+        self.getRefText(self.refpath)
         self.getVerseText(self.versepath)
         self.findBothVerse()
-        
+
         self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
         self.ui.chapterComboBox.setCurrentText(self.bothchapter)
         self.ui.verseComboBox.setCurrentText(self.bothverse)
         print(f'Book: {self.bothbookabbr} Chapter: {self.bothchapter} Verse: {self.bothverse}')
-    
+
         self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
         self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
         self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
@@ -318,17 +322,17 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefverseComboBox.setCurrentText(self.refverse)
         self.ui.ReflineComboBox.setCurrentText(self.refline)
 
-        print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')     
+        print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')
         self.verseverse = self.ui.verseComboBox.currentText()
         #self.verseline = self.ui.lineComboBox..currentText()
         self.refverse = self.ui.verseComboBox.currentText()
         #self.refline = self.ui.lineComboBox.currentText()
         self.verseversenum = int(self.verseverse)
         self.refversenum = int(self.refverse)
-        
+
         self.verseversecount = self.ui.verseComboBox.count()
-        self.refversecount = self.ui.verseComboBox.count()      
-        
+        self.refversecount = self.ui.verseComboBox.count()
+
         self.nexttextversenum = int(self.ui.verseComboBox.currentText()) + 1
         self.nextrefversenum = int(self.ui.verseComboBox.currentText()) + 1
 
@@ -338,8 +342,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.versebook = self.ui.bookComboBox.currentText()
         self.versebookindex = self.ui.bookComboBox.currentIndex()
         self.versebooknum = self.versebookindex + 40
-        self.versebookcount = self.ui.bookComboBox.count()        
-        
+        self.versebookcount = self.ui.bookComboBox.count()
+
         self.refbook = self.ui.bookComboBox.currentText()
         self.refbookindex = self.ui.bookComboBox.currentIndex()
         self.refbooknum = self.refbookindex + 40
@@ -377,17 +381,17 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.getSessionLastVerse()
             self.anchorbook = self.verselastbook
             self.anchorchapter = self.verselastchapter
-            self.anchorverse = self.verselastverse           
+            self.anchorverse = self.verselastverse
         self.updateSessionAnchor()
 
     def getSessionAnchor(self):
         print(f'Getting the anchor session settings')
-        
+
         # Opening JSON file
         with open(self.session) as f:
             # returns JSON object as
             # a dictionary
-            data = json.load(f)  
+            data = json.load(f)
         # Iterating through the json
         # list
             anchorbook_key = r"self.anchorbook"
@@ -417,13 +421,13 @@ class Ui_MainWindow(qtw.QMainWindow):
             'self.anchorchapter': self.ui.VersechapterComboBox.currentText(),
             'self.anchorverse': self.ui.VerseverseComboBox.currentText(),
             'self.anchorline': self.ui.VerselineComboBox.currentText(),
-        })  
+        })
 
     def addVerse(self):
         if self.ui.VerseNormcheckBox.isChecked():
             print("New verses cannot be added in Normalized text view.")
         else:
-        
+
             print(f'Adding new verse:')
             self.getSessionLastVerse()
             addversenum = int(self.ui.VerseverseComboBox.currentText()) + 1
@@ -439,19 +443,19 @@ class Ui_MainWindow(qtw.QMainWindow):
                 cursor.movePosition(cursor.EndOfBlock, cursor.MoveAnchor)
                 cursor.insertBlock()
                 #print(f'addbooktext 1: {addbooktext}')
-                if addversenum > self.ui.VerseverseComboBox.count():           
+                if addversenum > self.ui.VerseverseComboBox.count():
                     addversenum = 1
                     addchapternum += 1
                     if addchapternum > self.ui.VersechapterComboBox.count():
                         addchapternum += 1
                         #addbookindex += 1
                         addbooktext = self.ui.VersebookComboBox.itemText(self.ui.VersebookComboBox.currentIndex() + 1)
-                        print(f'addbooktext +1: {addbooktext}')              
-                
+                        print(f'addbooktext +1: {addbooktext}')
+
                 self.ui.VersebookComboBox.setCurrentText(addbooktext)
                 self.ui.VersechapterComboBox.setCurrentText(str(addchapternum))
                 self.ui.VerseverseComboBox.setCurrentText(str(addversenum))
-                
+
                 addbooktext = self.ui.VersebookComboBox.currentText()
                 addchaptertext = self.ui.VersechapterComboBox.currentText()
                 addversetext = self.ui.VerseverseComboBox.currentText()
@@ -464,8 +468,8 @@ class Ui_MainWindow(qtw.QMainWindow):
                 #self.ui.radioButtonVerses.setChecked(True)
                 self.ui.bookComboBox.setCurrentText(self.verselastbook)
                 self.ui.chapterComboBox.setCurrentText(self.verselastchapter)
-                self.ui.verseComboBox.setCurrentText(self.verselastverse)        
-                
+                self.ui.verseComboBox.setCurrentText(self.verselastverse)
+
                 #self.ui.AnchorCkBox.setChecked(True)
                 cursor.insertText(self.lastverse + " ")
                 self.findBothVerse()
@@ -473,12 +477,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def getSessionLastVerse(self):
         print(f'Getting the last verse session setting')
-        
+
         # Opening JSON file
         with open(self.session) as f:
             # returns JSON object as
             # a dictionary
-            data = json.load(f)  
+            data = json.load(f)
         # Iterating through the json
         # list
             verselastbook_key = r"self.verselastbook"
@@ -508,24 +512,24 @@ class Ui_MainWindow(qtw.QMainWindow):
             'self.verselastchapter': self.verselastchapter,
             'self.verselastverse': self.verselastverse,
             'self.verselastline': self.ui.VerselineComboBox.currentText(),
-        })        
+        })
 
     '''def getLastVerse(self):
         print(f'Finding the last verse:')
         versecount = self.ui.VerseDocument.blockCount()
-        
+
         cursor3 = self.ui.VerseText.textCursor()
         cursor3.setPosition(cursor3.End)
         #cursor3.movePosition(cursor3.PreviousBlock, cursor3.MoveAnchor)
         #loopcount = versecount
         loopcount = 1470
         # perform checks
-        
+
         # Opening JSON file
         with open(self.projecthome +  'Model/Project/Data/json/LineBookChapterVerse.json') as f:
             # returns JSON object as
             # a dictionary
-            data = json.load(f)  
+            data = json.load(f)
         # Iterating through the json
         # list
         while loopcount > 0:
@@ -553,22 +557,22 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.lastverseverse = str(Verse['Verse'])
                     #self.lastverseline = str(Verse['Line'])
                     if bcv == f"{self.lastversebook} {self.lastversechapter}:{self.lastverseverse}":
-                        self.lastverse = self.lastversebook + " " + self.lastversechapter + ":" + self.lastverseverse                    
+                        self.lastverse = self.lastversebook + " " + self.lastversechapter + ":" + self.lastverseverse
                         print(f"Book: {Verse['Book']} Chapter: {str(Verse['Chapter'])} Verse: {str(Verse['Verse'])}")
                     loopcount = 0
                 #else:
                     #print("unable to identify previous block")
-     
+
         f.close()'''
 
     def selectBookCombo(self):
         oldbookabbr = self.bothbookabbr
         self.bothbookabbr = self.ui.bookComboBox.currentText()
-        
+
         if self.ui.bookComboBox.currentText() != oldbookabbr:
-                  
+
             jsonfile = self.booksmarkdown
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -579,9 +583,9 @@ class Ui_MainWindow(qtw.QMainWindow):
                         self.latinbookmarkdown = 'latin'+bookmarkdown
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
-              
+
             '''jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 bothbookabbr_key = r"self.bothbookabbr"
@@ -600,7 +604,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         Setting['CurrentValue'] = self.latinbookmarkdown
                     print(Setting['CurrentValue'])
             f.close()'''
-            
+
             os.remove(jsonfile)
             with open(jsonfile, 'w') as f:
                 json.dump(data, f, indent=4)
@@ -611,18 +615,18 @@ class Ui_MainWindow(qtw.QMainWindow):
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
-            
+
             #self.ui.bookComboBox.clear()
-            
+
             # Iterating through the json
-            # list          
+            # list
             '''for booknumber in data:
                 print(booknumber['bookabbr'])
                 self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-            
+
             # Closing file
             f.close()'''
-            
+
         self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
         self.refbookabbr = self.ui.bookComboBox.currentText()
         self.refbooknum = self.ui.bookComboBox.currentIndex() + 40
@@ -648,7 +652,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.chapterComboBox.addItem(str(Chapter['Chapter']))
         # Closing file
         f.close()
-        
+
         #self.ui.bookComboBox.setEditText(self.bookabbr)
         self.refchapter = self.ui.chapterComboBox.currentText()
         self.refchapternum = int(self.refchapter)
@@ -666,7 +670,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-            
+
         # Iterating through the json
         # list
         for Verse in data:
@@ -680,8 +684,8 @@ class Ui_MainWindow(qtw.QMainWindow):
             # Get the text currently in selection
             self.selected_verseverse = self.ui.VerseText.textCursor().selectedText()
             self.selected_refverse = self.ui.RefText.textCursor().selectedText()
-            
-            
+
+
             # Split the text to get the word count
             self.verseverse_words = len(self.selected_verseverse.split())
             self.refverse_words = len(self.selected_refverse.split())
@@ -710,7 +714,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             subprocess.Popen([sys.executable, script], close_fds=True)
         except Exception as e:
             qtw.QMessageBox.warning(self, "Launch failed", f"Failed to launch resolver: {e}")
-    
+
     '''def popupbox(self):
 
         popup = qtw.QMessageBox(self)
@@ -734,7 +738,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             print("Nevermind. Moving on")
             stopresolver = True
             break'''
-    
+
     def loadVarWordCombo(self):
         #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
@@ -743,18 +747,18 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         for varword in varwords:
             self.varrecorder_ui.VarWordSelCombo.addItem(varword[0])
-        
+
         self.selectVarWordCombo()
 
     def selectVarWordCombo(self):
-        
+
         selvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
         #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
-        
+
         # This is only a partial solution.  It locks onto the first match only.
-        
+
         varfields = varwords[0]
 
         print(varfields[0])
@@ -767,34 +771,34 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         for repword in replacewords:
             self.varrecorder_ui.ReplaceWordSelCombo.addItem(repword[0])
-        
+
         self.selectReplaceWordCombo()
-    
+
     def selectReplaceWordCombo(self):
-        
+
         selrepword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
         #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRBibleWords.db")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/TRiBibleWords.db")
         repwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE Word =" + "'" + selrepword + "'")
-        
+
         # This is only a partial solution.  It locks onto the first match only.
-        
+
         #repfields = repwords[0]
         #print(repfields[0])
 
     def findResolverVariant(self,line,wordnum):
         if self.stoprecorder == True:
-            return 
-        
+            return
+
         print("Check if variant already exists in Resolver. If found, populate dialog.")
         helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
-        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
+        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants
                 WHERE Line = ? and WordNum = ?"""
         data = (line,wordnum)
         variant = helper.selectone(query,data)
         if not variant:
             self.varrecorder_ui.NewradioButton.setChecked(True)
-        else: 
+        else:
             self.varrecorder_ui.ExistingradioButton.setChecked(True)
             print(f'Variant: {variant}')
 
@@ -804,7 +808,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             resvarword = variant[3]
             reserrorcode = variant[4]
             respreserved = variant[5]
-            rescorrected = variant[6]       
+            rescorrected = variant[6]
             self.varrecorder_ui.VarWordSelCombo.setCurrentText(resvarword)
             self.varrecorder_ui.ReplaceWordSelCombo.setCurrentText(resword)
             self.varrecorder_ui.VariantCodeCombo.setCurrentText(reserrorcode)
@@ -820,7 +824,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         varverse = self.varrecorder_ui.VerseVerselineEdit.text()
         varwordnum = self.varrecorder_ui.VerseWordNumlineEdit.text()
         varnormword = self.varrecorder_ui.VerseNormWordlineEdit.text()
-        refline = self.varrecorder_ui.RefLinelineEdit.text()    
+        refline = self.varrecorder_ui.RefLinelineEdit.text()
         refwordnum = self.varrecorder_ui.RefWordNumlineEdit.text()
         refvarnormword = self.varrecorder_ui.VerseNormWordlineEdit.text()
         if self.stoprecorder == True:
@@ -835,7 +839,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         verseline = variant[0]
         versewordnum = variant[1]
         verseword = variant[2]
-                
+
         helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
         query = """SELECT Line, WordNum, Word, Strong, RMAC, Lemma FROM IntBibleWords
                 WHERE Line = ? and WordNum = ?"""
@@ -849,13 +853,13 @@ class Ui_MainWindow(qtw.QMainWindow):
         refstrong = variant[3]
         refrmac = variant[4]
         reflemma = variant[5]
-        
+
         errorcode = self.varrecorder_ui.VariantCodeCombo.currentText()
         preserved = 0
         Corrected = 0
         if self.varrecorder_ui.PreservedcheckBox.isChecked():
             preserved = 1
-        if self.varrecorder_ui.CorrectedcheckBox.isChecked():   
+        if self.varrecorder_ui.CorrectedcheckBox.isChecked():
             Corrected = 1
         varword = self.varrecorder_ui.VarWordSelCombo.currentText()
         verseword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
@@ -869,9 +873,9 @@ class Ui_MainWindow(qtw.QMainWindow):
     def updateResolverVariant(self,line,wordnum):
         if self.stoprecorder == True:
             return
-        print('Updating existing variant') 
+        print('Updating existing variant')
         helper = SqliteHelper(self.projecthome + self.sqldir + "/FROMVS.db")
-        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
+        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants
                 WHERE Line = ? and WordNum = ?"""
         data = (line,wordnum)
         variant = helper.selectone(query,data)
@@ -883,7 +887,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         resvarword = variant[3]
         reserrorcode = variant[4]
         respreserved = variant[5]
-        rescorrected = variant[6] 
+        rescorrected = variant[6]
         pckvar = ""
         cckvar = ""
         preserved = 0
@@ -903,7 +907,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 cckvar = "C"
             else:
                 Corrected= 0
-                cckvar = "" 
+                cckvar = ""
         resvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
         varform = pckvar + cckvar
         query = """UPDATE Variants SET Word = ?, VarWord = ?, ErrorCode = ?, Preserved = ?, Corrected = ?
@@ -922,12 +926,12 @@ class Ui_MainWindow(qtw.QMainWindow):
             elif self.varrecorder_ui.NewradioButton.isChecked():
                 print("Adding new variant to Resolver")
                 self.insertResolverVariant(self.resline,self.reswordnum)
-        
+
         '''def add():
             if self.varrecorder_ui.NewradioButton.isChecked():
                 print("Adding new variant to Resolver")
                 self.insertResolverVariant(self.resline,self.reswordnum)'''
-        
+
         def close():
             print("Closing Resolver")
             self.stoprecorder = True
@@ -937,7 +941,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         def reject():
             print("Moving on")
             #self.contresolver = True
-        
+
         '''def update():
             print("VARIANT ACCEPTED!!!!!!")
             if self.varrecorder_ui.ExistingradioButton.isChecked():
@@ -949,7 +953,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.VariantRecorderDialog.show()
         self.varrecorder_ui.buttonBox.accepted.connect(accept)
         self.varrecorder_ui.buttonBox.rejected.connect(reject)
-        self.varrecorder_ui.ClosepushButton.clicked.connect(close) 
+        self.varrecorder_ui.ClosepushButton.clicked.connect(close)
         self.varrecorder_ui.RefLinelineEdit.setText(self.ui.ReflineComboBox.currentText())
         self.varrecorder_ui.RefBooklineEdit.setText(self.ui.RefbookComboBox.currentText())
         self.varrecorder_ui.RefChapterlineEdit.setText(self.ui.RefchapterComboBox.currentText())
@@ -968,7 +972,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             refword = word[5]
             if str(refline) == self.varrecorder_ui.RefLinelineEdit.text() and str(refwordnum) == self.varrecorder_ui.RefWordNumlineEdit.text():
                 self.varrecorder_ui.RefWordlineEdit.setText(refword)
-                self.varrecorder_ui.VarWordSelCombo.setCurrentText(refword)            
+                self.varrecorder_ui.VarWordSelCombo.setCurrentText(refword)
         self.varrecorder_ui.VerseLinelineEdit.setText(self.ui.VerselineComboBox.currentText())
         self.varrecorder_ui.VerseBooklineEdit.setText(self.ui.VersebookComboBox.currentText())
         self.varrecorder_ui.VerseChapterlineEdit.setText(self.ui.VersechapterComboBox.currentText())
@@ -989,17 +993,17 @@ class Ui_MainWindow(qtw.QMainWindow):
             verseword = word[5]
             self.varrecorder_ui.ReplaceWordSelCombo.setCurrentText(verseword)
             if str(self.verseline) == self.varrecorder_ui.VerseLinelineEdit.text() and str(self.versewordnum) == self.varrecorder_ui.VerseWordNumlineEdit.text():
-                self.varrecorder_ui.VerseWordlineEdit.setText(verseword)           
-                self.findResolverVariant(self.verseline,self.versewordnum) 
+                self.varrecorder_ui.VerseWordlineEdit.setText(verseword)
+                self.findResolverVariant(self.verseline,self.versewordnum)
                 self.VariantRecorderDialog.exec()
                 #print(str(f'Next Verse Num: {self.nextverseversenum}'))
 
-    def VarianceRecorder(self):        
+    def VarianceRecorder(self):
         self.stoprecorder = False
-        
+
         if not self.ui.VerseNormcheckBox.isChecked():
             print("Normalized verse text is required for variant resolution")
-        
+
         if not self.ui.RefNormcheckBox.isChecked():
             print("Normalized reference text is required for variant resolution")
 
@@ -1011,7 +1015,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.verseversecount = self.ui.VerseDocument.blockCount()
         self.refversecount = self.ui.ReferenceDocument.blockCount()
-        
+
         if self.refversecount >= self.verseversecount:
             self.versecount = self.verseversecount
         elif self.refversecount < self.verseversecount:
@@ -1021,7 +1025,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refcursor = self.ui.RefText.textCursor()
         self.initverse = True
         self.stoprecorder = False
-    
+
         for x in range(self.versecount):
             if self.initverse == True:
                 versecursor.setPosition(0)
@@ -1047,7 +1051,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             #print(f'Verse versecursor start of first verse word position: {str(versecursor.position())}')
             self.versewordnum = 1
             self.ui.VerseWordNumlineEdit.setText(str(self.versewordnum))
-            
+
 
             if self.initverse == True:
                 refcursor.setPosition(0)
@@ -1074,10 +1078,10 @@ class Ui_MainWindow(qtw.QMainWindow):
             #print(f'Reference versecursor start of first ref word position: {str(refcursor.position())}')
             self.refwordnum = 1
             self.ui.RefWordNumlineEdit.setText(str(self.refwordnum))
-            
+
             if self.initverse == True:
                 self.initverse = False
-            
+
             #if versewordcount == refwordcount:
                 #print('Additions anticipated')
                 # Since there are extra ref words,
@@ -1107,22 +1111,22 @@ class Ui_MainWindow(qtw.QMainWindow):
                         #  accept()
                     #elif: self.VariantRecorderDialog.Rejected == True:
                         #reject()
-                
+
             #if self.stoprecorder == True:
                 #print("Stopping the Variant Recorder")
-                #break         
+                #break
             self.verseversenum = int(self.ui.VerseverseComboBox.currentText())
             self.nextverseversenum = int(self.ui.VerseverseComboBox.currentText()) + 1
-            print(str(f'Next Verse Num: {self.nextverseversenum}'))            
-            
+            print(str(f'Next Verse Num: {self.nextverseversenum}'))
+
             self.ui.VersebookComboBox.setCurrentText(str(self.versebook))
             self.ui.VersechapterComboBox.setCurrentText(str(self.versechapter))
             self.ui.VerseverseComboBox.setCurrentText(str(self.nextverseversenum))
-            
+
             self.ui.RefbookComboBox.setCurrentText(str(self.versebook))
             self.ui.RefchapterComboBox.setCurrentText(str(self.versechapter))
             self.ui.RefverseComboBox.setCurrentText(str(self.nextverseversenum))
-            
+
             self.ui.bookComboBox.setCurrentText(self.ui.VersebookComboBox.currentText())
             self.ui.chapterComboBox.setCurrentText(self.ui.VersechapterComboBox.currentText())
             self.ui.verseComboBox.setCurrentText(self.ui.VerseverseComboBox.currentText())
@@ -1130,15 +1134,15 @@ class Ui_MainWindow(qtw.QMainWindow):
             print(str(f'Next Verse Num: {self.nextverseversenum}'))
             #self.findVerseVerse()
             self.findBothVerse()
-        
+
     def selectVerseBookCombo(self):
         oldbookabbr = self.versebookabbr
         self.versebookabbr = self.ui.VersebookComboBox.currentText()
-        
+
         if self.ui.VersebookComboBox.currentText() != oldbookabbr:
-                  
+
             jsonfile = self.booksmarkdown
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -1149,7 +1153,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         self.latinbookmarkdown = 'latin'+bookmarkdown
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
-            
+
             SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
                 'self.versebookabbr': self.versebookabbr,
                 'self.sourcebookmarkdown': self.sourcebookmarkdown,
@@ -1162,18 +1166,18 @@ class Ui_MainWindow(qtw.QMainWindow):
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
-            
+
             #self.ui.VersebookComboBox.clear()
-            
+
             # Iterating through the json
-            # list          
+            # list
             '''for booknumber in data:
                 print(booknumber['bookabbr'])
                 self.ui.VersebookComboBox.addItem(booknumber['bookabbr'])
-            
+
             # Closing file
             f.close()'''
-            
+
         self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
         '''self.refbookabbr = self.ui.bookComboBox.currentText()
         self.refbooknum = self.ui.bookComboBox.currentIndex() + 40
@@ -1198,7 +1202,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.VersechapterComboBox.addItem(str(Chapter['Chapter']))
         # Closing file
         f.close()
-        
+
         #self.ui.VersebookComboBox.setEditText(self.bookabbr)
         self.versechapter = self.ui.VersechapterComboBox.currentText()
         self.versechapternum = int(self.versechapter)
@@ -1212,7 +1216,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-            
+
         # Iterating through the json
         # list
         for Verse in data:
@@ -1229,7 +1233,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-            
+
         # Iterating through the json
         # list
         for Line in data:
@@ -1238,21 +1242,21 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Closing file
         f.close()
         #self.updateVerseLineCombo()
-    
+
     def updateVerseLineCombo(self):
         #self.ui.VerselineComboBox.clear()
         # Opening JSON file
         with open(self.linebookchapterverse) as f:
             # returns JSON object as a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json list
         for Line in data:
             if Line['Book'] == self.ui.VersebookComboBox.currentText() and str(Line['Chapter']) == self.ui.VersechapterComboBox.currentText() and str(Line['Verse']) == self.ui.VerseverseComboBox.currentText():
                 self.ui.VerselineComboBox.setCurrentText(str(Line["Line"]))
                 #self.ui.VerseverseComboBox.setCurrentText(str(Line["Verse"]))
                 self.verseline = str(Line["Line"])
-                #self.findVerseVerse()                      
+                #self.findVerseVerse()
 
         # Closing file
         f.close()
@@ -1260,11 +1264,11 @@ class Ui_MainWindow(qtw.QMainWindow):
     def selectRefBookCombo(self):
         oldbookabbr = self.refbookabbr
         self.refbookabbr = self.ui.RefbookComboBox.currentText()
-        
+
         if self.ui.RefbookComboBox.currentText() != oldbookabbr:
-                  
+
             jsonfile = self.booksmarkdown
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -1275,7 +1279,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         self.latinbookmarkdown = 'latin'+bookmarkdown
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
-            
+
             SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
                 'self.bookabbr': self.refbookabbr,
                 'self.sourcebookmarkdown': self.sourcebookmarkdown,
@@ -1288,24 +1292,24 @@ class Ui_MainWindow(qtw.QMainWindow):
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
-            
+
             #self.ui.RefbookComboBox.clear()
-            
+
             # Iterating through the json
-            # list          
+            # list
             '''for booknumber in data:
                 print(booknumber['bookabbr'])
                 self.ui.RefbookComboBox.addItem(booknumber['bookabbr'])
-            
+
             # Closing file
             f.close()'''
-            
+
         self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
         self.refbookabbr = self.ui.RefbookComboBox.currentText()
         self.refbooknum = self.ui.RefbookComboBox.currentIndex() + 40
         self.refbookindex = self.ui.RefbookComboBox.currentIndex()
         self.refbookcount = self.ui.RefbookComboBox.count()
-    
+
     def loadRefChapterCombo(self):
         self.ui.RefchapterComboBox.clear()
         # Opening JSON file
@@ -1320,7 +1324,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.RefchapterComboBox.addItem(str(Chapter['Chapter']))
         # Closing file
         f.close()
-        
+
         #self.ui.RefbookComboBox.setEditText(self.bookabbr)
         self.refchapter = self.ui.RefchapterComboBox.currentText()
         self.refchapternum = int(self.refchapter)
@@ -1334,7 +1338,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-            
+
         # Iterating through the json
         # list
         for Verse in data:
@@ -1352,7 +1356,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-            
+
         # Iterating through the json
         # list
         for Line in data:
@@ -1368,13 +1372,13 @@ class Ui_MainWindow(qtw.QMainWindow):
         with open(self.linebookchapterverse) as f:
             # returns JSON object as a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json list
         for Line in data:
             if Line['Book'] == self.ui.RefbookComboBox.currentText() and str(Line['Chapter']) == self.ui.RefchapterComboBox.currentText() and str(Line['Verse']) == self.ui.RefverseComboBox.currentText():
                 #self.ui.RefverseComboBox.setCurrentText(str(Line["Verse"]))
                 self.ui.ReflineComboBox.setCurrentText(str(Line["Line"]))
-                self.refline = self.ui.ReflineComboBox.currentText()        
+                self.refline = self.ui.ReflineComboBox.currentText()
                 #self.findRefVerse()
         # Closing file
         f.close()
@@ -1390,19 +1394,19 @@ class Ui_MainWindow(qtw.QMainWindow):
                     print("finding matched text file for " + self.imgpath)
                     imgfilename = self.imgpath
                     file = qtc.QFile(imgfilename)
-                    filestr = os.path.basename(imgfilename)           
+                    filestr = os.path.basename(imgfilename)
                     filedir = os.path.dirname(imgfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.versedir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
+                    print(self.versedir +r"/"+ versionref + "_Page_" + pagestr + r".txt")
                 else:
                     print(self.imgpath + " does not exist")
-                
+
                 self.trytxtpath = self.versedir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
                 if self.trytxtpath:
                     print("opening " + self.trytxtpath)
@@ -1419,19 +1423,19 @@ class Ui_MainWindow(qtw.QMainWindow):
                     print("finding matched image file for " + self.versepath)
                     txtfilename = self.versepath
                     file = qtc.QFile(txtfilename)
-                    filestr = os.path.basename(txtfilename)           
+                    filestr = os.path.basename(txtfilename)
                     filedir = os.path.dirname(txtfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")
                 else:
                     print(self.versepath + " does not exist")
-                
+
                 self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
                 if self.tryimgpath:
                     print("opening " + self.tryimgpath)
@@ -1442,8 +1446,8 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         def reject():
-            pass        
-        
+            pass
+
         self.ImageTextPairDialog = qtw.QDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
         self.ImageTextPairDialog.show()
@@ -1465,7 +1469,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.versebookindex = self.ui.VersebookComboBox.currentIndex()
             #self.ui.VerseText.setTextCursor(cursor)
             #self.ui.VerseText.find(verseverse)
-            print(f'found = {findversebook}')              
+            print(f'found = {findversebook}')
             self.versebookcount = self.ui.VersebookComboBox.count()
             self.prevversebookindex = str(int(self.versebookindex) - 1)
             self.nextversebookindex = str(int(self.versebookindex) + 1)
@@ -1489,7 +1493,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def findPrevVerseBook(self):
         self.ui.VersebookComboBox.setCurrentIndex(self.ui.VersebookComboBox.currentIndex() - 1)
-        self.findVerseBook()       
+        self.findVerseBook()
 
     def findVerseChapter(self):
         versebook = self.ui.VersebookComboBox.currentText()
@@ -1505,7 +1509,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         versechapterfound = self.ui.VerseText.find(findversechapter)
         if versechapterfound:
             self.versechapter = self.ui.VersechapterComboBox.currentText()
-            print(f'found verse chapter = {findversechapter}')              
+            print(f'found verse chapter = {findversechapter}')
             self.versechaptercount = self.ui.VersechapterComboBox.count()
             print(f'self.versechapter = {self.versechapter}')
             print(f'self.versechaptercount = {self.versechaptercount}')
@@ -1525,8 +1529,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Opening JSON file
         with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
-            books = json.load(f)  
-        # Iterating through the json list  
+            books = json.load(f)
+        # Iterating through the json list
         for book in books:
             versebookabbr = str(book["bookabbr"])
             if versebookabbr == self.ui.VersebookComboBox.currentText():
@@ -1539,11 +1543,11 @@ class Ui_MainWindow(qtw.QMainWindow):
         versebookcount = self.ui.VersebookComboBox.count()
         print(f'Verse Chapter Count: {versechaptercount} Verse Chapter Num: {versechapternum} Next Verse Chapter Num: {nextversechapternum}')
         print(f'versebookindex: {versebookindex} versebook: {versebook} nextversebookindex: {nextversebookindex} nextversebook: {nextversebook}')
-        if versechapternum > versechaptercount:                    
+        if versechapternum > versechaptercount:
             self.ui.VersebookComboBox.setCurrentText(versebook)
             self.ui.VersechapterComboBox.setCurrentText("1")
             self.ui.VerseverseComboBox.setCurrentText("1")
-            self.versechapter = versechapter 
+            self.versechapter = versechapter
             if nextversechapternum > versechaptercount:
                 self.ui.VersebookComboBox.setCurrentText(nextversebook)
                 self.ui.VersechapterComboBox.setCurrentText("1")
@@ -1560,8 +1564,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Opening JSON file
         with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
-            books = json.load(f)  
-        # Iterating through the json list  
+            books = json.load(f)
+        # Iterating through the json list
         for book in books:
             versebookabbr = str(book["bookabbr"])
             if versebookabbr == self.ui.VersebookComboBox.currentText():
@@ -1570,11 +1574,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                 prevversebookindex = versebookindex - 1
         # Closing json file
         f.close()
-        prevversebook = self.ui.VersebookComboBox.itemText(prevversebookindex)     
+        prevversebook = self.ui.VersebookComboBox.itemText(prevversebookindex)
         versebookcount = self.ui.VersebookComboBox.count()
         print(f'Verse Chapter Num: {versechapternum} Prev Verse Chapter Num: {prevversechapternum}')
         print(f'versebookindex: {versebookindex} versebook: {versebook} prevversebookindex: {prevversebookindex} prevversebook: {prevversebook}')
-        if versechapternum == 0:                    
+        if versechapternum == 0:
             self.ui.VersebookComboBox.setCurrentText(versebook)
             self.ui.VersechapterComboBox.setCurrentText(str(self.ui.VersechapterComboBox.count()))
             self.ui.VerseverseComboBox.setCurrentText("1")
@@ -1584,10 +1588,10 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.VersechapterComboBox.setCurrentText(str(self.ui.VersechapterComboBox.count()))
                 self.ui.VerseverseComboBox.setCurrentText("1")
 
-        self.findVerseChapter()       
+        self.findVerseChapter()
 
     def findBothVerse(self):
-        
+
         if self.ui.radioButtonRef.isChecked():
             verse = self.ui.RefbookComboBox.currentText() + " " + self.ui.RefchapterComboBox.currentText() + ":" + self.ui.RefverseComboBox.currentText() + " "
         elif self.ui.radioButtonVerses.isChecked():
@@ -1598,15 +1602,15 @@ class Ui_MainWindow(qtw.QMainWindow):
             verse = self.anchorbook + " " + self.anchorchapter + ":" + self.anchorverse + " "
 
         print(f'find both Verse verse = {verse}')
-        
+
         cursor = self.ui.VerseText.textCursor()
         cursor.setPosition(0)
         self.ui.VerseText.setTextCursor(cursor)
         self.ui.VerseText.verticalScrollBar().setValue(self.ui.VerseText.verticalScrollBar().maximum())
-        
+
         if self.ui.VerseNormcheckBox.isChecked():
             findline = self.ui.VerselineComboBox.currentText()
-            print(f'find verse = {verse} find line = {findline}')           
+            print(f'find verse = {verse} find line = {findline}')
             linefound = self.ui.VerseText.find(findline)
             #comment out the line of code below to highlight the entire verse
             self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
@@ -1614,7 +1618,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.verseline = self.ui.VerselineComboBox.currentText()
                 #self.ui.VerseText.setTextCursor(cursor)
                 #self.ui.VerseText.find(verseverse)
-                print(f'found = {linefound}')              
+                print(f'found = {linefound}')
                 self.verselinenum = int(self.verseline)
                 self.verselinecount = self.ui.VerselineComboBox.count()
                 self.prevtextversenum = str(int(self.verseversenum) - 1)
@@ -1630,7 +1634,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             versefound = self.ui.VerseText.find(verse)
             if versefound:
                 self.verseverse = self.ui.verseComboBox.currentText()
-                print(f'find self.verseverse = {self.verseverse}')              
+                print(f'find self.verseverse = {self.verseverse}')
                 self.verseversenum = int(self.verseverse)
                 self.verseversecount = self.ui.verseComboBox.count()
                 self.prevtextversenum = str(int(self.verseverse) - 1)
@@ -1651,7 +1655,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refcursor.setPosition(0)
         self.ui.RefText.setTextCursor(refcursor)
         self.ui.RefText.verticalScrollBar().setValue(self.ui.RefText.verticalScrollBar().maximum())
-        
+
         if self.ui.RefNormcheckBox.isChecked():
             findline = self.ui.ReflineComboBox.currentText()
             print(f'find verse = {verse} find line = {findline}')
@@ -1662,7 +1666,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.refline = self.ui.ReflineComboBox.currentText()
                 #self.ui.RefText.setTextCursor(cursor)
                 #self.ui.RefText.find(refverse)
-                print(f'found = {linefound}')              
+                print(f'found = {linefound}')
                 self.reflinenum = int(self.refline)
                 self.reflinecount = self.ui.ReflineComboBox.count()
                 self.prevtextrefnum = str(int(self.refversenum) - 1)
@@ -1675,10 +1679,10 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.ReflineComboBox.setCurrentText(self.refline)
             else:
                 print(f'Unable to find ref verse line: {findline}')
-        
+
         else:
             refversefound = self.ui.RefText.find(verse)
-            if refversefound:          
+            if refversefound:
                 self.refverse = self.ui.verseComboBox.currentText()
                 print(f'find self.refverse = {self.refverse}')
                 self.refversenum = int(self.refverse)
@@ -1693,8 +1697,8 @@ class Ui_MainWindow(qtw.QMainWindow):
                 print(f'self.prevrefversenum = {self.prevrefversenum}')
                 print(f'self.nextrefversenum = {self.nextrefversenum}')
             else:
-                print(f'Unable to find ref verse: {refversefound}') 
-        
+                print(f'Unable to find ref verse: {refversefound}')
+
         #self.ui.ReflineComboBox.setCurrentText(self.refline)
 
         self.ui.VersebookComboBox.setCurrentText(self.ui.bookComboBox.currentText())
@@ -1705,7 +1709,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.versebookindex = self.ui.bookComboBox.currentIndex()
         self.versechapter = self.ui.chapterComboBox.currentText()
         self.versechapterindex = self.ui.chapterComboBox.currentIndex()
-        
+
         self.ui.RefbookComboBox.setCurrentText(self.ui.bookComboBox.currentText())
         self.ui.RefchapterComboBox.setCurrentText(self.ui.chapterComboBox.currentText())
         self.ui.RefverseComboBox.setCurrentText(self.ui.verseComboBox.currentText())
@@ -1714,7 +1718,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.refbookindex = self.ui.bookComboBox.currentIndex()
         self.refchapter = self.ui.chapterComboBox.currentText()
         self.refchapterindex = self.ui.chapterComboBox.currentIndex()
-        
+
         self.updateSessionBothVerse()
 
     def updateBothVerse(self):
@@ -1732,7 +1736,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             'self.bothbookabbr': self.bothbookabbr,
             'self.bothchapter': self.bothchapter,
             'self.bothverse': self.bothverse,
-        }) 
+        })
 
     def findVerseVerse(self):
 
@@ -1752,7 +1756,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.verseline = self.ui.VerselineComboBox.currentText()
                 #self.ui.VerseText.setTextCursor(cursor)
                 #self.ui.VerseText.find(verseverse)
-                print(f'found = {linefound}')              
+                print(f'found = {linefound}')
                 self.verselinenum = int(self.verseline)
                 self.verselinecount = self.ui.VerselineComboBox.count()
                 self.prevtextversenum = str(int(self.verseversenum) - 1)
@@ -1770,7 +1774,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.verseverse = self.ui.VerseverseComboBox.currentText()
                 #self.ui.VerseText.setTextCursor(cursor)
                 #self.ui.VerseText.find(verseverse)
-                print(f'found = {findverse}')              
+                print(f'found = {findverse}')
                 self.verseversenum = int(self.verseverse)
                 self.verseversecount = self.ui.VerseverseComboBox.count()
                 self.prevtextversenum = str(int(self.verseversenum) - 1)
@@ -1785,7 +1789,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             else:
                 print(f'Unable to find verse verse: {findverse}')
             self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
-        
+
         self.versebook = self.ui.VersebookComboBox.currentText()
         self.versebookindex = self.ui.VersebookComboBox.currentIndex()
         self.versechapter = self.ui.VersechapterComboBox.currentText()
@@ -1799,7 +1803,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             'self.versechapter': self.versechapter,
             'self.verseverse': self.verseverse,
             'self.verseline': self.ui.VerselineComboBox.currentText(),
-        }) 
+        })
 
     def findNextVerseVerse(self):
         self.ui.VerseverseComboBox.setCurrentText(str(int(self.ui.VerseverseComboBox.currentText()) + 1))
@@ -1811,7 +1815,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         nextversebookindex = self.ui.VersebookComboBox.currentIndex() + 1
         versechaptercount = self.ui.VersechapterComboBox.count()
         print(f'Next Text Verse: {nextverseversenum}')
-        if verseversenum == self.ui.VerseverseComboBox.count() + 1:                     
+        if verseversenum == self.ui.VerseverseComboBox.count() + 1:
             self.ui.VersebookComboBox.setCurrentText(versebook)
             self.ui.VersechapterComboBox.setCurrentText(str(nextversechapter))
             self.ui.VerseverseComboBox.setCurrentText("1")
@@ -1836,7 +1840,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Text Chapter: {versechapter}')
         print(f'Prev Text Chapter: {prevversechapter}')
         print(f'Prev Verse Book: {prevversebook}')
-        if verseversenum == 0:                     
+        if verseversenum == 0:
             self.ui.VersebookComboBox.setCurrentText(versebook)
             self.ui.VersechapterComboBox.setCurrentText(str(prevversechapter))
             self.ui.VerseverseComboBox.setCurrentText(str(self.ui.VerseverseComboBox.count()))
@@ -1845,11 +1849,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.VersebookComboBox.setCurrentText(prevversebook)
                 versechaptercount = self.ui.VersechapterComboBox.count()
                 self.ui.VersechapterComboBox.setCurrentText(str(versechaptercount))
-                self.ui.VerseverseComboBox.setCurrentText(str(self.ui.VerseverseComboBox.count())) 
+                self.ui.VerseverseComboBox.setCurrentText(str(self.ui.VerseverseComboBox.count()))
         self.updateVerseLineCombo()
         self.findVerseVerse()
 
-    def updateVerseVerseRegEx(self):   
+    def updateVerseVerseRegEx(self):
         self.refword = self.ui.RefText.textCursor().selectedText()
         print(self.refword)
         txtfile = open(self.refpath)
@@ -1858,9 +1862,9 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Parse lines of biblical text(tab delimited) as a csv with regexp
         for row in csv_f:
             #print(row[0])
-            
+
             # Each line is a verse => parse and label each book chapter:verse reference
-            
+
             rowline = row[0]
             textline = rowline.replace("\n","")
             #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
@@ -1878,10 +1882,10 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(chapter)
                         verse = str(match[3]).strip()
                         self.ui.RefverseComboBox.setCurrentText(verse)
-                        print(verse)                                       
-                    
-        txtfile.close()        
-    
+                        print(verse)
+
+        txtfile.close()
+
     '''
     def parseLinesRegEx(self):
         #***This is the original parse routine.  Keep for reference***
@@ -1890,7 +1894,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         textline = rowline.replace("\n","")
         #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
         pattern = re.compile('(\w+\s)(\d+:)(\d+\s)(.*)')
-        matches = pattern.finditer(textline)  
+        matches = pattern.finditer(textline)
         for match in matches:
             book = match[1]
             chcolon = match[2]
@@ -1911,7 +1915,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def getVerseLinePositions(self):
         cursor = self.ui.VerseText.textCursor()
         self.currentpos = cursor.position()
-        
+
         cursor2 = self.ui.VerseText.textCursor()
         cursor2.setPosition(self.currentpos)
 
@@ -1920,10 +1924,10 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         cursor2.movePosition(cursor.PreviousWord, cursor.KeepAnchor)
         self.lastwordstart = cursor2.position()
-        
+
         cursor2.movePosition(cursor.EndOfWord, cursor.KeepAnchor)
         self.lastwordend = cursor2.position()
-        
+
         cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
         self.startofline = cursor2.position()
         self.bookwordstart = self.startofline
@@ -2000,7 +2004,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.refbookindex = self.ui.RefbookComboBox.currentIndex()
             #self.ui.VerseText.setTextCursor(cursor)
             #self.ui.VerseText.find(refverse)
-            print(f'found = {findrefbook}')              
+            print(f'found = {findrefbook}')
             self.refbookcount = self.ui.RefbookComboBox.count()
             self.prevrefbookindex = str(int(self.refbookindex) - 1)
             self.nextrefbookindex = str(int(self.refbookindex) + 1)
@@ -2017,14 +2021,14 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefchapterComboBox.setCurrentText("1")
         self.ui.RefverseComboBox.setCurrentText("1")
         self.findRefVerse()
-    
+
     def findNextRefBook(self):
         self.ui.RefbookComboBox.setCurrentIndex(self.ui.RefbookComboBox.currentIndex() + 1)
         self.findRefBook()
 
     def findPrevRefBook(self):
         self.ui.RefbookComboBox.setCurrentIndex(self.ui.RefbookComboBox.currentIndex() - 1)
-        self.findRefBook() 
+        self.findRefBook()
 
     def findRefChapter(self):
         refbook = self.ui.RefbookComboBox.currentText()
@@ -2040,7 +2044,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refchapterfound = self.ui.RefText.find(findrefchapter)
         if refchapterfound:
             self.refchapter = self.ui.RefchapterComboBox.currentText()
-            print(f'found ref chapter = {findrefchapter}')              
+            print(f'found ref chapter = {findrefchapter}')
             self.refchaptercount = self.ui.RefchapterComboBox.count()
             print(f'self.refchapter = {self.refchapter}')
             print(f'self.refchaptercount = {self.refchaptercount}')
@@ -2050,8 +2054,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
         self.ui.RefverseComboBox.setCurrentText("1")
         self.findRefVerse()
-    
-    def findNextRefChapter(self):       
+
+    def findNextRefChapter(self):
         self.ui.RefchapterComboBox.setCurrentText(str(int(self.ui.RefchapterComboBox.currentText()) + 1))
         refchapternum = int(self.ui.RefchapterComboBox.currentText())
         refchapter = self.ui.RefchapterComboBox.currentText()
@@ -2060,8 +2064,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Opening JSON file
         with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
-            books = json.load(f)  
-        # Iterating through the json list  
+            books = json.load(f)
+        # Iterating through the json list
         for book in books:
             refbookabbr = str(book["bookabbr"])
             if refbookabbr == self.ui.RefbookComboBox.currentText():
@@ -2074,11 +2078,11 @@ class Ui_MainWindow(qtw.QMainWindow):
         refbookcount = self.ui.RefbookComboBox.count()
         print(f'Ref Chapter Count: {refchaptercount} Ref Chapter Num: {refchapternum} Next Ref Chapter Num: {nextrefchapternum}')
         print(f'refbookindex: {refbookindex} refbook: {refbook} nextrefbookindex: {nextrefbookindex} nextrefbook: {nextrefbook}')
-        if refchapternum > refchaptercount:                    
+        if refchapternum > refchaptercount:
             self.ui.RefbookComboBox.setCurrentText(refbook)
             self.ui.RefchapterComboBox.setCurrentText("1")
             self.ui.RefverseComboBox.setCurrentText("1")
-            self.refchapter = refchapter 
+            self.refchapter = refchapter
             if nextrefchapternum > refchaptercount:
                 self.ui.RefbookComboBox.setCurrentText(nextrefbook)
                 self.ui.RefchapterComboBox.setCurrentText("1")
@@ -2095,8 +2099,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Opening JSON file
         with open(self.booksabbrnamenumindex) as f:
             # returns JSON object as a dictionary
-            books = json.load(f)  
-        # Iterating through the json list  
+            books = json.load(f)
+        # Iterating through the json list
         for book in books:
             refbookabbr = str(book["bookabbr"])
             if refbookabbr == self.ui.RefbookComboBox.currentText():
@@ -2105,11 +2109,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                 prevrefbookindex = refbookindex - 1
         # Closing json file
         f.close()
-        prevrefbook = self.ui.RefbookComboBox.itemText(prevrefbookindex)     
+        prevrefbook = self.ui.RefbookComboBox.itemText(prevrefbookindex)
         refbookcount = self.ui.RefbookComboBox.count()
         print(f'Ref Chapter Num: {refchapternum} Prev Ref Chapter Num: {prevrefchapternum}')
         print(f'refbookindex: {refbookindex} refbook: {refbook} prevrefbookindex: {prevrefbookindex} prevrefbook: {prevrefbook}')
-        if refchapternum == 0:                    
+        if refchapternum == 0:
             self.ui.RefbookComboBox.setCurrentText(refbook)
             self.ui.RefchapterComboBox.setCurrentText(str(self.ui.RefchapterComboBox.count()))
             self.ui.RefverseComboBox.setCurrentText("1")
@@ -2129,7 +2133,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         refcursor.setPosition(0)
         self.ui.RefText.setTextCursor(refcursor)
         self.ui.RefText.verticalScrollBar().setValue(self.ui.RefText.verticalScrollBar().maximum())
-        
+
         if self.ui.RefNormcheckBox.isChecked():
             linefound = self.ui.RefText.find(findline)
             #comment out the line of code below to highlight the entire verse
@@ -2138,7 +2142,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.refline = self.ui.ReflineComboBox.currentText()
                 #self.ui.RefText.setTextCursor(cursor)
                 #self.ui.RefText.find(refverse)
-                print(f'found = {linefound}')              
+                print(f'found = {linefound}')
                 self.reflinenum = int(self.refline)
                 self.reflinecount = self.ui.ReflineComboBox.count()
                 self.prevtextrefnum = str(int(self.refversenum) - 1)
@@ -2150,7 +2154,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             else:
                 print(f'Unable to find verse line: {findline}')
             self.ui.ReflineComboBox.setCurrentText(self.refline)
-        else:  
+        else:
             reffound = self.ui.RefText.find(findverse)
             if reffound:
                 self.refverse = self.ui.RefverseComboBox.currentText()
@@ -2185,7 +2189,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             'self.refchapter': self.refchapter,
             'self.refverse': self.refverse,
             'self.refline': self.ui.VerselineComboBox.currentText(),
-        }) 
+        })
 
     def findNextRefVerse(self):
         self.ui.RefverseComboBox.setCurrentText(str(int(self.ui.RefverseComboBox.currentText()) + 1))
@@ -2197,7 +2201,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         nextrefbookindex = self.ui.RefbookComboBox.currentIndex() + 1
         refchaptercount = self.ui.RefchapterComboBox.count()
         print(f'Next Ref Verse: {nextrefversenum}')
-        if refversenum == self.ui.RefverseComboBox.count() + 1:                    
+        if refversenum == self.ui.RefverseComboBox.count() + 1:
             self.ui.RefchapterComboBox.setCurrentText(str(nextrefchapter))
             self.ui.RefverseComboBox.setCurrentText("1")
             self.refchapter = str(nextrefchapter)
@@ -2221,7 +2225,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Ref Chapter: {refchapter}')
         print(f'Prev Ref Chapter: {prevrefchapter}')
         print(f'Prev Ref Book: {prevrefbook}')
-        if refversenum == 0:                     
+        if refversenum == 0:
             self.ui.RefbookComboBox.setCurrentText(refbook)
             self.ui.RefchapterComboBox.setCurrentText(str(prevrefchapter))
             self.ui.RefverseComboBox.setCurrentText(str(self.ui.RefverseComboBox.count()))
@@ -2230,11 +2234,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.RefbookComboBox.setCurrentText(prevrefbook)
                 refchaptercount = self.ui.RefchapterComboBox.count()
                 self.ui.RefchapterComboBox.setCurrentText(str(refchaptercount))
-                self.ui.RefverseComboBox.setCurrentText(str(self.ui.RefverseComboBox.count())) 
+                self.ui.RefverseComboBox.setCurrentText(str(self.ui.RefverseComboBox.count()))
         #self.updateRefLineCombo()
         self.findRefVerse()
 
-    def updateRefVerse(self):   
+    def updateRefVerse(self):
         self.refword = self.ui.RefText.textCursor().selectedText()
         print(self.refword)
         txtfile = open(self.refpath)
@@ -2243,9 +2247,9 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Parse lines of biblical text(tab delimited) as a csv with regexp
         for row in csv_f:
             #print(row[0])
-            
+
             # Each line is a verse => parse and label each book chapter:verse reference
-            
+
             rowline = row[0]
             textline = rowline.replace("\n","")
             #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
@@ -2263,10 +2267,10 @@ class Ui_MainWindow(qtw.QMainWindow):
                         print(chapter)
                         verse = str(match[3]).strip()
                         self.ui.RefverseComboBox.setCurrentText(verse)
-                        print(verse)                                       
-                    
+                        print(verse)
+
         txtfile.close()
-        #self.updateRefLineCombo()        
+        #self.updateRefLineCombo()
 
     def findRefWord(self):
         self.refword = self.ui.RefText.textCursor.selectedText()
@@ -2275,7 +2279,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def getRefLinePositions(self):
         cursor = self.ui.RefText.textCursor()
         self.currentpos = cursor.position()
-        
+
         cursor2 = self.ui.RefText.textCursor()
         cursor2.setPosition(self.currentpos)
 
@@ -2284,10 +2288,10 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         cursor2.movePosition(cursor.PreviousWord, cursor.KeepAnchor)
         self.lastwordstart = cursor2.position()
-        
+
         cursor2.movePosition(cursor.EndOfWord, cursor.KeepAnchor)
         self.lastwordend = cursor2.position()
-        
+
         cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
         self.startofline = cursor2.position()
         self.bookwordstart = self.startofline
@@ -2298,7 +2302,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         cursor2.movePosition(cursor.EndOfWord,cursor.MoveAnchor )
         self.bookwordend = cursor2.position()'''
         cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
-        
+
         if self.ui.RefNormcheckBox.isChecked():
             cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor,1)
         else:
@@ -2382,17 +2386,17 @@ class Ui_MainWindow(qtw.QMainWindow):
             qtw.QMessageBox.warning(self, "LibreOffice not found", "LibreOffice/soffice not found on PATH.")
 
     def on_versefont_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         font = qtg.QFont(self.ui.VersefontComboBox.currentFont())
         font.setPointSize(self.ui.VersefontSizeBox.value())
-        
+
         self.ui.VerseText.setFont(font)
 
     def on_reffont_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         font = qtg.QFont(self.ui.ReffontComboBox.currentFont())
         font.setPointSize(self.ui.ReffontSizeBox.value())
-        
+
         self.ui.RefText.setFont(font)
 
     def on_lang_select(self):
@@ -2410,17 +2414,17 @@ class Ui_MainWindow(qtw.QMainWindow):
     def MoveVerseLHSlider(self):
         self.ui.VerseLHslider.setEnabled(True)
         self.ui.VerseLHslider.setValue(int(self.ui.VerseLHlineEdit.text()))
-    
+
     def SetVerseLineSpacing(self):
 
         lineSpacing = self.ui.VerseLHslider.value()
         self.ui.VerseLHlineEdit.setText(str(lineSpacing))
-            
+
         cursor = self.ui.VerseText.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         bf = self.ui.VerseCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.VerseBlockFormat.ProportionalHeight) 
+        bf.setLineHeight(lineSpacing, self.ui.VerseBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
 
     def GetRefLineSpacing(self):
@@ -2435,17 +2439,17 @@ class Ui_MainWindow(qtw.QMainWindow):
     def MoveRefLHSlider(self):
         self.ui.RefLHslider.setEnabled(True)
         self.ui.RefLHslider.setValue(int(self.ui.RefLHlineEdit.text()))
-    
+
     def SetRefLineSpacing(self):
 
         lineSpacing = self.ui.RefLHslider.value()
         self.ui.RefLHlineEdit.setText(str(lineSpacing))
-            
+
         cursor = self.ui.RefText.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         bf = self.ui.ReferenceCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.ReferenceBlockFormat.ProportionalHeight) 
+        bf.setLineHeight(lineSpacing, self.ui.ReferenceBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
 
     def SaveAsVerseTextDialog(self):
@@ -2453,21 +2457,21 @@ class Ui_MainWindow(qtw.QMainWindow):
         path = qtw.QFileDialog.getSaveFileName(
         self.ui.centralwidget, 'Save Corrected text file', '',
                 'Text files (*.txt)')[0]
-        filename = os.path.basename(path)        
+        filename = os.path.basename(path)
 
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.VerseDocument.toPlainText()
             file.write(my_CorrectedText)
-        
+
         self.ui.TextLE.setText(filename)
         file.close()
 
     def SaveVerseTextDialog(self):
-        
+
         defaultdir = self.versedir + r"/"
         defaultfile = self.ui.TextLE.displayText()
         defaultpath = defaultdir + defaultfile
-        
+
         if defaultpath:
             path = defaultpath
             filename = defaultfile
@@ -2475,12 +2479,12 @@ class Ui_MainWindow(qtw.QMainWindow):
             path = qtw.QFileDialog.getSaveFileName(
                 self.ui.centralwidget, 'Save Corrected text file', '',
                 'Text files (*.txt)')[0]
-            filename = os.path.basename(path)        
+            filename = os.path.basename(path)
 
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.VerseDocument.toPlainText()
             file.write(my_CorrectedText)
-        
+
         self.ui.TextLE.setText(filename)
         file.close()
 
@@ -2496,16 +2500,16 @@ class Ui_MainWindow(qtw.QMainWindow):
     def getVerseText(self,textpath):
             self.versepath = textpath
             self.versedirname = os.path.dirname(self.versepath)
-            #create file list 
+            #create file list
             if self.versepath:
-                #self.ui.BoxText.setText(os.path.basename(self.txtpath))       
+                #self.ui.BoxText.setText(os.path.basename(self.txtpath))
                 self.versefile = qtc.QFile(self.versepath)
                 self.versefilename = os.path.basename(self.versepath)
                 self.versedir = os.path.dirname(self.versepath)
                 self.ui.VerseTextLE.setText(self.versefilename)
                 self.showVerseText(self.versepath)
-    
-    def showVerseText(self,textpath):        
+
+    def showVerseText(self,textpath):
         self.versepath = textpath
         if self.versepath:
             versetext = open(self.versepath, encoding='UTF-8').read()
@@ -2526,11 +2530,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                 else:
                     self.ui.VerseText.setPlainText(text)'''
             self.on_versefont_update()
-            
+
             # update line spacing
-            self.SetVerseLineSpacing()      
+            self.SetVerseLineSpacing()
             self.versefile.close()
-       
+
         SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
             'self.versepath': self.versepath.replace(self.projecthome, ""),
             'self.versedir': self.versedir.replace(self.projecthome, ""),
@@ -2560,20 +2564,20 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.ui.VerseText.insertPlainText(text)
                 else:
                     self.ui.VerseText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_versefont_update()
-                
+
                 # update line spacing
                 self.SetLineSpacing()
 
     '''
     def loadText(self):
-        
+
         self.versepath = qtw.QFileDialog.getOpenFileName(
         self.ui.centralwidget, 'Open text file',self.versedir,
         'Text files (*.txt *.csv)')[0]
-        
+
         if self.versepath:
             file = qtc.QFile(self.versepath)
             filename = os.path.basename(self.versepath)
@@ -2584,14 +2588,14 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.sortTextFiles()
     '''
     '''
-    def showText(self, txtfilename):        
+    def showText(self, txtfilename):
         #self.textfile = txtfilename
         if self.versepath and not self.ui.VerseNormcheckBox.isChecked():
             file = qtc.QFile(self.versepath)
             filename = os.path.basename(self.versepath)
             self.versedir = os.path.dirname(self.versepath)
             self.ui.TextLE.setText(filename)
-        
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -2605,15 +2609,15 @@ class Ui_MainWindow(qtw.QMainWindow):
             #textfile.close()
             #txtdirpath = os.path.dirname(self.textpath)
 
-            # update font to selection and size       
+            # update font to selection and size
             self.on_versefont_update()
-            
+
             # update line spacing
             self.SetLineSpacing()
             file.close()
-      
+
         jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             txtpath_key = r"self.versepath"
@@ -2622,7 +2626,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 if Setting['Setting'] == txtpath_key:
                     Setting['CurrentValue'] = self.versepath
                     print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == txtdir_key:
                     Setting['CurrentValue'] = self.versedir
                     print(Setting['CurrentValue'])
         f.close()
@@ -2640,15 +2644,15 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.sortTextFiles()
     '''
-    
-    def showVerseNormText(self, txtfilename):        
+
+    def showVerseNormText(self, txtfilename):
         #self.textfile = txtfilename
         if self.versenormpath and self.ui.VerseNormcheckBox.isChecked():
             file = qtc.QFile(self.versenormpath)
             filename = os.path.basename(self.versenormpath)
             self.versenormdir = os.path.dirname(self.versenormpath)
             self.ui.TextLE.setText(filename)
-        
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -2662,15 +2666,15 @@ class Ui_MainWindow(qtw.QMainWindow):
             #textfile.close()
             #txtdirpath = os.path.dirname(self.textpath)
 
-            # update font to selection and size       
+            # update font to selection and size
             self.on_versefont_update()
-            
+
             # update line spacing
             self.SetLineSpacing()
             file.close()
-      
+
         '''jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             txtpath_key = r"self.versepath"
@@ -2679,7 +2683,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 if Setting['Setting'] == txtpath_key:
                     Setting['CurrentValue'] = self.versepath
                     print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == txtdir_key:
                     Setting['CurrentValue'] = self.versedir
                     print(Setting['CurrentValue'])
         f.close()
@@ -2696,14 +2700,14 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.txtfileList.append(tpath)
 
         #self.sortTextFiles()'''
-    
+
     def bothNormCheckbox(self):
         if self.ui.NormcheckBox.isChecked():
             self.ui.RefNormcheckBox.setChecked(True)
             self.ui.VerseNormcheckBox.setChecked(True)
         elif not self.ui.NormcheckBox.isChecked():
             self.ui.RefNormcheckBox.setChecked(False)
-            self.ui.VerseNormcheckBox.setChecked(False)            
+            self.ui.VerseNormcheckBox.setChecked(False)
 
     def VerseNormalize(self):
         script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "NormalizeVerseText.py")
@@ -2716,7 +2720,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def sortVerseTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)     
+        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)
 
     def nextVerseText(self):
         if self.refpath:
@@ -2750,16 +2754,16 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def nextText(self):
         # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.versepath)           
+        filestr = os.path.basename(self.versepath)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        
+
         if self.txtfileList:
             try:
                 txtfile = next(self.versedirIterator)
                 self.ui.TextLE.setText(os.path.basename(txtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(),
                     #QtCore.Qt.KeepAspectRatio)
                 self.txtfile = qtc.QFile(txtfile)
                 self.txtfilename = os.path.basename(txtfile)
@@ -2779,20 +2783,20 @@ class Ui_MainWindow(qtw.QMainWindow):
         else:
             # no file list found, load an image
             self.loadText()
-    
+
     def prevText(self):
         # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.versepath)           
+        filestr = os.path.basename(self.versepath)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        
+
         if self.txtfileList:
             try:
                 #txtfile = self.textfile
                 txtfile = next(self.versedirRevIterator)
                 self.ui.TextLE.setText(os.path.basename(txtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(),
                     #QtCore.Qt.KeepAspectRatio)
                 self.txtfile = qtc.QFile(txtfile)
                 self.txtfilename = os.path.basename(txtfile)
@@ -2808,12 +2812,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.versedirIterator = iter(sorted_txtfilelist)
                 self.nextText()
             self.versepath = txtfile
-            self.showText(txtfile)    
+            self.showText(txtfile)
         else:
             # no file list found, load an image
-            self.loadText()      
+            self.loadText()
     '''
-    
+
     def loadRefText(self):
         self.refpath = qtw.QFileDialog.getOpenFileName(
         self.ui.centralwidget, 'Open text file',self.refdir,
@@ -2826,17 +2830,17 @@ class Ui_MainWindow(qtw.QMainWindow):
     def getRefText(self,textpath):
             self.refpath = textpath
             self.refdirname = os.path.dirname(self.refpath)
-            #create file list 
+            #create file list
             if self.refpath:
-                #self.ui.BoxText.setText(os.path.basename(self.txtpath))       
+                #self.ui.BoxText.setText(os.path.basename(self.txtpath))
                 self.reffile = qtc.QFile(self.refpath)
                 self.reffilename = os.path.basename(self.refpath)
                 self.refdir = os.path.dirname(self.refpath)
                 self.ui.RefTextLE.setText(self.reffilename)
                 self.refpath = textpath
                 self.showRefText(self.refpath)
-    
-    def showRefText(self,textpath):        
+
+    def showRefText(self,textpath):
         self.refpath = textpath
         print(f'Reference File Path: {self.refpath}')
         if self.refpath:
@@ -2849,7 +2853,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # update line spacing
             self.SetRefLineSpacing()
             #self.reffile.close()
-       
+
         SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
             'self.refpath': self.refpath.replace(self.projecthome, ""),
             'self.refdir': self.refdir.replace(self.projecthome, ""),
@@ -2865,11 +2869,11 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     '''
     def loadRefText(self):
-        
+
         self.refpath = qtw.QFileDialog.getOpenFileName(
         self.ui.centralwidget, 'Open text file',self.refdir,
         'Text files (*.txt *.csv)')[0]
-        
+
         if self.refpath:
             file = qtc.QFile(self.refpath)
             filename = os.path.basename(self.refpath)
@@ -2881,16 +2885,16 @@ class Ui_MainWindow(qtw.QMainWindow):
     '''
     '''
 
-    def showRefText(self):        
-        print(f'Reference File Path: {self.refpath}') 
-        
+    def showRefText(self):
+        print(f'Reference File Path: {self.refpath}')
+
         #self.refpath = txtfilename
         if self.refpath and not self.ui.RefNormcheckBox.isChecked():
             file = qtc.QFile(self.refpath)
             filename = os.path.basename(self.refpath)
             self.refdir = os.path.dirname(self.refpath)
             self.ui.RefTextLE.setText(filename)
-        
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -2905,14 +2909,14 @@ class Ui_MainWindow(qtw.QMainWindow):
             #txtdirpath = os.path.dirname(self.textpath)
 
             self.on_reffont_update()
-            
+
             # update line spacing
             self.SetRefLineSpacing()
             file.close()
-        
-        
+
+
         jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             txtpath_key = r"self.versepath"
@@ -2921,7 +2925,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 if Setting['Setting'] == txtpath_key:
                     Setting['CurrentValue'] = self.versepath
                     print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == txtdir_key:
                     Setting['CurrentValue'] = self.versedir
                     print(Setting['CurrentValue'])
         f.close()
@@ -2939,15 +2943,15 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.sortRefTextFiles()
     '''
-    
-    def showRefNormText(self, txtfilename):        
+
+    def showRefNormText(self, txtfilename):
         #self.textfile = txtfilename
         if self.refnormpath and self.ui.RefNormcheckBox.isChecked():
             self.refnormfile = qtc.QFile(self.refnormpath)
             self.refnormfilename = os.path.basename(self.refnormpath)
             self.refnormdir = os.path.dirname(self.refnormpath)
             self.ui.RefTextLE.setText(self.refnormfilename)
-        
+
             if self.refnormfile.open(qtc.QIODevice.ReadOnly, encoding='UTF-8'):
                 stream = qtc.QTextStream(self.refnormfile)
                 text = stream.readAll()
@@ -2960,13 +2964,13 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.ui.RefText.setPlainText(text)
 
             self.on_reffont_update()
-            
+
             # update line spacing
             self.SetRefLineSpacing()
             self.refnormfile.close()
-      
+
         '''jsonfile = self.projecthome +  'Model/Project/Data/json/Session.json'
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             txtpath_key = r"self.versepath"
@@ -2975,7 +2979,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 if Setting['Setting'] == txtpath_key:
                     Setting['CurrentValue'] = self.versepath
                     print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == txtdir_key:
                     Setting['CurrentValue'] = self.versedir
                     print(Setting['CurrentValue'])
         f.close()
@@ -3004,7 +3008,7 @@ class Ui_MainWindow(qtw.QMainWindow):
     def sortRefTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)     
+        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)
 
     def nextRefText(self):
         if self.refpath:
@@ -3038,16 +3042,16 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def nextRefText(self):
         # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.refpath)           
+        filestr = os.path.basename(self.refpath)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        
+
         if self.reftxtfileList:
             try:
                 reftxtfile = next(self.reftxtdirIterator)
                 self.ui.RefTextLE.setText(os.path.basename(reftxtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(),
                     #QtCore.Qt.KeepAspectRatio)
                 self.reftxtfile = qtc.QFile(reftxtfile)
                 self.reftxtfilename = os.path.basename(reftxtfile)
@@ -3067,20 +3071,20 @@ class Ui_MainWindow(qtw.QMainWindow):
         else:
             # no file list found, load an image
             self.loadRefText()
-    
+
     def prevRefText(self):
         # ensure that the file list has not been cleared due to missing files
-        filestr = os.path.basename(self.refpath)           
+        filestr = os.path.basename(self.refpath)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        
+
         if self.reftxtfileList:
             try:
                 #txtfile = self.textfile
                 txtfile = next(self.reftxtdirRevIterator)
                 self.ui.TextLE.setText(os.path.basename(reftxtfile))
-                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(),
                     #QtCore.Qt.KeepAspectRatio)
                 self.reftxtfile = qtc.QFile(reftxtfile)
                 self.reftxtfilename = os.path.basename(reftxtfile)
@@ -3096,10 +3100,10 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.reftxtdirIterator = iter(sorted_reftxtfilelist)
                 self.nextRefText()
             self.refpath = reftxtfile
-            self.showText(reftxtfile)    
+            self.showText(reftxtfile)
         else:
             # no file list found, load an image
-            self.loadRefText()      
+            self.loadRefText()
     '''
 
     def ReloadRefText(self):
@@ -3118,10 +3122,10 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.ui.RefText.insertPlainText(text)
                 else:
                     self.ui.RefText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_reffont_update()
-                
+
                 # update line spacing
                 self.SetRefLineSpacing()
 
