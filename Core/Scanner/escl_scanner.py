@@ -4,6 +4,7 @@ import ipaddress
 import socket
 import time
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urljoin, urlparse
 
 try:
@@ -70,6 +71,8 @@ class ESCLScanner(ScannerDevice):
     service_types = ("_uscan._tcp.local.", "_uscans._tcp.local.")
     discovery_timeout_seconds = 1.5
     request_timeout_seconds = 20
+    probe_timeout_seconds = 0.75
+    probe_max_workers = 32
 
     def __init__(self):
         self._cached_devices = None
@@ -148,6 +151,8 @@ class ESCLScanner(ScannerDevice):
         devices = self._discover_devices_via_mdns()
         if not devices:
             devices = self._discover_devices_via_arp()
+        if not devices:
+            devices = self._discover_devices_via_subnet_probe()
 
         self._cached_devices = devices
         return list(self._cached_devices)
@@ -194,6 +199,36 @@ class ESCLScanner(ScannerDevice):
                 continue
             seen_base_urls.add(device["base_url"])
             devices.append(device)
+        return devices
+
+    def _discover_devices_via_subnet_probe(self):
+        subnet = self._get_local_subnet()
+        if not subnet:
+            return []
+
+        try:
+            network = ipaddress.ip_network(subnet, strict=False)
+        except Exception:
+            return []
+
+        devices = []
+        seen_base_urls = set()
+        with ThreadPoolExecutor(max_workers=self.probe_max_workers) as executor:
+            future_map = {
+                executor.submit(self._probe_host_for_escl, str(host)): str(host)
+                for host in network.hosts()
+            }
+            for future in as_completed(future_map):
+                try:
+                    device = future.result()
+                except Exception:
+                    continue
+                if not device:
+                    continue
+                if device["base_url"] in seen_base_urls:
+                    continue
+                seen_base_urls.add(device["base_url"])
+                devices.append(device)
         return devices
 
     def _get_local_subnet(self):
@@ -277,6 +312,44 @@ class ESCLScanner(ScannerDevice):
             response = requests.get(
                 urljoin(base_url, "ScannerCapabilities"),
                 timeout=min(self.request_timeout_seconds, 5),
+                verify=False,
+            )
+            if response.status_code != 200:
+                return False
+            ET.fromstring(response.content)
+            return True
+        except Exception:
+            return False
+
+    def _probe_host_for_escl(self, host):
+        for scheme, port in (("http", 80), ("https", 443)):
+            if not self._port_open(host, port):
+                continue
+
+            base_url = f"{scheme}://{host}/eSCL/"
+            if self._direct_capabilities_available_with_timeout(base_url, self.probe_timeout_seconds):
+                return {
+                    "display_name": host,
+                    "host": host,
+                    "port": port,
+                    "base_url": base_url,
+                    "properties": {"source": "subnet-probe"},
+                }
+
+        return None
+
+    def _port_open(self, host, port):
+        try:
+            with socket.create_connection((host, port), timeout=self.probe_timeout_seconds):
+                return True
+        except Exception:
+            return False
+
+    def _direct_capabilities_available_with_timeout(self, base_url, timeout_seconds):
+        try:
+            response = requests.get(
+                urljoin(base_url, "ScannerCapabilities"),
+                timeout=timeout_seconds,
                 verify=False,
             )
             if response.status_code != 200:
