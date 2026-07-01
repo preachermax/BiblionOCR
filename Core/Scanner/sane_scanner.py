@@ -273,9 +273,44 @@ class SaneScanner(ScannerDevice):
         if self.__class__._last_scanimage_devices:
             return list(self.__class__._last_scanimage_devices)
 
+        fallback_devices = self._discover_devices_via_escl_fallback()
+        if fallback_devices:
+            self.__class__._last_scanimage_devices = list(fallback_devices)
+            return fallback_devices
+
         if last_error:
             raise RuntimeError(last_error)
         return []
+
+    def _discover_devices_via_escl_fallback(self):
+        try:
+            from .escl_scanner import ESCLScanner
+        except Exception:
+            return []
+
+        if not ESCLScanner.is_available():
+            return []
+
+        try:
+            devices = ESCLScanner()._discover_devices(force_refresh=True)
+        except Exception:
+            return []
+
+        fallback_devices = []
+        for device in devices:
+            host = str(device.get("host") or "").strip()
+            if not host:
+                continue
+            display_name = f"{device.get('display_name', host)} [AirScan fallback]"
+            fallback_devices.append(
+                {
+                    "name": f"escl-fallback:{host}",
+                    "label": f"eSCL fallback ip={host}",
+                    "display_name": display_name,
+                    "fallback_target": host,
+                }
+            )
+        return fallback_devices
 
     @classmethod
     def _parse_scanimage_devices(cls, output):
@@ -308,6 +343,17 @@ class SaneScanner(ScannerDevice):
             raise RuntimeError("SANE did not report any scanner devices")
 
         device_info = self._select_scanimage_device(devices, request.get("device_name"))
+        if device_info.get("fallback_target"):
+            fallback_result = self._fallback_to_escl_target(
+                device_info.get("fallback_target"),
+                device_info,
+                destination_folder,
+                request,
+            )
+            if fallback_result is not None:
+                return fallback_result
+            raise RuntimeError("AirScan fallback device could not be reached")
+
         output_path = self._save_path(destination_folder)
         scanimage_path = self._scanimage_path()
         if not scanimage_path:
@@ -375,6 +421,12 @@ class SaneScanner(ScannerDevice):
         if not ip_match:
             return None
 
+        return self._fallback_to_escl_target(ip_match.group("host").strip(), device_info, destination_folder, request)
+
+    def _fallback_to_escl_target(self, direct_target, device_info, destination_folder, request):
+        if not direct_target:
+            return None
+
         try:
             from .escl_scanner import ESCLScanner
         except Exception:
@@ -383,7 +435,6 @@ class SaneScanner(ScannerDevice):
         if not ESCLScanner.is_available():
             return None
 
-        direct_target = ip_match.group("host").strip()
         fallback_request = dict(request or {})
         fallback_request["device_name"] = direct_target
 
