@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=My Server
+Comment=Launch My Server
+Version=1.0
+Exec=/home/jetson/Projects/BiblionOCR/launchers/run-myserver.sh %f
+TryExec=/home/jetson/Projects/BiblionOCR/launchers/run-myserver.sh
+Icon=/home/jetson/Projects/BiblionOCR/ViewController/0-MainUI/Icons/BiblionBoxer2.png
+Path=/home/jetson/Projects/BiblionOCR
+Terminal=true
+Categories=Utility;
+Name[en_US]=My Server
