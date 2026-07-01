@@ -254,7 +254,8 @@ class SaneScanner(ScannerDevice):
         if completed.returncode != 0:
             raise RuntimeError((completed.stderr or completed.stdout or "scanimage -L failed").strip())
 
-        return self._parse_scanimage_devices(completed.stdout)
+        output = "\n".join(part for part in (completed.stdout, completed.stderr) if part)
+        return self._parse_scanimage_devices(output)
 
     @classmethod
     def _parse_scanimage_devices(cls, output):
@@ -264,17 +265,21 @@ class SaneScanner(ScannerDevice):
             if not line:
                 continue
 
-            match = re.match(r"^device\s+[`'](?P<name>[^`']+)[`']\s+is\s+a\s+(?P<label>.+)$", line)
-            if match:
-                device_name = match.group("name").strip()
-                label = match.group("label").strip()
-                devices.append(
-                    {
-                        "name": device_name,
-                        "label": label,
-                        "display_name": f"{label} ({device_name})",
-                    }
-                )
+            name_match = re.search(r"\bdevice\s+[`'](?P<name>[^`']+)[`']", line, flags=re.IGNORECASE)
+            if not name_match:
+                continue
+
+            device_name = name_match.group("name").strip()
+            label_match = re.search(r"\bis\s+(?:an?\s+)?(?P<label>.+)$", line, flags=re.IGNORECASE)
+            label = label_match.group("label").strip() if label_match else ""
+            display_name = f"{label} ({device_name})" if label else device_name
+            devices.append(
+                {
+                    "name": device_name,
+                    "label": label,
+                    "display_name": display_name,
+                }
+            )
         return devices
 
     def _acquire_via_scanimage(self, destination_folder, request):
@@ -307,14 +312,11 @@ class SaneScanner(ScannerDevice):
         if request.get("source_type") == "adf" and "--source" in supported_options:
             command.extend(["--source", "ADF"])
 
-        with open(output_path, "wb") as image_handle:
-            completed = subprocess.run(
-                command,
-                stdout=image_handle,
-                stderr=subprocess.PIPE,
-                timeout=120,
-                check=False,
-            )
+        fallback_command = [scanimage_path, "--format=tiff"]
+
+        completed = self._run_scanimage_command(command, output_path)
+        if completed.returncode != 0 and self._should_retry_scanimage_without_device_name(completed.stderr):
+            completed = self._run_scanimage_command(fallback_command, output_path)
 
         if completed.returncode != 0:
             try:
@@ -329,6 +331,20 @@ class SaneScanner(ScannerDevice):
             "dir": destination_folder,
             "device": device_info["display_name"],
         }
+
+    def _run_scanimage_command(self, command, output_path):
+        with open(output_path, "wb") as image_handle:
+            return subprocess.run(
+                command,
+                stdout=image_handle,
+                stderr=subprocess.PIPE,
+                timeout=120,
+                check=False,
+            )
+
+    def _should_retry_scanimage_without_device_name(self, stderr_bytes):
+        message = stderr_bytes.decode("utf-8", errors="replace").lower()
+        return "open of device" in message and "invalid argument" in message
 
     def _scanimage_supported_options(self, scanimage_path, device_name):
         try:
