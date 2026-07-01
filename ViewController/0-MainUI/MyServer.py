@@ -1041,6 +1041,7 @@ class ScanWizardDialog(qtw.QDialog):
         self._backend_options_by_value = {
             option["value"]: option for option in self._backend_options_cache
         }
+        self.backend_combo.blockSignals(True)
         self._populate_backend_options()
         self.backend_combo.setEnabled(bool(self._backend_options_cache))
 
@@ -1050,6 +1051,7 @@ class ScanWizardDialog(qtw.QDialog):
             backend_index = 0
         if backend_index >= 0:
             self.backend_combo.setCurrentIndex(backend_index)
+        self.backend_combo.blockSignals(False)
 
         self._set_loading_state("", False)
         self._refresh_detected_devices()
@@ -1065,23 +1067,25 @@ class ScanWizardDialog(qtw.QDialog):
         self._update_validation_state()
 
     def _cleanup_backend_loader(self):
+        finished_thread = self.sender()
         if self._backend_loader_worker is not None:
             self._backend_loader_worker.deleteLater()
-        if self._backend_loader_thread is not None:
-            self._backend_loader_thread.deleteLater()
-        self._backend_loader_worker = None
-        self._backend_loader_thread = None
+            self._backend_loader_worker = None
+        if finished_thread is not None:
+            finished_thread.deleteLater()
+        if self._backend_loader_thread is finished_thread:
+            self._backend_loader_thread = None
 
     def _start_device_load(self, request):
+        if self._device_loader_thread is not None and self._device_loader_thread.isRunning():
+            return
+
         self._device_request_token += 1
         request_payload = dict(request)
         request_payload["_token"] = self._device_request_token
         self._loading_devices = True
         self.detected_devices_label.setText("Detecting devices for the selected backend...")
         self._set_loading_state("Detecting scanner devices...", True)
-
-        if self._device_loader_thread is not None:
-            self._device_loader_thread.quit()
 
         self._device_loader_thread = qtc.QThread(self)
         self._device_loader_worker = ScanWizardLoadWorker(
@@ -1117,12 +1121,14 @@ class ScanWizardDialog(qtw.QDialog):
         self._update_validation_state()
 
     def _cleanup_device_loader(self):
+        finished_thread = self.sender()
         if self._device_loader_worker is not None:
             self._device_loader_worker.deleteLater()
-        if self._device_loader_thread is not None:
-            self._device_loader_thread.deleteLater()
-        self._device_loader_worker = None
-        self._device_loader_thread = None
+            self._device_loader_worker = None
+        if finished_thread is not None:
+            finished_thread.deleteLater()
+        if self._device_loader_thread is finished_thread:
+            self._device_loader_thread = None
 
     def closeEvent(self, event):
         for thread in (self._backend_loader_thread, self._device_loader_thread):
