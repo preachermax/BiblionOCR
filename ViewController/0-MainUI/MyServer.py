@@ -703,6 +703,28 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         if self.imported_provenance:
             payload.update(self.imported_provenance)
         return payload
+class ScanWizardLoadWorker(qtc.QObject):
+    finished = qtc.pyqtSignal(object)
+    error = qtc.pyqtSignal(str)
+
+    def __init__(self, scan_manager, request=None, load_backend_options=False, discover_devices=False):
+        super().__init__()
+        self.scan_manager = scan_manager
+        self.request = request or {}
+        self.load_backend_options = load_backend_options
+        self.discover_devices = discover_devices
+
+    def run(self):
+        try:
+            payload = {}
+            if self.load_backend_options:
+                payload["backend_options"] = self.scan_manager.backend_options()
+            if self.discover_devices:
+                payload["request"] = dict(self.request)
+                payload["devices"] = self.scan_manager.discover_devices(self.request)
+            self.finished.emit(payload)
+        except Exception as exc:
+            self.error.emit(str(exc))
 
 
 class ScanWizardDialog(qtw.QDialog):
@@ -713,6 +735,15 @@ class ScanWizardDialog(qtw.QDialog):
         self.default_destination = default_destination
         self.initial_request = self.scan_manager.default_request(default_destination)
         self.initial_request.update(initial_request or {})
+        self._backend_options_cache = []
+        self._backend_options_by_value = {}
+        self._loading_backends = False
+        self._loading_devices = False
+        self._device_request_token = 0
+        self._backend_loader_thread = None
+        self._backend_loader_worker = None
+        self._device_loader_thread = None
+        self._device_loader_worker = None
         self._page_titles = [
             "Step 1 of 2: Scan source",
             "Step 2 of 2: Scan options",
@@ -722,6 +753,7 @@ class ScanWizardDialog(qtw.QDialog):
         self.resize(640, 420)
         self._build_ui()
         self._apply_initial_request()
+        self._start_backend_load()
         self._update_page_state()
 
     def _build_ui(self):
@@ -746,8 +778,17 @@ class ScanWizardDialog(qtw.QDialog):
         source_layout.addWidget(qtw.QLabel("Backend selection"))
 
         self.backend_combo = qtw.QComboBox()
-        self._populate_backend_options()
+        self.backend_combo.addItem("Loading scanner backends...", None)
+        self.backend_combo.setEnabled(False)
         source_layout.addWidget(self.backend_combo)
+
+        self.loading_label = qtw.QLabel("Loading scanner backends...")
+        self.loading_label.setWordWrap(True)
+        source_layout.addWidget(self.loading_label)
+
+        self.loading_progress = qtw.QProgressBar()
+        self.loading_progress.setRange(0, 0)
+        source_layout.addWidget(self.loading_progress)
 
         source_layout.addWidget(qtw.QLabel("Device name (optional)"))
         self.device_name_edit = qtw.QLineEdit()
@@ -755,7 +796,7 @@ class ScanWizardDialog(qtw.QDialog):
         source_layout.addWidget(self.device_name_edit)
 
         source_layout.addWidget(qtw.QLabel("Detected devices"))
-        self.detected_devices_label = qtw.QLabel(self._detected_devices_text())
+        self.detected_devices_label = qtw.QLabel("Scanner discovery has not completed yet.")
         self.detected_devices_label.setWordWrap(True)
         source_layout.addWidget(self.detected_devices_label)
         source_layout.addStretch(1)
@@ -837,7 +878,7 @@ class ScanWizardDialog(qtw.QDialog):
 
     def _populate_backend_options(self):
         self.backend_combo.clear()
-        for option in self.scan_manager.backend_options():
+        for option in self._backend_options_cache:
             label = option["label"]
             if not option.get("available", False):
                 label = f"{label} (unavailable)"
@@ -847,19 +888,15 @@ class ScanWizardDialog(qtw.QDialog):
         request = {
             "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference")
         }
-        try:
-            devices = self.scan_manager.discover_devices(request)
-        except Exception as exc:
-            return f"Device discovery unavailable: {exc}"
-
-        if not devices:
-            if request["backend_preference"] == "ESCLScanner":
-                return "No AirScan devices were discovered automatically. Enter a scanner IP or URL above to connect directly."
-            return "No devices reported by the current backend selection."
-        return "\n".join(str(device) for device in devices)
+        return self._format_detected_devices([], request)
 
     def _refresh_detected_devices(self):
-        self.detected_devices_label.setText(self._detected_devices_text())
+        if self._loading_backends:
+            return
+        request = {
+            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference")
+        }
+        self._start_device_load(request)
 
     def _apply_initial_request(self):
         backend_index = self.backend_combo.findData(self.initial_request.get("backend_preference", "auto"))
@@ -886,7 +923,6 @@ class ScanWizardDialog(qtw.QDialog):
             self.persist_format_combo.setCurrentText(persist_format)
 
         self.duplex_checkbox.setChecked(bool(self.initial_request.get("duplex", False)))
-        self._refresh_detected_devices()
 
     def _go_back(self):
         index = self.page_stack.currentIndex()
@@ -914,8 +950,12 @@ class ScanWizardDialog(qtw.QDialog):
             self.status_label.setText("Destination folder is required before the scan can start.")
             self.status_label.setStyleSheet("color: #9f3a38;")
             self.scan_button.setEnabled(False)
+        elif self._loading_backends or self._loading_devices:
+            self.status_label.setText("Loading scanner backends and devices. Please wait.")
+            self.status_label.setStyleSheet("color: #8a6d1d;")
+            self.scan_button.setEnabled(False)
         else:
-            backend_option = self.scan_manager.backend_option(request["backend_preference"])
+            backend_option = self._backend_options_by_value.get(request["backend_preference"])
             if backend_option is None:
                 self.status_label.setText("Select a valid scan backend before starting.")
                 self.status_label.setStyleSheet("color: #9f3a38;")
@@ -960,6 +1000,136 @@ class ScanWizardDialog(qtw.QDialog):
             "duplex": self.duplex_checkbox.isChecked(),
             "persist_format": self.persist_format_combo.currentText(),
         }
+
+    def _format_detected_devices(self, devices, request):
+        if not devices:
+            if request["backend_preference"] == "ESCLScanner":
+                return "No AirScan devices were discovered automatically. Enter a scanner IP or URL above to connect directly."
+            return "No devices reported by the current backend selection."
+        return "\n".join(str(device) for device in devices)
+
+    def _set_loading_state(self, message, active):
+        self.loading_label.setText(message)
+        self.loading_label.setVisible(active)
+        self.loading_progress.setVisible(active)
+        self._update_validation_state()
+
+    def _start_backend_load(self):
+        if self._backend_loader_thread is not None:
+            return
+        self._loading_backends = True
+        self._set_loading_state("Loading scanner backends...", True)
+        self.detected_devices_label.setText("Scanner discovery will start after the backend list loads.")
+
+        self._backend_loader_thread = qtc.QThread(self)
+        self._backend_loader_worker = ScanWizardLoadWorker(
+            self.scan_manager,
+            load_backend_options=True,
+        )
+        self._backend_loader_worker.moveToThread(self._backend_loader_thread)
+        self._backend_loader_thread.started.connect(self._backend_loader_worker.run)
+        self._backend_loader_worker.finished.connect(self._on_backend_load_finished)
+        self._backend_loader_worker.error.connect(self._on_backend_load_error)
+        self._backend_loader_worker.finished.connect(self._backend_loader_thread.quit)
+        self._backend_loader_worker.error.connect(self._backend_loader_thread.quit)
+        self._backend_loader_thread.finished.connect(self._cleanup_backend_loader)
+        self._backend_loader_thread.start()
+
+    def _on_backend_load_finished(self, payload):
+        self._loading_backends = False
+        self._backend_options_cache = payload.get("backend_options", [])
+        self._backend_options_by_value = {
+            option["value"]: option for option in self._backend_options_cache
+        }
+        self._populate_backend_options()
+        self.backend_combo.setEnabled(bool(self._backend_options_cache))
+
+        backend_value = self.initial_request.get("backend_preference", "auto")
+        backend_index = self.backend_combo.findData(backend_value)
+        if backend_index < 0 and self.backend_combo.count() > 0:
+            backend_index = 0
+        if backend_index >= 0:
+            self.backend_combo.setCurrentIndex(backend_index)
+
+        self._set_loading_state("", False)
+        self._refresh_detected_devices()
+        self._update_validation_state()
+
+    def _on_backend_load_error(self, message):
+        self._loading_backends = False
+        self.backend_combo.clear()
+        self.backend_combo.addItem("Scanner backends unavailable", None)
+        self.backend_combo.setEnabled(False)
+        self.detected_devices_label.setText(f"Device discovery unavailable: {message}")
+        self._set_loading_state("Failed to load scanner backends.", False)
+        self._update_validation_state()
+
+    def _cleanup_backend_loader(self):
+        if self._backend_loader_worker is not None:
+            self._backend_loader_worker.deleteLater()
+        if self._backend_loader_thread is not None:
+            self._backend_loader_thread.deleteLater()
+        self._backend_loader_worker = None
+        self._backend_loader_thread = None
+
+    def _start_device_load(self, request):
+        self._device_request_token += 1
+        request_payload = dict(request)
+        request_payload["_token"] = self._device_request_token
+        self._loading_devices = True
+        self.detected_devices_label.setText("Detecting devices for the selected backend...")
+        self._set_loading_state("Detecting scanner devices...", True)
+
+        if self._device_loader_thread is not None:
+            self._device_loader_thread.quit()
+
+        self._device_loader_thread = qtc.QThread(self)
+        self._device_loader_worker = ScanWizardLoadWorker(
+            self.scan_manager,
+            request=request_payload,
+            discover_devices=True,
+        )
+        self._device_loader_worker.moveToThread(self._device_loader_thread)
+        self._device_loader_thread.started.connect(self._device_loader_worker.run)
+        self._device_loader_worker.finished.connect(self._on_device_load_finished)
+        self._device_loader_worker.error.connect(self._on_device_load_error)
+        self._device_loader_worker.finished.connect(self._device_loader_thread.quit)
+        self._device_loader_worker.error.connect(self._device_loader_thread.quit)
+        self._device_loader_thread.finished.connect(self._cleanup_device_loader)
+        self._device_loader_thread.start()
+
+    def _on_device_load_finished(self, payload):
+        request = payload.get("request", {})
+        if request.get("_token") != self._device_request_token:
+            return
+        self._loading_devices = False
+        visible_request = dict(request)
+        visible_request.pop("_token", None)
+        devices = payload.get("devices", [])
+        self.detected_devices_label.setText(self._format_detected_devices(devices, visible_request))
+        self._set_loading_state("", False)
+        self._update_validation_state()
+
+    def _on_device_load_error(self, message):
+        self._loading_devices = False
+        self.detected_devices_label.setText(f"Device discovery unavailable: {message}")
+        self._set_loading_state("", False)
+        self._update_validation_state()
+
+    def _cleanup_device_loader(self):
+        if self._device_loader_worker is not None:
+            self._device_loader_worker.deleteLater()
+        if self._device_loader_thread is not None:
+            self._device_loader_thread.deleteLater()
+        self._device_loader_worker = None
+        self._device_loader_thread = None
+
+    def closeEvent(self, event):
+        for thread in (self._backend_loader_thread, self._device_loader_thread):
+            if thread is not None and thread.isRunning():
+                thread.quit()
+                thread.wait(1000)
+        super().closeEvent(event)
 
 # network_scanner.py
 # PyQt5 + Scapy threaded network scanner
