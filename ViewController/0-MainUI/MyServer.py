@@ -46,6 +46,16 @@ if DEBUG_PATHS:
     print(f"script_dir: {script_dir}")
 
 
+SCAN_ICON_RESOURCES = (
+    ":/Icons/Icons/scanner.png",
+    ":/Icons/Icons/BiblionScanner.png",
+)
+SCAN_ICON_FILES = (
+    os.path.join(script_dir, "Icons", "scanner.png"),
+    os.path.join(script_dir, "Icons", "BiblionScanner.png"),
+)
+
+
 SCANNED_FOLDER = os.path.join(
     project_root,
     "Model",
@@ -67,6 +77,7 @@ from ext import mainfind
 from HelpSystem import add_help_menu
 from Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
+from Core.Scanner import ScanManager, ScanWorker
 # EventBus is still defined below in this module during the Core migration.
 # ProjectCreationEngine remains below as a temporary fallback, but runtime wiring now uses CoreProjectCreationEngine.
 # Do not import MainWindow from MainUI.py; that file only contains the generated Ui_MainUI class.
@@ -688,6 +699,263 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             payload.update(self.imported_provenance)
         return payload
 
+
+class ScanWizardDialog(qtw.QDialog):
+
+    def __init__(self, scan_manager, default_destination, parent=None, initial_request=None):
+        super().__init__(parent)
+        self.scan_manager = scan_manager
+        self.default_destination = default_destination
+        self.initial_request = self.scan_manager.default_request(default_destination)
+        self.initial_request.update(initial_request or {})
+        self._page_titles = [
+            "Step 1 of 2: Scan source",
+            "Step 2 of 2: Scan options",
+        ]
+        self.setWindowTitle("Scan Image")
+        self.setModal(True)
+        self.resize(640, 420)
+        self._build_ui()
+        self._apply_initial_request()
+        self._update_page_state()
+
+    def _build_ui(self):
+        layout = qtw.QVBoxLayout(self)
+        layout.setSpacing(10)
+
+        intro_label = qtw.QLabel(
+            "Choose a scan backend, review the destination, and dispatch a normalized scan request into the Core scanner workflow."
+        )
+        intro_label.setWordWrap(True)
+        layout.addWidget(intro_label)
+
+        self.page_title_label = qtw.QLabel("")
+        layout.addWidget(self.page_title_label)
+
+        self.page_stack = qtw.QStackedWidget(self)
+        layout.addWidget(self.page_stack, 1)
+
+        source_page = qtw.QWidget()
+        source_layout = qtw.QVBoxLayout(source_page)
+        source_layout.setSpacing(10)
+        source_layout.addWidget(qtw.QLabel("Backend selection"))
+
+        self.backend_combo = qtw.QComboBox()
+        self._populate_backend_options()
+        source_layout.addWidget(self.backend_combo)
+
+        source_layout.addWidget(qtw.QLabel("Device name (optional)"))
+        self.device_name_edit = qtw.QLineEdit()
+        self.device_name_edit.setPlaceholderText("Leave blank to use backend default device, or enter an AirScan IP/URL")
+        source_layout.addWidget(self.device_name_edit)
+
+        source_layout.addWidget(qtw.QLabel("Detected devices"))
+        self.detected_devices_label = qtw.QLabel(self._detected_devices_text())
+        self.detected_devices_label.setWordWrap(True)
+        source_layout.addWidget(self.detected_devices_label)
+        source_layout.addStretch(1)
+        self.page_stack.addWidget(source_page)
+
+        options_page = qtw.QWidget()
+        options_layout = qtw.QVBoxLayout(options_page)
+        options_layout.setSpacing(10)
+        options_layout.addWidget(qtw.QLabel("Destination folder"))
+
+        self.destination_edit = qtw.QLineEdit(self.initial_request["destination_folder"])
+        options_layout.addWidget(self.destination_edit)
+
+        grid = qtw.QGridLayout()
+        grid.addWidget(qtw.QLabel("Mode"), 0, 0)
+        self.mode_combo = qtw.QComboBox()
+        self.mode_combo.addItems(["color", "grayscale", "mono"])
+        grid.addWidget(self.mode_combo, 0, 1)
+
+        grid.addWidget(qtw.QLabel("DPI"), 1, 0)
+        self.dpi_combo = qtw.QComboBox()
+        self.dpi_combo.addItems(["150", "300", "600"])
+        self.dpi_combo.setCurrentText("300")
+        grid.addWidget(self.dpi_combo, 1, 1)
+
+        grid.addWidget(qtw.QLabel("Source type"), 2, 0)
+        self.source_type_combo = qtw.QComboBox()
+        self.source_type_combo.addItems(["flatbed", "adf"])
+        grid.addWidget(self.source_type_combo, 2, 1)
+
+        grid.addWidget(qtw.QLabel("Persist format"), 3, 0)
+        self.persist_format_combo = qtw.QComboBox()
+        self.persist_format_combo.addItems(["tiff"])
+        grid.addWidget(self.persist_format_combo, 3, 1)
+        options_layout.addLayout(grid)
+
+        self.duplex_checkbox = qtw.QCheckBox("Use duplex when supported")
+        options_layout.addWidget(self.duplex_checkbox)
+
+        options_layout.addWidget(qtw.QLabel("Review"))
+        self.review_label = qtw.QLabel("")
+        self.review_label.setWordWrap(True)
+        options_layout.addWidget(self.review_label)
+
+        self.status_label = qtw.QLabel("")
+        self.status_label.setWordWrap(True)
+        options_layout.addWidget(self.status_label)
+        options_layout.addStretch(1)
+        self.page_stack.addWidget(options_page)
+
+        button_row = qtw.QHBoxLayout()
+        self.back_button = qtw.QPushButton("Back")
+        self.back_button.clicked.connect(self._go_back)
+        button_row.addWidget(self.back_button)
+
+        self.next_button = qtw.QPushButton("Next")
+        self.next_button.clicked.connect(self._go_next)
+        button_row.addWidget(self.next_button)
+
+        button_row.addStretch(1)
+        self.cancel_button = qtw.QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        button_row.addWidget(self.cancel_button)
+
+        self.scan_button = qtw.QPushButton("Start Scan")
+        self.scan_button.clicked.connect(self._attempt_accept)
+        button_row.addWidget(self.scan_button)
+        layout.addLayout(button_row)
+
+        self.backend_combo.currentTextChanged.connect(self._update_validation_state)
+        self.backend_combo.currentIndexChanged.connect(self._refresh_detected_devices)
+        self.device_name_edit.textChanged.connect(self._update_validation_state)
+        self.destination_edit.textChanged.connect(self._update_validation_state)
+        self.mode_combo.currentTextChanged.connect(self._update_validation_state)
+        self.dpi_combo.currentTextChanged.connect(self._update_validation_state)
+        self.source_type_combo.currentTextChanged.connect(self._update_validation_state)
+        self.persist_format_combo.currentTextChanged.connect(self._update_validation_state)
+        self.duplex_checkbox.toggled.connect(self._update_validation_state)
+
+    def _populate_backend_options(self):
+        self.backend_combo.clear()
+        for option in self.scan_manager.backend_options():
+            label = option["label"]
+            if not option.get("available", False):
+                label = f"{label} (unavailable)"
+            self.backend_combo.addItem(label, option["value"])
+
+    def _detected_devices_text(self):
+        request = {
+            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference")
+        }
+        try:
+            devices = self.scan_manager.discover_devices(request)
+        except Exception as exc:
+            return f"Device discovery unavailable: {exc}"
+
+        if not devices:
+            if request["backend_preference"] == "ESCLScanner":
+                return "No AirScan devices were discovered automatically. Enter a scanner IP or URL above to connect directly."
+            return "No devices reported by the current backend selection."
+        return "\n".join(str(device) for device in devices)
+
+    def _refresh_detected_devices(self):
+        self.detected_devices_label.setText(self._detected_devices_text())
+
+    def _apply_initial_request(self):
+        backend_index = self.backend_combo.findData(self.initial_request.get("backend_preference", "auto"))
+        if backend_index >= 0:
+            self.backend_combo.setCurrentIndex(backend_index)
+
+        self.device_name_edit.setText(self.initial_request.get("device_name", ""))
+        self.destination_edit.setText(self.initial_request.get("destination_folder", self.default_destination))
+
+        mode = self.initial_request.get("mode", "color")
+        if self.mode_combo.findText(mode) >= 0:
+            self.mode_combo.setCurrentText(mode)
+
+        dpi = str(self.initial_request.get("dpi", 300))
+        if self.dpi_combo.findText(dpi) >= 0:
+            self.dpi_combo.setCurrentText(dpi)
+
+        source_type = self.initial_request.get("source_type", "flatbed")
+        if self.source_type_combo.findText(source_type) >= 0:
+            self.source_type_combo.setCurrentText(source_type)
+
+        persist_format = self.initial_request.get("persist_format", "tiff")
+        if self.persist_format_combo.findText(persist_format) >= 0:
+            self.persist_format_combo.setCurrentText(persist_format)
+
+        self.duplex_checkbox.setChecked(bool(self.initial_request.get("duplex", False)))
+        self._refresh_detected_devices()
+
+    def _go_back(self):
+        index = self.page_stack.currentIndex()
+        if index > 0:
+            self.page_stack.setCurrentIndex(index - 1)
+            self._update_page_state()
+
+    def _go_next(self):
+        index = self.page_stack.currentIndex()
+        if index < self.page_stack.count() - 1:
+            self.page_stack.setCurrentIndex(index + 1)
+            self._update_page_state()
+
+    def _update_page_state(self):
+        index = self.page_stack.currentIndex()
+        self.page_title_label.setText(self._page_titles[index])
+        self.back_button.setEnabled(index > 0)
+        self.next_button.setVisible(index < self.page_stack.count() - 1)
+        self.scan_button.setVisible(index == self.page_stack.count() - 1)
+        self._update_validation_state()
+
+    def _update_validation_state(self):
+        request = self.get_request()
+        if not request["destination_folder"].strip():
+            self.status_label.setText("Destination folder is required before the scan can start.")
+            self.status_label.setStyleSheet("color: #9f3a38;")
+            self.scan_button.setEnabled(False)
+        else:
+            backend_option = self.scan_manager.backend_option(request["backend_preference"])
+            if backend_option is None:
+                self.status_label.setText("Select a valid scan backend before starting.")
+                self.status_label.setStyleSheet("color: #9f3a38;")
+                self.scan_button.setEnabled(False)
+            elif not backend_option.get("available", False):
+                self.status_label.setText(
+                    f"{backend_option['label']} is not available on this system. Choose another backend to test."
+                )
+                self.status_label.setStyleSheet("color: #9f3a38;")
+                self.scan_button.setEnabled(False)
+            else:
+                self.status_label.setText("Review the scan request and start when ready.")
+                self.status_label.setStyleSheet("color: #2f6b3b;")
+                self.scan_button.setEnabled(True)
+
+        review_lines = [
+            f"Backend: {self.backend_combo.currentText()}",
+            f"Device: {request['device_name'] or 'Default device'}",
+            f"Destination: {request['destination_folder']}",
+            f"Mode: {request['mode']}",
+            f"DPI: {request['dpi']}",
+            f"Source type: {request['source_type']}",
+            f"Duplex: {'Yes' if request['duplex'] else 'No'}",
+            f"Persist format: {request['persist_format']}",
+        ]
+        self.review_label.setText("\n".join(review_lines))
+
+    def _attempt_accept(self):
+        if not self.destination_edit.text().strip():
+            self._update_validation_state()
+            return
+        self.accept()
+
+    def get_request(self):
+        return {
+            "destination_folder": self.destination_edit.text().strip(),
+            "backend_preference": self.backend_combo.currentData(),
+            "device_name": self.device_name_edit.text().strip(),
+            "mode": self.mode_combo.currentText(),
+            "dpi": int(self.dpi_combo.currentText()),
+            "source_type": self.source_type_combo.currentText(),
+            "duplex": self.duplex_checkbox.isChecked(),
+            "persist_format": self.persist_format_combo.currentText(),
+        }
+
 # network_scanner.py
 # PyQt5 + Scapy threaded network scanner
 
@@ -880,6 +1148,8 @@ class MainWindow(qtw.QMainWindow):
         self._worker = None
         self._project_thread = None
         self._project_worker = None
+        self._scan_thread = None
+        self._scan_worker = None
         self._project_success_title = ""
         self._project_success_message = ""
 
@@ -893,13 +1163,13 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        self._apply_scan_icon()
         # self.ui.NetworkTable = QTableWidget(self.ui.centralwidget)
         # self.ui.NetworkTable.setGeometry(10, 10, 600, 300)   
         # self.ui.NetworkTable.setColumnCount(2)
         # self.ui.NetworkTable.setHorizontalHeaderLabels(["IP", "MAC"])
         # self.ui.verticalLayout.addWidget(self.ui.NetworkTable)
-        from Core.Scanner.manager import ScannerManager  # adjust path if needed
-        self.scannerManager = ScannerManager()
+        self.scannerManager = ScanManager()
         
         self.session_manager = SessionManager()
 
@@ -1021,6 +1291,7 @@ class MainWindow(qtw.QMainWindow):
         
         # Menu Modules
         self.ui.actionImageScanner.triggered.connect(self.actionScanNetwork)
+        self.ui.actionImageScanner_tb.triggered.connect(self.actionScanNetwork)
         
         self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
         self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
@@ -1111,6 +1382,37 @@ class MainWindow(qtw.QMainWindow):
             "project_created",
             self.on_project_created
         )
+
+    def _apply_scan_icon(self):
+        scan_icon = qtg.QIcon()
+        for resource_path in SCAN_ICON_RESOURCES:
+            scan_icon = qtg.QIcon(resource_path)
+            if not scan_icon.isNull():
+                break
+
+        if scan_icon.isNull():
+            for file_path in SCAN_ICON_FILES:
+                if os.path.exists(file_path):
+                    scan_icon = qtg.QIcon(file_path)
+                    if not scan_icon.isNull():
+                        break
+
+        if scan_icon.isNull():
+            return
+
+        if hasattr(self.ui, "imageScannerbutton"):
+            self.ui.imageScannerbutton.setIcon(scan_icon)
+            self.ui.imageScannerbutton.setIconSize(qtc.QSize(20, 20))
+            self.ui.imageScannerbutton.setMinimumSize(qtc.QSize(28, 28))
+            self.ui.imageScannerbutton.setToolTip("Scan image")
+
+        if hasattr(self.ui, "actionImageScanner"):
+            self.ui.actionImageScanner.setIcon(scan_icon)
+            self.ui.actionImageScanner.setIconVisibleInMenu(True)
+
+        if hasattr(self.ui, "actionImageScanner_tb"):
+            self.ui.actionImageScanner_tb.setIcon(scan_icon)
+            self.ui.actionImageScanner_tb.setIconVisibleInMenu(True)
 
     def on_new_project_clicked(self):
         payload = self.collect_new_project_payload()
@@ -1277,29 +1579,123 @@ class MainWindow(qtw.QMainWindow):
     #     self.networkScanner.finished.connect(self.onScanFinished)
     #     self.networkScanner.start()
     def actionScanNetwork(self):
-        # img = self.scannerManager.acquire_qimage()
-        # self.showImage(img)
-        
-        # result = self.scannerManager.acquire()
+        dialog = ScanWizardDialog(
+            self.scannerManager,
+            SCANNED_FOLDER,
+            self,
+            initial_request=self._default_scan_request(),
+        )
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            return None
 
-        # img = result["image"]
-        # self.imgpath = result["path"]
-        # self.imgdir = result["dir"]
+        request = dialog.get_request()
+        self._persist_scan_request(request)
+        return self._start_scan_workflow(request)
 
-        # self.showImage(img)
-        
-        
-        result = self.scannerManager.acquire(SCANNED_FOLDER)
+        # self.netDialog = NetworkScanDialog(self)
+        # self.netDialog.show()
 
-        if result is None:
+    def _start_scan_workflow(self, request):
+        if self._scan_thread is not None:
+            qtw.QMessageBox.information(
+                self,
+                "Scan In Progress",
+                "Wait for the current scan task to finish."
+            )
+            return None
+
+        self._scan_thread = qtc.QThread()
+        self._scan_worker = ScanWorker(self.scannerManager, request)
+        self._scan_worker.moveToThread(self._scan_thread)
+
+        self._scan_thread.started.connect(self._scan_worker.run)
+        self._scan_worker.progress.connect(self.on_scan_progress)
+        self._scan_worker.finished.connect(self.on_scan_result)
+        self._scan_worker.error.connect(self.on_scan_error)
+
+        self._scan_worker.finished.connect(self._scan_thread.quit)
+        self._scan_worker.finished.connect(self._scan_worker.deleteLater)
+        self._scan_worker.error.connect(self._scan_thread.quit)
+        self._scan_worker.error.connect(self._scan_worker.deleteLater)
+        self._scan_thread.finished.connect(self._scan_thread.deleteLater)
+        self._scan_thread.finished.connect(self._on_scan_thread_finished)
+
+        self._scan_thread.start()
+        self._show_progress(0)
+        return request
+
+    def on_scan_progress(self, value):
+        self._set_progress_percent(value)
+
+    def on_scan_result(self, result):
+        self._hide_progress(100)
+
+        if result.get("status") not in {"success", "ok"}:
+            qtw.QMessageBox.warning(
+                self,
+                "Scan Failed",
+                result.get("error", "Unknown scan error")
+            )
             return
 
         self.showImage(result["path"])
-        
-        
-            
-        # self.netDialog = NetworkScanDialog(self)
-        # self.netDialog.show()
+        self.statusBar().showMessage(
+            f"Scanned via {result.get('backend', 'scanner backend')}: {result['path']}",
+            5000,
+        )
+
+    def on_scan_error(self, msg):
+        self._hide_progress()
+        qtw.QMessageBox.warning(self, "Scan Failed", msg)
+
+    def _on_scan_thread_finished(self):
+        self._scan_thread = None
+        self._scan_worker = None
+
+    def _default_scan_request(self):
+        request = self.scannerManager.default_request(SCANNED_FOLDER)
+        request.update(
+            {
+                "destination_folder": getattr(self, "scan_destination_folder", SCANNED_FOLDER),
+                "backend_preference": getattr(self, "scan_backend_preference", "ESCLScanner"),
+                "device_name": getattr(self, "scan_device_name", ""),
+                "mode": getattr(self, "scan_mode", "color"),
+                "dpi": getattr(self, "scan_dpi", 300),
+                "source_type": getattr(self, "scan_source_type", "flatbed"),
+                "duplex": getattr(self, "scan_duplex", False),
+                "persist_format": getattr(self, "scan_persist_format", "tiff"),
+            }
+        )
+        return request
+
+    def _persist_scan_request(self, request):
+        normalized_request = self.scannerManager.default_request(
+            (request or {}).get("destination_folder") or SCANNED_FOLDER
+        )
+        normalized_request.update(request or {})
+
+        self.scan_destination_folder = normalized_request["destination_folder"]
+        self.scan_backend_preference = normalized_request["backend_preference"]
+        self.scan_device_name = normalized_request["device_name"]
+        self.scan_mode = normalized_request["mode"]
+        self.scan_dpi = normalized_request["dpi"]
+        self.scan_source_type = normalized_request["source_type"]
+        self.scan_duplex = normalized_request["duplex"]
+        self.scan_persist_format = normalized_request["persist_format"]
+
+        self.session_manager.update(
+            'Session.json',
+            {
+                'self.scan_destination_folder': self.scan_destination_folder,
+                'self.scan_backend_preference': self.scan_backend_preference,
+                'self.scan_device_name': self.scan_device_name,
+                'self.scan_mode': self.scan_mode,
+                'self.scan_dpi': self.scan_dpi,
+                'self.scan_source_type': self.scan_source_type,
+                'self.scan_duplex': self.scan_duplex,
+                'self.scan_persist_format': self.scan_persist_format,
+            },
+        )
         
     # def onDeviceFound(self, device):
     #     row = self.ui.NetworkTable.rowCount()
@@ -1390,6 +1786,25 @@ class MainWindow(qtw.QMainWindow):
         self.zoomslidervalue = get_setting('zoomslidervalue', 0)
         self.txtpath = get_setting('txtpath', '')
         self.txtdir = get_setting('txtdir', '')
+        self.scan_destination_folder = get_setting('scan_destination_folder', SCANNED_FOLDER)
+        self.scan_backend_preference = get_setting('scan_backend_preference', 'ESCLScanner')
+        self.scan_device_name = get_setting('scan_device_name', '')
+        self.scan_mode = get_setting('scan_mode', 'color')
+        self.scan_dpi = get_setting('scan_dpi', 300)
+        self.scan_source_type = get_setting('scan_source_type', 'flatbed')
+        self.scan_duplex = get_setting('scan_duplex', False)
+        self.scan_persist_format = get_setting('scan_persist_format', 'tiff')
+
+        try:
+            self.scan_dpi = int(self.scan_dpi)
+        except (TypeError, ValueError):
+            self.scan_dpi = 300
+
+        if isinstance(self.scan_duplex, str):
+            self.scan_duplex = self.scan_duplex.strip().lower() in {'1', 'true', 'yes', 'on'}
+        else:
+            self.scan_duplex = bool(self.scan_duplex)
+
         #self.origpixmap = qtg.QPixmap.fromImage(qtg.QImage())
         if hasattr(self, 'ui'):
             self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
@@ -3072,6 +3487,9 @@ class MainWindow(qtw.QMainWindow):
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
+
+        if hasattr(self.ui, "ImageLE"):
+            self.ui.ImageLE.setText(filestr)
   
         if file.open(qtc.QIODevice.ReadOnly):
             info = qtc.QFileInfo(imgfilename)      
@@ -3089,39 +3507,10 @@ class MainWindow(qtw.QMainWindow):
         file.close()
             
         self.on_zoom_combobox()
-       
-        
-        # jsonfile = 'Model/Project/Data/json/Session.json'
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")       
-        #with open(jsonfile, 'r') as f:
-        #     data = json.load(f)
-        #     imgpath_key = r"self.imgpath"
-        #     imgdir_key = r"self.imgdir"
-        #     for Setting in data:
-        #         if Setting['Setting'] == imgpath_key:
-        #             Setting['CurrentValue'] = self.imgpath
-        #             print(Setting['CurrentValue'])
-        #         elif Setting['Setting'] == imgdir_key:  
-        #             Setting['CurrentValue'] = self.imgdir
-        #             print(Setting['CurrentValue'])
-        # f.close()
-        with open(jsonfile, "r") as f:
-            data = json.load(f)
-
-        # ensure structure
-        if not isinstance(data, dict):
-            data = {}
-
-        data["path"] = self.imgpath if self.imgpath is not None else ""
-        data["dir"] = self.imgdir if self.imgdir is not None else ""
-
-        with open(jsonfile, "w") as f:
-            json.dump(data, f, indent=4)
-            
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
+        self.session_manager.update('Session.json', {
+            'self.imgpath': self.imgpath if self.imgpath is not None else '',
+            'self.imgdir': self.imgdir if self.imgdir is not None else '',
+        })
         
         self.imgfileList = []
         for i in sorted(os.listdir(self.imgdir)):
@@ -4254,147 +4643,6 @@ class MainWindow(qtw.QMainWindow):
 
     def on_lang_select(self):
         pass
-
-# Must install python-sane and have SANE-compatible scanner hardware to use this feature
-
-# class ScanWorker(QThread):
-#     import python-sane as sane
-    
-#     """Handles the scanning process in a background thread."""
-#     scan_complete = pyqtSignal(bytes)
-#     scan_failed = pyqtSignal(str)
-
-#     def __init__(self, device_name):
-#         super().__init__()
-#         self.device_name = device_name
-
-#     def run(self):
-#         try:
-#             # Initialize SANE inside the worker thread
-#             sane.init()
-#             dev = sane.open(self.device_name)
-            
-#             # Start scanning and capture the PIL Image object
-#             pil_img = dev.start()
-            
-#             if pil_img:
-#                 # Save PIL image to a byte buffer as a PNG
-#                 buffer = io.BytesIO()
-#                 pil_img.save(buffer, format="PNG")
-#                 self.scan_complete.emit(buffer.getvalue())
-#             else:
-#                 self.scan_failed.emit("No image data received from scanner.")
-            
-#             dev.close()
-#         except Exception as e:
-#             self.scan_failed.emit(str(e))
-#         finally:
-#             sane.exit()
-
-# class ScannerApp(QMainWindow):
-#     import sys
-#     import io
-#     import sane
-#     from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-#                                 QHBoxLayout, QPushButton, QComboBox, QLabel, 
-#                                 QMessageBox)
-#     from PyQt5.QtGui import QPixmap, QImage
-#     from PyQt5.QtCore import Qt, QThread, pyqtSignal
-    
-#     def __init__(self):
-#         super().__init__()
-#         self.setWindowTitle("PyQt5 Open Source Scanner")
-#         self.resize(600, 500)
-#         self.init_ui()
-#         self.refresh_devices()
-
-#     def init_ui(self):
-#         # Main Layout
-#         central_widget = QWidget()
-#         self.setCentralWidget(central_widget)
-#         main_layout = QVBoxLayout(central_widget)
-
-#         # Controls Layout (Top)
-#         controls_layout = QHBoxLayout()
-        
-#         self.device_combo = QComboBox()
-#         controls_layout.addWidget(QLabel("Scanner:"))
-#         controls_layout.addWidget(self.device_combo)
-
-#         self.refresh_btn = QPushButton("Refresh")
-#         self.refresh_btn.clicked.connect(self.refresh_devices)
-#         controls_layout.addWidget(self.refresh_btn)
-
-#         self.scan_btn = QPushButton("Scan Document")
-#         self.scan_btn.setStyleSheet("background-color: #007ACC; color: white; font-weight: bold;")
-#         self.scan_btn.clicked.connect(self.start_scan)
-#         controls_layout.addWidget(self.scan_btn)
-
-#         main_layout.addLayout(controls_layout)
-
-#         # Preview Area (Center)
-#         self.preview_label = QLabel("No document scanned yet.")
-#         self.preview_label.setAlignment(Qt.AlignCenter)
-#         self.preview_label.setStyleSheet("border: 2px dashed #999; background-color: #F0F0F0;")
-#         main_layout.addWidget(self.preview_label, stretch=1)
-
-#     def refresh_devices(self):
-#         """Detects connected hardware scanners."""
-#         self.device_combo.clear()
-#         try:
-#             sane.init()
-#             devices = sane.get_devices()
-#             sane.exit()
-
-#             if not devices:
-#                 self.device_combo.addItem("No scanners found")
-#                 self.scan_btn.setEnabled(False)
-#                 return
-
-#             for device in devices:
-#                 # device format: (device_name, vendor, model, type)
-#                 display_name = f"{device[1]} {device[2]}"
-#                 self.device_combo.addItem(display_name, device[0])
-            
-#             self.scan_btn.setEnabled(True)
-#         except Exception as e:
-#             QMessageBox.critical(self, "SANE Error", f"Could not initialize SANE:\n{str(e)}")
-
-#     def start_scan(self):
-#         """Prepares UI and triggers the background thread."""
-#         device_name = self.device_combo.currentData()
-#         if not device_name:
-#             return
-
-#         self.scan_btn.setEnabled(False)
-#         self.scan_btn.setText("Scanning...")
-#         self.preview_label.setText("Reading from scanner... Please wait.")
-
-#         # Start the background worker thread
-#         self.worker = ScanWorker(device_name)
-#         self.worker.scan_complete.connect(self.on_scan_success)
-#         self.worker.scan_failed.connect(self.on_scan_error)
-#         self.worker.start()
-
-#     def on_scan_success(self, img_bytes):
-#         """Displays the resulting image data in the UI layout."""
-#         self.scan_btn.setEnabled(True)
-#         self.scan_btn.setText("Scan Document")
-
-#         # Convert byte data to QPixmap
-#         qimage = QImage.fromData(img_bytes)
-#         pixmap = QPixmap.fromImage(qimage)
-
-#         # Scale the image smoothly to fit the preview window
-#         scaled_pixmap = pixmap.scaled(self.preview_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-#         self.preview_label.setPixmap(scaled_pixmap)
-
-#     def on_scan_error(self, error_msg):
-#         """Handles scan failures gracefully."""
-#         self.scan_btn.setEnabled(True)
-#         self.scan_btn.setText("Scan Document")
-#         self.preview_label.setText("Scan failed.")
-#         QMessageBox.warning(self, "Scan Error", f"An error occurred during scanning:\n{error_msg}")
 
 
 
