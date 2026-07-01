@@ -249,12 +249,47 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 ---
 
+## 🐧 Jetson / Git Operational Notes
+
+### Current Repository Cleanup State
+
+* Local `master` was fast-forwarded to the merged remote `master` after the Branch5 / Branch6 integration work
+* Branches `Biblion-Branch1` through `Biblion-Branch6` were deleted from both local and remote
+* Duplicate remote names were removed; the repo now standardizes on a single remote: `origin`
+* Jetson-facing Git instructions were captured in the root note `LOCAL_MASTER_SYNC_AFTER_PR.md`
+
+### Jetson Runtime Constraint
+
+* VS Code on the Jetson is currently too memory-heavy for the user's normal recovery/debug workflow
+* The practical support path for Jetson work should assume terminal-first operation rather than editor-first operation
+* Git sync and crash diagnosis notes should therefore remain usable from a plain Linux shell
+
+### Desktop Launcher Standardization
+
+* Desktop launchers that call Python directly are not sufficient for crash diagnosis because the terminal can disappear with the process
+* The current standard is to launch a small shell wrapper from the `.desktop` entry, run the module from that wrapper, print the exit status, and wait for Enter before closing
+* Canonical repo examples now exist for this pattern:
+
+  * `JETSON_PERSISTENT_LAUNCHERS.md`
+  * `launchers/run-myserver.sh`
+  * `My Server.desktop`
+
+* The wrapper pattern is intended to be replicated across the other desktop modules after validation on `MyServer`
+
+### Line Ending Safeguard
+
+* `.gitattributes` now forces LF line endings for `*.sh` and `*.desktop`
+* This is specifically to keep Jetson launcher artifacts Linux-safe when they are edited or committed from Windows
+
+---
+
 ## ⚠️ Known Issues
 
 * Zoom slider can desync from pixmap scale (non-compounding rule must be enforced)
 * Session manager may return stale paths across environments
 * Continue.dev YAML/config sensitive to formatting
 * Cross-platform path contamination (Jetson ↔ Windows)
+* Jetson desktop launchers should not point directly at Python if traceback preservation is required; wrapper-based launchers should be treated as the standard path going forward
 * `MyServer.py` still has too much project-creation business logic
 * `Core/engine.py` now compiles without the prior debug side effect `print("ENGINE MODULE LOADING")`
 * `Core/__init__.py` / `Core` imports must be validated before switching `MyServer.py` to Core imports
