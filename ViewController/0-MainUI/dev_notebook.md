@@ -110,8 +110,9 @@ Future implementations should derive from a common `ScannerBackend` interface so
 * **SANE**
 
   * Linux/macOS backend extracted from old `MyServer` commented prototype and moved into `Core/Scanner/sane_scanner.py`
-  * supports device enumeration, request-aware device matching, mode/DPI configuration, simple ADF hints, and TIFF persistence
-  * not testable on this Windows machine because `python-sane` is not installed here
+  * now uses a defensive split strategy on Linux: safe availability probing, `scanimage`-based enumeration, selective option probing, retry/caching for slow discovery, and AirScan-assisted fallback when `sane-airscan` discovery/acquisition is not self-sufficient
+  * Jetson Canon TS3700 result: SANE can be presented as a Linux-facing compatibility surface, but the reliable scan transport is still network AirScan/eSCL rather than a stable native SANE acquisition path
+  * not fully testable on this Windows machine because `python-sane` is not installed here
 
 ### Recent Scanner Stabilization
 
@@ -122,6 +123,9 @@ Future implementations should derive from a common `ScannerBackend` interface so
 * `Session.json` normalization was added so legacy dict-shaped files no longer crash startup
 * `showImage()` now updates the image filename line edit and persists image path/dir through `SessionManager.update()`
 * The scan wizard now blocks unavailable backends and provides a direct IP/URL path for AirScan when automatic discovery fails
+* The scan wizard now opens immediately and performs backend/device discovery asynchronously with a visible loading indicator, primarily to avoid long Jetson UI stalls
+* On the Jetson Canon path, SANE-first discovery now retries briefly and can synthesize AirScan-backed fallback entries when `scanimage -L` stays empty
+* Selecting one of those SANE fallback entries results in AirScan/eSCL acquisition by IP, which is currently the standardized cross-platform path for this Canon class
 
 ### Helper Formatting Pattern
 
@@ -297,7 +301,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Discovery and acquisition remain separate responsibilities by design, but capability normalization between them is still incomplete
 * TWAIN is intentionally unavailable for the current Canon TS3700 path because the machine exposes a usable 64-bit DSM but no 64-bit TWAIN source registration
 * Canon TS3700 evidence on this machine indicates: 64-bit `twaindsm.dll` can load, but the installed Canon scan package registers WIA/STI files rather than a 64-bit TWAIN source, while Canon TWAIN source artifacts remain under the 32-bit `C:\Windows\twain_32` tree
-* SANE backend is implemented but unvalidated on a real Linux runtime in this repo session
+* Native SANE acquisition remains device-dependent and should still be treated as best-effort until validated against non-AirScan-first hardware
 
 ---
 
@@ -519,7 +523,8 @@ These imports caused recent startup tracebacks because those names do not exist 
   * Keep `MyServer` backend-agnostic and continue pushing backend details into `Core/Scanner`
   * Add a `mock_backend.py` for no-hardware tests and UI validation
   * Add explicit backend diagnostics/capability reporting instead of only device-name lists
-  * Validate `SaneScanner` on a real Linux machine with `python-sane`
+  * Treat AirScan/eSCL as the default cross-platform transport for network-capable devices unless a future hardware path proves TWAIN or native SANE acquisition is materially better
+  * Validate `SaneScanner` against future genuinely local/non-AirScan Linux hardware rather than using the Jetson Canon path as the reference implementation
   * Decide whether TWAIN should remain best-effort/optional or gain a future 32-bit helper process path
 
 2. **Core / MyServer Unification**
@@ -735,6 +740,7 @@ DO NOT update for:
 * 2026-06-30: Confirmed current Windows runtime scan path is `MyServer.actionScanNetwork()` → `Core.Scanner.manager.ScannerManager` → `Core.Scanner.wia_scanner.WIAScanner.acquire()` → saved grayscale TIFF
 * 2026-06-30: Identified stale `acquire_qimage` helper contract mismatch in the current WIA path
 * 2026-06-30: Confirmed existing `NetworkScanner` belongs to discovery only; capability detection must remain a separate layer before backend selection
+* 2026-07-01: Jetson Canon TS3700 path validated with async scan-dialog loading, AirScan-first discovery, and SANE fallback entries that route final acquisition back through eSCL/AirScan by IP when native SANE transport is not dependable
 
 ---
 
