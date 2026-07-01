@@ -85,6 +85,10 @@ class SaneScanner(ScannerDevice):
         if not scanimage_path:
             return False
 
+        # Once scanimage is installed, SANE operations can run safely in a
+        # subprocess even if discovery is slow or temporarily empty.
+        return True
+
         try:
             completed = subprocess.run(
                 [scanimage_path, "-L"],
@@ -285,16 +289,22 @@ class SaneScanner(ScannerDevice):
             raise RuntimeError("scanimage is not installed or not on PATH")
 
         command = [scanimage_path, "--format=tiff", "--device-name", device_info["name"]]
-        command.extend(["--resolution", str(int(request.get("dpi", 300)))])
+        supported_options = self._scanimage_supported_options(scanimage_path, device_info["name"])
 
         mode_map = {
             "color": "Color",
             "grayscale": "Gray",
             "mono": "Lineart",
         }
-        command.extend(["--mode", mode_map.get(request.get("mode", "color"), "Color")])
+        requested_mode = mode_map.get(request.get("mode", "color"), "Color")
+        if "--mode" in supported_options:
+            command.extend(["--mode", requested_mode])
 
-        if request.get("source_type") == "adf":
+        requested_dpi = str(int(request.get("dpi", 300)))
+        if "--resolution" in supported_options:
+            command.extend(["--resolution", requested_dpi])
+
+        if request.get("source_type") == "adf" and "--source" in supported_options:
             command.extend(["--source", "ADF"])
 
         with open(output_path, "wb") as image_handle:
@@ -319,6 +329,32 @@ class SaneScanner(ScannerDevice):
             "dir": destination_folder,
             "device": device_info["display_name"],
         }
+
+    def _scanimage_supported_options(self, scanimage_path, device_name):
+        try:
+            completed = subprocess.run(
+                [scanimage_path, "-A", "--device-name", device_name],
+                capture_output=True,
+                text=True,
+                timeout=self._scanimage_timeout_seconds,
+                check=False,
+            )
+        except Exception:
+            return set()
+
+        if completed.returncode != 0:
+            return set()
+
+        supported_options = set()
+        for raw_line in completed.stdout.splitlines():
+            line = raw_line.strip()
+            if not line.startswith("--"):
+                continue
+
+            option_name = line.split()[0]
+            option_name = option_name.split("=")[0].rstrip(":")
+            supported_options.add(option_name)
+        return supported_options
 
     def _select_scanimage_device(self, devices, requested_name):
         if not requested_name:
