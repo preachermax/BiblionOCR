@@ -100,7 +100,12 @@ from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
-from scapy.all import ARP, Ether, srp
+try:
+    from scapy.all import ARP, Ether, srp
+except Exception:
+    ARP = None
+    Ether = None
+    srp = None
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QBuffer, QIODevice
 from PyQt5.QtGui import QImage, QPixmap
@@ -981,7 +986,6 @@ import socket
 import ipaddress
 
 from PyQt5 import QtCore as qtc
-from scapy.all import ARP, Ether, srp
 class NetworkScanner(qtc.QThread):
 
     deviceFound = qtc.pyqtSignal(dict)
@@ -1000,6 +1004,10 @@ class NetworkScanner(qtc.QThread):
     def run(self):
         try:
             print(f"[NETWORK] Scanning subnet: {self.subnet}")
+
+            if ARP is None or Ether is None or srp is None:
+                print("[NETWORK] Scapy is unavailable; skipping ARP scan")
+                return
 
             arp = ARP(pdst=self.subnet)
             ether = Ether(dst="ff:ff:ff:ff:ff:ff")

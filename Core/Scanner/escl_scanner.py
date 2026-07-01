@@ -76,7 +76,7 @@ class ESCLScanner(ScannerDevice):
 
     @classmethod
     def is_available(cls):
-        return Zeroconf is not None and requests is not None and Image is not None
+        return requests is not None and Image is not None
 
     def list_devices(self):
         return [device["display_name"] for device in self._discover_devices()]
@@ -84,7 +84,7 @@ class ESCLScanner(ScannerDevice):
     def acquire(self, destination_folder, request=None):
         if not self.is_available():
             raise RuntimeError(
-                "AirScan requires zeroconf, requests, and Pillow to be installed"
+                "AirScan requires requests and Pillow to be installed"
             )
 
         request = request or {}
