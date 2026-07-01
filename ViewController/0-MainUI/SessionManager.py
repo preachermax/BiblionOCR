@@ -1,7 +1,7 @@
 import os
 import json
 import platform
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 from PyQt5 import QtGui as qtg
 
@@ -71,7 +71,7 @@ class SessionManager:
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(list(session.values()), f, indent=4)
 
-    def _normalize_session_data(self, data: Any) -> list[JSONItem]:
+    def _normalize_session_data(self, data: Any) -> List[JSONItem]:
         if isinstance(data, list):
             normalized_items = []
             for item in data:
@@ -120,7 +120,7 @@ class SessionManager:
                 setter(value)
 
     @staticmethod
-    def default_font_install_dirs() -> list[str]:
+    def default_font_install_dirs() -> List[str]:
         home_dir = os.path.expanduser('~')
         system_name = platform.system().lower()
 
@@ -139,7 +139,7 @@ class SessionManager:
         ]
 
     @staticmethod
-    def _font_candidate_names(font_name: str) -> list[str]:
+    def _font_candidate_names(font_name: str) -> List[str]:
         if not font_name:
             return []
 
