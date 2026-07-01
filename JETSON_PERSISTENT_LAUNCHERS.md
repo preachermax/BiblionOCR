@@ -2,6 +2,9 @@
 
 Use this note when a desktop launcher starts a Biblion module in a terminal, but the terminal disappears as soon as Python crashes.
 
+For interactive terminal commands in this note, assume the shell already opens in your home directory, so `cd Projects/BiblionOCR` is sufficient.
+Absolute paths are still used in `.desktop` entries and wrapper-script locations because those should not depend on the caller's starting directory.
+
 ## Problem
 
 The current launcher pattern runs Python directly from the desktop entry:

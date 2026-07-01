@@ -3,8 +3,9 @@
 Use this after `Biblion-Branch6` is merged into `master` on GitHub.
 
 These examples are written for a Linux shell on the Jetson.
-They assume the repository lives at `/home/jetson/Projects/BiblionOCR`.
+They assume the repository lives at `~/Projects/BiblionOCR`.
 
+If the terminal opens in your home directory, use `cd Projects/BiblionOCR`.
 If the repo is somewhere else on that machine, change the `cd` line accordingly.
 
 ## Recommended Safe Method
@@ -12,7 +13,7 @@ If the repo is somewhere else on that machine, change the `cd` line accordingly.
 This keeps local `master` aligned with remote `master` and avoids accidental merge commits.
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
@@ -20,7 +21,7 @@ git pull --ff-only origin master
 
 ## Why This Is Best
 
-- `cd /home/jetson/Projects/BiblionOCR`
+- `cd Projects/BiblionOCR`
   Moves into the repository on the Jetson.
 - `git checkout master`
   Moves you to the local `master` branch.
@@ -35,7 +36,7 @@ git pull --ff-only origin master
 Use this only if you want local `master` to become an exact copy of remote `master`, and you are sure there is nothing local on `master` that you need to keep.
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git reset --hard origin/master
@@ -55,7 +56,7 @@ The safest normal flow is:
 2. On the local machine, run:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
@@ -68,14 +69,14 @@ If the PR is merged and you no longer need `Biblion-Branch6`, you can clean it u
 ### Delete local branch
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git branch -d Biblion-Branch6
 ```
 
 ### Delete remote branch
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git push origin --delete Biblion-Branch6
 ```
 
@@ -90,22 +91,41 @@ fatal: 'origin' does not appear to be a git repository
 check the configured remotes first:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git remote -v
 ```
 
 If nothing is listed, add `origin`:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git remote add origin https://github.com/preachermax/BiblionOCR.git
+git remote -v
+```
+
+If you already have a usable remote but it is named something else, rename it to `origin` instead of adding a duplicate.
+
+For example, if the repo already shows `BiblionOCR`:
+
+```bash
+cd Projects/BiblionOCR
+git remote rename BiblionOCR origin
+git remote -v
+```
+
+If both `BiblionOCR` and `BiblionGitHub` exist, rename one of them to `origin` and remove the extra duplicate:
+
+```bash
+cd Projects/BiblionOCR
+git remote rename BiblionOCR origin
+git remote remove BiblionGitHub
 git remote -v
 ```
 
 If `origin` exists but points to the wrong place, fix it:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git remote set-url origin https://github.com/preachermax/BiblionOCR.git
 git remote -v
 ```
@@ -113,7 +133,7 @@ git remote -v
 After that, retry:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git fetch origin --prune
 ```
 
@@ -126,7 +146,7 @@ Once `origin` points to GitHub, you still need GitHub credentials that work from
 Use the GitHub HTTPS remote:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git remote set-url origin https://github.com/preachermax/BiblionOCR.git
 git fetch origin --prune
 ```
@@ -157,7 +177,7 @@ cat ~/.ssh/id_ed25519.pub
 Add that public key to GitHub under SSH keys, then switch the remote:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git remote set-url origin git@github.com:preachermax/BiblionOCR.git
 ssh -T git@github.com
 git fetch origin --prune
@@ -179,7 +199,7 @@ In that case:
 If you only want the short version, use this:
 
 ```bash
-cd /home/jetson/Projects/BiblionOCR
+cd Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
