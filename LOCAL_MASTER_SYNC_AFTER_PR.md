@@ -3,7 +3,7 @@
 Use this after `Biblion-Branch6` is merged into `master` on GitHub.
 
 These examples are written for a Linux shell on the Jetson.
-They assume the repository lives at `/home/max/Projects/BiblionOCR`.
+They assume the repository lives at `/home/jetson/Projects/BiblionOCR`.
 
 If the repo is somewhere else on that machine, change the `cd` line accordingly.
 
@@ -12,7 +12,7 @@ If the repo is somewhere else on that machine, change the `cd` line accordingly.
 This keeps local `master` aligned with remote `master` and avoids accidental merge commits.
 
 ```bash
-cd /home/max/Projects/BiblionOCR
+cd /home/jetson/Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
@@ -20,7 +20,7 @@ git pull --ff-only origin master
 
 ## Why This Is Best
 
-- `cd /home/max/Projects/BiblionOCR`
+- `cd /home/jetson/Projects/BiblionOCR`
   Moves into the repository on the Jetson.
 - `git checkout master`
   Moves you to the local `master` branch.
@@ -35,7 +35,7 @@ git pull --ff-only origin master
 Use this only if you want local `master` to become an exact copy of remote `master`, and you are sure there is nothing local on `master` that you need to keep.
 
 ```bash
-cd /home/max/Projects/BiblionOCR
+cd /home/jetson/Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git reset --hard origin/master
@@ -55,7 +55,7 @@ The safest normal flow is:
 2. On the local machine, run:
 
 ```bash
-cd /home/max/Projects/BiblionOCR
+cd /home/jetson/Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
@@ -68,16 +68,102 @@ If the PR is merged and you no longer need `Biblion-Branch6`, you can clean it u
 ### Delete local branch
 
 ```bash
-cd /home/max/Projects/BiblionOCR
+cd /home/jetson/Projects/BiblionOCR
 git branch -d Biblion-Branch6
 ```
 
 ### Delete remote branch
 
 ```bash
-cd /home/max/Projects/BiblionOCR
+cd /home/jetson/Projects/BiblionOCR
 git push origin --delete Biblion-Branch6
 ```
+
+## If `origin` Does Not Exist Yet
+
+If you see this:
+
+```text
+fatal: 'origin' does not appear to be a git repository
+```
+
+check the configured remotes first:
+
+```bash
+cd /home/jetson/Projects/BiblionOCR
+git remote -v
+```
+
+If nothing is listed, add `origin`:
+
+```bash
+cd /home/jetson/Projects/BiblionOCR
+git remote add origin https://github.com/preachermax/BiblionOCR.git
+git remote -v
+```
+
+If `origin` exists but points to the wrong place, fix it:
+
+```bash
+cd /home/jetson/Projects/BiblionOCR
+git remote set-url origin https://github.com/preachermax/BiblionOCR.git
+git remote -v
+```
+
+After that, retry:
+
+```bash
+cd /home/jetson/Projects/BiblionOCR
+git fetch origin --prune
+```
+
+## GitHub Authentication On The Jetson
+
+Once `origin` points to GitHub, you still need GitHub credentials that work from the Jetson.
+
+### Easiest HTTPS Path
+
+Use the GitHub HTTPS remote:
+
+```bash
+cd /home/jetson/Projects/BiblionOCR
+git remote set-url origin https://github.com/preachermax/BiblionOCR.git
+git fetch origin --prune
+```
+
+GitHub will not accept your GitHub account password for command-line Git.
+When prompted:
+
+- username: your GitHub username
+- password: use a GitHub Personal Access Token (PAT), not your normal GitHub password
+
+If you want the Jetson to remember the token:
+
+```bash
+git config --global credential.helper store
+```
+
+Then the next successful authenticated Git command will save it locally in your home directory.
+
+### Better Long-Term SSH Path
+
+If you do not want to keep using HTTPS prompts, configure an SSH key on the Jetson:
+
+```bash
+ssh-keygen -t ed25519 -C "jetson@nano"
+cat ~/.ssh/id_ed25519.pub
+```
+
+Add that public key to GitHub under SSH keys, then switch the remote:
+
+```bash
+cd /home/jetson/Projects/BiblionOCR
+git remote set-url origin git@github.com:preachermax/BiblionOCR.git
+ssh -T git@github.com
+git fetch origin --prune
+```
+
+If the SSH test succeeds, future `fetch`, `pull`, and `push` commands can use the key without PAT prompts.
 
 ## If `pull --ff-only` Fails
 
@@ -93,7 +179,7 @@ In that case:
 If you only want the short version, use this:
 
 ```bash
-cd /home/max/Projects/BiblionOCR
+cd /home/jetson/Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
