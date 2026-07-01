@@ -17,7 +17,7 @@ import pandas as pd
 import json
 import platform
 
-#from ImageQt import ImageQt  
+#from ImageQt import ImageQt
 import cv2
 import numpy as np
 import pytesseract
@@ -43,7 +43,7 @@ from Training import Train as tr
 import ChrReference as chrref
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
-#from PyQt5.QtCore import QObject, QThread, pyqtSignal 
+#from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # Dialog Imports
 
 from Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
@@ -80,14 +80,14 @@ class MainWindow(qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         #Set Project Path
         self.mod_dirname = os.path.dirname(__file__)
         up_once = os.path.join(self.mod_dirname,"..")
         up_twice = os.path.join(up_once,"..")
         self.mod_rootdir = up_twice
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
-        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
@@ -97,14 +97,14 @@ class MainWindow(qtw.QMainWindow):
         print(f'OS Path relpath: {self.mod_dirname}')
         print(f'Project Home: {self.projecthome}')
 
-        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyGlypher')
         self.ui.GlyphImgTab.currentChanged.connect(self.on_tabChanged)
-        
+
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         #self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
@@ -113,7 +113,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.actionClassic.triggered.connect(self.classic)
         self.ui.actionStandardUI.triggered.connect(self.standardUI)
         self.ui.action_Explorer.triggered.connect(self.OpenProjectExplorer)
-        
+
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
 
@@ -122,8 +122,8 @@ class MainWindow(qtw.QMainWindow):
         self.ui.actionEdit_Greek_GlyphBox_Files.triggered.connect(self.glyphbox_edit_split)
         self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
-        #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)   
-        
+        #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)
+
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
         self.ui.BothPrevButton.clicked.connect(self.prevImage)
@@ -150,15 +150,15 @@ class MainWindow(qtw.QMainWindow):
 
         self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
         self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)         
-        
+        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.drawGlyphBoxImage)
 
         self.ui.GlyphBoxTable.setCornerButtonEnabled(False)
-        self.ui.GlyphBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu) 
+        self.ui.GlyphBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
         self.ui.GlyphBoxTable.customContextMenuRequested.connect(self.openTableMenu)
 
         self.ui.reloadTextbutton.clicked.connect(self.GlyphBoxText2GlyphBoxTable)
@@ -170,21 +170,22 @@ class MainWindow(qtw.QMainWindow):
         self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
 
         # UI and slots code ends here.
-        
+
         # Show the Main user interface
         self.ui.BoxDocument = qtg.QTextDocument(self.ui.GlyphBoxText)
-        font = qtg.QFont()
-        font.setFamily("FROMVS [MAXR]")
-        font.setPointSize(20)
+        font = SessionManager().build_workflow_font(
+            "FROMVS [MAXR]",
+            20,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
         self.ui.BoxDocument.setDefaultFont(font)
-        
-        self.ui.BoxDocument.setDefaultFont(font)
+        self.ui.GlyphBoxText.setFont(font)
         self.ui.BoxBlockFormat = qtg.QTextBlockFormat()
         self.ui.GlyphBoxTextFormat = qtg.QTextFormat()
         self.ui.BoxCursor = qtg.QTextCursor(self.ui.BoxDocument)
-        
+
         self.ui.GlyphBoxText.setDocument(self.ui.BoxDocument)
-        
+
         #self.ui.progressBar.valueChanged.connect(self.restartProgressTimer)
         # Initialize statusProgressBar Widget -- invoke addWidget as needed
         self.statusProgressBar = qtw.QProgressBar()
@@ -249,7 +250,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.statusbar.addPermanentWidget(self.statusBoxType)
         self.ui.statusbar.addPermanentWidget(VLine())
         self.ui.statusbar.addPermanentWidget(self.statusBoxModeLabel)
-        self.ui.statusbar.addPermanentWidget(self.statusBoxMode)        
+        self.ui.statusbar.addPermanentWidget(self.statusBoxMode)
         self.ui.statusbar.addPermanentWidget(VLine())
         self.ui.statusbar.addPermanentWidget(self.statusDrawingModeLabel)
         self.ui.statusbar.addPermanentWidget(self.statusDrawingMode)
@@ -260,7 +261,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.statusbar.addPermanentWidget(self.statusSpacerLabel)
 
         self.ui.statusbar.showMessage('Ready...')
-        
+
         #ChrRefText = open(self.userdir + '/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 
@@ -268,7 +269,7 @@ class MainWindow(qtw.QMainWindow):
         self.get_session_settings()
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
-        
+
         self.ui.GlyphImgTab.setCurrentIndex(0)
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
         self.origpixmap = None
@@ -432,24 +433,24 @@ class MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json
         # list
         for Sequence in data:
             print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
-        
+
         # Closing file
         f.close()
 
     def on_lang_select(self):
         self.lang = self.ui.OCRlangComboBox.currentText()
-        if  self.lang == "Ancient Greek" or self.lang == "Middle Greek" or self.lang == "Modern Greek":          
+        if  self.lang == "Ancient Greek" or self.lang == "Middle Greek" or self.lang == "Modern Greek":
             self.ui.LatinEditCharacterToolBar.setVisible(False)
             self.ui.LatinEditGlyphsToolBar.setVisible(False)
             self.ui.GreekEditCharacterToolBar.setVisible(True)
             self.ui.GreekEditGlyphsToolBar.setVisible(True)
-            
-        if  self.lang == "Latin":          
+
+        if  self.lang == "Latin":
             self.ui.GreekEditCharacterToolBar.setVisible(False)
             self.ui.GreekEditGlyphsToolBar.setVisible(False)
             self.ui.LatinEditCharacterToolBar.setVisible(True)
@@ -482,7 +483,7 @@ class MainWindow(qtw.QMainWindow):
             self.imgdir = self.greekpages
             self.imgopentitle = "Open Source Image"
             self.txtopentitle = "Open Source Text"
-            
+
     def initBookCombo(self):
 
         # Opening JSON file
@@ -490,16 +491,16 @@ class MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json
         # list
         for booknumber in data:
             print(booknumber['bookabbr'])
             self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-        
+
         # Closing file
         f.close()
-        
+
         #self.ui.bookComboBox.setEditText(self.bookabbr)'''
 
     def toggleGreekToolbars(self):
@@ -520,16 +521,16 @@ class MainWindow(qtw.QMainWindow):
         if self.ui.LatinEditCharacterToolBar.isVisible():
             self.ui.LatinEditCharacterToolBar.setVisible(False)
         elif not self.ui.LatinEditCharacterToolBar.isVisible():
-            self.ui.LatinEditCharacterToolBar.setVisible(True)      
+            self.ui.LatinEditCharacterToolBar.setVisible(True)
 
     def selectBookCombo(self):
         oldbookabbr = self.bookabbr
         self.bookabbr = self.ui.bookComboBox.currentText()
-        
+
         if self.ui.bookComboBox.currentText() != oldbookabbr:
-                  
+
             jsonfile = self.booksmarkdown
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -540,7 +541,7 @@ class MainWindow(qtw.QMainWindow):
                         self.latinbookmarkdown = 'latin'+bookmarkdown
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
-            
+
             from SessionManager import SessionManager
             SessionManager().update('GlypherSession.json', {
                 'self.bookabbr': self.bookabbr,
@@ -548,7 +549,7 @@ class MainWindow(qtw.QMainWindow):
                 'self.greekbookmarkdown': self.greekbookmarkdown,
                 'self.latinbookmarkdown': self.latinbookmarkdown,
             })
-            
+
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
     def setImageStack(self, tiffCaptureHandle):
@@ -565,7 +566,7 @@ class MainWindow(qtw.QMainWindow):
         """ Load an image stack from file.
         Without any arguments, loadImageStackFromFile() will popup a file dialog to choose the image file.
         With a fileName argument, loadImageStackFromFile(fileName) will attempt to load the specified file directly.
-        
+
         if len(fileName) == 0:
             if QT_VERSION_STR[0] == '4':
                 fileName = QFileDialog.getOpenFileName(self, "Open TIFF stack file.")
@@ -574,7 +575,7 @@ class MainWindow(qtw.QMainWindow):
         fileName = str(fileName)
         if len(fileName) and os.path.isfile(fileName):
             self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
-            
+
     def numFrames(self):
         """ Return the number of image frames in the stack.
         """
@@ -603,23 +604,23 @@ class MainWindow(qtw.QMainWindow):
         self.frame = self.getFrame(i)
         if self.frame is None:
             return
-        
+
     def showLineFrame(self, i=None):
         self.lineframe = self.getFrame(i)
         if self.lineframe is None:
             return
-    
+
     def loadImage(self):
-        #imgdir = self.projecthome + "Model/Project/Images/Workflow"     
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.GlypherWidget,self.imgopentitle,self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]      
+        #imgdir = self.projecthome + "Model/Project/Images/Workflow"
+        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.GlypherWidget,self.imgopentitle,self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
         self.getImage(self.imgpath)
-    
+
     def getImage(self, imgpath):
         if not imgpath:
             return
         self.imgpath = os.path.normpath(imgpath)
         #create file list
-        self.ui.ImageLe.setText(os.path.basename(self.imgpath))       
+        self.ui.ImageLe.setText(os.path.basename(self.imgpath))
         self.imgfile = qtc.QFile(self.imgpath)
         self.imgfilename = os.path.basename(self.imgpath)
         self.imgdir = os.path.normpath(os.path.dirname(self.imgpath))
@@ -640,10 +641,10 @@ class MainWindow(qtw.QMainWindow):
             self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
             self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
             # Convert self.qimage to pixmap
-            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), 
+            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(),
                 qtc.Qt.KeepAspectRatio)
         else:
-            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.Image.size(), 
+            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.Image.size(),
                 qtc.Qt.KeepAspectRatio)
 
         if self.pixmap.isNull():
@@ -684,7 +685,7 @@ class MainWindow(qtw.QMainWindow):
         self.imgpath = self.sorted_imgfilelist[nextidx]
         self.ui.ImageLe.setText(os.path.basename(self.imgpath))
         self.getImage(self.imgpath)
-    
+
     def prevImage(self):
         if not self.imgpath or not self.sorted_imgfilelist:
             return
@@ -708,20 +709,25 @@ class MainWindow(qtw.QMainWindow):
         if self.imgpath:
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
-            self.sortImgFiles()  
-    
+            self.sortImgFiles()
+
     def get_zoom(self):
         self.ui.Zoomslider.setEnabled(True)
         self.ui.Zoomslider.show()
         self.zoomValue = self.ui.Zoomslider.value()
-        
+
     def DisableZoomSlider(self):
         self.ui.Zoomslider.hide()
         self.ui.Zoomslider.setEnabled(False)
 
     def MoveZoomSlider(self):
         self.ui.Zoomslider.setEnabled(True)
-        self.ui.Zoomslider.setValue(int(self.ui.ZoomComboBox.currentText()[0]))
+        try:
+            value = int(self.ui.ZoomComboBox.currentText().replace('%', '').strip())
+        except ValueError:
+            return
+
+        self.ui.Zoomslider.setValue(value)
 
     def show_combo(self):
         self.ui.ZoomComboBox.show()
@@ -733,7 +739,7 @@ class MainWindow(qtw.QMainWindow):
         print(zoomValue)
         self.scale = zoomValue/100
         print(self.scale)
-    
+
     def on_zoom(self):
         if self.qimage:
             self.ui.ZoomComboBox.currentTextChanged.disconnect(self.on_zoom)
@@ -768,7 +774,7 @@ class MainWindow(qtw.QMainWindow):
             else:
                 self.scale = float(int(seltext.split(" ")[0])/100)
                 print(f'Starting scale: {self.scale*100}' + ' %')
-            
+
             print(f'Final scale: {self.scale*100}' + ' %')
 
             self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origpixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
@@ -778,7 +784,7 @@ class MainWindow(qtw.QMainWindow):
                 self.ui.GlyphMap.setPixmap(self.scaled_pixmap)
             else:
                 #elif self.currenttabtext == "Source Page":
-                self.ui.Image.setPixmap(self.scaled_pixmap)          
+                self.ui.Image.setPixmap(self.scaled_pixmap)
             print('Resizing contents')
             self.ui.ImagescrollAreaWidgetContents.resize(self.scale * self.ui.ImagescrollAreaWidgetContents.size())
             print(f'ImagescrollAreaWidgetContents size: {self.ui.ImagescrollAreaWidgetContents.size()}')
@@ -787,7 +793,7 @@ class MainWindow(qtw.QMainWindow):
 
     def resize_image(self):
         if self.qimage:
-            self.origsize = self.origpixmap.size()       
+            self.origsize = self.origpixmap.size()
             self.origheight = self.origpixmap.height
             self.origwidth = self.origpixmap.width
             self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
@@ -798,7 +804,7 @@ class MainWindow(qtw.QMainWindow):
             else:
                 #elif self.currenttabtext == "Source Page":
                 self.ui.Image.setPixmap(self.scaled_pixmap)
-    
+
     def resize_lineimage(self):
 
         self.ui.Line.setDisabled(False)
@@ -807,11 +813,11 @@ class MainWindow(qtw.QMainWindow):
         #if self.qlineimage():
         print('Placing Line label...')
         self.scaled_linepixmap = self.origlinepixmap.scaled(self.scale * self.origlinepixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
-        
+
         #self.ui.Line.resize(self.ui.Line.width(),self.ui.Image.height())
-        #self.ui.Line.setGeometry(int(self.img_xoffset) + self.ui.Image.width() + 1,0,self.ui.Line.width(),self.ui.Image.height())      
+        #self.ui.Line.setGeometry(int(self.img_xoffset) + self.ui.Image.width() + 1,0,self.ui.Line.width(),self.ui.Image.height())
         self.ui.Line.setPixmap(self.scaled_linepixmap)
-        
+
         self.ui.Line.move(self.ui.Image.width(),0)
 
     def GetOCRText(self):
@@ -824,8 +830,8 @@ class MainWindow(qtw.QMainWindow):
 
     def editTable(self):
         if self.ui.tableButton.isChecked():
-            self.ui.stackedWidget.setCurrentIndex(1)   
-    
+            self.ui.stackedWidget.setCurrentIndex(1)
+
     def loadText(self):
         if not self.txtopentitle:
             self.txtopentitle = "Open Text"
@@ -838,9 +844,9 @@ class MainWindow(qtw.QMainWindow):
     def getText(self,textpath):
             self.txtpath = textpath
             self.txtdirname = os.path.dirname(self.txtpath)
-            #create file list 
+            #create file list
             if self.txtpath:
-                #self.ui.GlyphBoxText.setText(os.path.basename(self.txtpath))       
+                #self.ui.GlyphBoxText.setText(os.path.basename(self.txtpath))
                 self.txtfile = qtc.QFile(self.txtpath)
                 self.txtfilename = os.path.basename(self.txtpath)
                 self.txtdirname = os.path.dirname(self.txtpath)
@@ -852,15 +858,15 @@ class MainWindow(qtw.QMainWindow):
                     self.txtfileList.append(tpath)
             self.sortTextFiles()
             self.showText(self.txtpath)
-    
-    def showText(self,txtpath):        
+
+    def showText(self,txtpath):
         self.txtpath = txtpath
         if self.txtpath:
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
-        
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -874,13 +880,13 @@ class MainWindow(qtw.QMainWindow):
             #textfile.close()
             #txtdirpath = os.path.dirname(self.txtpath)
 
-            # update font to selection and size       
+            # update font to selection and size
             self.on_font_update()
-            
+
             # update line spacing
             self.SetLineSpacing()
             file.close()
-       
+
         SessionManager().update('GlypherSession.json', {
             'self.txtpath': self.txtpath,
             'self.txtdir': self.txtdir,
@@ -889,7 +895,7 @@ class MainWindow(qtw.QMainWindow):
     def sortTextFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)     
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)
 
     def nextText(self):
         if self.txtpath:
@@ -919,10 +925,10 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.GlyphBoxText.insertPlainText(text)
                 else:
                     self.ui.GlyphBoxText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_font_update()
-                
+
                 # update line spacing
                 self.SetLineSpacing()
 
@@ -937,19 +943,19 @@ class MainWindow(qtw.QMainWindow):
                     print("finding matched text file for " + self.imgpath)
                     imgfilename = self.imgpath
                     file = qtc.QFile(imgfilename)
-                    filestr = os.path.basename(imgfilename)           
+                    filestr = os.path.basename(imgfilename)
                     filedir = os.path.dirname(imgfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
+                    print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")
                 else:
                     print(self.imgpath + " does not exist")
-                
+
                 self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
                 if self.trytxtpath:
                     print("opening " + self.trytxtpath)
@@ -966,19 +972,19 @@ class MainWindow(qtw.QMainWindow):
                     print("finding matched image file for " + self.txtpath)
                     txtfilename = self.txtpath
                     file = qtc.QFile(txtfilename)
-                    filestr = os.path.basename(txtfilename)           
+                    filestr = os.path.basename(txtfilename)
                     filedir = os.path.dirname(txtfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")
                 else:
                     print(self.txtpath + " does not exist")
-                
+
                 self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
                 if self.tryimgpath:
                     print("opening " + self.tryimgpath)
@@ -989,8 +995,8 @@ class MainWindow(qtw.QMainWindow):
 
 
         def reject():
-            pass        
-        
+            pass
+
         self.ImageTextPairDialog = qtw.QDialog()
         self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
@@ -998,7 +1004,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.ImageTextPairDialog_ui.buttonBox.accepted.connect(accept)
         self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
-  
+
     def GetLineSpacing(self):
         self.ui.LHslider.setEnabled(True)
         self.ui.LHslider.show()
@@ -1011,11 +1017,11 @@ class MainWindow(qtw.QMainWindow):
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
         self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
-    
+
     def SetLineSpacing(self):
-                
-        '''num,ok = qtw.QInputDialog.getInt(self.ui.GlypherWidget,"Proportional Line Spacing","Enter a percent value from 0-200")  
-        
+
+        '''num,ok = qtw.QInputDialog.getInt(self.ui.GlypherWidget,"Proportional Line Spacing","Enter a percent value from 0-200")
+
         if ok:
             lineSpacing = num
         else:
@@ -1023,14 +1029,14 @@ class MainWindow(qtw.QMainWindow):
 
         lineSpacing = self.ui.LHslider.value()
         self.ui.LHlineEdit.setText(str(lineSpacing))
-            
+
         cursor = self.ui.GlyphBoxText.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         bf = self.ui.BoxCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.BoxBlockFormat.ProportionalHeight) 
+        bf.setLineHeight(lineSpacing, self.ui.BoxBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
-    
+
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.GlypherWidget, 'Save Raw text file',self.txtdir,
@@ -1041,7 +1047,7 @@ class MainWindow(qtw.QMainWindow):
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
         file.close()
-        
+
     def SaveAsCorrectedTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.GlypherWidget, 'Save Corrected text file', self.txtdir,
@@ -1054,13 +1060,13 @@ class MainWindow(qtw.QMainWindow):
         file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
-        
+
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
             #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
-        
-        defaultdir = self.txtdir + r"/" 
+
+        defaultdir = self.txtdir + r"/"
         defaultfile = self.ui.TextLE.displayText()
 
         if defaultfile:
@@ -1075,7 +1081,7 @@ class MainWindow(qtw.QMainWindow):
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.BoxDocument.toPlainText()
             file.write(my_CorrectedText)
-        
+
         self.ui.TextLE.setText(filename)
         file.close()
 
@@ -1092,14 +1098,14 @@ class MainWindow(qtw.QMainWindow):
         fb.show()
         #self.explorer.show()
         newapp.exec_()'''
-    
+
     def OpenWithMyPixler(self):
         mw_cmd = "python3 ViewController/Application/0-MainUI/MyPixler.py"
         print(mw_cmd)
         os.system(mw_cmd)
 
     def OpenWithMyWriter(self):
-        
+
         mw_cmd = "python3 ViewController/Application/0-MainUI/MyWriter.py"
         print(mw_cmd)
         os.system(mw_cmd)
@@ -1108,13 +1114,13 @@ class MainWindow(qtw.QMainWindow):
         writer.ui = writer.Ui_MyWriterUI()
         writer.ui.setupUi(writer.MainWindow)
         writer.MainWindow.show()'''
-    
+
     def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference()
         self.chrrefmain.show()
 
     def on_font_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         #font = qtg.QFont()
         #font.setFamily(self.ui.fontComboBox.currentFont())
         #print(self.ui.fontComboBox.currentFont())
@@ -1122,7 +1128,7 @@ class MainWindow(qtw.QMainWindow):
         font.setPointSize(self.ui.fontSizeBox.value())
         #font = qtg.QFont(self.font)
         #font.setPointSize(int(self.fontsize))
-        
+
         self.ui.GlyphBoxText.setFont(font)
 
     def loadwordboximage(self):
@@ -1130,7 +1136,7 @@ class MainWindow(qtw.QMainWindow):
         img = cv2.imread(self.imgpath)
         self.imgdir = os.path.dirname(self.imgpath)
         filestr = os.path.basename(self.imgpath)
-        os.path.splitext(filestr)            
+        os.path.splitext(filestr)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
@@ -1143,7 +1149,7 @@ class MainWindow(qtw.QMainWindow):
         height = int(img.shape[0] * scale_percent / 100)
         dim = (width, height)
         resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)'''
-        
+
         ##############################################
         ##### Detecting Words  ######
         ##############################################
@@ -1163,21 +1169,21 @@ class MainWindow(qtw.QMainWindow):
                     cv2.rectangle(img, (x,y), (x+w, y+h), (255, 50, 50), 2)
                     #cv2.putText(img,b[11],(x,y-5),cv2.FONT_HERSHEY_SIMPLEX,1,(50,50,255),2)
                     # Pass the image to PIL
-                    pil_im = Image.fromarray(img)  
-                    #draw = ImageDraw.Draw(pil_im)  
-                    # use a truetype font  
+                    pil_im = Image.fromarray(img)
+                    #draw = ImageDraw.Draw(pil_im)
+                    # use a truetype font
                     print(f"For Image Line #: {str(imglinenum)} and Image Word #: {str(imgwordnum)} Placing Text Word: {imgword}")
                     #draw.text((x,y-5), imgword, font=font)
                     with open(wordboxcsvpath, mode='a') as file_:
                         file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{x}\t{y}\t{w}\t{h}")
-                        file_.write("\n")  # Next line.        
+                        file_.write("\n")  # Next line.
         file_.close()
         with open(wordboxcsvpath, mode='r') as file_:
             self.ui.GlyphBoxText.clear()
             self.ui.GlyphBoxText.insertPlainText(file_.read())
             self.ui.TextLE.setText(f"{filename}_wordbox.txt")
         self.wordboximagepath = f"Model/Images/Complete/Greek/tif_greek_box/{filename}_wordbox.tif"
-        self.wordboximage = pil_im.save(self.wordboximagepath) 
+        self.wordboximage = pil_im.save(self.wordboximagepath)
         self.ui.ImageLe.setText(f"{filename}_wordbox.tif")
         self.showImage(self.wordboximagepath)
         #image = ImageQt.ImageQt(pil_im)
@@ -1209,7 +1215,7 @@ class MainWindow(qtw.QMainWindow):
                 if int(row[0]) == linecount:
                     print(f"linenum: {row[0]} wordnum: {row[1]}")
                 linecount =+ 1
-  
+
     def sortcroplines(source, linebox, splitdir):
             dest_of_autosplit = splitdir
             dest_of_linebox = linebox
@@ -1228,17 +1234,17 @@ class MainWindow(qtw.QMainWindow):
 
             def removeworkflow(source):
                     shutil.remove(source)
-            
+
             for image in list_of_images:
-            
+
                     img = cv2.imread(os.path.join(path_of_images, image))
 
                     filestr = os.path.basename(os.path.join(path_of_images, image))
-                    
+
                     filesplit = os.path.splitext(filestr)
-                    
+
                     filename = filesplit[0]
-                    
+
                     fileext = filesplit[1]
 
                     #grayscale
@@ -1247,7 +1253,7 @@ class MainWindow(qtw.QMainWindow):
                     #cv2.imshow('gray',gray)
                     #cv2.waitKey(0)
 
-                    #binary 
+                    #binary
                     ret,binary = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
 
                     #binary inversion
@@ -1284,7 +1290,7 @@ class MainWindow(qtw.QMainWindow):
                     bnum = 1
 
                     for i,c in enumerate(ctrs):
-                    
+
                             # Get bounding box
                             x, y, w, h = cv2.boundingRect(c)
                             dividers = int(round(h/150))
@@ -1295,7 +1301,7 @@ class MainWindow(qtw.QMainWindow):
                                     cv2.rectangle(binary,(x,y),( x + w, y + h ),(0,0,255),2)
                                     bnum += 1
                                     saveline(roi,bnum)
-                                    
+
                             # Set height of multi-line contours and subdivide proportionally
                             elif h > 200:
                                     h = int(round(h/dividers))
@@ -1306,19 +1312,19 @@ class MainWindow(qtw.QMainWindow):
                                             bnum += 1
                                             y = y + h
                                             saveline(roi,bnum)
-                                            
-                    
+
+
                     # Write linebox image to file
                     cv2.imwrite(dest_of_linebox + filename + "_linebox" + fileext,binary)
-                    
+
                     #cv2.imshow("box image",image)
                     #cv2.waitKey(0)
                     #print("Writing "+filename+" Glyphbox Image")
-    
+
     # Start of GlyphBox Slots and Methods
-   
+
     # Slots
-    
+
     def on_acceptGlyphBoxEdit(self):
         if self.statusDrawingMode.text() == 'Table':
             self.putSbGlyphBox()
@@ -1326,7 +1332,7 @@ class MainWindow(qtw.QMainWindow):
         if self.statusDrawingMode.text() == 'Mouse':
             self.getRbGlyphBox()
         pass
-    
+
     def on_rDrawSelection(self):
         self.rubberBand = ResizableRubberBand(self)
         self.rubberBand.hide()
@@ -1337,9 +1343,9 @@ class MainWindow(qtw.QMainWindow):
         self.statusDrawingMode.setText("Mouse")
 
         self.ui.GlyphBoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.GlyphBoxTable.currentRow()        
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
         #print("Editing GlyphBoxTable selection")
-        self.ui.ZoomComboBox.setCurrentText('Contents')        
+        self.ui.ZoomComboBox.setCurrentText('Contents')
         self.setPrevGlyphBox()
         # self.getPrevTextGlyphBox()
         self.ui.statusbar.showMessage('Editing GlyphBox image using mouse and QRubberBand')
@@ -1354,15 +1360,15 @@ class MainWindow(qtw.QMainWindow):
         self.statusSelectionMode.setText("Row")
         self.statusDrawingMode.setText("Table")
 
-        self.ui.GlyphBoxTable.setSortingEnabled(False)      
-        self.ui.ZoomComboBox.setCurrentText('Contents')        
+        self.ui.GlyphBoxTable.setSortingEnabled(False)
+        self.ui.ZoomComboBox.setCurrentText('Contents')
 
         self.setPrevGlyphBox()
         #self.on_editGlyphBox(self.row_selected)
         self.on_selectGlyphBox(self.row_selected)
 
         print('Edit GlyphBox image using GlyphBoxTable spinboxes')
-        self.ui.statusbar.showMessage('Edit GlyphBox image using GlyphBoxTable spinboxes') 
+        self.ui.statusbar.showMessage('Edit GlyphBox image using GlyphBoxTable spinboxes')
         # self.ui.GlyphBoxTable.clearSelection()
         self.ui.GlyphBoxTable.setSortingEnabled(False)
         colcount = self.ui.GlyphBoxTable.columnCount() - 6
@@ -1375,7 +1381,7 @@ class MainWindow(qtw.QMainWindow):
             print(f'Current Cell Value: {self.cellvalue}')
             if col == 0:
                 self.tableitem.setFlags(qtc.Qt.ItemIsEditable)
-            elif col == 1:                   
+            elif col == 1:
                 self.currx = int(self.cellvalue)
             elif col == 2:
                 self.curry = int(self.cellvalue)
@@ -1386,25 +1392,25 @@ class MainWindow(qtw.QMainWindow):
 
         print(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh}')
         print(f'Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}')
-        self.ui.statusbar.showMessage(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh} --- Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}') 
+        self.ui.statusbar.showMessage(f'Prev X: {self.prevx} Prev Y: {self.prevy} Prev W: {self.prevw} Prev H: {self.prevh} --- Curr X: {self.currx} Curr Y: {self.curry} Curr W: {self.currw} Curr H: {self.currh}')
         #self.getSpinBox()
-        self.getSpinBoxes()   
+        self.getSpinBoxes()
 
-    def on_insertRowAbove(self):  
+    def on_insertRowAbove(self):
         row = self.ui.GlyphBoxTable.currentRow()
         self.on_editGlyphBox(row)
         if row:
             self.ui.GlyphBoxTable.insertRow(row)
             self.renumberRows()
-            self.GlyphBoxTable2csv() 
-    
+            self.GlyphBoxTable2csv()
+
     def on_insertRowBelow(self):
         row = self.ui.GlyphBoxTable.currentRow()
         self.on_editGlyphBox(row)
         if row:
             self.ui.GlyphBoxTable.insertRow(row+1)
             self.renumberRows()
-            self.GlyphBoxTable2csv() 
+            self.GlyphBoxTable2csv()
 
     def on_deleteRowSelection(self):
         row = self.ui.GlyphBoxTable.currentRow()
@@ -1427,7 +1433,7 @@ class MainWindow(qtw.QMainWindow):
                 self.GlyphBoxTable2csv()
                 self.drawGlyphBoxImage
                 self.saveGlyphBoxImage()
-                self.GlyphBoxText2GlyphBoxTable()        
+                self.GlyphBoxText2GlyphBoxTable()
             else:
                 pass
 
@@ -1435,36 +1441,36 @@ class MainWindow(qtw.QMainWindow):
         # Indexes Selected
         self.ix_selected = current
         self.prev_ix_selected = previous
-        
+
         # Row Selected
-        self.row_selected = current.row()        
+        self.row_selected = current.row()
         # Previous Row Selected
         self.prev_row_selected = previous.row()
-        
+
         self.run_event = False
-        
+
         print(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
         self.ui.statusbar.showMessage(f'Selected Row: {self.row_selected}  Previous Row: {self.prev_row_selected}')
-        
+
         # clear the CellWidgets
         rowcount = self.ui.GlyphBoxTable.rowCount()
         colcount = self.ui.GlyphBoxTable.columnCount()
         for row in range(rowcount):
             for col in range(colcount):
                 self.ui.GlyphBoxTable.removeCellWidget(row,col)
-                 
+
         self.showEditButtons()
         self.ui.GlyphBoxTable.setSortingEnabled(False)
-        self.row_selected = self.ui.GlyphBoxTable.currentRow()        
+        self.row_selected = self.ui.GlyphBoxTable.currentRow()
         print("Editing GlyphBoxTable selection")
         self.ui.ZoomComboBox.setCurrentText('Contents')
         self.ui.GlyphBoxTable.resizeRowsToContents()
         if self.prev_row_selected >= 0:
             self.on_editGlyphBox(self.prev_row_selected)
         if self.ui.NumsCheckBox.isChecked():
-            self.getGlyphBoxImageNums()      
+            self.getGlyphBoxImageNums()
         self.on_selectGlyphBox(self.row_selected)
-        
+
     def on_boxValueChanged(self):
         print('This is the handler for the selected spinbox value that is changed')
         #self.spinbox.valueChanged.disconnect(self.on_boxValueChanged)
@@ -1497,7 +1503,7 @@ class MainWindow(qtw.QMainWindow):
         #Scaled
         #scaled_x,scaled_y,scaled_w,scaled_h = int(self.xval/self.scale),int(self.yval/self.scale),int(self.wval/self.scale),int(self.hval/self.scale)
         #self.drawSbGlyphBox(scaled_x,scaled_y,scaled_w,scaled_h)
-        
+
         #Not Scaled
         self.x_sb_draw = xval
         self.y_sb_draw = yval
@@ -1517,7 +1523,7 @@ class MainWindow(qtw.QMainWindow):
             h = int(self.ui.GlyphBoxTable.item(row,6).text())
             cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,255,0),4)
             pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)        
+            qimage = ImageQt.ImageQt(pil_img)
             self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.pixmap)
             print("Selected glyphbox should be green")
@@ -1532,7 +1538,7 @@ class MainWindow(qtw.QMainWindow):
             h = int(self.ui.GlyphBoxTable.item(prevrow,6).text())
             cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),4)
             pil_img = Image.fromarray(self.norm)
-            qimage = ImageQt.ImageQt(pil_img)        
+            qimage = ImageQt.ImageQt(pil_img)
             self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.pixmap)
 
@@ -1564,13 +1570,13 @@ class MainWindow(qtw.QMainWindow):
         h = self.prevh
         cv2.rectangle(self.norm,(x,y),(x+w, y+h),(255,255,255),4)
         pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)      
+        qimage = ImageQt.ImageQt(pil_img)
         self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
         self.box_color = "white"
         print('Selected glyphbox should be removed (i.e. white, blank or background)')
         self.ui.statusbar.showMessage('Selected glyphbox should be removed (i.e. white, blank or background)')
-      
+
     # Methods
 
     # Table Methods
@@ -1660,13 +1666,13 @@ class MainWindow(qtw.QMainWindow):
                             insertBButton.clicked.connect(self.on_insertRowBelow)
                         elif col == 9:
                             deleteButton.setEnabled(True)
-                            deleteButton.show() 
+                            deleteButton.show()
                             deleteIcon = qtg.QIcon()
                             deleteIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/deleterow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             deleteButton.setIcon(deleteIcon)
                             deleteButton.setIconSize(QSize(12,12))
                             self.ui.GlyphBoxTable.setCellWidget(row,col,deleteButton)
-                            deleteButton.clicked.connect(self.on_deleteRowSelection)                                 
+                            deleteButton.clicked.connect(self.on_deleteRowSelection)
                         elif col == 10:
                             rDrawButton.setEnabled(True)
                             rDrawButton.show()
@@ -1695,15 +1701,15 @@ class MainWindow(qtw.QMainWindow):
                             acceptButton.setIconSize(QSize(12,12))
                             self.ui.GlyphBoxTable.setCellWidget(row,col,acceptButton)
                             acceptButton.clicked.connect(self.on_acceptGlyphBoxEdit)
-                        
+
     def GlyphBoxText2GlyphBoxTable(self):
         #self.ui.GlyphBoxTable.clearContents()
         boxes = []
         reader = csv.reader(open(self.glyphboxgreektxtpath), delimiter = '\t')
-        
+
         for row in reader:
             boxes.append(row)
-        
+
         if self.statusBoxMode.text() == "Make":
             boxes = boxes[0:]
         else:
@@ -1712,7 +1718,7 @@ class MainWindow(qtw.QMainWindow):
         rowCount = len(boxes)
         self.ui.GlyphBoxTable.setRowCount(rowCount)
         colcount = self.ui.GlyphBoxTable.columnCount()
-        print(f'GlyphBoxTable column count: {colcount}')              
+        print(f'GlyphBoxTable column count: {colcount}')
         self.ui.GlyphBoxTable.setSortingEnabled(False)
         #self.ui.GlyphBoxTable.clearContents()
         for row, boxes in enumerate(boxes):
@@ -1725,14 +1731,14 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.GlyphBoxTable.setItem(row, column, newItem)
                 elif column >= 1 and column <= 2:
                      #print(f'Updating GlyphBoxTable column: {column}')
-                    newItem = qtw.QTableWidgetItem(value)                    
+                    newItem = qtw.QTableWidgetItem(value)
                     #Not Scaled
                     newVal = newItem.text()
                     newItem.setText(str(newVal))
                     self.ui.GlyphBoxTable.setItem(row, column, newItem)
                 elif column >= 3 and column <= 6:
                     #print(f'Updating GlyphBoxTable column: {column}')
-                    newItem = qtw.QTableWidgetItem(value)                    
+                    newItem = qtw.QTableWidgetItem(value)
                     #Not Scaled
                     newVal = int(newItem.text())
                     newItem.setText(str(newVal))
@@ -1762,7 +1768,7 @@ class MainWindow(qtw.QMainWindow):
             else:
                 item.setText(str(row+1))
             self.ui.GlyphBoxTable.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
-    
+
     def openTableMenu(self,position):
         tableMenu = QMenu()
 
@@ -1812,11 +1818,11 @@ class MainWindow(qtw.QMainWindow):
         self.path_of_imgglyphbox = self.glyphboxgreekimgdir + r"/" + self.greekbookmarkdown + r"/"
         self.path_of_txtglyphbox = self.glyphboxgreektxtdir + r"/" + self.greekbookmarkdown + r"/"
         self.path_of_jsonglyphbox = self.glyphboxgreekjsondir + r"/" + self.greekbookmarkdown + r"/"
-        
+
         self.imgfilestr = os.path.basename(self.imgpath)
         self.imgfilesplit = os.path.splitext(self.imgfilestr)
         self.imgfilename = self.imgfilesplit[0]
-        self.imgfileext = self.imgfilesplit[1]        
+        self.imgfileext = self.imgfilesplit[1]
         self.imgglyphboxfile = self.projecthome + self.imgfilename + "_glyphbox" + self.imgfileext
         self.boximgpath = self.imgglyphboxfile
 
@@ -1845,7 +1851,7 @@ class MainWindow(qtw.QMainWindow):
     def getGlyphBoxImageNums(self):
         # Place and remove box/row numbers
         pass
-    
+
     def getGlyphBoxImageGlyphs(self):
         rowcount = self.ui.GlyphBoxTable.rowCount()
         for row in range(rowcount):
@@ -1863,26 +1869,26 @@ class MainWindow(qtw.QMainWindow):
                 print(f'Removing line number at : {linex},{liney}')
                 cv2.putText(self.norm,line,(linex,liney),cv2.FONT_HERSHEY_SIMPLEX,2,(255,255,255),3)
         pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)        
+        qimage = ImageQt.ImageQt(pil_img)
         self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
 
     def saveGlyphBoxImageGlyph(self,roi,bnum):
         PILimage = Image.fromarray(roi)
         thresh = 127
-        fn = lambda x : 255 if x > thresh else 0 
+        fn = lambda x : 255 if x > thresh else 0
         PIL_BWtif = PILimage.convert('L').point(fn, mode='1')
         tif_outfile = self.glyphtifgreekdir + "/" + self.imgfilename + "_glyph_" + str(bnum) + ".tif"
         print("Generating Glyph tif: " + tif_outfile)
-        PIL_BWtif.save(tif_outfile, "TIFF", dpi=(300,300)) 
+        PIL_BWtif.save(tif_outfile, "TIFF", dpi=(300,300))
 
         #PIL_BWbmp = PIL_BWtif.tobitmap(self.imgfilename)
         bmp_outfile = self.glyphbmpgreekdir + "/" + self.imgfilename + "_glyph_" + str(bnum) + ".bmp"
         print("Generating Glyph bmp: " + bmp_outfile)
-        PIL_BWtif.save(bmp_outfile) 
-   
-    # GlyphBox Image Methods    
-    
+        PIL_BWtif.save(bmp_outfile)
+
+    # GlyphBox Image Methods
+
     def saveGlyphBoxImage(self):
         self.imgboxfile = self.path_of_imgglyphbox + self.imgfilename + "_glyphbox" + self.imgfileext
         #self.ui.statusbar.showMessage(f'Saving GlyphBox file: {self.imgboxfile}')
@@ -1891,7 +1897,7 @@ class MainWindow(qtw.QMainWindow):
         self.boximgpath = self.imgboxfile
         self.showImage(self.boximgpath)
         if self.ui.NumsCheckBox.isChecked():
-            self.getGlyphBoxImageGlyphs() 
+            self.getGlyphBoxImageGlyphs()
 
     def drawGlyphBoxImage(self):
         print(f'Drawing Glyphbox Image from GlyphBoxText: \n {self.txtpath}')
@@ -1917,7 +1923,7 @@ class MainWindow(qtw.QMainWindow):
                 self.saveGlyphBoxImageGlyph(roi,bnum)
                 bnum += 1
         txtboxfile.close()
-  
+
     def setPrevGlyphBox(self):
         self.ui.GlyphBoxTable.setSortingEnabled(False)
         self.row_selected = self.ui.GlyphBoxTable.currentRow()
@@ -1929,7 +1935,7 @@ class MainWindow(qtw.QMainWindow):
         self.prevy = int(self.ui.GlyphBoxTable.item(row,4).text())
         self.prevw = int(self.ui.GlyphBoxTable.item(row,5).text())
         self.prevh = int(self.ui.GlyphBoxTable.item(row,6).text())
-     
+
     def getPrevTextGlyphBox(self):
         self.ui.GlyphBoxTable.setSortingEnabled(False)
         self.row_selected = self.ui.GlyphBoxTable.currentRow()
@@ -1974,9 +1980,9 @@ class MainWindow(qtw.QMainWindow):
         self.saveGlyphBoxImageGlyph(roi,self.line)
         self.statusDrawingMode.setText("None")
 
-    def drawRbGlyphBox(self):    
+    def drawRbGlyphBox(self):
         if self.statusDrawingMode.text() == "Mouse":
-            x = self.x_rb_draw 
+            x = self.x_rb_draw
             y = self.y_rb_draw
             w = self.w_rb_draw
             h = self.h_rb_draw
@@ -1985,14 +1991,14 @@ class MainWindow(qtw.QMainWindow):
             #self.saveGlyphBoxImage()
             self.showImage(self.boximgpath)
             self.putRbGlyphBox()
-        
+
         if self.rubberBand:
             self.rubberBand.hide()
             self.rubberBand = None
 
     def getRbGlyphBox(self):
         #self.rubberBand.hide()
-        self.run_event = True       
+        self.run_event = True
         if self.statusDrawingMode.text() == "Mouse":
             # At scale DrawGlyphBox QRect at GlyphBox Image offset from MainWindow origin(0,0)
             DrawImg_xs = self.x_rb - int(self.img_xoffset)
@@ -2003,7 +2009,7 @@ class MainWindow(qtw.QMainWindow):
             DrawImg_hs = self.h_rb
             DrawImg_sqrect = QRect(DrawImg_xs,DrawImg_ys,DrawImg_ws,DrawImg_hs)
             print("Offset Scaled QRect = " + str(DrawImg_sqrect))
-            
+
             # Up scale DrawGlyphBox QRect at GlyphBox Image previously offset from MainWindow origin(0,0)
             self.x_rb_draw = int(round(DrawImg_xs / self.scale))
             self.y_rb_draw = int(round(DrawImg_ys / self.scale))
@@ -2014,7 +2020,7 @@ class MainWindow(qtw.QMainWindow):
 
             print(f'x_rb_draw: {self.x_rb_draw} y_rb_draw: {self.y_rb_draw} w_rb_draw: {self.w_rb_draw} h_rb_draw: {self.h_rb_draw}')
             self.drawRbGlyphBox()
-    
+
     # Spinbox(Sb) Drawing Methods
     def putSbGlyphBox(self):
         row = self.ui.GlyphBoxTable.currentRow()
@@ -2022,9 +2028,9 @@ class MainWindow(qtw.QMainWindow):
         y = self.y_sb_draw
         w = self.w_sb_draw
         h = self.h_sb_draw
-        
-        # Update GlyphBoxText and GlyphBoxTable 
-        
+
+        # Update GlyphBoxText and GlyphBoxTable
+
         self.line = int(self.ui.GlyphBoxTable.item(row,0).text())
         print(f'Updating GlyphBoxText JSON and CSV files for line:{str(self.line)} with str values: x:{str(x)}, y:{str(y)}, w:{str(w)}, h:{str(h)}')
         self.update_GlyphBoxText(str(self.line),str(x),str(y),str(w),str(h))
@@ -2052,10 +2058,10 @@ class MainWindow(qtw.QMainWindow):
             self.putSbGlyphBox()
         #elif popup.clickedButton() == qtw.QMessageBox.Cancel:
         else:
-            #self.clearSpinBoxes()           
+            #self.clearSpinBoxes()
             self.GlyphBoxText2GlyphBoxTable()
 
-    def drawSbGlyphBox(self):        
+    def drawSbGlyphBox(self):
         x = int(self.x_sb_draw)
         y = int(self.y_sb_draw)
         w = int(self.w_sb_draw)
@@ -2064,14 +2070,14 @@ class MainWindow(qtw.QMainWindow):
         self.ui.statusbar.showMessage(f'Spinbox values: x:{x} y:{y} w:{w} h:{h}')
         cv2.rectangle(self.norm,(x,y),(x+w, y+h),(0,0,255),2)
         pil_img = Image.fromarray(self.norm)
-        qimage = ImageQt.ImageQt(pil_img)        
+        qimage = ImageQt.ImageQt(pil_img)
         self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
 
     def getSpinBoxes(self):
         self.row_selected = self.ui.GlyphBoxTable.currentRow()
         row = self.row_selected
-        #self.col_selected = self.ui.GlyphBoxTable.currentColumn() 
+        #self.col_selected = self.ui.GlyphBoxTable.currentColumn()
         #print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
         for column in range(1,5):
             value = self.ui.GlyphBoxTable.item(row,column).text()
@@ -2088,24 +2094,24 @@ class MainWindow(qtw.QMainWindow):
             #spinbox.setStepType(qtw.QAbstractSpinBox.DefaultStepType)
             #spinbox.setStepType(qtw.QAbstractSpinBox.AdaptiveDecimalStepType)
             #spinbox.setCorrectionMode(qtw.QAbstractSpinBox.CorrectToNearestValue)
-            
+
             # getting font of the spin box
             font = spinbox.font()
             # setting point size
             font.setPointSize(8)
             # reassigning this font to the spin box
             spinbox.setFont(font)
-        
+
             spinbox.setFixedWidth(50)
             spinbox.setValue(int(value))
             self.ui.GlyphBoxTable.setCellWidget(row,column,spinbox)
             self.ui.GlyphBoxTable.resizeRowToContents(row)
             self.ui.GlyphBoxTable.resizeColumnToContents(column)
-            spinbox.valueChanged.connect(self.on_boxValueChanged)        
+            spinbox.valueChanged.connect(self.on_boxValueChanged)
 
     '''def getSpinBox(self):
         self.row_selected = self.ui.GlyphBoxTable.currentRow()
-        self.col_selected = self.ui.GlyphBoxTable.currentColumn() 
+        self.col_selected = self.ui.GlyphBoxTable.currentColumn()
         print(f'Selected Cell Location:  Row: {self.row_selected} Column: {self.col_selected} Cell Value: {self.cellvalue}')
         self.spinbox = QSpinBox(self.ui.GlyphBoxTable) #changed parent from None to self.ui.GlyphBoxTable - could also be just self
         #self.spinbox.setMaximum(6000)
@@ -2113,28 +2119,28 @@ class MainWindow(qtw.QMainWindow):
         self.spinbox.setValue(int(self.cellvalue))
         self.ui.GlyphBoxTable.setCellWidget(self.row_selected,self.col_selected,self.spinbox)
         self.spinbox.valueChanged.connect(self.on_boxValueChanged)'''
-    
+
     # GlyphBox Text Methods
     def json2csv(self, csvFilePath, jsonFilePath):
         columns = ['Glyph','X','Y','W','H']
         df = pd.read_json (jsonFilePath)
         df = df[columns]
         df.to_csv(csvFilePath, sep='\t', header=True, index=False, encoding='utf-8')
-    
+
     def csv2json(self, csvFilePath, jsonFilePath):
         jsonArray = []
         #read csv file
-        with open(csvFilePath, encoding='utf-8') as csvf: 
+        with open(csvFilePath, encoding='utf-8') as csvf:
             #load csv file data using csv library's dictionary reader
-            csvReader = csv.DictReader(csvf, delimiter = '\t') 
+            csvReader = csv.DictReader(csvf, delimiter = '\t')
 
             #convert each csv dictionary row into json array
-            for row in csvReader: 
+            for row in csvReader:
                 #add this python dict to json array
                 jsonArray.append(row)
-    
+
         #write jsonArray to file
-        with open(jsonFilePath, 'w', encoding='utf-8') as jsonf: 
+        with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
             json.dump(jsonArray, jsonf, indent=4)
 
     # Make GlyphBox Method
@@ -2143,14 +2149,14 @@ class MainWindow(qtw.QMainWindow):
         self.statusBoxMode.setText('Make')
         self.statusBoxType.setText('Glyph')
         self.statusDrawingMode.setText('Auto')
-        
+
         # Activate the Source Tab
         self.ui.GlyphImgTab.setCurrentIndex(0)
 
         #If no source page image present, then load one.
         if self.ui.ImageLe.displayText() == "":
             self.loadImage()
-        else:    
+        else:
             print('Open Make Image message dailog')
             popup = qtw.QMessageBox(self)
             popup.setIcon(qtw.QMessageBox.Information)
@@ -2160,7 +2166,7 @@ class MainWindow(qtw.QMainWindow):
             otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
             popup.exec()
             if popup.clickedButton() == currentButton:
-                pass      
+                pass
             elif popup.clickedButton() == otherButton:
                 self.ui.ImageLe.clear()
                 self.ui.Image.clear()
@@ -2170,7 +2176,7 @@ class MainWindow(qtw.QMainWindow):
                 # Get imgglyphbox source file
                 self.loadImage()
 
-        
+
         # setting value to progress bar
         self.ui.progressBar.setValue(10)
         # Make GlyphBox File Pair
@@ -2183,7 +2189,7 @@ class MainWindow(qtw.QMainWindow):
         img = cv2.imread(self.imgpath)
         self.imgdir = os.path.dirname(self.imgpath)
         filestr = os.path.basename(self.imgpath)
-        os.path.splitext(filestr)            
+        os.path.splitext(filestr)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
@@ -2196,12 +2202,12 @@ class MainWindow(qtw.QMainWindow):
         #############################################
         '''Load GlyphBox Image'''
         hImg, wImg,_ = img.shape
-        glyphboxes = pytesseract.image_to_boxes(img,lang="feg")  
+        glyphboxes = pytesseract.image_to_boxes(img,lang="feg")
         print(f'Image Height: {hImg} Width: {wImg}')
         print(f'x-Offset:{self.img_xoffset}  Y-Offset:{self.img_yoffset}')
-        #draw = ImageDraw.Draw(pil_im)  
+        #draw = ImageDraw.Draw(pil_im)
         # use a truetype font
-        # font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8) 
+        # font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8)
         glyphcount = 1
         self.ui.progressBar.setValue(40)
         if os.path.exists(self.glyphboxgreektxtpath):
@@ -2248,7 +2254,7 @@ class MainWindow(qtw.QMainWindow):
                     #cv2.imshow("ROI",roi)
                     self.saveGlyphBoxImageGlyph(roi,glyphcount)
             glyphcount += 1
-        self.ui.progressBar.setValue(75)        
+        self.ui.progressBar.setValue(75)
         file_.close()
         self.glyphcount = glyphcount
         with open(self.glyphboxgreektxtpath, mode='r') as file_:
@@ -2256,20 +2262,20 @@ class MainWindow(qtw.QMainWindow):
             self.ui.GlyphBoxText.insertPlainText(file_.read())
             self.ui.TextLE.setText(f"{filename}_glyphbox.txt")
         # Pass the image to PIL and convert to pixmap
-        pil_im = Image.fromarray(img) 
+        pil_im = Image.fromarray(img)
         #show pixmap  #### moved below to GlyphImgTab.setCurrentIndex(1), which handles it all
-        self.ui.progressBar.setValue(85) 
+        self.ui.progressBar.setValue(85)
         #save glyphbox image and show filename
         self.glyphbox = pil_im.save(self.glyphboxgreekimgpath)
         self.ui.ImageLe.setText(f"{filename}_glyphbox.tif")
         self.ui.progressBar.setValue(90)
         # check current tab and show pixmap
-        self.ui.GlyphImgTab.setCurrentIndex(1)  
+        self.ui.GlyphImgTab.setCurrentIndex(1)
         self.GlyphBoxText2GlyphBoxTable()
         self.ui.progressBar.setValue(101)
-        self.ui.progressBar.reset()   
+        self.ui.progressBar.reset()
 
-    # Edit GlyphBox Method    
+    # Edit GlyphBox Method
     def glyphbox_edit_split(self):
         self.ui.statusbar.showMessage('Loading the GlyphBox file pair for editing')
         start = time.perf_counter()
@@ -2293,7 +2299,7 @@ class MainWindow(qtw.QMainWindow):
             elif popup.clickedButton() == otherButton:
                 self.ui.ImageLe.clear()
                 self.ui.GlyphBox.clear()
-        
+
         if self.ui.ImageLe.displayText() == "":
             # Get imgglyphbox source file
             self.loadImage()
@@ -2302,17 +2308,17 @@ class MainWindow(qtw.QMainWindow):
             self.ui.ImageLe.setText(self.imgfilename + "_glyphbox.txt")
             # Normalize indexed tif source file to RGB image
             self.normImage()
-        else: 
-            self.showImage(self.imgpath)       
+        else:
+            self.showImage(self.imgpath)
             self.ui.ImageLe.setText(self.imgfilename + "_glyphbox.txt")
-  
+
         # setting value to progress bar
         self.ui.progressBar.setValue(10)
         self.ui.TextLE.clear()
         self.ui.TextLE.setText(self.txtfilestr)
         imgfilename = self.ui.ImageLe.displayText().split(r".")[0]
         txtfilename = self.ui.TextLE.displayText().split(r".")[0]
-        
+
         # Get matching GlyphBoxText file
         print(f'Text File Name: {txtfilename}  Image File Name: {imgfilename}')
         if txtfilename == imgfilename:
@@ -2330,8 +2336,8 @@ class MainWindow(qtw.QMainWindow):
             self.row_current = self.ui.GlyphBoxTable.currentRow()
             self.startEditLoop = True
             self.ui.GlyphBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
-        else:   
-            print(f'The glyphbox text: {txtfilename} does not match the glyphbox image: {imgfilename} -- Please try again!')        
+        else:
+            print(f'The glyphbox text: {txtfilename} does not match the glyphbox image: {imgfilename} -- Please try again!')
 
         self.ui.progressBar.setValue(101)
         self.ui.progressBar.reset()
@@ -2346,10 +2352,10 @@ class MainWindow(qtw.QMainWindow):
             self.statusBoxType.setText('Glyph')
             self.statusDrawingMode.setText('Auto')
             #If no page image present, then load one.
-            
+
             if self.ui.ImageLe.displayText() == "":
                 self.loadImage()
-            else:    
+            else:
                 print('Open Make Image message dailog')
                 popup = qtw.QMessageBox(self)
                 popup.setIcon(qtw.QMessageBox.Information)
@@ -2359,7 +2365,7 @@ class MainWindow(qtw.QMainWindow):
                 otherButton = popup.addButton('Make Other', qtw.QMessageBox.YesRole)
                 popup.exec()
                 if popup.clickedButton() == currentButton:
-                    pass      
+                    pass
                 elif popup.clickedButton() == otherButton:
                     self.ui.ImageLe.clear()
                     self.ui.Image.clear()
@@ -2409,7 +2415,7 @@ class MainWindow(qtw.QMainWindow):
                         # Set height validation of contour to eliminate unwanted boxes
                         if h>120 and h<200:
                                 roi = binary[y:y+h, x:x+w]
-                                cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)                                                                              
+                                cv2.rectangle(self.norm,(x,y),( x + w, y + h ),(0,0,255),2)
                                 # Append to GlyphBoxText
                                 #boxlinestr = str(bnum) + ',' + str(x) + ',' + str(y) + ',' + str(w) + ',' + str(h) + ',' + str(x+w) + ',' + str(y+h) + '\n'
                                 boxlinestr = str(bnum) + '\t' + str(x) + '\t' + str(y) + '\t' + str(w) + '\t' + str(h) + '\n'
@@ -2433,16 +2439,16 @@ class MainWindow(qtw.QMainWindow):
                         # setting value to progress bar
                         self.ui.progressBar.setValue(bnum)
             print(f'Created GlyphBox Text File: {self.txtpath}')
-            #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"                                  
+            #self.txtpath = self.path_of_txtlinebox + self.imgfilename + "_linebox.txt"
             txtboxfile.close()
             self.ui.progressBar.setValue(50)
-            
+
             # Write Text Box File to GlyphBoxTable TableWidget
             self.GlyphBoxText2GlyphBoxTable()
             self.ui.progressBar.setValue(75)
 
             # Overwrite Text Box File from GlyphBoxTable TableWidget
-            # Already wrote the txtboxfile, above; so,likely unecessary 
+            # Already wrote the txtboxfile, above; so,likely unecessary
             self.GlyphBoxTable2csv()
             self.ui.progressBar.setValue(85)
 
@@ -2472,11 +2478,11 @@ class MainWindow(qtw.QMainWindow):
             popup.exec()
             if popup.clickedButton() == currentButton:
                 pass
-                
+
             elif popup.clickedButton() == otherButton:
                 self.ui.ImageLe.clear()
                 self.ui.Image.clear()
-        
+
         if self.ui.ImageLe.displayText() == "":
             # Get imglinebox source file
             self.loadImage()
@@ -2485,10 +2491,10 @@ class MainWindow(qtw.QMainWindow):
             self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
             # Normalize indexed tif source file to RGB image
             self.normImage()
-        else: 
-            self.showImage(self.imgpath)       
+        else:
+            self.showImage(self.imgpath)
             self.ui.ImageLe.setText(self.imgfilename + "_linebox.tif")
-  
+
         # setting value to progress bar
         self.ui.progressBar.setValue(10)
 
@@ -2511,8 +2517,8 @@ class MainWindow(qtw.QMainWindow):
             self.row_current = self.ui.GlyphBoxTable.currentRow()
             self.startEditLoop = True
             self.ui.GlyphBoxTable.selectionModel().currentRowChanged.connect(self.on_currentRowChanged)
-        else:   
-            print(f'The linebox text: {txtfilename} does not match the linebox image: {imgfilename} -- Please try again!')        
+        else:
+            print(f'The linebox text: {txtfilename} does not match the linebox image: {imgfilename} -- Please try again!')
 
         self.ui.progressBar.setValue(101)
         self.ui.progressBar.reset()
@@ -2536,7 +2542,7 @@ class MainWindow(qtw.QMainWindow):
             #print(f'ymax: {y_max}')
         else:
             self.run_event = False
-            print('You cannot draw without a loaded image') 
+            print('You cannot draw without a loaded image')
         if self.statusBoxMode.text() == "Edit":
             if self.statusDrawingMode.text() == "Mouse":
                 self.event_x = event.pos().x()
@@ -2559,8 +2565,8 @@ class MainWindow(qtw.QMainWindow):
                 else:
                     self.run_event = False
                     print('You cannot draw without a loaded image')'''
-                
-                if event.button() == Qt.LeftButton and self.run_event == True:          
+
+                if event.button() == Qt.LeftButton and self.run_event == True:
                     if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
                         #if self.rubberBand.w() != 0 and self.rubberBand.h() != 0:
                         #self.rubberBand = ResizableRubberBand(self)
@@ -2590,7 +2596,7 @@ class MainWindow(qtw.QMainWindow):
                                 self.ui.GlyphBoxTable.selectRow(row)
 
     def mouseMoveEvent(self, event):
-        if self.statusBoxMode.text() == "Edit" and self.run_event: 
+        if self.statusBoxMode.text() == "Edit" and self.run_event:
             self.end_pos = event.pos()
             self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
             row = self.ui.GlyphBoxTable.currentRow()
@@ -2605,14 +2611,14 @@ class MainWindow(qtw.QMainWindow):
             self.ui.GlyphBoxTable.item(row,3).setText(str(int(round(self.w_rb/self.scale))))
             self.ui.GlyphBoxTable.item(row,4).setText(str(int(round(self.h_rb/self.scale))))
             self.ui.statusbar.showMessage(f'x:{self.x_rb} y:{self.y_rb} w:{self.w_rb} h:{self.h_rb}')
-    
+
     #def mouseReleaseEvent(self, event):
-        
+
     # Utility Methods
     def renameimages(source, destination):
             def sorted_alphanumeric(data):
                     convert = lambda text: int(text) if text.isdigit() else text.lower()
-                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
                     return sorted(data, key=alphanum_key)
                     #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
@@ -2646,13 +2652,13 @@ class MainWindow(qtw.QMainWindow):
                             newpagenum = pagenum
                     print("pagenum: " + pagestr + "  newpagenum: " + str(newpagenum) + "  linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
                     shutil.copy(path_of_images + filestr, dest_of_images + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
-                    newlinenum += 1 
+                    newlinenum += 1
                     print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
 
     def moveimages(source, destination):
             def sorted_alphanumeric(data):
                     convert = lambda text: int(text) if text.isdigit() else text.lower()
-                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
                     return sorted(data, key=alphanum_key)
                     #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
@@ -2668,64 +2674,64 @@ class MainWindow(qtw.QMainWindow):
             newlinenum = 1
 
             for image in list_of_images:
-            
+
                     img = cv2.imread(os.path.join(path_of_images, image))
 
                     height, width = img.shape[:2]
-                    
+
                     filestr = os.path.basename(os.path.join(path_of_images, image))
-                    
+
                     filesplit = os.path.splitext(filestr)
-                    
+
                     filename = filesplit[0]
-                    
+
                     fileext = filesplit[1]
-                    
+
                     namesplit = filename.split("_")
-                    
+
                     versionref = namesplit[0]
-                    
+
                     pagestr = namesplit[2]
-                    
+
                     pagenum = int(pagestr)
-                    
+
                     linestr = namesplit[3]
                     #print(versionref,pagenum,linestr)
-                    
+
                     linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
                     #print("Last digits of "+filename+" are "+last_digits)
-                    
+
                     if pagenum > newpagenum:
-                            
+
                             newlinenum = 1
-                            
+
                             newpagenum = pagenum
-                    
+
                     print("pagenum: " + pagestr + "  newpagenum: " + str(newpagenum) + "  linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
-                            
+
                     shutil.move(path_of_images + filestr, dest_of_groundtruth + versionref + "_Page_" + pagestr + "_Line" + str(newlinenum) + fileext)
-                    
-                    newlinenum += 1 
+
+                    newlinenum += 1
                             #print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
-    
+
     def splittextlines(self, source, destination):
                 dest_of_textlinefiles = destination
                 path_of_textfiles = source
                 print(f'source:  {source} destination {destination}')
                 list_of_textfiles = os.listdir(path_of_textfiles)
-                        
+
                 for tfile in list_of_textfiles:
-                
+
                         textfile = open(path_of_textfiles + tfile)
-                        
+
                         filestr = os.path.basename(path_of_textfiles + tfile)
-                        
+
                         filesplit = os.path.splitext(filestr)
-                        
+
                         filename = filesplit[0]
-                        
+
                         fileext = filesplit[1]
-                
+
                         for cnt, line in enumerate(textfile):
                                 # open file to write line
                                 outF = open(dest_of_textlinefiles + filename + "_Line" + str(cnt + 1) + fileext, "w")
@@ -2739,7 +2745,7 @@ class MainWindow(qtw.QMainWindow):
     def text2groundtruth(source, destination):
             def sorted_alphanumeric(data):
                     convert = lambda text: int(text) if text.isdigit() else text.lower()
-                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+                    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
                     return sorted(data, key=alphanum_key)
                     #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
@@ -2753,41 +2759,41 @@ class MainWindow(qtw.QMainWindow):
                     '''filestr = os.path.basename(os.path.join(path_of_textfiles, textfile))
 
                     print(dest_of_groundtruth + filestr)
-                            
+
                     shutil.copy(path_of_textfiles + filestr, dest_of_groundtruth + filestr)'''
-                    
+
                     filestr = os.path.basename(os.path.join(path_of_textfiles, textfile))
 
                     filesplit = os.path.splitext(filestr)
-                    
+
                     filename = filesplit[0]
-                    
+
                     fileext = filesplit[1]
-                    
+
                     namesplit = filename.split("_")
-                    
+
                     versionref = namesplit[0]
-                    
+
                     pagestr = namesplit[2]
-                    
+
                     pagenum = int(pagestr)
-                    
+
                     linestr = namesplit[3]
-                    
+
                     print(font_name + versionref + "_Page_" + pagestr + "_" + linestr + fileext)
-        
-                    shutil.move(path_of_textfiles + filestr, dest_of_groundtruth + font_name + versionref + "_Page_" + pagestr + "_" + linestr + fileext)   
+
+                    shutil.move(path_of_textfiles + filestr, dest_of_groundtruth + font_name + versionref + "_Page_" + pagestr + "_" + linestr + fileext)
 
     # Style Sheets
     def darkOrange(self):
         app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_orange.qss').read_text())
-        
+
     def darkBlue(self):
         app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_blue.qss').read_text())
-                
+
     def classic(self):
         app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/classic.qss').read_text())
-            
+
     def standardUI(self):
         app.setStyleSheet("")
 
@@ -2811,7 +2817,7 @@ class ResizableRubberBand(QWidget):
         self.rubberband.move(0, 0)
         self.rubberband.show()
         # self.show()
-        
+
     def resizeEvent(self, event):
         self.rubberband.resize(self.size())
         row = self.parent().ui.GlyphBoxTable.currentRow()
@@ -2827,7 +2833,7 @@ class ResizableRubberBand(QWidget):
         #super(ResizableRubberBand, self).resizeEvent(event)
 
 # Only run this code if I am actually running this script
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
     w.show()

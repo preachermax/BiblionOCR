@@ -32,11 +32,13 @@ class Main(qtw.QMainWindow):
         add_help_menu(self, 'MyWriter')
         self.session_manager = SessionManager()
         self.initUI()
-        
+
         self.ui.TextDocument = qtg.QTextDocument(self.ui.textEdit)
-        self.font = qtg.QFont()
-        self.font.setFamily("FROMVS [MAXR]")
-        self.font.setPointSize(20)
+        self.font = self.session_manager.build_workflow_font(
+            "FROMVS [MAXR]",
+            20,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
         self.ui.TextDocument.setDefaultFont(self.font)
         self.ui.TextBlockFormat = qtg.QTextBlockFormat()
         #self.ui.TextFormat = qtg.QTextFormat()
@@ -88,7 +90,7 @@ class Main(qtw.QMainWindow):
         self.session_manager.update('Session.json', updates)
 
     def initToolbar(self):
-        # new widgets       
+        # new widgets
         self.textLineEdit = qtw.QLineEdit(self)
         self.textLineEdit.setEnabled(True)
         self.textLineEdit.setFixedSize(300, 25)
@@ -100,10 +102,10 @@ class Main(qtw.QMainWindow):
         self.textLineEdit.setAlignment(qtc.Qt.AlignCenter)
         self.textLineEdit.setObjectName("textLineEdit")
         self.textLineEdit.setPlaceholderText(os.path.basename(self.txtpath))
-        
+
         # add widgets
         self.ui.toolbar.addWidget(self.textLineEdit)
-        
+
         # signals(slots)
         self.ui.actionImport.triggered.connect(self.importfile)
         self.ui.actionNew.triggered.connect(self.new)
@@ -137,9 +139,9 @@ class Main(qtw.QMainWindow):
         self.LHlineEdit.setObjectName("LHlineEdit")
         self.LHlineEdit.setPlaceholderText(str(self.ui.LHslider.value()))
 
-        # add widgets        
+        # add widgets
         self.ui.formatbar.addWidget(self.LHlineEdit)
-       
+
         # signals(slots)
         self.ui.actionHighlightText.triggered.connect(self.highlight)
         self.ui.actionLeftJustify.triggered.connect(self.alignLeft)
@@ -190,7 +192,7 @@ class Main(qtw.QMainWindow):
 
         editbarAction = qtw.QAction("Toggle Filebar",self)
         editbarAction.triggered.connect(self.toggleEditbar)
-        
+
         formatbarAction = qtw.QAction("Toggle Formatbar",self)
         formatbarAction.triggered.connect(self.toggleFormatbar)
 
@@ -210,7 +212,7 @@ class Main(qtw.QMainWindow):
         # Set the tab stop width to around 33 pixels which is
         # more or less 8 spaces
         self.ui.textEdit.setTabStopWidth(33)
-        self.get_session_settings()        
+        self.get_session_settings()
         self.initMenubar()
         self.initToolbar()
         self.initFormatbar()
@@ -246,19 +248,19 @@ class Main(qtw.QMainWindow):
             event.accept()
 
         else:
-        
+
             popup = qtw.QMessageBox(self)
 
             popup.setIcon(qtw.QMessageBox.Warning)
-            
+
             popup.setText("The document has been modified")
-            
+
             popup.setInformativeText("Do you want to save your changes?")
-            
+
             popup.setStandardButtons(qtw.QMessageBox.Save   |
                                       qtw.QMessageBox.Cancel |
                                       qtw.QMessageBox.Discard)
-            
+
             popup.setDefaultButton(qtw.QMessageBox.Save)
 
             answer = popup.exec_()
@@ -360,7 +362,7 @@ class Main(qtw.QMainWindow):
 
             if self.formatbar.isVisible():
                 pos.setY(pos.y() + 45)
-                
+
             # Move the menu to the new position
             menu.move(pos)
 
@@ -487,11 +489,11 @@ class Main(qtw.QMainWindow):
 
             with open(self.filename) as file:
                 self.ui.textEdit.setText(file.read())
-            
+
             self.on_font_update()
             #if self.font:
                 #self.ui.textEdit.setCurrentFont(qtg.QFont(self.font))
- 
+
     def open(self):
 
         # Get filename and show only .writer files
@@ -537,13 +539,13 @@ class Main(qtw.QMainWindow):
         file.close()
 
     def savetextDialog(self):
-        
+
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
             #defaultdir = r"~/Projects/Python/EstablishTruth/Greek_txt_pages/"
-        
-        defaultdir = self.txtdir + r"/" 
+
+        defaultdir = self.txtdir + r"/"
         defaultfile = self.filename
 
         if defaultfile:
@@ -558,7 +560,7 @@ class Main(qtw.QMainWindow):
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.textEdit.toPlainText()
             file.write(my_CorrectedText)
-        
+
         #self.ui.TextLE.setText(filename)
         file.close()
 
@@ -605,7 +607,7 @@ class Main(qtw.QMainWindow):
         filename = qtw.QFileDialog.getOpenFileName(self, 'Insert image',".","Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
 
         if filename:
-            
+
             # Create image object
             image = qtg.QImage(filename)
 
@@ -838,24 +840,24 @@ class Main(qtw.QMainWindow):
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
         self.ui.LHslider.setValue(int(self.LHlineEdit.text()))
-    
+
     def SetLineSpacing(self):
 
         lineSpacing = self.ui.LHslider.value()
         self.LHlineEdit.setText(str(lineSpacing))
-            
+
         cursor = self.ui.textEdit.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         #bf = self.ui.TextCursor.blockFormat()
-        #bf.setLineHeight(lineSpacing, self.ui.TextBlockFormat.ProportionalHeight) 
+        #bf.setLineHeight(lineSpacing, self.ui.TextBlockFormat.ProportionalHeight)
         #cursor.mergeBlockFormat(bf)
-    
+
     def on_font_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         font = qtg.QFont(self.fontBox.currentFont())
         font.setPointSize(self.fontSize.value())
-        
+
         self.ui.textEdit.setFont(font)
 
 def main():

@@ -5,6 +5,8 @@ INTEGRATION GUIDE: Adding Help System to BiblionOCR Programs
 This document shows how to integrate the HelpSystem.py help module into
 your PyQt5 applications. Examples are provided for different scenarios.
 
+It also reflects the project-wide documentation deployment pattern used by the HelpSystem bundle, so release-facing notes stay aligned with the runtime help dialogs.
+
 """
 
 # ============================================================================
@@ -183,6 +185,8 @@ To add help to any program, follow these steps:
 □ Step 5: (Optional) Add program to HelpSystem.py if not already there
 
 □ Step 6: Update documentation as needed
+
+□ Step 7: For release-related changes, refresh the font installation workflow and confirm MyTrainer notes still match the current compiled release path
 
 
 PROGRAMS TO ADD HELP TO:

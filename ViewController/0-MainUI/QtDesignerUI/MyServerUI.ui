@@ -130,6 +130,49 @@
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
      </widget>
+     <widget class="QSlider" name="Zoomslider">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>0</y>
+        <width>21</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set current text line spacing</string>
+      </property>
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="pageStep">
+       <number>20</number>
+      </property>
+      <property name="value">
+       <number>25</number>
+      </property>
+      <property name="sliderPosition">
+       <number>25</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>true</bool>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QPushButton" name="OpenImageFilebutton">
@@ -145,6 +188,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -158,12 +204,12 @@
       <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
     </property>
    </widget>
-   <widget class="QLineEdit" name="ImageLe">
+   <widget class="QLineEdit" name="ImageLE">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>290</x>
       <y>0</y>
-      <width>241</width>
+      <width>281</width>
       <height>25</height>
      </rect>
     </property>
@@ -174,7 +220,7 @@
    <widget class="QPushButton" name="EditCorrectedTextbutton">
     <property name="geometry">
      <rect>
-      <x>980</x>
+      <x>1010</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -184,6 +230,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -200,7 +249,7 @@
    <widget class="QPushButton" name="SaveAsOCRCorrTextbutton">
     <property name="geometry">
      <rect>
-      <x>1250</x>
+      <x>1240</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -210,6 +259,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -226,7 +278,7 @@
    <widget class="QPushButton" name="SaveOCRCorrTextbutton">
     <property name="geometry">
      <rect>
-      <x>1280</x>
+      <x>1270</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -236,6 +288,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -272,46 +327,6 @@
       <italic>false</italic>
       <bold>false</bold>
      </font>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Writerbutton">
-    <property name="geometry">
-     <rect>
-      <x>1180</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Edit current text(.txt) file with OpenOffice Writer</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/libreoffice-writer.png</normaloff>:/Icons/Icons/libreoffice-writer.png</iconset>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Calcbutton">
-    <property name="geometry">
-     <rect>
-      <x>1210</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Edit current text(.csv) file with OpenOffice Calc</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="reloadTextbutton">
@@ -357,7 +372,7 @@
    <widget class="QPushButton" name="MyPixlerbutton">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>80</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -374,39 +389,10 @@
       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="Deskewbutton">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>FROMVS</family>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Deskew current image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/deskew_clear.png</normaloff>:/Icons/Icons/deskew_clear.png</iconset>
-    </property>
-   </widget>
    <widget class="QPushButton" name="PrevImgButton">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>220</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -426,7 +412,7 @@
    <widget class="QPushButton" name="NextImgButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>250</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -446,7 +432,7 @@
    <widget class="QPushButton" name="PrevTxtButton">
     <property name="geometry">
      <rect>
-      <x>1010</x>
+      <x>1050</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -466,7 +452,7 @@
    <widget class="QPushButton" name="NextTxtButton">
     <property name="geometry">
      <rect>
-      <x>1040</x>
+      <x>1080</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -722,6 +708,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -741,7 +730,7 @@
      <rect>
       <x>730</x>
       <y>0</y>
-      <width>241</width>
+      <width>281</width>
       <height>25</height>
      </rect>
     </property>
@@ -1051,9 +1040,9 @@
    <widget class="QComboBox" name="ZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>140</x>
       <y>0</y>
-      <width>81</width>
+      <width>61</width>
       <height>26</height>
      </rect>
     </property>
@@ -1119,7 +1108,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>120</x>
       <y>0</y>
       <width>21</width>
       <height>26</height>
@@ -1145,42 +1134,13 @@
       <normaloff>:/Icons/Icons/image-resize1.png</normaloff>:/Icons/Icons/image-resize1.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="Cropbutton">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>FROMVS</family>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Crop current image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/image-crop.png</normaloff>:/Icons/Icons/image-crop.png</iconset>
-    </property>
-   </widget>
    <widget class="QSlider" name="LHslider">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1160</x>
       <y>30</y>
       <width>21</width>
       <height>161</height>
@@ -1220,9 +1180,9 @@
    <widget class="QLineEdit" name="LHlineEdit">
     <property name="geometry">
      <rect>
-      <x>1100</x>
+      <x>1150</x>
       <y>0</y>
-      <width>31</width>
+      <width>41</width>
       <height>25</height>
      </rect>
     </property>
@@ -1251,7 +1211,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>1070</x>
+      <x>1120</x>
       <y>0</y>
       <width>31</width>
       <height>25</height>
@@ -1261,6 +1221,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1274,53 +1237,10 @@
       <normaloff>:/Icons/Icons/edit-line-spacing.png</normaloff>:/Icons/Icons/edit-line-spacing.png</iconset>
     </property>
    </widget>
-   <widget class="QSlider" name="Zoomslider">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>30</y>
-      <width>21</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Set current text line spacing</string>
-    </property>
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="singleStep">
-     <number>1</number>
-    </property>
-    <property name="pageStep">
-     <number>20</number>
-    </property>
-    <property name="value">
-     <number>25</number>
-    </property>
-    <property name="sliderPosition">
-     <number>25</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-    <property name="invertedAppearance">
-     <bool>true</bool>
-    </property>
-    <property name="tickPosition">
-     <enum>QSlider::TicksAbove</enum>
-    </property>
-   </widget>
    <widget class="QPushButton" name="MyWriterbutton">
     <property name="geometry">
      <rect>
-      <x>1150</x>
+      <x>1200</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1334,7 +1254,7 @@
     </property>
     <property name="icon">
      <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/icon.png</normaloff>:/Icons/Icons/icon.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="FindReplacebutton">
@@ -1363,6 +1283,23 @@
       <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
     </property>
    </widget>
+   <widget class="QPushButton" name="imageScannerbutton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>0</y>
+      <width>21</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1370,7 +1307,7 @@
      <x>0</x>
      <y>0</y>
      <width>1319</width>
-     <height>20</height>
+     <height>32</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTraining">
@@ -1432,7 +1369,9 @@
     </widget>
     <addaction name="separator"/>
     <addaction name="menuGround_Truth"/>
-    <addaction name="actionReview_Ground_Truth_tb"/>
+    <addaction name="actionMyVersifier"/>
+    <addaction name="actionMyResolver"/>
+    <addaction name="actionMyGrounder"/>
     <addaction name="actionStage_Ground_Truth"/>
    </widget>
    <widget class="QMenu" name="menuOCR">
@@ -1449,60 +1388,18 @@
      <addaction name="actionEnglish_2"/>
     </widget>
     <addaction name="menuSelect_Language"/>
+    <addaction name="actionOCR_Preprocess"/>
     <addaction name="actionSelect_Image"/>
     <addaction name="actionCorrect_OCR_tb"/>
-   </widget>
-   <widget class="QMenu" name="menuExtensions">
-    <property name="title">
-     <string>Extensions</string>
-    </property>
-    <widget class="QMenu" name="menuModules">
-     <property name="title">
-      <string>Modules</string>
-     </property>
-     <widget class="QMenu" name="menuGreek">
-      <property name="title">
-       <string>Greek</string>
-      </property>
-      <addaction name="actionUpdate_Verses"/>
-      <addaction name="actionUpdate_Words_Post"/>
-      <addaction name="actionNormalize"/>
-      <addaction name="actionLower_Case"/>
-      <addaction name="actionRemove_Diacritics"/>
-      <addaction name="actionAlign_Strongs"/>
-      <addaction name="actionAlign_English"/>
-      <addaction name="actionVariants"/>
-     </widget>
-     <widget class="QMenu" name="menuType_Here">
-      <property name="title">
-       <string>Type Here</string>
-      </property>
-     </widget>
-     <addaction name="actionPrepare_Text"/>
-     <addaction name="actionHebrew_5"/>
-     <addaction name="menuGreek"/>
-     <addaction name="actionLatin_3"/>
-     <addaction name="actionEnglish_4"/>
-     <addaction name="menuType_Here"/>
-    </widget>
-    <addaction name="actionGimp"/>
-    <addaction name="actionFont_Forge"/>
-    <addaction name="actionLibre_Office_Writer"/>
-    <addaction name="actionLibre_Office_Calc"/>
-    <addaction name="actionVerse_Correction"/>
-    <addaction name="actionDB_Browser_for_SQLite"/>
-    <addaction name="actionCreate_e_Sword_Bible_Module"/>
-    <addaction name="actionCreate_theWord_Bible_Module"/>
-    <addaction name="menuModules"/>
-    <addaction name="actionMistry"/>
-    <addaction name="actionAcademic"/>
-    <addaction name="actionDeveloper"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
       <family>Ubuntu</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -1510,6 +1407,7 @@
     </property>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Text"/>
+    <addaction name="actionImageScanner"/>
     <addaction name="actionSave_Image"/>
     <addaction name="actionSave_As_Image"/>
     <addaction name="actionSave_Text"/>
@@ -1519,9 +1417,9 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionPixler_Image_Editor"/>
-    <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionPrefernces"/>
+    <addaction name="actionMyPixler"/>
+    <addaction name="actionMyWriter"/>
     <addaction name="actionFind_and_Replace"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -1535,32 +1433,24 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionConvert_Image_s"/>
     <addaction name="actionOnline"/>
-    <addaction name="actionLibreOffice_Writer"/>
-    <addaction name="actionLibreOffice_Calc"/>
+    <addaction name="actionFontForge"/>
+    <addaction name="actionEdit_Image_tb"/>
+    <addaction name="actionDB_Browser_for_SQLite"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Project</string>
     </property>
     <addaction name="actionExplorer"/>
-    <addaction name="actionNew"/>
-    <addaction name="actionEdit"/>
-    <addaction name="actionPreferences"/>
+    <addaction name="actionNewProject"/>
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
-     <string>FontForge</string>
+     <string>Font</string>
     </property>
-    <widget class="QMenu" name="menuIndex_Images">
-     <property name="title">
-      <string>Bitmap Images</string>
-     </property>
-     <addaction name="actionLine_tif_to_bmp"/>
-    </widget>
-    <addaction name="menuIndex_Images"/>
-    <addaction name="actionExtract_Glyphs"/>
+    <addaction name="actionLine_tif_to_bmp"/>
+    <addaction name="actionMyGlypher"/>
     <addaction name="actionFontForge"/>
     <addaction name="actionInstall_Font"/>
    </widget>
@@ -1583,9 +1473,11 @@
      <addaction name="actionSelect_Language_Model"/>
      <addaction name="actionSelect_Fonts"/>
     </widget>
+    <addaction name="actionMyBoxer"/>
+    <addaction name="actionMyLexer"/>
     <addaction name="menuUpdate_Wordlists"/>
     <addaction name="menuSetup_Training"/>
-    <addaction name="actionTrain_Tesseract_tb"/>
+    <addaction name="actionMyTrainer"/>
    </widget>
    <widget class="QMenu" name="menuPre_Process">
     <property name="title">
@@ -1595,6 +1487,7 @@
      <property name="title">
       <string>Source</string>
      </property>
+     <addaction name="actionImageScanner_tb"/>
      <addaction name="actionextract_pdf_tb"/>
      <addaction name="actionpdf_for_tiff_tb"/>
      <addaction name="actionpdf_to_tiff_tb"/>
@@ -1620,11 +1513,9 @@
        <string>Greek</string>
       </property>
       <addaction name="actionConvert_Greek_tiff_To_png"/>
-      <addaction name="actionDeskewGreek_tiff_tb"/>
       <addaction name="actionResizeGreek_png_tb"/>
      </widget>
      <addaction name="actionCrop_Languages_tb"/>
-     <addaction name="actionManual_Crop_Image_tb"/>
      <addaction name="actionHebrew_6"/>
      <addaction name="menuGreek_3"/>
      <addaction name="actionLatin_5"/>
@@ -1637,18 +1528,53 @@
     <property name="title">
      <string>Post-Process</string>
     </property>
+    <addaction name="actionMyWriter"/>
+    <addaction name="actionCreate_e_Sword_Bible_Module"/>
+    <addaction name="actionCreate_theWord_Bible_Module"/>
+   </widget>
+   <widget class="QMenu" name="menuModules">
+    <property name="title">
+     <string>Modules</string>
+    </property>
+    <widget class="QMenu" name="menuImage_Modules">
+     <property name="title">
+      <string>Image Modules</string>
+     </property>
+     <addaction name="actionMyPixler"/>
+     <addaction name="actionMyGlypher"/>
+    </widget>
+    <widget class="QMenu" name="menuText_Modules">
+     <property name="title">
+      <string>Text Modules</string>
+     </property>
+     <addaction name="actionMyVersifier"/>
+     <addaction name="actionMyResolver"/>
+     <addaction name="actionMyLexer"/>
+     <addaction name="actionMyWriter"/>
+    </widget>
+    <widget class="QMenu" name="menuCombined_Modules">
+     <property name="title">
+      <string>Combined Modules</string>
+     </property>
+     <addaction name="actionMyBoxer"/>
+     <addaction name="actionMyGrounder"/>
+     <addaction name="actionMyTrainer"/>
+    </widget>
+    <addaction name="menuImage_Modules"/>
+    <addaction name="menuText_Modules"/>
+    <addaction name="menuCombined_Modules"/>
    </widget>
    <addaction name="menuHelp"/>
+   <addaction name="menuModules"/>
    <addaction name="menuPre_Process"/>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuOCR"/>
-   <addaction name="menuTraining"/>
    <addaction name="menuGlyphs"/>
+   <addaction name="menuTraining"/>
    <addaction name="menuGround_Truth_2"/>
-   <addaction name="menuExtensions"/>
    <addaction name="menuPost_Process"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -1761,23 +1687,6 @@
    <addaction name="actionRename_Latin_tif_Lines_tb"/>
    <addaction name="actionMove_Latin_tif_Lines_tb"/>
   </widget>
-  <widget class="QToolBar" name="ImageEditToolBar">
-   <property name="windowTitle">
-    <string>ImageEditToolBar</string>
-   </property>
-   <property name="toolTip">
-    <string>ImageEditToolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionPixler_Image_Editor"/>
-   <addaction name="actionEdit_Image_tb"/>
-   <addaction name="actionCorrect_OCR_tb"/>
-  </widget>
   <widget class="QToolBar" name="FontForgeToolBar">
    <property name="windowTitle">
     <string>FontForge Tool Bar</string>
@@ -1792,8 +1701,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionLine_tif_to_bmp"/>
-   <addaction name="actionExtract_Glyphs"/>
-   <addaction name="actionFontForge"/>
   </widget>
   <widget class="QToolBar" name="GreekTextLinesToolBar">
    <property name="windowTitle">
@@ -1810,6 +1717,7 @@
    </attribute>
    <addaction name="actionSplitGreek_text_lines_tb"/>
    <addaction name="actionRenameGreek_text_lines_tb"/>
+   <addaction name="actionUpdate_Wordlist_tb"/>
   </widget>
   <widget class="QToolBar" name="LatinTextLinesToolBar">
    <property name="enabled">
@@ -1830,23 +1738,6 @@
    <addaction name="actionSplit_Latin_Text_Lines_tb"/>
    <addaction name="actionRename_Latin_Text_Lines_tb"/>
   </widget>
-  <widget class="QToolBar" name="TesseractTrainingToolBar">
-   <property name="windowTitle">
-    <string>Tesseract OCR Training Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Tesseract OCR Training Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionUpdate_Wordlist_tb"/>
-   <addaction name="actionReview_Ground_Truth_tb"/>
-   <addaction name="actionTrain_Tesseract_tb"/>
-  </widget>
   <widget class="QToolBar" name="ModulesToolBar">
    <property name="windowTitle">
     <string>Versify Text Tool Bar</string>
@@ -1860,10 +1751,13 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionVerse_Correction"/>
-   <addaction name="actionDB_Browser_for_SQLite"/>
-   <addaction name="actionCreate_e_Sword_Bible_Module"/>
-   <addaction name="actionCreate_theWord_Bible_Module"/>
+   <addaction name="actionMyBoxer"/>
+   <addaction name="actionMyGlypher"/>
+   <addaction name="actionMyVersifier"/>
+   <addaction name="actionMyResolver"/>
+   <addaction name="actionMyLexer"/>
+   <addaction name="actionMyGrounder"/>
+   <addaction name="actionMyTrainer"/>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -2233,13 +2127,13 @@
     <string>Resolve Variants</string>
    </property>
   </action>
-  <action name="actionTrain_Tesseract_tb">
+  <action name="actionMyTrainer">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionTrainer1.png</normaloff>:/Icons/Icons/BiblionTrainer1.png</iconset>
    </property>
    <property name="text">
-    <string>Train Tesseract</string>
+    <string>MyTrainer</string>
    </property>
    <property name="toolTip">
     <string>Train Tesseract OCR with current Ground Truth</string>
@@ -2248,13 +2142,13 @@
     <string>Training Tesseract OCR with current Ground Truth...</string>
    </property>
   </action>
-  <action name="actionReview_Ground_Truth_tb">
+  <action name="actionMyGrounder">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
    </property>
    <property name="text">
-    <string>Validate Ground Truth</string>
+    <string>MyGrounder</string>
    </property>
    <property name="toolTip">
     <string>Validate current Ground Truth image|text</string>
@@ -2473,13 +2367,13 @@
     <string>Open Image</string>
    </property>
   </action>
-  <action name="actionVerse_Correction">
+  <action name="actionMyVersifier">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/versify.png</normaloff>:/Icons/Icons/versify.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
    </property>
    <property name="text">
-    <string>Verse Correction</string>
+    <string>MyVerser</string>
    </property>
    <property name="toolTip">
     <string>Book Chapter:Verse Text Assignment</string>
@@ -2524,13 +2418,13 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionExtract_Glyphs">
+  <action name="actionMyGlypher">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
    </property>
    <property name="text">
-    <string>GlyphTracer</string>
+    <string>MyGlypher</string>
    </property>
    <property name="toolTip">
     <string>Extract and trace bitmap glyphs with GlyphTracer</string>
@@ -2571,7 +2465,7 @@
   </action>
   <action name="actionPrefernces">
    <property name="text">
-    <string>Preferences</string>
+    <string>Project Settings</string>
    </property>
   </action>
   <action name="actionOpen_Text">
@@ -2613,7 +2507,7 @@
   </action>
   <action name="actionConvert_Image_s">
    <property name="text">
-    <string>Convert Image(s)</string>
+    <string>Convert Image</string>
    </property>
   </action>
   <action name="actionReview_Ground_Truth_3">
@@ -2892,13 +2786,13 @@
     <string>Ministry</string>
    </property>
   </action>
-  <action name="actionPixler_Image_Editor">
+  <action name="actionMyPixler">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
    </property>
    <property name="text">
-    <string>Pixler Image Editor</string>
+    <string>MyPixler</string>
    </property>
    <property name="font">
     <font>
@@ -2911,9 +2805,14 @@
     <string>Explorer</string>
    </property>
   </action>
-  <action name="actionNew">
+  <action name="actionNewProject">
    <property name="text">
-    <string>New</string>
+    <string>New Project</string>
+   </property>
+  </action>
+  <action name="actionRecreateErasmus1516">
+   <property name="text">
+    <string>Recreate Erasmus1516</string>
    </property>
   </action>
   <action name="actionEdit">
@@ -2934,6 +2833,65 @@
   <action name="actionLatin_5">
    <property name="text">
     <string>Latin</string>
+   </property>
+  </action>
+  <action name="actionOCR_Preprocess">
+   <property name="text">
+    <string>OCR Preprocess Tool</string>
+   </property>
+  </action>
+  <action name="actionMyWriter">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyWriter</string>
+   </property>
+  </action>
+  <action name="actionMyResolver">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyResolver</string>
+   </property>
+  </action>
+  <action name="actionMyLexer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLexer.png</normaloff>:/Icons/Icons/BiblionLexer.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyLexer</string>
+   </property>
+  </action>
+  <action name="actionMyBoxer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyBoxer</string>
+   </property>
+  </action>
+  <action name="actionImageScanner">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+   </property>
+   <property name="text">
+    <string>ImageScanner</string>
+   </property>
+  </action>
+  <action name="actionImageScanner_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+   </property>
+   <property name="text">
+    <string>ImageScanner</string>
    </property>
   </action>
  </widget>

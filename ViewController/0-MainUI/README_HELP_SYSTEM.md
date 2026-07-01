@@ -27,6 +27,8 @@ The BiblionOCR Help System provides comprehensive, integrated documentation for 
 
 ✅ **Tabbed Interface** - Organized information in readable format
 
+✅ **Release Workflow Coverage** - Documentation now reflects the cross-platform font refresh path used for release builds and Tesseract retraining updates
+
 ## Quick Start
 
 ### For End Users
@@ -49,7 +51,7 @@ class MyBoxer(MyBoxerUI.Ui_Boxer, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-        
+
         # Add this ONE line:
         add_help_menu(self, 'MyBoxer')
 ```
@@ -219,6 +221,7 @@ dialog.exec_()
 - **PROJECT_ARCHITECTURE.md** - Complete system architecture
 - **QUICK_REFERENCE.md** - Quick lookup for all programs
 - **DEPENDENCIES_AND_RELATIONSHIPS.md** - Program dependencies
+- **dev_notebook.md** - Current release workflow and stabilization notes
 
 These files were created by the Explore agent and provide comprehensive project documentation.
 
@@ -258,6 +261,8 @@ If help text needs updating:
 2. Find program in PROGRAM_HELP dictionary
 3. Update 'description', 'usage', or 'development'
 4. Save and test with F1
+
+For release-related changes, also refresh the font installation path and keep MyTrainer aligned with the final compiled release workflow.
 
 For major documentation, also update:
 - PROJECT_ARCHITECTURE.md

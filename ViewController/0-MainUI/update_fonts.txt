@@ -1,13 +1,12 @@
 Update Font Directories/FontFiles:
 
-cd ~/Documents/'My Forge'
+Run the cross-platform installer from this folder:
 
-cp FROMVS.ttf ~/.local/share/fonts
+python update_fonts.py --font FROMVS.ttf
 
-cp FROMVS.ttf ~/.fonts
+If the font lives in a different source folder, pass it explicitly:
 
-sudo cp FROMVS.ttf /usr/local/share/fonts
+python update_fonts.py --font FROMVS.ttf --source-dir "C:/path/to/training/output/fonts"
 
-sudo cp FROMVS.ttf /usr/share/fonts/truetype/FROMVS
-
-fc-cache -f -v
+The script installs to the current user's font locations on Windows, macOS, and Linux,
+and refreshes the Linux font cache when available.

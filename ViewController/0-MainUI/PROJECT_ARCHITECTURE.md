@@ -161,6 +161,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Track training sessions
 - Load and save session settings
 - Character reference integration
+- Refresh the release font path before final compilation when training updates change the font assets
 
 **Key Classes**:
 - `Ui_MainWindow` - Trainer interface
@@ -168,6 +169,10 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 **Related UI File**: [MyTrainerUI.py](MyTrainerUI.py)
 
 **Dependencies**: SqliteHelper, ext modules
+
+**Release Notes**:
+- Final release builds should include the current font installation path used by `update_fonts.py`
+- MyTrainer is the last planned development module, so its release state should be verified against the font refresh workflow
 
 ---
 

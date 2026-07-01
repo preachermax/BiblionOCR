@@ -150,13 +150,18 @@
   - Training module
   - SqliteHelper (database)
   - Ground truth data from MyGrounder
+  - Release font path refreshed by `update_fonts.py` before final compilation
   
 - **Used By**:
   - Model development
   - Before MyReader
+  - Final release packaging for the MyTrainer module
   
 - **Provides To**:
   - Trained Tesseract models
+
+- **Release Qualification**:
+  - This module qualifies as release-facing because it consumes the current training font state and must be validated after each Tesseract font update
 
 ---
 
