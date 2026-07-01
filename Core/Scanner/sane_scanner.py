@@ -1,4 +1,6 @@
 import os
+import re
+import shutil
 import subprocess
 import sys
 
@@ -18,6 +20,7 @@ from .device import ScannerDevice
 class SaneScanner(ScannerDevice):
     backend_name = "SANE"
     _availability_cache = {}
+    _engine_cache = {}
 
     @classmethod
     def is_supported_platform(cls, platform_name):
@@ -25,12 +28,31 @@ class SaneScanner(ScannerDevice):
 
     @classmethod
     def is_available(cls):
-        if sane is None or Image is None:
-            return False
+        return cls._select_engine() is not None
+
+    @classmethod
+    def _select_engine(cls):
+        if Image is None:
+            return None
 
         cache_key = sys.executable
-        if cache_key in cls._availability_cache:
-            return cls._availability_cache[cache_key]
+        if cache_key in cls._engine_cache:
+            return cls._engine_cache[cache_key]
+
+        engine = None
+        if cls._python_sane_available():
+            engine = "python"
+        elif cls._scanimage_available():
+            engine = "scanimage"
+
+        cls._engine_cache[cache_key] = engine
+        cls._availability_cache[cache_key] = engine is not None
+        return engine
+
+    @classmethod
+    def _python_sane_available(cls):
+        if sane is None:
+            return False
 
         probe_script = (
             "import sys\n"
@@ -52,27 +74,55 @@ class SaneScanner(ScannerDevice):
                 timeout=5,
                 check=False,
             )
-            available = completed.returncode == 0
+            return completed.returncode == 0
         except Exception:
-            available = False
+            return False
 
-        cls._availability_cache[cache_key] = available
-        return available
+    @classmethod
+    def _scanimage_available(cls):
+        scanimage_path = shutil.which("scanimage")
+        if not scanimage_path:
+            return False
+
+        try:
+            completed = subprocess.run(
+                [scanimage_path, "-L"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+        except Exception:
+            return False
+
+        if completed.returncode != 0:
+            return False
+
+        return bool(cls._parse_scanimage_devices(completed.stdout))
 
     def __init__(self):
-        if sane is None or Image is None:
-            raise RuntimeError("SANE scanning requires python-sane and Pillow")
+        engine = self._select_engine()
+        if engine is None:
+            raise RuntimeError("SANE scanning requires a working python-sane or scanimage installation plus Pillow")
+        self._engine = engine
 
     def list_devices(self):
-        sane.init()
-        try:
-            devices = sane.get_devices()
-            return [self._display_name(device) for device in devices]
-        finally:
-            sane.exit()
+        if self._engine == "python":
+            sane.init()
+            try:
+                devices = sane.get_devices()
+                return [self._display_name(device) for device in devices]
+            finally:
+                sane.exit()
+
+        devices = self._list_devices_via_scanimage()
+        return [device["display_name"] for device in devices]
 
     def acquire(self, destination_folder, request=None):
         request = request or {}
+        if self._engine == "scanimage":
+            return self._acquire_via_scanimage(destination_folder, request)
+
         sane.init()
         device_handle = None
         try:
@@ -172,3 +222,114 @@ class SaneScanner(ScannerDevice):
         if label:
             return f"{label} ({device_name})"
         return str(device_name)
+
+    def _list_devices_via_scanimage(self):
+        scanimage_path = shutil.which("scanimage")
+        if not scanimage_path:
+            return []
+
+        completed = subprocess.run(
+            [scanimage_path, "-L"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError((completed.stderr or completed.stdout or "scanimage -L failed").strip())
+
+        return self._parse_scanimage_devices(completed.stdout)
+
+    @classmethod
+    def _parse_scanimage_devices(cls, output):
+        devices = []
+        for raw_line in (output or "").splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+
+            match = re.match(r"^device\s+[`'](?P<name>[^`']+)[`']\s+is\s+a\s+(?P<label>.+)$", line)
+            if match:
+                device_name = match.group("name").strip()
+                label = match.group("label").strip()
+                devices.append(
+                    {
+                        "name": device_name,
+                        "label": label,
+                        "display_name": f"{label} ({device_name})",
+                    }
+                )
+        return devices
+
+    def _acquire_via_scanimage(self, destination_folder, request):
+        devices = self._list_devices_via_scanimage()
+        if not devices:
+            raise RuntimeError("SANE did not report any scanner devices")
+
+        device_info = self._select_scanimage_device(devices, request.get("device_name"))
+        output_path = self._save_path(destination_folder)
+        scanimage_path = shutil.which("scanimage")
+        if not scanimage_path:
+            raise RuntimeError("scanimage is not installed or not on PATH")
+
+        command = [scanimage_path, "--format=tiff", "--device-name", device_info["name"]]
+        command.extend(["--resolution", str(int(request.get("dpi", 300)))])
+
+        mode_map = {
+            "color": "Color",
+            "grayscale": "Gray",
+            "mono": "Lineart",
+        }
+        command.extend(["--mode", mode_map.get(request.get("mode", "color"), "Color")])
+
+        if request.get("source_type") == "adf":
+            command.extend(["--source", "ADF"])
+
+        with open(output_path, "wb") as image_handle:
+            completed = subprocess.run(
+                command,
+                stdout=image_handle,
+                stderr=subprocess.PIPE,
+                timeout=120,
+                check=False,
+            )
+
+        if completed.returncode != 0:
+            try:
+                os.remove(output_path)
+            except OSError:
+                pass
+            message = completed.stderr.decode("utf-8", errors="replace").strip() or "scanimage acquisition failed"
+            raise RuntimeError(message)
+
+        return {
+            "path": output_path,
+            "dir": destination_folder,
+            "device": device_info["display_name"],
+        }
+
+    def _select_scanimage_device(self, devices, requested_name):
+        if not requested_name:
+            return devices[0]
+
+        normalized_requested = str(requested_name).strip().lower()
+        for device in devices:
+            candidates = {device["name"].strip().lower(), device["display_name"].strip().lower()}
+            if normalized_requested in candidates:
+                return device
+        for device in devices:
+            if normalized_requested in device["name"].strip().lower():
+                return device
+            if normalized_requested in device["display_name"].strip().lower():
+                return device
+
+        raise RuntimeError(f"SANE device not found: {requested_name}")
+
+    def _save_path(self, destination_folder):
+        scan_number = 1
+        while True:
+            filename = f"scan_{scan_number:06d}.tif"
+            path = os.path.join(destination_folder, filename)
+            if not os.path.exists(path):
+                return path
+            scan_number += 1
