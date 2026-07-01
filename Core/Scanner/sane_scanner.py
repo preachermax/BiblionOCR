@@ -19,6 +19,7 @@ from .device import ScannerDevice
 
 class SaneScanner(ScannerDevice):
     backend_name = "SANE"
+    _scanimage_timeout_seconds = 20
     _availability_cache = {}
     _engine_cache = {}
 
@@ -80,7 +81,7 @@ class SaneScanner(ScannerDevice):
 
     @classmethod
     def _scanimage_available(cls):
-        scanimage_path = shutil.which("scanimage")
+        scanimage_path = cls._scanimage_path()
         if not scanimage_path:
             return False
 
@@ -89,7 +90,7 @@ class SaneScanner(ScannerDevice):
                 [scanimage_path, "-L"],
                 capture_output=True,
                 text=True,
-                timeout=5,
+                timeout=cls._scanimage_timeout_seconds,
                 check=False,
             )
         except Exception:
@@ -99,6 +100,17 @@ class SaneScanner(ScannerDevice):
             return False
 
         return bool(cls._parse_scanimage_devices(completed.stdout))
+
+    @classmethod
+    def _scanimage_path(cls):
+        for candidate in (
+            shutil.which("scanimage"),
+            "/usr/bin/scanimage",
+            "/usr/local/bin/scanimage",
+        ):
+            if candidate and os.path.exists(candidate):
+                return candidate
+        return None
 
     def __init__(self):
         engine = self._select_engine()
@@ -224,7 +236,7 @@ class SaneScanner(ScannerDevice):
         return str(device_name)
 
     def _list_devices_via_scanimage(self):
-        scanimage_path = shutil.which("scanimage")
+        scanimage_path = self._scanimage_path()
         if not scanimage_path:
             return []
 
@@ -232,7 +244,7 @@ class SaneScanner(ScannerDevice):
             [scanimage_path, "-L"],
             capture_output=True,
             text=True,
-            timeout=5,
+            timeout=self._scanimage_timeout_seconds,
             check=False,
         )
         if completed.returncode != 0:
@@ -268,7 +280,7 @@ class SaneScanner(ScannerDevice):
 
         device_info = self._select_scanimage_device(devices, request.get("device_name"))
         output_path = self._save_path(destination_folder)
-        scanimage_path = shutil.which("scanimage")
+        scanimage_path = self._scanimage_path()
         if not scanimage_path:
             raise RuntimeError("scanimage is not installed or not on PATH")
 
