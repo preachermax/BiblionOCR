@@ -165,6 +165,40 @@ git config --global credential.helper store
 
 Then the next successful authenticated Git command will save it locally in your home directory.
 
+#### One-Time PAT Setup Flow
+
+1. In a browser, sign in to GitHub.
+2. Open Settings -> Developer settings -> Personal access tokens -> Tokens (classic).
+3. Create a token with at least repo access for this repository.
+4. Copy the token immediately. GitHub will not show it again.
+5. Back on the Jetson, run:
+
+```bash
+git config --global credential.helper store
+cd Projects/BiblionOCR
+git fetch origin --prune
+```
+
+6. When Git prompts:
+
+  - username: `preachermax`
+  - password: paste the PAT
+
+On Linux, the token paste may not echo any characters to the screen. That is normal.
+Press Enter once after pasting.
+
+If the token is accepted, future HTTPS fetch/pull/push commands should reuse the stored credential.
+
+#### If A Bad HTTPS Credential Was Already Saved
+
+If Git keeps reusing a bad token, remove the saved GitHub line from `~/.git-credentials`, then retry the PAT flow:
+
+```bash
+sed -i '/github.com/d' ~/.git-credentials
+cd Projects/BiblionOCR
+git fetch origin --prune
+```
+
 ### Better Long-Term SSH Path
 
 If you do not want to keep using HTTPS prompts, configure an SSH key on the Jetson:
@@ -184,6 +218,47 @@ git fetch origin --prune
 ```
 
 If the SSH test succeeds, future `fetch`, `pull`, and `push` commands can use the key without PAT prompts.
+
+#### One-Time SSH Setup Flow
+
+1. On the Jetson, create the key if it does not already exist:
+
+```bash
+ssh-keygen -t ed25519 -C "jetson@nano"
+```
+
+2. Show the public key:
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+3. In a browser, sign in to GitHub.
+4. Open Settings -> SSH and GPG keys -> New SSH key.
+5. Paste the public key and save it.
+6. This is correct even for a private repository. GitHub needs your public key so it can verify the matching private key on the Jetson. The public key does not make the repository public, and the private key stays only on the Jetson.
+7. Back on the Jetson, test GitHub SSH access:
+
+```bash
+ssh -T git@github.com
+```
+
+8. If that succeeds, switch this repo to SSH and retry Git:
+
+```bash
+cd Projects/BiblionOCR
+git remote set-url origin git@github.com:preachermax/BiblionOCR.git
+git fetch origin --prune
+```
+
+SSH is usually the better long-term Jetson setup because it avoids repeated HTTPS token prompts.
+
+#### What "Public SSH Key" Means Here
+
+- `~/.ssh/id_ed25519.pub` is the public key file. This is the one you copy into GitHub.
+- `~/.ssh/id_ed25519` is the private key file. Do not upload this file anywhere.
+- GitHub stores the public key and uses it to verify that your Jetson holds the matching private key.
+- A public key on GitHub is normal for both public and private repositories.
 
 ## If `pull --ff-only` Fails
 
