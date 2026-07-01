@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 
 try:
     import sane
@@ -15,6 +17,7 @@ from .device import ScannerDevice
 
 class SaneScanner(ScannerDevice):
     backend_name = "SANE"
+    _availability_cache = {}
 
     @classmethod
     def is_supported_platform(cls, platform_name):
@@ -22,7 +25,39 @@ class SaneScanner(ScannerDevice):
 
     @classmethod
     def is_available(cls):
-        return sane is not None and Image is not None
+        if sane is None or Image is None:
+            return False
+
+        cache_key = sys.executable
+        if cache_key in cls._availability_cache:
+            return cls._availability_cache[cache_key]
+
+        probe_script = (
+            "import sys\n"
+            "try:\n"
+            "    import sane\n"
+            "    sane.init()\n"
+            "    devices = sane.get_devices()\n"
+            "    sane.exit()\n"
+            "    sys.exit(0 if devices else 3)\n"
+            "except Exception:\n"
+            "    sys.exit(2)\n"
+        )
+
+        try:
+            completed = subprocess.run(
+                [sys.executable, "-c", probe_script],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+                check=False,
+            )
+            available = completed.returncode == 0
+        except Exception:
+            available = False
+
+        cls._availability_cache[cache_key] = available
+        return available
 
     def __init__(self):
         if sane is None or Image is None:
