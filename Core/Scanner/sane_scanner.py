@@ -3,6 +3,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 
 try:
     import sane
@@ -20,8 +21,11 @@ from .device import ScannerDevice
 class SaneScanner(ScannerDevice):
     backend_name = "SANE"
     _scanimage_timeout_seconds = 20
+    _scanimage_discovery_attempts = 3
+    _scanimage_retry_delay_seconds = 2.0
     _availability_cache = {}
     _engine_cache = {}
+    _last_scanimage_devices = []
 
     @classmethod
     def is_supported_platform(cls, platform_name):
@@ -244,18 +248,34 @@ class SaneScanner(ScannerDevice):
         if not scanimage_path:
             return []
 
-        completed = subprocess.run(
-            [scanimage_path, "-L"],
-            capture_output=True,
-            text=True,
-            timeout=self._scanimage_timeout_seconds,
-            check=False,
-        )
-        if completed.returncode != 0:
-            raise RuntimeError((completed.stderr or completed.stdout or "scanimage -L failed").strip())
+        last_error = None
+        for attempt in range(self._scanimage_discovery_attempts):
+            completed = subprocess.run(
+                [scanimage_path, "-L"],
+                capture_output=True,
+                text=True,
+                timeout=self._scanimage_timeout_seconds,
+                check=False,
+            )
+            if completed.returncode != 0:
+                last_error = (completed.stderr or completed.stdout or "scanimage -L failed").strip()
+            else:
+                output = "\n".join(part for part in (completed.stdout, completed.stderr) if part)
+                devices = self._parse_scanimage_devices(output)
+                if devices:
+                    self.__class__._last_scanimage_devices = list(devices)
+                    return devices
+                last_error = "No devices reported by scanimage -L"
 
-        output = "\n".join(part for part in (completed.stdout, completed.stderr) if part)
-        return self._parse_scanimage_devices(output)
+            if attempt < self._scanimage_discovery_attempts - 1:
+                time.sleep(self._scanimage_retry_delay_seconds)
+
+        if self.__class__._last_scanimage_devices:
+            return list(self.__class__._last_scanimage_devices)
+
+        if last_error:
+            raise RuntimeError(last_error)
+        return []
 
     @classmethod
     def _parse_scanimage_devices(cls, output):
@@ -319,6 +339,9 @@ class SaneScanner(ScannerDevice):
             completed = self._run_scanimage_command(fallback_command, output_path)
 
         if completed.returncode != 0:
+            fallback_result = self._fallback_to_escl_if_possible(device_info, destination_folder, request)
+            if fallback_result is not None:
+                return fallback_result
             try:
                 os.remove(output_path)
             except OSError:
@@ -345,6 +368,33 @@ class SaneScanner(ScannerDevice):
     def _should_retry_scanimage_without_device_name(self, stderr_bytes):
         message = stderr_bytes.decode("utf-8", errors="replace").lower()
         return "open of device" in message and "invalid argument" in message
+
+    def _fallback_to_escl_if_possible(self, device_info, destination_folder, request):
+        label = str(device_info.get("label") or "")
+        ip_match = re.search(r"\bip=(?P<host>[^\s,;]+)", label, flags=re.IGNORECASE)
+        if not ip_match:
+            return None
+
+        try:
+            from .escl_scanner import ESCLScanner
+        except Exception:
+            return None
+
+        if not ESCLScanner.is_available():
+            return None
+
+        direct_target = ip_match.group("host").strip()
+        fallback_request = dict(request or {})
+        fallback_request["device_name"] = direct_target
+
+        try:
+            result = ESCLScanner().acquire(destination_folder, request=fallback_request)
+        except Exception:
+            return None
+
+        if isinstance(result, dict):
+            result.setdefault("device", device_info.get("display_name") or direct_target)
+        return result
 
     def _scanimage_supported_options(self, scanimage_path, device_name):
         try:
