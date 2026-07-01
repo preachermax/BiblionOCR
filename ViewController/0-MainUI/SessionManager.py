@@ -32,8 +32,15 @@ class SessionManager:
     def session_path(self, filename: str) -> str:
         return normalize_path(filename) if os.path.isabs(filename) else os.path.join(self.base_dir, filename)
 
+    def _ensure_session_file(self, path: str) -> None:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        if not os.path.exists(path):
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump([], f, indent=4)
+
     def load(self, filename: str, keys: Optional[Iterable[str]] = None) -> SessionDict:
         path = self.session_path(filename)
+        self._ensure_session_file(path)
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         normalized_data = self._normalize_session_data(data)
@@ -51,6 +58,7 @@ class SessionManager:
 
     def update(self, filename: str, updates: Dict[str, Any]) -> None:
         path = self.session_path(filename)
+        self._ensure_session_file(path)
         session = self.load(filename)
         changed = False
 
