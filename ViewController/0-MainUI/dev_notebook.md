@@ -308,6 +308,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * TWAIN is intentionally unavailable for the current Canon TS3700 path because the machine exposes a usable 64-bit DSM but no 64-bit TWAIN source registration
 * Canon TS3700 evidence on this machine indicates: 64-bit `twaindsm.dll` can load, but the installed Canon scan package registers WIA/STI files rather than a 64-bit TWAIN source, while Canon TWAIN source artifacts remain under the 32-bit `C:\Windows\twain_32` tree
 * Native SANE acquisition remains device-dependent and should still be treated as best-effort until validated against non-AirScan-first hardware
+* `Model/Backup Copies/0-MainUI copy/Ui2Py.py` is still a broad regeneration helper; even though its paths now point at the current Windows repo location, targeted `pyuic5` remains the safer default for intentional UI regeneration
 
 ---
 
@@ -802,6 +803,8 @@ DO NOT update for:
 * 2026-07-02: `MyScannerWin.py` was removed from version control and added to `.gitignore`, and should stay absent unless explicitly restored
 * 2026-07-02: Windows persistent launcher wrappers were standardized for the tracked `My*.py` entry points and documented in `WINDOWS_PERSISTENT_LAUNCHERS.md`
 * 2026-07-02: `MyExplorer.py` was upgraded from an internal-move-only tree to a real external drag/drop tree that can copy dropped files and folders into the project tree
+* 2026-07-02: `Model/Backup Copies/0-MainUI copy/Ui2Py.py` was repointed at the current Windows repo paths for rare backup-copy UI regeneration use, but targeted `pyuic5` remains preferred over broad regeneration
+* 2026-07-02: `Model/Project/Data/json/VersifierSession.json` was intentionally normalized by removing the duplicate `self.projectname` entry and updating the active Verse/Reference GroundTruth paths to the current Windows repo location
 
 ---
 

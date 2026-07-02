@@ -16,8 +16,8 @@ def sorted_alphanumeric(data):
     return sorted(data, key=alphanum_key)
     #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
-dest_of_pythonfiles = "/home/max/Projects/Python/Workflow/0-MainUI/"
-path_of_uifiles = r"/home/max/Projects/Python/Workflow/0-MainUI/QtDesignerUI/"
+dest_of_pythonfiles = "C:/Users/Max/Projects/BiblionOCR/ViewController/0-MainUI/"
+path_of_uifiles = r"C:/Users/Max/Projects/BiblionOCR/ViewController/0-MainUI/QtDesignerUI/"
 
 list_of_uifiles = sorted_alphanumeric(os.listdir(path_of_uifiles))
 #print(list_of_uifiles)

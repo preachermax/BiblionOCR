@@ -60,11 +60,6 @@
         "DefaultValue": "BooksAbbrNameNumIndex.json"
     },
     {
-        "Setting": "self.projectname",
-        "CurrentValue": "/BiblionOCR",
-        "DefaultValue": "/BiblionOCR"
-    },
-    {
         "Setting": "self.homefontdir",
         "CurrentValue": "/.fonts",
         "DefaultValue": ""
@@ -251,12 +246,12 @@
     },
     {
         "Setting": "self.versepath",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_verses/Erasmus1516NT_Verses.txt",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_verses/Erasmus1516NT_Verses.txt",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_verses/Erasmus1516NT_Verses.txt"
     },
     {
         "Setting": "self.versedir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_verses",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Greek/txt_greek_verses",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek/txt_greek_verses"
     },
     {
@@ -316,12 +311,12 @@
     },
     {
         "Setting": "self.refpath",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Source/TR/TR-Verses.txt",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Source/TR/TR-Verses.txt",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Source/TR/TR-Verses.txt"
     },
     {
         "Setting": "self.refdir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Source/TR",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Source/TR",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Source/TR"
     },
     {
