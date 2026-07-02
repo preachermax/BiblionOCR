@@ -301,7 +301,7 @@ class MainWindow(qtw.QMainWindow):
             os.path.dirname(os.path.realpath(__file__)),
         )
         self.ui.BoxDocument.setDefaultFont(font)
-        self.ui.BoxText.setFont(font)
+        self.currentTextTable.setFont(font)
         self.ui.BoxBlockFormat = qtg.QTextBlockFormat()
         self.currentTextTableFormat = qtg.QTextFormat()
         self.ui.BoxCursor = qtg.QTextCursor(self.ui.BoxDocument)
