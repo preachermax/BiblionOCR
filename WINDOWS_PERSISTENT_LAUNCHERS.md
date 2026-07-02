@@ -40,7 +40,7 @@ Standard Windows wrappers now exist in `launchers/` for these canonical runnable
 
 These correspond to the main `My*.py` entry points in `ViewController/0-MainUI`.
 Generated `*UI.py` files and obvious backup variants such as `copy`, `Old`, and one-off experiment files are intentionally not wrapped.
-`MyScannerWin.py` is also intentionally excluded from the repo-supported wrapper set because the module was removed from version control and kept local-only.
+`MyScannerWin.py` is also intentionally excluded from the repo-supported wrapper set because the module was removed from version control and should stay absent unless there is an explicit decision to restore it.
 
 ## MyServer Example
 

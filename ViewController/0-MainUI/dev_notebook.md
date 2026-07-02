@@ -284,7 +284,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Windows traceback-preserving launchers now use the same wrapper principle as the Jetson `.desktop` flow, but with `.cmd` scripts under `launchers/`
 * Canonical repo-supported Windows wrappers now exist for the main tracked `My*.py` module entry points, documented in `WINDOWS_PERSISTENT_LAUNCHERS.md`
-* `MyScannerWin.py` is intentionally excluded from the repo-supported wrapper set because it was removed from version control and remains local-only
+* `MyScannerWin.py` is intentionally excluded from the repo-supported wrapper set because it was removed from version control and should stay absent unless there is an explicit decision to restore it
 
 ### Line Ending Safeguard
 
@@ -455,6 +455,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Expected behavior after the rollout:
 
   * Windows Explorer drag/drop works on the main intake widgets
+  * `MyExplorer` can act as a drag source and can also accept external file/folder drops into the project tree with collision-safe copy naming
   * shared picker windows can act as drag sources
   * dropped files load contents instead of inserting URL text
   * `.nt` is treated as a text-file extension
@@ -466,7 +467,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Repository status note:
 
-  * `MyScannerWin.py` was intentionally removed from version control and added to `.gitignore`; keep it local-only unless there is an explicit reason to restore it to the repo
+  * `MyScannerWin.py` was intentionally removed from version control and added to `.gitignore`; keep it out of the repo unless there is an explicit reason to restore it
 
 ---
 
@@ -798,8 +799,9 @@ DO NOT update for:
 * 2026-06-30: Confirmed existing `NetworkScanner` belongs to discovery only; capability detection must remain a separate layer before backend selection
 * 2026-07-01: Jetson Canon TS3700 path validated with async scan-dialog loading, AirScan-first discovery, and SANE fallback entries that route final acquisition back through eSCL/AirScan by IP when native SANE transport is not dependable
 * 2026-07-02: Shared `LocalFileDrop.py` drag/drop routing and non-modal file picker workflows were standardized across the main image/text modules, with `MyVersifier` using pane-specific target routing and visible load progress
-* 2026-07-02: `MyScannerWin.py` was removed from version control and added to `.gitignore`, remaining local-only by design
+* 2026-07-02: `MyScannerWin.py` was removed from version control and added to `.gitignore`, and should stay absent unless explicitly restored
 * 2026-07-02: Windows persistent launcher wrappers were standardized for the tracked `My*.py` entry points and documented in `WINDOWS_PERSISTENT_LAUNCHERS.md`
+* 2026-07-02: `MyExplorer.py` was upgraded from an internal-move-only tree to a real external drag/drop tree that can copy dropped files and folders into the project tree
 
 ---
 
