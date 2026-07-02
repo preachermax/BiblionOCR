@@ -564,7 +564,7 @@ class ProjectCreationEngine:
             raise RuntimeError(f"Git repository initialization failed: {result.stderr.strip()}")
 
         branch_result = subprocess.run(
-            [git_executable, "branch", "-M", "main"],
+            [git_executable, "symbolic-ref", "HEAD", "refs/heads/main"],
             cwd=project_path,
             capture_output=True,
             text=True,
