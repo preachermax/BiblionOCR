@@ -414,6 +414,56 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 ---
 
+## ✅ File Intake / Drag-Drop Standardization
+
+* Shared local file URL intake now lives in `ViewController/0-MainUI/LocalFileDrop.py`
+* `LocalFileDropMixin` now provides:
+
+  * `install_local_file_drop(...)` for standard single-target image/text modules
+  * `install_local_file_drop_target(...)` for widget-specific routing in multi-pane modules
+  * shared non-modal drag-capable file pickers for text and image loads
+  * visible file-load feedback through terminal/status/wait-cursor helpers
+
+* Primary file-open workflows were standardized to the shared non-modal picker path in:
+
+  * `MyVersifier`
+  * `MyReader`
+  * `MyScanner`
+  * `MyGrounder`
+  * `MyGlypher`
+  * `MyBoxer`
+  * `MyServer`
+  * `MyWriter`
+  * `MyPixler`
+  * `MyLexer`
+  * `MyLauncher`
+
+* `MyVersifier` is the special multi-pane case:
+
+  * `RefText` was changed in Qt Designer so it is no longer read-only
+  * `MyVersifierUI.py` was regenerated from `QtDesignerUI/MyVersifierUI.ui`
+  * drops on `RefText` route to `getRefText(...)`
+  * drops on `VerseText` route to `getVerseText(...)`
+  * startup/file-load progress is now visible for long text loads and formatting passes
+
+* Expected behavior after the rollout:
+
+  * Windows Explorer drag/drop works on the main intake widgets
+  * shared picker windows can act as drag sources
+  * dropped files load contents instead of inserting URL text
+  * `.nt` is treated as a text-file extension
+
+* Constraint to preserve:
+
+  * native modal `QFileDialog` is not a reliable drag source back into the parent window on Windows
+  * keep using the shared non-modal picker path for drag-capable open workflows
+
+* Repository status note:
+
+  * `MyScannerWin.py` was intentionally removed from version control and added to `.gitignore`; keep it local-only unless there is an explicit reason to restore it to the repo
+
+---
+
 ## 🧱 System Boundaries (LOCKED)
 
 ### MyServer
