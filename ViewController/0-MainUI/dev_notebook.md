@@ -280,6 +280,12 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * The wrapper pattern is intended to be replicated across the other desktop modules after validation on `MyServer`
 
+### Windows Launcher Standardization
+
+* Windows traceback-preserving launchers now use the same wrapper principle as the Jetson `.desktop` flow, but with `.cmd` scripts under `launchers/`
+* Canonical repo-supported Windows wrappers now exist for the main tracked `My*.py` module entry points, documented in `WINDOWS_PERSISTENT_LAUNCHERS.md`
+* `MyScannerWin.py` is intentionally excluded from the repo-supported wrapper set because it was removed from version control and remains local-only
+
 ### Line Ending Safeguard
 
 * `.gitattributes` now forces LF line endings for `*.sh` and `*.desktop`
@@ -791,6 +797,9 @@ DO NOT update for:
 * 2026-06-30: Identified stale `acquire_qimage` helper contract mismatch in the current WIA path
 * 2026-06-30: Confirmed existing `NetworkScanner` belongs to discovery only; capability detection must remain a separate layer before backend selection
 * 2026-07-01: Jetson Canon TS3700 path validated with async scan-dialog loading, AirScan-first discovery, and SANE fallback entries that route final acquisition back through eSCL/AirScan by IP when native SANE transport is not dependable
+* 2026-07-02: Shared `LocalFileDrop.py` drag/drop routing and non-modal file picker workflows were standardized across the main image/text modules, with `MyVersifier` using pane-specific target routing and visible load progress
+* 2026-07-02: `MyScannerWin.py` was removed from version control and added to `.gitignore`, remaining local-only by design
+* 2026-07-02: Windows persistent launcher wrappers were standardized for the tracked `My*.py` entry points and documented in `WINDOWS_PERSISTENT_LAUNCHERS.md`
 
 ---
 
@@ -823,6 +832,7 @@ DO NOT update for:
 * dev_notebook.md
 * commit_checklist.md
 * AIcommitWorkflow.md
+* WINDOWS_PERSISTENT_LAUNCHERS.md
 
 ### Reference-Only / Supporting
 
@@ -843,6 +853,6 @@ DO NOT update for:
 
 ## 📅 Last Updated
 
-2026-06-30
+2026-07-02
 
 ---
