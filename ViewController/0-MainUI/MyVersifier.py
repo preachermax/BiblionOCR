@@ -290,6 +290,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # get session settings
         self._startup_progress("loading session settings")
         session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('VersifierSession.json')
+        repo_root_name = os.path.basename(os.path.normpath(self.projecthome))
 
         def get_setting(name: str, default=None):
             if default is None:
@@ -299,7 +300,23 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         def abs_project_path(name: str, default=''):
             value = session.get(f'self.{name}')
             if value:
-                return os.path.join(self.projecthome, value.lstrip('/'))
+                normalized_value = str(value).strip()
+
+                if len(normalized_value) > 1 and normalized_value[1] == ':' and normalized_value[0].isalpha():
+                    repo_marker = f'/{repo_root_name}/'
+                    posix_value = normalized_value.replace('\\', '/')
+                    marker_index = posix_value.lower().find(repo_marker.lower())
+                    if marker_index != -1:
+                        normalized_value = posix_value[marker_index + len(repo_marker):]
+                    elif os.name == 'nt':
+                        return os.path.normpath(normalized_value)
+
+                if os.path.isabs(normalized_value):
+                    return os.path.normpath(normalized_value)
+
+                return os.path.normpath(
+                    os.path.join(self.projecthome, normalized_value.lstrip('/\\'))
+                )
             return getattr(self, name, default)
 
         def data_path(name: str, default=''):

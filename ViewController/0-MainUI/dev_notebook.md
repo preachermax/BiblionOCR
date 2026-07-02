@@ -299,6 +299,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Session manager may return stale paths across environments
 * Continue.dev YAML/config sensitive to formatting
 * Cross-platform path contamination (Jetson ↔ Windows)
+* `MyVersifier` now remaps repo-local Windows session paths onto the active local repo root during startup, but other modules may still need the same normalization treatment if they restore machine-specific absolute paths
 * Jetson desktop launchers should not point directly at Python if traceback preservation is required; wrapper-based launchers should be treated as the standard path going forward
 * `MyServer.py` still has too much project-creation business logic
 * `Core/engine.py` now compiles without the prior debug side effect `print("ENGINE MODULE LOADING")`
@@ -805,6 +806,7 @@ DO NOT update for:
 * 2026-07-02: `MyExplorer.py` was upgraded from an internal-move-only tree to a real external drag/drop tree that can copy dropped files and folders into the project tree
 * 2026-07-02: `Model/Backup Copies/0-MainUI copy/Ui2Py.py` was repointed at the current Windows repo paths for rare backup-copy UI regeneration use, but targeted `pyuic5` remains preferred over broad regeneration
 * 2026-07-02: `Model/Project/Data/json/VersifierSession.json` was intentionally normalized by removing the duplicate `self.projectname` entry and updating the active Verse/Reference GroundTruth paths to the current Windows repo location
+* 2026-07-02: `MyVersifier.py` startup path restore now detects repo-local Windows absolute paths in `VersifierSession.json` and remaps them onto the current local checkout so Jetson startup does not prepend `/home/.../BiblionOCR/` to `C:/...` fragments
 
 ---
 
