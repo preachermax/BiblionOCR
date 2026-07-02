@@ -56,6 +56,7 @@ import MyScanner as scanner
 import MyExplorer as explorer
 import ChrReference as chrref
 from SessionManager import SessionManager
+from LocalFileDrop import LocalFileDropMixin
 
 #import PageVerseCrossReference as xref
 
@@ -110,18 +111,18 @@ class pandasModel(QAbstractTableModel):
             return self._data.columns[col]
         return None
 
-class Ui_MainWindow(qtw.QMainWindow):
+class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # Set Project Home
         self.mod_dirname = os.path.dirname(__file__)
         up_once = os.path.join(self.mod_dirname,"..")
         up_twice = os.path.join(up_once,"..")
         self.mod_rootdir = up_twice
         self.mod_realpath = os.path.realpath(self.mod_rootdir)
-        self.mod_abspath = os.path.abspath(self.mod_realpath) 
+        self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
         print(f'OS Path dirname: {self.mod_dirname}')
@@ -132,17 +133,22 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'OS Path abspath: {self.mod_abspath}')
         print(f'OS Path relpath: {self.mod_dirname}')
         print(f'Project Home: {self.projecthome}')
-        
-        
-        
+
+
+
         # Drops
         self.setAcceptDrops(True)
 
         #UI
-        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Grounder()
-        self.ui.setupUi(self)           
+        self.ui.setupUi(self)
+        self.install_local_file_drop(
+            [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'OCRTextEdit', None), getattr(self.ui, 'TextFileEdit', None)],
+            image_handler=self.loadDropImageEvent,
+            text_handler=self.loadDropTextEvent,
+        )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyGrounder')
         # Applications
@@ -165,7 +171,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Line Image controls
         #self.ui.StageButton.clicked.connect(self.Stage_Greek_tiff_Lines)
         self.ui.actionStage_Ground_Truth.triggered.connect(self.Stage_Greek_tiff_Lines)
-        self.ui.ImageButton.clicked.connect(self.loadImage)       
+        self.ui.ImageButton.clicked.connect(self.loadImage)
         self.ui.PrevImgButton.clicked.connect(self.prevImage)
         self.ui.NextImgButton.clicked.connect(self.nextImage)
         self.ui.SaveImgAsButton.clicked.connect(self.SaveImgFileDialog)
@@ -205,7 +211,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.SavePageTextButton.clicked.connect(self.SavePageTextDialog)
 
 
-        # Verse 
+        # Verse
         self.ui.VerseFindButton.clicked.connect(versefind.Find(self).show)
         self.ui.PageFindButton.clicked.connect(scanfind.Find(self).show)
         self.ui.StartbookComboBox.currentTextChanged.connect(self.selectBookCombo)
@@ -216,7 +222,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.VersefontComboBox.currentFontChanged.connect(self.on_verse_font_update)
         self.ui.VersefontSizeBox.valueChanged.connect(self.on_verse_font_update)
         self.ui.SaveVerseTextButton.clicked.connect(self.SaveVerseTextDialog)
-        
+
         # Final
         #self.ui.ReviewCompletecheckBox.stateChanged.connect(self.updateXRef)
         #self.ui.RenameButton.clicked.connect(self.buildXRef)
@@ -233,20 +239,34 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.lastverse = None
         self.imgfileList = []
         self.txtfileList = []
-        
+
         self.VerseLastEnd = 0
-        
+
         self.OpenChrReference()
 
         # Reference
         #ChrRefText = open(self.projecthome + 'ViewController/3-ConductOCR/FROMVS ChrReference.txt', encoding='UTF-8').read()
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
-        
+
         #self.loadChapterCombo()
 
         #self.loadVerseText()
 
 # Drop Functons
+    def _first_local_drop_path(self, event):
+        for url in event.mimeData().urls():
+            if url.isLocalFile():
+                return url.toLocalFile()
+        return ""
+
+    @staticmethod
+    def _is_image_file(file_path):
+        return os.path.splitext(file_path)[1].lower() in {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif", ".webp"}
+
+    @staticmethod
+    def _is_text_file(file_path):
+        return os.path.splitext(file_path)[1].lower() in {".txt", ".md", ".json", ".csv", ".tsv", ".xml", ".html", ".htm", ".ris"}
+
     def dragEnterEvent(self, event):
         m = event.mimeData()
         if m.hasUrls():
@@ -255,29 +275,26 @@ class Ui_MainWindow(qtw.QMainWindow):
                     event.accept()
                     return
         event.ignore()
-              
+
     def dropEvent(self, event):
-        if event.mimeData().hasText:
-            file_path = event.mimeData().urls()[0].toLocalFile()
+        file_path = self._first_local_drop_path(event)
+        if file_path and self._is_image_file(file_path):
+            event.setDropAction(Qt.CopyAction)
+            print(f'image file path: {file_path}')
+            self.loadDropImageEvent(file_path)
+            event.accept()
+        elif file_path and self._is_text_file(file_path):
             print(f'text file path: {file_path}')
             self.loadDropTextEvent(file_path)
             event.accept()
-        if event.mimeData().hasImage:
-            event.setDropAction(Qt.CopyAction)
-            file_path = event.mimeData().urls()[0].toLocalFile()
-            print(f'image file path: {file_path}')
-            self.loadDropImageEvent(file_path)
-            event.accept()        
-
         else:
-            file_path = event.mimeData().urls()[0].toLocalFile()
             print(f'drop file ignored: {file_path}')
             event.ignore()
 
 # Session functions
     def get_session_settings(self):
-        # get session settings        
-        # Define json data        
+        # get session settings
+        # Define json data
         print("loading session")
         sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         data = list(sm.load('GrounderSession.json').values())
@@ -300,7 +317,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         latin_book_markdown_key = r"self.latinbookmarkdown"
         sourcefile_key = r"self.sourcefile"
         firstpage_key = r"self.firstpage"
-        lastpage_key = r"self.lastpage"            
+        lastpage_key = r"self.lastpage"
         imagepath_key = r"self.imagepath"
         imagedir_key = r"self.imagedir"
         imagepage_key = r"self.imagepage"
@@ -314,7 +331,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         textpath_key = r"self.textpath"
         textdir_key = r"self.textdir"
         textfileList_key = r"self.textfileList"
-        PagelastStart_key = r"self.PagelastStart"       
+        PagelastStart_key = r"self.PagelastStart"
         pagetextpath_key = r"self.pagetextpath"
         pagetextdir_key = r"self.pagetextdir"
         pagetextfileList_key = r"self.pagetextfileList"
@@ -340,7 +357,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             elif Setting['Setting'] == session_key:
                 self.session = Setting['CurrentValue']
                 self.session = self.projecthome + self.jsondir + "/" + self.session
-            elif Setting['Setting'] == workflow_key: 
+            elif Setting['Setting'] == workflow_key:
                 self.workflow = Setting['CurrentValue']
                 self.workflow = self.projecthome + self.jsondir + "/" + self.workflow
             elif Setting['Setting'] == crossref_key:
@@ -360,30 +377,30 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
             elif Setting['Setting'] == ocrmodel_key:
                 self.ocrmodel = Setting['CurrentValue']
-                self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)              
-            elif Setting['Setting'] == bookabbr_key:  
+                self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+            elif Setting['Setting'] == bookabbr_key:
                 self.bookabbr = Setting['CurrentValue']
             elif Setting['Setting'] == font_key:
                 self.font = Setting['CurrentValue']
                 self.ui.fontComboBox.setCurrentText(self.font)
             elif Setting['Setting'] == fontsize_key:
                 self.fontsize = Setting['CurrentValue']
-                self.ui.fontSizeBox.setValue(int(self.fontsize))           
-            elif Setting['Setting'] == source_book_markdown_key:  
+                self.ui.fontSizeBox.setValue(int(self.fontsize))
+            elif Setting['Setting'] == source_book_markdown_key:
                 self.sourcebookmarkdown = Setting['CurrentValue']
-            elif Setting['Setting'] == greek_book_markdown_key:  
+            elif Setting['Setting'] == greek_book_markdown_key:
                 self.greekbookmarkdown = Setting['CurrentValue']
                 if self.ocrlang == "Ancient Greek" or self.ocrlang == "Middle Greek" or self.ocrlang == "Modern Greek":
                     self.language = "greek"
-            elif Setting['Setting'] == latin_book_markdown_key:  
+            elif Setting['Setting'] == latin_book_markdown_key:
                 self.latinbookmarkdown = Setting['CurrentValue']
                 if self.ocrlang == "Latin":
                     self.language = "latin"
-            elif Setting['Setting'] == sourcefile_key:   
+            elif Setting['Setting'] == sourcefile_key:
                 self.sourcefile = self.projecthome + Setting['CurrentValue']
-            elif Setting['Setting'] == firstpage_key:  
+            elif Setting['Setting'] == firstpage_key:
                 self.firstpage = Setting['CurrentValue']
-            elif Setting['Setting'] == lastpage_key:  
+            elif Setting['Setting'] == lastpage_key:
                 self.lastpage = Setting['CurrentValue']
             elif Setting['Setting'] == imagepath_key:
                 self.imagepath = self.projecthome + Setting['CurrentValue']
@@ -393,22 +410,22 @@ class Ui_MainWindow(qtw.QMainWindow):
             elif Setting['Setting'] == imagepage_key:
                 self.imagepage = self.projecthome + Setting['CurrentValue']
             elif Setting['Setting'] == imageline_key:
-                self.imageline = self.projecthome + Setting['CurrentValue'] 
+                self.imageline = self.projecthome + Setting['CurrentValue']
             elif Setting['Setting'] == imagefileList_key:
                 self.imagefileList = Setting['CurrentValue']
             elif Setting['Setting'] == imagezoom_key:
                 self.imagezoom = Setting['CurrentValue']
             elif Setting['Setting'] == imagezoomslidervalue_key:
                 self.imagezoomslidervalue = Setting['CurrentValue']
-            elif Setting['Setting'] == dirIterator_key:  
+            elif Setting['Setting'] == dirIterator_key:
                 self.dirIterator = Setting['CurrentValue']
-            elif Setting['Setting'] == pixmap_key:  
+            elif Setting['Setting'] == pixmap_key:
                 self.pixmap = self.projecthome + Setting['CurrentValue']
-            elif Setting['Setting'] == qimage_key:  
+            elif Setting['Setting'] == qimage_key:
                 self.qimage = self.projecthome + Setting['CurrentValue']
-            elif Setting['Setting'] == textpath_key:  
-                self.textpath = self.projecthome + Setting['CurrentValue'] 
-            elif Setting['Setting'] == textdir_key:  
+            elif Setting['Setting'] == textpath_key:
+                self.textpath = self.projecthome + Setting['CurrentValue']
+            elif Setting['Setting'] == textdir_key:
                 self.textdir = self.projecthome + Setting['CurrentValue']
             elif Setting['Setting'] == textfileList_key:
                 self.textfileList = self.projecthome + Setting['CurrentValue']
@@ -445,7 +462,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             elif Setting['Setting'] == gtreview_key:
                 self.gtreview = Setting['CurrentValue']
             print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
-        
+
         print(f'Absolute Path to Project Directory: {self.projecthome}')
         if not hasattr(self, 'font') or not self.font:
             self.font = 'FROMVS'
@@ -464,7 +481,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.on_verse_font_update()
         except Exception:
             pass
- 
+
     def get_workflow_settings(self):
 
         # Opening JSON file
@@ -472,17 +489,17 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-        
+
         # Iterating through the json
         # list
         for Sequence in data:
             print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
-        
+
         # Closing file
         f.close()
 
     def get_xref_last_image(self):
-        
+
         imgdir = self.projecthome + "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
         xrefjsonfile = self.crossref
         #markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
@@ -499,8 +516,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(f'Next image for review: {self.imgpath}')
         self.getImage(self.imgpath)
         self.prevImage()
-        self.syncText2Image()   
-        
+        self.syncText2Image()
+
 # Application callers
     def OpenWithMyScanner(self):
         self.scannermain = scanner.MainWindow()
@@ -515,16 +532,16 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.boxermain.show()
 
     def OpenMyBrowser(self):
-        
+
         self.browsermain = explorer.MyFileBrowser()
         self.browsermain.show()
-    
+
     def OpenChrReference(self):
-        
+
         self.chrrefmain = chrref.CharacterReference()
         self.chrrefmain.show()
 
-    
+
 # Line image functions
     def setImageStack(self, tiffCaptureHandle):
         """ Set the scene'Model/Project/Data/json/PageVerseCrossReference.json current TIFF image stack to the input TiffCapture object.
@@ -550,7 +567,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         fileName = str(fileName)
         if len(fileName) and os.path.isfile(fileName):
             self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
-            
+
     def numFrames(self):
         """ Return the number of image frames in the stack.
         """
@@ -581,34 +598,37 @@ class Ui_MainWindow(qtw.QMainWindow):
             return
         # Convert frame ndarray to a QImage.
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
-    
+
     def loadDropImageEvent(self,file_path):
         self.imgpath = file_path
         if self.imgpath:
-            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))       
+            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
             self.imgfilename = os.path.basename(self.imgpath)
             self.imgdir = os.path.dirname(self.imgpath)
             self.showImage(self.imgpath)
             #self.sortImgFiles()
-    
+
     def loadImage(self):
-        self.imgpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Select Image', "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/", 'Image Files (*.png *.jpg *.jpeg *.tif *.bmp)')[0]
-        self.getImage(self.imgpath)   
-            
+        self.open_non_modal_image_picker(
+            'Select Image',
+            "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/",
+            self.getImage,
+            '_image_open_dialog',
+        )
+
         #moved to getImage()
-        '''self.ui.ImageFileName.setText(os.path.basename(self.imgpath))       
+        '''self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
         self.imgfile = qtc.QFile(self.imgpath)
         self.imgfilename = os.path.basename(self.imgpath)
         self.showImage(self.imgpath)'''
-    
+
     def getImage(self, imgpath):
             # normalize incoming path and build robust file list
             if not imgpath:
                 return
             self.imgpath = os.path.normpath(imgpath)
             #create file list
-            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))       
+            self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
             self.imgfile = qtc.QFile(self.imgpath)
             self.imgfilename = os.path.basename(self.imgpath)
             self.imgdirname = os.path.normpath(os.path.dirname(self.imgpath))
@@ -619,7 +639,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.imgfileList.append(ipath)
             self.sortImgFiles()
             self.showImage(self.imgpath)
-         
+
     def showImage(self,imgpath):
         if not imgpath:
             return
@@ -627,10 +647,10 @@ class Ui_MainWindow(qtw.QMainWindow):
         if self.imgpath.endswith('.tif'):
             self.loadImageStackFromFile(self.imgpath)
             self.showFrame(0)
-            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImageView.size(), 
+            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.ImageView.size(),
                 qtc.Qt.KeepAspectRatio)
         else:
-            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.ImageView.size(), 
+            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.ImageView.size(),
                 qtc.Qt.KeepAspectRatio)
 
         if self.pixmap.isNull():
@@ -654,7 +674,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # cycle through the iterator until the current file is found
             if it == self.imgpath:
                 break
-    
+
     def setRevImgDirIterator(self):
         self.imgdirRevIterator = reversed(self.sorted_imgfilelist)
         #print(f'Image Directory Reverse Iterator: {list(self.imgdirRevIterator)}')
@@ -669,11 +689,11 @@ class Ui_MainWindow(qtw.QMainWindow):
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
         # sort using the basename so paths/drive letters don't affect ordering
         self.sorted_imgfilelist = sorted(self.imgfileList, key=lambda p: alphanum_key(os.path.basename(p)))
-        
+
         #self.setFwdImgDirIterator()
         #self.setRevImgDirIterator()
 
-    
+
     def nextImage(self):
         if not self.imgpath or not self.sorted_imgfilelist:
             return
@@ -694,7 +714,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.imgpath = self.sorted_imgfilelist[nextidx]
         self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
         self.getImage(self.imgpath)
-    
+
     def prevImage(self):
         if not self.imgpath or not self.sorted_imgfilelist:
             return
@@ -713,7 +733,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.imgpath = self.sorted_imgfilelist[previdx]
         self.ui.ImageFileName.setText(os.path.basename(self.imgpath))
         self.getImage(self.imgpath)
-    
+
     def bothNext(self):
         # Advance both text and image independently.
         self.nextText()
@@ -723,10 +743,10 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Move both text and image independently.
         self.prevText()
         self.prevImage()
-       
+
     '''
     def nextImage(self):
-        if self.imgpath:    
+        if self.imgpath:
             for it in self.imgdirIterator:
             # cycle through the iterator until the current file is found
                 if it == self.imgpath:
@@ -738,7 +758,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.loadImage()
 
     def prevImage(self):
-        if self.imgpath:    
+        if self.imgpath:
             for it in self.imgdirRevIterator:
             # cycle through the iterator until the current file is found
                 if it == self.imgpath:
@@ -770,13 +790,14 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.textfile = qtc.QFile(self.textpath)
             self.txtfilename = os.path.basename(self.textpath)
             self.showText(self.textpath)
-    
-    def loadText(self):
 
-        self.textpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-    
-        self.getText(self.textpath)
+    def loadText(self):
+        self.open_non_modal_text_picker(
+            'Open text file',
+            'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/',
+            self.getText,
+            '_text_open_dialog',
+        )
 
     def getText(self,textpath):
             if not textpath:
@@ -785,7 +806,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.txtdirname = os.path.normpath(os.path.dirname(self.textpath))
             # create file list only if the directory changed or if it is missing
             if not getattr(self, 'txtfileList', None) or getattr(self, '_txtdirname_cached', None) != self.txtdirname:
-                self.ui.TextFileName.setText(os.path.basename(self.textpath))       
+                self.ui.TextFileName.setText(os.path.basename(self.textpath))
                 self.txtfile = qtc.QFile(self.textpath)
                 self.txtfilename = os.path.basename(self.textpath)
                 self.txtfileList = []
@@ -796,12 +817,12 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.sortTextFiles()
                 self._txtdirname_cached = self.txtdirname
             else:
-                self.ui.TextFileName.setText(os.path.basename(self.textpath))       
+                self.ui.TextFileName.setText(os.path.basename(self.textpath))
                 self.txtfile = qtc.QFile(self.textpath)
                 self.txtfilename = os.path.basename(self.textpath)
             self.showText(self.textpath)
-            
-    def showText(self,txtpath):        
+
+    def showText(self,txtpath):
         self.textpath = txtpath
         if not self.textpath:
             return
@@ -878,7 +899,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             #print(f'Text Directory Iterator: {list(self.txtdirIterator)}')
             if next(self.txtdirIterator) == self.textpath:
                 break
-     
+
     def setRevTxtDirIterator(self):
         self.txtdirRevIterator = reversed(self.sorted_txtfilelist)
         #print(f'Text Directory Reverse Iterator: {list(self.txtdirRevIterator)}')
@@ -933,7 +954,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.textpath = self.sorted_txtfilelist[previdx]
         self.ui.TextFileName.setText(os.path.basename(self.textpath))
         self.getText(self.textpath)
-    
+
     '''
     def nextText(self):
         if self.textpath:
@@ -944,7 +965,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.getText(self.textpath)
                 else:
                     self.loadText()
-    
+
     def prevText(self):
         if self.textpath:
             for it in self.txtdirRevIterator:
@@ -954,7 +975,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     self.getText(self.textpath)
                 else:
                     self.loadText()'''
-   
+
     def syncText2Image(self):
         #imgdir = "Model/Project/Images/Workflow/Greek/tif_greek_lines_4groundtruth/"
         xrefjsonfile = self.crossref
@@ -971,7 +992,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         bookAbbr = PageLineImageFile['StartBook']
                         #self.ui.bookComboBox.setCurrentText('bookAbbr')
                         f.close()
-            
+
             with open(markdownjsonfile, 'r') as f:
                 data = json.load(f)
                 # Iterating through the json BooksMarkDown
@@ -983,8 +1004,8 @@ class Ui_MainWindow(qtw.QMainWindow):
             filedir = os.path.dirname(self.imgpath)
             filesplit = os.path.splitext(filestr)
             filename = filesplit[0]
-            fileext = filesplit[1]                    
-            namesplit = filename.split("_")                    
+            fileext = filesplit[1]
+            namesplit = filename.split("_")
             versionref = namesplit[0]
             pagestr = namesplit[2]
             linestr = namesplit[3]
@@ -995,7 +1016,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         else:
             print(self.imagepath + " does not exist")
             self.loadImage()
-        
+
     def bothLoad(self):
         ''' load the matching file for either the current image or the current text '''
         def accept():
@@ -1011,19 +1032,19 @@ class Ui_MainWindow(qtw.QMainWindow):
                     print("finding matched image file for " + self.textpath)
                     txtfilename = self.textpath
                     file = qtc.QFile(txtfilename)
-                    filestr = os.path.basename(txtfilename)           
+                    filestr = os.path.basename(txtfilename)
                     filedir = os.path.dirname(txtfilename)
                     filesplit = os.path.splitext(filestr)
                     filename = filesplit[0]
-                    fileext = filesplit[1]                    
-                    namesplit = filename.split("_")                    
+                    fileext = filesplit[1]
+                    namesplit = filename.split("_")
                     versionref = namesplit[0]
                     pagestr = namesplit[2]
                     pagenum = int(pagestr)
-                    print(self.imagedir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                    print(self.imagedir +r"/"+ versionref + "_Page_" + pagestr + r".tif")
                 else:
                     print(self.textpath + " does not exist")
-                
+
                 self.tryimgpath = self.imagedir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
                 if self.tryimgpath:
                     print("opening " + self.tryimgpath)
@@ -1034,8 +1055,8 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         def reject():
-            pass        
-        
+            pass
+
         self.ImageTextPairDialog = qtw.QDialog()
         self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
@@ -1056,19 +1077,19 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
-        
 
-        # Iterate through the data in the JSON and pop (remove)                      
-        # the obj once we find it.                                                      
+
+        # Iterate through the data in the JSON and pop (remove)
+        # the obj once we find it.
         for i in range(len(data)):
             if data[i]["PageLineImageFile"] == imagefile:
                 data.pop(i)
                 break
 
-        # Output the updated file with pretty JSON                                      
+        # Output the updated file with pretty JSON
         # Closing file
         f.close()
-        
+
         os.remove(jsonfile)
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
@@ -1081,7 +1102,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.greekrenumberlines_ui = Ui_tifgreekrenumberlinesDialog()
         self.greekrenumberlines_ui.setupUi(self.tifgreekrenumberlinesDialog)
         self.tifgreekrenumberlinesDialog.show()
-        
+
         def accept():
             # if self.pdf4tifDialog.Accepted:
             # Empty default Workflow folder
@@ -1099,7 +1120,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
@@ -1126,7 +1147,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             pass
 
         seq = "GL4"
-        
+
         def setdefault():
             if self.greekrenumberlines_ui.defaultsrcBox.isChecked():
                 self.greekrenumberlines_ui.SourceButton.setEnabled(False)
@@ -1141,20 +1162,20 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.greekrenumberlines_ui.buttonBox.accepted.connect(accept)
         self.greekrenumberlines_ui.buttonBox.rejected.connect(reject)
 
-        if self.greekrenumberlines_ui.defaultsrcBox.isChecked(): 
-            
-            
+        if self.greekrenumberlines_ui.defaultsrcBox.isChecked():
+
+
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             with open(self.workflow) as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
-                    
+
                     if Sequence['Sequence'] == seq:
                         print(Sequence['Sequence'])
                         # set source line edit to default workflow folder
@@ -1168,11 +1189,11 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         rsp = self.tifgreekrenumberlinesDialog.exec_()
-        
-            
+
+
         print("completed renumbering Greek tif lines for ground truth")
         # tr.renumberimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.renumberimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
+        # tr.renumberimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
 
     def GreekRenumberLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
@@ -1182,7 +1203,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def DestGreekRenumberLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
-        
+
         if self.directory:
             self.greekrenumberlines_ui.DestinationLineEdit.setText(self.directory+r'/')
 
@@ -1197,7 +1218,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         if self.directory:
             self.stagegreeklines_ui.SourceLineEdit.setText(self.directory+r'/')'''
-    
+
     def Stage_Greek_tiff_Lines(self):
         print("staging Greek tif lines for ground truth")
         # usage: tr.stageimages(source, destination, startpage, endpage)
@@ -1205,7 +1226,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.greekstagelines_ui = Ui_tifgreekstagelinesDialog()
         self.greekstagelines_ui.setupUi(self.tifgreekstagelinesDialog)
         self.tifgreekstagelinesDialog.show()
-        
+
         def accept():
             # if self.pdf4tifDialog.Accepted:
             # Empty default Workflow folder
@@ -1223,7 +1244,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))'''
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
@@ -1250,7 +1271,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             pass
 
         seq = "GT4"
-        
+
         def setdefault():
             if self.greekstagelines_ui.defaultsrcBox.isChecked():
                 self.greekstagelines_ui.SourceButton.setEnabled(False)
@@ -1265,20 +1286,20 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.greekstagelines_ui.buttonBox.accepted.connect(accept)
         self.greekstagelines_ui.buttonBox.rejected.connect(reject)
 
-        if self.greekstagelines_ui.defaultsrcBox.isChecked(): 
-            
-            
+        if self.greekstagelines_ui.defaultsrcBox.isChecked():
+
+
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             with open(self.workflow) as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
-                    
+
                     if Sequence['Sequence'] == seq:
                         print(Sequence['Sequence'])
                         # set source line edit to default workflow folder
@@ -1292,12 +1313,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         rsp = self.tifgreekstagelinesDialog.exec_()
-        
-            
+
+
         print("completed staging Greek tif lines for ground truth")
         # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
-        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")    
-    
+        # tr.stageimages(r"c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/", "c:/users/max/Projects/Python/Images/Greek/tif_greek_tif4groundtruth/")
+
     '''def Stage_Greek_tiff_Lines(self):
         print("renumbering Greek tif lines for ground truth")
         # usage: tr.renumberimages(source, destination)
@@ -1305,7 +1326,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.stagegreeklines_ui = Ui_tifgreekstagelinesDialog()
         self.stagegreeklines_ui.setupUi(self.stagegreeklinesDialog)
         self.stagegreeklinesDialog.show()
-        
+
         def accept():
             # if self.pdf4tifDialog.Accepted:
             # Empty default Workflow folder
@@ -1321,7 +1342,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
-            
+
 
             # Stage Renamed Files
             for filename in os.listdir(source_renamed_folder):
@@ -1331,9 +1352,9 @@ class Ui_MainWindow(qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_file_path, workflow_folder,)
             #tr.renumberimages(self.stagegreeklines_ui.SourceLineEdit.text(), self.stagegreeklines_ui.DestinationLineEdit.text(), self.stagegreeklines_ui.StartPageLineEdit.displayText(), self.stagegreeklines_ui.EndPageLineEdit.displayText())
-            
+
             tr.stageimages(source_renamed_folder, workflow_folder)
-            
+
             # Extract to default Complete folder
             #if complete_folder:
                 #pp.pdf4tif(source_file_path, complete_folder)
@@ -1356,9 +1377,9 @@ class Ui_MainWindow(qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_file_path, workflow_folder,)
             #tr.renumberimages(self.stagegreeklines_ui.SourceLineEdit.text(), self.stagegreeklines_ui.DestinationLineEdit.text(), self.stagegreeklines_ui.StartPageLineEdit.displayText(), self.stagegreeklines_ui.EndPageLineEdit.displayText())
-            
+
             tr.stageimages(source_renumbered_folder, workflow_folder)
-            
+
             # Extract to default Complete folder
             #if complete_folder:
                 #pp.pdf4tif(source_file_path, complete_folder)
@@ -1379,7 +1400,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             pass
 
         seq = "GL5"
-        
+
         def setdefault():
             if self.stagegreeklines_ui.defaultsrcBox.isChecked():
                 self.stagegreeklines_ui.SourceRenamedButton.setEnabled(False)
@@ -1394,19 +1415,19 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.stagegreeklines_ui.buttonBox.accepted.connect(accept)
         self.stagegreeklines_ui.buttonBox.rejected.connect(reject)
 
-        if self.stagegreeklines_ui.defaultsrcBox.isChecked(): 
-               
+        if self.stagegreeklines_ui.defaultsrcBox.isChecked():
+
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
-                    
+
                     if Sequence['Sequence'] == seq:
                         print(Sequence['Sequence'])
                         # set source line edit to default workflow folder
@@ -1416,9 +1437,9 @@ class Ui_MainWindow(qtw.QMainWindow):
                         self.stagegreeklines_ui.SourceRenamedLineEdit.setText(source_renamed_folder)
                         self.stagegreeklines_ui.DestinationLineEdit.setText(workflow_folder)
                         #print(f'source_folder: {source_folder},workflow_folder: {workflow_folder},complete_folder: {complete_folder}')
-        
+
         seq = "GL6"
-        
+
         def setdefault():
             if self.stagegreeklines_ui.defaultsrcBox.isChecked():
                 self.stagegreeklines_ui.SourceRenumberedButton.setEnabled(False)
@@ -1427,20 +1448,20 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.stagegreeklines_ui.SourceRenumberedButton.clicked.connect(self.GreekRenumberLinesDialog)
 
-        if self.stagegreeklines_ui.defaultsrcBox.isChecked(): 
-            
-            
+        if self.stagegreeklines_ui.defaultsrcBox.isChecked():
+
+
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             with open('Model/Project/Data/json/Workflow.json') as f:
                 # returns JSON object as
                 # a dictionary
                 data = json.load(f)
                 # Search the key value using 'in' operator
                 for Sequence in data:
-                    
+
                     if Sequence['Sequence'] == seq:
                         print(Sequence['Sequence'])
                         # set source line edit to default workflow folder
@@ -1450,7 +1471,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
 
         #rsp = self.tifstagegreeklines_uiDialog.exec_()'''
-  
+
     def GreekStageLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename tif Greek lines source folder"))
 
@@ -1459,13 +1480,13 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def DestGreekStageLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
-        
+
         if self.directory:
             self.greekstagelines_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     '''def DestGreekStageLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select rename Greek lines destination folder"))
-        
+
         if self.directory:
             self.stagegreeklines_ui.DestinationLineEdit.setText(self.directory+r'/')'''
 
@@ -1474,11 +1495,11 @@ class Ui_MainWindow(qtw.QMainWindow):
         imgname = os.path.basename(self.imgfilename)
         imgfilepath = os.path.join(dirpath,imgname)
         print(imgname,"\t",imgfilepath)
-        #self.qimage.save(imgfilepath,"PNG")        
+        #self.qimage.save(imgfilepath,"PNG")
         image = self.pixmap
         image.save(qtw.QFileDialog.getSaveFileName(self.ui.centralwidget, 'Save Image As', dirpath,
                                             'Name (*.jpg *.jpeg *.png *.tiff *.tif)'))
-        
+
         '''FontChange/path = qtw.QFileDialog.getSaveFileName(
             self.centralwidget, 'Save Image As', '', 'Image Files (*.png *.jpg *.jpeg *.tif)')[0]
         with open(path, 'w') as file:
@@ -1498,8 +1519,8 @@ class Ui_MainWindow(qtw.QMainWindow):
     def SaveCorrectedTextFileDialog(self, MainWindow):
         #defaultdir = r"~/Projects/Python/EstablishTruth/Greek lines4groundtruth/"
         defaultdir = self.projecthome + "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/" + self.greekbookmarkdown + "/"
-       
-        
+
+
         defaultfile = self.ui.TextFileName.displayText()
         path = defaultdir + defaultfile
 
@@ -1512,7 +1533,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             file.write(my_CorrectedText)
         file.close()
 
-    def discardText(self):        
+    def discardText(self):
         print('Discard Line Text File')
         discarddir = self.projecthome + "Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_discard"
         txtfile = self.ui.TextFileName.displayText()
@@ -1551,11 +1572,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %Model/Project/Data/json/PageVerseCrossReference.json. Reason: %Model/Project/Data/json/PageVerseCrossReference.json' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 #source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_folder, workflow_dest_folder)
             #self.splittextlines(self.split_greeklines_ui.SourceLineEdit.text(),self.split_greeklines_ui.DestinationLineEdit.text())
@@ -1596,13 +1617,13 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.renumber_greeklines_ui.buttonBox.rejected.connect(reject)
 
         seq = ["GL7","AddStep"]
-        
-        if self.renumber_greeklines_ui.defaultsrcBox.isChecked(): 
+
+        if self.renumber_greeklines_ui.defaultsrcBox.isChecked():
         # disable source button (default)
-            
+
             for step in seq:
 
-                # Define json data        
+                # Define json data
                 with open(self.workflow) as f:
                     # returns JSON object as
                     # a dictionary
@@ -1618,9 +1639,9 @@ class Ui_MainWindow(qtw.QMainWindow):
                                 source_folder = Sequence['DefaultSource']+r'/'+self.greekbookmarkdown+r'/'
                                 self.renumber_greeklines_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/')
                                 workflow_dest_folder = Sequence['WorkflowFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                                complete_dest_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                                
+                                complete_dest_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
                 f.close()
-            
+
         rsp = self.renumber_greek_text_linesDialog.exec_()
         print("completed renaming Greek textlines for ground truth review")
         #tr.sortcroplines(r"c:/users/max/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_41_Mark/","c:/users/max/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_41_Mark/")
@@ -1633,9 +1654,9 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def DestRenumberGreekTextLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek text lines destination folder"))
-        
+
         if self.directory:
-            self.renumber_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')  
+            self.renumber_greeklines_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def _cached_font(self, font_name):
         if not hasattr(self, '_font_cache'):
@@ -1687,12 +1708,12 @@ class Ui_MainWindow(qtw.QMainWindow):
             #self.OCRDocument.insertPlainText(my_OCR_rawtext)
             self.ui.OCRTextEdit.setText(my_OCR_cleantext)
             file.close()
-        
-        # update font to selection and size  
+
+        # update font to selection and size
         self.on_font_update()
 
     def autoScan(self):
-        
+
         self.ui.OCRAccuracyLineEdit.clear()
         self.ui.OCRAccuracyLineEdit.setText('0.00')
         if self.ui.AutoScancheckBox.isChecked():
@@ -1702,8 +1723,8 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.ui.OCRTextEdit.clear()
 
     def OCRAccuracy(self):
-        print(f'calculating OCR accuracy result for: {self.ui.OCRTextEdit.displayText()}') 
-        
+        print(f'calculating OCR accuracy result for: {self.ui.OCRTextEdit.displayText()}')
+
         if self.ui.OCRTextEdit.displayText() != None:
 
             OCRtext = self.ui.OCRTextEdit.text()
@@ -1713,7 +1734,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             Linetext = self.ui.TextFileEdit.toPlainText()
             Linesplit = Linetext.split()
             print(f'Linesplit: {Linesplit}')
-            
+
             OCRwords = len(OCRsplit)
             print('OCR wordcount:' + str(OCRwords))
             Linewords = len(Linesplit)
@@ -1728,11 +1749,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                 #pattern = r'\b' + r'\w+'
                 print(f'ocrword: {ocrword}')
                 pattern = re.compile(re.escape(ocrword))
-                for lineword in Linesplit:            
+                for lineword in Linesplit:
                     print(f'lineword: {lineword}')
                     if re.search(pattern, lineword):
                         matchTotal += 1
-                
+
             if matchTotal > 0:
                 print(f'matchTotal: {matchTotal}')
 
@@ -1741,10 +1762,10 @@ class Ui_MainWindow(qtw.QMainWindow):
 
                 Linesymbols = len(Linetext)
                 print('Line symbolcount:' + str(Linesymbols))
-                
+
                 OCRFraction =  matchTotal / Linewords
-                
-                #OCRFraction = matchTotal/Linewords 
+
+                #OCRFraction = matchTotal/Linewords
                 OCRDecimal = Decimal(str(OCRFraction))
                 OCRPercent = OCRDecimal * 100
                 if OCRPercent > 100:
@@ -1759,11 +1780,11 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.ui.OCRAccuracyLineEdit.setText('0.00')
 
         '''jsonfile = 'Model/Project/Data/json/GrounderSession.json'
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
-            
-            ocraccuracy_key = r"self.ocraccuracy"       
+
+            ocraccuracy_key = r"self.ocraccuracy"
 
             for Setting in data:
                 if Setting['Setting'] == self.ocraccuracy_key:
@@ -1774,17 +1795,17 @@ class Ui_MainWindow(qtw.QMainWindow):
         os.remove(jsonfile)
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
-        f.close()'''    
+        f.close()'''
 
 # Book Chapter:Verse Combo Box fuctions
     def selectBookCombo(self):
         oldbookabbr = self.bookabbr
         self.bookabbr = self.ui.bookComboBox.currentText()
-        
+
         if self.ui.bookComboBox.currentText() != oldbookabbr:
-                  
+
             jsonfile = self.booksmarkdown
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -1795,7 +1816,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                         self.latinbookmarkdown = 'latin'+self.bookmarkdown
                         print(self.bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
-            
+
             SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
                 'self.bookabbr': self.bookabbr,
                 'self.sourcebookmarkdown': self.sourcebookmarkdown,
@@ -1808,18 +1829,18 @@ class Ui_MainWindow(qtw.QMainWindow):
                 # returns JSON object as
                     # a dictionary
                 data = json.load(f)'''
-            
+
             #self.ui.bookComboBox.clear()
-            
+
             # Iterating through the json
-            # list          
+            # list
             '''for booknumber in data:
                 print(booknumber['bookabbr'])
                 self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-            
+
             # Closing file
             f.close()'''
-            
+
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
         self.ui.StartbookComboBox.setCurrentText(self.bookabbr)
 
@@ -1850,7 +1871,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             # returns JSON object as
             # a dictionary
             data = json.load(f)
-            
+
         # Iterating through the json
         # list
         for Verse in data:
@@ -1870,7 +1891,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self._cached_pagetextpath = self.pagetextpath
             else:
                 self.pageAutoSeek()
-    
+
     def sortPageFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
@@ -1890,8 +1911,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
             'self.pagetextfileList': self.pagetextfileList,
         })
-    
-    def showPageText(self,txtfilename):       
+
+    def showPageText(self,txtfilename):
         self.ui.PageText.clear()
         try:
             with open(self.pagetextpath, 'r', encoding='utf-8') as f:
@@ -1907,7 +1928,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.pagetext = pagetext
         self.on_page_font_update()
         self.pageAutoSeek()
-    
+
     def pageAutoSeek(self):
 
         if self.ui.PageAutoSeekcheckBox.isChecked():
@@ -1915,7 +1936,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             cursor.setPosition(0)
             for i in range(self.linenum):
                 if i == 0:
-                    cursor.movePosition(qtg.QTextCursor.StartOfLine,qtg.QTextCursor.MoveAnchor)       
+                    cursor.movePosition(qtg.QTextCursor.StartOfLine,qtg.QTextCursor.MoveAnchor)
                 else:
                     cursor.movePosition(qtg.QTextCursor.NextBlock,qtg.QTextCursor.MoveAnchor)
             cursor.movePosition(qtg.QTextCursor.EndOfLine,qtg.QTextCursor.KeepAnchor)
@@ -1935,17 +1956,17 @@ class Ui_MainWindow(qtw.QMainWindow):
                 msg.setStandardButtons(qtw.QMessageBox.Ok)
                 # start the app
                 retval = msg.exec_()
-        
+
         else:
             print("Page text auto seek disabled")
- 
-    def getPage(self):  
+
+    def getPage(self):
         self.ui.PageText.clear()
-        textfilestr = self.ui.TextFileName.displayText()    
-        filesplit = os.path.splitext(textfilestr)  
+        textfilestr = self.ui.TextFileName.displayText()
+        filesplit = os.path.splitext(textfilestr)
         filename = filesplit[0]
         fileext = filesplit[1]
-        namesplit = filename.split("_")        
+        namesplit = filename.split("_")
         versionref = namesplit[0]
         self.pagenumstr = namesplit[2]
         pagenum = int(self.pagenumstr)
@@ -1957,7 +1978,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.PagelineEdit.setText(self.pagenumstr)
         self.pagetextpath = self.pagetextdir + "/" + self.greekbookmarkdown + "/" + versionref + "_" + "Page" + "_" + self.pagenumstr + fileext
         print(f'Page text file path: {self.pagetextpath}')
-        
+
         pagetextpath = self.pagetextpath
         pagetextpath = pagetextpath.replace(self.projecthome,"")
         pagetextdir = self.pagetextdir
@@ -1969,12 +1990,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         })
 
     def SavePageTextDialog(self):
-        
+
         defaultfile =  os.path.basename(self.pagetextpath)
         defaultpath = self.pagetextpath
 
         print(f'Page textpath: {defaultpath}')
-        
+
         if defaultpath:
             path = defaultpath
             filename = defaultfile
@@ -1982,15 +2003,15 @@ class Ui_MainWindow(qtw.QMainWindow):
             path = qtw.QFileDialog.getSaveFileName(
                 self.ui.centralwidget, 'Save Corrected text file', '',
                 'Text files (*.txt)')[0]
-            filename = os.path.basename(path)        
+            filename = os.path.basename(path)
 
         print(f'Saving Page Text: {path}')
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.PageText.toPlainText()
             file.write(my_CorrectedText)
-        
+
         file.close()
-    
+
     def on_page_font_update(self):
         # update Page font to selection and size
         font_name = self.ui.PagefontComboBox.currentText()
@@ -2010,7 +2031,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.showVerseText(self.versetextpath)
                 self._cached_versetextpath = self.versetextpath
 
-    def showVerseText(self,txtfilename):       
+    def showVerseText(self,txtfilename):
         self.ui.VerseText.clear()
         try:
             with open(self.versetextpath, 'r', encoding='utf-8') as f:
@@ -2024,23 +2045,23 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self.ui.VerseText.setPlainText(versetext)
         self.on_verse_font_update()
-        
+
     def getVerse(self,find_end):
         print('Getting the book, chapter, and verse cross references ')
         cursor = self.ui.VerseText.textCursor()
         cursor.setPosition(find_end)
-        
+
         fullverse = cursor.block().text()
         print(f'full verse text: {fullverse}')
         lenverse = len(fullverse)
-        print(f'full verse length: {lenverse}') 
-        
+        print(f'full verse length: {lenverse}')
+
         cursor.movePosition(qtg.QTextCursor.EndOfBlock,qtg.QTextCursor.MoveAnchor)
         self.blockend = cursor.position()
         print(f'block end postion = {cursor.position()}')
         cursor.movePosition(qtg.QTextCursor.StartOfBlock,qtg.QTextCursor.MoveAnchor)
         print(f'start line postion = {cursor.position()}')
-        
+
         cursor.movePosition(qtg.QTextCursor.Right, qtg.QTextCursor.KeepAnchor,3)
         print(f'endbook postion = {cursor.position()}')
         #self.ui.VerseText.moveCursor(qtg.QTextCursor.EndOfWord,qtg.QTextCursor.KeepAnchor)
@@ -2049,7 +2070,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.StartbookComboBox.currentTextChanged.disconnect(self.loadChapterCombo)
         self.ui.StartbookComboBox.setCurrentText(self.book)
         self.ui.StartbookComboBox.currentTextChanged.connect(self.loadChapterCombo)
-        
+
         cursor.movePosition(qtg.QTextCursor.NextWord, qtg.QTextCursor.MoveAnchor)
         print(f'NextWord Position: {cursor.position()}')
         cursor.movePosition(qtg.QTextCursor.EndOfWord, qtg.QTextCursor.KeepAnchor)
@@ -2075,7 +2096,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         # may want to create auto enable radio button in gui.
 
         #self.updatesession()
-    
+
     def updatesession(self):
 
         SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
@@ -2091,7 +2112,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.StartbookComboBox.currentTextChanged.connect(self.loadChapterCombo)
         self.ui.StartchapterComboBox.currentTextChanged.connect(self.loadVerseCombo)
         self.ui.StartverseComboBox.currentTextChanged.connect(self.updateXRef_json)
-    
+
     def verseAutoSeek(self):
         self.verselength = 0
         if self.ui.VerseAutoSeekcheckBox.isChecked():
@@ -2104,7 +2125,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
             cursor = self.ui.VerseText.textCursor()
             print(f'Verse last ending cursor position: {self.VerseLastEnd}')
-            ''' 
+            '''
             if self.VerseLastEnd > 0:
                 self.VerseStart = self.VerseLastEnd
             else:
@@ -2128,14 +2149,14 @@ class Ui_MainWindow(qtw.QMainWindow):
             end = start + len(linestr)
             print(f'start: {start} end: {end}')
 
-            
+
             if start > 0:
 
                 cursor.movePosition(qtg.QTextCursor.Right, qtg.QTextCursor.MoveAnchor, start)
                 cursor.movePosition(qtg.QTextCursor.Right,qtg.QTextCursor.KeepAnchor, end-start)
                 selversetext = cursor.selectedText()
                 print(f'selected verse text: {selversetext}')
-                           
+
                 self.ui.VerseText.setTextCursor(cursor)
                 self.ui.VerseText.ensureCursorVisible()
 
@@ -2156,12 +2177,12 @@ class Ui_MainWindow(qtw.QMainWindow):
 
                 self.VerseStart = start
                 print(f'verse cursor start: {self.VerseStart}')
-                self.VerseLastEnd = end 
+                self.VerseLastEnd = end
                 print(f'verse cursor last found end position: {self.VerseLastEnd}')
                 self.getVerse(start)
 
                 #self.updatesession()
-                
+
                 self.updateXRef_json()
 
             #if start == -1 and self.findirection == 'next':
@@ -2170,7 +2191,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 #start = 0
 
                 self.getVerse(self.VerseLastEnd)
-                print(f'Getting current verse position at {self.VerseLastEnd}')                
+                print(f'Getting current verse position at {self.VerseLastEnd}')
                 print(f'End of block position: {self.blockend}')
                 print(f'verse last end position: {self.VerseLastEnd}')
                 cursor.movePosition(qtg.QTextCursor.Right, qtg.QTextCursor.MoveAnchor, self.VerseLastEnd)
@@ -2182,7 +2203,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 self.ui.VerseText.ensureCursorVisible()
 
                 self.updateXRef_json()
-                
+
                 remversetext = cursor.selectedText()
                 if remversetext[0] == " ":
                     remversetext = remversetext[1:]
@@ -2190,7 +2211,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                 print(f'remaining verse text: {remversetext} remaining verse length: {remverselen}')
                 linestart = linestr.find(remversetext)
 
-                try:                      
+                try:
                     if linestart == -1 and self.findirection == 'next':
                         raise VerseTextError
                 except VerseTextError:
@@ -2208,14 +2229,14 @@ class Ui_MainWindow(qtw.QMainWindow):
                 lineparttwo = linestr[remverselen:]
                 lenparttwo = len(lineparttwo)
                 print(f'line part two: {lineparttwo} length part two: {lenparttwo}')
-                
+
                 parttwostart = versetext.find(lineparttwo)
                 print(f'line part two start: {parttwostart}')
                 parttwoend = parttwostart + lenparttwo
                 print(f'line part two end: {parttwoend}')
                 print(f'block end: {self.blockend}')
 
-                try:                      
+                try:
                     if parttwostart == -1 and self.findirection == 'next':
                         raise VerseTextError
                 except VerseTextError:
@@ -2229,7 +2250,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     msg.setStandardButtons(qtw.QMessageBox.Ok)
                     # start the app
                     retval = msg.exec_()
-                if parttwostart > 0:                   
+                if parttwostart > 0:
                     print(f'current cursor before position: {cursor.position()}')
                     cursor.movePosition(qtg.QTextCursor.Right, qtg.QTextCursor.KeepAnchor, parttwoend - self.blockend)
                     print(f'current cursor after position: {cursor.position()}')
@@ -2247,22 +2268,22 @@ class Ui_MainWindow(qtw.QMainWindow):
                 print(f'complete previous text line not found')
                 self.prevImage()
                 self.prevText()
-   
+
         else:
-            print("Verse text auto seek disabled")    
+            print("Verse text auto seek disabled")
             self.reconnectStartComboBoxes()
             return
-        
+
         SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('GrounderSession.json', {
             'self.VerseStart': self.VerseStart,
             'self.VerseLastEnd': self.VerseLastEnd,
         })
 
     def SaveVerseTextDialog(self):
-        
+
         defaultfile =  os.path.basename(self.versetextpath)
         defaultpath = self.versetextpath
-        
+
         if defaultpath:
             path = defaultpath
             filename = defaultfile
@@ -2270,17 +2291,17 @@ class Ui_MainWindow(qtw.QMainWindow):
             path = qtw.QFileDialog.getSaveFileName(
                 self.ui.centralwidget, 'Save Corrected text file', '',
                 'Text files (*.txt)')[0]
-            filename = os.path.basename(path)        
+            filename = os.path.basename(path)
 
         print(f'Saving Verse Text: {path}')
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.VerseText.toPlainText()
             file.write(my_CorrectedText)
-        
+
         file.close()
 
     def on_verse_font_update(self):
-        # update Verse font to selection and size       
+        # update Verse font to selection and size
         font_name = self.ui.VersefontComboBox.currentText()
         font = self._cached_font(font_name)
         font.setPointSize(self.ui.VersefontSizeBox.value())
@@ -2291,7 +2312,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         'building the PageLineCrossReference.csv from renamed linefiles'
         def sorted_alphanumeric(data):
             convert = lambda text: int(text) if text.isdigit() else text.lower()
-            alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+            alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
             return sorted(data, key=alphanum_key)
             #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
@@ -2302,26 +2323,26 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(list_of_images)
 
         for image in list_of_images:
-                
+
                 filestr = os.path.basename(os.path.join(path_of_images, image))
-                
+
                 filestr = filestr.replace(r'.gt','')
 
                 filesplit = os.path.splitext(filestr)
-                
+
                 filename = filesplit[0]
-                
+
                 fileext = filesplit[1]
-                
+
                 namesplit = filename.split("_")
-                
-                
+
+
                 versionref = namesplit[0]
-                
+
                 pagestr = namesplit[2]
-                
+
                 pagenum = int(pagestr)
-                
+
                 linestr = namesplit[3].replace('Line','')
 
                 linenum = int(linestr)
@@ -2338,7 +2359,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         'loading the Page and Line combo boxes.'
         def sorted_alphanumeric(data):
             convert = lambda text: int(text) if text.isdigit() else text.lower()
-            alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+            alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
             return sorted(data, key=alphanum_key)
             #usage:dirlist = sorted_alphanumeric(os.listdir(...)) - works great!
 
@@ -2349,28 +2370,28 @@ class Ui_MainWindow(qtw.QMainWindow):
         print(list_of_images)
 
         for image in list_of_images:
-                
+
                 filestr = os.path.basename(os.path.join(path_of_images, image))
-                
+
                 filestr = filestr.replace(r'.gt','')
 
                 filesplit = os.path.splitext(filestr)
-                
+
                 filename = filesplit[0]
-                
+
                 fileext = filesplit[1]
-                
+
                 namesplit = filename.split("_")
-                
-                
+
+
                 versionref = namesplit[0]
-                
+
                 pagestr = namesplit[2]
-                
+
                 self.PVXrefDialog_ui.PagecomboBox.addItem(pagestr)
 
                 pagenum = int(pagestr)
-                
+
                 linestr = namesplit[3].replace('Line','')
                 self.PVXrefDialog_ui.LinecomboBox.addItem(linestr)
 
@@ -2385,10 +2406,10 @@ class Ui_MainWindow(qtw.QMainWindow):
         imagefile = self.ui.ImageFileName.displayText()
         #imagefile = imagefile.replace(r'.gt','')
         #filestr = os.path.basename(imagefile)
-        filesplit = os.path.splitext(imagefile)  
+        filesplit = os.path.splitext(imagefile)
         filename = filesplit[0]
         fileext = filesplit[1]
-        namesplit = filename.split("_")        
+        namesplit = filename.split("_")
         versionref = namesplit[0]
         pagestr = namesplit[2]
         pagenum = int(pagestr)
@@ -2401,11 +2422,11 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         with open(jsonfile, 'r') as f:
             data = json.load(f)
-        
+
             # Iterating through the json
             # list
             for PageLineImageFile in data:
-                
+
                 if PageLineImageFile['PageLineImageFile'] == imagefile:
 
                     PageLineImageFile['Page'] = str(pagenum)
@@ -2416,7 +2437,7 @@ class Ui_MainWindow(qtw.QMainWindow):
                     PageLineImageFile['StartVerse'] = self.ui.StartverseComboBox.currentText()
         # Closing file
         f.close()
-        
+
         os.remove(jsonfile)
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
@@ -2424,7 +2445,7 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def updateXRef_csv(self):
         if self.ui.ReviewCompletecheckBox.isChecked():
-        
+
             'update the PageLineCrossReference.csv'
             imagefile = self.ui.ImageFileName.displayText()
             textfile = self.ui.TextFileName.displayText()
@@ -2436,20 +2457,20 @@ class Ui_MainWindow(qtw.QMainWindow):
             startverse =  self.ui.StartverseComboBox.currentText()
             self.ocraccuracy = self.ui.OCRAccuracyLineEdit.displayText()
 
-            filestr = os.path.basename(imagefile)    
-            filesplit = os.path.splitext(filestr)  
+            filestr = os.path.basename(imagefile)
+            filesplit = os.path.splitext(filestr)
             filename = filesplit[0]
             fileext = filesplit[1]
-            namesplit = filename.split("_")        
+            namesplit = filename.split("_")
             versionref = namesplit[0]
             pagestr = namesplit[2]
             pagenum = int(pagestr)
             linestr = namesplit[3].replace('Line','')
             linenum = int(linestr)
-            
+
             XReffile = self.crossref
             tempfile = NamedTemporaryFile(mode='w', delete=False)
-            
+
             fields = ['LineImageFile','ImgPageNum','ImgPageLineNum','LineTextFile','LineText','Valid','ReviewComplete','StartBook','StartChapter','StartVerse','OCRAccuracy']
 
             with open(XReffile, 'r', encoding='UTF-8') as csvfile, tempfile:
@@ -2463,11 +2484,11 @@ class Ui_MainWindow(qtw.QMainWindow):
                     row = {'LineImageFile': row['LineImageFile'], 'ImgPageNum': row['ImgPageNum'], 'ImgPageLineNum': row['ImgPageLineNum'], 'LineTextFile': row['LineTextFile'],row['LineText']:'LineText',row['Valid']:'Valid',row['ReviewComplete']:'ReviewComplete',row['StartBook']:'StartBook',row['StartChapter']:'StartChapter',row['StartVerse']:'StartVerse',row['OCRAccuracy']:'OCRAccuracy'}
                     writer.writerow(row)
 
-            shutil.move(tempfile.name, filename)  
+            shutil.move(tempfile.name, filename)
 
     def PageVerseXref(self):
-        
-        
+
+
         print("Page Verse Cross Reference Dialog")
         # usage: tr.renumberimages(source, destination)
 
@@ -2475,49 +2496,49 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.PVXrefDialog_ui = Ui_PageVerseXrefDialog()
         self.PVXrefDialog_ui.setupUi(self.PageVerseXrefDialog)
         self.PageVerseXrefDialog.show()
-        
+
         # Initialize XRef Dialog
-        def InitDialog():            
-            
+        def InitDialog():
+
             lineimgfile = self.ui.ImageFileName.displayText()
             linetxtfile =  self.ui.TextFileName.displayText()
             imagefile = lineimgfile
             imagefile = imagefile.replace(r'.gt','')
             filestr = os.path.basename(imagefile)
-            filesplit = os.path.splitext(filestr)  
+            filesplit = os.path.splitext(filestr)
             filename = filesplit[0]
             fileext = filesplit[1]
-            namesplit = filename.split("_")        
+            namesplit = filename.split("_")
             versionref = namesplit[0]
             pagestr = namesplit[2]
             #pagenum = int(pagestr)
             #page = pagestr
             page = self.ui.PagelineEdit.displayText()
             pagenum = int(page)
-            
+
             linestr = namesplit[3].replace('Line','')
             linenum = int(linestr)
             line = linenum
-            
+
             # Initialize Filenames
 
-            pageimgfile = versionref + "_" + "Page" + "_" + page + fileext 
+            pageimgfile = versionref + "_" + "Page" + "_" + page + fileext
             self.PVXrefDialog_ui.PageImageFileName.setText(pageimgfile)
-            
+
             self.PVXrefDialog_ui.LineImageFileName.setText(lineimgfile)
-            
+
             pagetextfile = os.path.basename(self.pagetextpath)
             self.PVXrefDialog_ui.PageTextFileName.setText(pagetextfile)
-            
+
             self.PVXrefDialog_ui.LineTextFileName.setText(linetxtfile)
 
             book = self.ui.StartbookComboBox.currentText()
             chapter = self.ui.StartchapterComboBox.currentText()
             verse = self.ui.StartverseComboBox.currentText()
-            
+
             self.xref_df = pd.read_json(self.crossref)
             self.xref_table_df = self.xref_df[["Page","PageLine","StartBook","StartChapter","StartVerse"]]
-            
+
             # Initialize comboBoxes
             page_col = self.xref_df["Page"]
             page_nums = page_col.unique()
@@ -2526,12 +2547,12 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.PVXrefDialog_ui.PagecomboBox.addItems(pages)
             self.PVXrefDialog_ui.PagecomboBox.setCurrentText(page)
             self.PVXrefDialog_ui.PagecomboBox.currentTextChanged.connect(set_pageframe)
-            
+
 
             self.PVXrefDialog_ui.LinecomboBox.setCurrentText(str(line))
             self.PVXrefDialog_ui.LinefindPushButton.clicked.connect(set_pagelineframe)
             #self.PVXrefDialog_ui.LinecomboBox.currentTextChanged.connect()
-            
+
             self.PVXrefDialog_ui.StartbookComboBox.setCurrentText(book)
             #self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
             self.PVXrefDialog_ui.StartchapterComboBox.setCurrentText(chapter)
@@ -2542,22 +2563,22 @@ class Ui_MainWindow(qtw.QMainWindow):
             book = self.PVXrefDialog_ui.StartbookComboBox.currentText()
             chapter = self.PVXrefDialog_ui.StartchapterComboBox.currentText()
             verse = self.PVXrefDialog_ui.StartverseComboBox.currentText()'''
-        
+
             #df = pd.read_json('Model/Project/Data/json/PageVerseCrossReference.json')
             #table_df = df[["Page","PageLine","StartBook","StartChapter","StartVerse"]]
-            
+
             #self.PVXrefDialog_ui.LinefindPushButton.clicked.connect(pagefilter(page))
             #self.PVXrefDialog_ui.LinefindPushButton.clicked.connect(linefilter(page, line))
             #self.PVXrefDialog_ui.VersefindPushButton.clicked.connect(versefind(book, chapter, verse))
-        
+
             model = pandasModel(self.xref_table_df)
             self.PVXrefDialog_ui.XrefTableView.setModel(model)
-        
+
         def set_pageframe():
             page = self.PVXrefDialog_ui.PagecomboBox.currentText()
             page_filter = (self.xref_df["Page"] == int(page))
             self.xref_table_df = self.xref_df.loc[page_filter,["Page","PageLine","StartBook","StartChapter","StartVerse"]]
-            
+
             #set linecombo
             line_col = self.xref_table_df["PageLine"]
             print(line_col)
@@ -2566,7 +2587,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             lines = [str(x) for x in line_col]
             self.PVXrefDialog_ui.LinecomboBox.clear()
             self.PVXrefDialog_ui.LinecomboBox.addItems(lines)
-            
+
         def set_pagelineframe():
             page = int(self.PVXrefDialog_ui.PagecomboBox.currentText())
             line = int(self.PVXrefDialog_ui.LinecomboBox.currentText())
@@ -2580,7 +2601,7 @@ class Ui_MainWindow(qtw.QMainWindow):
             #table_df = row_df[["Page","PageLine","StartBook","StartChapter","StartVerse"]]
             model = pandasModel(page_df)
             self.PVXrefDialog_ui.XrefTableView.setModel(model)
-            
+
             self.PVXrefDialog_ui.XrefTableView.selectRow(line - 1)
             idx_row = self.PVXrefDialog_ui.XrefTableView.currentIndex()
             print(f'idx_row: {idx_row}')
@@ -2602,14 +2623,14 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         def getSelectedBook():
             return self.PVXrefDialog_ui.XrefTableView.item(getSelectedRowId(),2).text()
-        
+
         def versefind(book, chapter, verse):
             print("Page Verse Cross Reference Verse Find")
 
         InitDialog()
 
-# Only run this code if I am actually running this script       
-if __name__ == '__main__': 
+# Only run this code if I am actually running this script
+if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = Ui_MainWindow()
     w.show()

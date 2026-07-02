@@ -35,6 +35,7 @@ from PyQt5.QtGui import QPainter, QPen, QBrush
 from queue import Queue
 from ext import mainfind
 from MyGlypherUI import Ui_Glypher
+from LocalFileDrop import LocalFileDropMixin
 from Training import Train as tr
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
@@ -153,7 +154,7 @@ class ProgThread(QThread):
             time.sleep(0.3)
             self.change_value.emit(cnt)
 
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1380,8 +1381,12 @@ class MainWindow(qtw.QMainWindow):
 
     def loadImage(self):
         imgdir = "Model/Project/Images/Workflow"
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        self.getImage(self.imgpath)
+        self.open_non_modal_image_picker(
+            'Open image file',
+            imgdir,
+            self.getImage,
+            '_image_open_dialog',
+        )
 
     def getImage(self, imgpath):
         self.imgpath = imgpath
@@ -1681,11 +1686,12 @@ class MainWindow(qtw.QMainWindow):
             self.ui.stackedWidget.setCurrentIndex(1)
 
     def loadText(self):
-
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.BoxWidget, 'Open text file', 'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-        print(f'self.txtpath: {self.txtpath}')
-        self.getText(self.txtpath)
+        self.open_non_modal_text_picker(
+            'Open text file',
+            'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/',
+            self.getText,
+            '_text_open_dialog',
+        )
 
     def getText(self,textpath):
             self.txtpath = textpath

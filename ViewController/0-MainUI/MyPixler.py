@@ -54,6 +54,7 @@ from PreProcess import PreProcess as pp
 from MyPixlerUI import Ui_Pixler
 from Adjust import crop_processor, get_processor, rotate_processor, threshold_processor, PROCESSORS
 from ImagePreviewDialog import ImagePreviewDialog
+from LocalFileDrop import LocalFileDropMixin
 
 
 # Dialog Imports
@@ -110,7 +111,7 @@ from Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
 #         self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
 
 
-class PixlerMain(qtw.QMainWindow):
+class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, imgpath=None, parent=None, launch_args=None):
         super().__init__(parent)
@@ -2824,16 +2825,14 @@ class PixlerMain(qtw.QMainWindow):
             print("[Pixler] Ref image indexed")
 
     def loadRefImg(self):
-        fileName, _ = qtw.QFileDialog.getOpenFileName(
-            self,
+        self.open_non_modal_image_picker(
             "Open Reference Image",
-            "",
-            "Images (*.png *.jpg *.jpeg *.tif *.tiff)"
+            self.refimgdir or self.imagedir or "",
+            self._load_ref_image_from_picker,
+            '_ref_image_open_dialog',
         )
 
-        if not fileName:
-            print("[OPEN] No file selected")
-            return
+    def _load_ref_image_from_picker(self, fileName):
 
         fileName = os.path.abspath(os.path.normpath(fileName))
 

@@ -41,6 +41,7 @@ from ext import mainfind
 from MyGlypherUI import Ui_Glypher
 from Training import Train as tr
 import ChrReference as chrref
+from LocalFileDrop import LocalFileDropMixin
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal
@@ -76,7 +77,7 @@ class ProgThread(QThread):
             time.sleep(0.3)
             self.change_value.emit(cnt)
 
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -101,6 +102,11 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
+        self.install_local_file_drop(
+            [self, getattr(self.ui, 'GlypherWidget', None)],
+            image_handler=self.getImage,
+            text_handler=self.getText,
+        )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyGlypher')
         self.ui.GlyphImgTab.currentChanged.connect(self.on_tabChanged)
@@ -612,8 +618,12 @@ class MainWindow(qtw.QMainWindow):
 
     def loadImage(self):
         #imgdir = self.projecthome + "Model/Project/Images/Workflow"
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.GlypherWidget,self.imgopentitle,self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        self.getImage(self.imgpath)
+        self.open_non_modal_image_picker(
+            self.imgopentitle or 'Open image file',
+            self.imgdir,
+            self.getImage,
+            '_image_open_dialog',
+        )
 
     def getImage(self, imgpath):
         if not imgpath:
@@ -835,11 +845,12 @@ class MainWindow(qtw.QMainWindow):
     def loadText(self):
         if not self.txtopentitle:
             self.txtopentitle = "Open Text"
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-            #self.ui.GlypherWidget, 'Open text file', f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-            self.ui.GlypherWidget, self.txtopentitle,self.txtdir,'Text files (*.txt)')[0]
-        print(f'self.txtpath: {self.txtpath}')
-        self.getText(self.txtpath)
+        self.open_non_modal_text_picker(
+            self.txtopentitle,
+            self.txtdir,
+            self.getText,
+            '_text_open_dialog',
+        )
 
     def getText(self,textpath):
             self.txtpath = textpath

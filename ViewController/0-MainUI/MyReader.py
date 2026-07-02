@@ -33,6 +33,7 @@ import Qt5SelectRegion
 from Training import Train as tr
 import ChrReference as chrref
 from SessionManager import SessionManager
+from LocalFileDrop import LocalFileDropMixin
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -134,7 +135,7 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
         self.flush()'''
 
 
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
 
@@ -146,28 +147,33 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Reader()
         self.ui.setupUi(self)
+        self.install_local_file_drop(
+            [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
+            image_handler=self.showImage,
+            text_handler=self.showText,
+        )
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyReader')
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
-        self.ui.actionVerse_Correction.triggered.connect(self.actionVerse_Correction)
-        self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
-        self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
-        self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
+        self.ui.actionVerse_Correction.triggered.connect(self.OpenWithMyVersifier)
+        self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
 
-        self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
-        self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
-        self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
+        self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
 
-        self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
-        self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
+        self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.OpenWithMyScanner)
 
-        self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.actionSplit_Latin_Text_Lines)
-        self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.actionRename_Latin_Text_Lines)
+        self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.OpenWithMyScanner)
 
-        self.ui.actionReview_Ground_Truth_tb.triggered.connect(self.actionReview_Ground_Truth)
+        self.ui.actionReview_Ground_Truth_tb.triggered.connect(self.OpenWithMyGrounder)
         self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
-        self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
+        self.ui.actionTrain_Tesseract_tb.triggered.connect(self.OpenWithMyTrainer)
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         #self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
@@ -317,27 +323,29 @@ class MainWindow(qtw.QMainWindow):
         else:
             event.ignore()'''
 
+    def _first_local_drop_path(self, event):
+        for url in event.mimeData().urls():
+            if url.isLocalFile():
+                return url.toLocalFile()
+        return ""
+
+    @staticmethod
+    def _is_image_file(file_path):
+        return os.path.splitext(file_path)[1].lower() in {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif", ".webp"}
+
+    @staticmethod
+    def _is_text_file(file_path):
+        return os.path.splitext(file_path)[1].lower() in {".txt", ".md", ".json", ".csv", ".tsv", ".xml", ".html", ".htm", ".ris"}
+
     def dropEvent(self, event):
-        if event.mimeData().hasImage:
+        file_path = self._first_local_drop_path(event)
+        if file_path and self._is_image_file(file_path):
             event.setDropAction(Qt.CopyAction)
-            file_path = event.mimeData().urls()[0].toLocalFile()
             self.showImage(file_path)
             event.accept()
-        elif event.mimeData().hasText:
-            '''event.setDropAction(Qt.CopyAction)
-            file_path = event.mimeData().urls()[0].toLocalFile()
-            stream = qtc.QTextStream(file_path)
-            text = stream.readAll()
-            print(text)
-            info = qtc.QFileInfo(file_path)
-            self.ui.OCRText.clear()
-            if info.completeSuffix() == 'txt':
-                #self.ui.editor_text.setHtml(text
-                self.ui.OCRText.insertPlainText(text)
-            else:
-                self.ui.OCRText.setPlainText(text)
-            event.accept()'''
-            text = event.mimeData().text()
+        elif file_path and self._is_text_file(file_path):
+            with open(file_path, encoding='utf-8', errors='replace') as handle:
+                text = handle.read()
             self.ui.OCRText.setPlainText(text)
             event.accept()
         else:
@@ -664,11 +672,12 @@ class MainWindow(qtw.QMainWindow):
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
 
     def loadImage(self):
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        if self.imgpath:
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.showImage(self.imgpath)
-            self.sortImgFiles()
+        self.open_non_modal_image_picker(
+            'Open image file',
+            self.imgdir,
+            self.showImage,
+            '_image_open_dialog',
+        )
         '''imgfilename, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Select Image', '', 'Image Files (*.png *.jpg *.jpeg *.bmp *.tif)')
 
@@ -677,6 +686,9 @@ class MainWindow(qtw.QMainWindow):
             self.imgfilename = imgfilename'''
 
     def OpenImageFileDialog(self):
+        self.loadImage()
+        return
+
         self.imgpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open image file', self.imgdir,
             'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
@@ -900,20 +912,17 @@ class MainWindow(qtw.QMainWindow):
             self.txtfilename = os.path.basename(self.textpath)
             self.showText(MainWindow,self.txtfilename)'''
 
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-        self.ui.centralwidget, 'Open text file',self.txtdir,
-        'Text files (*.txt *.csv)')[0]
-
-        if self.txtpath:
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.txtdir = os.path.dirname(self.txtpath)
-            self.ui.TextLE.setText(filename)
-            #self.sortTextFiles(MainWindow)
-            self.showText(self.txtpath)
-            self.sortTextFiles()
+        self.open_non_modal_text_picker(
+            'Open text file',
+            self.txtdir,
+            self.showText,
+            '_text_open_dialog',
+        )
 
     def OpenTextFileDialog(self, MainWindow):
+        self.loadText()
+        return
+
         self.txtpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open text file',self.txtdir,
             'Text files (*.txt *.csv)')[0]
@@ -1336,20 +1345,36 @@ class MainWindow(qtw.QMainWindow):
         os.system(lo_cmd)
 
     def OpenWithMyPixler(self):
-        mw_cmd = "python3 ViewController/0-MainUI/MyPixler.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        self._launch_module("MyPixler.py")
+
+    def OpenWithMyScanner(self):
+        self._launch_module("MyScanner.py")
+
+    def OpenWithMyGrounder(self):
+        self._launch_module("MyGrounder.py")
+
+    def OpenWithMyTrainer(self):
+        self._launch_module("MyTrainer.py")
+
+    def OpenWithMyVersifier(self):
+        self._launch_module("MyVersifier.py")
 
     def OpenWithMyWriter(self):
-
-        mw_cmd = "python3 ViewController/0-MainUI/MyWriter.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        self._launch_module("MyWriter.py")
         '''
         writer.MainWindow = qtw.QMainWindow()
         writer.ui = writer.Ui_MyWriterUI()
         writer.ui.setupUi(writer.MainWindow)
         writer.MainWindow.show()'''
+
+    def actionUpdate_Wordlist(self):
+        pass
+
+    def _launch_module(self, module_name):
+        module_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), module_name)
+        mw_cmd = f'"{sys.executable}" "{module_path}"'
+        print(mw_cmd)
+        os.system(mw_cmd)
 
     def on_font_update(self):
         # update font to selection and size

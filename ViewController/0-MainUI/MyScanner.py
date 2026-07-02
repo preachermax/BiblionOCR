@@ -33,6 +33,7 @@ import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
 from Training import Train as tr
 from SessionManager import SessionManager
+from LocalFileDrop import LocalFileDropMixin
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -147,7 +148,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
         self.flush()
 '''
 
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
 
@@ -158,6 +159,11 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Scanner()
         self.ui.setupUi(self)
+        self.install_local_file_drop(
+            [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
+            image_handler=self.showImage,
+            text_handler=self.loadDropTextEvent,
+        )
         self.session_manager = SessionManager()
 
         #Implement Co-pilot Help system
@@ -305,21 +311,32 @@ class MainWindow(qtw.QMainWindow):
                     return
         event.ignore()
 
+    def _first_local_drop_path(self, event):
+        for url in event.mimeData().urls():
+            if url.isLocalFile():
+                return url.toLocalFile()
+        return ""
+
+    @staticmethod
+    def _is_image_file(file_path):
+        return os.path.splitext(file_path)[1].lower() in {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif", ".webp"}
+
+    @staticmethod
+    def _is_text_file(file_path):
+        return os.path.splitext(file_path)[1].lower() in {".txt", ".md", ".json", ".csv", ".tsv", ".xml", ".html", ".htm", ".ris"}
+
     def dropEvent(self, event):
-        if event.mimeData().hasImage:
+        file_path = self._first_local_drop_path(event)
+        if file_path and self._is_image_file(file_path):
             event.setDropAction(Qt.CopyAction)
-            file_path = event.mimeData().urls()[0].toLocalFile()
             print(f'image file path: {file_path}')
             self.showImage(file_path)
             event.accept()
-        if event.mimeData().hasText:
-            file_path = event.mimeData().urls()[0].toLocalFile()
+        elif file_path and self._is_text_file(file_path):
             print(f'text file path: {file_path}')
             self.loadDropTextEvent(file_path)
-            #self.ui.OCRText.insertPlainText(self.text())
             event.accept()
         else:
-            file_path = event.mimeData().urls()[0].toLocalFile()
             print(f'text file path ignored: {file_path}')
             event.ignore()
 
@@ -600,11 +617,12 @@ class MainWindow(qtw.QMainWindow):
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
 
     def loadImage(self):
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        if self.imgpath:
-            self.ui.ImageLe.setText(os.path.basename(self.imgpath))
-            self.showImage(self.imgpath)
-            self.sortImgFiles()
+        self.open_non_modal_image_picker(
+            'Open image file',
+            self.imgdir,
+            self.showImage,
+            '_image_open_dialog',
+        )
         '''imgfilename, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Select Image', '', 'Image Files (*.png *.jpg *.jpeg *.bmp *.tif)')
 
@@ -613,6 +631,9 @@ class MainWindow(qtw.QMainWindow):
             self.imgfilename = imgfilename'''
 
     def OpenImageFileDialog(self):
+        self.loadImage()
+        return
+
         self.imgpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open image file', self.imgdir,
             'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
@@ -845,14 +866,17 @@ class MainWindow(qtw.QMainWindow):
             self.txtfilename = os.path.basename(self.textpath)
             self.showText(MainWindow,self.txtfilename)'''
 
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget, 'Open text file', self.txtdir,
-            'Text files (*.txt *.csv)')[0]
-
-        if self.txtpath:
-            self.showText(self.txtpath)
+        self.open_non_modal_text_picker(
+            'Open text file',
+            self.txtdir,
+            self.showText,
+            '_text_open_dialog',
+        )
 
     def OpenTextFileDialog(self, MainWindow):
+        self.loadText()
+        return
+
         self.txtpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open text file', self.txtdir,
             'Text files (*.txt *.csv)')[0]

@@ -41,6 +41,7 @@ from MyBoxerUI import Ui_Boxer
 from Training import Train as tr
 from PreProcess import PreProcess as pp
 from SessionManager import SessionManager
+from LocalFileDrop import LocalFileDropMixin
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal
@@ -160,7 +161,7 @@ class changedSignalTest(QObject):
     signaltest = pyqtSignal(str,dict)
 
 ###########    Main Application Window Class    ############
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 ###########    Initialize Main Application Window    ############
     def __init__(self, *args, **kwargs):
@@ -187,6 +188,11 @@ class MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
         self.ui.setupUi(self)
+        self.install_local_file_drop(
+            [self, getattr(self.ui, 'BoxWidget', None)],
+            image_handler=self.getImage,
+            text_handler=self.getText,
+        )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyBoxer')
         self.ui.ImageTab.currentChanged.connect(self.on_tabChanged)
@@ -1005,9 +1011,12 @@ class MainWindow(qtw.QMainWindow):
     def loadImage(self):
         imgdir = self.projecthome + self.imgdir
         print(f'Current Image Folder: {imgdir}')
-        self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget,self.imgopentitle,imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        #self.imgpath = qtw.QFileDialog.getOpenFileName(self.ui.BoxWidget, 'Open image file',imgdir,'Images (*.png *.xpm *.jpg *.bmp *.gif *.tif)')[0]
-        self.getImage(self.imgpath)
+        self.open_non_modal_image_picker(
+            self.imgopentitle or 'Open image file',
+            imgdir,
+            self.getImage,
+            '_image_open_dialog',
+        )
 
     def getImage(self, imgpath):
         self.imgpath = imgpath
@@ -1183,10 +1192,12 @@ class MainWindow(qtw.QMainWindow):
     def loadText(self):
         if not self.txtopentitle:
             self.txtopentitle = "Open Text File"
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.BoxWidget, self.txtopentitle, f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-        print(f'self.txtpath: {self.txtpath}')
-        self.getText(self.txtpath)
+        self.open_non_modal_text_picker(
+            self.txtopentitle,
+            f'{self.projecthome}Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/',
+            self.getText,
+            '_text_open_dialog',
+        )
 
     def getText(self,textpath):
             self.txtpath = textpath

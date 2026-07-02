@@ -22,10 +22,12 @@ from MyVersifierUI import Ui_Versifier
 from SessionManager import SessionManager
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
+from LocalFileDrop import LocalFileDropMixin
 import ChrReference as chrref
 #import pytesseract
 
-class Ui_MainWindow(qtw.QMainWindow):
+
+class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -186,6 +188,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.RefspaceWidth = self.ReffontMetrics.width(' ')
         self.ui.RefText.setTabStopWidth(int(self.RefspaceWidth * 4))
 
+        # Accept dropped local text files on the two text panes and load them
+        # through the normal Versifier loaders instead of letting QTextEdit
+        # insert a file URL as plain text.
+        self.install_local_file_drop_target(self.ui.RefText, text_handler=self.getRefText)
+        self.install_local_file_drop_target(self.ui.VerseText, text_handler=self.getVerseText)
+
         # Restore Session settings
         self.get_session_settings()
         #print(f'Reference File Path: {self.refpath}')
@@ -193,9 +201,94 @@ class Ui_MainWindow(qtw.QMainWindow):
         # Startup
         self.getstarted()
 
+    def _startup_progress(self, message, end='\n'):
+        print(f'[Versifier startup] {message}', end=end, flush=True)
+
+    @staticmethod
+    def _format_size(byte_count):
+        for unit in ('B', 'KB', 'MB', 'GB'):
+            if byte_count < 1024 or unit == 'GB':
+                return f'{byte_count:.1f} {unit}' if unit != 'B' else f'{int(byte_count)} {unit}'
+            byte_count /= 1024
+
+    def _read_text_file_with_progress(self, path, label):
+        total_size = os.path.getsize(path)
+        self._startup_progress(f'{label}: reading {os.path.basename(path)} ({self._format_size(total_size)})')
+
+        chunk_size = 1024 * 1024
+        bytes_read = 0
+        chunks = []
+        last_report = 0
+
+        with open(path, 'rb') as handle:
+            while True:
+                chunk = handle.read(chunk_size)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                bytes_read += len(chunk)
+
+                if total_size and (bytes_read == total_size or time.time() - last_report >= 0.25):
+                    percent = min(100, int(bytes_read * 100 / total_size))
+                    print(
+                        f'\r[Versifier startup] {label}: read {percent:3d}% '
+                        f'({self._format_size(bytes_read)} / {self._format_size(total_size)})',
+                        end='',
+                        flush=True,
+                    )
+                    last_report = time.time()
+
+        if total_size:
+            print('', flush=True)
+
+        self._startup_progress(f'{label}: decoding text')
+        return b''.join(chunks).decode('UTF-8')
+
+    def _run_with_terminal_spinner(self, message, func):
+        spinner_code = (
+            "import sys,time; "
+            f"message={message!r}; "
+            "frames='|/-\\\\'; start=time.time(); i=0; "
+            "\nwhile True:\n"
+            "    elapsed=int(time.time()-start)\n"
+            "    sys.stdout.write(f'\\r[Versifier startup] {message} {frames[i % len(frames)]} {elapsed}s elapsed')\n"
+            "    sys.stdout.flush()\n"
+            "    i += 1\n"
+            "    time.sleep(0.5)\n"
+        )
+        spinner = subprocess.Popen([sys.executable, '-u', '-c', spinner_code])
+        try:
+            return func()
+        finally:
+            spinner.terminate()
+            try:
+                spinner.wait(timeout=1)
+            except subprocess.TimeoutExpired:
+                spinner.kill()
+            print(f'\r[Versifier startup] {message} complete           ', flush=True)
+
+    def _begin_visible_text_load(self, label, path):
+        message = f'{label}: loading {os.path.basename(path)} -- please wait...'
+        self._startup_progress(message)
+        if hasattr(self, 'ui') and hasattr(self.ui, 'statusbar'):
+            self.ui.statusbar.showMessage(message)
+        qtw.QApplication.setOverrideCursor(qtc.Qt.WaitCursor)
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+
+    def _end_visible_text_load(self, label):
+        try:
+            qtw.QApplication.restoreOverrideCursor()
+        except Exception:
+            pass
+        message = f'{label}: load complete'
+        self._startup_progress(message)
+        if hasattr(self, 'ui') and hasattr(self.ui, 'statusbar'):
+            self.ui.statusbar.showMessage(message, 5000)
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+
     def get_session_settings(self):
         # get session settings
-        print("loading session")
+        self._startup_progress("loading session settings")
         session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('VersifierSession.json')
 
         def get_setting(name: str, default=None):
@@ -300,10 +393,12 @@ class Ui_MainWindow(qtw.QMainWindow):
             self.ui.RefTextLE.setText(os.path.basename(self.refpath))
 
     def getstarted(self):
-        print(f'Reference File Path: {self.refpath}')
-        print(f'Verse File Path: {self.versepath}')
+        self._startup_progress('starting initial text load')
+        self._startup_progress(f'Reference File Path: {self.refpath}')
+        self._startup_progress(f'Verse File Path: {self.versepath}')
         self.getRefText(self.refpath)
         self.getVerseText(self.versepath)
+        self._startup_progress('locating current verse')
         self.findBothVerse()
 
         self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
@@ -323,6 +418,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.ReflineComboBox.setCurrentText(self.refline)
 
         print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')
+        self._startup_progress('ready')
         self.verseverse = self.ui.verseComboBox.currentText()
         #self.verseline = self.ui.lineComboBox..currentText()
         self.refverse = self.ui.verseComboBox.currentText()
@@ -2488,32 +2584,43 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.TextLE.setText(filename)
         file.close()
 
+    def _open_non_modal_text_dialog(self, title, directory, selected_handler, dialog_attr_name):
+        """Open a non-modal file picker that can also be used as a drag source."""
+        self.open_non_modal_text_picker(title, directory or self.projecthome, selected_handler, dialog_attr_name)
+
     def loadVerseText(self):
-        self.versepath = qtw.QFileDialog.getOpenFileName(
-        self.ui.centralwidget, 'Open text file',self.versedir,
-        'Text files (*.txt *.csv)')[0]
-        #self.txtpath = qtw.QFileDialog.getOpenFileName(
-            #self.ui.centralwidget, 'Open text file', self.projecthome +  'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-        print(f'self.versepath: {self.versepath}')
-        self.getVerseText(self.versepath)
+        self._open_non_modal_text_dialog(
+            'Open verse text file',
+            self.versedir,
+            self.getVerseText,
+            '_verse_open_dialog',
+        )
 
     def getVerseText(self,textpath):
             self.versepath = textpath
             self.versedirname = os.path.dirname(self.versepath)
             #create file list
             if self.versepath:
-                #self.ui.BoxText.setText(os.path.basename(self.txtpath))
-                self.versefile = qtc.QFile(self.versepath)
-                self.versefilename = os.path.basename(self.versepath)
-                self.versedir = os.path.dirname(self.versepath)
-                self.ui.VerseTextLE.setText(self.versefilename)
-                self.showVerseText(self.versepath)
+                self._begin_visible_text_load('Verse text', self.versepath)
+                try:
+                    #self.ui.BoxText.setText(os.path.basename(self.txtpath))
+                    self.versefile = qtc.QFile(self.versepath)
+                    self.versefilename = os.path.basename(self.versepath)
+                    self.versedir = os.path.dirname(self.versepath)
+                    self.ui.VerseTextLE.setText(self.versefilename)
+                    self.showVerseText(self.versepath)
+                finally:
+                    self._end_visible_text_load('Verse text')
 
     def showVerseText(self,textpath):
         self.versepath = textpath
         if self.versepath:
-            versetext = open(self.versepath, encoding='UTF-8').read()
-            self.ui.VerseText.setPlainText(versetext)
+            versetext = self._read_text_file_with_progress(self.versepath, 'Verse text')
+            self._startup_progress('Verse text: rendering in pane')
+            self._run_with_terminal_spinner(
+                'Verse text: rendering in pane',
+                lambda: self.ui.VerseText.setPlainText(versetext),
+            )
             self.versefilename = os.path.basename(self.versepath)
             self.versedir = os.path.dirname(self.versepath)
             self.ui.VerseTextLE.setText(self.versefilename)
@@ -2819,53 +2926,70 @@ class Ui_MainWindow(qtw.QMainWindow):
     '''
 
     def loadRefText(self):
-        self.refpath = qtw.QFileDialog.getOpenFileName(
-        self.ui.centralwidget, 'Open text file',self.refdir,
-        'Text files (*.txt *.csv)')[0]
-        #self.txtpath = qtw.QFileDialog.getOpenFileName(
-            #self.ui.centralwidget, 'Open text file', self.projecthome +  'Model/Project/Text/EstablishTruth/Greek/txt_greek_lines_autosplit/','Text files (*.txt)')[0]
-        print(f'self.refpath: {self.refpath}')
-        self.getRefText(self.refpath)
+        self._open_non_modal_text_dialog(
+            'Open reference text file',
+            self.refdir,
+            self.getRefText,
+            '_ref_open_dialog',
+        )
 
     def getRefText(self,textpath):
             self.refpath = textpath
             self.refdirname = os.path.dirname(self.refpath)
             #create file list
             if self.refpath:
-                #self.ui.BoxText.setText(os.path.basename(self.txtpath))
-                self.reffile = qtc.QFile(self.refpath)
-                self.reffilename = os.path.basename(self.refpath)
-                self.refdir = os.path.dirname(self.refpath)
-                self.ui.RefTextLE.setText(self.reffilename)
-                self.refpath = textpath
-                self.showRefText(self.refpath)
+                self._begin_visible_text_load('Reference text', self.refpath)
+                try:
+                    #self.ui.BoxText.setText(os.path.basename(self.txtpath))
+                    self.reffile = qtc.QFile(self.refpath)
+                    self.reffilename = os.path.basename(self.refpath)
+                    self.refdir = os.path.dirname(self.refpath)
+                    self.ui.RefTextLE.setText(self.reffilename)
+                    self.refpath = textpath
+                    self.showRefText(self.refpath)
+                finally:
+                    self._end_visible_text_load('Reference text')
 
     def showRefText(self,textpath):
         self.refpath = textpath
-        print(f'Reference File Path: {self.refpath}')
+        self._startup_progress(f'Reference File Path: {self.refpath}')
         if self.refpath:
-            reftext = open(self.refpath, encoding='UTF-8').read()
-            self.ui.RefText.setPlainText(reftext)
+            reftext = self._read_text_file_with_progress(self.refpath, 'Reference text')
+            self._startup_progress('Reference text: rendering in pane')
+            self._run_with_terminal_spinner(
+                'Reference text: rendering in pane',
+                lambda: self.ui.RefText.setPlainText(reftext),
+            )
             self.reffilename = os.path.basename(self.refpath)
             self.refdir = os.path.dirname(self.refpath)
             self.ui.RefTextLE.setText(self.reffilename)
-            self.on_reffont_update()
+            self._run_with_terminal_spinner(
+                'Reference text: applying font to large document',
+                self.on_reffont_update,
+            )
             # update line spacing
-            self.SetRefLineSpacing()
+            self._run_with_terminal_spinner(
+                'Reference text: applying line spacing to large document',
+                self.SetRefLineSpacing,
+            )
             #self.reffile.close()
 
+        self._startup_progress('Reference text: updating session settings')
         SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).update('VersifierSession.json', {
             'self.refpath': self.refpath.replace(self.projecthome, ""),
             'self.refdir': self.refdir.replace(self.projecthome, ""),
         })
 
+        self._startup_progress('Reference text: building directory file list')
         self.reftxtfileList = []
         for t in os.listdir(self.refdir):
             tpath = os.path.join(self.refdir, t)
             if os.path.isfile(tpath) and t.endswith(('.txt')):
                 self.reftxtfileList.append(tpath)
 
+        self._startup_progress(f'Reference text: sorting {len(self.reftxtfileList)} text files')
         self.sortRefTextFiles()
+        self._startup_progress('Reference text: startup processing complete')
 
     '''
     def loadRefText(self):

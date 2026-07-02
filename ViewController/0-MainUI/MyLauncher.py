@@ -1,6 +1,6 @@
 #print(len(locals()))
 
-# Python imports 
+# Python imports
 import sys
 import os
 import re
@@ -33,6 +33,7 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # Custom imports
 from MyLauncherUI import Ui_MainUI
 from PreProcess import PreProcess as pp
+from LocalFileDrop import LocalFileDropMixin
 
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
@@ -57,25 +58,25 @@ from Training import Train as tr
 
 #print(len(locals()))
 
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
-# Menu and Toolbar Action Methods 
+# Menu and Toolbar Action Methods
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyServer')
-        # extended slots code 
-        #   
+        # extended slots code
+        #
         self.ui.actionMy_Reader.triggered.connect(self.OpenWithMyReader)
         self.ui.actionMy_Scanner.triggered.connect(self.OpenWithMyScanner)
         self.ui.actionMy_Glypher.triggered.connect(self.OpenWithMyGlypher)
-        self.ui.actionMy_Pixler.triggered.connect(self.OpenWithMyPixler)     
+        self.ui.actionMy_Pixler.triggered.connect(self.OpenWithMyPixler)
         self.ui.actionMy_Boxer.triggered.connect(self.OpenWithMyBoxer)
         self.ui.actionMy_Versifier.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionMy_Resolver.triggered.connect(self.OpenWithMyResolver)
@@ -87,7 +88,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
-    
+
         #self.ui.Gimpbutton.clicked.connect(self.actionGimpEdit)
         self.ui.MyReaderbutton.clicked.connect(self.OpenWithMyReader)
         self.ui.MyScannerbutton.clicked.connect(self.OpenWithMyScanner)
@@ -95,32 +96,32 @@ class MainWindow(qtw.QMainWindow):
         self.ui.MyBoxerbutton.clicked.connect(self.OpenWithMyBoxer)
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         self.ui.MyVersifierbutton.clicked.connect(self.OpenWithMyVersifier)
-        self.ui.MyResolverbutton.clicked.connect(self.OpenWithMyResolver)     
+        self.ui.MyResolverbutton.clicked.connect(self.OpenWithMyResolver)
         self.ui.MyLexerbutton.clicked.connect(self.OpenWithMyLexer)
         self.ui.MyGrounderbutton.clicked.connect(self.OpenWithMyGrounder)
-        self.ui.MyTrainerbutton.clicked.connect(self.OpenWithMyTrainer)       
+        self.ui.MyTrainerbutton.clicked.connect(self.OpenWithMyTrainer)
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
 
         # UI and slots code ends here.
-        
+
         # Show the Main user interface
         self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
         font = qtg.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(20)
         self.ui.OCRDocument.setDefaultFont(font)
-        
+
         self.ui.OCRDocument.setDefaultFont(font)
         self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
         self.ui.OCRTextFormat = qtg.QTextFormat()
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
-        
+
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
-   
+
         # Restore Session settings
         self.get_session_settings()
-        
+
         self.show()
 
     def get_session_settings(self):
@@ -149,12 +150,12 @@ class MainWindow(qtw.QMainWindow):
         workflow_file = os.path.join(project_root, 'Model', 'SQLite', 'json', 'Workflow.json')
         with open(workflow_file, 'r') as f:
             data = json.load(f)
-        
+
         # Iterating through the json
         # list
         for Sequence in data:
             print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
-        
+
         # Closing file
         f.close()
 
@@ -162,8 +163,8 @@ class MainWindow(qtw.QMainWindow):
 
         greekimgpagesstate = self.ui.GreekImagePagesToolBar.isVisible()
         greekimglinesstate = self.ui.GreekImageLinesToolBar.isVisible()
-        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()        
-        
+        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()
+
         # Set the visibility to its inverse
         self.ui.GreekImagePagesToolBar.setVisible(not greekimgpagesstate)
         self.ui.GreekImageLinesToolBar.setVisible(not greekimglinesstate)
@@ -173,13 +174,13 @@ class MainWindow(qtw.QMainWindow):
 
         latinimgpagesstate = self.ui.LatinImagePagesToolBar.isVisible()
         latinimglinesstate = self.ui.LatinImageLinesToolBar.isVisible()
-        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()        
-        
+        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()
+
         # Set the visibility to its inverse
         self.ui.LatinImagePagesToolBar.setVisible(not latinimgpagesstate)
         self.ui.LatinImageLinesToolBar.setVisible(not latinimglinesstate)
         self.ui.LatinTextLinesToolBar.setVisible(not latintxtlinesstate)'''
-    
+
     '''def actionPixler(self):
 
         self.PixlerWindow = qtw.QMainWindow()
@@ -203,7 +204,7 @@ class MainWindow(qtw.QMainWindow):
 
 
 
-        rsp = self.PixlerWindow.exec_()'''   
+        rsp = self.PixlerWindow.exec_()'''
 
     def actionGimpEdit(self):
         #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"
@@ -213,16 +214,16 @@ class MainWindow(qtw.QMainWindow):
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --document-export =" + self.imgpath + "--command=gimp-2.10" + self.imgpath + "--file-forwarding org.gimp.GIMP"
             print(self.imgpath)
         else:
-            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''         
-        
+            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''
+
         os.system(gimp_cmd)
-    
+
     def actionUpdate_Wordlist(self):
         pass
-    
+
     def actionTrain_Tesseract(self):
         pass
-    
+
     def loadText(self):
         '''self.textpath = QtWidgets.QFileDialog.getOpenFileName(
             self.centralwidget, 'Open text file', '',
@@ -231,31 +232,25 @@ class MainWindow(qtw.QMainWindow):
             self.textfile = QtCore.QFile(self.textpath)
             self.txtfilename = os.path.basename(self.textpath)
             self.showText(MainWindow,self.txtfilename)'''
-        
-        self.txtpath = qtw.QFileDialog.getOpenFileName(
-        self.ui.centralwidget, 'Open text file',self.txtdir,
-        'Text files (*.txt *.csv)')[0]
-        
-        if self.txtpath:
-            file = qtc.QFile(self.txtpath)
-            filename = os.path.basename(self.txtpath)
-            self.txtdir = os.path.dirname(self.txtpath)
-            self.ui.TextLE.setText(filename)
-            #self.sortTextFiles(MainWindow)
-            self.showText(self.txtpath)
-            self.sortTextFiles()
+
+        self.open_non_modal_text_picker(
+            'Open text file',
+            self.txtdir,
+            self.showText,
+            '_text_open_dialog',
+        )
 
     def OpenTextFileDialog(self, MainWindow):
         self.txtpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget, 'Open text file',self.txtdir,
             'Text files (*.txt *.csv)')[0]
-        
+
         if self.txtpath:
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
-            
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -266,14 +261,14 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.OCRText.insertPlainText(text)
                 else:
                     self.ui.OCRText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_font_update()
-                
+
                 file.close()
-        
+
         jsonfile = os.path.join(project_root, 'Model', 'Data', 'json', 'Session.json')
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             txtpath_key = r"self.txtpath"
@@ -282,7 +277,7 @@ class MainWindow(qtw.QMainWindow):
                 if Setting['Setting'] == txtpath_key:
                     Setting['CurrentValue'] = self.txtpath
                     print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == txtdir_key:
                     Setting['CurrentValue'] = self.txtdir
                     print(Setting['CurrentValue'])
         f.close()
@@ -300,14 +295,14 @@ class MainWindow(qtw.QMainWindow):
                 self.txtfileList.append(tpath)
         self.sortTextFiles()
 
-    def showText(self, txtfilename):        
+    def showText(self, txtfilename):
         #self.textfile = txtfilename
         if self.txtpath:
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
-        
+
             if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
@@ -321,15 +316,15 @@ class MainWindow(qtw.QMainWindow):
             #textfile.close()
             #txtdirpath = os.path.dirname(self.textpath)
 
-            # update font to selection and size       
+            # update font to selection and size
             self.on_font_update()
-            
+
             # update line spacing
             self.SetLineSpacing()
             file.close()
-       
+
         jsonfile = os.path.join(project_root, 'Model', 'Data', 'json', 'Session.json')
-        
+
         with open(jsonfile, 'r') as f:
             data = json.load(f)
             txtpath_key = r"self.txtpath"
@@ -338,7 +333,7 @@ class MainWindow(qtw.QMainWindow):
                 if Setting['Setting'] == txtpath_key:
                     Setting['CurrentValue'] = self.txtpath
                     print(Setting['CurrentValue'])
-                elif Setting['Setting'] == txtdir_key:  
+                elif Setting['Setting'] == txtdir_key:
                     Setting['CurrentValue'] = self.txtdir
                     print(Setting['CurrentValue'])
         f.close()
@@ -366,7 +361,7 @@ class MainWindow(qtw.QMainWindow):
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
         file.close()
-        
+
     def SaveAsCorrectedTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save Corrected text file', self.txtdir,
@@ -379,13 +374,13 @@ class MainWindow(qtw.QMainWindow):
         file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
-        
+
         #if self.txtdir:
             #defaultdir = self.txtdir
         #else:
             #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
-        
-        defaultdir = self.txtdir + r"/" 
+
+        defaultdir = self.txtdir + r"/"
         defaultfile = self.ui.TextLE.displayText()
 
         if defaultfile:
@@ -400,10 +395,10 @@ class MainWindow(qtw.QMainWindow):
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()
             file.write(my_CorrectedText)
-        
+
         self.ui.TextLE.setText(filename)
         file.close()
-    
+
     def run_child_module(self, filename):
         module_path = os.path.join(script_dir, filename)
         subprocess.Popen(['python3', module_path])
@@ -445,7 +440,7 @@ class MainWindow(qtw.QMainWindow):
         self.run_child_module('MyExplorer.py')
 
     def on_font_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         #font = qtg.QFont()
         #font.setFamily(self.ui.fontComboBox.currentFont())
         #print(self.ui.fontComboBox.currentFont())
@@ -453,14 +448,14 @@ class MainWindow(qtw.QMainWindow):
         font.setPointSize(self.ui.fontSizeBox.value())
         #font = qtg.QFont(self.font)
         #font.setPointSize(int(self.fontsize))
-        
+
         self.ui.OCRText.setFont(font)
 
     def on_lang_select(self):
         pass
 
 # Only run this code if I am actually running this script
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
     w.show()

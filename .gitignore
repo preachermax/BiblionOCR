@@ -23,4 +23,5 @@ Thumbs.db
 # BiblionOCR local runtime artifacts
 Model/Project/Data/json/Session.json
 ViewController/0-MainUI/__pycache__/
+ViewController/0-MainUI/MyScannerWin.py
 Core/Scanner/TWAINDSM.dll

@@ -503,7 +503,7 @@
      </font>
     </property>
     <property name="readOnly">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="RefTextLE">
@@ -3800,7 +3800,7 @@
      <x>0</x>
      <y>0</y>
      <width>1351</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -4,7 +4,7 @@ print("RUNNING:", __file__)
 # Integrated with ChatGPT:
 # OCR Preprocess Tool (OpenCV morphology + tiffcapture bridge)
 # Next steps: OCR preview, multi-page TIFF, pipeline integration
-# Python imports 
+# Python imports
 import ipaddress
 import socket
 import sys
@@ -65,7 +65,7 @@ SCANNED_FOLDER = os.path.join(
 )
 os.makedirs(SCANNED_FOLDER, exist_ok=True)
 
-  
+
 from SessionManager import SessionManager
 from ocr_preprocess_tool import OCRPreprocessTool
 #from subprocess import Popen, PIPE, CalledProcessError
@@ -94,7 +94,7 @@ elif 'Linux' in platform.system():
 else:
     print("Platform:  ", platform.system(), platform.release(), platform.version())
     print("Unsupported platform. Some features may not work as expected.")
-    
+
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
@@ -126,6 +126,7 @@ import ImageLoadWorker
 from ProjectCreationWorker import ProjectCreationWorker
 from Training import Train as tr
 from TiffStackWorker import TiffStackWorker
+from LocalFileDrop import LocalFileDropMixin
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
 from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
@@ -154,7 +155,7 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from ImagePreviewDialog import ImagePreviewDialog
 #from MultiPreProcess import MultiPreProcess as mpp
 def configure_tesseract():
-    
+
     import pytesseract
     import shutil
     import platform
@@ -1201,7 +1202,7 @@ class NetworkScanner(qtc.QThread):
 
             for _, received in answered:
                 print(received.psrc, received.hwsrc)
-                
+
             for i, (sent, received) in enumerate(answered):
 
                 if not self._running:
@@ -1311,9 +1312,9 @@ class NetworkScanDialog(QDialog):
         self.statusLabel.setText("Scan complete")
 
 
-class MainWindow(qtw.QMainWindow):
+class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
-# Menu and Toolbar Action Methods 
+# Menu and Toolbar Action Methods
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -1347,14 +1348,19 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        self.install_local_file_drop(
+            [self, getattr(self.ui, 'centralwidget', None)],
+            image_handler=self.showImage,
+            text_handler=self.showText,
+        )
         self._apply_scan_icon()
         # self.ui.NetworkTable = QTableWidget(self.ui.centralwidget)
-        # self.ui.NetworkTable.setGeometry(10, 10, 600, 300)   
+        # self.ui.NetworkTable.setGeometry(10, 10, 600, 300)
         # self.ui.NetworkTable.setColumnCount(2)
         # self.ui.NetworkTable.setHorizontalHeaderLabels(["IP", "MAC"])
         # self.ui.verticalLayout.addWidget(self.ui.NetworkTable)
         self.scannerManager = ScanManager()
-        
+
         self.session_manager = SessionManager()
 
         # -------------------------
@@ -1376,7 +1382,7 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         self.ui.actionNewProject.setText("New Project")
         self.ui.actionNewProject.triggered.connect(self.on_new_project_clicked)
-        
+
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
         self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
         self.ui.actionpdf_for_tiff_tb.triggered.connect(self.actionpdf_for_tiff)
@@ -1422,7 +1428,7 @@ class MainWindow(qtw.QMainWindow):
         # Buttons / Navigation
         # -------------------------
         self.ui.imageScannerbutton.clicked.connect(self.actionScanNetwork)
-        
+
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
 
@@ -1472,11 +1478,11 @@ class MainWindow(qtw.QMainWindow):
         # -------------------------
         # External Modules
         # -------------------------
-        
+
         # Menu Modules
         self.ui.actionImageScanner.triggered.connect(self.actionScanNetwork)
         self.ui.actionImageScanner_tb.triggered.connect(self.actionScanNetwork)
-        
+
         self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
         self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
         self.ui.actionMyVersifier.triggered.connect(lambda: self.open_module("MyVersifier"))
@@ -1484,7 +1490,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.actionMyLexer.triggered.connect(lambda: self.open_module("MyLexer"))
         self.ui.actionMyGrounder.triggered.connect(lambda: self.open_module("MyGrounder"))
         self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
-        
+
         # Button Modules
         self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
@@ -1751,7 +1757,7 @@ class MainWindow(qtw.QMainWindow):
                 f"Project name was normalized to: {safe_name}"
             )
         return safe_name
-    
+
     def on_project_created(self, event):
         print("UI: Project created!", event["project_name"])
 
@@ -1880,7 +1886,7 @@ class MainWindow(qtw.QMainWindow):
                 'self.scan_persist_format': self.scan_persist_format,
             },
         )
-        
+
     # def onDeviceFound(self, device):
     #     row = self.ui.NetworkTable.rowCount()
     #     self.ui.NetworkTable.insertRow(row)
@@ -1890,20 +1896,20 @@ class MainWindow(qtw.QMainWindow):
 
     #     self.ui.NetworkTable.setItem(row, 1,
     #         qtw.QTableWidgetItem(device["mac"]))
-    
+
     # # def onDeviceFound(self, device):
     # #     print(f"[FOUND] {device['ip']}   {device['mac']}")
-        
+
     # def onScanProgress(self, value):
     #     print(f"[SCAN] {value}%")
 
     #     if hasattr(self.ui, "progressBar"):
-    #         self.ui.progressBar.setValue(value) 
-            
+    #         self.ui.progressBar.setValue(value)
+
     # def onScanFinished(self):
     #     print("[NETWORK] Scan complete.")
     #     self.ui.imageScannerbutton.setEnabled(True)
-        
+
     @qtc.pyqtSlot(str)
     def on_zoom_combobox(self, text=None):
         if text is None:
@@ -1918,7 +1924,7 @@ class MainWindow(qtw.QMainWindow):
             return
 
         self.ui.Zoomslider.setValue(value)  # drives everything
-    
+
     # def on_zoom_combobox(self, text):
     #     print("[ZOOM HANDLER HIT] ComboBox")
 
@@ -1930,7 +1936,7 @@ class MainWindow(qtw.QMainWindow):
 
     #     # Sync slider (this will trigger on_zoomslider)
     #     self.ui.Zoomslider.setValue(value)
-    
+
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
@@ -2008,19 +2014,19 @@ class MainWindow(qtw.QMainWindow):
         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
         with open(jsonfile, 'r') as f:
             data = json.load(f)
-        
+
             # Iterating through the json
             # list
             for Sequence in data:
                 print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
-        
+
         # Closing file
-        f.close() 
-    
-    def OpenChrReference(self):  
+        f.close()
+
+    def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference()
-        self.chrrefmain.show()  
-    
+        self.chrrefmain.show()
+
     def initBookCombo(self):
         # Opening JSON file
         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksAbbrName.json")
@@ -2031,19 +2037,19 @@ class MainWindow(qtw.QMainWindow):
             for booknumber in data:
                 print(booknumber['bookabbr'])
                 self.ui.bookComboBox.addItem(booknumber['bookabbr'])
-        
+
         # Closing file
         f.close()
 
     def selectBookCombo(self):
         oldbookabbr = self.bookabbr
         self.bookabbr = self.ui.bookComboBox.currentText()
-        
+
         if self.ui.bookComboBox.currentText() != oldbookabbr:
-                  
+
             # jsonfile = 'Model/Data/json/BooksMarkDown.json'
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksMarkDown.json")
-            
+
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 for BookAbbr in data:
@@ -2053,7 +2059,7 @@ class MainWindow(qtw.QMainWindow):
                         self.greekbookmarkdown = 'greek' + bookmarkdown
                         self.latinbookmarkdown = 'latin' + bookmarkdown
             f.close()
-            
+
             #jsonfile = 'Model/Data/json/Session.json'
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
 
@@ -2075,20 +2081,20 @@ class MainWindow(qtw.QMainWindow):
                         Setting['CurrentValue'] = self.latinbookmarkdown
                     print(Setting['CurrentValue'])
             f.close()
-            
+
             os.remove(jsonfile)
             with open(jsonfile, 'w') as f:
                 json.dump(data, f, indent=4)
             f.close()
-            
+
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
     def toggleGreekToolbars(self):
 
         greekimgpagesstate = self.ui.GreekImagePagesToolBar.isVisible()
         greekimglinesstate = self.ui.GreekImageLinesToolBar.isVisible()
-        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()        
-        
+        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()
+
         # Set the visibility to its inverse
         self.ui.GreekImagePagesToolBar.setVisible(not greekimgpagesstate)
         self.ui.GreekImageLinesToolBar.setVisible(not greekimglinesstate)
@@ -2098,8 +2104,8 @@ class MainWindow(qtw.QMainWindow):
 
         latinimgpagesstate = self.ui.LatinImagePagesToolBar.isVisible()
         latinimglinesstate = self.ui.LatinImageLinesToolBar.isVisible()
-        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()        
-        
+        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()
+
         # Set the visibility to its inverse
         self.ui.LatinImagePagesToolBar.setVisible(not latinimgpagesstate)
         self.ui.LatinImageLinesToolBar.setVisible(not latinimglinesstate)
@@ -2107,7 +2113,7 @@ class MainWindow(qtw.QMainWindow):
 
     def actionextract_pdf(self):
         print("extracting pdf pages from source pdf")
-        
+
         def accept():
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
@@ -2121,15 +2127,15 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             self.sourcefile = self.pdfx_ui.SourceLineEdit.text()
             self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
             self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
-            
+
             # Extract to default Workflow folder
             print(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
             pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
-            
+
             if complete_folder:
                 symlinks=False
                 ignore=None
@@ -2141,7 +2147,7 @@ class MainWindow(qtw.QMainWindow):
                     else:
                         shutil.copy2(source, destination)
             print("pdf page extraction complete")
-        
+
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -2152,10 +2158,10 @@ class MainWindow(qtw.QMainWindow):
                     if Setting['Setting'] == sourcefile_key:
                         Setting['CurrentValue'] = self.sourcefile
                         print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == firstpage_key:  
+                    elif Setting['Setting'] == firstpage_key:
                         Setting['CurrentValue'] = self.firstpage
                         print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == lastpage_key:  
+                    elif Setting['Setting'] == lastpage_key:
                         Setting['CurrentValue'] = self.lastpage
                         print(Setting['CurrentValue'])
             f.close()
@@ -2164,17 +2170,17 @@ class MainWindow(qtw.QMainWindow):
             with open(jsonfile, 'w') as f:
                 json.dump(data, f, indent=4)
             f.close()
-        
+
         def reject():
             pass
-        
+
         self.pdfxDialog = qtw.QDialog()
         self.pdfx_ui = Ui_ExtractDialog()
         self.pdfx_ui.setupUi(self.pdfxDialog)
         self.pdfxDialog.show()
-        
+
         seq = "SP1"
-        
+
         def setdefault():
             if self.pdfx_ui.defaultsrcBox.isChecked():
                 self.pdfx_ui.SourceButton.setEnabled(False)
@@ -2189,10 +2195,10 @@ class MainWindow(qtw.QMainWindow):
         self.pdfx_ui.buttonBox.accepted.connect(accept)
         self.pdfx_ui.buttonBox.rejected.connect(reject)
 
-        if self.pdfx_ui.defaultsrcBox.isChecked(): 
+        if self.pdfx_ui.defaultsrcBox.isChecked():
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
-                data = json.load(f)      
+                data = json.load(f)
                # Search the key value using 'in' operator
                 for Sequence in data:
                     print(Sequence['Sequence'])
@@ -2202,12 +2208,12 @@ class MainWindow(qtw.QMainWindow):
                         self.pdfx_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
                         workflow_folder = Sequence['WorkflowFullPath']+r'/'
                         complete_folder = Sequence['CompleteFullPath']+r'/'
-       
+
         rsp = self.pdfxDialog.exec_()
-   
+
     def actionpdf_for_tiff(self):
         print("extracting pdf pages for tif")
-        
+
         def accept():
             # if self.pdf4tifDialog.Accepted:
             # Empty default Workflow folder
@@ -2222,11 +2228,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_file_path, workflow_folder)
             pp.pdf4tif(source_file_path, workflow_folder)
@@ -2251,7 +2257,7 @@ class MainWindow(qtw.QMainWindow):
         self.pdf4tifDialog.show()
 
         seq = "SP2"
-        
+
         def setdefault():
             if self.pdf4tif_ui.defaultsrcBox.isChecked():
                 self.pdf4tif_ui.SourceButton.setEnabled(False)
@@ -2265,11 +2271,11 @@ class MainWindow(qtw.QMainWindow):
         self.pdf4tif_ui.DestinationButton.clicked.connect(self.DestPdfForTifDialog)
         self.pdf4tif_ui.buttonBox.accepted.connect(accept)
         self.pdf4tif_ui.buttonBox.rejected.connect(reject)
-        
 
-        if self.pdf4tif_ui.defaultsrcBox.isChecked(): 
+
+        if self.pdf4tif_ui.defaultsrcBox.isChecked():
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -2289,7 +2295,7 @@ class MainWindow(qtw.QMainWindow):
 
     def actionpdf_to_tiff(self):
         print("converting pdf pages to tiff")
-        
+
         def accept():
         # if self.pdf2tifDialog.Accepted:
             # Empty default Workflow folder
@@ -2304,11 +2310,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             #pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
@@ -2333,7 +2339,7 @@ class MainWindow(qtw.QMainWindow):
         self.pdf2tifDialog.show()
 
         seq = "SP3"
-        
+
         def setdefault():
             if self.pdf2tif_ui.defaultsrcBox.isChecked():
                 self.pdf2tif_ui.SourceButton.setEnabled(False)
@@ -2348,9 +2354,9 @@ class MainWindow(qtw.QMainWindow):
         self.pdf2tif_ui.buttonBox.accepted.connect(accept)
         self.pdf2tif_ui.buttonBox.rejected.connect(reject)
 
-        if self.pdf2tif_ui.defaultsrcBox.isChecked(): 
+        if self.pdf2tif_ui.defaultsrcBox.isChecked():
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -2369,12 +2375,12 @@ class MainWindow(qtw.QMainWindow):
                         print(source_folder,workflow_folder,complete_folder,start_page)
 
             rsp = self.pdf2tifDialog.exec_()
-                    
+
         print("tif pages conversion complete")
 
     def actiontiff_to_mono(self):
         print("creating indexed(BW) tiff")
-        
+
         def accept():
             # if self.tif2monoDialog.Accepted:
             # Empty default Workflow folder
@@ -2389,11 +2395,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2tiffidx(self.tif2mono_ui.SourceLineEdit.text(), self.tif2mono_ui.DestinationLineEdit.text())
@@ -2411,16 +2417,16 @@ class MainWindow(qtw.QMainWindow):
                         shutil.copy2(source, destination)
         def reject():
             pass
-        
-        #usage: pp.tiff2tiffidx(source, destination)      
-        
+
+        #usage: pp.tiff2tiffidx(source, destination)
+
         self.tif2monoDialog = qtw.QDialog()
         self.tif2mono_ui = Ui_tif2monoDialog()
         self.tif2mono_ui.setupUi(self.tif2monoDialog)
         self.tif2monoDialog.show()
 
         seq = "SP4"
-        
+
         def setdefault():
             if self.tif2mono_ui.defaultsrcBox.isChecked():
                 self.tif2mono_ui.SourceButton.setEnabled(False)
@@ -2435,11 +2441,11 @@ class MainWindow(qtw.QMainWindow):
         self.tif2mono_ui.buttonBox.accepted.connect(accept)
         self.tif2mono_ui.buttonBox.rejected.connect(reject)
 
-        if self.tif2mono_ui.defaultsrcBox.isChecked(): 
+        if self.tif2mono_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -2456,14 +2462,14 @@ class MainWindow(qtw.QMainWindow):
                         print(source_folder,workflow_folder,complete_folder)
 
         rsp = self.tif2monoDialog.exec_()
-        
 
-            
+
+
         print("completed creating indexed(BW) tiff")
 
     def actionmono_to_png(self):
         print("creating indexed(BW) png")
-        
+
         def accept():
             # if self.mono2pngDialog.Accepted:
             # Empty default Workflow folder
@@ -2478,11 +2484,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
@@ -2508,7 +2514,7 @@ class MainWindow(qtw.QMainWindow):
         self.mono2pngDialog.show()
 
         seq = "SP5"
-        
+
         def setdefault():
             if self.mono2png_ui.defaultsrcBox.isChecked():
                 self.mono2png_ui.SourceButton.setEnabled(False)
@@ -2517,11 +2523,11 @@ class MainWindow(qtw.QMainWindow):
                 self.mono2png_ui.SourceButton.setEnabled(True)
                 self.mono2png_ui.DestinationButton.setEnabled(True)
 
-        if self.mono2png_ui.defaultsrcBox.isChecked(): 
+        if self.mono2png_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -2542,13 +2548,13 @@ class MainWindow(qtw.QMainWindow):
         self.mono2png_ui.DestinationButton.clicked.connect(self.DestMonoToPngDialog)
         self.mono2png_ui.buttonBox.accepted.connect(accept)
         self.mono2png_ui.buttonBox.rejected.connect(reject)
-        
-        rsp = self.mono2pngDialog.exec_()    
+
+        rsp = self.mono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
 
     def actiondeskew_mono(self):
         print("deskewing monochrome tiff and png files")
-        
+
         def accept():
             # if self.deskew_monoDialog.Accepted:
             # Empty default Workflow folders
@@ -2576,11 +2582,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folders
             print(source_folder, png_workflow_folder, tif_workflow_folder)
             pp.deskewfiles(self.deskew_mono_ui.SourceLineEdit.text(), self.deskew_mono_ui.DestPngLineEdit.text(),self.deskew_mono_ui.DestTifLineEdit.text())
@@ -2607,7 +2613,7 @@ class MainWindow(qtw.QMainWindow):
                         shutil.copy2(source, destination)
         def reject():
             pass
-        
+
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
 
         self.deskew_monoDialog = qtw.QDialog()
@@ -2616,7 +2622,7 @@ class MainWindow(qtw.QMainWindow):
         self.deskew_monoDialog.show()
 
         seq = "SP6"
-        
+
         def setdefault():
             if self.deskew_mono_ui.defaultsrcBox.isChecked():
                 self.deskew_mono_ui.SourceButton.setEnabled(False)
@@ -2625,11 +2631,11 @@ class MainWindow(qtw.QMainWindow):
                 self.deskew_mono_ui.SourceButton.setEnabled(True)
                 self.deskew_mono_ui.DestTifButton.setEnabled(True)
 
-        if self.deskew_mono_ui.defaultsrcBox.isChecked(): 
+        if self.deskew_mono_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -2643,10 +2649,10 @@ class MainWindow(qtw.QMainWindow):
                         source_folder = Sequence['DefaultSource']+r'/'
                         tif_workflow_folder = Sequence['WorkflowFullPath']+r'/'
                         tif_complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(source_folder,tif_workflow_folder,tif_complete_folder)  
-            
+                        print(source_folder,tif_workflow_folder,tif_complete_folder)
+
         seq = "SP7"
-        
+
         def setdefault():
             if self.deskew_mono_ui.defaultsrcBox.isChecked():
                 self.deskew_mono_ui.SourceButton.setEnabled(False)
@@ -2661,11 +2667,11 @@ class MainWindow(qtw.QMainWindow):
         self.deskew_mono_ui.buttonBox.accepted.connect(accept)
         self.deskew_mono_ui.buttonBox.rejected.connect(reject)
 
-        if self.deskew_mono_ui.defaultsrcBox.isChecked(): 
+        if self.deskew_mono_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 # returns JSON object as
@@ -2683,9 +2689,9 @@ class MainWindow(qtw.QMainWindow):
                         png_complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
                         print(png_workflow_folder,png_complete_folder)
 
-        rsp = self.deskew_monoDialog.exec_() 
+        rsp = self.deskew_monoDialog.exec_()
         print("completed deskewing monochrome tiff and png files")
-     
+
     def actionCrop_Languages(self):
         print("creating cropped language tif files")
 
@@ -2738,7 +2744,7 @@ class MainWindow(qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
-            
+
             if workflow_greek_folder:
                 symlinks=False
                 ignore=None
@@ -2763,7 +2769,7 @@ class MainWindow(qtw.QMainWindow):
 
         def reject():
             pass
- 
+
         #usage: pp.croplangs(source, boxdir, greekdir, latindir, elimdir)
         self.crop_languagesDialog = qtw.QDialog()
         self.crop_languages_ui = Ui_crop_languagesDialog()
@@ -2781,9 +2787,9 @@ class MainWindow(qtw.QMainWindow):
 
         seq = ["SP10","SP11","GP1","GP2","LP1","LP2"]
 
-        if self.crop_languages_ui.defaultsrcBox.isChecked(): 
+        if self.crop_languages_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             for step in seq:
                 jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
                 with open(jsonfile, 'r') as f:
@@ -2807,23 +2813,23 @@ class MainWindow(qtw.QMainWindow):
                             elif step == "GP1":
                                 self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
                                 workflow_greek_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                             
+                                complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
                             elif step == "GP2":
                                 #self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
                                 workflow_dup_greek_folder = Sequence['WorkflowFullPath']+r'/'
-                                #complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'                                
-                            elif step == "LP1":                         
+                                #complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+                            elif step == "LP1":
                                 self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
                                 workflow_latin_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'                            
-                            elif step == "LP2":                         
+                                complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
+                            elif step == "LP2":
                                 #self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
                                 workflow_dup_latin_folder = Sequence['WorkflowFullPath']+r'/'
                                 #complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
 
                 f.close()
-        print(source_folder,workflow_box_folder,workflow_elim_folder,workflow_greek_folder,workflow_latin_folder)                  
-        rsp = self.crop_languagesDialog.exec_()   
+        print(source_folder,workflow_box_folder,workflow_elim_folder,workflow_greek_folder,workflow_latin_folder)
+        rsp = self.crop_languagesDialog.exec_()
 
     def actionConvert_Greek_tiff_To_png(self):
         print("creating indexed(BW) Greek png files")
@@ -2841,11 +2847,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2pngidx(self.greekmono2png_ui.SourceLineEdit.text(), self.greekmono2png_ui.DestinationLineEdit.text())
@@ -2870,9 +2876,9 @@ class MainWindow(qtw.QMainWindow):
         self.greekmono2png_ui = Ui_greekmono2pngDialog()
         self.greekmono2png_ui.setupUi(self.greekmono2pngDialog)
         self.greekmono2pngDialog.show()
-        
+
         seq = "GP5"
-        
+
         def setdefault():
             if self.greekmono2png_ui.defaultsrcBox.isChecked():
                 self.greekmono2png_ui.SourceButton.setEnabled(False)
@@ -2886,18 +2892,18 @@ class MainWindow(qtw.QMainWindow):
         self.greekmono2png_ui.DestinationButton.clicked.connect(self.GreekDestMonoToPngDialog)
         self.greekmono2png_ui.buttonBox.accepted.connect(accept)
         self.greekmono2png_ui.buttonBox.rejected.connect(reject)
-        
 
-        if self.greekmono2png_ui.defaultsrcBox.isChecked(): 
+
+        if self.greekmono2png_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data 
-            
+            # Define json data
+
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
-                   
+
                 # Search the key value using 'in' operator
                 for Sequence in data:
                     print(Sequence['Sequence'])
@@ -2912,11 +2918,11 @@ class MainWindow(qtw.QMainWindow):
 
         rsp = self.greekmono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
- 
+
     def actionDeskewGreek_tiff(self):
         print("deskewing Greek tiff files")
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
-        
+
         def accept():
             # if self.deskew_greekmonoDialog.Accepted:
             # Empty default Workflow folders
@@ -2944,11 +2950,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folders
             print(source_folder, png_workflow_folder, tif_workflow_folder)
             pp.deskewfiles(self.deskew_greekmono_ui.SourceLineEdit.text(), self.deskew_greekmono_ui.DestPngLineEdit.text(),self.deskew_greekmono_ui.DestTifLineEdit.text())
@@ -2975,7 +2981,7 @@ class MainWindow(qtw.QMainWindow):
                         shutil.copy2(source, destination)
         def reject():
             pass
-        
+
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
 
         self.deskew_greekmonoDialog = qtw.QDialog()
@@ -2984,7 +2990,7 @@ class MainWindow(qtw.QMainWindow):
         self.deskew_greekmonoDialog.show()
 
         seq = "GP6"
-        
+
         def setdefault():
             if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
                 self.deskew_greekmono_ui.SourceButton.setEnabled(False)
@@ -2993,11 +2999,11 @@ class MainWindow(qtw.QMainWindow):
                 self.deskew_greekmono_ui.SourceButton.setEnabled(True)
                 self.deskew_greekmono_ui.DestTifButton.setEnabled(True)
 
-        if self.deskew_greekmono_ui.defaultsrcBox.isChecked(): 
+        if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -3012,9 +3018,9 @@ class MainWindow(qtw.QMainWindow):
                         tif_workflow_folder = Sequence['WorkflowFullPath']+r'/'
                         tif_complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
                         print(source_folder,tif_workflow_folder,tif_complete_folder)
-            
+
         seq = "GP7"
-        
+
         def setdefault():
             if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
                 self.deskew_greekmono_ui.SourceButton.setEnabled(False)
@@ -3029,11 +3035,11 @@ class MainWindow(qtw.QMainWindow):
         self.deskew_greekmono_ui.buttonBox.accepted.connect(accept)
         self.deskew_greekmono_ui.buttonBox.rejected.connect(reject)
 
-        if self.deskew_greekmono_ui.defaultsrcBox.isChecked(): 
+        if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
+            # Define json data
             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -3065,11 +3071,11 @@ class MainWindow(qtw.QMainWindow):
                         print(source_folder,png_workflow_folder,png_complete_folder)
 
         rsp = self.deskew_greekmonoDialog.exec_()
-        
-        
+
+
         #dsk.deskewfiles("/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
         #pp.deskewfiles("/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
-    
+
     def actionResizeGreek_png(self):
         print("resizing Greek png files")
         #usage: pp.resizepngs(source, destination)
@@ -3087,11 +3093,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
-            
+
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.resizepngs(self.greekresizepng_ui.SourceLineEdit.text(), self.greekresizepng_ui.DestinationLineEdit.text())
@@ -3117,9 +3123,9 @@ class MainWindow(qtw.QMainWindow):
         self.greekresizepng_ui = Ui_greekresizepngDialog()
         self.greekresizepng_ui.setupUi(self.greekresizepngDialog)
         self.greekresizepngDialog.show()
-        
+
         seq = "GP10"
-        
+
         def setdefault():
             if self.greekresizepng_ui.defaultsrcBox.isChecked():
                 self.greekresizepng_ui.SourceButton.setEnabled(False)
@@ -3133,14 +3139,14 @@ class MainWindow(qtw.QMainWindow):
         self.greekresizepng_ui.DestinationButton.clicked.connect(self.DestGreekResizePngDialog)
         self.greekresizepng_ui.buttonBox.accepted.connect(accept)
         self.greekresizepng_ui.buttonBox.rejected.connect(reject)
-        
 
-        if self.greekresizepng_ui.defaultsrcBox.isChecked(): 
+
+        if self.greekresizepng_ui.defaultsrcBox.isChecked():
             # disable source button (default)
-            
+
             # get default folder
-            # Define json data        
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")  
+            # Define json data
+            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -3172,7 +3178,7 @@ class MainWindow(qtw.QMainWindow):
 
         rsp = self.greekresizepngDialog.exec_()
         print("completed resizing indexed(BW) png")
- 
+
     def actionConvert_Latin_tiff_To_png(self):
         print("creating indexed(BW) Latin png files")
         #usage: pp.tiff2pngidx(source, destination)
@@ -3185,7 +3191,7 @@ class MainWindow(qtw.QMainWindow):
         self.latinmono2png_ui.DestinationButton.clicked.connect(self.LatinDestMonoToPngDialog)
 
         rsp = self.latinmono2pngDialog.exec_()
-        
+
         if self.latinmono2pngDialog.Accepted:
             pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
@@ -3205,7 +3211,7 @@ class MainWindow(qtw.QMainWindow):
         self.deskew_latinmono_ui.DestTifButton.clicked.connect(self.DestDeskewLatinTifDialog)
 
         rsp = self.deskew_latinmonoDialog.exec_()
-        
+
         if self.deskew_latinmonoDialog.Accepted:
             pp.deskewfiles(self.deskew_latinmono_ui.SourceLineEdit.text(), self.deskew_latinmono_ui.DestPngLineEdit.text(),self.deskew_latinmono_ui.DestTifLineEdit.text())
             print("completed deskewing monochrome tiff and png files")
@@ -3221,11 +3227,11 @@ class MainWindow(qtw.QMainWindow):
         self.latinresizepng_ui.DestinationButton.clicked.connect(self.DestLatinResizePngDialog)
 
         rsp = self.latinresizepngDialog.exec_()
-        
+
         if self.latinresizepngDialog.Accepted:
             pp.resizepngs(self.latinresizepng_ui.SourceLineEdit.text(), self.latinresizepng_ui.DestinationLineEdit.text())
             print("completed creating indexed(BW) png")
-    
+
     def crop_processor(self, qimage, params):
         if not params:
             return qimage
@@ -3236,7 +3242,7 @@ class MainWindow(qtw.QMainWindow):
         h = params.get("h", qimage.height())
 
         return qimage.copy(x, y, w, h)
-    
+
     def actionCrop_Greek_To_tiff_Lines(self):
         print("cropping and sorting Greek tiff lines")
         #usage: tr.sortcroplines(source, splitdir, linebox)
@@ -3268,11 +3274,11 @@ class MainWindow(qtw.QMainWindow):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
             for filename in os.listdir(source_folder):
                 #print(source_folder,filename)
                 #source_file_path = os.path.join(source_folder, filename)
-            
+
                 # Extract to default Workflow folder
                 print(source_folder, workflow_dest_folder, workflow_box_folder)
                 tr.sortcroplines(self.crop_greeklines_ui.SourceLineEdit.text(),self.crop_greeklines_ui.GreekBoxFolderLineEdit.text(),self.crop_greeklines_ui.DestGreekLineEdit.text())
@@ -3312,14 +3318,14 @@ class MainWindow(qtw.QMainWindow):
         self.crop_greeklines_ui.buttonBox.rejected.connect(reject)
 
         seq = ["GL1","GL2"]
-        
-        if self.crop_greeklines_ui.defaultsrcBox.isChecked(): 
+
+        if self.crop_greeklines_ui.defaultsrcBox.isChecked():
         # disable source button (default)
-            
+
             for step in seq:
 
-                # Define json data        
-                
+                # Define json data
+
                 jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
                 with open(jsonfile, 'r') as f:
                     # returns JSON object as
@@ -3361,9 +3367,9 @@ class MainWindow(qtw.QMainWindow):
                                 self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
                                 workflow_box_folder = Sequence['WorkflowFullPath']+r'/'
                                 complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                                
+
                 f.close()
-            
+
         rsp = self.crop_greeklinesDialog.exec_()
         print("completed creating cropped language tif files")
     def actionRename_Greek_tiff_Lines(self):
@@ -3377,10 +3383,10 @@ class MainWindow(qtw.QMainWindow):
         self.greekrenamelines_ui.DestinationButton.clicked.connect(self.DestGreekRenameLinesDialog)
 
         rsp = self.greekrenamelinesDialog.exec_()
-        
+
         if self.greekrenamelinesDialog.Accepted:
             tr.renameimages(self.greekrenamelines_ui.SourceLineEdit.text(), self.greekrenamelines_ui.DestinationLineEdit.text())
-            
+
             print("completed renaming Greek tif lines for ground truth")
     def actionMove_Greek_tiff_Lines(self):
         print("moving Greek tif lines for ground truth")
@@ -3394,7 +3400,7 @@ class MainWindow(qtw.QMainWindow):
         self.greekmovelines_ui.DestinationButton.clicked.connect(self.DestGreekMovelinesDialog)
 
         rsp = self.greekmovelinesDialog.exec_()
-        
+
         if self.greekmovelinesDialog.Accepted:
             tr.renameimages(self.greekmovelines_ui.SourceLineEdit.text(), self.greekmovelines_ui.DestinationLineEdit.text())
             print("completed moving Greek tif lines for ground truth")
@@ -3412,7 +3418,7 @@ class MainWindow(qtw.QMainWindow):
         self.crop_latinlines_ui.DestlatinButton.clicked.connect(self.DestlatinLinesDialog)
 
         rsp = self.crop_latinlinesDialog.exec_()
-        
+
         if self.crop_latinlinesDialog.Accepted:
             tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
             print("completed creating cropped Latin tif lines")
@@ -3429,12 +3435,12 @@ class MainWindow(qtw.QMainWindow):
         self.latinrenamelines_ui.DestinationButton.clicked.connect(self.DestLatinRenameLinesDialog)
 
         rsp = self.latinrenamelinesDialog.exec_()
-        
+
         if self.latinrenamelinesDialog.Accepted:
             tr.renameimages(self.latinrenamelines_ui.SourceLineEdit.text(), self.latinrenamelines_ui.DestinationLineEdit.text())
-            
+
             print("completed renaming Greek tif lines for ground truth")
-        
+
     def actionMove_Latin_tiff_Lines(self):
         print("moving Latin tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
@@ -3446,7 +3452,7 @@ class MainWindow(qtw.QMainWindow):
         self.latinmovelines_ui.DestinationButton.clicked.connect(self.DestLatinMovelinesDialog)
 
         rsp = self.latinmovelinesDialog.exec_()
-        
+
         if self.latinmovelinesDialog.Accepted:
             tr.renameimages(self.latinmovelines_ui.SourceLineEdit.text(), self.latinmovelines_ui.DestinationLineEdit.text())
             print("completed moving Latin tif lines for ground truth")
@@ -3455,12 +3461,12 @@ class MainWindow(qtw.QMainWindow):
         print("splitting Greek textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
         tr.splittextlines("/home/jetson/Projects/Python/EstablishTruth/Greek txt4linesplit/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/")
-        
+
     def actionRenameGreek_text_lines(self):
         print("renaming Greek textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
         tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Greek lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Greek lines2groundtruth/")
-    
+
     def actionSplit_Latin_Text_Lines(self):
         print("splitting Latin textlines for ground truth")
         # usage: tr.splittextlines(source, destination)
@@ -3470,7 +3476,7 @@ class MainWindow(qtw.QMainWindow):
         print("renaming Latin textlines for ground truth")
         # usage: tr.text2groundtruth(source, destination)
         tr.text2groundtruth(r"/home/jetson/Projects/Python/EstablishTruth/Latin lines4groundtruth/", "/home/jetson/Projects/Python/EstablishTruth/Latin lines2groundtruth/")
-    
+
     def actionReview_Ground_Truth(self):
         gtr.MainWindow = qtw.QMainWindow()
         gtr.ui = gtr.Ui_MainWindow()
@@ -3482,18 +3488,18 @@ class MainWindow(qtw.QMainWindow):
         versify.ui = versify.Ui_MainWindow()
         versify.ui.setupUi(versify.MainWindow)
         versify.MainWindow.show()
-    
+
     def actionUpdate_Wordlist(self):
         pass
-    
+
     def actionTrain_Tesseract(self):
         pass
-    
+
     def actionCorrect_OCR(self):
         print("performing OCR on current image")
         self.GetRawOCRtext()
 
-    
+
     def start_image_load(self, path, target="ref"):
         print(f"[THREAD] Start load Ã¢â€ â€™ {path} ({target})")
 
@@ -3521,8 +3527,8 @@ class MainWindow(qtw.QMainWindow):
 
         # show progress immediately
         self._show_progress(0)
-    
-    
+
+
     def on_image_loaded(self, qimage):
         print("[LOAD] Complete")
 
@@ -3545,7 +3551,7 @@ class MainWindow(qtw.QMainWindow):
         # DISPLAY (no scaling here)
         # -------------------------
         self.ui.Image.setPixmap(self.imagepixmap)
-    
+
     def on_load_progress(self, value):
          print(f"[LOAD] {value}%")
          self._set_progress_percent(value)
@@ -3558,19 +3564,20 @@ class MainWindow(qtw.QMainWindow):
         # Ã°Å¸â€Â´ invalidate image state
         self.imagepixmap = qtg.QPixmap()
         self.origpixmap  = qtg.QPixmap()
-    
+
     def loadImage(self):
-        fileName, _ = qtw.QFileDialog.getOpenFileName(
-            self,
-            "Open Image",
-            "",
-            "Images (*.png *.jpg *.jpeg *.tif *.tiff)"
-        )
-        if fileName:
-            filestr = os.path.basename(fileName) 
+        def selected(fileName):
+            filestr = os.path.basename(fileName)
             self.ui.ImageLE.setText(filestr)
             self.loadImageStackFromFile(fileName)
-    
+
+        self.open_non_modal_image_picker(
+            "Open Image",
+            "",
+            selected,
+            '_image_open_dialog',
+        )
+
     def loadImageStackFromFile(self, fileName=''):
         fileName = str(fileName)
 
@@ -3615,7 +3622,7 @@ class MainWindow(qtw.QMainWindow):
         if hasattr(self, "progress_bar"):
             self.progress_bar.setValue(0)
             self.progress_bar.setVisible(True)
-    
+
     def numFrames(self):
         """ Return the number of image frames in the stack.
         """
@@ -3655,7 +3662,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.preprocess_window = OCRPreprocessTool(self, initial_pixmap=initial_pixmap)
         self.preprocess_window.exec_()
-    
+
 
     from PyQt5.QtGui import QPixmap, QImage
     from PyQt5.QtCore import QFileInfo
@@ -3667,40 +3674,40 @@ class MainWindow(qtw.QMainWindow):
         print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
         self.imgfilename = self.imgpath
         file = qtc.QFile(imgfilename)
-        filestr = os.path.basename(imgfilename)           
+        filestr = os.path.basename(imgfilename)
         filesplit = os.path.splitext(filestr)
         filename = filesplit[0]
         fileext = filesplit[1]
 
         if hasattr(self.ui, "ImageLE"):
             self.ui.ImageLE.setText(filestr)
-  
+
         if file.open(qtc.QIODevice.ReadOnly):
-            info = qtc.QFileInfo(imgfilename)      
+            info = qtc.QFileInfo(imgfilename)
 
             if fileext == '.tif':
                 self.loadImageStackFromFile(imgfilename)
                 self.imgdir = os.path.dirname(imgfilename)
                 print("[DEBUG] imagepixmap will be populated by on_image_loaded")
-                
+
             else:
                 self.imagepixmap = qtg.QPixmap(self.imgpath)
                 self.origpixmap  = self.imagepixmap
                 self.ui.Image.setPixmap(self.imagepixmap)
-            
+
         file.close()
-            
+
         self.on_zoom_combobox()
         self.session_manager.update('Session.json', {
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
         })
-        
+
         self.imgfileList = []
         for i in sorted(os.listdir(self.imgdir)):
             ipath = os.path.join(self.imgdir, i)
             if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)        
+                self.imgfileList.append(ipath)
         self.sortImgFiles()
 
 
@@ -3719,7 +3726,7 @@ class MainWindow(qtw.QMainWindow):
 #             # QImage case (scanner)
 #             self.imgpath = None
 #             self.imgdir = None
-            
+
 #         print(f"[showImage DEBUG] self.imgpath set to: {self.imgpath}")
 
 #         if isinstance(img, str):
@@ -3800,7 +3807,7 @@ class MainWindow(qtw.QMainWindow):
     #     # -----------------------------
     #     # CASE 2: file path (OLD pipeline still supported)
     #     # -----------------------------
-        
+
     #     elif isinstance(img, str):
     #         pixmap = QPixmap(img)
 
@@ -3819,37 +3826,37 @@ class MainWindow(qtw.QMainWindow):
     #         self.ui.imageLabel.setScaledContents(True)
     #     else:
     #         print("[showImage ERROR] imageLabel not found in UI")
-    
+
     # def showImage(self,imgfilename):
     #     self.imgpath = imgfilename
     #     print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
     #     self.imgfilename = self.imgpath
     #     file = qtc.QFile(imgfilename)
-    #     filestr = os.path.basename(imgfilename)           
+    #     filestr = os.path.basename(imgfilename)
     #     filesplit = os.path.splitext(filestr)
     #     filename = filesplit[0]
     #     fileext = filesplit[1]
-  
+
     #     if file.open(qtc.QIODevice.ReadOnly):
-    #         info = qtc.QFileInfo(imgfilename)      
+    #         info = qtc.QFileInfo(imgfilename)
 
     #         if fileext == '.tif':
     #             self.loadImageStackFromFile(imgfilename)
     #             self.imgdir = os.path.dirname(imgfilename)
     #             print("[DEBUG] imagepixmap will be populated by on_image_loaded")
-                
+
     #         else:
     #             self.imagepixmap = qtg.QPixmap(self.imgpath)
     #             self.origpixmap  = self.imagepixmap
     #             self.ui.Image.setPixmap(self.imagepixmap)
-            
+
     #     file.close()
-            
+
         self.on_zoom_combobox()
-       
-        
+
+
         # jsonfile = 'Model/Project/Data/json/Session.json'
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")       
+        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
         with open(jsonfile, 'r') as f:
             # data = json.load(f)
             # imgpath_key = r"self.imgpath"
@@ -3858,8 +3865,8 @@ class MainWindow(qtw.QMainWindow):
             "path": self.imgpath if isinstance(self.imgpath, str) else str(self.imgpath),
             "dir": self.imgdir if isinstance(self.imgdir, str) else str(self.imgdir)
 }
-            
-            
+
+
             for Setting in data:
                 # -------------------------------------------------
                 # SAFE SESSION CHECK (NO CRASH VERSION)
@@ -3885,15 +3892,15 @@ class MainWindow(qtw.QMainWindow):
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
         f.close()
-        
+
         self.imgfileList = []
-        
+
         for i in sorted(os.listdir(self.imgdir)):
             ipath = os.path.join(self.imgdir, i)
             if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)        
+                self.imgfileList.append(ipath)
         self.sortImgFiles()
-    
+
     def sortImgFiles(self):
         import re
 
@@ -3909,8 +3916,8 @@ class MainWindow(qtw.QMainWindow):
         if self.imgpath in self.sorted_imgfilelist:
             self.current_img_index = self.sorted_imgfilelist.index(self.imgpath)
         else:
-            self.current_img_index = 0   
-    
+            self.current_img_index = 0
+
     def nextImage(self):
         if not self.sorted_imgfilelist:
             return
@@ -3935,26 +3942,18 @@ class MainWindow(qtw.QMainWindow):
         if self.imgpath:
             self.ui.ImageLE.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
-            self.sortImgFiles()  
+            self.sortImgFiles()
     def loadText(self):
-        from PyQt5 import QtWidgets as qtw
-
-        txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget,
+        self.open_non_modal_text_picker(
             'Open text file',
             self.txtdir if hasattr(self, 'txtdir') else '',
-            'Text files (*.txt *.csv)'
-        )[0]
-
-        if not txtpath:
-            return
-
-        # Ã¢Å“â€¦ Single source of truth
-        self.showText(txtpath)
+            self.showText,
+            '_text_open_dialog',
+        )
 
     def OpenTextFileDialog(self, MainWindow):
-        from PyQt5 import QtWidgets as qtw
-        import os
+        self.loadText()
+        return
 
         txtpath = qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget,
@@ -4059,7 +4058,7 @@ class MainWindow(qtw.QMainWindow):
 
         self.txtpath = txtfile
         self.showText(txtfile)
-    
+
     def prevText(self):
         if not self.sorted_txtfilelist:
             self.loadText()
@@ -4070,7 +4069,7 @@ class MainWindow(qtw.QMainWindow):
         txtfile = self.sorted_txtfilelist[self.txt_index]
 
         self.txtpath = txtfile
-        self.showText(txtfile)   
+        self.showText(txtfile)
 
     def ReloadText(self):
         if self.txtpath:
@@ -4088,10 +4087,10 @@ class MainWindow(qtw.QMainWindow):
                     self.ui.OCRText.insertPlainText(text)
                 else:
                     self.ui.OCRText.setPlainText(text)
-                
-                # update font to selection and size       
+
+                # update font to selection and size
                 self.on_font_update()
-                
+
                 # update line spacing
                 self.SetLineSpacing()
 
@@ -4179,8 +4178,8 @@ class MainWindow(qtw.QMainWindow):
 
 
         def reject():
-            pass        
-        
+            pass
+
         self.ImageTextPairDialog = qtw.QDialog()
         self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
@@ -4197,7 +4196,7 @@ class MainWindow(qtw.QMainWindow):
 
     def DestPdfFileDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.pdfx_ui.DestinationLineEdit.setText(self.directory+r'/')
 
@@ -4209,193 +4208,193 @@ class MainWindow(qtw.QMainWindow):
 
     def DestPdfForTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.pdf4tif_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def PdfToTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
-        
+
         if self.directory:
             self.pdf2tif_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestPdfToTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.pdf2tif_ui.DestinationLineEdit.setText(self.directory+r'/')
-    
+
     def TifToMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
-        
+
         if self.directory:
             self.tif2mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestTifToMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.tif2mono_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def MonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select mono tif pages source folder"))
-        
+
         if self.directory:
             self.mono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestMonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
-            self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')    
-    
+            self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
+
     def GreekMonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek mono tif pages source folder"))
-        
+
         if self.directory:
             self.greekmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def GreekDestMonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.greekmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DeskewMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
-        
+
         if self.directory:
             self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestDeskewPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def DeskewGreekMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek pages source folder"))
-        
+
         if self.directory:
             self.deskew_greekmono_ui.SourceLineEdit.setText(self.directory+r'/')
-   
+
     def DestDeskewGreekPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek png pages destination folder"))
-        
+
         if self.directory:
             self.deskew_greekmono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewGreekTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek tif pages destination folder"))
-        
+
         if self.directory:
             self.deskew_greekmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def GreekResizePngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek pages source folder"))
-        
+
         if self.directory:
             self.greekresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestGreekResizePngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek png pages destination folder"))
-        
+
         if self.directory:
             self.greekresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DeskewLatinMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin pages source folder"))
-        
+
         if self.directory:
             self.deskew_latinmono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def LatinMonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin mono tif pages source folder"))
-        
+
         if self.directory:
             self.latinmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def LatinDestMonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.latinmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DestMonoToPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DeskewMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
-        
+
         if self.directory:
             self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestDeskewPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def DestDeskewLatinPngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin png pages destination folder"))
-        
+
         if self.directory:
             self.deskew_latinmono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewLatinTifDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin tif pages destination folder"))
-        
+
         if self.directory:
             self.deskew_latinmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def LatinResizePngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin pages source folder"))
-        
+
         if self.directory:
             self.latinresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestLatinResizePngDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin png pages destination folder"))
-        
+
         if self.directory:
             self.latinresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
-    
+
     def CropLanguagesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
-        
+
         if self.directory:
             self.crop_languages_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def BoxFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.crop_languages_ui.BoxFolderLineEdit.setText(self.directory+r'/')
 
     def ElimFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.crop_languages_ui.ElimFolderLineEdit.setText(self.directory+r'/')
 
     def DestGreekDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-        
+
         if self.directory:
             self.crop_languages_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
@@ -4413,13 +4412,13 @@ class MainWindow(qtw.QMainWindow):
 
     def GreekLineBoxFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
-        
+
         if self.directory:
             self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestGreekLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
-        
+
         if self.directory:
             self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
@@ -4431,15 +4430,15 @@ class MainWindow(qtw.QMainWindow):
 
     def LatinLineBoxFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
-        
+
         if self.directory:
             self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestLatinLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
-        
+
         if self.directory:
-            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')            
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
     def GetRawOCRtext(self):
         self.ui.OCRText.clear()
@@ -4448,7 +4447,7 @@ class MainWindow(qtw.QMainWindow):
         imgfilename = self.ui.ImageLE.text()
         imgbasename = imgfilename.split(".")[0]
         self.ui.TextLE.setText(imgbasename + ".txt")
-    
+
     def GetLineSpacing(self):
         self.ui.LHslider.setEnabled(True)
         self.ui.LHslider.show()
@@ -4464,18 +4463,18 @@ class MainWindow(qtw.QMainWindow):
         text = self.ui.LHlineEdit.text().strip()
         value = int(text) if text.isdigit() else 0
         self.ui.LHslider.setValue(value)
-        
+
     def SetLineSpacing(self):
         lineSpacing = self.ui.LHslider.value()
         self.ui.LHlineEdit.setText(str(lineSpacing))
-            
+
         cursor = self.ui.OCRText.textCursor()
         if not cursor.hasSelection():
             cursor.select(qtg.QTextCursor.Document)
         bf = self.ui.OCRCursor.blockFormat()
-        bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight) 
+        bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
-    
+
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save Raw text file',self.txtdir,
@@ -4486,7 +4485,7 @@ class MainWindow(qtw.QMainWindow):
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
         file.close()
-        
+
     def SaveAsCorrectedTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save Corrected text file', self.txtdir,
@@ -4499,8 +4498,8 @@ class MainWindow(qtw.QMainWindow):
         file.close()
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
-  
-        defaultdir = self.txtdir + r"/" 
+
+        defaultdir = self.txtdir + r"/"
         defaultfile = self.ui.TextLE.displayText()
 
         if defaultfile:
@@ -4515,7 +4514,7 @@ class MainWindow(qtw.QMainWindow):
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()
             file.write(my_CorrectedText)
-        
+
         self.ui.TextLE.setText(filename)
         file.close()
 
@@ -4523,7 +4522,7 @@ class MainWindow(qtw.QMainWindow):
         self.ui.Zoomslider.setEnabled(True)
         self.ui.Zoomslider.show()
         zoomValue = self.ui.Zoomslider.value()
-        
+
     def DisableZoomSlider(self):
         self.ui.Zoomslider.hide()
         self.ui.Zoomslider.setEnabled(False)
@@ -4572,8 +4571,8 @@ class MainWindow(qtw.QMainWindow):
         )
 
         self.ui.Image.setPixmap(scaled)
-    
-    
+
+
     def run_child_module(self, filename, *args):
         module_path = os.path.abspath(os.path.join(script_dir, filename))
         cmd = [sys.executable, module_path]
@@ -4588,7 +4587,7 @@ class MainWindow(qtw.QMainWindow):
             return
 
         try:
-            process = subprocess.Popen(cmd)                       
+            process = subprocess.Popen(cmd)
             print(f"[LAUNCH] {filename} (PID: {process.pid})")
         except Exception as e:
             print(f"[Subprocess Error] {e}")
@@ -4812,17 +4811,17 @@ class MainWindow(qtw.QMainWindow):
 
     def OpenWithMyExplorer(self):
         self.run_child_module('MyExplorer.py')
-    
+
     def OpenWithCalc(self):
         lo_cmd = 'libreoffice --calc ' + self.txtpath
         print(lo_cmd)
         os.system(lo_cmd)
 
     def on_font_update(self):
-        # update font to selection and size       
+        # update font to selection and size
         font = qtg.QFont(self.ui.fontComboBox.currentFont())
         font.setPointSize(self.ui.fontSizeBox.value())
-        
+
         self.ui.OCRText.setFont(font)
 
     def on_lang_select(self):
@@ -5234,7 +5233,7 @@ class ProjectReplayEngine:
 
 
 # Only run this code if I am actually running this script
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
     w.show()

@@ -13,10 +13,11 @@ from PyQt5 import QtCore as qtc
 from PyQt5.QtCore import Qt
 
 from ext import *
+from LocalFileDrop import LocalFileDropMixin
 
 from MyWriterUI import Ui_MyWriterUI
 
-class Main(qtw.QMainWindow):
+class Main(LocalFileDropMixin, qtw.QMainWindow):
     def __init__(self,parent=None):
         qtw.QMainWindow.__init__(self,parent)
 
@@ -495,15 +496,19 @@ class Main(qtw.QMainWindow):
                 #self.ui.textEdit.setCurrentFont(qtg.QFont(self.font))
 
     def open(self):
-
-        # Get filename and show only .writer files
-        #PYQT5 Returns a tuple in PyQt5, we only need the filename
-        self.filename = qtw.QFileDialog.getOpenFileName(self, 'Open File',".","(*.txt *.csv *.writer)")[0]
-
-        if self.filename:
+        def selected(path):
+            self.filename = path
             with open(self.filename,"rt", encoding='UTF-8') as file:
                 self.ui.textEdit.setText(file.read())
-        self.on_font_update()
+            self.on_font_update()
+
+        self.open_non_modal_file_picker(
+            'Open File',
+            '.',
+            selected,
+            '_open_file_dialog',
+            ['*.txt', '*.csv', '*.writer'],
+        )
 
     def save(self):
 
@@ -601,12 +606,7 @@ class Main(qtw.QMainWindow):
         wc.show()
 
     def insertImage(self):
-
-        # Get image file name
-        #PYQT5 Returns a tuple in PyQt5
-        filename = qtw.QFileDialog.getOpenFileName(self, 'Insert image',".","Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
-
-        if filename:
+        def selected(filename):
 
             # Create image object
             image = qtg.QImage(filename)
@@ -626,6 +626,13 @@ class Main(qtw.QMainWindow):
                 cursor = self.ui.textEdit.textCursor()
 
                 cursor.insertImage(image,filename)
+
+        self.open_non_modal_image_picker(
+            'Insert image',
+            '.',
+            selected,
+            '_insert_image_dialog',
+        )
 
     def fontColorChanged(self):
 
