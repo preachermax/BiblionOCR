@@ -112,6 +112,7 @@ Future implementations should derive from a common `ScannerBackend` interface so
   * Linux/macOS backend extracted from old `MyServer` commented prototype and moved into `Core/Scanner/sane_scanner.py`
   * now uses a defensive split strategy on Linux: safe availability probing, `scanimage`-based enumeration, selective option probing, retry/caching for slow discovery, and AirScan-assisted fallback when `sane-airscan` discovery/acquisition is not self-sufficient
   * Jetson Canon TS3700 result: SANE can be presented as a Linux-facing compatibility surface, but the reliable scan transport is still network AirScan/eSCL rather than a stable native SANE acquisition path
+  * strict USB-only Jetson validation result: with `airscan` removed from both `dll.conf` and `dll.d`, `scanimage -L` returned no devices and `SANE_DEBUG_PIXMA=4` reported `pixma_find_scanners() found 0 devices`, so native USB SANE should be treated as unavailable for the current TS3700 path
   * not fully testable on this Windows machine because `python-sane` is not installed here
 
 ### Recent Scanner Stabilization
@@ -126,6 +127,8 @@ Future implementations should derive from a common `ScannerBackend` interface so
 * The scan wizard now opens immediately and performs backend/device discovery asynchronously with a visible loading indicator, primarily to avoid long Jetson UI stalls
 * On the Jetson Canon path, SANE-first discovery now retries briefly and can synthesize AirScan-backed fallback entries when `scanimage -L` stays empty
 * Selecting one of those SANE fallback entries results in AirScan/eSCL acquisition by IP, which is currently the standardized cross-platform path for this Canon class
+* The scan wizard now supports a persisted strict-SANE test mode that disables the app-level AirScan fallback path, and SANE discovery labels now distinguish `[native SANE]` devices from `[AirScan fallback]` entries
+* Jetson Ubuntu SANE note: files left inside `/etc/sane.d/dll.d/` still load regardless of extension, so strict USB-only validation must move `airscan` loader files out of `dll.d`, not just rename them in place
 
 ### Helper Formatting Pattern
 
@@ -807,6 +810,8 @@ DO NOT update for:
 * 2026-07-02: `Model/Backup Copies/0-MainUI copy/Ui2Py.py` was repointed at the current Windows repo paths for rare backup-copy UI regeneration use, but targeted `pyuic5` remains preferred over broad regeneration
 * 2026-07-02: `Model/Project/Data/json/VersifierSession.json` was intentionally normalized by removing the duplicate `self.projectname` entry and updating the active Verse/Reference GroundTruth paths to the current Windows repo location
 * 2026-07-02: `MyVersifier.py` startup path restore now detects repo-local Windows absolute paths in `VersifierSession.json` and remaps them onto the current local checkout so Jetson startup does not prepend `/home/.../BiblionOCR/` to `C:/...` fragments
+* 2026-07-02: Scan wizard gained a persisted strict-SANE toggle that disables app-level AirScan fallback during Jetson USB validation, and SANE device discovery now labels native `scanimage -L` results separately from fallback entries
+* 2026-07-02: Jetson strict USB SANE validation for Canon TS3700 failed even with `airscan` removed from both `dll.conf` and `dll.d`; `pixma` loaded but reported `0 devices`, so AirScan/eSCL remains the supported Jetson transport for this model
 
 ---
 

@@ -791,6 +791,10 @@ class ScanWizardDialog(qtw.QDialog):
         self.loading_progress.setRange(0, 0)
         source_layout.addWidget(self.loading_progress)
 
+        self.allow_network_fallback_checkbox = qtw.QCheckBox("Allow AirScan fallback while testing SANE")
+        self.allow_network_fallback_checkbox.setChecked(bool(self.initial_request.get("allow_network_fallback", True)))
+        source_layout.addWidget(self.allow_network_fallback_checkbox)
+
         source_layout.addWidget(qtw.QLabel("Device name (optional)"))
         self.device_name_edit = qtw.QLineEdit()
         self.device_name_edit.setPlaceholderText("Leave blank to use backend default device, or enter an AirScan IP/URL")
@@ -869,6 +873,7 @@ class ScanWizardDialog(qtw.QDialog):
 
         self.backend_combo.currentTextChanged.connect(self._update_validation_state)
         self.backend_combo.currentIndexChanged.connect(self._refresh_detected_devices)
+        self.backend_combo.currentIndexChanged.connect(self._sync_backend_specific_controls)
         self.device_name_edit.textChanged.connect(self._update_validation_state)
         self.destination_edit.textChanged.connect(self._update_validation_state)
         self.mode_combo.currentTextChanged.connect(self._update_validation_state)
@@ -876,6 +881,8 @@ class ScanWizardDialog(qtw.QDialog):
         self.source_type_combo.currentTextChanged.connect(self._update_validation_state)
         self.persist_format_combo.currentTextChanged.connect(self._update_validation_state)
         self.duplex_checkbox.toggled.connect(self._update_validation_state)
+        self.allow_network_fallback_checkbox.toggled.connect(self._refresh_detected_devices)
+        self.allow_network_fallback_checkbox.toggled.connect(self._update_validation_state)
 
     def _populate_backend_options(self):
         self.backend_combo.clear()
@@ -887,7 +894,8 @@ class ScanWizardDialog(qtw.QDialog):
 
     def _detected_devices_text(self):
         request = {
-            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference")
+            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference"),
+            "allow_network_fallback": self.allow_network_fallback_checkbox.isChecked(),
         }
         return self._format_detected_devices([], request)
 
@@ -895,7 +903,8 @@ class ScanWizardDialog(qtw.QDialog):
         if self._loading_backends:
             return
         request = {
-            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference")
+            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference"),
+            "allow_network_fallback": self.allow_network_fallback_checkbox.isChecked(),
         }
         self._start_device_load(request)
 
@@ -924,6 +933,15 @@ class ScanWizardDialog(qtw.QDialog):
             self.persist_format_combo.setCurrentText(persist_format)
 
         self.duplex_checkbox.setChecked(bool(self.initial_request.get("duplex", False)))
+        self.allow_network_fallback_checkbox.setChecked(bool(self.initial_request.get("allow_network_fallback", True)))
+
+    def _sync_backend_specific_controls(self):
+        is_sane_backend = self.backend_combo.currentData() == "SaneScanner"
+        self.allow_network_fallback_checkbox.setEnabled(is_sane_backend)
+        if is_sane_backend:
+            self.allow_network_fallback_checkbox.setText("Allow AirScan fallback while testing SANE")
+        else:
+            self.allow_network_fallback_checkbox.setText("AirScan fallback applies only to the SANE backend")
 
     def _go_back(self):
         index = self.page_stack.currentIndex()
@@ -975,6 +993,7 @@ class ScanWizardDialog(qtw.QDialog):
         review_lines = [
             f"Backend: {self.backend_combo.currentText()}",
             f"Device: {request['device_name'] or 'Default device'}",
+            f"Allow AirScan fallback: {'Yes' if request['allow_network_fallback'] else 'No'}",
             f"Destination: {request['destination_folder']}",
             f"Mode: {request['mode']}",
             f"DPI: {request['dpi']}",
@@ -995,6 +1014,7 @@ class ScanWizardDialog(qtw.QDialog):
             "destination_folder": self.destination_edit.text().strip(),
             "backend_preference": self.backend_combo.currentData(),
             "device_name": self.device_name_edit.text().strip(),
+            "allow_network_fallback": self.allow_network_fallback_checkbox.isChecked(),
             "mode": self.mode_combo.currentText(),
             "dpi": int(self.dpi_combo.currentText()),
             "source_type": self.source_type_combo.currentText(),
@@ -1006,7 +1026,15 @@ class ScanWizardDialog(qtw.QDialog):
         if not devices:
             if request["backend_preference"] == "ESCLScanner":
                 return "No AirScan devices were discovered automatically. Enter a scanner IP or URL above to connect directly."
+            if request["backend_preference"] == "SaneScanner" and not request.get("allow_network_fallback", True):
+                return "No native SANE devices were reported by scanimage -L. AirScan fallback is currently disabled for this test."
             return "No devices reported by the current backend selection."
+        if request["backend_preference"] == "SaneScanner":
+            legend_lines = [
+                "[native SANE] = reported directly by scanimage -L via local SANE backend",
+                "[AirScan fallback] = network fallback path, not native USB SANE",
+            ]
+            return "\n".join(legend_lines + [""] + [str(device) for device in devices])
         return "\n".join(str(device) for device in devices)
 
     def _set_loading_state(self, message, active):
@@ -1053,6 +1081,7 @@ class ScanWizardDialog(qtw.QDialog):
         if backend_index >= 0:
             self.backend_combo.setCurrentIndex(backend_index)
         self.backend_combo.blockSignals(False)
+        self._sync_backend_specific_controls()
 
         self._set_loading_state("", False)
         self._refresh_detected_devices()
@@ -1849,6 +1878,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 "destination_folder": getattr(self, "scan_destination_folder", SCANNED_FOLDER),
                 "backend_preference": getattr(self, "scan_backend_preference", "ESCLScanner"),
                 "device_name": getattr(self, "scan_device_name", ""),
+                "allow_network_fallback": getattr(self, "scan_allow_network_fallback", True),
                 "mode": getattr(self, "scan_mode", "color"),
                 "dpi": getattr(self, "scan_dpi", 300),
                 "source_type": getattr(self, "scan_source_type", "flatbed"),
@@ -1867,6 +1897,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.scan_destination_folder = normalized_request["destination_folder"]
         self.scan_backend_preference = normalized_request["backend_preference"]
         self.scan_device_name = normalized_request["device_name"]
+        self.scan_allow_network_fallback = normalized_request.get("allow_network_fallback", True)
         self.scan_mode = normalized_request["mode"]
         self.scan_dpi = normalized_request["dpi"]
         self.scan_source_type = normalized_request["source_type"]
@@ -1879,6 +1910,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 'self.scan_destination_folder': self.scan_destination_folder,
                 'self.scan_backend_preference': self.scan_backend_preference,
                 'self.scan_device_name': self.scan_device_name,
+                'self.scan_allow_network_fallback': self.scan_allow_network_fallback,
                 'self.scan_mode': self.scan_mode,
                 'self.scan_dpi': self.scan_dpi,
                 'self.scan_source_type': self.scan_source_type,
@@ -1979,6 +2011,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.scan_destination_folder = get_setting('scan_destination_folder', SCANNED_FOLDER)
         self.scan_backend_preference = get_setting('scan_backend_preference', 'ESCLScanner')
         self.scan_device_name = get_setting('scan_device_name', '')
+        self.scan_allow_network_fallback = get_setting('scan_allow_network_fallback', True)
         self.scan_mode = get_setting('scan_mode', 'color')
         self.scan_dpi = get_setting('scan_dpi', 300)
         self.scan_source_type = get_setting('scan_source_type', 'flatbed')
@@ -1994,6 +2027,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.scan_duplex = self.scan_duplex.strip().lower() in {'1', 'true', 'yes', 'on'}
         else:
             self.scan_duplex = bool(self.scan_duplex)
+
+        if isinstance(self.scan_allow_network_fallback, str):
+            self.scan_allow_network_fallback = self.scan_allow_network_fallback.strip().lower() in {'1', 'true', 'yes', 'on'}
+        else:
+            self.scan_allow_network_fallback = bool(self.scan_allow_network_fallback)
 
         #self.origpixmap = qtg.QPixmap.fromImage(qtg.QImage())
         if hasattr(self, 'ui'):
