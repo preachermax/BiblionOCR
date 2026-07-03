@@ -126,6 +126,12 @@ class SaneScanner(ScannerDevice):
             raise RuntimeError("SANE scanning requires a working python-sane or scanimage installation plus Pillow")
         self._engine = engine
 
+    def _allow_network_fallback(self, request=None):
+        fallback_value = True if request is None else request.get("allow_network_fallback", True)
+        if isinstance(fallback_value, str):
+            return fallback_value.strip().lower() in {"1", "true", "yes", "on"}
+        return bool(fallback_value)
+
     def list_devices(self):
         if self._engine == "python":
             sane.init()
@@ -243,7 +249,7 @@ class SaneScanner(ScannerDevice):
             return f"{label} ({device_name})"
         return str(device_name)
 
-    def _list_devices_via_scanimage(self):
+    def _list_devices_via_scanimage(self, request=None):
         scanimage_path = self._scanimage_path()
         if not scanimage_path:
             return []
@@ -273,10 +279,11 @@ class SaneScanner(ScannerDevice):
         if self.__class__._last_scanimage_devices:
             return list(self.__class__._last_scanimage_devices)
 
-        fallback_devices = self._discover_devices_via_escl_fallback()
-        if fallback_devices:
-            self.__class__._last_scanimage_devices = list(fallback_devices)
-            return fallback_devices
+        if self._allow_network_fallback(request):
+            fallback_devices = self._discover_devices_via_escl_fallback()
+            if fallback_devices:
+                self.__class__._last_scanimage_devices = list(fallback_devices)
+                return fallback_devices
 
         if last_error:
             raise RuntimeError(last_error)
@@ -327,7 +334,7 @@ class SaneScanner(ScannerDevice):
             device_name = name_match.group("name").strip()
             label_match = re.search(r"\bis\s+(?:an?\s+)?(?P<label>.+)$", line, flags=re.IGNORECASE)
             label = label_match.group("label").strip() if label_match else ""
-            display_name = f"{label} ({device_name})" if label else device_name
+            display_name = f"{label} ({device_name}) [native SANE]" if label else f"{device_name} [native SANE]"
             devices.append(
                 {
                     "name": device_name,
@@ -338,12 +345,14 @@ class SaneScanner(ScannerDevice):
         return devices
 
     def _acquire_via_scanimage(self, destination_folder, request):
-        devices = self._list_devices_via_scanimage()
+        devices = self._list_devices_via_scanimage(request)
         if not devices:
             raise RuntimeError("SANE did not report any scanner devices")
 
         device_info = self._select_scanimage_device(devices, request.get("device_name"))
         if device_info.get("fallback_target"):
+            if not self._allow_network_fallback(request):
+                raise RuntimeError("SANE strict mode is enabled and scanimage did not report a native device")
             fallback_result = self._fallback_to_escl_target(
                 device_info.get("fallback_target"),
                 device_info,
@@ -385,9 +394,10 @@ class SaneScanner(ScannerDevice):
             completed = self._run_scanimage_command(fallback_command, output_path)
 
         if completed.returncode != 0:
-            fallback_result = self._fallback_to_escl_if_possible(device_info, destination_folder, request)
-            if fallback_result is not None:
-                return fallback_result
+            if self._allow_network_fallback(request):
+                fallback_result = self._fallback_to_escl_if_possible(device_info, destination_folder, request)
+                if fallback_result is not None:
+                    return fallback_result
             try:
                 os.remove(output_path)
             except OSError:
