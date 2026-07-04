@@ -4,7 +4,7 @@
 
 **Status:** Active implementation contract  
 **Scope:** MyServer, Core project engine, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation  
-**Last updated:** 2026-06-27
+**Last updated:** 2026-07-04
 
 ---
 
@@ -21,6 +21,7 @@ Current rules:
 * Project folder structure should be generated from `ProjectFolderList.txt`.
 * File entries in `ProjectFolderList.txt` are treated as parent-directory requirements.
 * Empty directories receive `.gitkeep` placeholders so Git can track them.
+* The curated manifest must stay project-safe: new projects should include runtime JSON data and minimal workflow/training scaffolding, but should not expand broad `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, or deep historical training payloads by default.
 
 Temporary implementation note:
 
@@ -29,8 +30,9 @@ Temporary implementation note:
 * The current `MyServer` entry path now uses a guided two-step modal dialog instead of chained text prompts.
 * New project dialogs should follow the same stacked-label, direct-action format already used by existing BiblionOCR custom dialogs.
 * The dialog supports optional loading of user-provided provenance files in `json`, `ris`, `txt`, or `csv` format to prefill required provenance fields before project creation starts.
-* The provenance file picker now opens from the filesystem root rather than defaulting to `Downloads`.
+* The provenance file picker now opens from the user Projects root rather than defaulting to `Downloads`.
 * The second step includes an in-dialog review summary before project creation is dispatched to the worker.
+* The new `Open Project` action and MyExplorer entry path both start from the same user Projects root, so project selection and file browsing share a single top-level anchor.
 
 ---
 
@@ -58,6 +60,12 @@ A valid project should include:
 ```
 
 The full `Model/Project/...` and `ViewController/...` directory tree is derived from `ProjectFolderList.txt`.
+
+Manifest curation rules for new-project generation:
+
+* Keep `Model/Project/Data/json` contents needed by runtime modules.
+* Keep minimal image workflow folders and the top-level `Model/Project/Training` scaffold.
+* Exclude heavy data trees such as `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, and deep training support payloads unless there is an explicit one-off regeneration case.
 
 ---
 
@@ -238,6 +246,16 @@ For each new project creation test:
 
 ---
 
-## 11. Design Statement
+## 11. Open Behavior Contract
+
+`MyServer` project/file entry points should follow these defaults:
+
+* `Open Project` starts from `os.path.join(os.path.expanduser("~"), "Projects")` and validates the selected folder as a BiblionOCR project root before launching `MyExplorer` there.
+* Shared file-open pickers should prefer the current working file/folder when present, otherwise fall back to the same Projects root.
+* `MyExplorer` should accept an explicit startup directory from `MyServer` and default to the user Projects root when no project-specific path is supplied.
+
+---
+
+## 12. Design Statement
 
 Project creation must produce a traceable, RIS-backed, locally version-controlled project artifact with a deterministic folder structure generated from `ProjectFolderList.txt`.

@@ -52,7 +52,7 @@ SCAN_ICON_RESOURCES = (
 )
 SCAN_ICON_FILES = (
     os.path.join(script_dir, "Icons", "scanner.png"),
-    os.path.join(script_dir, "Icons", "BiblionScanner.png"),
+    os.path.join(script_dir, "Icons", "BiblionScanner1.png"),
 )
 
 
@@ -127,6 +127,7 @@ from ProjectCreationWorker import ProjectCreationWorker
 from Training import Train as tr
 from TiffStackWorker import TiffStackWorker
 from LocalFileDrop import LocalFileDropMixin
+from ScanWorkflow import ScanWizardDialog as SharedScanWizardDialog
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
 from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
@@ -433,7 +434,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.review_label.setText("\n".join(review_lines))
 
     def _browse_for_ris(self):
-        start_dir = qtc.QDir.rootPath()
+        start_dir = self._projects_base_path()
         path, _ = qtw.QFileDialog.getOpenFileName(
             self,
             "Select Provenance File",
@@ -889,7 +890,11 @@ class ScanWizardDialog(qtw.QDialog):
         for option in self._backend_options_cache:
             label = option["label"]
             if not option.get("available", False):
-                label = f"{label} (unavailable)"
+                reason = option.get("unavailable_reason")
+                if reason and option["label"] == "TWAIN":
+                    label = f"{label} (unavailable on this system)"
+                else:
+                    label = f"{label} (unavailable)"
             self.backend_combo.addItem(label, option["value"])
 
     def _detected_devices_text(self):
@@ -980,9 +985,13 @@ class ScanWizardDialog(qtw.QDialog):
                 self.status_label.setStyleSheet("color: #9f3a38;")
                 self.scan_button.setEnabled(False)
             elif not backend_option.get("available", False):
-                self.status_label.setText(
-                    f"{backend_option['label']} is not available on this system. Choose another backend to test."
-                )
+                unavailable_reason = backend_option.get("unavailable_reason")
+                if unavailable_reason:
+                    self.status_label.setText(unavailable_reason)
+                else:
+                    self.status_label.setText(
+                        f"{backend_option['label']} is not available on this system. Choose another backend to test."
+                    )
                 self.status_label.setStyleSheet("color: #9f3a38;")
                 self.scan_button.setEnabled(False)
             else:
@@ -1411,6 +1420,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui.actionNewProject.setText("New Project")
         self.ui.actionNewProject.triggered.connect(self.on_new_project_clicked)
+        if hasattr(self.ui, "actionOpen_Project"):
+            self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
 
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
         self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
@@ -1622,7 +1633,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, "imageScannerbutton"):
             self.ui.imageScannerbutton.setIcon(scan_icon)
             self.ui.imageScannerbutton.setIconSize(qtc.QSize(20, 20))
-            self.ui.imageScannerbutton.setMinimumSize(qtc.QSize(28, 28))
             self.ui.imageScannerbutton.setToolTip("Scan image")
 
         if hasattr(self.ui, "actionImageScanner"):
@@ -1656,6 +1666,24 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             success_title="Project Created",
             success_message=f"Project created: {payload['project_name']}"
         )
+
+    def on_open_project_clicked(self):
+        project_path = self._choose_directory("Select project folder", self._projects_base_path())
+        if not project_path:
+            return None
+
+        model_project_path = os.path.join(project_path, "Model", "Project")
+        if not os.path.isdir(model_project_path):
+            qtw.QMessageBox.warning(
+                self,
+                "Open Project",
+                "Selected folder does not look like a BiblionOCR project root. Expected Model/Project under the selected folder.",
+            )
+            return None
+
+        self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
+        self.run_child_module('MyExplorer.py', project_path)
+        return project_path
         return payload
 
     def _start_project_creation(self, payload, success_title, success_message):
@@ -1798,7 +1826,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     #     self.networkScanner.finished.connect(self.onScanFinished)
     #     self.networkScanner.start()
     def actionScanNetwork(self):
-        dialog = ScanWizardDialog(
+        dialog = SharedScanWizardDialog(
             self.scannerManager,
             SCANNED_FOLDER,
             self,
@@ -1808,6 +1836,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return None
 
         request = dialog.get_request()
+        if request.get("source_type") == "adf":
+            self._redirect_scan_to_myscanner(request)
+            return request
         self._persist_scan_request(request)
         return self._start_scan_workflow(request)
 
@@ -1917,6 +1948,34 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 'self.scan_duplex': self.scan_duplex,
                 'self.scan_persist_format': self.scan_persist_format,
             },
+        )
+
+    def _redirect_scan_to_myscanner(self, request):
+        normalized_request = self.scannerManager.default_request(
+            (request or {}).get("destination_folder") or SCANNED_FOLDER
+        )
+        normalized_request.update(request or {})
+
+        self.session_manager.update(
+            'ScannerSession.json',
+            {
+                'self.scan_destination_folder': normalized_request['destination_folder'],
+                'self.scan_backend_preference': normalized_request['backend_preference'],
+                'self.scan_device_name': normalized_request['device_name'],
+                'self.scan_allow_network_fallback': normalized_request.get('allow_network_fallback', True),
+                'self.scan_mode': normalized_request['mode'],
+                'self.scan_dpi': normalized_request['dpi'],
+                'self.scan_source_type': normalized_request['source_type'],
+                'self.scan_duplex': normalized_request['duplex'],
+                'self.scan_persist_format': normalized_request['persist_format'],
+                'self.pending_scan_handoff': True,
+            },
+        )
+        self.run_child_module('MyScanner.py')
+        qtw.QMessageBox.information(
+            self,
+            'Continue In MyScanner',
+            'ADF workflows are routed through MyScanner. It has been opened with this scan request so you can continue there.'
         )
 
     # def onDeviceFound(self, device):
@@ -3611,7 +3670,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.open_non_modal_image_picker(
             "Open Image",
-            "",
+            self.imgdir if hasattr(self, 'imgdir') and self.imgdir else self._projects_base_path(),
             selected,
             '_image_open_dialog',
         )
@@ -3981,10 +4040,44 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.ImageLE.setText(os.path.basename(self.imgpath))
             self.showImage(self.imgpath)
             self.sortImgFiles()
+
+    def _projects_base_path(self):
+        base_path = getattr(getattr(self, 'project_engine', None), 'base_path', '')
+        if isinstance(base_path, str) and base_path and os.path.isdir(base_path):
+            return base_path
+        fallback = os.path.join(os.path.expanduser("~"), "Projects")
+        return fallback if os.path.isdir(fallback) else qtc.QDir.homePath()
+
+    def _dialog_start_directory(self, path_hint=''):
+        if isinstance(path_hint, str) and path_hint:
+            normalized = os.path.abspath(os.path.normpath(path_hint))
+            if os.path.isfile(normalized):
+                normalized = os.path.dirname(normalized)
+            if os.path.isdir(normalized):
+                return normalized
+        return self._projects_base_path()
+
+    def _choose_directory(self, title, start_dir=''):
+        return str(
+            qtw.QFileDialog.getExistingDirectory(
+                self.ui.centralwidget,
+                title,
+                self._dialog_start_directory(start_dir),
+            )
+        )
+
+    def _choose_file(self, title, name_filter='All Files (*.*)', start_dir=''):
+        return qtw.QFileDialog.getOpenFileName(
+            self.ui.centralwidget,
+            title,
+            self._dialog_start_directory(start_dir),
+            name_filter,
+        )[0]
+
     def loadText(self):
         self.open_non_modal_text_picker(
             'Open text file',
-            self.txtdir if hasattr(self, 'txtdir') else '',
+            self.txtdir if hasattr(self, 'txtdir') and self.txtdir else self._projects_base_path(),
             self.showText,
             '_text_open_dialog',
         )
@@ -4227,139 +4320,139 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
 
     def OpenPdfFileDialog(self):
-        self.path = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget,'Select pdf source file','','*.pdf')[0]
+        self.path = self._choose_file('Select pdf source file', '*.pdf', getattr(self, 'path', ''))
 
         if self.path:
             self.pdfx_ui.SourceLineEdit.setText(self.path)
 
     def DestPdfFileDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.pdfx_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.pdfx_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def PdfForTifDialog(self):
-        self.path = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget,'Select pdf pages source file','','*.pdf')[0]
+        self.path = self._choose_file('Select pdf pages source file', '*.pdf', getattr(self, 'path', ''))
 
         if self.path:
             self.pdf4tif_ui.SourceLineEdit.setText(self.path)
 
     def DestPdfForTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.pdf4tif_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.pdf4tif_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def PdfToTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
+        self.directory = self._choose_directory("Select pdf pages source folder", self.pdf2tif_ui.SourceLineEdit.text())
 
         if self.directory:
             self.pdf2tif_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestPdfToTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.pdf2tif_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.pdf2tif_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def TifToMonoDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
+        self.directory = self._choose_directory("Select pdf pages source folder", self.tif2mono_ui.SourceLineEdit.text())
 
         if self.directory:
             self.tif2mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestTifToMonoDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.tif2mono_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.tif2mono_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def MonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select mono tif pages source folder"))
+        self.directory = self._choose_directory("Select mono tif pages source folder", self.mono2png_ui.SourceLineEdit.text())
 
         if self.directory:
             self.mono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.mono2png_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def GreekMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek mono tif pages source folder"))
+        self.directory = self._choose_directory("Select greek mono tif pages source folder", self.greekmono2png_ui.SourceLineEdit.text())
 
         if self.directory:
             self.greekmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def GreekDestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.greekmono2png_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.greekmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DeskewMonoDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
+        self.directory = self._choose_directory("Select pdf pages source folder", self.deskew_mono_ui.SourceLineEdit.text())
 
         if self.directory:
             self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestDeskewPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.deskew_mono_ui.DestPngLineEdit.text())
 
         if self.directory:
             self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.deskew_mono_ui.DestTifLineEdit.text())
 
         if self.directory:
             self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def DeskewGreekMonoDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek pages source folder"))
+        self.directory = self._choose_directory("Select greek pages source folder", self.deskew_greekmono_ui.SourceLineEdit.text())
 
         if self.directory:
             self.deskew_greekmono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestDeskewGreekPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek png pages destination folder"))
+        self.directory = self._choose_directory("Select greek png pages destination folder", self.deskew_greekmono_ui.DestPngLineEdit.text())
 
         if self.directory:
             self.deskew_greekmono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewGreekTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek tif pages destination folder"))
+        self.directory = self._choose_directory("Select greek tif pages destination folder", self.deskew_greekmono_ui.DestTifLineEdit.text())
 
         if self.directory:
             self.deskew_greekmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def GreekResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek pages source folder"))
+        self.directory = self._choose_directory("Select greek pages source folder", self.greekresizepng_ui.SourceLineEdit.text())
 
         if self.directory:
             self.greekresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestGreekResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek png pages destination folder"))
+        self.directory = self._choose_directory("Select greek png pages destination folder", self.greekresizepng_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.greekresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DeskewLatinMonoDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin pages source folder"))
+        self.directory = self._choose_directory("Select latin pages source folder", self.deskew_latinmono_ui.SourceLineEdit.text())
 
         if self.directory:
             self.deskew_latinmono_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def LatinMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin mono tif pages source folder"))
+        self.directory = self._choose_directory("Select latin mono tif pages source folder", self.latinmono2png_ui.SourceLineEdit.text())
 
         if self.directory:
             self.latinmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def LatinDestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.latinmono2png_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.latinmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
@@ -4389,91 +4482,91 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def DestDeskewLatinPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin png pages destination folder"))
+        self.directory = self._choose_directory("Select latin png pages destination folder", self.deskew_latinmono_ui.DestPngLineEdit.text())
 
         if self.directory:
             self.deskew_latinmono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
     def DestDeskewLatinTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin tif pages destination folder"))
+        self.directory = self._choose_directory("Select latin tif pages destination folder", self.deskew_latinmono_ui.DestTifLineEdit.text())
 
         if self.directory:
             self.deskew_latinmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
     def LatinResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin pages source folder"))
+        self.directory = self._choose_directory("Select latin pages source folder", self.latinresizepng_ui.SourceLineEdit.text())
 
         if self.directory:
             self.latinresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def DestLatinResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin png pages destination folder"))
+        self.directory = self._choose_directory("Select latin png pages destination folder", self.latinresizepng_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.latinresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def CropLanguagesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
+        self.directory = self._choose_directory("Select pdf pages source folder", self.crop_languages_ui.SourceLineEdit.text())
 
         if self.directory:
             self.crop_languages_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def BoxFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.BoxFolderLineEdit.text())
 
         if self.directory:
             self.crop_languages_ui.BoxFolderLineEdit.setText(self.directory+r'/')
 
     def ElimFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.ElimFolderLineEdit.text())
 
         if self.directory:
             self.crop_languages_ui.ElimFolderLineEdit.setText(self.directory+r'/')
 
     def DestGreekDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.DestGreekLineEdit.text())
 
         if self.directory:
             self.crop_languages_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
     def DestLatinDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.DestLatinLineEdit.text())
 
         if self.directory:
             self.crop_languages_ui.DestLatinLineEdit.setText(self.directory+r'/')
 
     def CropGreekLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select tif pages source folder"))
+        self.directory = self._choose_directory("Select tif pages source folder", self.crop_greeklines_ui.SourceLineEdit.text())
 
         if self.directory:
             self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def GreekLineBoxFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
+        self.directory = self._choose_directory("Select linebox destination folder", self.crop_greeklines_ui.GreekBoxFolderLineEdit.text())
 
         if self.directory:
             self.crop_greeklines_ui.GreekBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestGreekLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
+        self.directory = self._choose_directory("Select Greek lines destination folder", self.crop_greeklines_ui.DestGreekLineEdit.text())
 
         if self.directory:
             self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
     def CropLatinLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select tif pages source folder"))
+        self.directory = self._choose_directory("Select tif pages source folder", self.crop_greeklines_ui.SourceLineEdit.text())
 
         if self.directory:
             self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def LatinLineBoxFolderDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select linebox destination folder"))
+        self.directory = self._choose_directory("Select linebox destination folder", self.crop_greeklines_ui.LatinBoxFolderLineEdit.text())
 
         if self.directory:
             self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestLatinLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select Greek lines destination folder"))
+        self.directory = self._choose_directory("Select Greek lines destination folder", self.crop_greeklines_ui.DestGreekLineEdit.text())
 
         if self.directory:
             self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
@@ -4848,7 +4941,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyWriter.py')
 
     def OpenWithMyExplorer(self):
-        self.run_child_module('MyExplorer.py')
+        self.run_child_module('MyExplorer.py', self._projects_base_path())
 
     def OpenWithCalc(self):
         lo_cmd = 'libreoffice --calc ' + self.txtpath
