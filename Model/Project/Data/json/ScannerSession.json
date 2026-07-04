@@ -488,5 +488,55 @@
         "Setting": "self.latinlinesbox",
         "CurrentValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box",
         "DefaultValue": "Model/Project/Images/Workflow/Latin/tif_latin_lines_box"
+    },
+    {
+        "Setting": "self.scan_destination_folder",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Scanned",
+        "DefaultValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Scanned"
+    },
+    {
+        "Setting": "self.scan_backend_preference",
+        "CurrentValue": "ESCLScanner",
+        "DefaultValue": "WIAScanner"
+    },
+    {
+        "Setting": "self.scan_device_name",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.scan_allow_network_fallback",
+        "CurrentValue": true,
+        "DefaultValue": true
+    },
+    {
+        "Setting": "self.scan_mode",
+        "CurrentValue": "color",
+        "DefaultValue": "color"
+    },
+    {
+        "Setting": "self.scan_dpi",
+        "CurrentValue": 300,
+        "DefaultValue": 300
+    },
+    {
+        "Setting": "self.scan_source_type",
+        "CurrentValue": "flatbed",
+        "DefaultValue": "flatbed"
+    },
+    {
+        "Setting": "self.scan_duplex",
+        "CurrentValue": false,
+        "DefaultValue": false
+    },
+    {
+        "Setting": "self.scan_persist_format",
+        "CurrentValue": "tiff",
+        "DefaultValue": "tiff"
+    },
+    {
+        "Setting": "self.pending_scan_handoff",
+        "CurrentValue": false,
+        "DefaultValue": false
     }
 ]

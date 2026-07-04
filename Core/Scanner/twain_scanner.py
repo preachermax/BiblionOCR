@@ -1,5 +1,6 @@
 import io
 import os
+import sys
 
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(MODULE_DIR, "..", ".."))
@@ -42,15 +43,34 @@ class TwainScanner(ScannerDevice):
 
 	@classmethod
 	def is_available(cls):
+		return cls.availability_details().get("available", False)
+
+	@classmethod
+	def availability_details(cls):
 		if twain is None or Image is None:
-			return False
-		for dsm_name in cls.DSM_CANDIDATES:
-			try:
-				with twain.SourceManager(0, dsm_name=dsm_name):
-					return True
-			except Exception:
-				continue
-		return False
+			return {
+				"available": False,
+				"reason": "TWAIN scanning requires pytwain and Pillow on Windows.",
+			}
+
+		dsm_name = cls._detect_dsm_name()
+		if not dsm_name:
+			return {
+				"available": False,
+				"reason": "TWAIN is unavailable because no usable TWAIN data source manager DLL was found.",
+			}
+
+		source_names = cls._list_source_names(dsm_name)
+		if source_names:
+			return {
+				"available": True,
+				"reason": None,
+			}
+
+		return {
+			"available": False,
+			"reason": cls._unavailable_reason_without_sources(),
+		}
 
 	def __init__(self):
 		if twain is None or Image is None:
@@ -112,6 +132,37 @@ class TwainScanner(ScannerDevice):
 			except Exception:
 				continue
 		return None
+
+	@classmethod
+	def _list_source_names(cls, dsm_name):
+		try:
+			with twain.SourceManager(0, dsm_name=dsm_name) as source_manager:
+				return list(source_manager.GetSourceList() or [])
+		except Exception:
+			return []
+
+	@classmethod
+	def _unavailable_reason_without_sources(cls):
+		if cls._has_canon_twain_32_artifacts() and cls._is_64_bit_runtime():
+			return (
+				"TWAIN is unavailable in this 64-bit runtime: Canon ScanGear installed only 32-bit "
+				"TWAIN source artifacts under C:\\Windows\\twain_32, and no usable 64-bit TWAIN source is registered. "
+				"Use AirScan/eSCL as the default path for this Canon TS3700/TS3722 class setup; WIA remains the local Windows fallback."
+			)
+		return "TWAIN is unavailable because the data source manager loaded but reported no usable scanner sources."
+
+	@classmethod
+	def _has_canon_twain_32_artifacts(cls):
+		windir = os.environ.get("WINDIR", r"C:\Windows")
+		candidate_paths = (
+			os.path.join(windir, "twain_32", "SG20"),
+			os.path.join(windir, "twain_32", "SG20", "TS3700 series"),
+		)
+		return any(os.path.isdir(path) for path in candidate_paths)
+
+	@staticmethod
+	def _is_64_bit_runtime():
+		return sys.maxsize > 2 ** 32
 
 	def _open_source_manager(self):
 		return twain.SourceManager(0, dsm_name=self._dsm_name)

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/BiblionScanner1.png</file>
     <file>Icons/scanner.png</file>
     <file>Icons/BiblionServer.png</file>
     <file>Icons/BiblionLexer.png</file>
@@ -103,7 +104,7 @@
     <file>Icons/insertbelow.png</file>
     <file>Icons/ground.png</file>
     <file>Icons/folder-horizontal-open.png</file>
-    <file>Icons/BiblionScanner.png</file>
+    <file alias="Icons/BiblionScanner.png">Icons/BiblionScanner1.png</file>
     <file>Icons/BiblionExplorer.png</file>
     <file>Icons/rename.png</file>
     <file>Icons/fileexplorer.png</file>

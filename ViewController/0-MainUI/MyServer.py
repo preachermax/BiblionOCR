@@ -4608,8 +4608,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
-            self.ui.centralwidget, 'Save Raw text file',self.txtdir,
+            self.ui.centralwidget, 'Save Raw text file', self._dialog_start_directory(getattr(self, 'txtdir', '')),
             'Text files (*.txt)')[0]
+        if not path:
+            return
         with open(path, 'w') as file:
             my_RawText = self.ui.OCRDocument.toPlainText()
             file.write(my_RawText)
@@ -4619,8 +4621,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def SaveAsCorrectedTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
-            self.ui.centralwidget, 'Save Corrected text file', self.txtdir,
+            self.ui.centralwidget, 'Save Corrected text file', self._dialog_start_directory(getattr(self, 'txtdir', '')),
             'Text files (*.txt)')[0]
+        if not path:
+            return
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()
             file.write(my_CorrectedText)
@@ -4630,7 +4634,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
 
-        defaultdir = self.txtdir + r"/"
+        defaultdir = self._dialog_start_directory(getattr(self, 'txtdir', '')) + r"/"
         defaultfile = self.ui.TextLE.displayText()
 
         if defaultfile:
@@ -4639,8 +4643,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             filename = defaultfile
         else:
             path = qtw.QFileDialog.getSaveFileName(
-                self.ui.centralwidget, 'Save Corrected text file', '',
+                self.ui.centralwidget, 'Save Corrected text file', self._dialog_start_directory(getattr(self, 'txtdir', '')),
                 'Text files (*.txt)')[0]
+            if not path:
+                return
             filename = os.path.basename(path)
         with open(path, 'w') as file:
             my_CorrectedText = self.ui.OCRDocument.toPlainText()

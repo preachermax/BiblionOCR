@@ -136,7 +136,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>120</x>
         <y>0</y>
         <width>21</width>
         <height>161</height>
@@ -174,35 +174,6 @@
       </property>
      </widget>
     </widget>
-   </widget>
-   <widget class="QPushButton" name="OpenImageFilebutton">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>FROMVS [MAXR]</family>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Open current image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
-    </property>
    </widget>
    <widget class="QLineEdit" name="ImageLE">
     <property name="geometry">
@@ -369,30 +340,10 @@
       <normaloff>:/Icons/Icons/reload.png</normaloff>:/Icons/Icons/reload.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="MyPixlerbutton">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Edit images with Pixer</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
-    </property>
-   </widget>
    <widget class="QPushButton" name="PrevImgButton">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>230</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -412,7 +363,7 @@
    <widget class="QPushButton" name="NextImgButton">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>260</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1040,7 +991,7 @@
    <widget class="QComboBox" name="ZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>160</x>
       <y>0</y>
       <width>61</width>
       <height>26</height>
@@ -1108,7 +1059,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>140</x>
       <y>0</y>
       <width>21</width>
       <height>26</height>
@@ -1286,11 +1237,14 @@
    <widget class="QPushButton" name="imageScannerbutton">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>80</x>
       <y>0</y>
-      <width>21</width>
-      <height>23</height>
+      <width>20</width>
+      <height>25</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Scan image</string>
     </property>
     <property name="text">
      <string/>
@@ -1298,6 +1252,84 @@
     <property name="icon">
      <iconset resource="../UI_Icons.qrc">
       <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="OpenImageFilebutton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="MyPixlerbutton">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Edit images with Pixer</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="MyExplorerbutton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
   </widget>
@@ -1442,8 +1474,9 @@
     <property name="title">
      <string>Project</string>
     </property>
-    <addaction name="actionExplorer"/>
+    <addaction name="actionMyExplorer"/>
     <addaction name="actionNewProject"/>
+    <addaction name="actionOpen_Project"/>
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
@@ -2800,9 +2833,13 @@
     </font>
    </property>
   </action>
-  <action name="actionExplorer">
+  <action name="actionMyExplorer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
    <property name="text">
-    <string>Explorer</string>
+    <string>MyExplorer</string>
    </property>
   </action>
   <action name="actionNewProject">
@@ -2892,6 +2929,11 @@
    </property>
    <property name="text">
     <string>ImageScanner</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project</string>
    </property>
   </action>
  </widget>

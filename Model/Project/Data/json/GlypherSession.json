@@ -336,7 +336,7 @@
     },
     {
         "Setting": "self.imgpath",
-        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages\\greek1516_Page_172.tif",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages\\greek1516_Page_130.tif",
         "DefaultValue": ""
     },
     {
@@ -381,12 +381,12 @@
     },
     {
         "Setting": "self.txtpath",
-        "CurrentValue": "",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages/greek_book_42_Luke/greek1516_Page_130.txt",
         "DefaultValue": ""
     },
     {
         "Setting": "self.txtdir",
-        "CurrentValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages",
+        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/EstablishTruth/Greek/txt_greek_pages/greek_book_42_Luke",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Greek_txt_pages"
     },
     {

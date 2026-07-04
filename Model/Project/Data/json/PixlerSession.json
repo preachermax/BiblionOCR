@@ -141,12 +141,12 @@
     },
     {
         "Setting": "self.refimgpath",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages/greek_book_42_Luke/greek1516_Page_173.tif",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages\\greek1516_Page_173.tif",
         "DefaultValue": ""
     },
     {
         "Setting": "self.refimgdir",
-        "CurrentValue": "/home/jetson/Projects/BiblionOCR/Model/Project/Images/Complete/Greek/tif_greek_pages/greek_book_42_Luke",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\Greek\\tif_greek_pages",
         "DefaultValue": "Model/Project/Images/Complete/Greek/tif_greek_pages"
     },
     {
@@ -176,12 +176,12 @@
     },
     {
         "Setting": "self.imagepath",
-        "CurrentValue": "",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow\\greek1516_Page_173.tiff",
         "DefaultValue": ""
     },
     {
         "Setting": "self.imagedir",
-        "CurrentValue": "",
+        "CurrentValue": "C:\\Users\\Max\\Projects\\BiblionOCR\\Model\\Project\\Images\\Workflow",
         "DefaultValue": ""
     },
     {

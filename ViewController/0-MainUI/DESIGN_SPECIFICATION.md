@@ -286,6 +286,7 @@ Current practical interpretation:
 - `Core/engine.py` owns project-creation lifecycle Processes.
 - `MyServer.py` owns UI orchestration and project/workflow entry points.
 - `MyPixler.py` owns image-processing Processes and preview/apply behavior.
+- `MyScanner.py`, related scanner adapters under `Core/Scanner/`, and emerging scan-workflow surfaces own hardware-facing acquisition Processes and scan-session UI state.
 - `ProjectFolderList.py` curates which Workspace artifacts become Project artifacts.
 - `PROJECT_CREATION_ARCHITECTURE.md` defines the project-creation contract.
 - `PROJECT_ARCHITECTURE.md` describes the larger module landscape.

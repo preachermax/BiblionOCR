@@ -100,11 +100,11 @@
       <x>580</x>
       <y>30</y>
       <width>161</width>
-      <height>71</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
-     <string>Workflow</string>
+     <string>Language</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -196,7 +196,7 @@
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>100</y>
+      <y>110</y>
       <width>161</width>
       <height>81</height>
      </rect>
@@ -452,7 +452,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>180</x>
       <y>0</y>
       <width>21</width>
       <height>26</height>
@@ -501,7 +501,7 @@
    <widget class="QPushButton" name="OpenRefImgbutton">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>60</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -530,7 +530,7 @@
    <widget class="QComboBox" name="RefImgZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>200</x>
       <y>0</y>
       <width>71</width>
       <height>26</height>
@@ -681,7 +681,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>150</x>
         <y>0</y>
         <width>21</width>
         <height>161</height>
@@ -850,7 +850,7 @@
    <widget class="QPushButton" name="ImportRefImgFilebutton">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>90</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1041,152 +1041,10 @@
       <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>180</y>
-      <width>161</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Adjustment Settings</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-    <widget class="QLabel" name="label_3">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>90</y>
-       <width>61</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>FROMVS [MAXR]</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Rotate CCW</string>
-     </property>
-    </widget>
-    <widget class="QSlider" name="horizontalSlider_2">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>70</y>
-       <width>160</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QSlider" name="horizontalSlider_3">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>100</y>
-       <width>160</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>60</x>
-       <y>30</y>
-       <width>41</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>FROMVS [MAXR]</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Denoise</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>60</y>
-       <width>61</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>FROMVS [MAXR]</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string> Rotate CW</string>
-     </property>
-    </widget>
-    <widget class="QSlider" name="horizontalSlider">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>40</y>
-       <width>160</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </widget>
    <widget class="QPushButton" name="Deskewbutton">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>150</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1202,7 +1060,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>Deskew Reference Image</string>
+     <string>Deskew Reference Image - In Place</string>
     </property>
     <property name="text">
      <string/>
@@ -1215,7 +1073,7 @@
    <widget class="QPushButton" name="ExportRefImgFilebutton">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>120</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1239,6 +1097,35 @@
     <property name="icon">
      <iconset resource="../UI_Icons.qrc">
       <normaloff>:/Icons/Icons/image-export.png</normaloff>:/Icons/Icons/image-export.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="MyExplorerbutton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>FROMVS [MAXR]</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Open current image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
   </widget>
@@ -1273,6 +1160,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionMyExplorer"/>
     <addaction name="actionOpen_Reference_Image"/>
     <addaction name="actionImport_Current_Image"/>
     <addaction name="actionExport_Image"/>
@@ -1327,7 +1215,7 @@
      <addaction name="menuBrush_Size"/>
      <addaction name="actionErase"/>
     </widget>
-    <addaction name="actionGimp_Image_Editor"/>
+    <addaction name="actionLanguage_Morphology"/>
     <addaction name="actionRotateRefImg_360_deg"/>
     <addaction name="actionRotateRefImg_180_deg_CW"/>
     <addaction name="actionRotateRefImg_90_CW"/>
@@ -1394,28 +1282,7 @@
      <property name="title">
       <string>Source Segmentation</string>
      </property>
-     <widget class="QMenu" name="menuLanguage_Contour_Morphology">
-      <property name="font">
-       <font>
-        <family>FROMVS [MAXR]</family>
-        <pointsize>11</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="title">
-       <string>Contour Morphology</string>
-      </property>
-      <addaction name="actionLanguage_Threshold"/>
-      <addaction name="actionLanguage_Operator"/>
-      <addaction name="actionLanguage_SE"/>
-      <addaction name="actionLanguage_kernal_x"/>
-      <addaction name="actionLanguage_kernal_y"/>
-      <addaction name="actionLanguage_Iterations"/>
-     </widget>
-     <addaction name="actionManually_Crop_Language_Pages"/>
-     <addaction name="menuLanguage_Contour_Morphology"/>
+    <addaction name="actionManually_Crop_Language_Pages"/>
     </widget>
     <addaction name="menuSourceImage"/>
     <addaction name="menuLanguage_Segmentation"/>
@@ -1424,9 +1291,9 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionReader"/>
+    <addaction name="actionMyScanner"/>
+    <addaction name="actionMyReader"/>
     <addaction name="actionBoxer"/>
-    <addaction name="actionScanner"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWorkflow"/>
@@ -1448,16 +1315,15 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionEdit_Image_tb"/>
+   <addaction name="actionDeskewRefImg"/>
    <addaction name="actionRotateRefImg_360_deg"/>
    <addaction name="actionRotateRefImg_90_CW"/>
    <addaction name="actionRotateRefImg_90_CCW"/>
    <addaction name="actionRotateRefImg_180_deg_CW"/>
-   <addaction name="actionDeskewRefImg"/>
    <addaction name="actionDenoise"/>
+   <addaction name="actionErase"/>
    <addaction name="actionCropRefImg"/>
    <addaction name="actionClipRefImg"/>
-   <addaction name="actionErase"/>
    <addaction name="actionFillTransparent"/>
   </widget>
   <widget class="QToolBar" name="SourceToolBar">
@@ -1470,8 +1336,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionScanner"/>
-   <addaction name="actionReader"/>
+   <addaction name="actionMyScanner"/>
+   <addaction name="actionMyReader"/>
    <addaction name="actionExtract_pdf"/>
    <addaction name="actionpdf_For_tiff"/>
    <addaction name="actionpdf_To_tiff"/>
@@ -1675,7 +1541,7 @@
      <normaloff>:/Icons/Icons/image-import.png</normaloff>:/Icons/Icons/image-import.png</iconset>
    </property>
    <property name="text">
-    <string>Import</string>
+    <string>Import Reference</string>
    </property>
   </action>
   <action name="actionExport_Image">
@@ -1684,7 +1550,7 @@
      <normaloff>:/Icons/Icons/image-export.png</normaloff>:/Icons/Icons/image-export.png</iconset>
    </property>
    <property name="text">
-    <string>Export</string>
+    <string>Export Reference</string>
    </property>
   </action>
   <action name="actionLanguage_Threshold">
@@ -1743,7 +1609,7 @@
      <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
    </property>
    <property name="text">
-    <string>Boxer</string>
+    <string>MyBoxer</string>
    </property>
   </action>
   <action name="actionPage_Segmentation">
@@ -1830,7 +1696,7 @@
      <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Save Image</string>
    </property>
   </action>
   <action name="actionOverwrite_Reference_Image">
@@ -1839,7 +1705,7 @@
      <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
    </property>
    <property name="text">
-    <string>Overwrite</string>
+    <string>Overwrite Reference</string>
    </property>
   </action>
   <action name="actionSave_As_Image">
@@ -1848,7 +1714,7 @@
      <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
    </property>
    <property name="text">
-    <string>Save As</string>
+    <string>Save Image As</string>
    </property>
   </action>
   <action name="actionOpen_Reference_Image">
@@ -1857,7 +1723,7 @@
      <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>Open Reference</string>
    </property>
   </action>
   <action name="actionLanguage_Morphology">
@@ -1933,15 +1799,6 @@
   <action name="actionLine_Iterations">
    <property name="text">
     <string>Line Iterations</string>
-   </property>
-  </action>
-  <action name="actionGimp">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
-   </property>
-   <property name="text">
-    <string>Gimp</string>
    </property>
   </action>
   <action name="actionGlyph_Tracer">
@@ -2174,13 +2031,13 @@
     <string>Gimp Image Editor</string>
    </property>
   </action>
-  <action name="actionReader">
+  <action name="actionMyReader">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionReader2.png</normaloff>:/Icons/Icons/BiblionReader2.png</iconset>
    </property>
    <property name="text">
-    <string>Reader</string>
+    <string>MyReader</string>
    </property>
   </action>
   <action name="actionClipRefImg">
@@ -2227,13 +2084,22 @@
     <string>Black</string>
    </property>
   </action>
-  <action name="actionScanner">
+  <action name="actionMyScanner">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionScanner1.png</normaloff>:/Icons/Icons/BiblionScanner1.png</iconset>
    </property>
    <property name="text">
-    <string>Scanner</string>
+    <string>MyScanner</string>
+   </property>
+  </action>
+  <action name="actionMyExplorer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyExplorer</string>
    </property>
   </action>
  </widget>
