@@ -691,7 +691,7 @@ Rules:
 * Continue.dev → codebase-aware validation and refactoring
 * Copilot → inline coding + commit assistance
 * Git → state control and rollback safety
-* `dev_notebook.md` → single source of truth
+* `docs/development/DEV_NOTEBOOK.md` → active engineering notebook within the authoritative docs library
 
 ---
 
@@ -738,6 +738,15 @@ DO NOT update for:
 * formatting only
 * debug prints only
 * minor edits that do not alter project state
+
+---
+
+## 📚 Documentation Library Rule
+
+* `docs/` is the authoritative knowledge repository for Biblion
+* `docs/development/DEV_NOTEBOOK.md` is the active engineering notebook and replaces legacy lowercase `dev_notebook.md` references
+* When older notes mention `dev_notebook.md`, normalize that reference to this file unless the note is explicitly discussing historical file layout
+* Architecture-facing references should prefer the current docs library paths over legacy in-module markdown locations when both exist
 
 ---
 
@@ -831,45 +840,45 @@ DO NOT update for:
 * 2026-07-03: `ScanWorkflow.py` extracted the shared scan wizard so `MyScanner.py` can use the same Core scanner backend stack as `MyServer.py` without a circular import
 * 2026-07-03: `MyServer.py` now redirects ADF scan requests to `MyScanner.py`, while `MyScanner.py` supports both flatbed and ADF requests through the shared scanner workflow
 * 2026-07-03: `QtDesignerUI/MyScannerUI.ui` was updated to restore a Designer-owned scan UI contract for `MyScanner`, adding MyServer-style `imageScannerbutton`, `actionImageScanner`, and `actionImageScanner_tb`, then regenerating `MyScannerUI.py` from that source
+* 2026-07-04: project documentation was consolidated under `docs/`, and the active developer notebook was renamed to uppercase `docs/development/DEV_NOTEBOOK.md` to match the new library convention
 
 ---
 
 ## 📚 Documentation Classification
 
-### Release-Facing
+### Documentation Root
 
-* update_fonts.py
-* update_fonts.txt
-* `.vscode/tasks.json`
+* `docs/README.md`
+* `docs/DOCUMENTATION_ARCHITECTURE.md`
+* `docs/PROJECT MANIFESTO.md`
 
-### Compilation Docs
+### Architecture-Facing
 
-* dev_notebook.md
-* commit_checklist.md
-* AIcommitWorkflow.md
-* PROJECT_ARCHITECTURE.md
-* DEPENDENCIES_AND_RELATIONSHIPS.md
+* `docs/architecture/PROJECT_ARCHITECTURE.md`
+* `docs/architecture/PROJECT_CREATION_ARCHITECTURE.md`
+* `docs/development/DESIGN_SPECIFICATION.md`
+* `docs/development/DEPENDENCIES_AND_RELATIONSHIPS.md`
 
 ### HelpSystem-Facing
 
-* README_HELP_SYSTEM.md
-* HELP_INTEGRATION_GUIDE.md
-* QUICK_REFERENCE.md
-* PROJECT_ARCHITECTURE.md
-* DEPENDENCIES_AND_RELATIONSHIPS.md
+* `docs/development/README_HELP_SYSTEM.md`
+* `docs/development/HELP_INTEGRATION_GUIDE.md`
+* `docs/development/QUICK_REFERENCE.md`
+* `docs/architecture/PROJECT_ARCHITECTURE.md`
+* `docs/development/DEPENDENCIES_AND_RELATIONSHIPS.md`
 
 ### Development-Facing
 
-* dev_notebook.md
-* commit_checklist.md
-* AIcommitWorkflow.md
-* WINDOWS_PERSISTENT_LAUNCHERS.md
+* `docs/development/DEV_NOTEBOOK.md`
+* `docs/development/WINDOWS_PERSISTENT_LAUNCHERS.md`
+* `docs/development/UBUNTU24_DEV_TOOLS_AND_RESTORE.md`
+* `docs/development/LOCAL_MASTER_SYNC_AFTER_PR.md`
 
 ### Reference-Only / Supporting
 
-* DESIGN_SPECIFICATION.md
-* PROJECT_CREATION_ARCHITECTURE.md
-* PROJECT_SPEC.md
+* `docs/development/DESIGN_SPECIFICATION.md`
+* `docs/architecture/PROJECT_CREATION_ARCHITECTURE.md`
+* `docs/development/PROJECT_SPEC.md`
 
 ---
 
@@ -879,7 +888,7 @@ DO NOT update for:
 * The safest boundary for future edits is: `MyServer.py` wires UI/runtime behavior, `Core/` owns lifecycle logic, and `MyPixler`/`ImagePreviewDialog` own image processing and preview state
 * After any project-creation change, the first validation target should be the external project root at `C:/Users/Max/Projects`, the `_registry.json` update path, and ProjectFolderList-driven structure generation
 * The highest-risk refactor remains removing duplicate engine/event classes from `MyServer.py` before Core imports, runtime wiring, and replay behavior are fully validated
-* There are currently multiple notebook copies in circulation; the repo-tracked notebook should stay intentionally synchronized with the working copy when architecture notes are updated
+* The authoritative engineering notebook now lives at `docs/development/DEV_NOTEBOOK.md`; avoid reviving legacy lowercase notebook copies or stale parallel notebook paths
 * 2026-07-04: `ProjectFolderList.py` now prunes new-project generation down to runtime-safe `Model/Project/Data/json` plus minimal workflow/training scaffolding, instead of restoring `Data/SQLite`, `Data/csv`, or deep training payloads from older manifests
 * 2026-07-04: `Model/Project/Data/esword` remains intentionally preserved in the curated manifest because MyWriter is expected to generate and update those files later
 * 2026-07-04: `MyServer` file/directory pickers now share a Projects-root fallback helper, and `actionOpen_Project` launches `MyExplorer` at the selected validated project root so both project browsing entry points start from the same anchor
