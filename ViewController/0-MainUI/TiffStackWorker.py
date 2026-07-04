@@ -32,7 +32,7 @@ class TiffStackWorker(qtc.QObject):
             if frame is None:
                 raise RuntimeError("Failed to read first frame")
 
-            qimage = qimage2ndarray.array2qimage(frame, normalize=True)
+            qimage = qimage2ndarray.array2qimage(frame, normalize=False)
 
             self.progress.emit(100)
 

@@ -95,8 +95,9 @@ class ExplorerTreeView(QtWidgets.QTreeView):
         return candidate
 
 class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
-    def __init__(self, maya=False):
+    def __init__(self, start_dir=None, maya=False):
         super(MyFileBrowser, self).__init__()
+        self.start_dir = start_dir
         self.setupUi(self)
         original_tree = self.treeView
         self.treeView = ExplorerTreeView(self.frame)
@@ -112,7 +113,9 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.populate()
 
     def populate(self):
-        dir_path = os.path.join(project_root, 'Model', 'Project')
+        dir_path = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else os.path.join(os.path.expanduser('~'), 'Projects')
+        if not os.path.isdir(dir_path):
+            dir_path = project_root
         self.model = QtWidgets.QFileSystemModel()
         self.model.setRootPath(dir_path)
         self.model.setReadOnly(False)
@@ -135,6 +138,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
-    fb = MyFileBrowser()
+    start_dir = sys.argv[1] if len(sys.argv) > 1 else None
+    fb = MyFileBrowser(start_dir=start_dir)
     fb.show()
     app.exec_()

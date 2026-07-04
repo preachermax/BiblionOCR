@@ -125,6 +125,9 @@ Future implementations should derive from a common `ScannerBackend` interface so
 * `showImage()` now updates the image filename line edit and persists image path/dir through `SessionManager.update()`
 * The scan wizard now blocks unavailable backends and provides a direct IP/URL path for AirScan when automatic discovery fails
 * The scan wizard now opens immediately and performs backend/device discovery asynchronously with a visible loading indicator, primarily to avoid long Jetson UI stalls
+* `MyScanner.py` now uses the same Core scanner workflow as `MyServer.py`, including backend selection, persisted scan request settings, and threaded scan execution through `ScanManager` + `ScanWorker`
+* `MyServer.py` now treats flatbed scanning as its local path and redirects ADF requests into `MyScanner.py`, passing the normalized scan request through `ScannerSession.json` so the user can continue there without re-entering settings
+* `QtDesignerUI/MyScannerUI.ui` now owns the visible MyScanner scan entry points again, with MyServer-style `imageScannerbutton`, `actionImageScanner`, and `actionImageScanner_tb` regenerated into `MyScannerUI.py` while `actionScanImage` remains the canonical runtime slot target
 * On the Jetson Canon path, SANE-first discovery now retries briefly and can synthesize AirScan-backed fallback entries when `scanimage -L` stays empty
 * Selecting one of those SANE fallback entries results in AirScan/eSCL acquisition by IP, which is currently the standardized cross-platform path for this Canon class
 * The scan wizard now supports a persisted strict-SANE test mode that disables the app-level AirScan fallback path, and SANE discovery labels now distinguish `[native SANE]` devices from `[AirScan fallback]` entries
@@ -384,14 +387,19 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Standalone launch: **WORKING**
 * Session image load: **WORKING**
+* Reference-image session restore now persists correctly again through `PixlerSession.json`
 * `start_image_load()` threading: **STABLE**
 * `on_image_loaded()` receiving `QImage`: **CONFIRMED**
 * RefImg display + `RefImgLE` sync: **WORKING**
 * Crop apply from `ImagePreviewDialog` returns a full-resolution QImage in original image coordinates
 * Applied crop is displayed directly in the MyPixler right-hand panel without an immediate second scaling pass
 * Crop result preserves source image resolution metadata (`dotsPerMeterX`, `dotsPerMeterY`, `devicePixelRatio`, and color space where supported)
+* Rotate, 90 CW/CCW, 180, deskew, clip, and erase now route through the shared preview/apply workflow instead of mixed legacy paths
+* Mono-source TIFF save/overwrite path now preserves bilevel output from the canonical `QImage` rather than the display pixmap
+* Legacy click-on-reference-image crop trigger and keep/edit prompt have been disabled; crop entry is now the explicit preview tool path only
 * TIFF return/save path derives DPI from QImage dots-per-meter metadata instead of hard-coding 300 DPI
 * Subprocess return-path crop handoff back to MyServer: **CONFIRMED**
+* Rotate/save smoke test against `greek1516_Page_173.tif` confirmed source mode `1`, output mode `1`, and only `[0, 255]` pixel values in the saved result
 
 ### ✅ ImagePreviewDialog
 
@@ -406,6 +414,8 @@ These imports caused recent startup tracebacks because those names do not exist 
 
   * Left = original
   * Right = processed
+  * rotate preview now uses a reduced working image during slider drag for responsiveness, then recomputes the settled preview from the full-resolution source on slider release
+  * mono/bilevel preview rendering now uses a preview-only black/white display conversion instead of relying on Qt's default mono scaling path
 
 * Crop apply:
 
@@ -422,6 +432,12 @@ These imports caused recent startup tracebacks because those names do not exist 
   * preview zoom is display-only and does not determine the applied crop's pixel size
   * `get_result()` returns the full-resolution processed crop
   * QImage resolution metadata is copied from the source image through the crop result
+
+* Current remaining gap:
+
+  * saved rotated mono TIFF output now matches document expectations materially better than preview
+  * preview has been tuned substantially closer, but still remains slightly lighter/thinner than the final saved result
+  * remaining work is preview-only calibration in `ImagePreviewDialog.py`, not TIFF processing or save-path correction
 
 ---
 
@@ -812,6 +828,9 @@ DO NOT update for:
 * 2026-07-02: `MyVersifier.py` startup path restore now detects repo-local Windows absolute paths in `VersifierSession.json` and remaps them onto the current local checkout so Jetson startup does not prepend `/home/.../BiblionOCR/` to `C:/...` fragments
 * 2026-07-02: Scan wizard gained a persisted strict-SANE toggle that disables app-level AirScan fallback during Jetson USB validation, and SANE device discovery now labels native `scanimage -L` results separately from fallback entries
 * 2026-07-02: Jetson strict USB SANE validation for Canon TS3700 failed even with `airscan` removed from both `dll.conf` and `dll.d`; `pixma` loaded but reported `0 devices`, so AirScan/eSCL remains the supported Jetson transport for this model
+* 2026-07-03: `ScanWorkflow.py` extracted the shared scan wizard so `MyScanner.py` can use the same Core scanner backend stack as `MyServer.py` without a circular import
+* 2026-07-03: `MyServer.py` now redirects ADF scan requests to `MyScanner.py`, while `MyScanner.py` supports both flatbed and ADF requests through the shared scanner workflow
+* 2026-07-03: `QtDesignerUI/MyScannerUI.ui` was updated to restore a Designer-owned scan UI contract for `MyScanner`, adding MyServer-style `imageScannerbutton`, `actionImageScanner`, and `actionImageScanner_tb`, then regenerating `MyScannerUI.py` from that source
 
 ---
 
@@ -848,6 +867,7 @@ DO NOT update for:
 
 ### Reference-Only / Supporting
 
+* DESIGN_SPECIFICATION.md
 * PROJECT_CREATION_ARCHITECTURE.md
 * PROJECT_SPEC.md
 
@@ -860,11 +880,20 @@ DO NOT update for:
 * After any project-creation change, the first validation target should be the external project root at `C:/Users/Max/Projects`, the `_registry.json` update path, and ProjectFolderList-driven structure generation
 * The highest-risk refactor remains removing duplicate engine/event classes from `MyServer.py` before Core imports, runtime wiring, and replay behavior are fully validated
 * There are currently multiple notebook copies in circulation; the repo-tracked notebook should stay intentionally synchronized with the working copy when architecture notes are updated
+* 2026-07-04: `ProjectFolderList.py` now prunes new-project generation down to runtime-safe `Model/Project/Data/json` plus minimal workflow/training scaffolding, instead of restoring `Data/SQLite`, `Data/csv`, or deep training payloads from older manifests
+* 2026-07-04: `Model/Project/Data/esword` remains intentionally preserved in the curated manifest because MyWriter is expected to generate and update those files later
+* 2026-07-04: `MyServer` file/directory pickers now share a Projects-root fallback helper, and `actionOpen_Project` launches `MyExplorer` at the selected validated project root so both project browsing entry points start from the same anchor
+* 2026-07-04: physically pruned unreferenced workspace folders `Model/Project/Data/Archive`, `Model/Project/Training/tesstrain`, `Model/Project/Training/staged_ground_truth`, and `ViewController/0-MainUI/TessTrainBoxFiles`; retained `Data/csv`, `Data/SQLite`, and `Data/esword` because `csv`/`SQLite` are still referenced by active modules and `esword` is reserved for MyWriter output
+* 2026-07-04: offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed `MyExplorer(start_dir=...)` roots the tree at the selected project folder as intended
+* 2026-07-04: added `DESIGN_SPECIFICATION.md` to define the repo vocabulary around System, Workspace, Project, Workflow, Process, Stage, Module, Artifact, Session, Event, and Reference Data so future cleanup and MyTrainer discussions use consistent boundaries
+* 2026-07-04: `MyPixler` now routes `Denoise` through morphology preview, `Clip` through inverse selection with background fill, and `Erase` through a paint-click preview flow with adjustable brush radius and background-color replacement
+* 2026-07-04: active preview dialogs now preserve one comparison contract across the repo: left = original/reference input, right = processed/output result; `MorphologyDialog` was corrected to match `ImagePreviewDialog`
+* 2026-07-04: final broad checkpoint commit is expected to bundle outstanding scanner/session/UI/icon resource changes, including `MyScanner`, `Core/Scanner/*`, regenerated UI resources, session JSON updates, and new scan-workflow support files, even though further test-driven cleanup is still expected afterward
 
 ---
 
 ## 📅 Last Updated
 
-2026-07-02
+2026-07-04
 
 ---

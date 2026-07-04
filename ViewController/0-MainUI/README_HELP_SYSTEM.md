@@ -219,6 +219,7 @@ dialog.exec_()
 ## Related Documentation
 
 - **PROJECT_ARCHITECTURE.md** - Complete system architecture
+- **DESIGN_SPECIFICATION.md** - Domain vocabulary and design boundaries
 - **QUICK_REFERENCE.md** - Quick lookup for all programs
 - **DEPENDENCIES_AND_RELATIONSHIPS.md** - Program dependencies
 - **dev_notebook.md** - Current release workflow and stabilization notes

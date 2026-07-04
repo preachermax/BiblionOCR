@@ -54,6 +54,7 @@ from PreProcess import PreProcess as pp
 from MyPixlerUI import Ui_Pixler
 from Adjust import crop_processor, get_processor, rotate_processor, threshold_processor, PROCESSORS
 from ImagePreviewDialog import ImagePreviewDialog
+from MorphologyDialog import MorphologyDialog
 from LocalFileDrop import LocalFileDropMixin
 
 
@@ -111,6 +112,147 @@ from Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
 #         self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
 
 
+def _copy_qimage_resolution_metadata(source, target):
+    if source is None or target is None or source.isNull() or target.isNull():
+        return
+
+    target.setDotsPerMeterX(source.dotsPerMeterX())
+    target.setDotsPerMeterY(source.dotsPerMeterY())
+    target.setDevicePixelRatio(source.devicePixelRatio())
+
+    if hasattr(source, "colorSpace") and hasattr(target, "setColorSpace"):
+        try:
+            color_space = source.colorSpace()
+            if color_space.isValid():
+                target.setColorSpace(color_space)
+        except Exception:
+            pass
+
+
+def _qimage_to_cv_bgr_image(qimage):
+    if qimage is None or qimage.isNull():
+        return None
+
+    buffer = qtc.QBuffer()
+    buffer.open(qtc.QBuffer.ReadWrite)
+    qimage.save(buffer, "PNG")
+    pil_image = pilimg.open(io.BytesIO(buffer.data())).convert("RGB")
+    return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
+
+def _morphology_shape_constant(shape_name):
+    shape_map = {
+        "rect": cv2.MORPH_RECT,
+        "ellipse": cv2.MORPH_ELLIPSE,
+        "cross": cv2.MORPH_CROSS,
+    }
+    return shape_map.get(shape_name, cv2.MORPH_RECT)
+
+
+def process_morphology_qimage(qimage, params, progress_callback=None, status_callback=None):
+    def report_progress(value):
+        if progress_callback is not None:
+            progress_callback(int(value))
+
+    def report_status(message):
+        if status_callback is not None:
+            status_callback(message)
+
+    if qimage is None or qimage.isNull():
+        return qtg.QImage()
+
+    report_status("Preparing morphology input...")
+    report_progress(5)
+
+    cv_image = _qimage_to_cv_bgr_image(qimage)
+    if cv_image is None:
+        return qtg.QImage()
+
+    report_status("Converting reference image to grayscale...")
+    report_progress(20)
+    if len(cv_image.shape) == 2:
+        gray = cv_image
+    else:
+        gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+
+    threshold_value = max(0, min(255, int(params.get("threshold", 0))))
+    report_status("Thresholding reference image...")
+    report_progress(40)
+    if threshold_value == 0:
+        _threshold, binary = cv2.threshold(
+            gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )
+    else:
+        _threshold, binary = cv2.threshold(
+            gray, threshold_value, 255, cv2.THRESH_BINARY
+        )
+
+    operation = params.get("operator", "threshold")
+    kernel_x = max(1, int(params.get("kernel_x", 3)))
+    kernel_y = max(1, int(params.get("kernel_y", 3)))
+    kernel_x = kernel_x if kernel_x % 2 == 1 else kernel_x + 1
+    kernel_y = kernel_y if kernel_y % 2 == 1 else kernel_y + 1
+    iterations = max(0, int(params.get("iterations", 1)))
+
+    processed_mask = cv2.bitwise_not(binary)
+    if operation != "threshold" and iterations > 0:
+        report_status("Applying morphology operator...")
+        report_progress(65)
+        kernel = cv2.getStructuringElement(
+            _morphology_shape_constant(params.get("shape", "rect")),
+            (kernel_x, kernel_y),
+        )
+
+        if operation == "erode":
+            processed_mask = cv2.erode(processed_mask, kernel, iterations=iterations)
+        elif operation == "dilate":
+            processed_mask = cv2.dilate(processed_mask, kernel, iterations=iterations)
+        elif operation == "open":
+            processed_mask = cv2.morphologyEx(
+                processed_mask, cv2.MORPH_OPEN, kernel, iterations=iterations
+            )
+        elif operation == "close":
+            processed_mask = cv2.morphologyEx(
+                processed_mask, cv2.MORPH_CLOSE, kernel, iterations=iterations
+            )
+    else:
+        report_status("Threshold preview selected. Skipping morphology operator...")
+        report_progress(65)
+
+    report_status("Finalizing processed image...")
+    report_progress(85)
+    result = cv2.bitwise_not(processed_mask)
+    result_qimage = qimage2ndarray.array2qimage(result, normalize=False)
+    _copy_qimage_resolution_metadata(qimage, result_qimage)
+    report_progress(100)
+    return result_qimage
+
+
+class MorphologyApplyWorker(qtc.QObject):
+    progress = qtc.pyqtSignal(int)
+    status = qtc.pyqtSignal(str)
+    finished = qtc.pyqtSignal(object)
+    error = qtc.pyqtSignal(str)
+
+    def __init__(self, qimage, params, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.qimage = qtg.QImage(qimage)
+        self.params = dict(params or {})
+
+    @qtc.pyqtSlot()
+    def run(self):
+        try:
+            result = process_morphology_qimage(
+                self.qimage,
+                self.params,
+                progress_callback=self.progress.emit,
+                status_callback=self.status.emit,
+            )
+            self.finished.emit(result)
+        except Exception as exc:
+            self.error.emit(str(exc))
+
+
 class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, imgpath=None, parent=None, launch_args=None):
@@ -144,6 +286,25 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.refimgqimage = qtg.QImage()
         self.imagepixmap = qtg.QPixmap()
         self.imageqimage = qtg.QImage()
+        self._progress_bar_scale = 10
+        self._stack_thread = None
+        self._stack_worker = None
+        self._load_thread = None
+        self._load_worker = None
+        self._processing_thread = None
+        self._processing_worker = None
+        self._pending_morphology_params = None
+        self.morphology_params = {
+            "threshold": 0,
+            "operator": "threshold",
+            "shape": "rect",
+            "kernel_x": 3,
+            "kernel_y": 3,
+            "iterations": 1,
+        }
+        self.fill_background_color = qtg.QColor("white")
+        self.fill_foreground_color = qtg.QColor("black")
+        self.eraser_tip_size = 24
         self.rubberBand = None
         self.return_to_server_button = None
         self.crop_prompt_dialog = None
@@ -193,7 +354,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if not hasattr(self, "progress_bar"):
             self.progress_bar = qtw.QProgressBar()
 
-        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setRange(0, 100 * self._progress_bar_scale)
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
         self.statusBar().addPermanentWidget(self.progress_bar)
@@ -730,6 +891,22 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         print(f'Absolute Path to Project Directory: {self.projecthome}')
 
+    def _update_pixler_session_paths(self):
+        base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
+
+        payload = {}
+        if getattr(self, 'refimgpath', None):
+            payload['self.refimgpath'] = os.path.normpath(self.refimgpath)
+        if getattr(self, 'refimgdir', None):
+            payload['self.refimgdir'] = os.path.normpath(self.refimgdir)
+        if getattr(self, 'imagepath', None):
+            payload['self.imagepath'] = os.path.normpath(self.imagepath)
+        if getattr(self, 'imagedir', None):
+            payload['self.imagedir'] = os.path.normpath(self.imagedir)
+
+        if payload:
+            SessionManager(base).update('PixlerSession.json', payload)
+
     def get_workflow_settings(self):
 
         jsonfile = os.path.join(self.project_root, "Model", "Project", "Data", "json", "Workflow.json")
@@ -749,7 +926,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionCropRefImg.triggered.connect(self.actionCropImage)
         self.ui.actionDeskewRefImg.triggered.connect(self.deskewRefImg)
         self.ui.actionRotateRefImg_360_deg.triggered.connect(self.rotateRefImg)
-        #self.ui.actionDenoise.triggered.connect()
+        self.ui.actionDenoise.triggered.connect(self.openDenoiseDialog)
         self.ui.actionClipRefImg.triggered.connect(self.clip)
         self.ui.actionErase.triggered.connect(self.eraser)
         #self.ui.actionFlipRefImg.triggered.connect()
@@ -766,13 +943,13 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionSave_As_Image.triggered.connect(self.SaveImageAs)
         self.ui.actionOverwrite_Reference_Image.triggered.connect(self.OverwriteRefImg)
         self.ui.actionImport_Current_Image.triggered.connect(self.importRefImg)
+        self.ui.actionLanguage_Morphology.triggered.connect(self.openMorphologyDialog)
         #self.ui.actionExport_Image.triggered.connect()
 
         # Edit Menu Signals(Slots)
 
-        '''self.ui.actionFillSelection.triggered.connect()
-        self.ui.actionFillBackground.triggered.connect()
-        self.ui.actionFillForeground.triggered.connect()'''
+        self.ui.actionFillBackground.triggered.connect(self.choose_fill_background_color)
+        self.ui.actionFillForeground.triggered.connect(self.choose_fill_foreground_color)
 
 
 
@@ -832,7 +1009,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.rubberBand.hide()
 
         self._init_subprocess_return_controls()
-        self._init_crop_prompt_dialog()
 
         # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ mark UI ready
         self._ui_ready = True
@@ -970,27 +1146,29 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         # Thread setup
         # -------------------------
-        self._thread = qtc.QThread()
-        self._worker = TiffStackWorker(fileName)
+        self._stack_thread = qtc.QThread(self)
+        self._stack_worker = TiffStackWorker(fileName)
 
-        self._worker.moveToThread(self._thread)
+        self._stack_worker.moveToThread(self._stack_thread)
 
-        self._thread.started.connect(self._worker.run)
+        self._stack_thread.started.connect(self._stack_worker.run)
 
-        self._worker.progress.connect(self.on_stack_progress)
-        self._worker.finished.connect(self.on_stack_loaded)
-        self._worker.error.connect(self.on_stack_error)
+        self._stack_worker.progress.connect(self.on_stack_progress)
+        self._stack_worker.finished.connect(self.on_stack_loaded)
+        self._stack_worker.error.connect(self.on_stack_error)
 
         # cleanup
-        self._worker.finished.connect(self._thread.quit)
-        self._worker.finished.connect(self._worker.deleteLater)
-        self._thread.finished.connect(self._thread.deleteLater)
+        self._stack_worker.finished.connect(self._stack_thread.quit)
+        self._stack_worker.finished.connect(self._stack_worker.deleteLater)
+        self._stack_worker.error.connect(self._stack_thread.quit)
+        self._stack_worker.error.connect(self._stack_worker.deleteLater)
+        self._stack_thread.finished.connect(self._stack_thread.deleteLater)
+        self._stack_thread.finished.connect(self._on_stack_thread_finished)
 
-        self._thread.start()
+        self._stack_thread.start()
 
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(0)
-            self.progress_bar.setVisible(True)
+        self.statusBar().showMessage("Loading TIFF reference image...")
+        self._show_progress(0)
 
     # def loadStackFromFile(self,fileName=''):
     #     fileName = str(fileName)
@@ -999,26 +1177,24 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def on_stack_progress(self, value):
         print(f"[STACK] {value}%")
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(value)
+        self._set_progress_percent(value)
+        self.statusBar().showMessage(f"Loading TIFF reference image... {int(value)}%")
 
 
     def on_stack_loaded(self, handle):
         print("[STACK] Loaded")
 
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(100)
-            self.progress_bar.setVisible(False)
+        self._hide_progress(100)
 
-        # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ assign handle
-        self._tiffCaptureHandle = handle
-
-        # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ NOW resume your original pipeline
-        self.showFrame(0)
-
-        # persist qimage like before
+        # TiffStackWorker currently emits the first frame as a QImage.
+        # Preserve that full-resolution frame directly instead of routing it
+        # back through a second ndarray->QImage conversion step.
+        self.qimage = handle
         self.refimgqimage = self.qimage
         self.refimgpixmap = qtg.QPixmap.fromImage(self.refimgqimage)
+        if self.refimgpath:
+            self.refimgdir = os.path.dirname(self.refimgpath)
+        self._update_pixler_session_paths()
 
         # display
         self.ui.RefImg.setPixmap(
@@ -1029,13 +1205,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
 
+        self.statusBar().showMessage("Reference TIFF loaded.")
         print("[STACK] Render complete")
 
 
     def on_stack_error(self, msg):
         print(f"[STACK ERROR] {msg}")
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setVisible(False)
+        self._hide_progress()
+        self.statusBar().showMessage(f"TIFF load failed: {msg}", 5000)
+
+    def _on_stack_thread_finished(self):
+        self._stack_thread = None
+        self._stack_worker = None
 
 
     def numFrames(self):
@@ -1067,7 +1248,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if self.frame is None:
             return
         # Convert frame ndarray to a QImage.
-        self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
+        self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=False)
 
     # def showRefImg(self, imgpath):
     #     print(f"[SHOW] Display only: {imgpath}")
@@ -1149,8 +1330,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             if fileext == '.tif':
                 self.loadStackFromFile(imgfilename)
                 self.showFrame(0)
-                #self.imagepixmap = qtg.QPixmap.fromImage(self.qimage)
-                self.imagepixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
+                self.imageqimage = qtg.QImage(self.qimage)
+                self.imagepixmap = qtg.QPixmap.fromImage(self.imageqimage)
             # else:
             #     self.imagepixmap = qtg.QPixmap(self.imagepath)
             else:
@@ -2614,17 +2795,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         elif self.ui.Image.geometry().contains(event.pos()):
             self.ui.Image.setFocus()
 
-        # ---- Rubber band start ----
-        if event.button() == Qt.LeftButton and self.ui.RefImg.geometry().contains(event.pos()):
-            print("[CROP UI] Begin crop selection with grip handles")
-            self.crop_drawing_active = True
-            self.origin = event.pos()
-            self.rubberBand.setGeometry(QRect(self.origin, QSize()))
-            self.rubberBand.show()
-            self.rubberBand.raise_()
-            if hasattr(self.rubberBand, "_raise_handles"):
-                self.rubberBand._raise_handles()
-            self.crop_selection_ready = False
+        super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
 
@@ -2637,79 +2808,56 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             pos = QPoint(x,y)
             print(str(pos))
             self.rubberBand.setGeometry(QRect(self.origin, pos).normalized())'''
-        if self.crop_drawing_active and not self.origin.isNull():
-            self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
+        super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-
-        if self.rubberBand and event.button() == Qt.LeftButton and self.crop_drawing_active:
-            geo = self.rubberBand.geometry()
-            h = self.rubberBand.height()
-            w = self.rubberBand.width()
-            x = self.rubberBand.x()
-            y = self.rubberBand.y()
-            #x = self.rubberBand.x() + self.refimg_xoffset
-            #y = self.rubberBand.y() + self.refimg_yoffset
-            #print("selection geometry = " + geo)
-            print("selection x = " + str(x))
-            print("selection w = " + str(w))
-            print("selection x+ w = " + str(x+w))
-            print("selection y = " + str(y))
-            print("selection h = " + str(h))
-            print("selection y+h = " + str(y+h))
-            print(x,":",x+w,",",y,":",y+h)
-            self.currentQRect = self.rubberBand.geometry()
-            self.crop_selection_ready = True
-            self.crop_drawing_active = False
-            self.origin = QPoint()
-            self.preview_crop_selection()
-            qtc.QTimer.singleShot(0, self._show_crop_prompt_dialog)
+        super().mouseReleaseEvent(event)
 
     # Reference Image Edit Controllers
     def start_image_load(self, path, target="ref"):
         print(f"[THREAD] Start load ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {path} ({target})")
         # store target so handler knows where to route image
         self._load_target = target
-        self._thread = qtc.QThread(self)
-        #self._worker = ImageLoadWorker(self.image_load_path)
-        self._worker = ImageLoadWorker(path)
-        self._worker.moveToThread(self._thread)
+        self._load_thread = qtc.QThread(self)
+        self._load_worker = ImageLoadWorker(path)
+        self._load_worker.moveToThread(self._load_thread)
 
         # --- signals
-        self._thread.started.connect(self._worker.run)
-        self._worker.progress.connect(self.on_load_progress)
-        self._worker.finished.connect(self.on_image_loaded)
-        self._worker.error.connect(self.on_load_error)
+        self._load_thread.started.connect(self._load_worker.run)
+        self._load_worker.progress.connect(self.on_load_progress)
+        self._load_worker.finished.connect(self.on_image_loaded)
+        self._load_worker.error.connect(self.on_load_error)
 
         # --- cleanup
-        self._worker.finished.connect(self._thread.quit)
-        self._worker.finished.connect(self._worker.deleteLater)
-        self._thread.finished.connect(self._thread.deleteLater)
+        self._load_worker.finished.connect(self._load_thread.quit)
+        self._load_worker.finished.connect(self._load_worker.deleteLater)
+        self._load_worker.error.connect(self._load_thread.quit)
+        self._load_worker.error.connect(self._load_worker.deleteLater)
+        self._load_thread.finished.connect(self._load_thread.deleteLater)
+        self._load_thread.finished.connect(self._on_load_thread_finished)
 
         # --- start
-        self._thread.start()
+        self._load_thread.start()
 
-        # show progress immediately
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(0)
-            self.progress_bar.setVisible(True)
+        self.statusBar().showMessage("Loading reference image...")
+        self._show_progress(0)
 
     def on_load_progress(self, value):
         print(f"[LOAD] {value}%")
-        print("[LOAD] Complete")
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(value)
+        self._set_progress_percent(value)
+        self.statusBar().showMessage(f"Loading reference image... {int(value)}%")
 
 
     def on_image_loaded(self, qimage):
         self.refimgqimage = qimage
 
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setValue(100)
-            self.progress_bar.setVisible(False)
+        self._hide_progress(100)
 
         # store pixmap (CRITICAL for zoom, etc.)
         self.refimgpixmap = qtg.QPixmap.fromImage(qimage)
+        if self.refimgpath:
+            self.refimgdir = os.path.dirname(self.refimgpath)
+        self._update_pixler_session_paths()
 
         # display
         self.ui.RefImg.setPixmap(self.refimgpixmap.scaled(self.ui.RefImg.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation))
@@ -2722,6 +2870,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.RefImgLE.setText(filename)
             #self.ui.RefImgLE.setToolTip(self.refimgpath)  # Reuse this path forward to modify a ToolTip
             self.ui.RefImgLE.setToolTip("Reference Image Filename")
+
+        self.statusBar().showMessage("Reference image loaded.")
 
     # def on_image_loaded(self, qimage):
     #     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ STORE BOTH (CRITICAL)
@@ -2803,24 +2953,42 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def on_load_error(self, msg):
         print(f"[LOAD ERROR] {msg}")
+        self._hide_progress()
+        self.statusBar().showMessage(f"Image load failed: {msg}", 5000)
 
-        if hasattr(self, "progress_bar"):
-            self.progress_bar.setVisible(False)
-        def setImageStack(self, tiffCaptureHandle):
-                """ Set the scene's current TIFF image stack to the input TiffCapture object.
-                Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
-                :type tiffCaptureHandle: TiffCapture
-                """
-                if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
-                    raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
-                self._tiffCaptureHandle = tiffCaptureHandle
-                self.showFrame(0)
+    def _on_load_thread_finished(self):
+        self._load_thread = None
+        self._load_worker = None
+
+    def _set_progress_percent(self, value):
+        if not hasattr(self, "progress_bar"):
+            return
+
+        bounded = max(0, min(100, int(value)))
+        self.progress_bar.setValue(bounded * self._progress_bar_scale)
+
+    def _show_progress(self, value=0):
+        if not hasattr(self, "progress_bar"):
+            return
+
+        self._set_progress_percent(value)
+        self.progress_bar.setVisible(True)
+
+    def _hide_progress(self, value=None):
+        if not hasattr(self, "progress_bar"):
+            return
+
+        if value is not None:
+            self._set_progress_percent(value)
+        self.progress_bar.setVisible(False)
 
     def importRefImg(self):
         print("Importing current reference image path provided by get_session")
         if self.imgpath:
             print(self.imgpath)
             self.refimgpath = self.imgpath
+            self.refimgdir = os.path.dirname(self.refimgpath)
+            self._update_pixler_session_paths()
             self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
             print("[Pixler] Ref image indexed")
 
@@ -3275,16 +3443,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         path = qtw.QFileDialog.getSaveFileName(
             self.ui.centralwidget, 'Save cropped tiff file', '',
             'Tiff files (*.tif)')[0]
-        #my_Image = self.ui.Cropped.pixmap().toImage()
-        my_Image = self.imagepixmap.toImage()
-        # Write accepted ROI to correct folder/file
-        buffer = qtc.QBuffer()
-        buffer.open(qtc.QBuffer.ReadWrite)
-        my_Image.save(buffer, "PNG")
-        PILimage = pilimg.open(io.BytesIO(buffer.data()))
-        outfile = path
-        print("Generating: " + outfile)
-        PILimage.save(outfile, "TIFF", dpi=(300,300), compression = "tiff_lzw")
+        if not path:
+            return
+
+        my_image = self.imageqimage if not self.imageqimage.isNull() else self.imagepixmap.toImage()
+        self._save_qimage_as_tiff(my_image, path)
         filename = os.path.basename(path)
         self.ui.ImageLE.setText(filename)
 
@@ -3302,17 +3465,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 self.centralwidget, 'Save modified tif file', '',
                 'Tif files (*.tif)')[0]
 
-        #self.ui.Cropped.self.pixmap.save(path)
-        my_Image = self.imagepixmap.toImage()
-        #my_Image.save(path)
-        buffer = qtc.QBuffer()
-        buffer.open(qtc.QBuffer.ReadWrite)
-        my_Image.save(buffer, "PNG")
-        PILimage = pilimg.open(io.BytesIO(buffer.data()))
-        outfile = path
-        print("Generating: " + outfile)
-        PILimage.save(outfile, "TIFF", dpi=(300,300), compression = "tiff_lzw")
-        #self.imagepixmap.save(path)
+        if not path:
+            return
+
+        my_image = self.imageqimage if not self.imageqimage.isNull() else self.imagepixmap.toImage()
+        self._save_qimage_as_tiff(my_image, path)
         filename = os.path.basename(path)
         self.ui.ImageLE.setText(filename)
         #file.close()
@@ -3321,17 +3478,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def OverwriteRefImg(self):
         path = self.refimgpath
-        #self.ui.Cropped.self.pixmap.save(path)
-        my_Image = self.imagepixmap.toImage()
-        #my_Image.save(path)
-        buffer = qtc.QBuffer()
-        buffer.open(qtc.QBuffer.ReadWrite)
-        my_Image.save(buffer, "PNG")
-        PILimage = pilimg.open(io.BytesIO(buffer.data()))
-        outfile = path
-        print("Generating: " + outfile)
-        PILimage.save(outfile, "TIFF", dpi=(300,300), compression = "tiff_lzw")
-        #self.imagepixmap.save(path)
+        if not path:
+            return
+
+        my_image = self.imageqimage if not self.imageqimage.isNull() else self.imagepixmap.toImage()
+        self._save_qimage_as_tiff(my_image, path)
         filename = os.path.basename(path)
         self.ui.RefImgLE.setText(filename)
         #file.close()
@@ -3339,6 +3490,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         RefImgchangesSaved = True
 
     def _save_qimage_as_tiff(self, qimage, outfile):
+        qimage = self._prepare_output_qimage(qimage)
         buffer = qtc.QBuffer()
         buffer.open(qtc.QBuffer.ReadWrite)
         qimage.save(buffer, "PNG")
@@ -3350,6 +3502,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if qimage.dotsPerMeterY() > 0:
             dpi_y = qimage.dotsPerMeterY() * 0.0254
         print("Generating: " + outfile)
+        if self._source_prefers_bilevel_output():
+            PILimage = PILimage.convert("1")
         PILimage.save(outfile, "TIFF", dpi=(dpi_x, dpi_y), compression="tiff_lzw")
 
     def returnCropToMyServer(self):
@@ -3437,74 +3591,42 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_drawing_active = False
 
     def clip(self):
-        # RefImg QRect
-        print("This is the new clip method of the Pixler class")
-
-        # Initialize RefImg QRect
-        RefImg_qimage = qtg.QPixmap.toImage(self.ui.RefImg.pixmap())
-        RefImg_qimage_size = RefImg_qimage.size()
-        RefImg_xr = self.ui.RefImg.geometry().x()
-        RefImg_yr = self.ui.RefImg.geometry().y()
-        RefImg_wr = self.RefImg_width
-        RefImg_hr = self.RefImg_height
-        RefImg_qrect = QRect(RefImg_xr, RefImg_yr, RefImg_wr, RefImg_hr)
-        print("Reference Image QRect = " + str(RefImg_qrect))
-
-        # Initialize Scaled RefImg QRect
-        RefImg_xs = 0
-        RefImg_ys = 0
-        RefImg_ws = 0
-        RefImg_hs = 0
-        RefImg_xs = RefImg_xr * self.refimgscale
-        RefImg_ys = RefImg_yr * self.refimgscale
-        RefImg_ws = RefImg_wr * self.refimgscale
-        RefImg_hs = RefImg_hr * self.refimgscale
-        RefImg_sqrect = QRect(RefImg_xs,RefImg_ys,RefImg_ws,RefImg_hs)
-        print("Reference Image Scaled QRect = " + str(RefImg_sqrect))
-
-        # ClipImg QRect
-
-        # Get ClipImg QRect from event.pos()
-        ClipImg_xc = self.rubberBand.x()
-        ClipImg_yc = self.rubberBand.y()
-        ClipImg_wc = self.rubberBand.width()
-        ClipImg_hc = self.rubberBand.height()
-        ClipImg_cqrect = QRect(ClipImg_xc,ClipImg_yc,ClipImg_wc,ClipImg_hc)
-        print("Reference Image Clipped QRect = " + str(ClipImg_cqrect))
-
-        # Move ClipImg QRect to RefImg MainWindow origin(0,0)
-        ClipImg_xm = self.rubberBand.x() - int(self.refimg_xoffset)
-        ClipImg_ym= self.rubberBand.y() - int(self.refimg_yoffset)
-        ClipImg_wm = self.rubberBand.width()
-        ClipImg_hm = self.rubberBand.height()
-        ClipImg_mqrect = QRect(ClipImg_xm,ClipImg_ym,ClipImg_wm,ClipImg_hm)
-        print("Crop Image Cropped2Main QRect = " + str(ClipImg_mqrect))
-
-        # Upscale ClipImg QRect at RefImg MainWindow origin(0,0)
-        ClipImg_xu = 0
-        ClipImg_yu = 0
-        ClipImg_wu = 0
-        ClipImg_hu = 0
-        ClipImg_xu = ClipImg_xm / self.refimgscale
-        ClipImg_yu = ClipImg_ym / self.refimgscale
-        ClipImg_wu = ClipImg_wm / self.refimgscale
-        ClipImg_hu = ClipImg_hm / self.refimgscale
-        ClipImg_uqrect = QRect(ClipImg_xu,ClipImg_yu,ClipImg_wu,ClipImg_hu)
-        print("Crop Image Upscaled QRect = " + str(ClipImg_uqrect))
-
-        # Show Cropped Image
-        self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
-        self.clippixmap = self.refimgpixmap.copy(ClipImg_uqrect)
-        print("Clipped Image Size = " + str(self.clippixmap.size()))
-        self.imagepixmap = self.clippixmap
-        self.ui.Image.setPixmap(self.imagepixmap)
-        self.resize_Image()
-        self.rubberBand.hide()
-        self.crop_selection_ready = False
+        print("[CLIP] Opening inverse-selection preview")
+        return self._launch_preview_tool(
+            self.clip_processor,
+            title="Clip Preview",
+            params={"background_color": self._background_fill_color_name(self.refimgqimage)},
+            enable_crop=True,
+        )
 
     def eraser(self):
-        painter = QPainter(self)
-        painter.setPen(QPen(Qt.white,7,Qt.SolidLine))
+        print("[ERASE] Opening preview")
+        if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
+            print("[ERASE] No image loaded")
+            return False
+
+        dialog = ImagePreviewDialog(
+            self.refimgqimage,
+            self.erase_processor,
+            {
+                "brush_radius": int(self.eraser_tip_size),
+                "background_color": self._background_fill_color_name(self.refimgqimage),
+                "erase_points": [],
+            },
+            self,
+            enable_crop=False,
+            interaction_mode="paint",
+            preview_max_dimension=1600,
+        )
+        dialog.setWindowTitle("Erase Preview")
+        dialog.add_slider("brush_radius", 1, 200, int(self.eraser_tip_size))
+
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            print("[ERASE] Cancelled")
+            return False
+
+        self.eraser_tip_size = int(dialog.params.get("brush_radius", self.eraser_tip_size))
+        return self._apply_preview_result(dialog.get_result())
 
     def crop_processor(self, qimage, params):
         if not params:
@@ -3524,6 +3646,293 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         result = qimage.copy(x, y, w, h)
         self._copy_qimage_resolution(qimage, result)
         return result
+
+    def clip_processor(self, qimage, params):
+        if qimage is None or qimage.isNull() or not params:
+            return qimage
+
+        x = int(params.get("x", 0))
+        y = int(params.get("y", 0))
+        w = int(params.get("w", 0))
+        h = int(params.get("h", 0))
+        if w <= 0 or h <= 0:
+            return qimage
+
+        result = qtg.QImage(qimage)
+        painter = qtg.QPainter(result)
+        painter.fillRect(
+            qtc.QRect(x, y, w, h),
+            self._coerce_fill_color(params.get("background_color"), qimage),
+        )
+        painter.end()
+        self._copy_qimage_resolution(qimage, result)
+        return result
+
+    def erase_processor(self, qimage, params):
+        if qimage is None or qimage.isNull() or not params:
+            return qimage
+
+        erase_points = params.get("erase_points", [])
+        radius = max(1, int(params.get("brush_radius", self.eraser_tip_size)))
+        if not erase_points:
+            return qimage
+
+        result = qtg.QImage(qimage)
+        painter = qtg.QPainter(result)
+        fill_color = self._coerce_fill_color(params.get("background_color"), qimage)
+        painter.setPen(qtg.QPen(fill_color, 1))
+        painter.setBrush(qtg.QBrush(fill_color))
+        for point in erase_points:
+            x = int(point.get("x", 0))
+            y = int(point.get("y", 0))
+            painter.drawEllipse(qtc.QPoint(x, y), radius, radius)
+        painter.end()
+        self._copy_qimage_resolution(qimage, result)
+        return result
+
+    def openDenoiseDialog(self):
+        return self.openMorphologyDialog(window_title="Denoise Preview")
+
+    def choose_fill_background_color(self):
+        color = QColorDialog.getColor(self.fill_background_color, self, "Choose Background Fill Color")
+        if not color.isValid():
+            return False
+
+        self.fill_background_color = color
+        self.statusBar().showMessage("Background fill color set to {}".format(color.name()), 3000)
+        return True
+
+    def choose_fill_foreground_color(self):
+        color = QColorDialog.getColor(self.fill_foreground_color, self, "Choose Foreground Fill Color")
+        if not color.isValid():
+            return False
+
+        self.fill_foreground_color = color
+        self.statusBar().showMessage("Foreground fill color set to {}".format(color.name()), 3000)
+        return True
+
+    def _background_fill_color_name(self, qimage):
+        return self._default_background_fill_color(qimage).name()
+
+    def _default_background_fill_color(self, qimage):
+        if qimage is not None and not qimage.isNull():
+            if qimage.format() in (qtg.QImage.Format_Mono, qtg.QImage.Format_MonoLSB):
+                return qtg.QColor("white")
+            if qimage.isGrayscale() or qimage.depth() == 8:
+                return qtg.QColor("white")
+
+        if isinstance(self.fill_background_color, qtg.QColor) and self.fill_background_color.isValid():
+            return qtg.QColor(self.fill_background_color)
+
+        return qtg.QColor("white")
+
+    def _coerce_fill_color(self, color_value, qimage):
+        if isinstance(color_value, qtg.QColor) and color_value.isValid():
+            return qtg.QColor(color_value)
+
+        if isinstance(color_value, str) and color_value:
+            color = qtg.QColor(color_value)
+            if color.isValid():
+                return color
+
+        return self._default_background_fill_color(qimage)
+
+    def deskew_processor(self, qimage, params=None):
+        if qimage is None or qimage.isNull():
+            return qtg.QImage()
+
+        cv_image = self._qimage_to_cv_bgr(qimage)
+        if cv_image is None:
+            return qtg.QImage(qimage)
+
+        gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (9, 9), 0)
+        thresh = cv2.threshold(
+            blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
+        )[1]
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 5))
+        dilated = cv2.dilate(thresh, kernel, iterations=5)
+
+        contour_result = cv2.findContours(
+            dilated, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
+        )
+        contours = contour_result[0] if len(contour_result) == 2 else contour_result[1]
+        if not contours:
+            return qtg.QImage(qimage)
+
+        largest_contour = max(contours, key=cv2.contourArea)
+        angle = cv2.minAreaRect(largest_contour)[-1]
+        if angle < -45:
+            angle = 90 + angle
+
+        (height, width) = cv_image.shape[:2]
+        center = (width // 2, height // 2)
+        matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+        rotated = cv2.warpAffine(
+            cv_image,
+            matrix,
+            (width, height),
+            flags=cv2.INTER_NEAREST if self._should_preserve_binary_output(qimage) else cv2.INTER_CUBIC,
+            borderMode=cv2.BORDER_REPLICATE,
+        )
+
+        result = self._cv_bgr_to_qimage(rotated)
+        if self._should_preserve_binary_output(qimage):
+            result = self._convert_qimage_to_bilevel(result)
+        self._copy_qimage_resolution(qimage, result)
+        return result
+
+    def rotate_preview_processor(self, qimage, params):
+        angle = float(params.get("angle", 0))
+
+        if qimage is None or qimage.isNull():
+            return qtg.QImage()
+
+        transform_mode = (
+            qtc.Qt.FastTransformation
+            if self._should_preserve_binary_output(qimage)
+            else qtc.Qt.SmoothTransformation
+        )
+        transform = qtg.QTransform().rotate(angle)
+        result = qimage.transformed(transform, mode=transform_mode)
+        if self._should_preserve_binary_output(qimage):
+            result = self._convert_qimage_to_bilevel(result)
+        self._copy_qimage_resolution(qimage, result)
+        return result
+
+    def _qimage_to_cv_bgr(self, qimage):
+        if qimage is None or qimage.isNull():
+            return None
+
+        buffer = qtc.QBuffer()
+        buffer.open(qtc.QBuffer.ReadWrite)
+        qimage.save(buffer, "PNG")
+        pil_image = pilimg.open(io.BytesIO(buffer.data())).convert("RGB")
+        return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
+    def _cv_bgr_to_qimage(self, cv_image):
+        if cv_image is None:
+            return qtg.QImage()
+
+        if len(cv_image.shape) == 2:
+            rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_GRAY2RGB)
+        else:
+            rgb_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+        return qimage2ndarray.array2qimage(rgb_image, normalize=False)
+
+    def _source_prefers_bilevel_output(self):
+        if not self.refimgpath or not os.path.isfile(self.refimgpath):
+            return False
+
+        try:
+            with pilimg.open(self.refimgpath) as source_image:
+                return source_image.mode == "1"
+        except Exception as exc:
+            print(f"[TIFF SAVE] Could not inspect source mode: {exc}")
+            return False
+
+    @staticmethod
+    def _is_bilevel_qimage(qimage):
+        if qimage is None or qimage.isNull():
+            return False
+
+        if qimage.format() in (qtg.QImage.Format_Mono, qtg.QImage.Format_MonoLSB):
+            return True
+
+        if qimage.depth() == 1:
+            return True
+
+        return qimage.colorCount() == 2
+
+    def _should_preserve_binary_output(self, qimage=None):
+        return self._source_prefers_bilevel_output() or self._is_bilevel_qimage(qimage)
+
+    def _prepare_output_qimage(self, qimage):
+        if qimage is None or qimage.isNull():
+            return qtg.QImage()
+
+        prepared = qtg.QImage(qimage)
+        if self._should_preserve_binary_output(qimage):
+            prepared = self._convert_qimage_to_bilevel(prepared)
+
+        self._copy_qimage_resolution(qimage, prepared)
+        return prepared
+
+    def _convert_qimage_to_bilevel(self, qimage):
+        cv_image = self._qimage_to_cv_bgr(qimage)
+        if cv_image is None:
+            return qtg.QImage(qimage)
+
+        if len(cv_image.shape) == 2:
+            gray = cv_image
+        else:
+            gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+
+        _threshold, binary = cv2.threshold(
+            gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )
+
+        bilevel = qimage2ndarray.array2qimage(binary, normalize=False)
+        if bilevel.format() not in (qtg.QImage.Format_Mono, qtg.QImage.Format_MonoLSB):
+            bilevel = bilevel.convertToFormat(qtg.QImage.Format_Mono)
+        return bilevel
+
+    def _apply_preview_result(self, result):
+        if result is None or result.isNull():
+            print("[PREVIEW APPLY] No result returned")
+            return False
+
+        result = self._prepare_output_qimage(result)
+
+        result_pixmap = qtg.QPixmap.fromImage(result)
+        if result_pixmap.isNull():
+            print("[PREVIEW APPLY] Result pixmap is null")
+            return False
+
+        self.imageqimage = result
+        self.imagepixmap = result_pixmap
+        self.imagescale = 1.0
+
+        if self.refimgpath:
+            self.imagepath = self.refimgpath
+            self.imagedir = os.path.dirname(self.refimgpath)
+            self.ui.ImageLE.setText(os.path.basename(self.refimgpath))
+
+        if self.subprocess_mode and self.subprocess_return_path and self.return_to_server_button is not None:
+            self.return_to_server_button.setEnabled(True)
+            self.statusBar().showMessage("Result ready. Press Return Crop to MyServer.")
+
+        self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
+        self.ui.Image.setPixmap(self.imagepixmap)
+        self.ui.Image.resize(self.imagepixmap.size())
+        print("[PREVIEW APPLY] Result displayed on right panel")
+        return True
+
+    def _launch_preview_tool(self, processor, title="Preview", params=None,
+                             sliders=None, enable_crop=False,
+                             preview_max_dimension=0):
+        if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
+            print("[PREVIEW] No image loaded")
+            return False
+
+        dialog = ImagePreviewDialog(
+            self.refimgqimage,
+            processor,
+            params or {},
+            self,
+            enable_crop=enable_crop,
+            preview_max_dimension=preview_max_dimension,
+        )
+        dialog.setWindowTitle(title)
+
+        for slider in sliders or []:
+            dialog.add_slider(*slider)
+
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            print("[PREVIEW] Cancelled")
+            return False
+
+        return self._apply_preview_result(dialog.get_result())
 
     @staticmethod
     def _copy_qimage_resolution(source, target):
@@ -3550,64 +3959,16 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     def actionCropImage(self):
         print("[NEW CROP]")
 
-        if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
-            print("[CROP] No image loaded")
-            return
-
-        dialog = ImagePreviewDialog(
-            self.refimgqimage,
+        if self._launch_preview_tool(
             self.crop_processor,
-            self
-        )
-
-        # Optional sliders
-        # dialog.add_slider("threshold", 0, 255, 127)
-
-        if dialog.exec_() == qtw.QDialog.Accepted:
-            print("[CROP] Apply pressed")
-
-            # Apply the processor result in original image coordinates.  Do not
-            # use the zoomed dialog preview image here: preview zoom is only for
-            # display, while the applied crop should retain the source image's
-            # pixel resolution minus only the pixels actually cropped away.
-            result = dialog.get_result()
-            if result is not None:
-                print("[CROP] Using full-resolution crop result: {}x{}".format(result.width(), result.height()))
-
-            if result is None:
-                print("[CROP] No result returned")
-                return
-
-            # -------------------------
-            # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ DO NOT overwrite original
-            # -------------------------
-            self.cropped_qimage = result
-
-            self.cropped_pixmap = qtg.QPixmap.fromImage(result)
-
-            if self.cropped_pixmap.isNull():
-                print("[CROP] Cropped pixmap is null")
-                return
-
-            # Make crop result the canonical right-panel image source so the
-            # right zoom slider scales from a real original pixmap.
-            self.imageqimage = result
-            self.imagepixmap = self.cropped_pixmap
-            self.imagescale = 1.0
-
-            if self.subprocess_mode and self.subprocess_return_path:
-                if self.return_to_server_button is not None:
-                    self.return_to_server_button.setEnabled(True)
-                    self.statusBar().showMessage("Crop ready. Press Return Crop to MyServer.")
-
-
-            self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
-            self.ui.Image.setPixmap(self.imagepixmap)
-            self.ui.Image.resize(self.imagepixmap.size())
-            print("[CROP] Result displayed on right panel")
-
-        else:
-            print("[CROP] Cancelled")
+            title="Crop Preview",
+            enable_crop=True,
+        ):
+            self.cropped_qimage = qtg.QImage(self.imageqimage)
+            self.cropped_pixmap = qtg.QPixmap(self.imagepixmap)
+            print("[CROP] Using full-resolution crop result: {}x{}".format(
+                self.imageqimage.width(), self.imageqimage.height()
+            ))
 
 
     # def applyProcessedImage(self, qimage):
@@ -3651,12 +4012,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
 
     def deskewRefImg(self):
-        print("Deskewing current reference image")
-        if self.refimgpath != "":
-            pp.deskewimage(self.refimgpath)
-            print("Reloading deskewed image")
-            self.reloadRefImg()
-        print("Deskew current image complete")
+        print("[DESKEW] Opening preview")
+        self._launch_preview_tool(
+            self.deskew_processor,
+            title="Deskew Preview",
+            enable_crop=False,
+        )
 
     def initcvimg(self):
         print("RefImg path = " + self.refimgpath)
@@ -3664,188 +4025,127 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def rotateRefImg(self):
         self.workflowdir = self.pixlerpagesrotatedir
-        def on_Spinner():
-            self.rotateDialog_ui.Sliderhorizontal.setValue(self.rotateDialog_ui.SliderspinBox.value())
-            angle = self.rotateDialog_ui.Sliderhorizontal.value()
-            print("New Rotation Angle = " + str(angle) + " degrees")
-            self.rotatedpixmap = self.ui.RefImg.pixmap().transformed(qtg.QTransform().rotate(angle))
-            self.ui.Image.setPixmap(self.rotatedpixmap)
-
-        def on_Slider():
-            self.rotateDialog_ui.SliderspinBox.setValue(self.rotateDialog_ui.Sliderhorizontal.value())
-            angle = self.rotateDialog_ui.SliderspinBox.value()
-
-        def accept():
-            print("Rotating Original Reference Image")
-            angle = self.rotateDialog_ui.SliderspinBox.value()
-            self.imagepixmap = self.origpixmap.transformed(qtg.QTransform().rotate(angle))
-            self.ui.Image.setPixmap(self.imagepixmap)
-            self.ui.ImageLE.setText(os.path.basename(self.refimgpath))
-            self.on_Imagezoom()
-
-        def reject():
-            print("Rotation cancelled")
-            self.ui.Image.clear()
-
-        self.rotateDialog = qtw.QDialog()
-        self.rotateDialog_ui = Ui_SliderDialog()
-        self.rotateDialog_ui.setupUi(self.rotateDialog)
-        self.rotateDialog.show()
-
-        '''Configure slider to adjust rotation angle (0:360)'''
-        self.rotateDialog_ui.Sliderhorizontal.setEnabled(True)
-        self.rotateDialog_ui.Sliderlabel.setEnabled(True)
-        self.rotateDialog_ui.Sliderlabel.setText("Adjust rotation angle from 0 to 360 degrees")
-        self.rotateDialog_ui.Sliderhorizontal.setMinimum(0)
-        self.rotateDialog_ui.Sliderhorizontal.setMaximum(360)
-        self.rotateDialog_ui.Sliderhorizontal.setSingleStep(1)
-        self.rotateDialog_ui.Sliderhorizontal.setPageStep(15)
-        self.rotateDialog_ui.Sliderhorizontal.setProperty("value", 180)
-        self.rotateDialog_ui.Sliderhorizontal.setSliderPosition(180)
-        self.rotateDialog_ui.Sliderhorizontal.setOrientation(Qt.Horizontal)
-        self.rotateDialog_ui.Sliderhorizontal.setInvertedAppearance(False)
-        self.rotateDialog_ui.SliderspinBox.setEnabled(True)
-        self.rotateDialog_ui.SliderspinBox.setMinimum(0)
-        self.rotateDialog_ui.SliderspinBox.setMaximum(360)
-        self.rotateDialog_ui.SliderspinBox.setSingleStep(1)
-        self.rotateDialog_ui.SliderspinBox.setValue(180)
-        self.rotateDialog_ui.SliderspinBox.setSuffix(" deg")
-        self.rotateDialog_ui.Sliderhorizontal.valueChanged.connect(on_Slider)
-        self.rotateDialog_ui.SliderspinBox.valueChanged.connect(on_Spinner)
-        self.rotateDialog_ui.SliderbuttonBox.accepted.connect(accept)
-        self.rotateDialog_ui.SliderbuttonBox.rejected.connect(reject)
-        #self.initcvimg()
+        self._launch_preview_tool(
+            self.rotate_preview_processor,
+            title="Rotate Preview",
+            params={"angle": 0},
+            sliders=[("angle", 0, 360, 0)],
+            enable_crop=False,
+            preview_max_dimension=1600,
+        )
 
     def rotateRefImg90CW(self):
         self.workflowdir = self.pixlerpagesrotatedir
-        # Reading an image in default mode
-        src = cv2.imread(self.refimgpath)
-
-        # Using cv2.ROTATE_90_CLOCKWISE rotate
-        # by 90 degrees clockwise
-        newImage = cv2.rotate(src, cv2.ROTATE_90_CLOCKWISE)
-
-        # Displaying the image
-        #write rotated file to destination folder
-        PILimage = pilimg.fromarray(newImage)
-        thresh = 127
-        fn = lambda x : 255 if x > thresh else 0
-        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
-
-        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath)
-        print("Converting cv2 image to PIL image: " + outfile)
-        self.imagepath = outfile
-
-        #self.showImage(self.imagepath)
-        print("Reloading rotated image")
-        rqimage = pilqimg.ImageQt(PIL_BWimage)
-        rpixmap = qtg.QPixmap.fromImage(rqimage)
-        self.ui.Image.setPixmap(rpixmap)
-        self.imagedir = os.path.dirname(outfile)
-        self.ui.ImageLE.setText(os.path.basename(self.refimgpath))
-        self.imagepixmap = rpixmap
-        self.on_Imagezoom()
-        # Save workflow image to Pixler rotated workflow folder
-        try:
-            print("Generating: " + outfile)
-            PIL_BWimage.save(outfile)
-
-            #print("Generating: " + png_outfile)
-            #PIL_BWimage.save(png_outfile, "PNG", dpi=(300,300))
-            #my_img_resized.save(outfile, "PNG")
-
-        except Exception as e:
-            print(e)
-
-
-        print("Auto rotation by 90 degrees clockwise complete")
+        self._launch_preview_tool(
+            self.rotate_preview_processor,
+            title="Rotate 90 deg CW Preview",
+            params={"angle": 90},
+            enable_crop=False,
+            preview_max_dimension=1600,
+        )
 
     def rotateRefImg90CCW(self):
         self.workflowdir = self.pixlerpagesrotatedir
-        # Reading an image in default mode
-        src = cv2.imread(self.refimgpath)
-
-        # Using cv2.ROTATE_90_CLOCKWISE rotate
-        # by 90 degrees clockwise
-        newImage = cv2.rotate(src, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-        # Displaying the image
-
-        #write rotated file to destination folder
-        PILimage = pilimg.fromarray(newImage)
-        thresh = 127
-        fn = lambda x : 255 if x > thresh else 0
-        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
-
-        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath)
-        print("Converting cv2 image to PIL image: " + outfile)
-        self.imagepath = outfile
-
-        #self.showImage(self.imagepath)
-        print("Reloading rotated image")
-        rqimage = pilqimg.ImageQt(PIL_BWimage)
-        rpixmap = qtg.QPixmap.fromImage(rqimage)
-        self.ui.Image.setPixmap(rpixmap)
-        self.imagedir = os.path.dirname(outfile)
-        self.ui.ImageLE.setText(os.path.basename(self.refimgpath))
-        self.imagepixmap = rpixmap
-        self.on_Imagezoom()
-        #png_outfile = self.imgpath + self.ui.ImageLe.text()
-
-        # Save workflow image to Pixler rotated workflow folder
-        try:
-            print("Generating: " + outfile)
-            PIL_BWimage.save(outfile)
-
-        except Exception as e:
-            print(e)
-
-        print("Auto rotation by 90 degrees counter-clockwise complete")
+        self._launch_preview_tool(
+            self.rotate_preview_processor,
+            title="Rotate 90 deg CCW Preview",
+            params={"angle": -90},
+            enable_crop=False,
+            preview_max_dimension=1600,
+        )
 
     def rotateRefImg180CW(self):
         self.workflowdir = self.pixlerpagesrotatedir
-        # Reading an image in default mode
-        src = cv2.imread(self.refimgpath)
+        self._launch_preview_tool(
+            self.rotate_preview_processor,
+            title="Rotate 180 deg Preview",
+            params={"angle": 180},
+            enable_crop=False,
+            preview_max_dimension=1600,
+        )
 
-        # Using cv2.ROTATE_180 rotate by
-        # 180 degrees clockwise
-        newImage = cv2.rotate(src, cv2.ROTATE_180)
+    def openMorphologyDialog(self, window_title="Reference Morphology"):
+        if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
+            print("[MORPHOLOGY] No image loaded")
+            return False
 
-                # Displaying the image
+        dialog = MorphologyDialog(
+            self.refimgqimage,
+            self.morphology_preview_processor,
+            params=self.morphology_params,
+            parent=self,
+            preview_max_dimension=1600,
+        )
+        dialog.setWindowTitle(window_title)
 
-        #write rotated file to destination folder
-        PILimage = pilimg.fromarray(newImage)
-        thresh = 127
-        fn = lambda x : 255 if x > thresh else 0
-        PIL_BWimage = PILimage.convert('L').point(fn, mode='1')
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            print("[MORPHOLOGY] Cancelled")
+            return False
 
-        outfile = self.pixlerpagesrotatedir + "/" + os.path.basename(self.refimgpath)
-        print("Converting cv2 image to PIL image: " + outfile)
-        self.imagepath = outfile
+        return self.start_morphology_apply(dialog.params)
 
-        #self.showImage(self.imagepath)
-        print("Reloading rotated image")
-        rqimage = pilqimg.ImageQt(PIL_BWimage)
-        rpixmap = qtg.QPixmap.fromImage(rqimage)
-        self.ui.Image.setPixmap(rpixmap)
-        self.imagedir = os.path.dirname(outfile)
-        self.ui.ImageLE.setText(os.path.basename(self.refimgpath))
-        self.imagepixmap = rpixmap
-        self.on_Imagezoom()
-        #png_outfile = self.imgpath + self.ui.ImageLe.text()
+    def start_morphology_apply(self, params):
+        if self._processing_thread is not None:
+            qtw.QMessageBox.information(
+                self,
+                "Morphology In Progress",
+                "Wait for the current morphology task to finish.",
+            )
+            return False
 
-        # Save workflow image to Pixler rotated workflow folder
-        try:
-            print("Generating: " + outfile)
-            PIL_BWimage.save(outfile)
+        self._pending_morphology_params = dict(params or {})
+        self._processing_thread = qtc.QThread(self)
+        self._processing_worker = MorphologyApplyWorker(
+            self.refimgqimage,
+            self._pending_morphology_params,
+        )
+        self._processing_worker.moveToThread(self._processing_thread)
 
-            #print("Generating: " + png_outfile)
-            #PIL_BWimage.save(png_outfile, "PNG", dpi=(300,300))
-            #my_img_resized.save(outfile, "PNG")
+        self._processing_thread.started.connect(self._processing_worker.run)
+        self._processing_worker.progress.connect(self.on_morphology_progress)
+        self._processing_worker.status.connect(self.on_morphology_status)
+        self._processing_worker.finished.connect(self.on_morphology_finished)
+        self._processing_worker.error.connect(self.on_morphology_error)
 
-        except Exception as e:
-            print(e)
-        print("Auto rotation by 180 degrees clockwise complete")
+        self._processing_worker.finished.connect(self._processing_thread.quit)
+        self._processing_worker.finished.connect(self._processing_worker.deleteLater)
+        self._processing_worker.error.connect(self._processing_thread.quit)
+        self._processing_worker.error.connect(self._processing_worker.deleteLater)
+        self._processing_thread.finished.connect(self._processing_thread.deleteLater)
+        self._processing_thread.finished.connect(self._on_processing_thread_finished)
+
+        self._processing_thread.start()
+
+        self.statusBar().showMessage("Applying morphology to reference image...")
+        self._show_progress(0)
+        return True
+
+    def on_morphology_progress(self, value):
+        self._set_progress_percent(value)
+
+    def on_morphology_status(self, message):
+        self.statusBar().showMessage(message)
+
+    def on_morphology_finished(self, result):
+        self._hide_progress(100)
+        self.statusBar().showMessage("Morphology result ready.")
+        self.morphology_params = dict(self._pending_morphology_params or self.morphology_params)
+        self._pending_morphology_params = None
+        if not self._apply_preview_result(result):
+            qtw.QMessageBox.warning(self, "Morphology Failed", "Processed morphology result could not be applied.")
+
+    def on_morphology_error(self, message):
+        self._hide_progress()
+        self.statusBar().showMessage(f"Morphology failed: {message}", 5000)
+        self._pending_morphology_params = None
+        qtw.QMessageBox.warning(self, "Morphology Failed", message)
+
+    def _on_processing_thread_finished(self):
+        self._processing_thread = None
+        self._processing_worker = None
+
+    def morphology_preview_processor(self, qimage, params):
+        return process_morphology_qimage(qimage, params)
 
 class Images:
     def __init__(self, img):

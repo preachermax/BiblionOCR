@@ -12,6 +12,13 @@ class ScannerDevice:
     def is_available(cls):
         return False
 
+    @classmethod
+    def availability_details(cls):
+        return {
+            "available": cls.is_available(),
+            "reason": None,
+        }
+
     def discover(self):
         raise NotImplementedError
 

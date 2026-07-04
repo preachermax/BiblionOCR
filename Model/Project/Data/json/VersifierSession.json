@@ -311,12 +311,12 @@
     },
     {
         "Setting": "self.refpath",
-        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Source/TR/TR-Verses.txt",
+        "CurrentValue": "Model\\Project\\Text\\GroundTruth\\Source\\TR\\TR-Verses.txt",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Source/TR/TR-Verses.txt"
     },
     {
         "Setting": "self.refdir",
-        "CurrentValue": "C:/Users/Max/Projects/BiblionOCR/Model/Project/Text/GroundTruth/Source/TR",
+        "CurrentValue": "Model\\Project\\Text\\GroundTruth\\Source\\TR",
         "DefaultValue": "Model/Project/Text/EstablishTruth/Source/TR"
     },
     {

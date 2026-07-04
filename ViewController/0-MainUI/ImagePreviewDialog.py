@@ -1,6 +1,7 @@
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
+import numpy as np
 
 
 class ImagePreviewDialog(qtw.QDialog):
@@ -11,6 +12,8 @@ class ImagePreviewDialog(qtw.QDialog):
     compounds scaling artifacts and crop coordinates are stored in original
     image coordinates.
     """
+
+    BILEVEL_DISPLAY_THRESHOLD = 216
 
     def __init__(self, qimage=None, processor=None, params=None, parent=None,
                  initial_params=None, **kwargs):
@@ -41,6 +44,9 @@ class ImagePreviewDialog(qtw.QDialog):
         self.original = qimage
         self.processor = processor or self._identity_processor
         self.params = dict(initial_params or {})
+        self.enable_crop = kwargs.get("enable_crop", True)
+        self.interaction_mode = kwargs.get("interaction_mode", "crop")
+        self.preview_max_dimension = int(kwargs.get("preview_max_dimension", 0) or 0)
         self.zoom_factor = 1.0
         self.origin = qtc.QPoint()
         self.crop_drawing_active = False
@@ -51,6 +57,13 @@ class ImagePreviewDialog(qtw.QDialog):
         self._handle_start_rect = qtc.QRect()
         self._last_processed_result = qtg.QImage()
         self._last_preview_result = qtg.QImage()
+        self._pending_full_quality_preview = False
+        self._preview_update_timer = qtc.QTimer(self)
+        self._preview_update_timer.setSingleShot(True)
+        self._preview_update_timer.timeout.connect(self._run_scheduled_preview_update)
+        self.paint_points = [dict(point) for point in self.params.get("erase_points", [])]
+        self.params["erase_points"] = list(self.paint_points)
+        self.preview_source = self._build_preview_source()
 
         self.setWindowTitle("Preview")
         self.resize(1200, 700)
@@ -111,6 +124,7 @@ class ImagePreviewDialog(qtw.QDialog):
         self.zoom_slider.setPageStep(10)
         self.zoom_slider.setValue(100)
         self.zoom_slider.valueChanged.connect(self.on_zoom_changed)
+        self.zoom_slider.sliderReleased.connect(lambda: self._flush_preview_update(full_quality=True))
         zoom_layout.addWidget(self.zoom_label)
         zoom_layout.addWidget(self.zoom_slider)
         layout.addLayout(zoom_layout)
@@ -255,9 +269,10 @@ class ImagePreviewDialog(qtw.QDialog):
         def on_change(value):
             self.params[name] = value
             label.setText("{}: {}".format(name, value))
-            self.update_preview()
+            self._schedule_preview_update()
 
         slider.valueChanged.connect(on_change)
+        slider.sliderReleased.connect(lambda: self._flush_preview_update(full_quality=True))
         self.controls_layout.addWidget(label)
         self.controls_layout.addWidget(slider)
         self.params[name] = default
@@ -302,7 +317,20 @@ class ImagePreviewDialog(qtw.QDialog):
 
             return super().eventFilter(obj, event)
 
-        if obj == self.left_label:
+        if obj == self.left_label and self.interaction_mode == "paint":
+            if event.type() == qtc.QEvent.MouseButtonPress and event.button() == qtc.Qt.LeftButton:
+                self._record_paint_point(event.pos())
+                return True
+
+            if event.type() == qtc.QEvent.MouseMove and event.buttons() & qtc.Qt.LeftButton:
+                self._record_paint_point(event.pos())
+                return True
+
+            if event.type() == qtc.QEvent.MouseButtonPress and event.button() == qtc.Qt.RightButton:
+                self._undo_last_paint_point()
+                return True
+
+        if obj == self.left_label and self.enable_crop:
             if event.type() == qtc.QEvent.MouseButtonPress and event.button() == qtc.Qt.LeftButton:
                 self.crop_drawing_active = True
                 self.origin = event.pos()
@@ -325,26 +353,81 @@ class ImagePreviewDialog(qtw.QDialog):
     def on_zoom_changed(self, value):
         self.zoom_factor = max(0.01, value / 100.0)
         self.zoom_label.setText("Zoom: {}%".format(value))
-        self.update_preview()
+        self._schedule_preview_update()
 
-    def update_preview(self):
+    def _record_paint_point(self, display_pos):
+        point = self._display_pos_to_image_point(display_pos)
+        if point is None:
+            return
+
+        if self.paint_points:
+            last_point = self.paint_points[-1]
+            if last_point.get("x") == point.x() and last_point.get("y") == point.y():
+                return
+
+        self.paint_points.append({"x": point.x(), "y": point.y()})
+        self.params["erase_points"] = list(self.paint_points)
+        self._flush_preview_update(full_quality=True)
+
+    def _undo_last_paint_point(self):
+        if not self.paint_points:
+            return
+
+        self.paint_points.pop()
+        self.params["erase_points"] = list(self.paint_points)
+        self._flush_preview_update(full_quality=True)
+
+    def _display_pos_to_image_point(self, display_pos):
+        pixmap = self.left_label.pixmap()
+        if pixmap is None or pixmap.isNull():
+            return None
+
+        display_x = max(0, min(int(display_pos.x()), pixmap.width() - 1))
+        display_y = max(0, min(int(display_pos.y()), pixmap.height() - 1))
+        scale = max(0.01, self.zoom_factor)
+        x = int(round(display_x / scale))
+        y = int(round(display_y / scale))
+
+        image_w = self.original.width()
+        image_h = self.original.height()
+        x = max(0, min(x, image_w - 1))
+        y = max(0, min(y, image_h - 1))
+        return qtc.QPoint(x, y)
+
+    def _schedule_preview_update(self, delay_ms=20, full_quality=False):
+        self._pending_full_quality_preview = self._pending_full_quality_preview or full_quality
+        self._preview_update_timer.start(delay_ms)
+
+    def _run_scheduled_preview_update(self):
+        full_quality = self._pending_full_quality_preview
+        self._pending_full_quality_preview = False
+        self.update_preview(force_full_quality=full_quality)
+
+    def _flush_preview_update(self, full_quality=False):
+        if self._preview_update_timer.isActive():
+            self._preview_update_timer.stop()
+        full_quality = full_quality or self._pending_full_quality_preview
+        self._pending_full_quality_preview = False
+        self.update_preview(force_full_quality=full_quality)
+
+    def update_preview(self, force_full_quality=False):
         if self.original is None or self.original.isNull():
             print("[PREVIEW] No valid original image")
             return
 
-        processed = self._process()
+        preview_original = self.original if force_full_quality else self.preview_source
+        if preview_original is None or preview_original.isNull():
+            preview_original = self.original
+        processed = self._process(preview_original)
         if processed is None or processed.isNull():
             print("[PREVIEW] Processor returned no valid image")
             return
 
-        original_pixmap = qtg.QPixmap.fromImage(self.original)
-        processed_pixmap = qtg.QPixmap.fromImage(processed)
-        if original_pixmap.isNull() or processed_pixmap.isNull():
+        original_scaled = self._scaled_display_pixmap(preview_original)
+        processed_scaled = self._scaled_display_pixmap(processed)
+        if original_scaled.isNull() or processed_scaled.isNull():
             print("[PREVIEW] Null pixmap after image conversion")
             return
-
-        original_scaled = self._scaled_pixmap(original_pixmap)
-        processed_scaled = self._scaled_pixmap(processed_pixmap)
 
         self._last_processed_result = qtg.QImage(processed)
         self._last_preview_result = processed_scaled.toImage()
@@ -359,7 +442,7 @@ class ImagePreviewDialog(qtw.QDialog):
             self._show_crop_overlay(self.crop_rect)
 
     def get_result(self):
-        return self._process()
+        return self._process(self.original)
 
     def get_preview_result(self):
         """Return the exact QImage currently represented by the right preview.
@@ -401,9 +484,12 @@ class ImagePreviewDialog(qtw.QDialog):
     def _identity_processor(qimage, params):
         return qimage
 
-    def _process(self):
+    def _process(self, source_image=None):
+        if source_image is None:
+            source_image = self.original
+
         try:
-            result = self.processor(self.original, self.params)
+            result = self.processor(source_image, self.params)
         except Exception as exc:
             print("[PREVIEW ERROR] {}".format(exc))
             return None
@@ -411,20 +497,105 @@ class ImagePreviewDialog(qtw.QDialog):
         if isinstance(result, qtg.QPixmap):
             result = result.toImage()
 
-        self._copy_image_resolution(self.original, result)
+        self._copy_image_resolution(source_image, result)
         return result
 
-    def _scaled_pixmap(self, pixmap):
-        if pixmap.isNull():
-            return pixmap
+    def _scaled_display_pixmap(self, qimage):
+        if qimage is None or qimage.isNull():
+            return qtg.QPixmap()
 
-        width = max(1, int(round(pixmap.width() * self.zoom_factor)))
-        height = max(1, int(round(pixmap.height() * self.zoom_factor)))
+        width = max(1, int(round(qimage.width() * self.zoom_factor)))
+        height = max(1, int(round(qimage.height() * self.zoom_factor)))
+        target_size = qtc.QSize(width, height)
+
+        if self._is_bilevel_image(qimage):
+            scaled_image = self._scale_bilevel_for_display(qimage, target_size)
+            return qtg.QPixmap.fromImage(scaled_image)
+
+        pixmap = qtg.QPixmap.fromImage(qimage)
+        if pixmap.isNull():
+            return qtg.QPixmap()
+
         return pixmap.scaled(
-            qtc.QSize(width, height),
+            target_size,
             qtc.Qt.KeepAspectRatio,
             qtc.Qt.SmoothTransformation,
         )
+
+    def _scale_bilevel_for_display(self, qimage, target_size):
+        if qimage is None or qimage.isNull():
+            return qtg.QImage()
+
+        grayscale = qimage.convertToFormat(qtg.QImage.Format_Grayscale8)
+        scaled = grayscale.scaled(
+            target_size,
+            qtc.Qt.KeepAspectRatio,
+            qtc.Qt.SmoothTransformation,
+        )
+        if scaled.isNull():
+            return qtg.QImage(qimage)
+
+        thresholded = self._threshold_grayscale_display_image(
+            scaled,
+            self.BILEVEL_DISPLAY_THRESHOLD,
+        )
+        self._copy_image_resolution(qimage, thresholded)
+        return thresholded
+
+    @staticmethod
+    def _threshold_grayscale_display_image(qimage, threshold):
+        grayscale = qimage.convertToFormat(qtg.QImage.Format_Grayscale8)
+        width = grayscale.width()
+        height = grayscale.height()
+        bytes_per_line = grayscale.bytesPerLine()
+
+        bits = grayscale.bits()
+        bits.setsize(bytes_per_line * height)
+        array = np.frombuffer(bits, dtype=np.uint8).reshape((height, bytes_per_line))[:, :width]
+        binary = np.where(array <= threshold, 0, 255).astype(np.uint8)
+
+        output = qtg.QImage(
+            binary.data,
+            width,
+            height,
+            width,
+            qtg.QImage.Format_Grayscale8,
+        ).copy()
+        return output
+
+    @staticmethod
+    def _is_bilevel_image(qimage):
+        if qimage is None or qimage.isNull():
+            return False
+
+        if qimage.format() in (qtg.QImage.Format_Mono, qtg.QImage.Format_MonoLSB):
+            return True
+
+        if qimage.depth() == 1:
+            return True
+
+        return qimage.colorCount() == 2
+
+    def _build_preview_source(self):
+        if self.original is None or self.original.isNull():
+            return qtg.QImage()
+
+        preview_source = qtg.QImage(self.original)
+        if self.enable_crop or self.interaction_mode == "paint" or self.preview_max_dimension <= 0:
+            return preview_source
+
+        max_dimension = max(preview_source.width(), preview_source.height())
+        if max_dimension <= self.preview_max_dimension:
+            return preview_source
+
+        scaled = preview_source.scaled(
+            self.preview_max_dimension,
+            self.preview_max_dimension,
+            qtc.Qt.KeepAspectRatio,
+            qtc.Qt.FastTransformation if self._is_bilevel_image(preview_source) else qtc.Qt.SmoothTransformation,
+        )
+        self._copy_image_resolution(self.original, scaled)
+        return scaled
 
     def _set_crop_from_display_rect(self, rect):
         pixmap = self.left_label.pixmap()

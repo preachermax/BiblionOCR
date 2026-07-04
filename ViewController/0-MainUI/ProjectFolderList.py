@@ -5,14 +5,14 @@ Rebuild/update ProjectFolderList.txt for BiblionOCR.
 This script captures the cleanup rules used while curating ProjectFolderList.txt:
 - seed from the current ProjectFolderList.txt when it exists;
 - add folders referenced by Model/Project/Data/json/*Session.json;
-- include Model/Project/Data file contents for csv/json/SQLite-driven project setup;
+- include only project-safe `Model/Project/Data/json` and `Model/Project/Data/esword` contents needed at runtime;
 - reduce Model/Project/Images file entries to folders only;
 - normalize project-absolute paths to project-relative paths;
 - reduce file paths to their containing folders;
 - redirect Model/Developer and old Model/Utilities references to Model/Project/Utilities;
 - explicitly prevent Model/Developer and old Model/Utilities references from being written;
 - always include existing folders under Model/Project/Utilities;
-- always include project-local training assets for Tesseract workflows;
+- keep only minimal project-local training scaffolding for Tesseract workflows;
 - always include required ViewController folders and MainUI files;
 - exclude Model/Project/Utilities/Reference folders;
 - exclude external/system font, Tesseract, home, and user profile folders;
@@ -96,7 +96,7 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Images",
     "Model/Project/Images/Complete",
     "Model/Project/Data/json",
-    "Model/Project/Data/SQLite",
+    "Model/Project/Data/esword",
     "Model/Project/Utilities",
     "Model/Project/Images/Complete/Greek",
     "Model/Project/Images/Complete/Latin",
@@ -169,6 +169,7 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/0-MainUI/ProjectFolderList.txt",
     "ViewController/0-MainUI/ProjectFolderList.py",
     "ViewController/0-MainUI/Dialogs/ProjectSettingsDialog.py",
+    "ViewController/0-MainUI/DESIGN_SPECIFICATION.md",
     "ViewController/0-MainUI/PROJECT_ARCHITECTURE.md",
     "ViewController/0-MainUI/PreviewStudio.py",
     "ViewController/0-MainUI/PreProcess.py",
@@ -251,10 +252,8 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/0-MainUI/web",
 }
 
-TRAINING_SUPPORT_ROOTS = {
+MINIMAL_TRAINING_FOLDERS = {
     "Model/Project/Training",
-    "ViewController/0-MainUI/TessTrainBoxFiles",
-    "ViewController/2-TrainTesseract",
 }
 
 KNOWN_FILE_EXTENSIONS = {
@@ -352,9 +351,7 @@ class ProjectFolderListBuilder:
         folders.update(self._collect_session_json_folders())
         folders.update(self._collect_model_data_folders())
         files.update(self._collect_model_data_files())
-        training_folders, training_files = self._collect_recursive_support_entries(TRAINING_SUPPORT_ROOTS)
-        folders.update(training_folders)
-        files.update(training_files)
+        folders.update(self._collect_minimal_training_folders())
         folders.update(self._collect_workflow_image_folders())
         files.update(self._collect_mainui_module_files())
         files.update(self._collect_mainui_font_files())
@@ -422,12 +419,17 @@ class ProjectFolderListBuilder:
                 continue
 
             if normalized.startswith("Model/Project/Data/"):
+                if not self.is_allowed_project_data_reference(normalized):
+                    continue
                 if self._is_file_reference(normalized):
                     files.add(normalized)
                 else:
                     folder_entry = self.normalize_path(normalized)
                     if folder_entry:
                         folders.add(folder_entry)
+                continue
+
+            if self.is_pruned_training_reference(normalized):
                 continue
 
             if self._is_file_reference(normalized):
@@ -463,51 +465,62 @@ class ProjectFolderListBuilder:
 
     def _collect_model_data_folders(self) -> Set[str]:
         folders: Set[str] = set()
-        data_root = self.project_root / "Model" / "Project" / "Data"
-        if not data_root.exists():
+        data_roots = [
+            self.project_root / "Model" / "Project" / "Data" / "json",
+            self.project_root / "Model" / "Project" / "Data" / "esword",
+        ]
+        if not any(root.exists() for root in data_roots):
             return folders
 
-        for current, dirnames, filenames in os.walk(data_root):
-            relative = self._to_project_relative(Path(current))
-            if not relative:
-                continue
-            if relative == "Model/Project/Data/Archive" or relative.startswith("Model/Project/Data/Archive/"):
-                dirnames[:] = []
-                continue
-            if self.should_exclude(relative):
-                dirnames[:] = []
-                continue
-            dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
+        folders.update({"Model/Project/Data", "Model/Project/Data/json", "Model/Project/Data/esword"})
 
-            if filenames or dirnames or relative == "Model/Project/Data":
-                folders.add(relative)
+        for data_root in data_roots:
+            if not data_root.exists():
+                continue
+            for current, dirnames, filenames in os.walk(data_root):
+                relative = self._to_project_relative(Path(current))
+                if not relative:
+                    continue
+                if self.should_exclude(relative):
+                    dirnames[:] = []
+                    continue
+                dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
+
+                if filenames or dirnames or relative == "Model/Project/Data":
+                    folders.add(relative)
 
         return folders
 
     def _collect_model_data_files(self) -> Set[str]:
         files: Set[str] = set()
-        data_root = self.project_root / "Model" / "Project" / "Data"
-        if not data_root.exists():
+        data_roots = [
+            self.project_root / "Model" / "Project" / "Data" / "json",
+            self.project_root / "Model" / "Project" / "Data" / "esword",
+        ]
+        if not any(root.exists() for root in data_roots):
             return files
 
-        for current, dirnames, filenames in os.walk(data_root):
-            relative = self._to_project_relative(Path(current))
-            if not relative:
+        for data_root in data_roots:
+            if not data_root.exists():
                 continue
-            if relative == "Model/Project/Data/Archive" or relative.startswith("Model/Project/Data/Archive/"):
-                dirnames[:] = []
-                continue
-            if self.should_exclude(relative):
-                dirnames[:] = []
-                continue
-            dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
+            for current, dirnames, filenames in os.walk(data_root):
+                relative = self._to_project_relative(Path(current))
+                if not relative:
+                    continue
+                if self.should_exclude(relative):
+                    dirnames[:] = []
+                    continue
+                dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
 
-            for filename in filenames:
-                normalized = self.normalize_path(f"{relative}/{filename}", reduce_file_paths=False)
-                if normalized:
-                    files.add(normalized)
+                for filename in filenames:
+                    normalized = self.normalize_path(f"{relative}/{filename}", reduce_file_paths=False)
+                    if normalized:
+                        files.add(normalized)
 
         return files
+
+    def _collect_minimal_training_folders(self) -> Set[str]:
+        return set(MINIMAL_TRAINING_FOLDERS)
 
     def _collect_recursive_support_entries(self, relative_roots: Iterable[str]) -> tuple[Set[str], Set[str]]:
         folders: Set[str] = set()
@@ -812,6 +825,10 @@ class ProjectFolderListBuilder:
             return True
         if ".duplicity" in parts:
             return True
+        if normalized.startswith("Model/Project/Data/") and not self.is_allowed_project_data_reference(normalized):
+            return True
+        if self.is_pruned_training_reference(normalized):
+            return True
         if self.is_model_developer_reference(normalized):
             return True
         if self.is_project_utilities_reference_reference(normalized):
@@ -819,6 +836,26 @@ class ProjectFolderListBuilder:
         if normalized == "ViewController/Developer" or normalized.startswith("ViewController/Developer/"):
             return True
         return False
+
+    @staticmethod
+    def is_allowed_project_data_reference(path: str) -> bool:
+        normalized = path.replace("\\", "/").strip("/")
+        return (
+            normalized == "Model/Project/Data"
+            or normalized == "Model/Project/Data/json"
+            or normalized.startswith("Model/Project/Data/json/")
+            or normalized == "Model/Project/Data/esword"
+            or normalized.startswith("Model/Project/Data/esword/")
+        )
+
+    @staticmethod
+    def is_pruned_training_reference(path: str) -> bool:
+        normalized = path.replace("\\", "/").strip("/")
+        return (
+            normalized.startswith("Model/Project/Training/")
+            or normalized == "ViewController/0-MainUI/TessTrainBoxFiles"
+            or normalized.startswith("ViewController/0-MainUI/TessTrainBoxFiles/")
+        )
 
     @staticmethod
     def is_model_developer_reference(path: str) -> bool:

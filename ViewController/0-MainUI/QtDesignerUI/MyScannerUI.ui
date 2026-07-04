@@ -151,6 +151,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -162,6 +165,26 @@
     <property name="icon">
      <iconset resource="../UI_Icons.qrc">
       <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="imageScannerbutton">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Scan image</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../UI_Icons.qrc">
+      <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
     </property>
    </widget>
    <widget class="QLineEdit" name="ImageLe">
@@ -190,6 +213,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -216,6 +242,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -242,6 +271,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -272,7 +304,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="acceptDrops">
@@ -342,7 +378,7 @@
    <widget class="QPushButton" name="MyPixlerbutton">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>80</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -362,7 +398,7 @@
    <widget class="QPushButton" name="Deskewbutton">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>110</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -370,7 +406,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -387,7 +427,7 @@
    <widget class="QPushButton" name="PrevImgButton">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>260</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -407,7 +447,7 @@
    <widget class="QPushButton" name="NextImgButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>290</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -520,6 +560,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -600,7 +643,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -621,7 +668,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -701,6 +752,9 @@
       <font>
        <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -773,7 +827,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>10</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="toolTip">
@@ -942,7 +1000,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -960,7 +1022,11 @@
      </property>
      <property name="font">
       <font>
+       <family>FROMVS [MAXR]</family>
        <pointsize>8</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -1018,7 +1084,7 @@
    <widget class="QComboBox" name="ZoomComboBox">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>160</x>
       <y>0</y>
       <width>81</width>
       <height>26</height>
@@ -1032,7 +1098,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1082,7 +1152,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>140</x>
       <y>0</y>
       <width>21</width>
       <height>26</height>
@@ -1090,7 +1160,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1191,6 +1265,9 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="toolTip">
@@ -1210,7 +1287,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>140</x>
       <y>30</y>
       <width>21</width>
       <height>161</height>
@@ -1278,7 +1355,11 @@
     </property>
     <property name="font">
      <font>
+      <family>FROMVS [MAXR]</family>
       <pointsize>9</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
@@ -1296,7 +1377,7 @@
      <x>0</x>
      <y>0</y>
      <width>1317</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOCR">
@@ -1321,13 +1402,16 @@
      <font>
       <family>FROMVS [MAXR]</family>
       <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
      <string>File</string>
     </property>
     <addaction name="actionProject_Browser"/>
-    <addaction name="actionExternally_Scan_Imsge"/>
+    <addaction name="actionImageScanner"/>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Text"/>
     <addaction name="actionSave_Image"/>
@@ -1355,6 +1439,10 @@
     <property name="font">
      <font>
       <family>FROMVS [MAXR]</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="title">
@@ -2476,9 +2564,31 @@
     <string>Character Reference</string>
    </property>
   </action>
-  <action name="actionExternally_Scan_Imsge">
+  <action name="actionImageScanner">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+   </property>
    <property name="text">
-    <string>Externally Scan Imsge</string>
+    <string>Scan Image</string>
+   </property>
+  </action>
+  <action name="actionImageScanner_tb">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+   </property>
+   <property name="text">
+    <string>Scan Image</string>
+   </property>
+  </action>
+  <action name="actionScanImage">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+   </property>
+   <property name="text">
+    <string>Scan Image</string>
    </property>
   </action>
  </widget>

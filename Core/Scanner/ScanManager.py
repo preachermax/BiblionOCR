@@ -24,11 +24,13 @@ class ScanManager:
         for backend_class in self.BACKEND_PRIORITY:
             if not backend_class.is_supported_platform(self._platform):
                 continue
+            availability = backend_class.availability_details()
             options.append(
                 {
                     "value": backend_class.__name__,
                     "label": backend_class.backend_name,
-                    "available": backend_class.is_available(),
+                    "available": availability.get("available", False),
+                    "unavailable_reason": availability.get("reason"),
                 }
             )
         return options
@@ -122,6 +124,10 @@ class ScanManager:
                     f"Scanner backend {backend_class.backend_name} is not supported on {self._platform}"
                 )
             if not backend_class.is_available():
+                availability = backend_class.availability_details()
+                reason = availability.get("reason")
+                if reason:
+                    raise RuntimeError(reason)
                 raise RuntimeError(
                     f"Scanner backend {backend_class.backend_name} is not currently available"
                 )
