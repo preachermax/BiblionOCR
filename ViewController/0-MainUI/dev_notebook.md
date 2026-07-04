@@ -882,6 +882,8 @@ DO NOT update for:
 * 2026-07-04: `ProjectFolderList.py` now prunes new-project generation down to runtime-safe `Model/Project/Data/json` plus minimal workflow/training scaffolding, instead of restoring `Data/SQLite`, `Data/csv`, or deep training payloads from older manifests
 * 2026-07-04: `Model/Project/Data/esword` remains intentionally preserved in the curated manifest because MyWriter is expected to generate and update those files later
 * 2026-07-04: `MyServer` file/directory pickers now share a Projects-root fallback helper, and `actionOpen_Project` launches `MyExplorer` at the selected validated project root so both project browsing entry points start from the same anchor
+* 2026-07-04: physically pruned unreferenced workspace folders `Model/Project/Data/Archive`, `Model/Project/Training/tesstrain`, `Model/Project/Training/staged_ground_truth`, and `ViewController/0-MainUI/TessTrainBoxFiles`; retained `Data/csv`, `Data/SQLite`, and `Data/esword` because `csv`/`SQLite` are still referenced by active modules and `esword` is reserved for MyWriter output
+* 2026-07-04: offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed `MyExplorer(start_dir=...)` roots the tree at the selected project folder as intended
 
 ---
 

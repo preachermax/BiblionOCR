@@ -68,6 +68,11 @@ Manifest curation rules for new-project generation:
 * Keep minimal image workflow folders and the top-level `Model/Project/Training` scaffold.
 * Exclude heavy data trees such as `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, and deep training support payloads unless there is an explicit one-off regeneration case.
 
+Current workspace cleanup status:
+
+* Physically removed repo-local `Model/Project/Data/Archive`, `Model/Project/Training/tesstrain`, `Model/Project/Training/staged_ground_truth`, and `ViewController/0-MainUI/TessTrainBoxFiles` after confirming they were not referenced by current runtime code.
+* Deliberately retained `Model/Project/Data/csv` and `Model/Project/Data/SQLite` because active runtime modules still reference those trees.
+
 ---
 
 ## 3. Core Engine Structure Generation
@@ -254,6 +259,7 @@ For each new project creation test:
 * `Open Project` starts from `os.path.join(os.path.expanduser("~"), "Projects")` and validates the selected folder as a BiblionOCR project root before launching `MyExplorer` there.
 * Shared file-open pickers should prefer the current working file/folder when present, otherwise fall back to the same Projects root.
 * `MyExplorer` should accept an explicit startup directory from `MyServer` and default to the user Projects root when no project-specific path is supplied.
+* Offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed that `MyExplorer` roots both the model path and the tree root index at the selected project folder.
 
 ---
 
