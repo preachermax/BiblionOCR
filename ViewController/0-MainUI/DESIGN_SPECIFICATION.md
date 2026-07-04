@@ -156,6 +156,7 @@ Rules:
 - a UI Surface gathers input, presents state, and triggers Processes
 - UI Surfaces should not become the source of truth for business policy
 - when the repo requires Designer-first ownership, the `.ui` file is the editable source of truth for layout
+- preview/compare surfaces must preserve a stable comparison contract: left = original/reference input, right = processed/output result
 
 ### Artifact
 
@@ -275,6 +276,7 @@ Reference Data
 - Project generation must remain curated; broad workspace payloads should not be copied by default.
 - Workflows may cross module boundaries, but Processes should remain locally understandable and testable.
 - UI Surfaces collect input and present state; they should not become the authoritative source of business policy.
+- Preview dialogs must keep their comparison layout stable: original/reference on the left, processed/output on the right.
 - Reference Data must be explicitly curated, especially when deciding what belongs in generated Projects.
 - MyTrainer remains an active future-facing module area, so training-related cleanup should distinguish between stale helper payloads and still-planned training workflows.
 

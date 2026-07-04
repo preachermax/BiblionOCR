@@ -887,6 +887,7 @@ DO NOT update for:
 * 2026-07-04: offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed `MyExplorer(start_dir=...)` roots the tree at the selected project folder as intended
 * 2026-07-04: added `DESIGN_SPECIFICATION.md` to define the repo vocabulary around System, Workspace, Project, Workflow, Process, Stage, Module, Artifact, Session, Event, and Reference Data so future cleanup and MyTrainer discussions use consistent boundaries
 * 2026-07-04: `MyPixler` now routes `Denoise` through morphology preview, `Clip` through inverse selection with background fill, and `Erase` through a paint-click preview flow with adjustable brush radius and background-color replacement
+* 2026-07-04: active preview dialogs now preserve one comparison contract across the repo: left = original/reference input, right = processed/output result; `MorphologyDialog` was corrected to match `ImagePreviewDialog`
 
 ---
 
