@@ -880,6 +880,7 @@ DO NOT update for:
 * The highest-risk refactor remains removing duplicate engine/event classes from `MyServer.py` before Core imports, runtime wiring, and replay behavior are fully validated
 * There are currently multiple notebook copies in circulation; the repo-tracked notebook should stay intentionally synchronized with the working copy when architecture notes are updated
 * 2026-07-04: `ProjectFolderList.py` now prunes new-project generation down to runtime-safe `Model/Project/Data/json` plus minimal workflow/training scaffolding, instead of restoring `Data/SQLite`, `Data/csv`, or deep training payloads from older manifests
+* 2026-07-04: `Model/Project/Data/esword` remains intentionally preserved in the curated manifest because MyWriter is expected to generate and update those files later
 * 2026-07-04: `MyServer` file/directory pickers now share a Projects-root fallback helper, and `actionOpen_Project` launches `MyExplorer` at the selected validated project root so both project browsing entry points start from the same anchor
 
 ---

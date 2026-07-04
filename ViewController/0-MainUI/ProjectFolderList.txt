@@ -2,6 +2,8 @@ Core/MyServer.py => ViewController/0-MainUI/MyServer.py
 Core/MyServerUI.py => ViewController/0-MainUI/MyServerUI.py
 Core/MyServerUI.ui => ViewController/QtDesignerUI/MyServerUI.ui
 Model/Project/Data
+Model/Project/Data/esword
+Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json
 Model/Project/Data/json/BookChapter.json
 Model/Project/Data/json/BookChapterVerse.json

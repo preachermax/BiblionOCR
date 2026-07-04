@@ -21,7 +21,7 @@ Current rules:
 * Project folder structure should be generated from `ProjectFolderList.txt`.
 * File entries in `ProjectFolderList.txt` are treated as parent-directory requirements.
 * Empty directories receive `.gitkeep` placeholders so Git can track them.
-* The curated manifest must stay project-safe: new projects should include runtime JSON data and minimal workflow/training scaffolding, but should not expand broad `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, or deep historical training payloads by default.
+* The curated manifest must stay project-safe: new projects should include runtime JSON data, the `Model/Project/Data/esword` tree reserved for future MyWriter generation/update workflows, and minimal workflow/training scaffolding, but should not expand broad `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, or deep historical training payloads by default.
 
 Temporary implementation note:
 
@@ -64,6 +64,7 @@ The full `Model/Project/...` and `ViewController/...` directory tree is derived 
 Manifest curation rules for new-project generation:
 
 * Keep `Model/Project/Data/json` contents needed by runtime modules.
+* Keep `Model/Project/Data/esword` contents and placeholders; MyWriter is expected to generate and refresh that data later.
 * Keep minimal image workflow folders and the top-level `Model/Project/Training` scaffold.
 * Exclude heavy data trees such as `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, and deep training support payloads unless there is an explicit one-off regeneration case.
 

@@ -5,7 +5,7 @@ Rebuild/update ProjectFolderList.txt for BiblionOCR.
 This script captures the cleanup rules used while curating ProjectFolderList.txt:
 - seed from the current ProjectFolderList.txt when it exists;
 - add folders referenced by Model/Project/Data/json/*Session.json;
-- include only project-safe Model/Project/Data/json contents needed at runtime;
+- include only project-safe `Model/Project/Data/json` and `Model/Project/Data/esword` contents needed at runtime;
 - reduce Model/Project/Images file entries to folders only;
 - normalize project-absolute paths to project-relative paths;
 - reduce file paths to their containing folders;
@@ -96,6 +96,7 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Images",
     "Model/Project/Images/Complete",
     "Model/Project/Data/json",
+    "Model/Project/Data/esword",
     "Model/Project/Utilities",
     "Model/Project/Images/Complete/Greek",
     "Model/Project/Images/Complete/Latin",
@@ -463,45 +464,57 @@ class ProjectFolderListBuilder:
 
     def _collect_model_data_folders(self) -> Set[str]:
         folders: Set[str] = set()
-        json_root = self.project_root / "Model" / "Project" / "Data" / "json"
-        if not json_root.exists():
+        data_roots = [
+            self.project_root / "Model" / "Project" / "Data" / "json",
+            self.project_root / "Model" / "Project" / "Data" / "esword",
+        ]
+        if not any(root.exists() for root in data_roots):
             return folders
 
-        folders.update({"Model/Project/Data", "Model/Project/Data/json"})
+        folders.update({"Model/Project/Data", "Model/Project/Data/json", "Model/Project/Data/esword"})
 
-        for current, dirnames, filenames in os.walk(json_root):
-            relative = self._to_project_relative(Path(current))
-            if not relative:
+        for data_root in data_roots:
+            if not data_root.exists():
                 continue
-            if self.should_exclude(relative):
-                dirnames[:] = []
-                continue
-            dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
+            for current, dirnames, filenames in os.walk(data_root):
+                relative = self._to_project_relative(Path(current))
+                if not relative:
+                    continue
+                if self.should_exclude(relative):
+                    dirnames[:] = []
+                    continue
+                dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
 
-            if filenames or dirnames or relative == "Model/Project/Data":
-                folders.add(relative)
+                if filenames or dirnames or relative == "Model/Project/Data":
+                    folders.add(relative)
 
         return folders
 
     def _collect_model_data_files(self) -> Set[str]:
         files: Set[str] = set()
-        json_root = self.project_root / "Model" / "Project" / "Data" / "json"
-        if not json_root.exists():
+        data_roots = [
+            self.project_root / "Model" / "Project" / "Data" / "json",
+            self.project_root / "Model" / "Project" / "Data" / "esword",
+        ]
+        if not any(root.exists() for root in data_roots):
             return files
 
-        for current, dirnames, filenames in os.walk(json_root):
-            relative = self._to_project_relative(Path(current))
-            if not relative:
+        for data_root in data_roots:
+            if not data_root.exists():
                 continue
-            if self.should_exclude(relative):
-                dirnames[:] = []
-                continue
-            dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
+            for current, dirnames, filenames in os.walk(data_root):
+                relative = self._to_project_relative(Path(current))
+                if not relative:
+                    continue
+                if self.should_exclude(relative):
+                    dirnames[:] = []
+                    continue
+                dirnames[:] = [d for d in dirnames if not self.should_exclude(f"{relative}/{d}")]
 
-            for filename in filenames:
-                normalized = self.normalize_path(f"{relative}/{filename}", reduce_file_paths=False)
-                if normalized:
-                    files.add(normalized)
+                for filename in filenames:
+                    normalized = self.normalize_path(f"{relative}/{filename}", reduce_file_paths=False)
+                    if normalized:
+                        files.add(normalized)
 
         return files
 
@@ -830,6 +843,8 @@ class ProjectFolderListBuilder:
             normalized == "Model/Project/Data"
             or normalized == "Model/Project/Data/json"
             or normalized.startswith("Model/Project/Data/json/")
+            or normalized == "Model/Project/Data/esword"
+            or normalized.startswith("Model/Project/Data/esword/")
         )
 
     @staticmethod
