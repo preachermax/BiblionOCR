@@ -121,6 +121,7 @@ ViewController/0-MainUI/Co-pilot Instructions.txt
 ViewController/0-MainUI/commit_checklist.md
 ViewController/0-MainUI/CropTif.py
 ViewController/0-MainUI/DEPENDENCIES_AND_RELATIONSHIPS.md
+ViewController/0-MainUI/DESIGN_SPECIFICATION.md
 ViewController/0-MainUI/dev_notebook.md
 ViewController/0-MainUI/Dialogs/crop_greek_linesDialog.py
 ViewController/0-MainUI/Dialogs/crop_languagesDialog.py

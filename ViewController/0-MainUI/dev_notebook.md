@@ -867,6 +867,7 @@ DO NOT update for:
 
 ### Reference-Only / Supporting
 
+* DESIGN_SPECIFICATION.md
 * PROJECT_CREATION_ARCHITECTURE.md
 * PROJECT_SPEC.md
 
@@ -884,6 +885,7 @@ DO NOT update for:
 * 2026-07-04: `MyServer` file/directory pickers now share a Projects-root fallback helper, and `actionOpen_Project` launches `MyExplorer` at the selected validated project root so both project browsing entry points start from the same anchor
 * 2026-07-04: physically pruned unreferenced workspace folders `Model/Project/Data/Archive`, `Model/Project/Training/tesstrain`, `Model/Project/Training/staged_ground_truth`, and `ViewController/0-MainUI/TessTrainBoxFiles`; retained `Data/csv`, `Data/SQLite`, and `Data/esword` because `csv`/`SQLite` are still referenced by active modules and `esword` is reserved for MyWriter output
 * 2026-07-04: offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed `MyExplorer(start_dir=...)` roots the tree at the selected project folder as intended
+* 2026-07-04: added `DESIGN_SPECIFICATION.md` to define the repo vocabulary around System, Workspace, Project, Workflow, Process, Stage, Module, Artifact, Session, Event, and Reference Data so future cleanup and MyTrainer discussions use consistent boundaries
 
 ---
 

@@ -169,6 +169,7 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/0-MainUI/ProjectFolderList.txt",
     "ViewController/0-MainUI/ProjectFolderList.py",
     "ViewController/0-MainUI/Dialogs/ProjectSettingsDialog.py",
+    "ViewController/0-MainUI/DESIGN_SPECIFICATION.md",
     "ViewController/0-MainUI/PROJECT_ARCHITECTURE.md",
     "ViewController/0-MainUI/PreviewStudio.py",
     "ViewController/0-MainUI/PreProcess.py",
