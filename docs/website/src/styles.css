@@ -112,13 +112,14 @@ body {
 
 .graph-card {
   display: grid;
-  grid-template-columns: minmax(220px, 320px) 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
   align-items: stretch;
 }
 
 .graph-card-header {
   align-self: start;
+  max-width: 760px;
 }
 
 .graph-card-header h2 {
@@ -127,7 +128,7 @@ body {
 }
 
 .graph-canvas {
-  min-height: 420px;
+  min-height: 640px;
   border-radius: 14px;
   overflow: hidden;
   background: linear-gradient(180deg, rgba(247, 243, 233, 0.92), rgba(241, 235, 221, 0.78));

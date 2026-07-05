@@ -18,7 +18,8 @@ const overviewNodes = [
       label: "Biblion",
       category: "Platform",
       summary: "Digital Humanities platform centered on preservation, scholarship, and responsible AI."
-    }
+    },
+    position: { x: 120, y: 220 }
   },
   {
     data: {
@@ -26,7 +27,8 @@ const overviewNodes = [
       label: "Vision",
       category: "Document",
       summary: "Defines the long-term purpose and intellectual direction of the project."
-    }
+    },
+    position: { x: 380, y: 220 }
   },
   {
     data: {
@@ -34,7 +36,8 @@ const overviewNodes = [
       label: "Architecture",
       category: "Document",
       summary: "Describes the system structure, module boundaries, and implementation shape."
-    }
+    },
+    position: { x: 640, y: 220 }
   },
   {
     data: {
@@ -42,7 +45,8 @@ const overviewNodes = [
       label: "Development",
       category: "Workflow",
       summary: "Tracks active engineering notes, procedures, and ongoing implementation work."
-    }
+    },
+    position: { x: 900, y: 220 }
   },
   {
     data: {
@@ -50,7 +54,8 @@ const overviewNodes = [
       label: "Publications",
       category: "Outcome",
       summary: "Represents the scholarly outputs the platform is intended to support."
-    }
+    },
+    position: { x: 1160, y: 220 }
   }
 ];
 
@@ -91,7 +96,8 @@ const principlesNodes = [
       summary: "Source material should remain recoverable, traceable, and documented whenever possible."
     }
   },
-  {
+        },
+        position: { x: 640, y: 350 }
     data: {
       id: "stewardship",
       label: "Scholarship Before Automation",
@@ -99,7 +105,8 @@ const principlesNodes = [
       summary: "Automation supports scholarship; human understanding remains central."
     }
   }
-];
+        },
+        position: { x: 640, y: 110 }
 
 const principlesEdges = [
       label: "Documentation Before Assumption",
@@ -107,7 +114,8 @@ const principlesEdges = [
       summary: "Knowledge should not exist only in source code; decisions and context must be recorded."
     data: {
       id: "p1",
-      source: "principles",
+        },
+        position: { x: 980, y: 260 }
       target: "preservation"
     }
       label: "Community Before Individual",
@@ -115,7 +123,8 @@ const principlesEdges = [
       summary: "Meaningful preservation depends on contributions from many disciplines."
   {
     data: {
-      id: "p2",
+        },
+        position: { x: 860, y: 570 }
       source: "principles",
       target: "scholarship"
       label: "Stewardship Before Ownership",
@@ -123,7 +132,8 @@ const principlesEdges = [
       summary: "Historical texts are treated as shared human inheritance, not possessions."
   },
   {
-    data: {
+        },
+        position: { x: 420, y: 570 }
       id: "p3",
       source: "principles",
       target: "documentation"
@@ -131,7 +141,8 @@ const principlesEdges = [
   },
   {
     data: {
-      id: "p4",
+        },
+        position: { x: 300, y: 260 }
       source: "principles",
       target: "community"
     }
@@ -158,10 +169,10 @@ const stylesheet = [
       "text-valign": "center",
       "text-halign": "center",
       "text-wrap": "wrap",
-      "text-max-width": 138,
-      "font-size": "10px",
-      width: 156,
-      height: 84,
+      "text-max-width": 188,
+      "font-size": "13px",
+      width: 220,
+      height: 124,
       "border-width": 2,
       "border-color": "#cda15c"
     }
@@ -195,28 +206,13 @@ const stylesheet = [
   }
 ];
 
-const layout = {
-  name: "breadthfirst",
-  directed: true,
-  padding: 24,
-  spacingFactor: 1.2
-};
+const overviewLayout = { name: "preset", fit: true, padding: 24 };
 
-const circleLayout = {
-  name: "concentric",
-  minNodeSpacing: 24,
-  padding: 28,
-  spacingFactor: 1.1,
-  concentric(node) {
-    return node.id() === "principles" ? 3 : 1;
-  },
-  levelWidth() {
-    return 1;
-  }
-};
+const principlesLayout = { name: "preset", fit: true, padding: 30 };
 
 function GraphCard({ title, description, elements, layoutConfig, onNodeSelect }) {
   const [cy, setCy] = useState(null);
+  const zoomMultiplier = title === "Guiding Principles" ? 1.06 : 1.02;
 
   useEffect(() => {
     if (!cy || !onNodeSelect) {
@@ -236,6 +232,18 @@ function GraphCard({ title, description, elements, layoutConfig, onNodeSelect })
       cy.off("tap", "node", handleNodeTap);
     };
   }, [cy, onNodeSelect, title]);
+
+  useEffect(() => {
+    if (!cy) {
+      return undefined;
+    }
+
+    cy.fit(cy.elements(), 18);
+    cy.zoom(cy.zoom() * zoomMultiplier);
+    cy.center();
+
+    return undefined;
+  }, [cy, elements, layoutConfig, zoomMultiplier]);
 
   return (
     <article className="graph-card">
@@ -417,7 +425,7 @@ export default function App() {
           title="Biblion Overview"
           description={`A minimal relationship map for the current documentation-facing website prototype. Sequence step ${sequenceStep + 1} of ${overviewSequence.length}.`}
           elements={overviewElements}
-          layoutConfig={layout}
+          layoutConfig={overviewLayout}
           onNodeSelect={setSelectedNode}
         />
 
@@ -425,7 +433,7 @@ export default function App() {
           title="Guiding Principles"
           description="A static graph derived from the principles outlined in THE_BIBLION_PROJECT.md."
           elements={principlesElements}
-          layoutConfig={circleLayout}
+          layoutConfig={principlesLayout}
           onNodeSelect={setSelectedNode}
         />
       </section>
