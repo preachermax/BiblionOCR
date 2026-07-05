@@ -1,0 +1,20 @@
+{
+  "name": "biblion-website-graph-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cytoscape": "^3.30.2",
+    "react": "^18.3.1",
+    "react-cytoscapejs": "^2.0.0",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
