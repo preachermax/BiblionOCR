@@ -30,6 +30,39 @@
 
 ---
 
+  ## 🌐 Website Prototype Notes
+
+  ### Current Website Demo State
+
+  * `docs/website/` now contains a minimal React + Cytoscape website prototype
+  * `docs/website/src/App.jsx` is the maintained source version of the demo
+  * `docs/website/preview.html` is the no-build browser preview for environments without local Node.js
+  * the current demo includes:
+
+    * static overview graph
+    * static guiding-principles graph derived from `docs/vision/THE_BIBLION_PROJECT.md`
+    * node-click selection routed into parent state
+    * advance, reset, and autoplay sequence controls for the overview graph
+
+  ### Current Layout / Readability Contract
+
+  * graph cards now use a single-column layout so the canvas can consume the full card width
+  * graph nodes use wrapped text inside rounded rectangle geometry rather than circular targets
+  * the overview graph now uses explicit preset positions across the horizontal axis to avoid vertical scrolling
+  * the guiding-principles graph also uses preset positions so larger readable targets can fit the available canvas
+  * label readability was validated through the local browser preview before the final website commits were published
+
+  ### Commit / Branch State
+
+  * the website prototype landed first on `development` as:
+
+    * `e27f513` Add website Cytoscape graph demo
+    * `c99d010` Refine website graph readability
+
+  * the same work was promoted onto `master`, and both branches now reconcile at merge commit `d48a643`
+
+  ---
+
 
 ## 📠 Scanner Acquisition Architecture
 

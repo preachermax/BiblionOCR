@@ -71,6 +71,9 @@ Forward-looking planning, milestones, and future initiatives.
 
 Website planning, structure, and public presentation material.
 
+Key documents:
+- [README.md](website/README.md)
+
 ### `patreon/`
 
 Funding and supporter-oriented planning material.
@@ -118,6 +121,7 @@ When a document feels misplaced, move or rewrite it so the directory purpose rem
 - [PROJECT_ARCHITECTURE.md](architecture/PROJECT_ARCHITECTURE.md)
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
+- [website/README.md](website/README.md)
 
 ---
 
