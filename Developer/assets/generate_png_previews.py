@@ -1,13 +1,14 @@
-"""Generate PNG previews and a contact sheet from licensed EPS assets.
+"""Generate PNG previews and a contact sheet from licensed source assets.
 
-This script preserves the EPS files in ``Licensed images`` as the source
-archive and regenerates the PNG working set in ``PNG previews`` for review and
-tagging.
+This script preserves the source files in ``Licensed images`` and regenerates
+the PNG working set in ``PNG previews`` for review and tagging. Raster assets
+are converted directly; EPS files are rendered through Ghostscript when present.
 """
 
+import csv
 from pathlib import Path
 import math
-import shutil
+import re
 import subprocess
 
 from PIL import Image, ImageDraw, ImageFont
@@ -16,42 +17,142 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent
 SOURCE_DIR = ROOT / "Licensed images"
 PREVIEW_DIR = ROOT / "PNG previews"
+MANIFEST_PATH = ROOT / "asset_tags.csv"
 GHOSTSCRIPT = Path(r"C:\Program Files\gs\gs10.00.0\bin\gswin64c.exe")
+RENDER_DPI = 600
+MAX_PREVIEW_DIMENSION = 2400
+THUMB_RESAMPLE = Image.Resampling.LANCZOS
+SUPPORTED_RASTER_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp"}
 
 
-def render_eps_previews():
+def iter_preview_pngs():
+    return sorted(
+        path
+        for path in PREVIEW_DIR.glob("*.png")
+        if path.name != "contact_sheet.png" and not path.stem.endswith("__raw")
+    )
+
+
+def slugify(value):
+    text = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return text or "asset"
+
+
+def load_manifest_rows():
+    with MANIFEST_PATH.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+        fieldnames = reader.fieldnames or []
+    return fieldnames, rows
+
+
+def build_preview_filename(row):
+    source_file = (row.get("eps_file") or "").strip()
+    stem = Path(source_file).stem
+    numeric_id = stem.replace("shutterstock_", "")
+    category_code = slugify((row.get("category_code") or "").strip()) or "uncategorized"
+    tags = [slugify(tag) for tag in (row.get("tags") or "").split(";") if tag.strip()]
+    tag_part = "-".join(tags[:3]) if tags else "preview"
+    return f"{category_code}_{tag_part}_{numeric_id}.png"
+
+
+def write_manifest_rows(fieldnames, rows):
+    with MANIFEST_PATH.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def render_with_ghostscript_tiff(source_file, temp_output):
+    subprocess.run(
+        [
+            str(GHOSTSCRIPT),
+            "-dSAFER",
+            "-dBATCH",
+            "-dNOPAUSE",
+            "-sDEVICE=tiff24nc",
+            "-dUseCropBox",
+            "-dTextAlphaBits=4",
+            "-dGraphicsAlphaBits=4",
+            "-dDOINTERPOLATE",
+            f"-r{RENDER_DPI}",
+            f"-sOutputFile={temp_output}",
+            str(source_file),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def normalize_image(raw_image, output_file):
+    final_image = raw_image.convert("RGB")
+    longest_edge = max(final_image.size)
+    if longest_edge > MAX_PREVIEW_DIMENSION:
+        scale = MAX_PREVIEW_DIMENSION / float(longest_edge)
+        resized_size = (
+            max(1, int(final_image.width * scale)),
+            max(1, int(final_image.height * scale)),
+        )
+        final_image = final_image.resize(resized_size, THUMB_RESAMPLE)
+    final_image.save(output_file, format="PNG")
+
+
+def render_preview_image(source_file, output_file):
+    if source_file.suffix.lower() in SUPPORTED_RASTER_EXTENSIONS:
+        with Image.open(source_file) as raw_image:
+            normalize_image(raw_image, output_file)
+        return
+
+    temp_output = output_file.with_name(f"{output_file.stem}__raw.tiff")
+    try:
+        render_with_ghostscript_tiff(source_file, temp_output)
+
+        with Image.open(temp_output) as raw_image:
+            normalize_image(raw_image, output_file)
+    finally:
+        temp_output.unlink(missing_ok=True)
+
+
+def render_source_previews():
     PREVIEW_DIR.mkdir(exist_ok=True)
+    fieldnames, rows = load_manifest_rows()
+    rows_by_source = {
+        (row.get("eps_file") or "").strip(): row
+        for row in rows
+        if (row.get("eps_file") or "").strip()
+    }
 
-    for png_file in PREVIEW_DIR.glob("shutterstock_*.png"):
+    for png_file in PREVIEW_DIR.glob("*.png"):
+        if png_file.name == "contact_sheet.png":
+            continue
         png_file.unlink()
 
-    for eps_file in sorted(SOURCE_DIR.glob("shutterstock_*.eps")):
-        output_file = PREVIEW_DIR / f"{eps_file.stem}.png"
-        subprocess.run(
-            [
-                str(GHOSTSCRIPT),
-                "-dSAFER",
-                "-dBATCH",
-                "-dNOPAUSE",
-                "-sDEVICE=pngalpha",
-                "-r120",
-                f"-sOutputFile={output_file}",
-                str(eps_file),
-            ],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+    source_files = sorted(
+        path
+        for path in SOURCE_DIR.iterdir()
+        if path.is_file() and path.name.startswith("shutterstock_") and path.suffix.lower() in (SUPPORTED_RASTER_EXTENSIONS | {".eps"})
+    )
+
+    for source_file in source_files:
+        row = rows_by_source.get(source_file.name)
+        if row is None:
+            continue
+        output_file = PREVIEW_DIR / build_preview_filename(row)
+        row["png_preview_file"] = output_file.name
+        render_preview_image(source_file, output_file)
+
+    write_manifest_rows(fieldnames, rows)
 
 
 def build_contact_sheet():
-    files = sorted(PREVIEW_DIR.glob("shutterstock_*.png"))
+    files = iter_preview_pngs()
     if not files:
         return
 
-    thumb_w = 220
-    thumb_h = 220
-    label_h = 36
+    thumb_w = 280
+    thumb_h = 280
+    label_h = 54
     cols = 4
     rows = max(1, math.ceil(len(files) / cols))
 
@@ -65,7 +166,7 @@ def build_contact_sheet():
 
     for idx, path in enumerate(files):
         img = Image.open(path).convert("RGB")
-        img.thumbnail((thumb_w - 12, thumb_h - 12))
+        img.thumbnail((thumb_w - 16, thumb_h - 16), THUMB_RESAMPLE)
         x = (idx % cols) * thumb_w
         y = (idx // cols) * (thumb_h + label_h)
         px = x + (thumb_w - img.width) // 2
@@ -77,8 +178,8 @@ def build_contact_sheet():
             width=1,
         )
         draw.text(
-            (x + 6, y + thumb_h + 8),
-            path.stem.replace("shutterstock_", ""),
+            (x + 8, y + thumb_h + 8),
+            path.stem,
             fill="black",
             font=font,
         )
@@ -93,10 +194,13 @@ def ensure_sample_preview_removed():
 
 
 def main():
-    if not GHOSTSCRIPT.exists():
+    if not SOURCE_DIR.exists():
+        raise FileNotFoundError(f"Source folder not found: {SOURCE_DIR}")
+
+    if any(path.suffix.lower() == ".eps" for path in SOURCE_DIR.glob("shutterstock_*")) and not GHOSTSCRIPT.exists():
         raise FileNotFoundError(f"Ghostscript not found: {GHOSTSCRIPT}")
 
-    render_eps_previews()
+    render_source_previews()
     ensure_sample_preview_removed()
     build_contact_sheet()
 
