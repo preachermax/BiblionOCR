@@ -108,13 +108,18 @@
 
       .graph-card {
         display: grid;
-        grid-template-columns: minmax(220px, 320px) 1fr;
-        gap: 20px;
+        grid-template-columns: 1fr;
+        gap: 16px;
         align-items: stretch;
       }
 
+      .graph-card-header {
+        align-self: start;
+        max-width: 760px;
+      }
+
       .graph-canvas {
-        min-height: 420px;
+        min-height: 640px;
         border-radius: 14px;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(247, 243, 233, 0.92), rgba(241, 235, 221, 0.78));
@@ -162,11 +167,11 @@
       const overviewSequenceEdges = ["e1", "e2", "e3", "e4"];
 
       const overviewNodes = [
-        { data: { id: "biblion", label: "Biblion", category: "Platform", summary: "Digital Humanities platform centered on preservation, scholarship, and responsible AI." } },
-        { data: { id: "vision", label: "Vision", category: "Document", summary: "Defines the long-term purpose and intellectual direction of the project." } },
-        { data: { id: "architecture", label: "Architecture", category: "Document", summary: "Describes the system structure, module boundaries, and implementation shape." } },
-        { data: { id: "development", label: "Development", category: "Workflow", summary: "Tracks active engineering notes, procedures, and ongoing implementation work." } },
-        { data: { id: "publications", label: "Publications", category: "Outcome", summary: "Represents the scholarly outputs the platform is intended to support." } }
+        { data: { id: "biblion", label: "Biblion", category: "Platform", summary: "Digital Humanities platform centered on preservation, scholarship, and responsible AI." }, position: { x: 120, y: 220 } },
+        { data: { id: "vision", label: "Vision", category: "Document", summary: "Defines the long-term purpose and intellectual direction of the project." }, position: { x: 380, y: 220 } },
+        { data: { id: "architecture", label: "Architecture", category: "Document", summary: "Describes the system structure, module boundaries, and implementation shape." }, position: { x: 640, y: 220 } },
+        { data: { id: "development", label: "Development", category: "Workflow", summary: "Tracks active engineering notes, procedures, and ongoing implementation work." }, position: { x: 900, y: 220 } },
+        { data: { id: "publications", label: "Publications", category: "Outcome", summary: "Represents the scholarly outputs the platform is intended to support." }, position: { x: 1160, y: 220 } }
       ];
 
       const overviewEdges = [
@@ -177,12 +182,12 @@
       ];
 
       const principlesNodes = [
-        { data: { id: "principles", label: "Guiding Principles", category: "Vision", summary: "Core commitments that govern how Biblion applies technology to historical materials." } },
-        { data: { id: "preservation", label: "Preservation Before Convenience", category: "Principle", summary: "Source material should remain recoverable, traceable, and documented whenever possible." } },
-        { data: { id: "scholarship", label: "Scholarship Before Automation", category: "Principle", summary: "Automation supports scholarship; human understanding remains central." } },
-        { data: { id: "documentation", label: "Documentation Before Assumption", category: "Principle", summary: "Knowledge should not exist only in source code; decisions and context must be recorded." } },
-        { data: { id: "community", label: "Community Before Individual", category: "Principle", summary: "Meaningful preservation depends on contributions from many disciplines." } },
-        { data: { id: "stewardship", label: "Stewardship Before Ownership", category: "Principle", summary: "Historical texts are treated as shared human inheritance, not possessions." } }
+        { data: { id: "principles", label: "Guiding Principles", category: "Vision", summary: "Core commitments that govern how Biblion applies technology to historical materials." }, position: { x: 640, y: 350 } },
+        { data: { id: "preservation", label: "Preservation Before Convenience", category: "Principle", summary: "Source material should remain recoverable, traceable, and documented whenever possible." }, position: { x: 640, y: 110 } },
+        { data: { id: "scholarship", label: "Scholarship Before Automation", category: "Principle", summary: "Automation supports scholarship; human understanding remains central." }, position: { x: 980, y: 260 } },
+        { data: { id: "documentation", label: "Documentation Before Assumption", category: "Principle", summary: "Knowledge should not exist only in source code; decisions and context must be recorded." }, position: { x: 860, y: 570 } },
+        { data: { id: "community", label: "Community Before Individual", category: "Principle", summary: "Meaningful preservation depends on contributions from many disciplines." }, position: { x: 420, y: 570 } },
+        { data: { id: "stewardship", label: "Stewardship Before Ownership", category: "Principle", summary: "Historical texts are treated as shared human inheritance, not possessions." }, position: { x: 300, y: 260 } }
       ];
 
       const principlesEdges = [
@@ -206,10 +211,10 @@
             "text-valign": "center",
             "text-halign": "center",
             "text-wrap": "wrap",
-            "text-max-width": 154,
-            "font-size": "11px",
-            width: 176,
-            height: 96,
+            "text-max-width": 188,
+            "font-size": "13px",
+            width: 220,
+            height: 124,
             "border-width": 2,
             "border-color": "#cda15c"
           }
@@ -243,23 +248,13 @@
         }
       ];
 
-      const layout = { name: "breadthfirst", directed: true, padding: 30, spacingFactor: 1.25 };
+      const overviewLayout = { name: "preset", fit: true, padding: 24 };
 
-      const circleLayout = {
-        name: "concentric",
-        minNodeSpacing: 56,
-        padding: 48,
-        spacingFactor: 1.45,
-        concentric(node) {
-          return node.id() === "principles" ? 3 : 1;
-        },
-        levelWidth() {
-          return 1;
-        }
-      };
+      const principlesLayout = { name: "preset", fit: true, padding: 30 };
 
       function CytoscapeCanvas({ elements, layoutConfig, onNodeSelect, title }) {
         const containerRef = useRef(null);
+        const zoomMultiplier = title === "Guiding Principles" ? 1.06 : 1.02;
 
         useEffect(() => {
           if (!containerRef.current) {
@@ -273,6 +268,10 @@
             layout: layoutConfig
           });
 
+          cy.fit(cy.elements(), 18);
+          cy.zoom(cy.zoom() * zoomMultiplier);
+          cy.center();
+
           const handleNodeTap = (event) => {
             onNodeSelect({ graphTitle: title, ...event.target.data() });
           };
@@ -283,7 +282,7 @@
             cy.off("tap", "node", handleNodeTap);
             cy.destroy();
           };
-        }, [elements, layoutConfig, onNodeSelect, title]);
+        }, [elements, layoutConfig, onNodeSelect, title, zoomMultiplier]);
 
         return React.createElement("div", {
           ref: containerRef,
@@ -432,14 +431,14 @@
               title: "Biblion Overview",
               description: `A minimal relationship map for the current documentation-facing website prototype. Sequence step ${sequenceStep + 1} of ${overviewSequence.length}.`,
               elements: overviewElements,
-              layoutConfig: layout,
+              layoutConfig: overviewLayout,
               onNodeSelect: setSelectedNode
             }),
             React.createElement(GraphCard, {
               title: "Guiding Principles",
               description: "A static graph derived from the principles outlined in THE_BIBLION_PROJECT.md.",
               elements: principlesElements,
-              layoutConfig: circleLayout,
+              layoutConfig: principlesLayout,
               onNodeSelect: setSelectedNode
             })
           )
