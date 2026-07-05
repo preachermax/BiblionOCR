@@ -82,6 +82,72 @@
   ---
 
 
+## 🧪 Developer Mode Milestones
+
+### v1.7 Foundation
+
+* `Developer/` now exists as the initial Developer Mode package
+* `DeveloperServices` is the sole runtime instrumentation boundary for Developer Mode
+* the initial runtime model now tracks observed modules with:
+
+  * module name
+  * current state
+  * last observed event
+  * last update timestamp
+  * status
+
+* lightweight metrics currently include:
+
+  * total observed event count
+  * event count per module
+
+* trace recording currently stores:
+
+  * trace identifier
+  * event name
+  * source module
+  * destination module
+  * timestamp
+
+* the public read-only `DeveloperServices` API now exposes runtime model, modules, individual module state, metrics, traces, and recent events through defensive-copy accessors suitable for future Developer Mode panels
+* milestone commit published on `development`:
+
+  * `7ca2bfd` v1.7 milestone 7.6: add DeveloperServices instrumentation API
+
+### v1.8 First Visible Developer Panel
+
+* the first visible Developer Mode milestone is intentionally narrow: a Runtime Inspector that proves the architecture boundary instead of expanding feature scope
+* `ViewController/Developer/RuntimeInspectorPanel.py` renders module state using only the public `DeveloperServices` API
+* the Runtime Inspector now displays:
+
+  * registered modules
+  * standardized runtime status
+  * last observed event
+  * last update timestamp
+  * selected-module detail view
+
+* runtime status is currently normalized to the canonical set:
+
+  * `OPEN`
+  * `CLOSED`
+  * `OBSERVED`
+  * `UNKNOWN`
+
+* `DeveloperServices` now publishes runtime updates through an event-driven subscriber model so the Runtime Inspector refreshes without polling
+* `MyServer.py` now hosts the first Developer Mode panel through a hidden-by-default `Developer` menu entry
+* Runtime Inspector activation is lazy:
+
+  * the panel dock is created only when opened
+  * `DeveloperServices` observation is attached only while the panel is visible
+  * normal application behavior remains unaffected when Developer Mode is unused
+
+* milestone commit published on `development`:
+
+  * `ac2a93c` v1.8: integrate visible Runtime Inspector milestone
+
+---
+
+
 ## 📠 Scanner Acquisition Architecture
 
 ### Design Philosophy
