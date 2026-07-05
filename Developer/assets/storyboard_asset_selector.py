@@ -21,8 +21,11 @@ from PIL import Image, ImageTk
 ROOT = Path(__file__).resolve().parent
 SOURCE_DIR = ROOT / "Licensed images"
 PREVIEW_DIR = ROOT / "PNG previews"
+REFERENCE_PREVIEW_DIR = ROOT / "Reference previews"
 MANIFEST_PATH = ROOT / "asset_tags.csv"
 CATEGORY_CONFIG_PATH = ROOT / "storyboard_categories.csv"
+PREVIEW_RESAMPLE = Image.Resampling.LANCZOS
+SUPPORTED_PREVIEW_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp")
 
 DEFAULT_CATEGORIES = [
     {
@@ -131,6 +134,8 @@ def load_category_config() -> list[CategoryDefinition]:
 
 def load_preview_records() -> list[AssetRecord]:
     records_by_png: dict[str, AssetRecord] = {}
+    records_by_eps: dict[str, AssetRecord] = {}
+    manifest_records: list[AssetRecord] = []
 
     if MANIFEST_PATH.exists():
         with MANIFEST_PATH.open("r", encoding="utf-8", newline="") as handle:
@@ -139,7 +144,7 @@ def load_preview_records() -> list[AssetRecord]:
                 png_name = (row.get("png_preview_file") or "").strip()
                 if not png_name:
                     continue
-                records_by_png[png_name] = AssetRecord(
+                record = AssetRecord(
                     eps_file=(row.get("eps_file") or "").strip(),
                     png_preview_file=png_name,
                     category_code=(row.get("category_code") or "").strip(),
@@ -147,21 +152,85 @@ def load_preview_records() -> list[AssetRecord]:
                     tags=(row.get("tags") or "").strip(),
                     notes=(row.get("notes") or "").strip(),
                 )
+                manifest_records.append(record)
+                records_by_png[png_name] = record
+                if record.eps_file:
+                    records_by_eps[record.eps_file] = record
 
-    ordered_records: list[AssetRecord] = []
-    for preview_path in sorted(PREVIEW_DIR.glob("shutterstock_*.png")):
+    ordered_records: list[AssetRecord] = list(manifest_records)
+    seen_preview_names = {record.png_preview_file for record in ordered_records}
+    for preview_path in sorted(iter_generated_preview_paths()):
         png_name = preview_path.name
+        if png_name in seen_preview_names:
+            continue
         record = records_by_png.get(png_name)
         if record is None:
+            stem = preview_path.stem
+            numeric_id = stem.rsplit("_", 1)[-1]
+            fallback_eps = f"shutterstock_{numeric_id}.eps"
+            record = records_by_eps.get(fallback_eps)
+            if record is not None:
+                record.png_preview_file = png_name
+        if record is None:
             record = AssetRecord(
-                eps_file=f"{preview_path.stem}.eps",
+                eps_file="",
                 png_preview_file=png_name,
             )
         elif not record.eps_file:
-            record.eps_file = f"{preview_path.stem}.eps"
+            stem = preview_path.stem
+            numeric_id = stem.rsplit("_", 1)[-1]
+            record.eps_file = f"shutterstock_{numeric_id}.eps"
         ordered_records.append(record)
+        seen_preview_names.add(record.png_preview_file)
 
     return ordered_records
+
+
+def iter_generated_preview_paths() -> list[Path]:
+    return sorted(
+        path
+        for path in PREVIEW_DIR.glob("*.png")
+        if path.name != "contact_sheet.png" and not path.stem.endswith("__raw")
+    )
+
+
+def iter_reference_preview_paths() -> list[Path]:
+    if not REFERENCE_PREVIEW_DIR.exists():
+        return []
+    return sorted(
+        path
+        for path in REFERENCE_PREVIEW_DIR.iterdir()
+        if path.is_file() and path.suffix.lower() in SUPPORTED_PREVIEW_EXTENSIONS
+    )
+
+
+def resolve_preview_path(record: AssetRecord) -> Path | None:
+    candidates: list[Path] = []
+
+    if record.png_preview_file:
+        png_name = Path(record.png_preview_file).name
+        png_stem = Path(record.png_preview_file).stem
+        candidates.append(REFERENCE_PREVIEW_DIR / png_name)
+        for ext in SUPPORTED_PREVIEW_EXTENSIONS:
+            candidates.append(REFERENCE_PREVIEW_DIR / f"{png_stem}{ext}")
+
+    if record.eps_file:
+        eps_stem = Path(record.eps_file).stem
+        for ext in SUPPORTED_PREVIEW_EXTENSIONS:
+            candidates.append(REFERENCE_PREVIEW_DIR / f"{eps_stem}{ext}")
+
+    if record.png_preview_file:
+        candidates.append(PREVIEW_DIR / Path(record.png_preview_file).name)
+
+    seen_paths: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen_paths:
+            continue
+        seen_paths.add(candidate)
+        if candidate.exists():
+            return candidate
+
+    return None
 
 
 def load_category_definitions(records: list[AssetRecord]) -> list[CategoryDefinition]:
@@ -455,16 +524,22 @@ class StoryboardSelectorApp:
         if self.current_record is None:
             return
 
-        preview_path = PREVIEW_DIR / self.current_record.png_preview_file
-        if not preview_path.exists():
-            self.preview_label.configure(text=f"Missing preview: {preview_path.name}", image="")
+        preview_path = resolve_preview_path(self.current_record)
+        if preview_path is None:
+            self.preview_label.configure(
+                text=(
+                    "Missing preview. Add a generated PNG to 'PNG previews' or an external "
+                    "replacement image to 'Reference previews'."
+                ),
+                image="",
+            )
             self.current_photo = None
             return
 
         frame_width = max(self.preview_label.winfo_width(), 600)
         frame_height = max(self.preview_label.winfo_height(), 700)
         image = Image.open(preview_path).convert("RGBA")
-        image.thumbnail((frame_width - 20, frame_height - 20))
+        image.thumbnail((frame_width - 20, frame_height - 20), PREVIEW_RESAMPLE)
         self.current_photo = ImageTk.PhotoImage(image)
         self.preview_label.configure(image=self.current_photo, text="")
 
