@@ -26,6 +26,7 @@ MANIFEST_PATH = ROOT / "asset_tags.csv"
 CATEGORY_CONFIG_PATH = ROOT / "storyboard_categories.csv"
 PREVIEW_RESAMPLE = Image.Resampling.LANCZOS
 SUPPORTED_PREVIEW_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp")
+SUPPORTED_SOURCE_PREVIEW_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp")
 
 DEFAULT_CATEGORIES = [
     {
@@ -157,8 +158,32 @@ def load_preview_records() -> list[AssetRecord]:
                 if record.eps_file:
                     records_by_eps[record.eps_file] = record
 
-    ordered_records: list[AssetRecord] = list(manifest_records)
+    filtered_manifest_records: list[AssetRecord] = []
+    for record in manifest_records:
+        source_preview = resolve_source_preview_for_record(record)
+        if source_preview is not None:
+            record.png_preview_file = source_preview.name
+        if resolve_preview_path(record) is not None:
+            filtered_manifest_records.append(record)
+
+    ordered_records: list[AssetRecord] = list(filtered_manifest_records)
     seen_preview_names = {record.png_preview_file for record in ordered_records}
+    seen_source_names = {record.eps_file for record in ordered_records if record.eps_file}
+
+    for source_path in iter_source_asset_paths():
+        if source_path.name in seen_preview_names:
+            continue
+        if source_path.name in seen_source_names:
+            continue
+
+        record = AssetRecord(
+            eps_file=source_path.name,
+            png_preview_file=source_path.name,
+        )
+        ordered_records.append(record)
+        seen_source_names.add(source_path.name)
+        seen_preview_names.add(record.png_preview_file)
+
     for preview_path in sorted(iter_generated_preview_paths()):
         png_name = preview_path.name
         if png_name in seen_preview_names:
@@ -194,6 +219,41 @@ def iter_generated_preview_paths() -> list[Path]:
     )
 
 
+def iter_source_asset_paths() -> list[Path]:
+    if not SOURCE_DIR.exists():
+        return []
+
+    return sorted(
+        path
+        for path in SOURCE_DIR.iterdir()
+        if path.is_file() and path.suffix.lower() in SUPPORTED_SOURCE_PREVIEW_EXTENSIONS
+    )
+
+
+def resolve_source_preview_for_record(record: AssetRecord) -> Path | None:
+    candidates: list[Path] = []
+
+    if record.png_preview_file:
+        preview_stem = Path(record.png_preview_file).stem
+        for ext in SUPPORTED_SOURCE_PREVIEW_EXTENSIONS:
+            candidates.append(SOURCE_DIR / f"{preview_stem}{ext}")
+
+    if record.eps_file:
+        source_stem = Path(record.eps_file).stem
+        for ext in SUPPORTED_SOURCE_PREVIEW_EXTENSIONS:
+            candidates.append(SOURCE_DIR / f"{source_stem}{ext}")
+
+    seen_paths: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen_paths:
+            continue
+        seen_paths.add(candidate)
+        if candidate.exists():
+            return candidate
+
+    return None
+
+
 def iter_reference_preview_paths() -> list[Path]:
     if not REFERENCE_PREVIEW_DIR.exists():
         return []
@@ -221,6 +281,7 @@ def resolve_preview_path(record: AssetRecord) -> Path | None:
 
     if record.png_preview_file:
         candidates.append(PREVIEW_DIR / Path(record.png_preview_file).name)
+        candidates.append(SOURCE_DIR / Path(record.png_preview_file).name)
 
     seen_paths: set[Path] = set()
     for candidate in candidates:
@@ -501,8 +562,8 @@ class StoryboardSelectorApp:
         self.current_record = record
         self.file_label_var.set(
             f"{position + 1} / {len(self.filtered_indices)}\n"
-            f"PNG: {record.png_preview_file}\n"
-            f"EPS: {record.eps_file or 'Not set'}"
+            f"Preview: {record.png_preview_file}\n"
+            f"Source: {record.eps_file or 'Not set'}"
         )
         self.category_var.set(record.category_code)
         self._update_category_help(record.category_code)
