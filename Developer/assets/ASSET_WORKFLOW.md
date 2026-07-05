@@ -5,6 +5,7 @@ The EPS files in [Licensed images](c:/Users/Max/Projects/BiblionOCR/Developer/as
 The working surface for review and tagging is [PNG previews](c:/Users/Max/Projects/BiblionOCR/Developer/assets/PNG%20previews).
 
 Use [storyboard_asset_selector.py](c:/Users/Max/Projects/BiblionOCR/Developer/assets/storyboard_asset_selector.py) when you want an interactive PNG-based review tool for assigning storyboard categories.
+The selector reads its editable category list from [storyboard_categories.csv](c:/Users/Max/Projects/BiblionOCR/Developer/assets/storyboard_categories.csv).
 
 ## Intended Flow
 
@@ -28,4 +29,5 @@ Use [storyboard_asset_selector.py](c:/Users/Max/Projects/BiblionOCR/Developer/as
 
 - `contact_sheet.png` is generated inside `PNG previews` for fast visual review.
 - `asset_tags.csv` now includes both the EPS source file and the PNG preview file for each classified asset.
+- `storyboard_categories.csv` is the editable source for storyboard category labels and destination folders.
 - The category folders remain a non-destructive sort; the source EPS set stays intact.

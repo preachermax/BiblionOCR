@@ -22,13 +22,34 @@ ROOT = Path(__file__).resolve().parent
 SOURCE_DIR = ROOT / "Licensed images"
 PREVIEW_DIR = ROOT / "PNG previews"
 MANIFEST_PATH = ROOT / "asset_tags.csv"
+CATEGORY_CONFIG_PATH = ROOT / "storyboard_categories.csv"
 
 DEFAULT_CATEGORIES = [
-    ("A", "A - Darkness abstraction emergence"),
-    ("B", "B - Knowledge thought conceptual structures"),
-    ("C", "C - Technical systems UI data machines"),
-    ("D", "D - Architecture diagrams flow networks"),
-    ("E", "E - Neutral branding background textures"),
+    {
+        "category_code": "A",
+        "display_name": "Darkness / abstraction / emergence",
+        "category_folder": "A - Darkness abstraction emergence",
+    },
+    {
+        "category_code": "B",
+        "display_name": "Knowledge / thought / conceptual structures",
+        "category_folder": "B - Knowledge thought conceptual structures",
+    },
+    {
+        "category_code": "C",
+        "display_name": "Technical systems / UI / data / machines",
+        "category_folder": "C - Technical systems UI data machines",
+    },
+    {
+        "category_code": "D",
+        "display_name": "Architecture / diagrams / flow / networks",
+        "category_folder": "D - Architecture diagrams flow networks",
+    },
+    {
+        "category_code": "E",
+        "display_name": "Neutral / branding / background textures",
+        "category_folder": "E - Neutral branding background textures",
+    },
 ]
 
 
@@ -40,6 +61,39 @@ class AssetRecord:
     category_folder: str = ""
     tags: str = ""
     notes: str = ""
+
+
+@dataclass(frozen=True)
+class CategoryDefinition:
+    code: str
+    display_name: str
+    folder: str
+
+
+def load_category_config() -> list[CategoryDefinition]:
+    categories: list[CategoryDefinition] = []
+
+    if CATEGORY_CONFIG_PATH.exists():
+        with CATEGORY_CONFIG_PATH.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                code = (row.get("category_code") or "").strip()
+                display_name = (row.get("display_name") or "").strip()
+                folder = (row.get("category_folder") or "").strip()
+                if code and display_name and folder:
+                    categories.append(CategoryDefinition(code=code, display_name=display_name, folder=folder))
+
+    if categories:
+        return categories
+
+    return [
+        CategoryDefinition(
+            code=item["category_code"],
+            display_name=item["display_name"],
+            folder=item["category_folder"],
+        )
+        for item in DEFAULT_CATEGORIES
+    ]
 
 
 def load_preview_records() -> list[AssetRecord]:
@@ -77,18 +131,24 @@ def load_preview_records() -> list[AssetRecord]:
     return ordered_records
 
 
-def load_category_definitions(records: list[AssetRecord]) -> list[tuple[str, str]]:
+def load_category_definitions(records: list[AssetRecord]) -> list[CategoryDefinition]:
     seen_codes: set[str] = set()
-    categories: list[tuple[str, str]] = []
+    categories: list[CategoryDefinition] = []
 
-    for code, folder in DEFAULT_CATEGORIES:
-        if code not in seen_codes:
-            categories.append((code, folder))
-            seen_codes.add(code)
+    for category in load_category_config():
+        if category.code not in seen_codes:
+            categories.append(category)
+            seen_codes.add(category.code)
 
     for record in records:
         if record.category_code and record.category_folder and record.category_code not in seen_codes:
-            categories.append((record.category_code, record.category_folder))
+            categories.append(
+                CategoryDefinition(
+                    code=record.category_code,
+                    display_name=record.category_folder,
+                    folder=record.category_folder,
+                )
+            )
             seen_codes.add(record.category_code)
 
     return categories
@@ -121,21 +181,21 @@ def write_manifest(records: list[AssetRecord]) -> None:
             )
 
 
-def sync_category_folders(records: list[AssetRecord], categories: list[tuple[str, str]]) -> None:
-    category_lookup = {code: folder for code, folder in categories}
+def sync_category_folders(records: list[AssetRecord], categories: list[CategoryDefinition]) -> None:
+    category_lookup = {category.code: category.folder for category in categories}
     managed_filenames = {record.eps_file for record in records if record.eps_file}
 
-    for _, folder in categories:
-        (ROOT / folder).mkdir(exist_ok=True)
+    for category in categories:
+        (ROOT / category.folder).mkdir(exist_ok=True)
 
-    for _, folder in categories:
-        target_dir = ROOT / folder
+    for category in categories:
+        target_dir = ROOT / category.folder
         for eps_path in target_dir.glob("shutterstock_*.eps"):
             matching_record = next((record for record in records if record.eps_file == eps_path.name), None)
             if matching_record is None:
                 continue
             expected_folder = category_lookup.get(matching_record.category_code, "")
-            if matching_record.eps_file in managed_filenames and folder != expected_folder:
+            if matching_record.eps_file in managed_filenames and category.folder != expected_folder:
                 eps_path.unlink()
 
     for record in records:
@@ -159,7 +219,7 @@ class StoryboardSelectorApp:
 
         self.records = load_preview_records()
         self.categories = load_category_definitions(self.records)
-        self.category_map = {code: folder for code, folder in self.categories}
+        self.category_map = {category.code: category.folder for category in self.categories}
 
         self.current_record: AssetRecord | None = None
         self.current_photo: ImageTk.PhotoImage | None = None
@@ -196,7 +256,7 @@ class StoryboardSelectorApp:
         header.pack(fill=tk.X)
         ttk.Label(header, text="Storyboard filter").pack(anchor=tk.W)
 
-        filter_values = ["All", "Unassigned"] + [f"{code} - {folder}" for code, folder in self.categories]
+        filter_values = ["All", "Unassigned"] + [f"{category.code} - {category.display_name}" for category in self.categories]
         filter_box = ttk.Combobox(
             header,
             textvariable=self.filter_var,
@@ -219,12 +279,12 @@ class StoryboardSelectorApp:
 
         category_frame = ttk.LabelFrame(control_panel, text="Storyboard category")
         category_frame.pack(fill=tk.X, pady=(0, 10))
-        for index, (code, folder) in enumerate(self.categories, start=1):
-            label = f"{index}. {code}"
+        for index, category in enumerate(self.categories, start=1):
+            label = f"{index}. {category.code}"
             button = ttk.Radiobutton(
                 category_frame,
-                text=f"{label}  {folder}",
-                value=code,
+                text=f"{label}  {category.display_name}",
+                value=category.code,
                 variable=self.category_var,
                 command=self._assign_from_radio,
             )
@@ -263,11 +323,11 @@ class StoryboardSelectorApp:
         self.master.bind("<Right>", lambda _event: self.next_asset())
         self.master.bind("<Control-s>", lambda _event: self.save_manifest())
 
-        for index, (code, _) in enumerate(self.categories, start=1):
+        for index, category in enumerate(self.categories, start=1):
             if index <= 9:
-                self.master.bind(str(index), lambda _event, value=code: self.assign_category(value))
-            self.master.bind(code.lower(), lambda _event, value=code: self.assign_category(value))
-            self.master.bind(code.upper(), lambda _event, value=code: self.assign_category(value))
+                self.master.bind(str(index), lambda _event, value=category.code: self.assign_category(value))
+            self.master.bind(category.code.lower(), lambda _event, value=category.code: self.assign_category(value))
+            self.master.bind(category.code.upper(), lambda _event, value=category.code: self.assign_category(value))
 
     def _filtered_record_indices(self) -> list[int]:
         filter_value = self.filter_var.get()
