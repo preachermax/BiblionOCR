@@ -1,6 +1,6 @@
-category_code,display_name,category_folder
-A,Darkness / abstraction / emergence,A - Darkness abstraction emergence
-B,Knowledge / thought / conceptual structures,B - Knowledge thought conceptual structures
-C,Technical systems / UI / data / machines,C - Technical systems UI data machines
-D,Architecture / diagrams / flow / networks,D - Architecture diagrams flow networks
-E,Neutral / branding / background textures,E - Neutral branding background textures
+category_code,display_name,category_folder,description
+A,Darkness / abstraction / emergence,A - Darkness abstraction emergence,Canonical A storyboard map for shadowed archive and discovery imagery: caves lanterns manuscripts emergence and first-contact visuals.
+B,Knowledge / thought / conceptual structures,B - Knowledge thought conceptual structures,Canonical B storyboard map for scholars books seminars and interpretive scenes centered on learning dialogue and textual understanding.
+C,Technical systems / UI / data / machines,C - Technical systems UI data machines,Canonical C storyboard map for interfaces dashboards holograms and technical workstations used in analytical and computational sequences.
+D,Architecture / diagrams / flow / networks,D - Architecture diagrams flow networks,Canonical D storyboard map for architectural civic and circulation scenes that widen story world and public context.
+E,Neutral / branding / background textures,E - Neutral branding background textures,Canonical E storyboard map for title plates transitions background textures and other low-semantic supporting frames.

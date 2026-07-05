@@ -6,6 +6,7 @@ The working surface for review and tagging is [PNG previews](c:/Users/Max/Projec
 
 Use [storyboard_asset_selector.py](c:/Users/Max/Projects/BiblionOCR/Developer/assets/storyboard_asset_selector.py) when you want an interactive PNG-based review tool for assigning storyboard categories.
 The selector reads its editable category list from [storyboard_categories.csv](c:/Users/Max/Projects/BiblionOCR/Developer/assets/storyboard_categories.csv).
+That file preserves the canonical A-E storyboard asset maps, including display labels, destination folders, and category guidance.
 
 ## Intended Flow
 

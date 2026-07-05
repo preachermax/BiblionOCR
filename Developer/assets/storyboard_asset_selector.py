@@ -29,26 +29,49 @@ DEFAULT_CATEGORIES = [
         "category_code": "A",
         "display_name": "Darkness / abstraction / emergence",
         "category_folder": "A - Darkness abstraction emergence",
+        "description": (
+            "Canonical A storyboard map for shadowed archive and discovery "
+            "imagery: caves lanterns manuscripts emergence and first-contact "
+            "visuals."
+        ),
     },
     {
         "category_code": "B",
         "display_name": "Knowledge / thought / conceptual structures",
         "category_folder": "B - Knowledge thought conceptual structures",
+        "description": (
+            "Canonical B storyboard map for scholars books seminars and "
+            "interpretive scenes centered on learning dialogue and textual "
+            "understanding."
+        ),
     },
     {
         "category_code": "C",
         "display_name": "Technical systems / UI / data / machines",
         "category_folder": "C - Technical systems UI data machines",
+        "description": (
+            "Canonical C storyboard map for interfaces dashboards holograms and "
+            "technical workstations used in analytical and computational "
+            "sequences."
+        ),
     },
     {
         "category_code": "D",
         "display_name": "Architecture / diagrams / flow / networks",
         "category_folder": "D - Architecture diagrams flow networks",
+        "description": (
+            "Canonical D storyboard map for architectural civic and circulation "
+            "scenes that widen story world and public context."
+        ),
     },
     {
         "category_code": "E",
         "display_name": "Neutral / branding / background textures",
         "category_folder": "E - Neutral branding background textures",
+        "description": (
+            "Canonical E storyboard map for title plates transitions background "
+            "textures and other low-semantic supporting frames."
+        ),
     },
 ]
 
@@ -68,6 +91,7 @@ class CategoryDefinition:
     code: str
     display_name: str
     folder: str
+    description: str = ""
 
 
 def load_category_config() -> list[CategoryDefinition]:
@@ -80,8 +104,16 @@ def load_category_config() -> list[CategoryDefinition]:
                 code = (row.get("category_code") or "").strip()
                 display_name = (row.get("display_name") or "").strip()
                 folder = (row.get("category_folder") or "").strip()
+                description = (row.get("description") or "").strip()
                 if code and display_name and folder:
-                    categories.append(CategoryDefinition(code=code, display_name=display_name, folder=folder))
+                    categories.append(
+                        CategoryDefinition(
+                            code=code,
+                            display_name=display_name,
+                            folder=folder,
+                            description=description,
+                        )
+                    )
 
     if categories:
         return categories
@@ -91,6 +123,7 @@ def load_category_config() -> list[CategoryDefinition]:
             code=item["category_code"],
             display_name=item["display_name"],
             folder=item["category_folder"],
+            description=item.get("description", ""),
         )
         for item in DEFAULT_CATEGORIES
     ]
@@ -147,6 +180,7 @@ def load_category_definitions(records: list[AssetRecord]) -> list[CategoryDefini
                     code=record.category_code,
                     display_name=record.category_folder,
                     folder=record.category_folder,
+                    description="",
                 )
             )
             seen_codes.add(record.category_code)
@@ -220,6 +254,7 @@ class StoryboardSelectorApp:
         self.records = load_preview_records()
         self.categories = load_category_definitions(self.records)
         self.category_map = {category.code: category.folder for category in self.categories}
+        self.category_details = {category.code: category for category in self.categories}
 
         self.current_record: AssetRecord | None = None
         self.current_photo: ImageTk.PhotoImage | None = None
@@ -228,6 +263,7 @@ class StoryboardSelectorApp:
         self.filter_var = tk.StringVar(value="All")
         self.file_label_var = tk.StringVar(value="")
         self.category_var = tk.StringVar(value="")
+        self.category_help_var = tk.StringVar(value="Select an A-E storyboard category to see its guidance.")
         self.tags_var = tk.StringVar(value="")
         self.status_var = tk.StringVar(value="Ready")
         self.auto_advance_var = tk.BooleanVar(value=True)
@@ -289,6 +325,13 @@ class StoryboardSelectorApp:
                 command=self._assign_from_radio,
             )
             button.pack(anchor=tk.W, padx=8, pady=3)
+
+        ttk.Label(
+            control_panel,
+            textvariable=self.category_help_var,
+            wraplength=420,
+            justify=tk.LEFT,
+        ).pack(fill=tk.X, pady=(0, 10))
 
         tag_frame = ttk.Frame(control_panel)
         tag_frame.pack(fill=tk.X, pady=(0, 8))
@@ -393,10 +436,20 @@ class StoryboardSelectorApp:
             f"EPS: {record.eps_file or 'Not set'}"
         )
         self.category_var.set(record.category_code)
+        self._update_category_help(record.category_code)
         self.tags_var.set(record.tags)
         self.notes_text.delete("1.0", tk.END)
         self.notes_text.insert("1.0", record.notes)
         self._render_preview()
+
+    def _update_category_help(self, category_code: str) -> None:
+        category = self.category_details.get(category_code)
+        if category is None:
+            self.category_help_var.set("Select an A-E storyboard category to see its guidance.")
+            return
+
+        guidance = category.description or "No description configured for this storyboard category."
+        self.category_help_var.set(f"{category.display_name}\n{guidance}")
 
     def _render_preview(self) -> None:
         if self.current_record is None:
@@ -437,6 +490,7 @@ class StoryboardSelectorApp:
 
     def _assign_from_radio(self) -> None:
         if self.category_var.get():
+            self._update_category_help(self.category_var.get())
             self.assign_category(self.category_var.get())
 
     def assign_category(self, category_code: str) -> None:
@@ -447,8 +501,10 @@ class StoryboardSelectorApp:
         self.current_record.category_code = category_code
         self.current_record.category_folder = self.category_map.get(category_code, "")
         self.category_var.set(category_code)
+        self._update_category_help(category_code)
         write_manifest(self.records)
-        self.status_var.set(f"Saved {self.current_record.png_preview_file} -> {category_code}")
+        category_name = self.category_details.get(category_code).display_name if category_code in self.category_details else category_code
+        self.status_var.set(f"Saved {self.current_record.png_preview_file} -> {category_name}")
         self._refresh_asset_list()
 
         if self.auto_advance_var.get():
