@@ -13,6 +13,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 
+RUNTIME_STATUS_OPEN = "OPEN"
+RUNTIME_STATUS_CLOSED = "CLOSED"
+RUNTIME_STATUS_OBSERVED = "OBSERVED"
+RUNTIME_STATUS_UNKNOWN = "UNKNOWN"
+
+
 @dataclass
 class ObservedModule:
     """Developer-facing snapshot for a single observed runtime module."""
@@ -246,6 +252,7 @@ class DeveloperServices:
         self.runtime_model = RuntimeModel()
         self.trace_recorder = TraceRecorder()
         self.recent_events = RecentEventStore()
+        self._runtime_update_subscribers = []
 
     def start(self):
         """Start DeveloperServices subscriptions and collection pipelines.
@@ -274,6 +281,21 @@ class DeveloperServices:
         self.collect_metrics(normalized_event)
         self.record_trace(normalized_event)
         self.record_recent_event(normalized_event)
+        self.publish_diagnostics()
+
+    def subscribe_runtime_updates(self, callback):
+        """Register a callback for published runtime information updates.
+
+        The callback receives a read-only runtime model snapshot whenever
+        DeveloperServices publishes updated diagnostic state.
+        """
+        if callback not in self._runtime_update_subscribers:
+            self._runtime_update_subscribers.append(callback)
+
+    def unsubscribe_runtime_updates(self, callback):
+        """Remove a previously registered runtime update callback."""
+        if callback in self._runtime_update_subscribers:
+            self._runtime_update_subscribers.remove(callback)
 
     def normalize_event(self, event):
         """Normalize a production event into the Developer Mode event model.
@@ -282,13 +304,14 @@ class DeveloperServices:
         the modules collection.
         """
         module_name = event.get("module") or event.get("source") or "unknown"
+        event_name = event.get("event", "UNKNOWN")
         return {
             "module_name": module_name,
             "current_state": event.get("state"),
-            "last_event": event.get("event", "UNKNOWN"),
-            "status": event.get("status", "observed"),
+            "last_event": event_name,
+            "status": self._normalize_runtime_status(event),
             "trace_identifier": event.get("trace_id", "untraced"),
-            "event_name": event.get("event", "UNKNOWN"),
+            "event_name": event_name,
             "source_module": event.get("source") or module_name,
             "destination_module": event.get("target")
             or event.get("destination")
@@ -296,6 +319,33 @@ class DeveloperServices:
             "timestamp": event.get("timestamp")
             or datetime.now(timezone.utc).isoformat(),
         }
+
+    def _normalize_runtime_status(self, event):
+        """Return a canonical runtime status derived from architecture data.
+
+        The architecture defines a runtime `Status` field and event types such
+        as `MODULE_OPENED` and `MODULE_CLOSED`. This implementation
+        standardizes status values around that documented surface.
+        """
+        raw_status = event.get("status")
+        if raw_status is not None:
+            normalized_status = str(raw_status).strip().upper()
+            if normalized_status in {
+                RUNTIME_STATUS_OPEN,
+                RUNTIME_STATUS_CLOSED,
+                RUNTIME_STATUS_OBSERVED,
+                RUNTIME_STATUS_UNKNOWN,
+            }:
+                return normalized_status
+
+        event_name = str(event.get("event", "")).strip().upper()
+        if event_name == "MODULE_OPENED":
+            return RUNTIME_STATUS_OPEN
+        if event_name == "MODULE_CLOSED":
+            return RUNTIME_STATUS_CLOSED
+        if event_name:
+            return RUNTIME_STATUS_OBSERVED
+        return RUNTIME_STATUS_UNKNOWN
 
     def update_runtime_model(self, normalized_event):
         """Update the internal runtime state model.
@@ -360,10 +410,13 @@ class DeveloperServices:
     def publish_diagnostics(self):
         """Publish aggregated diagnostic data to Developer Mode consumers.
 
-        Placeholder only. Future implementations should expose runtime model,
-        metrics, traces, and related developer-facing information to panels or
-        other developer-mode surfaces.
+        This initial implementation publishes a read-only runtime snapshot to
+        subscribed Developer Mode consumers using an event-driven callback
+        model rather than polling.
         """
+        runtime_snapshot = self.get_runtime_model()
+        for callback in list(self._runtime_update_subscribers):
+            callback(runtime_snapshot)
 
     def get_runtime_model(self):
         """Return the current runtime model snapshot.

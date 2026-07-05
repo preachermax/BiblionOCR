@@ -1,17 +1,17 @@
 # Developer Mode Architecture Validation Report
 
-Version: 1.0
+Version: 1.1
 Status: Pre-Commit Review Artifact
-Scope: `DeveloperServices` milestone through initial runtime model, lightweight metrics, trace storage, and read-only access API
+Scope: `DeveloperServices` milestone through initial runtime model, lightweight metrics, trace storage, read-only access API, and first visible Runtime Inspector integration
 Date: July 2026
 
 ---
 
 ## 1. Conformance to `DEVELOPER_MODE_ARCHITECTURE.md`
 
-Assessment: Partial conformance, aligned with the current milestone slice.
+Assessment: Partial conformance, aligned with the current milestone slice and now exercised by the first visible Developer Mode panel.
 
-The implementation in [Developer/developer_services.py](c:/Users/Max/Projects/BiblionOCR/Developer/developer_services.py) conforms to the architecture in the following ways:
+The implementation in [Developer/developer_services.py](c:/Users/Max/Projects/BiblionOCR/Developer/developer_services.py), [ViewController/Developer/RuntimeInspectorPanel.py](c:/Users/Max/Projects/BiblionOCR/ViewController/Developer/RuntimeInspectorPanel.py), and [ViewController/0-MainUI/MyServer.py](c:/Users/Max/Projects/BiblionOCR/ViewController/0-MainUI/MyServer.py) conforms to the architecture in the following ways:
 
 - `DeveloperServices` is implemented as a separate developer-facing subsystem rather than production application logic.
 - The service is modeled as an observer of EventBus traffic through `observe_event()` and does not require production modules to call developer-specific APIs.
@@ -19,17 +19,19 @@ The implementation in [Developer/developer_services.py](c:/Users/Max/Projects/Bi
 - A modules collection exists and maintains module name, current state, last observed event, last update timestamp, and status.
 - A lightweight metrics section exists and currently records only total observed event count and event count per module.
 - A trace recorder exists and stores execution trace entries without implementing replay, filtering, export, or session comparison.
-- The implementation remains incremental and matches the architecture's staged rollout approach for `Developer Services` before panels and richer diagnostics.
+- `DeveloperServices` now publishes updated runtime information to consumers using an event-driven callback model rather than polling.
+- The Runtime Inspector panel consumes only the public `DeveloperServices` API and does not query production modules directly.
+- `MyServer` hosts the Runtime Inspector as a hidden-by-default Developer panel and activates event observation only while that panel is visible.
+- The implementation remains incremental and matches the architecture's staged rollout approach for `Developer Services` before additional panels and richer diagnostics.
 
 The implementation does not yet satisfy the full architecture document end-to-end, which is expected at this milestone. Specifically, the following documented areas remain intentionally unimplemented or placeholder-only:
 
-- EventBus subscription lifecycle in `start()` and `stop()`
 - dependency graph updates
-- diagnostic publication to panels
 - session diagnostics
 - full performance metrics beyond event counters
 - trace replay, export, filtering, and session comparison
 - richer runtime state fields such as previous state, active task, execution count, average runtime, error state, and last exception
+- a reusable panel host abstraction beyond the first `MyServer` integration
 
 Conclusion: the implementation conforms to the current intended milestone boundary, but not yet to the full future architecture surface.
 
@@ -44,6 +46,8 @@ Yes. A small number of assumptions were required because the architecture docume
 - Trace entry structure was inferred from the Trace Recorder and Live Event Monitor descriptions because the architecture does not currently define an explicit persisted trace schema.
 - The initial metrics shape assumes that event counts are a safe minimal subset of future performance metrics without committing to runtime duration or resource-usage semantics.
 - Read-only access was implemented via defensive copies to satisfy the architectural principle that Developer Mode should not mutate production state.
+- The first visible host integration assumes that lazy activation in `MyServer` is an acceptable way to preserve the architecture's requirement that normal application behavior remain unaffected when Developer Mode is unused.
+- Runtime status values were standardized to `OPEN`, `CLOSED`, `OBSERVED`, and `UNKNOWN` because the architecture names a `Status` field but does not enumerate its canonical vocabulary.
 
 ---
 
@@ -54,9 +58,13 @@ Yes. A few implementation-facing interfaces were added to make the milestone usa
 Public accessors added on `DeveloperServices`:
 
 - `get_modules()`
+- `get_registered_modules()`
 - `get_module_state(module_name)`
 - `get_metrics()`
 - `get_traces()`
+- `get_recent_events()`
+- `subscribe_runtime_updates(callback)`
+- `unsubscribe_runtime_updates(callback)`
 
 Existing snapshot methods retained as public read access:
 
@@ -70,7 +78,15 @@ Internal support types added for structure and isolation:
 - `RuntimeMetrics`
 - `TraceEntry`
 - `TraceRecorder`
+- `RecentEvent`
+- `RecentEventStore`
 - `RuntimeModel`
+
+Visible integration surface added:
+
+- hidden-by-default `Runtime Inspector` entry in `MyServer`
+- lazy `QDockWidget` host for the first Developer Mode panel
+- passive wildcard EventBus observation while the panel is in use
 
 These additions are consistent with the architecture, but they are more concrete than the current document and should be considered implementation-defined until the document names them explicitly.
 
@@ -95,8 +111,14 @@ Recommended updates based on implementation experience:
 5. Clarify whether `status` belongs formally in the Runtime State Model.
    It appears in panel descriptions and was needed immediately, but it is not currently listed in the Runtime State Model section.
 
+6. Define the canonical runtime status vocabulary.
+   The visible Runtime Inspector now relies on a stable status set, but the architecture currently names `Status` without defining allowable values.
+
+7. Document the expected activation model for Developer Mode panels.
+   The current `MyServer` integration is intentionally lazy and hidden by default. The architecture should state whether this behavior is the required pattern for future panels.
+
 ---
 
 ## Summary
 
-The current `DeveloperServices` implementation is architecturally consistent with the intended first milestone and respects the read-only, event-observing model described in the design document. The main gap is not a design violation but a lack of document precision around normalized event schema, trace schema, and the public panel-facing API.
+The current `DeveloperServices` and Runtime Inspector implementation is architecturally consistent with the intended visible milestone and respects the read-only, event-observing model described in the design document. The main remaining gaps are not design violations but missing document precision around normalized event schema, canonical status values, panel activation patterns, trace schema, and the formal public panel-facing API.

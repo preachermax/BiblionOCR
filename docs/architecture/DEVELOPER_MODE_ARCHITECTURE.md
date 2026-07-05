@@ -101,6 +101,10 @@ Developer panels are independent.
 
 Each panel should be capable of being enabled or disabled without affecting other panels.
 
+Visible Developer panels should be hidden by default and activated only through an explicit Developer-facing control.
+
+When a panel is closed or inactive, it should not require ongoing observation work beyond the minimum runtime wiring needed to preserve normal application behavior.
+
 ---
 
 ## Principle 5
@@ -174,6 +178,10 @@ Production modules remain unaware of Developer Services.
 
 Displays live information for each module.
 
+The Runtime Inspector consumes runtime information exclusively through the public read-only Developer Services API.
+
+It must not query production modules directly.
+
 Example:
 
 Module Name
@@ -187,6 +195,16 @@ Execution Time
 Subscriber Count
 
 Recent Events
+
+Canonical runtime status values for the initial Runtime Inspector are:
+
+OPEN
+
+CLOSED
+
+OBSERVED
+
+UNKNOWN
 
 ---
 
@@ -441,6 +459,18 @@ Community demonstrations
 # 12. Integration Strategy
 
 Developer Mode will evolve incrementally.
+
+The first visible panel integration should prove the architecture with the smallest viable host surface.
+
+For the initial Runtime Inspector milestone, the panel should be:
+
+hidden by default
+
+opened through a Developer-facing interface
+
+driven by event subscriptions rather than polling
+
+activated lazily so normal application behavior remains unaffected when Developer Mode is not in use
 
 Implementation order:
 
