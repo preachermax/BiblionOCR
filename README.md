@@ -17,7 +17,7 @@ If you want the documentation-first entry point, begin with:
 1. [docs/README.md](docs/README.md)
 2. [docs/architecture/PROJECT_ARCHITECTURE.md](docs/architecture/PROJECT_ARCHITECTURE.md)
 3. [docs/development/DEV_NOTEBOOK.md](docs/development/DEV_NOTEBOOK.md)
-4. [video/intro_v1/README.md](video/intro_v1/README.md)
+4. [Developer/video/README.md](Developer/video/README.md)
 
 ## Repository Focus
 
