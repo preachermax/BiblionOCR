@@ -35,3 +35,12 @@ BiblionOCR is designed to make systems visible.
 Unless a file or directory says otherwise, original BiblionOCR work is licensed under Apache-2.0. See [LICENSE](LICENSE).
 
 This repository also contains third-party components under their own licenses. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+## Contributions and Content
+
+Developer contributions and content submissions do not follow the same review path.
+
+- Developers should contribute through pull requests and repository review.
+- Content creators should only submit material that the project has clear rights to publish and redistribute.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CONTENT_POLICY.md](CONTENT_POLICY.md).
