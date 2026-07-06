@@ -1016,10 +1016,92 @@ DO NOT update for:
 * 2026-07-04: active preview dialogs now preserve one comparison contract across the repo: left = original/reference input, right = processed/output result; `MorphologyDialog` was corrected to match `ImagePreviewDialog`
 * 2026-07-04: final broad checkpoint commit is expected to bundle outstanding scanner/session/UI/icon resource changes, including `MyScanner`, `Core/Scanner/*`, regenerated UI resources, session JSON updates, and new scan-workflow support files, even though further test-driven cleanup is still expected afterward
 
+
+---
+
+# 🚀 Milestone — Public Introduction Video v1.0
+
+**Date:** July 2026
+
+## Summary
+
+BiblionOCR reached its first major public-facing milestone with the completion and publication of the **Introduction Video v1.0**. This marks the project's transition from an architecture and development effort into a publicly demonstrable software system.
+
+The introduction video serves as the project's visual identity and provides a concise overview of the philosophy behind BiblionOCR rather than an exhaustive feature demonstration.
+
+## Production Artifacts
+
+The following production assets were completed:
+
+* Approved production storyboard.
+* Production execution sequence.
+* Licensed Shutterstock asset organization.
+* Narration generation pipeline.
+* Kdenlive editing workflow.
+* Final public YouTube publication.
+
+Public introduction video:
+
+https://youtu.be/zrJQzivQwT4
+
+## Production Lessons Learned
+
+### Narration
+
+* Initial attempts to use OpenAI Text-to-Speech were unsuccessful because the project API did not include access to audio speech models.
+* Edge TTS was adopted as the production narration engine for RC1.
+* Phonetic spelling was used where necessary to improve pronunciation of "BiblionOCR."
+
+### Video Editing
+
+* DaVinci Resolve could not be used on the current Windows development workstation because of OpenGL compatibility limitations with the installed Intel HD Graphics hardware.
+* Kdenlive was adopted as the production editor and performed successfully throughout the remainder of the project.
+
+### Asset Management
+
+A dedicated production asset hierarchy was established under the Developer workspace, including:
+
+* Storyboards
+* Narration
+* Audio
+* Licensed imagery
+* Production documentation
+
+Licensed Shutterstock imagery is organized into semantic production categories:
+
+* A — Emergence
+* B — Cognition
+* C — Systems
+* D — Architecture
+* E — Identity
+
+## Project Status
+
+The following milestones are complete:
+
+* Developer Services v1.8
+* Observable Runtime architecture
+* Developer Mode architecture documentation
+* Public Introduction Video v1.0
+* Public YouTube publication
+
+The repository now contains both the software architecture and the supporting public-facing project identity.
+
+## Next Development Phase
+
+With the public introduction complete, development focus returns to core application capabilities, including:
+
+* Continued Developer Services integration.
+* Runtime observability enhancements.
+* OCR workflow improvements.
+* Scanner integration.
+* Architecture visualization.
+* Preparation for future Introduction Video revisions as the software evolves.
+
 ---
 
 ## 📅 Last Updated
 
-2026-07-04
+2026-07-06
 
 ---
