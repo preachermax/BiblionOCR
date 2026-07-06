@@ -177,8 +177,8 @@ All applications use consistent patterns:
 
 | Tool | Location | Purpose |
 |------|----------|---------|
-| glyphtracer | glyphtracer-master/ | Glyph tracing |
-| potrace | potrace-main/ | Vector tracing |
+| glyphtracer | external/local tool | Glyph tracing |
+| potrace | external/local tool | Vector tracing |
 | Version finder | ext/versefind.py | Locate verses |
 | Scan finder | ext/scanfind.py | Locate scan regions |
 

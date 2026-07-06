@@ -50,6 +50,95 @@ body {
   border-top: 1px solid rgba(20, 54, 66, 0.12);
 }
 
+.event-log-panel {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(20, 54, 66, 0.12);
+}
+
+.system-state-panel {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(20, 54, 66, 0.12);
+}
+
+.system-state-list {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.system-state-item {
+  padding: 12px 14px;
+  border: 1px solid rgba(20, 54, 66, 0.1);
+  border-radius: 12px;
+  background: rgba(247, 243, 233, 0.8);
+}
+
+.system-state-item dt {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: #7d5a22;
+}
+
+.system-state-item dd {
+  margin: 0;
+}
+
+.system-state-value {
+  margin: 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(20, 54, 66, 0.06);
+  color: #143642;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.event-log-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.event-log-item {
+  padding: 12px 14px;
+  border: 1px solid rgba(20, 54, 66, 0.1);
+  border-radius: 12px;
+  background: rgba(247, 243, 233, 0.8);
+}
+
+.event-log-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.event-log-row time {
+  font-size: 0.84rem;
+  color: #7d5a22;
+  white-space: nowrap;
+}
+
+.event-log-payload {
+  margin: 10px 0 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(20, 54, 66, 0.06);
+  color: #143642;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .selected-node-panel h2 {
   margin: 0 0 8px;
   font-size: clamp(1.25rem, 2vw, 1.75rem);

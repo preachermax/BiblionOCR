@@ -43,6 +43,10 @@
     * static guiding-principles graph derived from `docs/vision/THE_BIBLION_PROJECT.md`
     * node-click selection routed into parent state
     * advance, reset, and autoplay sequence controls for the overview graph
+    * EventBus + EventRunner + EventGraphExecutor wiring for recursive event-graph traversal
+    * in-memory event logger with per-run `traceId` grouping
+    * live event log panel and system-state panel
+    * graph highlighting for both the current active node and previously visited nodes
 
   ### Current Layout / Readability Contract
 
@@ -50,7 +54,17 @@
   * graph nodes use wrapped text inside rounded rectangle geometry rather than circular targets
   * the overview graph now uses explicit preset positions across the horizontal axis to avoid vertical scrolling
   * the guiding-principles graph also uses preset positions so larger readable targets can fit the available canvas
+  * GraphView now persists visual visited-node highlighting across an execution run while still emphasizing the current active node
   * label readability was validated through the local browser preview before the final website commits were published
+
+  ### Current Runtime / Instrumentation Contract
+
+  * `eventBus.js` is the local publish/subscribe channel for website demo events
+  * `eventGraph.js` defines the next-event adjacency map used by the runtime traversal layer
+  * `EventRunner.js` now delegates execution to an injected executor instead of iterating a sequence directly
+  * `EventGraphExecutor.js` recursively traverses the event graph, emits through the EventBus, and guards against cycles / runaway depth
+  * `eventLogger.js` records each runtime event with timestamp plus `traceId` so one execution run can be grouped end-to-end
+  * `stateManager.js` exposes subscribable `activeNode`, `lastEvent`, and `isRunning` state for the React side panels
 
   ### Commit / Branch State
 
@@ -61,7 +75,77 @@
 
   * the same work was promoted onto `master`, and both branches now reconcile at merge commit `d48a643`
 
+  * the event-graph runtime milestone then landed on `development` as:
+
+    * `cf5f483` v1.6 complete: event graph execution engine with traceable runtime traversal
+
   ---
+
+
+## 🧪 Developer Mode Milestones
+
+### v1.7 Foundation
+
+* `Developer/` now exists as the initial Developer Mode package
+* `DeveloperServices` is the sole runtime instrumentation boundary for Developer Mode
+* the initial runtime model now tracks observed modules with:
+
+  * module name
+  * current state
+  * last observed event
+  * last update timestamp
+  * status
+
+* lightweight metrics currently include:
+
+  * total observed event count
+  * event count per module
+
+* trace recording currently stores:
+
+  * trace identifier
+  * event name
+  * source module
+  * destination module
+  * timestamp
+
+* the public read-only `DeveloperServices` API now exposes runtime model, modules, individual module state, metrics, traces, and recent events through defensive-copy accessors suitable for future Developer Mode panels
+* milestone commit published on `development`:
+
+  * `7ca2bfd` v1.7 milestone 7.6: add DeveloperServices instrumentation API
+
+### v1.8 First Visible Developer Panel
+
+* the first visible Developer Mode milestone is intentionally narrow: a Runtime Inspector that proves the architecture boundary instead of expanding feature scope
+* `ViewController/Developer/RuntimeInspectorPanel.py` renders module state using only the public `DeveloperServices` API
+* the Runtime Inspector now displays:
+
+  * registered modules
+  * standardized runtime status
+  * last observed event
+  * last update timestamp
+  * selected-module detail view
+
+* runtime status is currently normalized to the canonical set:
+
+  * `OPEN`
+  * `CLOSED`
+  * `OBSERVED`
+  * `UNKNOWN`
+
+* `DeveloperServices` now publishes runtime updates through an event-driven subscriber model so the Runtime Inspector refreshes without polling
+* `MyServer.py` now hosts the first Developer Mode panel through a hidden-by-default `Developer` menu entry
+* Runtime Inspector activation is lazy:
+
+  * the panel dock is created only when opened
+  * `DeveloperServices` observation is attached only while the panel is visible
+  * normal application behavior remains unaffected when Developer Mode is unused
+
+* milestone commit published on `development`:
+
+  * `ac2a93c` v1.8: integrate visible Runtime Inspector milestone
+
+---
 
 
 ## 📠 Scanner Acquisition Architecture

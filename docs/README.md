@@ -84,6 +84,11 @@ Website planning, structure, and public presentation material.
 Key documents:
 - [README.md](website/README.md)
 
+Current prototype highlights:
+- React + Cytoscape demo under `docs/website/`
+- EventBus + EventRunner + EventGraphExecutor runtime path for demo traversal
+- traceable event logging, state inspection, and visited-node highlighting in the graph view
+
 ### `patreon/`
 
 Funding and supporter-oriented planning material.

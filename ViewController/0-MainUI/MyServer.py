@@ -6,6 +6,7 @@ print("RUNNING:", __file__)
 # Next steps: OCR preview, multi-page TIFF, pipeline integration
 # Python imports
 import ipaddress
+import importlib.util
 import socket
 import sys
 import os
@@ -38,6 +39,10 @@ session_dir = os.path.join(data_dir, "json")
 # Add project root to path
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
+if developer_view_dir not in sys.path:
+    sys.path.insert(0, developer_view_dir)
 
 # Debug (optional toggle)
 DEBUG_PATHS = True
@@ -149,6 +154,7 @@ from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
 from Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
 from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
+from Developer.developer_services import DeveloperServices
 
 #import MyPixler as pixler
 #import CropTif as croptif
@@ -1375,6 +1381,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._scan_worker = None
         self._project_success_title = ""
         self._project_success_message = ""
+        self.developer_services = None
+        self.runtime_inspector_panel = None
+        self.runtime_inspector_dock = None
+        self._developer_services_active = False
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -1414,6 +1424,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Help System
         # -------------------------
         add_help_menu(self, 'MyServer')
+        self._setup_developer_mode_ui()
 
         # -------------------------
         # Actions / Signals
@@ -1612,6 +1623,107 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             "project_created",
             self.on_project_created
         )
+
+    def _setup_developer_mode_ui(self):
+        """Create hidden-by-default Developer Mode entry points.
+
+        The Runtime Inspector is exposed through a Developer menu and remains
+        inactive until the user explicitly opens it.
+        """
+        menu_bar = self.menuBar()
+        self.developer_menu = menu_bar.addMenu("Developer")
+
+        self.action_runtime_inspector = qtw.QAction("Runtime Inspector", self)
+        self.action_runtime_inspector.setCheckable(True)
+        self.action_runtime_inspector.setChecked(False)
+        self.action_runtime_inspector.triggered.connect(
+            self._toggle_runtime_inspector
+        )
+        self.developer_menu.addAction(self.action_runtime_inspector)
+
+    def _toggle_runtime_inspector(self, checked):
+        """Show or hide the Runtime Inspector dock on demand."""
+        self._ensure_runtime_inspector_dock()
+
+        if checked:
+            self.runtime_inspector_dock.show()
+            self.runtime_inspector_dock.raise_()
+        else:
+            self.runtime_inspector_dock.hide()
+
+    def _ensure_runtime_inspector_dock(self):
+        """Create the Runtime Inspector dock lazily."""
+        if self.runtime_inspector_dock is not None:
+            return
+
+        self._ensure_developer_services()
+        panel_module_path = os.path.join(
+            developer_view_dir,
+            "RuntimeInspectorPanel.py",
+        )
+        panel_module_spec = importlib.util.spec_from_file_location(
+            "biblion_runtime_inspector_panel",
+            panel_module_path,
+        )
+        panel_module = importlib.util.module_from_spec(panel_module_spec)
+        panel_module_spec.loader.exec_module(panel_module)
+        runtime_inspector_panel_class = panel_module.RuntimeInspectorPanel
+        self.runtime_inspector_panel = runtime_inspector_panel_class(
+            developer_services=self.developer_services,
+            parent=self,
+        )
+        self.runtime_inspector_dock = qtw.QDockWidget(
+            "Runtime Inspector",
+            self,
+        )
+        self.runtime_inspector_dock.setObjectName("runtimeInspectorDock")
+        self.runtime_inspector_dock.setWidget(self.runtime_inspector_panel)
+        self.runtime_inspector_dock.setAllowedAreas(
+            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea
+        )
+        self.runtime_inspector_dock.visibilityChanged.connect(
+            self._on_runtime_inspector_visibility_changed
+        )
+        self.addDockWidget(Qt.RightDockWidgetArea, self.runtime_inspector_dock)
+        self.runtime_inspector_dock.hide()
+
+    def _ensure_developer_services(self):
+        """Create DeveloperServices only when a Developer panel is used."""
+        if self.developer_services is not None:
+            return
+
+        self.developer_services = DeveloperServices(event_bus=self.event_bus)
+
+    def _on_runtime_inspector_visibility_changed(self, visible):
+        """Activate DeveloperServices observation only while the panel is in use."""
+        if visible:
+            self._activate_developer_services()
+            if self.runtime_inspector_panel is not None:
+                self.runtime_inspector_panel.refresh()
+        else:
+            self._deactivate_developer_services()
+
+        if hasattr(self, "action_runtime_inspector"):
+            self.action_runtime_inspector.blockSignals(True)
+            self.action_runtime_inspector.setChecked(bool(visible))
+            self.action_runtime_inspector.blockSignals(False)
+
+    def _activate_developer_services(self):
+        """Attach DeveloperServices to passive EventBus observation."""
+        self._ensure_developer_services()
+        if self._developer_services_active:
+            return
+
+        self.event_bus.subscribe("*", self.developer_services.observe_event)
+        self._developer_services_active = True
+
+    def _deactivate_developer_services(self):
+        """Detach DeveloperServices when Developer Mode is not in use."""
+        if not self._developer_services_active or self.developer_services is None:
+            return
+
+        self.event_bus.unsubscribe("*", self.developer_services.observe_event)
+        self._developer_services_active = False
 
     def _apply_scan_icon(self):
         scan_icon = qtg.QIcon()
@@ -5330,7 +5442,11 @@ class EventBus:
         name = event["event"]
 
         if name in self.listeners:
-            for cb in self.listeners[name]:
+            for cb in list(self.listeners[name]):
+                cb(event)
+
+        if "*" in self.listeners:
+            for cb in list(self.listeners["*"]):
                 cb(event)
 
 # ================================

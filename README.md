@@ -29,3 +29,9 @@ This repository currently contains:
 - publication and video-production materials for the first public introduction
 
 BiblionOCR is designed to make systems visible.
+
+## License
+
+Unless a file or directory says otherwise, original BiblionOCR work is licensed under Apache-2.0. See [LICENSE](LICENSE).
+
+This repository also contains third-party components under their own licenses. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
