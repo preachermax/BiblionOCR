@@ -46,6 +46,7 @@ Developer/assets/E - Neutral branding background textures/*
 
 # Backup-copy cache artifacts
 Model/Backup Copies/**/__pycache__/
+Model/Backup Copies/0-MainUI copy/
 
 # Excluded vendored GPL tooling for public repo surface
 ViewController/0-MainUI/glyphtracer-master/
