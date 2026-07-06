@@ -2,6 +2,10 @@
 
 This workspace holds the production materials for the first BiblionOCR introduction video.
 
+The public release of the introduction video is available here:
+
+https://www.youtube.com/watch?v=zrJQzivQwT4
+
 It is intentionally separated from application runtime code and Developer Services.
 Use the existing licensed image categories in [Developer/assets](c:/Users/Max/Projects/BiblionOCR/Developer/assets) as source material without moving or renaming those folders.
 

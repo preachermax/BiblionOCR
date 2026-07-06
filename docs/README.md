@@ -1,5 +1,15 @@
 # Biblion Documentation Library
 
+## Public Introduction Video
+
+The public introduction video for BiblionOCR is available here:
+
+https://www.youtube.com/watch?v=zrJQzivQwT4
+
+Use this link when pointing GitHub visitors to the project's public-facing introduction.
+
+---
+
 ## Purpose
 
 This directory is the documentation root for the Biblion project.
