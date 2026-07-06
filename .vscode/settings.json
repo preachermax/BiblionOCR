@@ -1,5 +1,8 @@
 {
     "sqltools.useNodeRuntime": true,
+    "terminal.integrated.env.windows": {
+        "PATH": "${workspaceFolder}\\.tools\\node-v22.23.1-win-x64;${env:PATH}"
+    },
     "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
     "git.autofetch": true,
     "python.testing.unittestArgs": [
