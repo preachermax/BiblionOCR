@@ -531,7 +531,6 @@ BiblionOCR/
 - Dynamic icon resource system (UI_Icons.py)
 
 ### Extensions
-- `glyphtracer-master/`: Glyph tracing utilities
-- `potrace-main/`: Vector tracing for character shapes
+- Glyph tracing and vector tracing rely on optional external tools; GPL vendored copies are intentionally excluded from the public-tracked repo surface.
 - Additional third-party integrations in `ext/` folder
 
