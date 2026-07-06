@@ -25,3 +25,29 @@ Model/Project/Data/json/Session.json
 ViewController/0-MainUI/__pycache__/
 ViewController/0-MainUI/MyScannerWin.py
 Core/Scanner/TWAINDSM.dll
+
+# Public-release asset exclusions
+Developer/assets/Licensed images/*
+!Developer/assets/Licensed images/.gitkeep
+Developer/assets/PNG previews/*
+!Developer/assets/PNG previews/.gitkeep
+Developer/assets/Reference previews/*
+!Developer/assets/Reference previews/.gitkeep
+Developer/assets/A - Darkness abstraction emergence/*
+!Developer/assets/A - Darkness abstraction emergence/.gitkeep
+Developer/assets/B - Knowledge thought conceptual structures/*
+!Developer/assets/B - Knowledge thought conceptual structures/.gitkeep
+Developer/assets/C - Technical systems UI data machines/*
+!Developer/assets/C - Technical systems UI data machines/.gitkeep
+Developer/assets/D - Architecture diagrams flow networks/*
+!Developer/assets/D - Architecture diagrams flow networks/.gitkeep
+Developer/assets/E - Neutral branding background textures/*
+!Developer/assets/E - Neutral branding background textures/.gitkeep
+
+# Backup-copy cache artifacts
+Model/Backup Copies/**/__pycache__/
+
+# Excluded vendored GPL tooling for public repo surface
+ViewController/0-MainUI/glyphtracer-master/
+ViewController/0-MainUI/potrace-main/
+ViewController/0-MainUI/pyTesseractTrainer-1.03.py
