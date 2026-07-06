@@ -28,6 +28,15 @@
   * EventBus dispatches events
   * SQLiteEventStore persists events
 
+  ---
+
+  ## Repository Policy Surface
+
+  * public contribution policy is now defined in the repository root through `CONTRIBUTING.md`
+  * non-code submission and rights screening policy is now defined through `CONTENT_POLICY.md`
+  * repository review ownership for sensitive paths is now expressed through `.github/CODEOWNERS`
+  * developer and content-creator intake are intentionally treated as different workflows because software licensing and content redistribution rights are not the same problem
+
 ---
 
   ## 🌐 Website Prototype Notes
