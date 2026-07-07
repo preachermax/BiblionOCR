@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
-import { EventGraphExecutor } from "./EventGraphExecutor.js";
 import EventLogList from "./EventLogList.jsx";
 import SystemStatePanel from "./SystemStatePanel.jsx";
 import { EventBus } from "./eventBus.js";
@@ -9,6 +8,12 @@ import { emitEvent } from "./eventLogger.js";
 import { setActiveNode, setLastEvent } from "./stateManager.js";
 
 const autoplayIntervalMs = 1200;
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
 
 const overviewSequence = [
   "biblion",
@@ -199,10 +204,7 @@ const stylesheet = [
       color: "#143642",
       "border-color": "#d46a1f",
       "border-width": 5,
-      "overlay-opacity": 0,
-      "shadow-blur": 24,
-      "shadow-color": "#d46a1f",
-      "shadow-opacity": 0.35
+      "overlay-opacity": 0
     }
   },
   {
@@ -327,24 +329,61 @@ export default function App() {
   const [isAutoplaying, setIsAutoplaying] = useState(false);
   const sequenceStepRef = useRef(0);
   const eventBusRef = useRef(null);
-  const eventGraphExecutorRef = useRef(null);
   const eventRunnerRef = useRef(null);
 
   if (!eventBusRef.current) {
     eventBusRef.current = new EventBus();
   }
 
-  if (!eventGraphExecutorRef.current) {
-    eventGraphExecutorRef.current = new EventGraphExecutor({
-      eventBus: eventBusRef.current
-    });
-  }
-
   if (!eventRunnerRef.current) {
     eventRunnerRef.current = new EventRunner({
       eventBus: eventBusRef.current,
-      executor: (startEvent, context) =>
-        eventGraphExecutorRef.current.execute(startEvent, context),
+      executor: async (_startEvent, context) => {
+        const {
+          delayMs,
+          isCurrentRun,
+          payload = {},
+          traceId
+        } = context;
+        const { startIndex = 0 } = payload;
+        const trail = [];
+
+        for (let index = startIndex; index < overviewSequenceNodes.length; index += 1) {
+          if (!isCurrentRun()) {
+            break;
+          }
+
+          const nodeData = overviewSequenceNodes[index];
+          setActiveNode(nodeData);
+
+          const entry = emitEvent(
+            "sequence_step_advanced",
+            {
+              source: "autoplay",
+              previousStep: index === 0 ? null : index - 1,
+              nextStep: index,
+              nodeId: nodeData.id
+            },
+            { traceId }
+          );
+
+          setLastEvent(entry);
+          eventBusRef.current.emit("sequence_step", {
+            index,
+            node: nodeData,
+            source: "autoplay",
+            traceId,
+            logEntry: entry
+          });
+          trail.push(entry);
+
+          if (index < overviewSequenceNodes.length - 1) {
+            await delay(delayMs);
+          }
+        }
+
+        return trail;
+      },
       delayMs: autoplayIntervalMs
     });
   }
@@ -482,7 +521,21 @@ export default function App() {
         ? 0
         : sequenceStepRef.current + 1;
 
+    const startEntry = emitEvent("autoplay_toggled", {
+      previousState: false,
+      nextState: true,
+      intervalMs: autoplayIntervalMs,
+      startIndex
+    });
+
     setIsAutoplaying(true);
+    setLastEvent(startEntry);
+    eventBusRef.current.emit("autoplay_toggled", {
+      nextState: true,
+      intervalMs: autoplayIntervalMs,
+      startIndex,
+      logEntry: startEntry
+    });
 
     eventRunnerRef.current
       ?.run("autoplay_toggled", {
@@ -499,8 +552,8 @@ export default function App() {
   };
 
   return (
-    <main className="page-shell">
-      <section className="intro-panel">
+    <main className={`page-shell ${isAutoplaying ? "page-shell-autoplay" : ""}`}>
+      <section className={`intro-panel ${isAutoplaying ? "intro-panel-autoplay" : ""}`}>
         <p className="eyebrow">Biblion Website Prototype</p>
         <h1>Minimal Cytoscape Graph</h1>
         <p>
@@ -532,6 +585,12 @@ export default function App() {
           Autoplay is {isAutoplaying ? "running" : "stopped"} at {autoplayIntervalMs} ms per step.
         </p>
 
+        {isAutoplaying ? (
+          <p className="autoplay-focus-note">
+            Diagnostic panels are hidden while autoplay runs so the graph animation stays in focus.
+          </p>
+        ) : null}
+
         <section className="selected-node-panel" aria-label="Selected node details">
           <p className="eyebrow">Selected Node</p>
           {selectedNode ? (
@@ -547,11 +606,14 @@ export default function App() {
           )}
         </section>
 
-        <SystemStatePanel />
-        <EventLogList />
+        {isAutoplaying ? null : <SystemStatePanel />}
+        {isAutoplaying ? null : <EventLogList />}
       </section>
 
-      <section className="graph-panel" aria-label="Biblion graph previews">
+      <section
+        className={`graph-panel ${isAutoplaying ? "graph-panel-autoplay" : ""}`}
+        aria-label="Biblion graph previews"
+      >
         <GraphView
           title="Biblion Overview"
           description={`A minimal relationship map for the current documentation-facing website prototype. Sequence step ${sequenceStep + 1} of ${overviewSequence.length}.`}
