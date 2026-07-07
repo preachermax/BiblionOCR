@@ -10,6 +10,12 @@ https://www.youtube.com/watch?v=zrJQzivQwT4
 
 This short video presents the project's philosophy, architectural direction, and public identity.
 
+## Public Home Page
+
+The live public home page is now available here:
+
+https://biblionocr.onrender.com/
+
 ## Start Here
 
 If you want the documentation-first entry point, begin with:

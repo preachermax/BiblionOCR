@@ -93,6 +93,8 @@ Current prototype highlights:
 - React + Cytoscape demo under `docs/website/`
 - EventBus + EventRunner + EventGraphExecutor runtime path for demo traversal
 - traceable event logging, state inspection, and visited-node highlighting in the graph view
+- Render-ready static deployment blueprint at `render.yaml` with `docs/website/` as the first public hosting surface
+- live public home page deployed at `https://biblionocr.onrender.com/`
 
 ### `patreon/`
 

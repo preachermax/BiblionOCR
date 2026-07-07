@@ -9,6 +9,7 @@ __pycache__/
 .ruff_cache/
 build/
 dist/
+node_modules/
 *.egg-info/
 
 # IDE/local machine files

@@ -68,6 +68,7 @@
   * `docs/website/` now contains a minimal React + Cytoscape website prototype
   * `docs/website/src/App.jsx` is the maintained source version of the demo
   * `docs/website/preview.html` is the no-build browser preview for environments without local Node.js
+  * the public website milestone is now live at `https://biblionocr.onrender.com/`
   * the current demo includes:
 
     * static overview graph
@@ -989,6 +990,7 @@ DO NOT update for:
 * 2026-07-03: `MyServer.py` now redirects ADF scan requests to `MyScanner.py`, while `MyScanner.py` supports both flatbed and ADF requests through the shared scanner workflow
 * 2026-07-03: `QtDesignerUI/MyScannerUI.ui` was updated to restore a Designer-owned scan UI contract for `MyScanner`, adding MyServer-style `imageScannerbutton`, `actionImageScanner`, and `actionImageScanner_tb`, then regenerating `MyScannerUI.py` from that source
 * 2026-07-04: project documentation was consolidated under `docs/`, and the active developer notebook was renamed to uppercase `docs/development/DEV_NOTEBOOK.md` to match the new library convention
+* 2026-07-07: the public Biblion home page went live at `https://biblionocr.onrender.com/`, the Patreon posting flow succeeded against the hosted site URL, and the local weekly queue was tuned and regenerated for the remaining week
 
 ---
 
