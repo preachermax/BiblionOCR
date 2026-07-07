@@ -57,6 +57,7 @@ import MyExplorer as explorer
 import ChrReference as chrref
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
+from project_status_controller import ProjectStatusController
 
 #import PageVerseCrossReference as xref
 
@@ -230,6 +231,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyGrounder',
+            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+        )
         #self.bookmarkdown = self.greekbookmarkdown
         self.get_xref_last_image()
         #self.get_xref_settings()
@@ -297,6 +303,9 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Define json data
         print("loading session")
         sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
+        active_project = sm.get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         data = list(sm.load('GrounderSession.json').values())
 
         # Set json key values

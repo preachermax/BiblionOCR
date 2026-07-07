@@ -7,6 +7,8 @@ import sqlite3
 from SqliteHelper import *
 import time
 import UI_Icons
+from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 #import Qt5ResolveVariants as resolver
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,6 +16,11 @@ project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 
 app = QtWidgets.QApplication([])
 varui = uic.loadUi(os.path.join(script_dir, "QtDesignerUI", "MyResolverUI.ui"))
+project_status_controller = ProjectStatusController(
+    varui,
+    "MyResolver",
+    session_manager=SessionManager(),
+)
 
 def main():
     print("working")

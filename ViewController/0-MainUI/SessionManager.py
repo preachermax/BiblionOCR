@@ -9,6 +9,15 @@ JSONItem = Dict[str, Any]
 SessionDict = Dict[str, JSONItem]
 SettingMap = Dict[str, Union[str, Callable[[Any], None]]]
 
+ACTIVE_PROJECT_ROOT_KEYS = (
+    'self.active_project_root',
+    'self.project_root',
+)
+ACTIVE_PROJECT_NAME_KEYS = (
+    'self.active_project_name',
+    'self.project_name',
+)
+
 
 def normalize_path(path: str) -> str:
     return os.path.abspath(os.path.expanduser(path))
@@ -55,6 +64,51 @@ class SessionManager:
 
     def values(self, filename: str, keys: Optional[Iterable[str]] = None) -> Dict[str, Any]:
         return {key: item.get('CurrentValue') for key, item in self.load(filename, keys).items()}
+
+    def get_active_project(self, filename: str = 'Session.json') -> Dict[str, str]:
+        values = self.values(filename)
+
+        project_root = ''
+        for key in ACTIVE_PROJECT_ROOT_KEYS:
+            value = values.get(key)
+            if value:
+                project_root = normalize_path(str(value))
+                break
+
+        project_name = ''
+        for key in ACTIVE_PROJECT_NAME_KEYS:
+            value = values.get(key)
+            if value:
+                project_name = str(value).strip()
+                break
+
+        if project_root and not project_name:
+            project_name = os.path.basename(project_root)
+
+        return {
+            'project_root': project_root,
+            'project_name': project_name,
+        }
+
+    def get_active_project_root(self, filename: str = 'Session.json') -> str:
+        return self.get_active_project(filename).get('project_root', '')
+
+    def set_active_project(self, project_root: str, filename: str = 'Session.json') -> Dict[str, str]:
+        normalized_root = normalize_path(project_root)
+        project_name = os.path.basename(normalized_root)
+        self.update(
+            filename,
+            {
+                'self.active_project_root': normalized_root,
+                'self.active_project_name': project_name,
+                'self.project_root': normalized_root,
+                'self.project_name': project_name,
+            },
+        )
+        return {
+            'project_root': normalized_root,
+            'project_name': project_name,
+        }
 
     def update(self, filename: str, updates: Dict[str, Any]) -> None:
         path = self.session_path(filename)

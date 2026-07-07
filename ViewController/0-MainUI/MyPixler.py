@@ -36,6 +36,7 @@ if project_root not in sys.path:
 
 
 from HelpSystem import add_help_menu
+from Core.project_tracking import ProjectWorkflowTracker
 from SessionManager import SessionManager
 # PyQt5 imports
 from PyQt5 import uic
@@ -56,6 +57,7 @@ from Adjust import crop_processor, get_processor, rotate_processor, threshold_pr
 from ImagePreviewDialog import ImagePreviewDialog
 from MorphologyDialog import MorphologyDialog
 from LocalFileDrop import LocalFileDropMixin
+from ProjectTrackingDialog import ProjectTrackingDialog
 
 
 # Dialog Imports
@@ -310,6 +312,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_prompt_dialog = None
         self.crop_selection_ready = False
         self.crop_drawing_active = False
+        self.shared_session_manager = SessionManager()
+        self.current_project_root = self.shared_session_manager.get_active_project_root() or None
+        self._active_project_sync_timer = None
 
         # -------------------------
         # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ARGUMENT HANDLING (MyServer ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ MyPixler)
@@ -357,7 +362,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.progress_bar.setRange(0, 100 * self._progress_bar_scale)
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
+        self._init_project_status_widgets()
         self.statusBar().addPermanentWidget(self.progress_bar)
+        self._start_active_project_sync()
 
         add_help_menu(self, 'MyPixler')
 
@@ -406,6 +413,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         else:
             print("[INIT] No valid image to load")
 
+        self._refresh_project_status(self.refimgpath or self.imgpath)
         print("=== INIT COMPLETE ===")
 
     def _parse_launch_arguments(self, argv):
@@ -1045,6 +1053,149 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_prompt_dialog.raise_()
         self.crop_prompt_dialog.activateWindow()
 
+    def _init_project_status_widgets(self):
+        self.workflow_tracker = ProjectWorkflowTracker(workspace_root=project_root)
+
+        self.project_name_status_label = qtw.QLabel("Project: none")
+        self.project_name_status_label.setMinimumWidth(180)
+
+        self.workflow_status_label = qtw.QLabel("MyPixler 0/5 | Next: Source images captured")
+        self.workflow_status_label.setMinimumWidth(360)
+
+        self.project_overall_status_bar = qtw.QProgressBar()
+        self.project_overall_status_bar.setRange(0, 100)
+        self.project_overall_status_bar.setValue(0)
+        self.project_overall_status_bar.setTextVisible(True)
+        self.project_overall_status_bar.setFormat("Project 0%")
+        self.project_overall_status_bar.setFixedWidth(140)
+        self.project_overall_status_bar.setAlignment(Qt.AlignCenter)
+
+        self.project_tracking_button = qtw.QPushButton("Milestones")
+        self.project_tracking_button.setFixedHeight(24)
+        self.project_tracking_button.clicked.connect(self._open_project_tracking_dialog)
+
+        self.statusBar().addPermanentWidget(self.project_name_status_label)
+        self.statusBar().addPermanentWidget(self.workflow_status_label)
+        self.statusBar().addPermanentWidget(self.project_overall_status_bar)
+        self.statusBar().addPermanentWidget(self.project_tracking_button)
+
+    def _shared_active_project_root(self):
+        return self.shared_session_manager.get_active_project_root()
+
+    def _start_active_project_sync(self):
+        if self._active_project_sync_timer is None:
+            self._active_project_sync_timer = qtc.QTimer(self)
+            self._active_project_sync_timer.timeout.connect(self._sync_active_project_from_server)
+            self._active_project_sync_timer.start(1000)
+        self._sync_active_project_from_server()
+
+    def _sync_active_project_from_server(self):
+        shared_root = self._shared_active_project_root()
+        if not shared_root or shared_root == self.current_project_root:
+            return
+
+        self.current_project_root = shared_root
+        self._refresh_project_status(shared_root)
+
+    def _format_module_workflow_status(self, module_name, snapshot):
+        module_total = int(snapshot.get("module_total_count", 0))
+        module_completed = int(snapshot.get("module_completed_count", 0))
+        next_label = snapshot.get("module_next_label", "")
+
+        if module_total <= 0:
+            return f"{module_name} | No milestones configured"
+        if next_label == "Complete":
+            return f"{module_name} {module_completed}/{module_total} | Complete"
+        return f"{module_name} {module_completed}/{module_total} | Next: {next_label}"
+
+    def _refresh_project_status(self, candidate_path=None):
+        snapshot = self.workflow_tracker.snapshot(
+            "MyPixler",
+            project_root=self.current_project_root,
+            candidate_paths=(
+                self._shared_active_project_root(),
+                candidate_path,
+                self.current_project_root,
+                getattr(self, "refimgpath", ""),
+                getattr(self, "imgpath", ""),
+                getattr(self, "refimgdir", ""),
+                getattr(self, "imagedir", ""),
+                getattr(self, "workflow", ""),
+                getattr(self, "session", ""),
+            ),
+        )
+
+        project_root_value = snapshot.get("project_root")
+        if project_root_value:
+            self.current_project_root = project_root_value
+
+        project_name = snapshot.get("project_name", "none")
+        self.project_name_status_label.setText(f"Project: {project_name}")
+        self.project_name_status_label.setToolTip(project_root_value or "No active project selected")
+
+        completed_labels = snapshot.get("completed_labels", [])
+        completed_text = ", ".join(completed_labels) if completed_labels else "None yet"
+        overall_percent = int(snapshot.get("overall_percent", 0))
+        overall_next = snapshot.get("overall_next_label", "")
+        tooltip = f"Overall {overall_percent}%\nCompleted: {completed_text}\nNext: {overall_next}"
+
+        self.workflow_status_label.setText(self._format_module_workflow_status("MyPixler", snapshot))
+        self.workflow_status_label.setToolTip(tooltip)
+        self.project_overall_status_bar.setValue(overall_percent)
+        self.project_overall_status_bar.setFormat(f"Project {overall_percent}%")
+        self.project_overall_status_bar.setToolTip(tooltip)
+
+    def _record_project_milestone(self, milestone_key, candidate_path=None, details=None):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            candidate_path,
+            self.current_project_root,
+            getattr(self, "refimgpath", ""),
+            getattr(self, "imgpath", ""),
+            getattr(self, "refimgdir", ""),
+            getattr(self, "imagedir", ""),
+            getattr(self, "workflow", ""),
+            getattr(self, "session", ""),
+        )
+        if not project_root:
+            return None
+
+        self.current_project_root = project_root
+        self.workflow_tracker.ensure_tracking_state(project_root)
+        self.workflow_tracker.record_milestone(
+            project_root,
+            milestone_key,
+            module_name="MyPixler",
+            details=details,
+        )
+        self._refresh_project_status(project_root)
+        return project_root
+
+    def _open_project_tracking_dialog(self):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "refimgpath", ""),
+            getattr(self, "imgpath", ""),
+            getattr(self, "refimgdir", ""),
+            getattr(self, "imagedir", ""),
+            getattr(self, "workflow", ""),
+            getattr(self, "session", ""),
+        )
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                "Project Milestones",
+                "Select or create a project in MyServer first so milestone state can be edited.",
+            )
+            return
+
+        self.current_project_root = project_root
+        self.workflow_tracker.ensure_tracking_state(project_root)
+        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, "MyPixler", self)
+        dialog.exec_()
+        self._refresh_project_status(project_root)
+
     def _init_subprocess_return_controls(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
             return
@@ -1205,6 +1356,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
 
+        self._refresh_project_status(self.refimgpath or self.refimgdir)
         self.statusBar().showMessage("Reference TIFF loaded.")
         print("[STACK] Render complete")
 
@@ -1449,6 +1601,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 'self.firstpage': self.firstpage,
                 'self.lastpage': self.lastpage,
             })
+            self._record_project_milestone(
+                "source_acquired",
+                workflow_folder,
+                details={"source": "actionextract_pdf"},
+            )
 
         def reject():
             pass
@@ -1530,6 +1687,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     else:
                         shutil.copy2(source, destination)
             print("pdf pages for tif extraction complete")
+            self._record_project_milestone(
+                "source_converted",
+                workflow_folder,
+                details={"source": "actionpdf_for_tiff"},
+            )
         def reject():
             pass
 
@@ -1616,6 +1778,16 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            self._record_project_milestone(
+                "source_converted",
+                workflow_folder,
+                details={"source": "actiontiff_to_mono"},
+            )
+            self._record_project_milestone(
+                "source_converted",
+                workflow_folder,
+                details={"source": "actionpdf_to_tiff"},
+            )
         def reject():
             pass
 
@@ -1706,6 +1878,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            self._record_project_milestone(
+                "source_converted",
+                workflow_folder,
+                details={"source": "actionmono_to_png"},
+            )
         def reject():
             pass
 
@@ -1910,6 +2087,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            self._record_project_milestone(
+                "source_converted",
+                tif_workflow_folder,
+                details={"source": "actiondeskew_mono"},
+            )
         def reject():
             pass
 
@@ -2088,6 +2270,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            self._record_project_milestone(
+                "pages_prepared",
+                workflow_greek_folder or workflow_latin_folder,
+                details={"source": "actionCrop_Languages"},
+            )
             '''if workflow_dup_latin_folder:
                 #symlinks=False
                 #ignore=None
@@ -2871,6 +3058,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             #self.ui.RefImgLE.setToolTip(self.refimgpath)  # Reuse this path forward to modify a ToolTip
             self.ui.RefImgLE.setToolTip("Reference Image Filename")
 
+        self._refresh_project_status(self.refimgpath or self.refimgdir)
         self.statusBar().showMessage("Reference image loaded.")
 
     # def on_image_loaded(self, qimage):
@@ -2990,6 +3178,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.refimgdir = os.path.dirname(self.refimgpath)
             self._update_pixler_session_paths()
             self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
+            self._refresh_project_status(self.refimgpath)
             print("[Pixler] Ref image indexed")
 
     def loadRefImg(self):
@@ -3015,6 +3204,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.refimgpath = fileName
         self.refimgdir = os.path.dirname(fileName)
+        self._refresh_project_status(fileName)
 
         # -------------------------
         # Re-index folder (optional but recommended)

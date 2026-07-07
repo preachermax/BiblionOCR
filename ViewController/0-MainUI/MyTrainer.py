@@ -13,6 +13,7 @@ from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 from ext import *
 from ext import versifiercount, versefind, reffind
 # Custom imports
@@ -39,12 +40,20 @@ class Ui_MainWindow(qtw.QMainWindow):
         
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyTrainer',
+            session_manager=self.session_manager,
+        )
 
         self.show()
 
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('VersifierSession.json')
         for setting, value in session.items():
             if setting.startswith('self.'):

@@ -5,6 +5,7 @@ import os
 import json
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 from PyQt5 import QtPrintSupport
 #from PyQt5 import QPrintPreviewDialog, QPrintDialog
 from PyQt5 import QtWidgets as qtw
@@ -51,6 +52,9 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('Session.json')
 
         def get_setting(name: str, default=None):
@@ -214,6 +218,12 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         # more or less 8 spaces
         self.ui.textEdit.setTabStopWidth(33)
         self.get_session_settings()
+        if not hasattr(self, 'project_status_controller'):
+            self.project_status_controller = ProjectStatusController(
+                self,
+                'MyWriter',
+                session_manager=self.session_manager,
+            )
         self.initMenubar()
         self.initToolbar()
         self.initFormatbar()

@@ -30,6 +30,28 @@
 
   ---
 
+  ## Project Status and Milestones
+
+  * `MyServer` is now the authoritative selector for the active project across the runtime toolchain
+  * the selected project is persisted through shared session state in `Model/Project/Data/json/Session.json`
+  * `SessionManager` now exposes active-project helpers so modules can read and publish the same project identity consistently
+  * `Core/project_tracking.py` now owns the shared workflow milestone model, project-root resolution, persisted tracking state, and weighted progress calculation
+  * milestone state is persisted per project in `Model/Project/Data/json/ProjectTracking.json`
+  * `ViewController/0-MainUI/ProjectTrackingDialog.py` is now the common user-facing milestone editor
+  * the `Milestones` dialog is no longer `MyServer`/`MyPixler` only; the shared controller in `ViewController/0-MainUI/project_status_controller.py` mounts the same project-status surface across the main runtime modules
+  * the common status surface now includes:
+
+    * current project name
+    * module workflow summary
+    * weighted overall project progress bar
+    * `Milestones` button opening the shared editor dialog
+
+  * `MyPixler` follows `MyServer` project selection live while open
+  * the remaining main windows now read the same active project and expose the same milestone dialog / status-bar workflow surface
+  * this work turns project progress from inferred, local, and mostly invisible state into a shared, user-visible, and manually editable development contract
+
+  ---
+
   ## Repository Policy Surface
 
   * public contribution policy is now defined in the repository root through `CONTRIBUTING.md`
