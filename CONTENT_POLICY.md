@@ -65,9 +65,11 @@ Anyone submitting covered content should be prepared to state, in the pull reque
 - Prefer pull requests over direct pushes.
 - If contributors are primarily content creators rather than developers, prefer a curated intake path rather than broad write access to the main repository.
 - If needed, use a separate private intake repository or off-repo review process for preliminary content screening.
+- Content-creator membership requests should start through the GitHub `Content Creator Membership Request` issue form and should only be recorded as approved after provenance review is complete.
+- Approved content-creator accounts should be entered in `.github/membership-registry.json` with `curated_intake` or `pull_request_only` access.
 
 ## Relationship to Licensing
 
 The root [LICENSE](LICENSE) covers original BiblionOCR software unless a file or directory states otherwise. That does not automatically determine whether contributed content is safe to publish.
 
-See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for repository licensing notes and [CONTRIBUTING.md](CONTRIBUTING.md) for contributor workflow expectations.
+See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for repository licensing notes, [CONTRIBUTING.md](CONTRIBUTING.md) for contributor workflow expectations, and [docs/community/MEMBERSHIP.md](docs/community/MEMBERSHIP.md) for the membership approval path.

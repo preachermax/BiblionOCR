@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contribution Policy
+    url: https://github.com/preachermax/BiblionOCR/blob/master/CONTRIBUTING.md
+    about: Read the developer and content contribution rules before requesting membership.
+  - name: Content Policy
+    url: https://github.com/preachermax/BiblionOCR/blob/master/CONTENT_POLICY.md
+    about: Review provenance and publication-rights requirements for content submissions.

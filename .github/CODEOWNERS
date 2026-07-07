@@ -4,6 +4,8 @@
 /CONTRIBUTING.md @preachermax
 /CONTENT_POLICY.md @preachermax
 /README.md @preachermax
+/.github/ @preachermax
+/docs/community/ @preachermax
 
 # Security- and release-sensitive areas
 /Core/ @preachermax

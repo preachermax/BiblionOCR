@@ -15,6 +15,17 @@ These two groups do not follow the same intake path.
 - Content creators should not be given broad write access to the main code repository unless they are also acting as maintainers.
 - Content submissions should be reviewed separately for provenance, copyright, redistribution rights, and publication suitability before they are merged into the public repo.
 
+## Membership Intake Mechanism
+
+Repository membership is tracked through a GitHub-native approval path:
+
+- Developer membership requests should be filed with the `Developer Membership Request` issue form.
+- Content-creator membership requests should be filed with the `Content Creator Membership Request` issue form.
+- Approved memberships should be recorded in `.github/membership-registry.json`.
+- Membership-registry changes should happen by pull request so CODEOWNERS review and workflow validation both apply.
+
+The registry is the backend record of which accounts were explicitly permitted, for which role, and under what access level.
+
 ## Authentication Expectations
 
 - Use a personal GitHub account protected by MFA.
@@ -63,6 +74,8 @@ Before content is accepted, the contributor should be able to state:
 
 See [CONTENT_POLICY.md](CONTENT_POLICY.md) for the required content standards.
 
+Content-creator membership approvals should normally use `curated_intake` or `pull_request_only` access in `.github/membership-registry.json`. Broad write access is intentionally not the default path for this group.
+
 ## Inbound Rights Policy
 
 This repository currently follows a practical inbound-equals-outbound model for accepted original contributions:
@@ -99,6 +112,8 @@ The repository owner should use GitHub controls that match this policy:
 - least-privilege team access
 - CODEOWNERS review for sensitive paths
 - MFA for accounts with write access
+- issue forms enabled for developer and content-creator membership intake
+- membership approvals recorded in `.github/membership-registry.json`
 
 ## Related Documents
 
@@ -106,3 +121,4 @@ The repository owner should use GitHub controls that match this policy:
 - [LICENSE](LICENSE)
 - [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)
 - [CONTENT_POLICY.md](CONTENT_POLICY.md)
+- [docs/community/MEMBERSHIP.md](docs/community/MEMBERSHIP.md)
