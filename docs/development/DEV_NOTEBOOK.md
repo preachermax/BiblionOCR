@@ -392,7 +392,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Local `master` was fast-forwarded to the merged remote `master` after the Branch5 / Branch6 integration work
 * Branches `Biblion-Branch1` through `Biblion-Branch6` were deleted from both local and remote
 * Duplicate remote names were removed; the repo now standardizes on a single remote: `origin`
-* Jetson-facing Git instructions were captured in the root note `LOCAL_MASTER_SYNC_AFTER_PR.md`
+* Jetson-facing Git instructions are captured in `docs/development/LOCAL_MASTER_SYNC_AFTER_PR.md`
 
 ### Jetson Runtime Constraint
 

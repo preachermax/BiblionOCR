@@ -58,6 +58,7 @@ Active engineering notebook, developer references, runtime notes, and implementa
 Key documents:
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
+- [LOCAL_MASTER_SYNC_AFTER_PR.md](development/LOCAL_MASTER_SYNC_AFTER_PR.md)
 - [README_HELP_SYSTEM.md](development/README_HELP_SYSTEM.md)
 - [QUICK_REFERENCE.md](development/QUICK_REFERENCE.md)
 

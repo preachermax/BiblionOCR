@@ -1,6 +1,6 @@
-# Sync Local `master` From GitHub After PR Merge
+# Sync Local `master` From GitHub After Upstream Update
 
-Use this after `Biblion-Branch6` is merged into `master` on GitHub.
+Use this after `master` has been updated on GitHub and you want the Jetson checkout to match it.
 
 These examples are written for a Linux shell on the Jetson.
 They assume the repository lives at `~/Projects/BiblionOCR`.
@@ -52,8 +52,8 @@ Do not use it unless you are certain.
 
 The safest normal flow is:
 
-1. Merge `Biblion-Branch6` into `master` on GitHub by PR.
-2. On the local machine, run:
+1. Update `master` on GitHub, whether that happened through a PR merge or a reviewed merge from `development`.
+2. On the Jetson, run:
 
 ```bash
 cd Projects/BiblionOCR
@@ -62,22 +62,22 @@ git fetch origin --prune
 git pull --ff-only origin master
 ```
 
-## Optional Cleanup After Merge
+## Optional Cleanup After Update
 
-If the PR is merged and you no longer need `Biblion-Branch6`, you can clean it up.
+If the upstream work came from a local feature branch and you no longer need that branch on the Jetson, you can clean it up.
 
 ### Delete local branch
 
 ```bash
 cd Projects/BiblionOCR
-git branch -d Biblion-Branch6
+git branch -d YOUR_BRANCH_NAME
 ```
 
 ### Delete remote branch
 
 ```bash
 cd Projects/BiblionOCR
-git push origin --delete Biblion-Branch6
+git push origin --delete YOUR_BRANCH_NAME
 ```
 
 ## If `origin` Does Not Exist Yet
