@@ -820,8 +820,8 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.refsymbols = len(reftext)
 
     def OpenResolver(self):
-        print("Starting up MyResolver")
-        script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "MyResolver.py")
+        print("Starting up QT5ResolveVariants")
+        script = os.path.join(self.mod_abspath, "ViewController", "0-MainUI", "Qt5ResolveVariants.py")
         print(f'Launching: {sys.executable} {script}')
         try:
             subprocess.Popen([sys.executable, script], close_fds=True)

@@ -28,6 +28,8 @@ from MyScannerUI import Ui_Scanner
 from PreProcess import PreProcess as pp
 
 import CropTif as croptif
+import QtCropImage as cropimg
+import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
 from Training import Train as tr
 from SessionManager import SessionManager
