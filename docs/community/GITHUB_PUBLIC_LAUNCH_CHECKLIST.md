@@ -1,6 +1,11 @@
 # GitHub Public Launch Checklist
 
-Use this as the final click-through checklist before making the BiblionOCR repository public.
+Use this as the recorded click-through checklist for the BiblionOCR public launch and as a reusable audit list for future repository reviews.
+
+Launch status:
+
+- the repository is now public on GitHub as of `2026-07-07`
+- sections 1 through 8 remain the operating baseline for future membership, permissions, and policy checks
 
 ## 1. Confirm Repo State
 
@@ -69,6 +74,44 @@ Instead:
 3. approve it by pull request against the registry
 4. then apply matching GitHub permissions
 
+Explicitly, for each approved person:
+
+1. open the membership request issue
+2. confirm whether it is a `Developer Membership Request` or `Content Creator Membership Request`
+3. choose the least-permissive approved access level
+4. create a pull request that updates `.github/membership-registry.json`
+5. add one new object under `members`, for example:
+
+```json
+{
+	"github_username": "example-user",
+	"role": "developer",
+	"access_level": "pull_request_only",
+	"status": "approved",
+	"approved_by": "preachermax",
+	"approved_at": "2026-07-07",
+	"request_issue": 123
+}
+```
+
+6. wait for the `Validate Membership Registry` GitHub Action to pass on that pull request
+7. merge the pull request
+8. only after merge, go to `Settings -> Collaborators and teams` and add the person with the matching GitHub repository role
+9. comment on the original issue with the approval result and close it
+
+Permission mapping to use:
+
+- `curated_intake`: registry-only approval path, usually no added repository collaborator role
+- `pull_request_only`: registry approval plus normal pull-request contribution, usually no direct write access
+- `triage`: add the GitHub `Triage` role
+- `write`: add the GitHub `Write` role
+- `maintain`: add the GitHub `Maintain` role
+- `admin`: add the GitHub `Admin` role
+
+Practical rule:
+
+- if the access level does not correspond to a built-in GitHub collaborator role, record it in the registry but do not grant broader repository permissions just to "match" the label
+
 Registry file:
 
 - [.github/membership-registry.json](../../.github/membership-registry.json)
@@ -92,6 +135,8 @@ Do not give broad write access to content-only contributors by default.
 
 ## 9. Make the Repository Public
 
+This step is now complete for the current launch.
+
 In GitHub:
 
 1. go to `Settings -> General`
@@ -109,6 +154,10 @@ After the visibility change:
 - verify issue forms are visible
 - verify branch protection is still active
 - review the Security or Dependabot page for the reported vulnerabilities
+
+Ongoing note:
+
+- repeat this section after any major repository policy change or access-model change
 
 ## GitHub UI Paths
 

@@ -1036,6 +1036,8 @@ DO NOT update for:
 
 BiblionOCR reached its first major public-facing milestone with the completion and publication of the **Introduction Video v1.0**. This marks the project's transition from an architecture and development effort into a publicly demonstrable software system.
 
+That public-facing transition is now backed by the repository itself being live on GitHub as a public repository, with contributor intake routed through the documented membership and policy workflow.
+
 The introduction video serves as the project's visual identity and provides a concise overview of the philosophy behind BiblionOCR rather than an exhaustive feature demonstration.
 
 ## Production Artifacts
@@ -1093,6 +1095,7 @@ The following milestones are complete:
 * Developer Mode architecture documentation
 * Public Introduction Video v1.0
 * Public YouTube publication
+* Public GitHub repository launch
 
 The repository now contains both the software architecture and the supporting public-facing project identity.
 
@@ -1111,6 +1114,6 @@ With the public introduction complete, development focus returns to core applica
 
 ## 📅 Last Updated
 
-2026-07-06
+2026-07-07
 
 ---
