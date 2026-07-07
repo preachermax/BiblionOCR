@@ -2,6 +2,8 @@
 
 This section is the documentation-library entry point for repository participation, contribution workflow, and public-submission rules.
 
+The BiblionOCR repository is now public on GitHub, so this directory serves as the primary entry point for external contributors who need policy and membership guidance.
+
 ## Purpose
 
 BiblionOCR distinguishes between two contributor groups:
@@ -44,6 +46,8 @@ The repository now has a concrete backend path for contributor membership:
 - content-creator requests use the `Content Creator Membership Request` issue form
 - approved accounts are recorded in `.github/membership-registry.json`
 - registry changes are validated by GitHub Actions and should remain under maintainer review
+
+For the public repository, this means access decisions should remain reviewable in-repo instead of being handled informally through direct collaborator grants.
 
 See [MEMBERSHIP.md](MEMBERSHIP.md) for the approval workflow.
 
