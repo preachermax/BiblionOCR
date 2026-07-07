@@ -27,8 +27,6 @@ from PreProcess import PreProcess as pp
 
 import MyPixler as pixler
 import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
 from Training import Train as tr
 import ChrReference as chrref
