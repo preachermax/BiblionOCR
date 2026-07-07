@@ -1,0 +1,13 @@
+# Repository policy and licensing
+/LICENSE @preachermax
+/THIRD_PARTY_LICENSES.md @preachermax
+/CONTRIBUTING.md @preachermax
+/CONTENT_POLICY.md @preachermax
+/README.md @preachermax
+
+# Security- and release-sensitive areas
+/Core/ @preachermax
+/ViewController/0-MainUI/ @preachermax
+/docs/architecture/ @preachermax
+/docs/development/ @preachermax
+/Developer/video/ @preachermax

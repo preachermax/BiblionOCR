@@ -8,6 +8,18 @@ from .wia_scanner import WIAScanner
 
 
 class ScanManager:
+    REQUEST_FIELDS = (
+        "destination_folder",
+        "backend_preference",
+        "device_name",
+        "allow_network_fallback",
+        "mode",
+        "dpi",
+        "source_type",
+        "duplex",
+        "persist_format",
+    )
+
     BACKEND_PRIORITY = (
         ESCLScanner,
         SaneScanner,
@@ -46,12 +58,59 @@ class ScanManager:
             "destination_folder": destination_folder,
             "backend_preference": ESCLScanner.__name__,
             "device_name": "",
+            "allow_network_fallback": True,
             "mode": "color",
             "dpi": 300,
             "source_type": "flatbed",
             "duplex": False,
             "persist_format": "tiff",
         }
+
+    def request_from_state(self, state, destination_folder):
+        request = self.default_request(destination_folder)
+        for field_name in self.REQUEST_FIELDS:
+            request[field_name] = getattr(state, f"scan_{field_name}", request[field_name])
+        return self.normalize_request(request, destination_folder)
+
+    def normalize_request(self, request, destination_folder=None):
+        scan_request = self.default_request(destination_folder or (request or {}).get("destination_folder"))
+        scan_request.update(request or {})
+
+        destination_folder = scan_request.get("destination_folder")
+        if not destination_folder:
+            raise RuntimeError("Scan request is missing destination_folder")
+
+        scan_request["destination_folder"] = destination_folder
+        scan_request["backend_preference"] = scan_request.get("backend_preference") or ESCLScanner.__name__
+        scan_request["device_name"] = scan_request.get("device_name") or ""
+        scan_request["allow_network_fallback"] = self._coerce_bool(
+            scan_request.get("allow_network_fallback", True),
+            default=True,
+        )
+        scan_request["dpi"] = self._coerce_int(scan_request.get("dpi"), default=300)
+        scan_request["source_type"] = scan_request.get("source_type") or "flatbed"
+        scan_request["mode"] = scan_request.get("mode") or "color"
+        scan_request["duplex"] = self._coerce_bool(scan_request.get("duplex"), default=False)
+        scan_request["persist_format"] = scan_request.get("persist_format") or "tiff"
+
+        os.makedirs(destination_folder, exist_ok=True)
+        return scan_request
+
+    def apply_request_state(self, target, request, destination_folder=None):
+        normalized_request = self.normalize_request(request, destination_folder)
+        for field_name in self.REQUEST_FIELDS:
+            setattr(target, f"scan_{field_name}", normalized_request[field_name])
+        return normalized_request
+
+    def session_payload(self, request, destination_folder=None, pending_scan_handoff=None):
+        normalized_request = self.normalize_request(request, destination_folder)
+        payload = {
+            f"self.scan_{field_name}": normalized_request[field_name]
+            for field_name in self.REQUEST_FIELDS
+        }
+        if pending_scan_handoff is not None:
+            payload["self.pending_scan_handoff"] = bool(pending_scan_handoff)
+        return payload
 
     def discover_devices(self, request=None):
         backend = self._get_backend(request or {"backend_preference": "auto"}, required=False)
@@ -98,16 +157,20 @@ class ScanManager:
         return qimage
 
     def _normalize_request(self, request):
-        scan_request = self.default_request((request or {}).get("destination_folder"))
-        scan_request.update(request or {})
+        return self.normalize_request(request)
 
-        destination_folder = scan_request.get("destination_folder")
-        if not destination_folder:
-            raise RuntimeError("Scan request is missing destination_folder")
+    def _coerce_bool(self, value, default=False):
+        if value is None:
+            return default
+        if isinstance(value, str):
+            return value.strip().lower() in {"1", "true", "yes", "on"}
+        return bool(value)
 
-        os.makedirs(destination_folder, exist_ok=True)
-        scan_request["destination_folder"] = destination_folder
-        return scan_request
+    def _coerce_int(self, value, default):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
 
     def _get_backend(self, request, required):
         if self._backend is not None:

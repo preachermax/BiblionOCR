@@ -73,6 +73,9 @@ Publication-facing writing and editorial support material.
 
 Contributor-facing and participation-oriented project material.
 
+Key documents:
+- [README.md](community/README.md)
+
 ### `roadmap/`
 
 Forward-looking planning, milestones, and future initiatives.
@@ -124,6 +127,7 @@ Use this README to decide where new documentation belongs:
 - active implementation state or debugging notes → `development/`
 - supporting investigation → `research/`
 - outward-facing publishing material → `publications/`
+- contribution workflow or participation rules → `community/`
 
 When a document feels misplaced, move or rewrite it so the directory purpose remains clear.
 
@@ -136,6 +140,7 @@ When a document feels misplaced, move or rewrite it so the directory purpose rem
 - [PROJECT_ARCHITECTURE.md](architecture/PROJECT_ARCHITECTURE.md)
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
+- [community/README.md](community/README.md)
 - [website/README.md](website/README.md)
 
 ---

@@ -52,3 +52,11 @@ Model/Backup Copies/0-MainUI copy/
 ViewController/0-MainUI/glyphtracer-master/
 ViewController/0-MainUI/potrace-main/
 ViewController/0-MainUI/pyTesseractTrainer-1.03.py
+
+# Video-production generated outputs and editor byproducts
+Developer/video/exports/*
+!Developer/video/exports/README.md
+Developer/video/generated/
+Developer/video/masters/
+Developer/video/audio/generated/
+Developer/video/*.kdenlive.ass
