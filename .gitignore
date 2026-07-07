@@ -15,6 +15,7 @@ dist/
 .vs/
 .vscode/
 .idea/
+.tools/
 
 # OS metadata
 .DS_Store
