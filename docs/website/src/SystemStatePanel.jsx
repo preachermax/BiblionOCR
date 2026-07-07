@@ -21,7 +21,7 @@ function renderValue(value) {
   return JSON.stringify(value, null, 2);
 }
 
-export default function SystemStatePanel() {
+export default function SystemStatePanel({ isCollapsed }) {
   const [systemState, setSystemState] = useState(() => getState());
 
   useEffect(() => {
@@ -31,26 +31,29 @@ export default function SystemStatePanel() {
   return (
     <section className="system-state-panel" aria-label="System state">
       <p className="eyebrow">System State</p>
-      <dl className="system-state-list">
-        <div className="system-state-item">
-          <dt>activeNode</dt>
-          <dd>
-            <pre className="system-state-value">{renderValue(systemState.activeNode)}</pre>
-          </dd>
-        </div>
-        <div className="system-state-item">
-          <dt>lastEvent</dt>
-          <dd>
-            <pre className="system-state-value">{renderValue(systemState.lastEvent)}</pre>
-          </dd>
-        </div>
-        <div className="system-state-item">
-          <dt>isRunning</dt>
-          <dd>
-            <pre className="system-state-value">{renderValue(systemState.isRunning)}</pre>
-          </dd>
-        </div>
-      </dl>
+
+      {isCollapsed ? null : (
+        <dl className="system-state-list" id="system-state-list">
+          <div className="system-state-item">
+            <dt>activeNode</dt>
+            <dd>
+              <pre className="system-state-value">{renderValue(systemState.activeNode)}</pre>
+            </dd>
+          </div>
+          <div className="system-state-item">
+            <dt>lastEvent</dt>
+            <dd>
+              <pre className="system-state-value">{renderValue(systemState.lastEvent)}</pre>
+            </dd>
+          </div>
+          <div className="system-state-item">
+            <dt>isRunning</dt>
+            <dd>
+              <pre className="system-state-value">{renderValue(systemState.isRunning)}</pre>
+            </dd>
+          </div>
+        </dl>
+      )}
     </section>
   );
 }

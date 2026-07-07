@@ -26,13 +26,14 @@ body {
 .page-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(260px, 360px) 1fr;
+  grid-template-columns: minmax(220px, 320px) minmax(320px, 1fr);
   gap: 24px;
   padding: 24px;
+  align-items: start;
 }
 
 .page-shell-autoplay {
-  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  grid-template-columns: minmax(200px, 260px) minmax(320px, 1fr);
 }
 
 .intro-panel,
@@ -46,6 +47,8 @@ body {
 .intro-panel {
   padding: 24px;
   align-self: start;
+  position: sticky;
+  top: 24px;
 }
 
 .intro-panel-autoplay {
@@ -69,6 +72,31 @@ body {
   margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid rgba(20, 54, 66, 0.12);
+}
+
+.system-state-controls {
+  margin-top: 24px;
+}
+
+.system-state-toggle {
+  padding: 8px 12px;
+  border: 1px solid rgba(20, 54, 66, 0.14);
+  border-radius: 999px;
+  background: rgba(247, 243, 233, 0.9);
+  color: #143642;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+.system-state-toggle:hover {
+  background: rgba(228, 212, 175, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(20, 54, 66, 0.12);
+}
+
+.system-state-toggle:active {
+  transform: translateY(0);
 }
 
 .system-state-list {
@@ -215,6 +243,7 @@ body {
   display: grid;
   gap: 24px;
   padding: 24px;
+  align-self: start;
 }
 
 .graph-panel-autoplay {
@@ -268,7 +297,7 @@ p {
   line-height: 1.6;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 560px) {
   .page-shell {
     grid-template-columns: 1fr;
   }
