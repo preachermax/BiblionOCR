@@ -10,10 +10,10 @@ This sequence follows the next practical path for the BiblionOCR introduction vi
 
 Use these documents together:
 
-- [video/project/TIMELINE_ASSEMBLY_GUIDE.md](video/project/TIMELINE_ASSEMBLY_GUIDE.md)
-- [video/project/RESOLVE_PROJECT_MANIFEST.md](video/project/RESOLVE_PROJECT_MANIFEST.md)
-- [video/project/TYPOGRAPHY_GUIDE.md](video/project/TYPOGRAPHY_GUIDE.md)
-- [video/audio/NARRATION_PACKAGE.md](video/audio/NARRATION_PACKAGE.md)
+- [project/TIMELINE_ASSEMBLY_GUIDE.md](project/TIMELINE_ASSEMBLY_GUIDE.md)
+- [project/RESOLVE_PROJECT_MANIFEST.md](project/RESOLVE_PROJECT_MANIFEST.md)
+- [project/TYPOGRAPHY_GUIDE.md](project/TYPOGRAPHY_GUIDE.md)
+- [audio/NARRATION_PACKAGE.md](audio/NARRATION_PACKAGE.md)
 
 Execution order:
 
@@ -42,8 +42,8 @@ Completion condition:
 
 Use these documents together:
 
-- [video/project/RENDER_SPECIFICATION.md](video/project/RENDER_SPECIFICATION.md)
-- [video/project/RESOLVE_PROJECT_MANIFEST.md](video/project/RESOLVE_PROJECT_MANIFEST.md)
+- [project/RENDER_SPECIFICATION.md](project/RENDER_SPECIFICATION.md)
+- [project/RESOLVE_PROJECT_MANIFEST.md](project/RESOLVE_PROJECT_MANIFEST.md)
 
 Execution order:
 
@@ -61,9 +61,9 @@ Completion condition:
 
 Use these documents together:
 
-- [video/FINAL_QA_CHECKLIST.md](video/FINAL_QA_CHECKLIST.md)
-- [video/PRODUCTION_READINESS_REPORT.md](video/PRODUCTION_READINESS_REPORT.md)
-- [video/PUBLICATION_GUIDE.md](video/PUBLICATION_GUIDE.md)
+- [FINAL_QA_CHECKLIST.md](FINAL_QA_CHECKLIST.md)
+- [PRODUCTION_READINESS_REPORT.md](PRODUCTION_READINESS_REPORT.md)
+- [PUBLICATION_GUIDE.md](PUBLICATION_GUIDE.md)
 
 Execution order:
 
@@ -80,4 +80,4 @@ Completion condition:
 
 ## Current Blocker
 
-The repository does not currently contain a rendered intro video export under [video](video), so the workflow cannot move beyond documentation until the Resolve timeline is actually assembled and rendered.
+The repository does not currently contain a rendered intro video export under [exports](exports), so the workflow cannot move beyond documentation until the Resolve timeline is actually assembled and rendered.

@@ -2,8 +2,8 @@
 
 Source documents:
 
-- [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
-- [video/project/RENDER_SPECIFICATION.md](video/project/RENDER_SPECIFICATION.md)
+- [storyboards/BIBLIONOCR_INTRO_STORYBOARD.md](storyboards/BIBLIONOCR_INTRO_STORYBOARD.md)
+- [project/RENDER_SPECIFICATION.md](project/RENDER_SPECIFICATION.md)
 
 This guide describes the publication workflow for the BiblionOCR introduction video.
 

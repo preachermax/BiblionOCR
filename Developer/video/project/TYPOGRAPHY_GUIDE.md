@@ -2,8 +2,8 @@
 
 Source documents:
 
-- [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
-- [video/project/RESOLVE_PROJECT_MANIFEST.md](video/project/RESOLVE_PROJECT_MANIFEST.md)
+- [../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md](../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md)
+- [RESOLVE_PROJECT_MANIFEST.md](RESOLVE_PROJECT_MANIFEST.md)
 
 This guide provides implementation guidance only for the approved typography already defined in the storyboard.
 

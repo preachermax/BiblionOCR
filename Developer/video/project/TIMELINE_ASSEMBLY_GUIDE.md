@@ -2,9 +2,9 @@
 
 Source documents present in this workspace:
 
-- [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
-- [video/intro_v1/storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md](video/intro_v1/storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md)
-- [video/project/RESOLVE_PROJECT_MANIFEST.md](video/project/RESOLVE_PROJECT_MANIFEST.md)
+- [../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md](../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md)
+- [../storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md](../storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md)
+- [RESOLVE_PROJECT_MANIFEST.md](RESOLVE_PROJECT_MANIFEST.md)
 
 This guide describes how to assemble the BiblionOCR introduction video timeline in DaVinci Resolve.
 

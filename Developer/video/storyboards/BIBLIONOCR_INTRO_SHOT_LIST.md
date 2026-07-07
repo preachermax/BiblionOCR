@@ -1,6 +1,6 @@
 # BiblionOCR Intro Video Shot List
 
-Source of truth: [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
+Source of truth: [BIBLIONOCR_INTRO_STORYBOARD.md](BIBLIONOCR_INTRO_STORYBOARD.md)
 
 This shot list is derived from the approved storyboard only.
 

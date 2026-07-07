@@ -1534,6 +1534,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionImageScanner.triggered.connect(self.actionScanNetwork)
         self.ui.actionImageScanner_tb.triggered.connect(self.actionScanNetwork)
 
+        self.ui.actionMyExplorer.triggered.connect(self.OpenWithMyExplorer)
         self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
         self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
         self.ui.actionMyVersifier.triggered.connect(lambda: self.open_module("MyVersifier"))
@@ -1543,6 +1544,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
 
         # Button Modules
+        self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
         self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
 

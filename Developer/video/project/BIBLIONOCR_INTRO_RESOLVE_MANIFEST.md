@@ -1,6 +1,6 @@
 # BiblionOCR Intro Resolve Manifest
 
-Source of truth: [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
+Source of truth: [../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md](../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md)
 
 This manifest translates the approved storyboard into editor-facing scene blocks for timeline assembly.
 

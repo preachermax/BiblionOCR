@@ -2,7 +2,7 @@
 
 Source document:
 
-- [video/audio/NARRATION_PACKAGE.md](video/audio/NARRATION_PACKAGE.md)
+- [NARRATION_PACKAGE.md](NARRATION_PACKAGE.md)
 
 This guide is for AI voice generation and studio preparation only.
 
@@ -10,7 +10,7 @@ Do not rewrite narration.
 
 Do not generate audio from this document alone.
 
-Use the approved narration exactly as packaged in [video/audio/NARRATION_PACKAGE.md](video/audio/NARRATION_PACKAGE.md).
+Use the approved narration exactly as packaged in [NARRATION_PACKAGE.md](NARRATION_PACKAGE.md).
 
 ## AI Voice Preparation
 
@@ -23,7 +23,7 @@ Use the approved narration exactly as packaged in [video/audio/NARRATION_PACKAGE
   - clear diction
   - no promotional delivery
   - no theatrical delivery
-- Load the narration from [video/audio/NARRATION_PACKAGE.md](video/audio/NARRATION_PACKAGE.md) without paraphrase.
+- Load the narration from [NARRATION_PACKAGE.md](NARRATION_PACKAGE.md) without paraphrase.
 - Preserve all approved pauses, including ellipsis-driven pauses and end-of-line release timing.
 - Keep Scene 1 unvoiced.
 - Preserve pronunciation guidance for:
@@ -46,7 +46,7 @@ Use the approved narration exactly as packaged in [video/audio/NARRATION_PACKAGE
 
 ## Suggested Generation Workflow
 
-1. Open [video/audio/NARRATION_PACKAGE.md](video/audio/NARRATION_PACKAGE.md) and confirm the approved script, pause guidance, and pronunciation notes.
+1. Open [NARRATION_PACKAGE.md](NARRATION_PACKAGE.md) and confirm the approved script, pause guidance, and pronunciation notes.
 2. Configure the AI voice using the approved narrator profile.
 3. Generate a first clean pass for each narrated scene only:
    - Scene 2
@@ -81,7 +81,7 @@ Increment version numbers only when a new approved render supersedes the prior o
 
 ## Quality Verification Checklist
 
-- The narration text matches [video/audio/NARRATION_PACKAGE.md](video/audio/NARRATION_PACKAGE.md) exactly.
+- The narration text matches [NARRATION_PACKAGE.md](NARRATION_PACKAGE.md) exactly.
 - Scene 1 contains no spoken narration.
 - Pronunciations match the approved notes.
 - Delivery sounds educated Southern American, warm baritone, calm, and restrained.
@@ -96,4 +96,4 @@ Increment version numbers only when a new approved render supersedes the prior o
 - The sample rate is `48 kHz`.
 - The bit depth is `24-bit PCM`.
 - File naming follows the approved convention.
-- Final files are ready for import into the Resolve timeline described in [video/project/RESOLVE_PROJECT_MANIFEST.md](video/project/RESOLVE_PROJECT_MANIFEST.md).
+- Final files are ready for import into the Resolve timeline described in [../project/RESOLVE_PROJECT_MANIFEST.md](../project/RESOLVE_PROJECT_MANIFEST.md).

@@ -2,7 +2,7 @@
 
 Source document:
 
-- [video/project/RESOLVE_PROJECT_MANIFEST.md](video/project/RESOLVE_PROJECT_MANIFEST.md)
+- [RESOLVE_PROJECT_MANIFEST.md](RESOLVE_PROJECT_MANIFEST.md)
 
 This document defines recommended render settings for the BiblionOCR introduction video.
 
@@ -44,9 +44,9 @@ It does not generate proprietary Resolve project files.
 
 ### Output Directory
 
-- Recommended output directory: [video/intro_v1/exports/README.md](video/intro_v1/exports/README.md)
+- Recommended output directory: [../exports/README.md](../exports/README.md)
 - Operational export path recommendation:
-  - `video/intro_v1/exports/master/`
+  - `Developer/video/exports/master/`
 
 ### Checksum Recommendation
 
@@ -83,9 +83,9 @@ It does not generate proprietary Resolve project files.
 
 ### Output Directory
 
-- Recommended output directory: [video/intro_v1/exports/README.md](video/intro_v1/exports/README.md)
+- Recommended output directory: [../exports/README.md](../exports/README.md)
 - Operational export path recommendation:
-  - `video/intro_v1/exports/youtube/`
+  - `Developer/video/exports/youtube/`
 
 ### Checksum Recommendation
 

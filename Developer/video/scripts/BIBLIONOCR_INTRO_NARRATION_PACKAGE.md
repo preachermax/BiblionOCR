@@ -1,6 +1,6 @@
 # BiblionOCR Intro Narration Package
 
-Source of truth: [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
+Source of truth: [../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md](../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md)
 
 This package reproduces the approved narration and voice constraints without altering the storyboard text.
 

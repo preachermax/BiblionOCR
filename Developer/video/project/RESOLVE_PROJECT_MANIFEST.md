@@ -2,8 +2,8 @@
 
 Source documents:
 
-- [Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md](Developer/StoryBoard/BIBLIONOCR_INTRO_STORYBOARD.md)
-- [video/intro_v1/storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md](video/intro_v1/storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md)
+- [../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md](../storyboards/BIBLIONOCR_INTRO_STORYBOARD.md)
+- [../storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md](../storyboards/BIBLIONOCR_INTRO_SHOT_LIST.md)
 
 This manifest describes the complete DaVinci Resolve project configuration for the BiblionOCR introduction video without generating proprietary Resolve project files.
 
