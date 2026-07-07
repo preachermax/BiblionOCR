@@ -76,6 +76,7 @@ Contributor-facing and participation-oriented project material.
 
 Key documents:
 - [README.md](community/README.md)
+- [MEMBERSHIP.md](community/MEMBERSHIP.md)
 
 ### `roadmap/`
 

@@ -42,5 +42,6 @@ Developer contributions and content submissions do not follow the same review pa
 
 - Developers should contribute through pull requests and repository review.
 - Content creators should only submit material that the project has clear rights to publish and redistribute.
+- Membership requests now start through GitHub issue forms and are approved through the reviewed registry in `.github/membership-registry.json`.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [CONTENT_POLICY.md](CONTENT_POLICY.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CONTENT_POLICY.md](CONTENT_POLICY.md), and [docs/community/MEMBERSHIP.md](docs/community/MEMBERSHIP.md).
