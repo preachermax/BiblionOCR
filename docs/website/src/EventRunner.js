@@ -10,6 +10,10 @@ export class EventRunner {
     this.activeTraceId = null;
   }
 
+  #isCurrentRun(runId) {
+    return runId === this.runId;
+  }
+
   async run(startEvent, context = {}) {
     if (!this.eventBus) {
       throw new Error("EventRunner requires an EventBus instance.");
@@ -48,6 +52,7 @@ export class EventRunner {
       const result = await Promise.resolve(
         this.executor(startEvent, {
           ...context,
+          isCurrentRun: () => this.#isCurrentRun(runId),
           traceId,
           delayMs: this.delayMs
         })

@@ -16,6 +16,7 @@ Current scope:
 * button-driven linear sequence highlight for the overview graph
 * reset action for returning the sequence highlight to the first node
 * optional autoplay for advancing the overview sequence automatically
+* autoplay mode now favors the graph surface by collapsing diagnostic side panels while the sequence runs
 * interaction events now emit timestamped entries through `src/eventLogger.js`
 * a React event log panel now renders logged events and timestamps from the logger module
 * a React system-state panel now renders `activeNode`, `lastEvent`, and `isRunning` from the state manager
@@ -41,6 +42,12 @@ Files:
 * `src/stateManager.js` stores `activeNode`, `lastEvent`, and `isRunning` with getter, setter, and subscription helpers.
 * `src/styles.css` provides the page layout and visual treatment.
 * `preview.html` mirrors the demo in a no-build browser-friendly form for environments without Node.js.
+
+Autoplay behavior notes:
+
+* the live autoplay path now emits concrete `sequence_step` updates rather than only abstract event-graph entries
+* while autoplay is active, the system-state and event-log panels are hidden so the graph animation has more visual room
+* the active-node highlight now relies on border and fill treatment without the earlier invalid shadow style warnings
 
 To run locally once Node.js and npm are installed:
 
