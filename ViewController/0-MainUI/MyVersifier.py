@@ -20,6 +20,7 @@ from ext import versifiercount, versefind, reffind
 # Custom imports
 from MyVersifierUI import Ui_Versifier
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 from LocalFileDrop import LocalFileDropMixin
@@ -196,6 +197,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyVersifier',
+            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+        )
         #print(f'Reference File Path: {self.refpath}')
         #self.getRefText(self.refpath)
         # Startup
@@ -289,6 +295,9 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings
         self._startup_progress("loading session settings")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('VersifierSession.json')
         repo_root_name = os.path.basename(os.path.normpath(self.projecthome))
 

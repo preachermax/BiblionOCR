@@ -34,6 +34,7 @@ from Training import Train as tr
 import ChrReference as chrref
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
+from project_status_controller import ProjectStatusController
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -250,6 +251,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyReader',
+            session_manager=self.session_manager,
+        )
 
         self.dirIterator = None
         self.imgfileList = []
@@ -363,6 +369,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def get_session_settings(self):
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('ReaderSession.json')
 
         defaults = {

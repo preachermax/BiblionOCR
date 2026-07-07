@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 
 #import glob
 import shutil
@@ -273,6 +274,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyGlypher',
+            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+        )
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
 
@@ -297,6 +303,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def get_session_settings(self):
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('GlypherSession.json')
 
         def get_setting(name: str, default=None):

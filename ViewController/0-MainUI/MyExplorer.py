@@ -5,6 +5,8 @@ import os
 import shlex
 import shutil
 import sys
+from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
@@ -98,6 +100,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
     def __init__(self, start_dir=None, maya=False):
         super(MyFileBrowser, self).__init__()
         self.start_dir = start_dir
+        self.session_manager = SessionManager()
         self.setupUi(self)
         original_tree = self.treeView
         self.treeView = ExplorerTreeView(self.frame)
@@ -111,6 +114,11 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView.customContextMenuRequested.connect(self.context_menu)
         
         self.populate()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyExplorer',
+            session_manager=self.session_manager,
+        )
 
     def populate(self):
         dir_path = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else os.path.join(os.path.expanduser('~'), 'Projects')

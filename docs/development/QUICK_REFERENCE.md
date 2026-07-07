@@ -60,6 +60,42 @@ python3 MyExplorer.py           # File browser
 
 ---
 
+## Current Project Contract
+
+- Select or create the active project in `MyServer` first.
+- `MyServer` now publishes the active project to shared session state for the rest of the runtime modules.
+- Other tools should treat that shared selection as the current project instead of inferring project identity only from the last opened file.
+- If a module shows `Project: none`, open or switch the project in `MyServer` and let the module refresh.
+
+---
+
+## Project Status and Milestones
+
+- Main runtime modules now show a common status-bar surface with the current project, workflow status, overall progress, and a `Milestones` button.
+- The `Milestones` button opens the shared milestone editor dialog for the currently selected project.
+- Milestones are persisted per project in `Model/Project/Data/json/ProjectTracking.json`.
+- Project selection is shared through `Model/Project/Data/json/Session.json`.
+- The milestone editor is intended to be user-visible and manually editable, not only auto-derived from file artifacts.
+
+Modules with the common project-status surface:
+
+- `MyServer`
+- `MyPixler`
+- `MyScanner`
+- `MyReader`
+- `MyWriter`
+- `MyGrounder`
+- `MyVersifier`
+- `MyTrainer`
+- `MyGlypher`
+- `MyBoxer`
+- `MyLexer`
+- `MyResolver`
+- `MyExplorer`
+- `MyLauncher`
+
+---
+
 ## Key Workflows
 
 ### Workflow 1: Complete OCR from PDF

@@ -30,6 +30,8 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame, QProgressBar
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from PyQt5.QtGui import QPainter, QPen, QBrush
+from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 
 
 from queue import Queue
@@ -337,6 +339,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyLexer',
+            session_manager=SessionManager(),
+        )
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
@@ -437,6 +444,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.homedir = '/home'
         self.user = '/jetson'
         self.userdir = '/home/jetson'
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
 
         # Define json data
         print("loading session")

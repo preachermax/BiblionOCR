@@ -80,6 +80,7 @@ from ext import mainfind
 from HelpSystem import add_help_menu
 from Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
+from Core.project_tracking import ProjectWorkflowTracker
 from Core.Scanner import NetworkScanner, ScanManager
 from scan_runtime import start_scan_workflow
 # EventBus is still defined below in this module during the Core migration.
@@ -118,6 +119,7 @@ import MyVersifier as versify
 import MyBoxer as boxer
 import MyScanner as scanner
 import MyExplorer as explorer
+from ProjectTrackingDialog import ProjectTrackingDialog
 import MyGrounder as gtr
 import ImageLoadWorker
 from ProjectCreationWorker import ProjectCreationWorker
@@ -208,6 +210,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.runtime_inspector_panel = None
         self.runtime_inspector_dock = None
         self._developer_services_active = False
+        self.current_project_root = None
+        self._pending_project_root = None
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -233,6 +237,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.scannerManager = ScanManager()
 
         self.session_manager = SessionManager()
+        self.current_project_root = self.session_manager.get_active_project_root() or self.current_project_root
 
         # -------------------------
         # Progress Bar (FIXED)
@@ -241,6 +246,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.progress_bar.setRange(0, 100 * self._progress_bar_scale)
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
+        self._init_project_status_widgets()
         self.statusBar().addPermanentWidget(self.progress_bar)
 
         # -------------------------
@@ -448,6 +454,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             "project_created",
             self.on_project_created
         )
+        self._refresh_project_status()
 
     def _setup_developer_mode_ui(self):
         """Create hidden-by-default Developer Mode entry points.
@@ -580,12 +587,141 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionImageScanner_tb.setIcon(scan_icon)
             self.ui.actionImageScanner_tb.setIconVisibleInMenu(True)
 
+    def _init_project_status_widgets(self):
+        self.workflow_tracker = ProjectWorkflowTracker(workspace_root=project_root)
+
+        self.project_name_status_label = qtw.QLabel("Project: none")
+        self.project_name_status_label.setMinimumWidth(180)
+
+        self.workflow_status_label = qtw.QLabel("MyServer 0/4 | Next: Project initialized")
+        self.workflow_status_label.setMinimumWidth(360)
+
+        self.project_overall_status_bar = qtw.QProgressBar()
+        self.project_overall_status_bar.setRange(0, 100)
+        self.project_overall_status_bar.setValue(0)
+        self.project_overall_status_bar.setTextVisible(True)
+        self.project_overall_status_bar.setFormat("Project 0%")
+        self.project_overall_status_bar.setFixedWidth(140)
+        self.project_overall_status_bar.setAlignment(Qt.AlignCenter)
+
+        self.project_tracking_button = qtw.QPushButton("Milestones")
+        self.project_tracking_button.setFixedHeight(24)
+        self.project_tracking_button.clicked.connect(self._open_project_tracking_dialog)
+
+        self.statusBar().addPermanentWidget(self.project_name_status_label)
+        self.statusBar().addPermanentWidget(self.workflow_status_label)
+        self.statusBar().addPermanentWidget(self.project_overall_status_bar)
+        self.statusBar().addPermanentWidget(self.project_tracking_button)
+
+    def _format_module_workflow_status(self, module_name, snapshot):
+        module_total = int(snapshot.get("module_total_count", 0))
+        module_completed = int(snapshot.get("module_completed_count", 0))
+        next_label = snapshot.get("module_next_label", "")
+
+        if module_total <= 0:
+            return f"{module_name} | No milestones configured"
+        if next_label == "Complete":
+            return f"{module_name} {module_completed}/{module_total} | Complete"
+        return f"{module_name} {module_completed}/{module_total} | Next: {next_label}"
+
+    def _shared_active_project_root(self):
+        return self.session_manager.get_active_project_root()
+
+    def _set_current_project(self, project_root):
+        if not project_root:
+            return None
+
+        resolved_root = self.workflow_tracker.resolve_project_root(project_root) or os.path.abspath(os.path.normpath(project_root))
+        self.current_project_root = resolved_root
+        self.session_manager.set_active_project(resolved_root)
+        return resolved_root
+
+    def _refresh_project_status(self, candidate_path=None):
+        snapshot = self.workflow_tracker.snapshot(
+            "MyServer",
+            project_root=self.current_project_root,
+            candidate_paths=(
+                self._shared_active_project_root(),
+                candidate_path,
+                self.current_project_root,
+                getattr(self, "imgpath", ""),
+                getattr(self, "imgdir", ""),
+                getattr(self, "txtpath", ""),
+                getattr(self, "txtdir", ""),
+            ),
+        )
+
+        project_root_value = snapshot.get("project_root")
+        if project_root_value:
+            self._set_current_project(project_root_value)
+
+        project_name = snapshot.get("project_name", "none")
+        self.project_name_status_label.setText(f"Project: {project_name}")
+        self.project_name_status_label.setToolTip(project_root_value or "No active project selected")
+
+        completed_labels = snapshot.get("completed_labels", [])
+        completed_text = ", ".join(completed_labels) if completed_labels else "None yet"
+        overall_percent = int(snapshot.get("overall_percent", 0))
+        overall_next = snapshot.get("overall_next_label", "")
+        tooltip = f"Overall {overall_percent}%\nCompleted: {completed_text}\nNext: {overall_next}"
+
+        self.workflow_status_label.setText(self._format_module_workflow_status("MyServer", snapshot))
+        self.workflow_status_label.setToolTip(tooltip)
+        self.project_overall_status_bar.setValue(overall_percent)
+        self.project_overall_status_bar.setFormat(f"Project {overall_percent}%")
+        self.project_overall_status_bar.setToolTip(tooltip)
+
+    def _record_project_milestone(self, milestone_key, candidate_path=None, details=None):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            candidate_path,
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+        )
+        if not project_root:
+            return None
+
+        self._set_current_project(project_root)
+        self.workflow_tracker.record_milestone(
+            project_root,
+            milestone_key,
+            module_name="MyServer",
+            details=details,
+        )
+        self._refresh_project_status(project_root)
+        return project_root
+
+    def _open_project_tracking_dialog(self):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+            getattr(self, "txtpath", ""),
+            getattr(self, "txtdir", ""),
+        )
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                "Project Milestones",
+                "Open or create a project first so milestone state can be edited.",
+            )
+            return
+
+        self._set_current_project(project_root)
+        self.workflow_tracker.ensure_tracking_state(project_root)
+        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, "MyServer", self)
+        dialog.exec_()
+        self._refresh_project_status(project_root)
+
     def on_new_project_clicked(self):
         payload = self.collect_new_project_payload()
         if payload is None:
             return None
 
         project_path = os.path.join(self.project_engine.base_path, payload["project_name"])
+        self._pending_project_root = project_path
         if os.path.exists(project_path):
             answer = qtw.QMessageBox.question(
                 self,
@@ -595,6 +731,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 qtw.QMessageBox.No,
             )
             if answer != qtw.QMessageBox.Yes:
+                self._pending_project_root = None
                 return None
             payload["overwrite_existing"] = True
 
@@ -618,6 +755,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
             return None
 
+        self._set_current_project(project_path)
+        self.workflow_tracker.ensure_tracking_state(project_path)
+        self._record_project_milestone("project_ready", project_path)
+        self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
         self.run_child_module('MyExplorer.py', project_path)
         return project_path
@@ -664,6 +805,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._hide_progress(100)
 
         if result.get("status") in {"success", "ok"}:
+            if self._pending_project_root:
+                self._set_current_project(self._pending_project_root)
+                self.workflow_tracker.ensure_tracking_state(self._pending_project_root)
+                self._record_project_milestone(
+                    "project_ready",
+                    self._pending_project_root,
+                    details={"source": "project_creation"},
+                )
+                self._refresh_project_status(self._pending_project_root)
             qtw.QMessageBox.information(
                 self,
                 self._project_success_title,
@@ -675,9 +825,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 "Project Creation Failed",
                 result.get("error", "Unknown error")
             )
+        self._pending_project_root = None
 
     def on_project_creation_error(self, msg):
         self._hide_progress()
+        self._pending_project_root = None
 
         qtw.QMessageBox.warning(
             self,
@@ -809,6 +961,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         self.showImage(result["path"])
+        self._record_project_milestone(
+            "source_acquired",
+            result["path"],
+            details={"backend": result.get("backend", "scanner backend")},
+        )
         self.statusBar().showMessage(
             f"Scanned via {result.get('backend', 'scanner backend')}: {result['path']}",
             5000,
@@ -2633,6 +2790,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.imgpath = imgfilename
         print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
         self.imgfilename = self.imgpath
+        self.imgdir = os.path.dirname(imgfilename)
         file = qtc.QFile(imgfilename)
         filestr = os.path.basename(imgfilename)
         filesplit = os.path.splitext(filestr)
@@ -2662,6 +2820,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
         })
+        self._record_project_milestone(
+            "source_acquired",
+            self.imgpath,
+            details={"source": "showImage"},
+        )
+        self._refresh_project_status(self.imgpath)
 
         self.imgfileList = []
         for i in sorted(os.listdir(self.imgdir)):

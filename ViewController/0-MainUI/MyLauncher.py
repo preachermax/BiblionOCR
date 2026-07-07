@@ -18,6 +18,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
 import tiffcapture
@@ -121,12 +122,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyLauncher',
+            session_manager=self.session_manager,
+        )
 
         self.show()
 
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('Session.json')
 
         def get_setting(name: str, default=None):
