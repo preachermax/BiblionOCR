@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import csv
 import glob
+import json
 import os
+import platform
 import re
 import subprocess
 from typing import Any, Dict, Iterable, Mapping
@@ -53,11 +56,56 @@ class GPUProvider(ComputeProvider):
 
 	def _devices(self) -> tuple[Dict[str, Any], ...]:
 		"""Return detected GPU devices using the best available source."""
+		if platform.system() == "Windows":
+			return self._devices_from_windows()
+
 		devices = self._devices_from_lspci()
 		if devices:
 			return devices
 
-		return self._devices_from_sysfs()
+		devices = self._devices_from_sysfs()
+		if devices:
+			return devices
+
+		return self._devices_from_jetson_sysfs()
+
+	def _devices_from_windows(self) -> tuple[Dict[str, Any], ...]:
+		"""Read GPU information from Windows management interfaces."""
+		output = self._run_first_available_command(
+			(
+				(
+					"powershell",
+					"-NoProfile",
+					"-Command",
+					"Get-CimInstance Win32_VideoController | Select-Object Name,AdapterCompatibility,DriverVersion,AdapterRAM,PNPDeviceID,VideoProcessor | ConvertTo-Json -Compress",
+				),
+				(
+					"pwsh",
+					"-NoProfile",
+					"-Command",
+					"Get-CimInstance Win32_VideoController | Select-Object Name,AdapterCompatibility,DriverVersion,AdapterRAM,PNPDeviceID,VideoProcessor | ConvertTo-Json -Compress",
+				),
+			)
+		)
+		if output is not None:
+			devices = self._devices_from_windows_json(output)
+			if devices:
+				return devices
+
+		output = self._run_command(
+			(
+				"wmic",
+				"path",
+				"win32_VideoController",
+				"get",
+				"Name,AdapterCompatibility,DriverVersion,AdapterRAM,PNPDeviceID,VideoProcessor",
+				"/format:csv",
+			)
+		)
+		if output is None:
+			return ()
+
+		return self._devices_from_wmic_csv(output)
 
 	def _devices_from_lspci(self) -> tuple[Dict[str, Any], ...]:
 		"""Read GPU information from lspci when it is available."""
@@ -115,6 +163,92 @@ class GPUProvider(ComputeProvider):
 					"model": uevent.get("PCI_ID", device_id),
 					"driver": driver,
 					"bus_id": os.path.basename(real_path),
+				}
+			)
+
+		return tuple(devices)
+
+	def _devices_from_jetson_sysfs(self) -> tuple[Dict[str, Any], ...]:
+		"""Read Jetson-integrated GPU information from device-tree backed sysfs."""
+		devices = []
+
+		for compatible_path in sorted(glob.glob("/sys/class/devfreq/*/device/of_node/compatible")):
+			compatible = self._read_text(compatible_path)
+			if compatible is None:
+				continue
+
+			compatible_values = [value for value in compatible.replace("\x00", "\n").splitlines() if value]
+			if not any("nvidia" in value.lower() for value in compatible_values):
+				continue
+
+			device_root = os.path.dirname(os.path.dirname(compatible_path))
+			name = self._read_text(os.path.join(device_root, "of_node", "name"))
+			driver = os.path.basename(os.path.realpath(os.path.join(device_root, "driver")))
+			if driver == "driver":
+				driver = None
+
+			devices.append(
+				{
+					"vendor": "NVIDIA",
+					"model": self._jetson_model_name(name, compatible_values),
+					"driver": driver,
+					"platform": "jetson",
+					"bus_id": os.path.basename(os.path.dirname(compatible_path)),
+				}
+			)
+
+		return tuple(devices)
+
+	def _devices_from_windows_json(self, output: str) -> tuple[Dict[str, Any], ...]:
+		"""Parse GPU devices from PowerShell JSON output for deterministic testing."""
+		try:
+			payload = json.loads(output)
+		except ValueError:
+			return ()
+
+		if isinstance(payload, dict):
+			entries = [payload]
+		elif isinstance(payload, list):
+			entries = [entry for entry in payload if isinstance(entry, dict)]
+		else:
+			return ()
+
+		devices = []
+		for entry in entries:
+			description = str(entry.get("Name") or entry.get("VideoProcessor") or "").strip()
+			adapter_compatibility = str(entry.get("AdapterCompatibility") or "").strip()
+			pnp_device_id = str(entry.get("PNPDeviceID") or "").strip()
+			devices.append(
+				{
+					"vendor": self._windows_vendor_name(adapter_compatibility, description, pnp_device_id),
+					"model": description or None,
+					"driver_version": str(entry.get("DriverVersion") or "").strip() or None,
+					"memory_total_mb": self._windows_memory_mb(entry.get("AdapterRAM")),
+					"pnp_device_id": pnp_device_id or None,
+				}
+			)
+
+		return tuple(devices)
+
+	def _devices_from_wmic_csv(self, output: str) -> tuple[Dict[str, Any], ...]:
+		"""Parse GPU devices from WMIC CSV output for deterministic testing."""
+		rows = csv.DictReader(output.splitlines())
+		devices = []
+
+		for row in rows:
+			description = str(row.get("Name") or row.get("VideoProcessor") or "").strip()
+			adapter_compatibility = str(row.get("AdapterCompatibility") or "").strip()
+			pnp_device_id = str(row.get("PNPDeviceID") or "").strip()
+			if not description and not adapter_compatibility:
+				continue
+
+			devices.append(
+				{
+					"vendor": self._windows_vendor_name(adapter_compatibility, description, pnp_device_id),
+					"model": description or None,
+					"driver_version": str(row.get("DriverVersion") or "").strip() or None,
+					"memory_total_mb": self._windows_memory_mb(row.get("AdapterRAM")),
+					"pnp_device_id": pnp_device_id or None,
 				}
 			)
 
@@ -181,6 +315,43 @@ class GPUProvider(ComputeProvider):
 
 		return self._VENDOR_NAMES.get(vendor_id.lower(), vendor_id)
 
+	def _windows_vendor_name(
+		self,
+		adapter_compatibility: str,
+		description: str,
+		pnp_device_id: str,
+	) -> str | None:
+		"""Infer a Windows GPU vendor from multiple descriptive fields."""
+		vendor = self._vendor_from_description(adapter_compatibility or description)
+		if vendor is not None:
+			return vendor
+
+		match = re.search(r"VEN_([0-9A-Fa-f]{4})", pnp_device_id)
+		if match is None:
+			return None
+
+		return self._vendor_name(f"0x{match.group(1).lower()}")
+
+	def _windows_memory_mb(self, value: Any) -> int | None:
+		"""Convert Windows adapter memory bytes to megabytes."""
+		try:
+			memory_bytes = int(str(value))
+		except (TypeError, ValueError):
+			return None
+
+		if memory_bytes <= 0:
+			return None
+
+		return round(memory_bytes / (1024 ** 2))
+
+	def _jetson_model_name(self, name: str | None, compatible_values: Iterable[str]) -> str:
+		"""Build a readable Jetson GPU model name from sysfs values."""
+		if name:
+			return name
+
+		compatible = next(iter(compatible_values), "jetson-gpu")
+		return compatible.split(",")[-1]
+
 	def _read_text(self, path: str) -> str | None:
 		"""Read a trimmed text file when available."""
 		try:
@@ -221,6 +392,18 @@ class GPUProvider(ComputeProvider):
 			return None
 
 		return result.stdout.strip() or None
+
+	def _run_first_available_command(
+		self,
+		commands: Iterable[Iterable[str]],
+	) -> str | None:
+		"""Run the first available command that returns useful output."""
+		for command in commands:
+			output = self._run_command(command)
+			if output is not None:
+				return output
+
+		return None
 
 	def _normalize_bus_id(self, bus_id: str) -> str:
 		"""Normalize GPU bus IDs so metrics can be merged consistently."""
