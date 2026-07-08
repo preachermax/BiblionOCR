@@ -63,32 +63,37 @@ class ComputeEngine:
 
     def get_profile(self) -> Mapping[str, Any]:
         """
-        Return a unified profile view for registered providers.
+        Return a normalized compute profile for registered providers.
 
-        The result is intentionally generic so the compute engine can compose
-        information from current and future provider types without hard-coding
-        knowledge about specific accelerator technologies.
+        The public profile groups hardware information into stable top-level
+        sections such as ``cpu``, ``memory``, ``storage``, ``gpus``, and
+        ``cuda``. Raw provider output is preserved alongside the normalized
+        view for callers that need provider-specific detail.
         """
         self._bootstrap_if_enabled()
-        return {
-            "providers": [self._provider_profile(provider) for provider in self.providers()],
-            "available_providers": [
-                self._provider_name(provider) for provider in self.available_providers()
-            ],
-        }
+        provider_profiles = [self._provider_profile(provider) for provider in self.providers()]
+        profile = self._empty_profile_schema()
+        profile.update(self._normalized_profile_sections(provider_profiles))
+        profile["providers"] = provider_profiles
+        profile["available_providers"] = [
+            self._provider_name(provider) for provider in self.available_providers()
+        ]
+        return profile
 
     def get_status(self) -> Mapping[str, Any]:
         """
-        Return current runtime status for registered providers.
+        Return normalized runtime status for registered providers.
 
-        Status entries are grouped per provider so callers can inspect the
-        current runtime view without requiring direct access to provider
-        implementations.
+        The public status groups runtime information into the same stable
+        top-level sections as the profile output. Raw provider status is
+        preserved separately for provider-specific consumers.
         """
         self._bootstrap_if_enabled()
-        return {
-            "providers": [self._provider_status(provider) for provider in self.providers()],
-        }
+        provider_status = [self._provider_status(provider) for provider in self.providers()]
+        status = self._empty_status_schema()
+        status.update(self._normalized_status_sections(provider_status))
+        status["providers"] = provider_status
+        return status
 
     def _bootstrap_if_enabled(self) -> None:
         """Run lazy provider discovery when the engine is configured to do so."""
@@ -114,3 +119,197 @@ class ComputeEngine:
             "available": provider.available(),
             "status": dict(provider.status()),
         }
+
+    def _empty_profile_schema(self) -> Dict[str, Any]:
+        """Return the default normalized compute-engine profile schema."""
+        return {
+            "cpu": {
+                "vendor": None,
+                "model": None,
+                "architecture": None,
+                "platform": None,
+                "cores": None,
+                "threads": None,
+                "logical_threads": None,
+            },
+            "memory": {
+                "installed_bytes": None,
+                "installed_gb": None,
+                "total_bytes": None,
+                "total_gb": None,
+                "available_bytes": None,
+            },
+            "storage": {
+                "path": None,
+                "capacity_bytes": None,
+                "capacity_gb": None,
+                "total_bytes": None,
+                "total_gb": None,
+                "available_bytes": None,
+                "free_bytes": None,
+            },
+            "gpus": [],
+            "cuda": {
+                "available": False,
+                "version": None,
+                "device_count": 0,
+                "devices": [],
+                "driver_version": None,
+            },
+            "providers": [],
+            "available_providers": [],
+        }
+
+    def _empty_status_schema(self) -> Dict[str, Any]:
+        """Return the default normalized compute-engine status schema."""
+        return {
+            "cpu": {
+                "threads": None,
+                "logical_threads": None,
+                "load_average_1m": None,
+                "load_average_5m": None,
+                "load_average_15m": None,
+            },
+            "memory": {
+                "installed_bytes": None,
+                "total_bytes": None,
+                "available_bytes": None,
+                "free_bytes": None,
+                "used_bytes": None,
+            },
+            "storage": {
+                "path": None,
+                "capacity_bytes": None,
+                "total_bytes": None,
+                "available_bytes": None,
+                "free_bytes": None,
+                "used_bytes": None,
+            },
+            "gpus": [],
+            "cuda": {
+                "available": False,
+                "version": None,
+                "device_count": 0,
+                "devices": [],
+                "driver_version": None,
+            },
+            "providers": [],
+        }
+
+    def _normalized_profile_sections(
+        self,
+        provider_profiles: Iterable[Mapping[str, Any]],
+    ) -> Dict[str, Any]:
+        """Build normalized top-level profile sections from raw provider data."""
+        return self._normalized_sections(provider_profiles, payload_key="profile")
+
+    def _normalized_status_sections(
+        self,
+        provider_status: Iterable[Mapping[str, Any]],
+    ) -> Dict[str, Any]:
+        """Build normalized top-level status sections from raw provider data."""
+        return self._normalized_sections(provider_status, payload_key="status")
+
+    def _normalized_sections(
+        self,
+        provider_entries: Iterable[Mapping[str, Any]],
+        payload_key: str,
+    ) -> Dict[str, Any]:
+        """Map raw provider entries into the public compute-engine schema."""
+        normalized = (
+            self._empty_profile_schema()
+            if payload_key == "profile"
+            else self._empty_status_schema()
+        )
+
+        for entry in provider_entries:
+            payload = dict(entry.get(payload_key, {}))
+            resource = payload.pop("resource", None)
+
+            if resource == "cpu":
+                normalized["cpu"] = self._normalize_cpu_section(payload_key, payload, normalized["cpu"])
+            elif resource == "memory":
+                normalized["memory"] = self._normalize_memory_section(
+                    payload_key,
+                    payload,
+                    normalized["memory"],
+                )
+            elif resource == "storage":
+                normalized["storage"] = self._normalize_storage_section(
+                    payload_key,
+                    payload,
+                    normalized["storage"],
+                )
+            elif resource == "gpu":
+                normalized["gpus"] = list(payload.get("devices", []))
+            elif resource == "cuda":
+                cuda_section = dict(normalized["cuda"])
+                cuda_section.update(payload)
+                normalized["cuda"] = cuda_section
+
+        return normalized
+
+    def _normalize_cpu_section(
+        self,
+        payload_key: str,
+        payload: Mapping[str, Any],
+        default_section: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """Normalize CPU data into a stable public section."""
+        section = dict(default_section)
+        section.update(payload)
+
+        threads = payload.get("threads", payload.get("logical_threads"))
+        section["threads"] = threads
+        section["logical_threads"] = payload.get("logical_threads", threads)
+
+        if payload_key == "profile":
+            section["cores"] = payload.get("cores")
+
+        return section
+
+    def _normalize_memory_section(
+        self,
+        payload_key: str,
+        payload: Mapping[str, Any],
+        default_section: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """Normalize memory data into a stable public section."""
+        section = dict(default_section)
+        section.update(payload)
+
+        installed_bytes = payload.get("installed_bytes", payload.get("total_bytes"))
+        section["installed_bytes"] = installed_bytes
+        section["total_bytes"] = payload.get("total_bytes", installed_bytes)
+
+        if payload_key == "profile":
+            installed_gb = payload.get("installed_gb", payload.get("total_gb"))
+            section["installed_gb"] = installed_gb
+            section["total_gb"] = payload.get("total_gb", installed_gb)
+
+        return section
+
+    def _normalize_storage_section(
+        self,
+        payload_key: str,
+        payload: Mapping[str, Any],
+        default_section: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """Normalize storage data into a stable public section."""
+        section = dict(default_section)
+        section.update(payload)
+
+        capacity_bytes = payload.get("capacity_bytes", payload.get("total_bytes"))
+        section["capacity_bytes"] = capacity_bytes
+        section["total_bytes"] = payload.get("total_bytes", capacity_bytes)
+
+        available_bytes = payload.get("available_bytes", payload.get("free_bytes"))
+        section["available_bytes"] = available_bytes
+        section["free_bytes"] = payload.get("free_bytes", available_bytes)
+
+        if payload_key == "profile":
+            capacity_gb = payload.get("capacity_gb", payload.get("total_gb"))
+            section["capacity_gb"] = capacity_gb
+            section["total_gb"] = payload.get("total_gb", capacity_gb)
+
+        return section

@@ -24,7 +24,7 @@ class ProviderBootstrap:
 
 	def __init__(self, factories: Iterable[ProviderFactory] | None = None) -> None:
 		"""Initialize the bootstrap with provider factories."""
-		self._factories = tuple(factories or self.default_factories())
+		self._factories = tuple(self.default_factories() if factories is None else factories)
 
 	def discover(
 		self,
