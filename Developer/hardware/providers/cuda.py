@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import ctypes.util
+import glob
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -55,13 +58,17 @@ class CUDAProvider(ComputeProvider):
 		)
 		cuda_home = self._cuda_home()
 		nvcc_path = shutil.which("nvcc")
+		runtime_library = self._runtime_library()
+		jetpack_version = self._jetpack_version()
 		driver_version = devices[0].get("driver_version") if devices else None
 
 		return {
-			"available": bool(version or devices or cuda_home or nvcc_path),
+			"available": bool(version or devices or cuda_home or nvcc_path or runtime_library),
 			"version": version,
 			"cuda_home": cuda_home,
 			"nvcc_path": nvcc_path,
+			"runtime_library": runtime_library,
+			"jetpack_version": jetpack_version,
 			"driver_version": driver_version,
 			"devices": devices,
 		}
@@ -145,6 +152,10 @@ class CUDAProvider(ComputeProvider):
 			]
 		)
 
+		if platform.system() == "Windows":
+			candidates.extend(glob.glob(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v*\version.json"))
+			candidates.extend(glob.glob(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v*\version.txt"))
+
 		return tuple(dict.fromkeys(candidates))
 
 	def _cuda_version_from_json(self, path: str) -> str | None:
@@ -186,7 +197,42 @@ class CUDAProvider(ComputeProvider):
 				return value
 
 		default_path = "/usr/local/cuda"
-		return default_path if os.path.isdir(default_path) else None
+		if os.path.isdir(default_path):
+			return default_path
+
+		if platform.system() == "Windows":
+			matches = sorted(glob.glob(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v*"))
+			if matches:
+				return matches[-1]
+
+		return None
+
+	def _runtime_library(self) -> str | None:
+		"""Return the resolved CUDA runtime library name when discoverable."""
+		for library_name in ("cuda", "nvcuda"):
+			resolved = ctypes.util.find_library(library_name)
+			if resolved:
+				return resolved
+
+		return None
+
+	def _jetpack_version(self) -> str | None:
+		"""Return the JetPack/L4T release version on Jetson platforms."""
+		try:
+			with open("/etc/nv_tegra_release", "r", encoding="utf-8") as handle:
+				contents = handle.read()
+		except OSError:
+			return None
+
+		return self._parse_jetpack_version(contents)
+
+	def _parse_jetpack_version(self, contents: str) -> str | None:
+		"""Parse an L4T / JetPack release string from nv_tegra_release text."""
+		match = re.search(r"R([0-9]+)\s*\(release\),\s*REVISION:\s*([0-9.]+)", contents)
+		if match is None:
+			return contents.strip() or None
+
+		return f"L4T R{match.group(1)}.{match.group(2)}"
 
 	def _run_command(self, command: Iterable[str]) -> str | None:
 		"""Run a shell command and return stdout when it succeeds."""
