@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Any, Dict, Iterable, Mapping
 
 from Core.compute_provider import ComputeProvider
-from Core.compute_registry import ComputeRegistry
+from Core.compute_registry import ProviderRegistry
+from Developer.hardware.providers.bootstrap import default_provider_bootstrap
 
 
 class ComputeEngine:
@@ -20,15 +21,23 @@ class ComputeEngine:
     concrete provider implementations.
     """
 
-    def __init__(self, registry: ComputeRegistry | None = None) -> None:
+    def __init__(
+        self,
+        registry: ProviderRegistry | None = None,
+        auto_discover: bool = True,
+    ) -> None:
         """
         Initialize the compute engine.
 
         Args:
             registry: Optional provider registry. When omitted, the engine
-                creates a new empty registry for its own use.
+                creates a new registry configured with the default provider
+                bootstrap.
+            auto_discover: When ``True``, the engine lazily bootstraps
+                providers before provider queries and profile/status access.
         """
-        self._registry = registry or ComputeRegistry()
+        self._registry = registry or ProviderRegistry(default_provider_bootstrap())
+        self._auto_discover = auto_discover
 
     def register_provider(self, provider: ComputeProvider) -> None:
         """Register a provider with the engine's registry."""
@@ -40,11 +49,17 @@ class ComputeEngine:
 
     def providers(self) -> Iterable[ComputeProvider]:
         """Return all providers currently registered with the engine."""
+        self._bootstrap_if_enabled()
         return self._registry.providers()
 
     def available_providers(self) -> Iterable[ComputeProvider]:
         """Return only providers whose availability currently resolves true."""
+        self._bootstrap_if_enabled()
         return self._registry.available_providers()
+
+    def bootstrap_providers(self) -> Iterable[ComputeProvider]:
+        """Discover and register providers through the configured registry."""
+        return self._registry.discover()
 
     def get_profile(self) -> Mapping[str, Any]:
         """
@@ -54,6 +69,7 @@ class ComputeEngine:
         information from current and future provider types without hard-coding
         knowledge about specific accelerator technologies.
         """
+        self._bootstrap_if_enabled()
         return {
             "providers": [self._provider_profile(provider) for provider in self.providers()],
             "available_providers": [
@@ -69,9 +85,15 @@ class ComputeEngine:
         current runtime view without requiring direct access to provider
         implementations.
         """
+        self._bootstrap_if_enabled()
         return {
             "providers": [self._provider_status(provider) for provider in self.providers()],
         }
+
+    def _bootstrap_if_enabled(self) -> None:
+        """Run lazy provider discovery when the engine is configured to do so."""
+        if self._auto_discover:
+            self._registry.discover()
 
     def _provider_name(self, provider: ComputeProvider) -> str:
         """Return a stable engine-facing name for a provider instance."""

@@ -1,23 +1,39 @@
 from __future__ import annotations
 
-from typing import Iterable, List
+from typing import Iterable, List, Protocol
 
 from Core.compute_provider import ComputeProvider
 
 
-class ComputeRegistry:
+class ProviderBootstrap(Protocol):
+	"""Protocol for bootstrap components that discover provider instances."""
+
+	def discover(
+		self,
+		registered_providers: Iterable[ComputeProvider] = (),
+	) -> Iterable[ComputeProvider]:
+		"""Return discovered providers that should be registered."""
+
+
+class ProviderRegistry:
 	"""
 	In-memory registry for compute provider instances.
 
-	The registry is intentionally limited to provider lifecycle management.
-	It does not discover hardware, inspect platforms, or apply scheduling
-	logic. Its role is to maintain the collection of provider objects that
-	other compute-engine components may query.
+	The registry owns provider lifecycle management and optional bootstrap
+	discovery. Discovery is delegated to a bootstrap component so provider
+	selection and instantiation remain outside the compute engine itself.
 	"""
 
-	def __init__(self) -> None:
+	def __init__(self, bootstrap: ProviderBootstrap | None = None) -> None:
 		"""Initialize an empty provider registry."""
 		self._providers: List[ComputeProvider] = []
+		self._bootstrap = bootstrap
+		self._discovered = False
+
+	def set_bootstrap(self, bootstrap: ProviderBootstrap | None) -> None:
+		"""Assign or replace the bootstrap used for provider discovery."""
+		self._bootstrap = bootstrap
+		self._discovered = False
 
 	def register(self, provider: ComputeProvider) -> None:
 		"""
@@ -63,3 +79,23 @@ class ComputeRegistry:
 			currently reports ``True``.
 		"""
 		return tuple(provider for provider in self._providers if provider.available())
+
+	def discover(self) -> Iterable[ComputeProvider]:
+		"""
+		Discover providers through the configured bootstrap once.
+
+		Returns:
+			An immutable snapshot of the registry after discovery completes.
+		"""
+		if self._discovered:
+			return self.providers()
+
+		if self._bootstrap is not None:
+			for provider in self._bootstrap.discover(self.providers()):
+				self.register(provider)
+
+		self._discovered = True
+		return self.providers()
+
+
+ComputeRegistry = ProviderRegistry
