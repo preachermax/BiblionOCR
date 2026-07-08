@@ -7,6 +7,8 @@ from Core.compute_engine import ComputeEngine
 from Core.compute_provider import ComputeProvider
 from Core.compute_registry import ProviderRegistry
 from Developer.hardware.providers.bootstrap import ProviderBootstrap
+from Developer.hardware.providers.cuda import CUDAProvider
+from Developer.hardware.providers.gpu import GPUProvider
 
 
 class FakeAvailableProvider(ComputeProvider):
@@ -77,6 +79,12 @@ class ProviderBootstrapTests(unittest.TestCase):
 		engine.get_status()
 
 		self.assertEqual(1, bootstrap.calls)
+
+	def test_default_factories_include_gpu_and_cuda_providers(self) -> None:
+		factories = ProviderBootstrap.default_factories()
+
+		self.assertIn(GPUProvider, factories)
+		self.assertIn(CUDAProvider, factories)
 
 
 if __name__ == "__main__":

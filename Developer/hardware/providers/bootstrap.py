@@ -4,6 +4,8 @@ from typing import Callable, Iterable, Tuple
 
 from Core.compute_provider import ComputeProvider
 from Developer.hardware.providers.cpu import CPUProvider
+from Developer.hardware.providers.cuda import CUDAProvider
+from Developer.hardware.providers.gpu import GPUProvider
 from Developer.hardware.providers.memory import MemoryProvider
 from Developer.hardware.providers.storage import StorageProvider
 
@@ -53,6 +55,8 @@ class ProviderBootstrap:
 			CPUProvider,
 			MemoryProvider,
 			StorageProvider,
+			GPUProvider,
+			CUDAProvider,
 		)
 
 	def _build_provider(self, factory: ProviderFactory) -> ComputeProvider | None:
