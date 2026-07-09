@@ -202,7 +202,8 @@ This profile becomes the authoritative hardware description for the current runt
 
 Current implementation note:
 
-* `Core/compute_profile.py` now defines schema-only dataclasses for the normalized profile shape: `CPUProfile`, `MemoryProfile`, `StorageProfile`, `GPUProfile`, `CUDAProfile`, `ProviderProfileEntry`, and `HardwareProfile`
+* `Core/compute_profile.py` now defines schema-only dataclasses for the normalized profile shape: `CPUProfile`, `MemoryProfile`, `StorageProfile`, `OSProfile`, `PythonProfile`, `GPUProfile`, `CUDAProfile`, `ProviderProfileEntry`, and `HardwareProfile`
+* the refinement pass keeps storage and memory capacities in bytes, names CPU topology fields as `physical_cores` and `logical_cores`, and reserves `HardwareProfile.raw` for provider-native diagnostic payloads
 * this file intentionally contains no discovery, registration, monitoring, or aggregation logic
 * provider implementations and `ComputeEngine` output are not yet wired to these dataclasses; they remain a type-definition layer only
 

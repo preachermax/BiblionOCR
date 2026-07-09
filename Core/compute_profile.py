@@ -10,17 +10,14 @@ class CPUProfile:
 	model: str | None = None
 	architecture: str | None = None
 	platform: str | None = None
-	cores: int | None = None
-	threads: int | None = None
-	logical_threads: int | None = None
+	physical_cores: int | None = None
+	logical_cores: int | None = None
 
 
 @dataclass
 class MemoryProfile:
 	installed_bytes: int | None = None
-	installed_gb: float | None = None
 	total_bytes: int | None = None
-	total_gb: float | None = None
 	available_bytes: int | None = None
 
 
@@ -28,11 +25,28 @@ class MemoryProfile:
 class StorageProfile:
 	path: str | None = None
 	capacity_bytes: int | None = None
-	capacity_gb: float | None = None
 	total_bytes: int | None = None
-	total_gb: float | None = None
 	available_bytes: int | None = None
 	free_bytes: int | None = None
+	used_bytes: int | None = None
+
+
+@dataclass
+class OSProfile:
+	name: str | None = None
+	version: str | None = None
+	release: str | None = None
+	platform: str | None = None
+	architecture: str | None = None
+
+
+@dataclass
+class PythonProfile:
+	implementation: str | None = None
+	version: str | None = None
+	executable: str | None = None
+	prefix: str | None = None
+	virtualenv: bool | None = None
 
 
 @dataclass
@@ -69,16 +83,21 @@ class HardwareProfile:
 	cpu: CPUProfile = field(default_factory=CPUProfile)
 	memory: MemoryProfile = field(default_factory=MemoryProfile)
 	storage: StorageProfile = field(default_factory=StorageProfile)
+	os: OSProfile = field(default_factory=OSProfile)
+	python: PythonProfile = field(default_factory=PythonProfile)
 	gpus: List[GPUProfile] = field(default_factory=list)
 	cuda: CUDAProfile = field(default_factory=CUDAProfile)
 	providers: List[ProviderProfileEntry] = field(default_factory=list)
 	available_providers: List[str] = field(default_factory=list)
+	raw: Dict[str, Any] = field(default_factory=dict)
 
 
 __all__ = [
 	"CPUProfile",
 	"MemoryProfile",
 	"StorageProfile",
+	"OSProfile",
+	"PythonProfile",
 	"GPUProfile",
 	"CUDAProfile",
 	"ProviderProfileEntry",
