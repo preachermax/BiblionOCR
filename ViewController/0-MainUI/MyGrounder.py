@@ -36,6 +36,16 @@ from HelpSystem import add_help_menu
 import platform
 from HelpSystem import add_help_menu
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog

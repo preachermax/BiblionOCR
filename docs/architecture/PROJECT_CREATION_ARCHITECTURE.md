@@ -256,9 +256,10 @@ For each new project creation test:
 
 `MyServer` project/file entry points should follow these defaults:
 
-* `Open Project` starts from `os.path.join(os.path.expanduser("~"), "Projects")` and validates the selected folder as a BiblionOCR project root before launching `MyExplorer` there.
-* Shared file-open pickers should prefer the current working file/folder when present, otherwise fall back to the same Projects root.
-* `MyExplorer` should accept an explicit startup directory from `MyServer` and default to the user Projects root when no project-specific path is supplied.
+* `Open Project` starts from `os.path.join(os.path.expanduser("~"), "Projects")`, validates the selected folder as a BiblionOCR project root, records that root through shared session state, and launches `MyExplorer` against that project.
+* Shared file-open pickers should prefer the current working file/folder when present, otherwise fall back to the same Projects root; they remain the correct surface for OS-wide browsing.
+* `MyExplorer` should accept an explicit startup directory from `MyServer`, resolve that startup path back to the active project root when possible, and keep the visible tree bounded to that project root rather than exposing the full operating-system filesystem.
+* Within that bounded tree, `MyExplorer` should prefer the project `Model` directory as its initial working focus and display folders before files for the primary file-browser view.
 * Offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed that `MyExplorer` roots both the model path and the tree root index at the selected project folder.
 
 ---

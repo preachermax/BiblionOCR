@@ -7,6 +7,11 @@ import re
 import json
 import io
 import pathlib
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+
+sanitize_current_process_and_reexec()
+
 import tiffcapture
 import qimage2ndarray
 from queue import Queue
@@ -18,26 +23,22 @@ import numpy as np
 from scipy import ndimage
 import math
 from copy import deepcopy
+from SessionManager import SessionManager, build_runtime_paths
+
 # Path configuration and directory setup
-script_dir = os.path.dirname(os.path.realpath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
-
-# Define directories
-model_dir = os.path.join(project_root, "Model")
-data_dir = os.path.join(model_dir, "Data")
-image_dir = os.path.join(model_dir, "Images")
-text_dir = os.path.join(model_dir, "Text")
-train_dir = os.path.join(model_dir, "Training")
-session_dir = os.path.join(data_dir, "json")
-
-# Add project root to path
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+RUNTIME_PATHS = build_runtime_paths(__file__)
+script_dir = RUNTIME_PATHS.script_dir
+project_root = RUNTIME_PATHS.project_root
+model_dir = RUNTIME_PATHS.model_dir
+data_dir = RUNTIME_PATHS.data_dir
+image_dir = RUNTIME_PATHS.image_dir
+text_dir = RUNTIME_PATHS.text_dir
+train_dir = RUNTIME_PATHS.train_dir
+session_dir = RUNTIME_PATHS.session_dir
 
 
 from HelpSystem import add_help_menu
 from Core.project_tracking import ProjectWorkflowTracker
-from SessionManager import SessionManager
 # PyQt5 imports
 from PyQt5 import uic
 from PyQt5.QtWidgets import QRubberBand, QWidget, QVBoxLayout, QHBoxLayout, QSizeGrip, QPushButton, QMessageBox, QFrame, QLabel, QColorDialog
@@ -406,8 +407,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 # index only (no rendering)
                 self.setupRefImages()
 
-                # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ CRITICAL: start async load
-                self.start_image_load(self.refimgpath, target="ref")
+                # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ CRITICAL: route TIFFs through the TIFF loader
+                self.load_ref_image(self.refimgpath)
 
             qtc.QTimer.singleShot(0, _startup)
         else:
@@ -1479,7 +1480,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if file.open(qtc.QIODevice.ReadOnly):
             info = qtc.QFileInfo(imgfilename)
 
-            if fileext == '.tif':
+            if fileext.lower() in ('.tif', '.tiff'):
                 self.loadStackFromFile(imgfilename)
                 self.showFrame(0)
                 self.imageqimage = qtg.QImage(self.qimage)
@@ -1508,7 +1509,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.imagefileList = []
         for i in os.listdir(self.imagedir):
             ipath = os.path.normpath(os.path.join(self.imagedir, i))
-            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            if os.path.isfile(ipath) and i.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
                 self.imagefileList.append(ipath)
 
         self.sortImgFiles()
@@ -3029,6 +3030,13 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage("Loading reference image...")
         self._show_progress(0)
 
+    def load_ref_image(self, path):
+        fileext = os.path.splitext(str(path))[1].lower()
+        if fileext in ('.tif', '.tiff'):
+            self.loadStackFromFile(path)
+            return
+        self.start_image_load(path, target="ref")
+
     def on_load_progress(self, value):
         print(f"[LOAD] {value}%")
         self._set_progress_percent(value)
@@ -3394,7 +3402,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.refimgpath = self.refimgfiles[self.refimgindex]
 
         print(f"[NAV] Next ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {self.refimgpath}")
-        self.start_image_load(self.refimgpath, target="ref")
+        self.load_ref_image(self.refimgpath)
     def prevRefImage(self):
         if not self.refimgfiles:
             return
@@ -3403,7 +3411,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.refimgpath = self.refimgfiles[self.refimgindex]
 
         print(f"[NAV] Prev ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {self.refimgpath}")
-        self.start_image_load(self.refimgpath, target="ref")
+        self.load_ref_image(self.refimgpath)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -3599,7 +3607,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if self.imgpath:
             self.ui.ImageLe.setText(os.path.basename(self.imgpath))
 
-            self.start_image_load(self.refimgpath, target="ref")
+            self.load_ref_image(self.refimgpath)
             print("[Pixler] Ref image indexed")
 
             self.sortImgFiles()

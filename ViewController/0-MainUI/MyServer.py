@@ -9,44 +9,33 @@ import importlib.util
 import sys
 import os
 import re
-import shlex
 import subprocess
 import tempfile
-from subprocess import Popen, PIPE, CalledProcessError
 #import glob
 import shutil
 import json
-import csv
 import time
 import hashlib
 from enum import Enum
+from gui_runtime_env import build_sanitized_env, sanitize_current_process_and_reexec
+from SessionManager import SessionManager
+
+
+sanitize_current_process_and_reexec()
 
 
 # Path configuration and directory setup
-script_dir = os.path.dirname(os.path.realpath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
-
-# Define directories
-model_dir = os.path.join(project_root, "Model")
-data_dir = os.path.join(model_dir, "Data")
-image_dir = os.path.join(model_dir, "Images")
-text_dir = os.path.join(model_dir, "Text")
-train_dir = os.path.join(model_dir, "Training")
-session_dir = os.path.join(data_dir, "json")
-
-# Add project root to path
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
-if developer_view_dir not in sys.path:
-    sys.path.insert(0, developer_view_dir)
+RUNTIME_PATHS = SessionManager.export_runtime_paths(
+    globals(),
+    __file__,
+    add_developer_view=True,
+)
 
 # Debug (optional toggle)
 DEBUG_PATHS = True
 if DEBUG_PATHS:
-    print(f"project_root: {project_root}")
-    print(f"script_dir: {script_dir}")
+    print(f"project_root: {RUNTIME_PATHS.project_root}")
+    print(f"script_dir: {RUNTIME_PATHS.script_dir}")
 
 
 SCAN_ICON_RESOURCES = (
@@ -54,13 +43,13 @@ SCAN_ICON_RESOURCES = (
     ":/Icons/Icons/BiblionScanner.png",
 )
 SCAN_ICON_FILES = (
-    os.path.join(script_dir, "Icons", "scanner.png"),
-    os.path.join(script_dir, "Icons", "BiblionScanner1.png"),
+    os.path.join(RUNTIME_PATHS.script_dir, "Icons", "scanner.png"),
+    os.path.join(RUNTIME_PATHS.script_dir, "Icons", "BiblionScanner1.png"),
 )
 
 
 SCANNED_FOLDER = os.path.join(
-    project_root,
+    RUNTIME_PATHS.project_root,
     "Model",
     "Project",
     "Images",
@@ -69,19 +58,20 @@ SCANNED_FOLDER = os.path.join(
 os.makedirs(SCANNED_FOLDER, exist_ok=True)
 
 
-from SessionManager import SessionManager
+def _sanitized_child_process_env():
+    return build_sanitized_env(os.environ)
+
 from ocr_preprocess_tool import OCRPreprocessTool
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
 import tiffcapture
 import qimage2ndarray
-from queue import Queue
 from ext import mainfind
 from HelpSystem import add_help_menu
 from Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
-from Core.Scanner import NetworkScanner, ScanManager
+from Core.Scanner import ScanManager
 from scan_runtime import start_scan_workflow
 # EventBus is still defined below in this module during the Core migration.
 # ProjectCreationEngine remains below as a temporary fallback, but runtime wiring now uses CoreProjectCreationEngine.
@@ -104,21 +94,12 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import QBuffer, QIODevice
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import QFileInfo
-import numpy as np
-import tifffile
 
 # Custom imports
 from MyServerUI import Ui_MainUI
 from PreProcess import PreProcess as pp
 import ChrReference as chrref
 import MyVersifier as versify
-import MyBoxer as boxer
-import MyScanner as scanner
-import MyExplorer as explorer
 from ProjectTrackingDialog import ProjectTrackingDialog
 import MyGrounder as gtr
 import ImageLoadWorker
@@ -153,7 +134,6 @@ from Developer.developer_services import DeveloperServices
 #import MyPixler as pixler
 #import CropTif as croptif
 #import QtCropImage as cropimg
-from ImagePreviewDialog import ImagePreviewDialog
 from project_creation_wizard_dialog import ProjectCreationWizardDialog
 #from MultiPreProcess import MultiPreProcess as mpp
 def configure_tesseract():
@@ -411,20 +391,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionOCR_Preprocess.triggered.connect(self.open_preprocess_tool)
 
+        self.imgfileList = []
+        self.txtfileList = []
+        self.imgdir = ""
+        self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+        self.pixler_return_path = ""
+        self.pending_pixler_source_path = ""
+        self._pixler_return_poll_timer = None
+        self.pixler_return_prompt_dialog = None
+
         # -------------------------
         # Session Restore
         # -------------------------
         self.get_session_settings()
         self.OpenChrReference()
-
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = ""
-        self.imgpath = ""
-        self.pixler_return_path = ""
-        self.pending_pixler_source_path = ""
-        self._pixler_return_poll_timer = None
-        self.pixler_return_prompt_dialog = None
 
         print('current book:', self.bookabbr)
 
@@ -432,6 +414,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Final UI State
         # -------------------------
         self.show()
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
 
         self.toggleLatinToolbars()
 
@@ -446,7 +429,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.project_engine = CoreProjectCreationEngine(
             base_path=os.path.join(os.path.expanduser("~"), "Projects"),
             event_bus=self.event_bus,
-            folder_list_path=os.path.join(script_dir, "ProjectFolderList.txt")
+            folder_list_path=os.path.join(RUNTIME_PATHS.script_dir, "ProjectFolderList.txt")
         )
 
         # optional: hook events
@@ -490,7 +473,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._ensure_developer_services()
         panel_module_path = os.path.join(
-            developer_view_dir,
+            RUNTIME_PATHS.developer_view_dir,
             "RuntimeInspectorPanel.py",
         )
         panel_module_spec = importlib.util.spec_from_file_location(
@@ -588,7 +571,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionImageScanner_tb.setIconVisibleInMenu(True)
 
     def _init_project_status_widgets(self):
-        self.workflow_tracker = ProjectWorkflowTracker(workspace_root=project_root)
+        self.workflow_tracker = ProjectWorkflowTracker(workspace_root=RUNTIME_PATHS.project_root)
 
         self.project_name_status_label = qtw.QLabel("Project: none")
         self.project_name_status_label.setMinimumWidth(180)
@@ -626,6 +609,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def _shared_active_project_root(self):
         return self.session_manager.get_active_project_root()
+
+    def _current_model_dir(self):
+        project_root_value = self.current_project_root or self._shared_active_project_root()
+        if project_root_value:
+            candidate = os.path.join(project_root_value, "Model")
+            if os.path.isdir(candidate):
+                return candidate
+        return RUNTIME_PATHS.model_dir
 
     def _set_current_project(self, project_root):
         if not project_root:
@@ -760,7 +751,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._record_project_milestone("project_ready", project_path)
         self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
-        self.run_child_module('MyExplorer.py', project_path)
+        self.run_child_module('MyExplorer.py', model_project_path)
         return project_path
         return payload
 
@@ -864,7 +855,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.progress_bar.setVisible(False)
 
     def open_project_settings_dialog(self):
-        dialog = ProjectSettingsDialog(project_root, self.session_manager, self)
+        dialog = ProjectSettingsDialog(RUNTIME_PATHS.project_root, self.session_manager, self)
         dialog.exec_()
 
     def collect_new_project_payload(self):
@@ -1128,7 +1119,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_workflow_settings(self):
 
         # Opening JSON file
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+        jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
         with open(jsonfile, 'r') as f:
             data = json.load(f)
 
@@ -1140,13 +1131,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Closing file
         f.close()
 
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
+
     def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference()
         self.chrrefmain.show()
 
     def initBookCombo(self):
         # Opening JSON file
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksAbbrName.json")
+        jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "BooksAbbrName.json")
         with open(jsonfile, 'r') as f:
             data = json.load(f)
         # Iterating through the json
@@ -1165,7 +1163,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if self.ui.bookComboBox.currentText() != oldbookabbr:
 
             # jsonfile = 'Model/Data/json/BooksMarkDown.json'
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksMarkDown.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "BooksMarkDown.json")
 
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1178,7 +1176,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             f.close()
 
             #jsonfile = 'Model/Data/json/Session.json'
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Session.json")
 
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1265,7 +1263,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copy2(source, destination)
             print("pdf page extraction complete")
 
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Session.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 sourcefile_key = r"self.sourcefile"
@@ -1313,7 +1311,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.pdfx_ui.buttonBox.rejected.connect(reject)
 
         if self.pdfx_ui.defaultsrcBox.isChecked():
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                # Search the key value using 'in' operator
@@ -1393,7 +1391,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if self.pdf4tif_ui.defaultsrcBox.isChecked():
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -1474,7 +1472,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if self.pdf2tif_ui.defaultsrcBox.isChecked():
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -1563,7 +1561,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -1645,7 +1643,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -1753,7 +1751,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -1789,7 +1787,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 # returns JSON object as
                 # a dictionary
@@ -1908,7 +1906,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             # disable source button (default)
 
             for step in seq:
-                jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+                jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
                 with open(jsonfile, 'r') as f:
                     data = json.load(f)
 
@@ -2017,7 +2015,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             # get default folder
             # Define json data
 
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
 
@@ -2121,7 +2119,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -2157,7 +2155,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -2263,7 +2261,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             # get default folder
             # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+            jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
                 # Search the key value using 'in' operator
@@ -2443,7 +2441,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
                 # Define json data
 
-                jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+                jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Workflow.json")
                 with open(jsonfile, 'r') as f:
                     # returns JSON object as
                     # a dictionary
@@ -2704,6 +2702,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         print(f"[STACK LOAD] Requested: {fileName}")
 
+        self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
+        if self._tiffCaptureHandle is None:
+            print(f"[STACK LOAD] Failed to open TIFF stack: {fileName}")
+            return
+
         self._stack_path = fileName
         self._load_target = "main"  # or "ref" if needed
 
@@ -2803,7 +2806,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if file.open(qtc.QIODevice.ReadOnly):
             info = qtc.QFileInfo(imgfilename)
 
-            if fileext == '.tif':
+            if fileext.lower() in ('.tif', '.tiff'):
                 self.loadImageStackFromFile(imgfilename)
                 self.imgdir = os.path.dirname(imgfilename)
                 print("[DEBUG] imagepixmap will be populated by on_image_loaded")
@@ -2830,7 +2833,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.imgfileList = []
         for i in sorted(os.listdir(self.imgdir)):
             ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
                 self.imgfileList.append(ipath)
         self.sortImgFiles()
 
@@ -2980,7 +2983,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 
         # jsonfile = 'Model/Project/Data/json/Session.json'
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
+        jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Session.json")
         with open(jsonfile, 'r') as f:
             # data = json.load(f)
             # imgpath_key = r"self.imgpath"
@@ -3021,7 +3024,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         for i in sorted(os.listdir(self.imgdir)):
             ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
                 self.imgfileList.append(ipath)
         self.sortImgFiles()
 
@@ -3166,7 +3169,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             file.close()
 
         # Ã¢Å“â€¦ Update session JSON safely
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
+        jsonfile = os.path.join(RUNTIME_PATHS.project_root, "Model", "Project", "Data", "json", "Session.json")
         if os.path.exists(jsonfile):
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -3738,7 +3741,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 
     def run_child_module(self, filename, *args):
-        module_path = os.path.abspath(os.path.join(script_dir, filename))
+        module_path = os.path.abspath(os.path.join(RUNTIME_PATHS.script_dir, filename))
         cmd = [sys.executable, module_path]
 
         if args and args[0]:
@@ -3751,7 +3754,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         try:
-            process = subprocess.Popen(cmd)
+            process = subprocess.Popen(cmd, env=_sanitized_child_process_env())
             print(f"[LAUNCH] {filename} (PID: {process.pid})")
         except Exception as e:
             print(f"[Subprocess Error] {e}")
@@ -3933,7 +3936,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         else:
             temp_dir = tempfile.mkdtemp(prefix="biblion_pixler_return_")
             self.pixler_return_path = os.path.join(temp_dir, "pixler_return.tif")
-        module_path = os.path.abspath(os.path.join(script_dir, 'MyPixler.py'))
+        module_path = os.path.abspath(os.path.join(RUNTIME_PATHS.script_dir, 'MyPixler.py'))
         cmd = [
             sys.executable,
             module_path,
@@ -3949,7 +3952,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         try:
-            process = subprocess.Popen(cmd)
+            process = subprocess.Popen(cmd, env=_sanitized_child_process_env())
             print(f"[LAUNCH] MyPixler.py (PID: {process.pid})")
             self._start_pixler_return_monitor()
         except Exception as e:
@@ -3974,7 +3977,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyWriter.py')
 
     def OpenWithMyExplorer(self):
-        self.run_child_module('MyExplorer.py', self._projects_base_path())
+        self.run_child_module('MyExplorer.py', self._current_model_dir())
 
     def OpenWithCalc(self):
         lo_cmd = 'libreoffice --calc ' + self.txtpath

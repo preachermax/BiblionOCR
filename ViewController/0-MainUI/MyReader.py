@@ -14,6 +14,17 @@ import tiffcapture
 import qimage2ndarray
 from queue import Queue
 from ext import mainfind
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
@@ -249,6 +260,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.initBookCombo()
         #self.selectBookCombo()
 
+        self.dirIterator = None
+        self.imgfileList = []
+        self.txtfileList = []
+        self.imgdir = ""
+        self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+
         # Restore Session settings
         self.get_session_settings()
         self.project_status_controller = ProjectStatusController(
@@ -256,12 +275,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyReader',
             session_manager=self.session_manager,
         )
-
-        self.dirIterator = None
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = ""
-        self.imgpath = ""
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         #print('current book:',self.bookabbr)
 
@@ -303,6 +316,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #sys.stdout = Streamer(textWritten=self.output_terminal_written)
 
         self.show()
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
         #self.toggleLatinToolbars()
 
     def dragEnterEvent(self, event):
@@ -481,6 +495,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def save_session_settings(self, **updates):
         self.session_manager.update('ReaderSession.json', updates)
+
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
 
     def get_workflow_settings(self):
 

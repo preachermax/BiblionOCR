@@ -10,6 +10,16 @@ import platform
 from HelpSystem import add_help_menu
 import subprocess
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
@@ -306,24 +316,50 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 default = getattr(self, name, None)
             return session.get(f'self.{name}', default)
 
+        def remap_legacy_project_path(path: str):
+            if not path:
+                return path
+
+            candidate = os.path.normpath(path)
+            if os.path.exists(candidate):
+                return candidate
+
+            alias_pairs = (
+                (
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'GroundTruth', 'Source', 'TR')),
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'EstablishTruth', 'Source', 'TR')),
+                ),
+                (
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'GroundTruth', 'Greek', 'txt_greek_verses')),
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'EstablishTruth', 'Greek', 'txt_greek_verses')),
+                ),
+            )
+
+            for old_fragment, new_fragment in alias_pairs:
+                if old_fragment in candidate:
+                    remapped = os.path.normpath(candidate.replace(old_fragment, new_fragment))
+                    if os.path.exists(remapped):
+                        return remapped
+
+            return candidate
+
         def abs_project_path(name: str, default=''):
             value = session.get(f'self.{name}')
             if value:
-                normalized_value = str(value).strip()
+                normalized_value = str(value).strip().replace('\\', '/')
 
                 if len(normalized_value) > 1 and normalized_value[1] == ':' and normalized_value[0].isalpha():
                     repo_marker = f'/{repo_root_name}/'
-                    posix_value = normalized_value.replace('\\', '/')
-                    marker_index = posix_value.lower().find(repo_marker.lower())
+                    marker_index = normalized_value.lower().find(repo_marker.lower())
                     if marker_index != -1:
-                        normalized_value = posix_value[marker_index + len(repo_marker):]
+                        normalized_value = normalized_value[marker_index + len(repo_marker):]
                     elif os.name == 'nt':
                         return os.path.normpath(normalized_value)
 
                 if os.path.isabs(normalized_value):
-                    return os.path.normpath(normalized_value)
+                    return remap_legacy_project_path(normalized_value)
 
-                return os.path.normpath(
+                return remap_legacy_project_path(
                     os.path.join(self.projecthome, normalized_value.lstrip('/\\'))
                 )
             return getattr(self, name, default)
@@ -482,8 +518,14 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.OpenChrReference()
 
     def OpenChrReference(self):
-        self.chrrefmain = chrref.CharacterReference()
-        self.chrrefmain.show()
+        chrref_window = getattr(self, 'chrrefmain', None)
+        if chrref_window is None:
+            chrref_window = chrref.CharacterReference()
+            self.chrrefmain = chrref_window
+
+        chrref_window.show()
+        chrref_window.raise_()
+        chrref_window.activateWindow()
 
     def dropAnchor(self):
         print("Drop Anchor!")

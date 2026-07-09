@@ -4,17 +4,27 @@ import json
 import os
 import re
 from pathlib import Path
+import sys
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 from HelpSystem import add_help_menu
 
 #import glob
 import shutil
-import sys
 import time
 #import pyautogui
 #from tempfile import NamedTemporaryFile
 import pandas as pd
 import json
-import platform
 
 #from ImageQt import ImageQt
 import cv2
@@ -30,12 +40,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageQt
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame, QProgressBar
+from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
-from PyQt5.QtGui import QPainter, QPen, QBrush
 
 
-from queue import Queue
 from ext import mainfind
 from MyBoxerUI import Ui_Boxer
 from Training import Train as tr
@@ -47,7 +55,6 @@ from project_status_controller import ProjectStatusController
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # Dialog Imports
-from MySlidersUI import Ui_SliderDialog
 from Dialogs.deskew_greekmonoDialog import Ui_deskew_greekmonoDialog
 from Dialogs.crop_languagesDialog import Ui_crop_languagesDialog
 from Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
@@ -396,7 +403,21 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         #self.imgdir = r"Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
 
+        self.origpixmap = None
+        self.box_color = "red"
+        self.dirIterator = None
+        self.imgfileList = []
+        self.txtfileList = []
+        self.imgpath = ""
+        self.txtpath = ""
+        self.imgopentitle = "Open Image"
+        self.txtopentitle = "Open Text"
+
         # Restore BoxerSession settings
+        self.ui.ImageTab.setCurrentIndex(3)
+        self.currenttabindex = self.ui.ImageTab.currentIndex()
+        self.currenttabtext = self.ui.ImageTab.tabText(self.currenttabindex)
+
         self.get_session_settings()
         self.project_status_controller = ProjectStatusController(
             self,
@@ -408,20 +429,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
 
 
-        self.ui.ImageTab.setCurrentIndex(3)
-        self.currenttabindex = self.ui.ImageTab.currentIndex()
-        self.currenttabtext = self.ui.ImageTab.tabText(self.currenttabindex)
-        self.origpixmap = None
-        self.box_color = "red"
-        self.dirIterator = None
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgpath = ""
-        self.txtpath = ""
-        self.imgopentitle = "Open Image"
-        self.txtopentitle = "Open Text"
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         #print('current book:',self.bookabbr)
+
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
 
         #self.disableMouseEvents()
 
@@ -595,6 +606,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def save_session_settings(self, **updates):
         self.session_manager.update('BoxerSession.json', updates)
+
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
 
     def get_workflow_settings(self):
 

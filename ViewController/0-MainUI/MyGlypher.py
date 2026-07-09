@@ -4,13 +4,24 @@ import json
 import os
 import re
 from pathlib import Path
+import sys
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 
 #import glob
 import shutil
-import sys
 import time
 #import pyautogui
 #from tempfile import NamedTemporaryFile
@@ -273,6 +284,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
 
         # Restore BoxerSession settings
+        self.origpixmap = None
+        self.box_color = "red"
+        self.dirIterator = None
+        self.imgfileList = []
+        self.txtfileList = []
+        self.imgdir = ""
+        self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+        self.imgopentitle = "Open Image"
+        self.txtopentitle = "Open Text"
+
         self.get_session_settings()
         self.project_status_controller = ProjectStatusController(
             self,
@@ -284,21 +307,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.GlyphImgTab.setCurrentIndex(0)
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
-        self.origpixmap = None
-        self.box_color = "red"
-        self.dirIterator = None
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = self.greekpages
-        self.imgpath = ""
-        self.txtdir = ""
-        self.txtpath = ""
-        self.imgopentitle = "Open Image"
-        self.txtopentitle = "Open Text"
+        self.imgdir = self.imgdir or self.greekpages
 
 
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
+
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
 
 
     def get_session_settings(self):
@@ -440,6 +455,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.ZoomComboBox.setCurrentText(self.zoom)
             if str(self.zoomslidervalue).isdigit():
                 self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
 
     def get_workflow_settings(self):
 

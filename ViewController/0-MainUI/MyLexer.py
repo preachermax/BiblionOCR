@@ -4,10 +4,20 @@ import json
 import os
 import re
 from pathlib import Path
+import sys
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
 
 #import glob
 import shutil
-import sys
 import time
 #import pyautogui
 #from tempfile import NamedTemporaryFile
@@ -27,16 +37,15 @@ from PIL import Image, ImageDraw, ImageFont, ImageQt
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame, QProgressBar
+from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
-from PyQt5.QtGui import QPainter, QPen, QBrush
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 
 
 from queue import Queue
 from ext import mainfind
-from MyGlypherUI import Ui_Glypher
+from MyLexerUI import Ui_Glypher
 from LocalFileDrop import LocalFileDropMixin
 from Training import Train as tr
 #from ProjectBrowserUI import Ui_Explorer
@@ -338,6 +347,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.imgdir = r"Model/Images/Complete/Greek/tif_greek_pages/greek_book_41_Mark/"
 
         # Restore BoxerSession settings
+        self.origpixmap = None
+        self.dirIterator = None
+        self.imgfileList = []
+        self.txtfileList = []
+        self.imgdir = ""
+        self.imgpath = ""
+
         self.get_session_settings()
         self.project_status_controller = ProjectStatusController(
             self,
@@ -347,14 +363,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
-        self.origpixmap = None
-        self.dirIterator = None
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = ""
-        self.imgpath = ""
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
+
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
 
         #self.disableMouseEvents()
 
@@ -441,9 +453,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def get_session_settings(self):
         # get session settings
-        self.homedir = '/home'
-        self.user = '/jetson'
-        self.userdir = '/home/jetson'
+        default_userdir = str(Path.home())
+        default_user = os.path.basename(default_userdir.rstrip(os.sep))
+        default_homedir = os.path.dirname(default_userdir.rstrip(os.sep)) or default_userdir
+
+        self.homedir = default_homedir
+        self.user = default_user
+        self.userdir = default_userdir
+        self.linuxhomedir = default_homedir
+        self.linuxuser = default_user
+        self.linuxuserdir = default_userdir
+        self.windowshomedir = default_homedir
+        self.windowsuser = default_user
+        self.windowsuserdir = default_userdir
+        self.macoshomedir = default_homedir
+        self.macosuser = default_user
+        self.macosuserdir = default_userdir
         active_project = SessionManager().get_active_project('Session.json')
         self.current_project_root = active_project.get('project_root', '')
         self.current_project_name = active_project.get('project_name', '')
@@ -636,6 +661,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 self.userdir = r'./'
 
             print(f'Absolute Path to User Directory: {self.userdir}')
+
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
 
     def get_workflow_settings(self):
 
