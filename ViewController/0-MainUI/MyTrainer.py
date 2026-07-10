@@ -1,11 +1,7 @@
 # Python imports
 import sys
 import os
-import re
-import shutil
 import json
-import csv
-import time
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
@@ -19,16 +15,12 @@ sanitize_current_process_and_reexec()
 
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
-from PyQt5 import QtGui as qtg
-from PyQt5 import QtCore as qtc
 
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from ext import *
-from ext import versifiercount, versefind, reffind
 # Custom imports
 from MyTrainerUI import Ui_Trainer
-from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 #import pytesseract
 
@@ -46,6 +38,8 @@ class Ui_MainWindow(qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Trainer()
         self.ui.setupUi(self)
+        if hasattr(self.ui, 'actionExit'):
+            self.ui.actionExit.triggered.connect(self.close)
 
         self.projecthome = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
         self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))

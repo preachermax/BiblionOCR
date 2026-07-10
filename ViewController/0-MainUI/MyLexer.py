@@ -173,6 +173,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
+        if hasattr(self.ui, 'actionExit'):
+            self.ui.actionExit.triggered.connect(self.close)
 
         self.ui.actionBatchCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)

@@ -5,14 +5,11 @@ import sys
 import os
 import re
 #import glob
-import shutil
 import json
 #from subprocess import Popen, PIPE, CalledProcessError
-import numpy as np
 import pytesseract
 import tiffcapture
 import qimage2ndarray
-from queue import Queue
 from ext import mainfind
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -30,22 +27,19 @@ from HelpSystem import add_help_menu
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
+from PyQt5.QtCore import Qt
 # Custom imports
 #from MainUI import Ui_MainUI
 from MyReaderUI import Ui_Reader
 from PreProcess import PreProcess as pp
 
 import MyPixler as pixler
-import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
 import ChrReference as chrref
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
 from project_status_controller import ProjectStatusController
+from print_menu_support import install_print_menu_support, image_target, document_target
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -163,6 +157,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,
             text_handler=self.showText,
+        )
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Image": image_target(
+                    lambda: self.qimage if hasattr(self, 'qimage') else self.ui.Image.pixmap(),
+                    "There is currently no active reference image loaded to print.",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.OCRText.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Ref_Image",
         )
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system

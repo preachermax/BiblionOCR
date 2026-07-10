@@ -7,15 +7,11 @@
 # WARNING! All changes made in this file will be lost!
 
 # PyQt5 imports
-from pickle import FALSE
-from string import punctuation
 #from termios import OCRNL
-from turtle import clear
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 from PyQt5.QtCore import QAbstractTableModel, Qt
-from PyQt5.QtWidgets import QTableView
 
 # Python imports
 import os
@@ -24,7 +20,6 @@ import re
 import pytesseract
 #import numpy as np
 import pandas as pd
-from sqlalchemy import false
 import tiffcapture
 import qimage2ndarray
 import csv
@@ -33,7 +28,6 @@ import shutil
 from decimal import Decimal
 from tempfile import NamedTemporaryFile
 from HelpSystem import add_help_menu
-import platform
 from HelpSystem import add_help_menu
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -48,10 +42,8 @@ sanitize_current_process_and_reexec()
 
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
-from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
 from Dialogs.renumber_greek_text_linesDialog import Ui_renumbergreektextlinesDialog
 from Dialogs.tif_greek_lines_renumberDialog import Ui_tifgreekrenumberlinesDialog
-from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
 from Dialogs.tif_greek_lines_stageDialog import Ui_tifgreekstagelinesDialog
 from Dialogs.PageVerseXrefDialog import Ui_PageVerseXrefDialog
 
@@ -155,6 +147,8 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Grounder()
         self.ui.setupUi(self)
+        if hasattr(self.ui, 'actionExit'):
+            self.ui.actionExit.triggered.connect(self.close)
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'OCRTextEdit', None), getattr(self.ui, 'TextFileEdit', None)],
             image_handler=self.loadDropImageEvent,

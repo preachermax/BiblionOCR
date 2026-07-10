@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 # Python imports
-import sys
 import os
 import re
 import json
@@ -14,9 +13,7 @@ sanitize_current_process_and_reexec()
 
 import tiffcapture
 import qimage2ndarray
-from queue import Queue
 from PIL import Image as pilimg
-from PIL import ImageQt as pilqimg
 import shutil
 import cv2
 import numpy as np
@@ -41,24 +38,24 @@ from HelpSystem import add_help_menu
 from Core.project_tracking import ProjectWorkflowTracker
 # PyQt5 imports
 from PyQt5 import uic
-from PyQt5.QtWidgets import QRubberBand, QWidget, QVBoxLayout, QHBoxLayout, QSizeGrip, QPushButton, QMessageBox, QFrame, QLabel, QColorDialog
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox, QFrame, QColorDialog
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtGui import QPainter, QPen, QIcon, QPixmap, QColor, QBrush
+from PyQt5.QtGui import QIcon
 from PyQt5 import QtGui as qtg
-from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QUrl
+from PyQt5.QtCore import QPoint, QRect, QSize, Qt
 from PyQt5 import QtCore as qtc
 from ImageLoadWorker import ImageLoadWorker
 from TiffStackWorker import TiffStackWorker
 # Custom imports
-from MySlidersUI import Ui_SliderDialog
 from PreProcess import PreProcess as pp
 #from MyScanner import Ui_Scanner
 from MyPixlerUI import Ui_Pixler
-from Adjust import crop_processor, get_processor, rotate_processor, threshold_processor, PROCESSORS
+from Adjust import crop_processor
 from ImagePreviewDialog import ImagePreviewDialog
 from MorphologyDialog import MorphologyDialog
 from LocalFileDrop import LocalFileDropMixin
 from ProjectTrackingDialog import ProjectTrackingDialog
+from print_menu_support import install_print_menu_support, image_target
 
 
 # Dialog Imports
@@ -355,6 +352,20 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_Pixler()
         self.ui.setupUi(self)
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Image": image_target(
+                    lambda: self.refimgqimage,
+                    "There is currently no active reference image loaded to print.",
+                ),
+                "actionPrint_Image": image_target(
+                    lambda: self.imageqimage,
+                    "There is currently no active edited image loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Image",
+        )
 
         # Progress bar (safe)
         if not hasattr(self, "progress_bar"):

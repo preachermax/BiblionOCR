@@ -96,6 +96,17 @@ Modules with the common project-status surface:
 
 ---
 
+## Shared Print And Exit Menu Support
+
+- `MyServer` remains the source implementation for print flow behavior.
+- `ViewController/0-MainUI/print_menu_support.py` now provides shared controller-side print wiring for `MyScanner`, `MyReader`, `MyGlypher`, `MyVersifier`, `MyWriter`, `MyPixler`, and `MyBoxer`.
+- `actionPrint_Preview` now follows the active or first available print target for those modules instead of each module duplicating its own preview routing.
+- `actionExit` is wired in the controller layer for `MyServer`, `MyGrounder`, `MyLauncher`, `MyLexer`, and `MyTrainer` when the matching UI action exists.
+- `MyExplorer` and `MyResolver` are intentionally excluded from the `actionExit` rollout.
+- See `PRINT_AND_EXIT_MENU_SUPPORT.md` for the full controller/UI contract.
+
+---
+
 ## Key Workflows
 
 ### Workflow 1: Complete OCR from PDF

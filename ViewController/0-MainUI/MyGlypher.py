@@ -27,7 +27,6 @@ import time
 #from tempfile import NamedTemporaryFile
 import pandas as pd
 import json
-import platform
 
 #from ImageQt import ImageQt
 import cv2
@@ -37,38 +36,28 @@ import qimage2ndarray
 import tiffcapture
 #from subprocess import Popen, PIPE, CalledProcessError
 
-from PIL import Image, ImageDraw, ImageFont, ImageQt
+from PIL import Image, ImageQt
 
 # PyQt5 imports
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame, QProgressBar
+from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeGrip, QMenu, QFrame
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
-from PyQt5.QtGui import QPainter, QPen, QBrush
 
 
-from queue import Queue
 from ext import mainfind
 from MyGlypherUI import Ui_Glypher
-from Training import Train as tr
 import ChrReference as chrref
 from LocalFileDrop import LocalFileDropMixin
+from print_menu_support import install_print_menu_support, image_target, document_target
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # Dialog Imports
 
-from Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
-from Dialogs.crop_latin_linesDialog import Ui_crop_latin_linesDialog
-from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
 #from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
-from Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
-from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
-from Dialogs.tif_greek_lines_stageDialog import Ui_tifgreekstagelinesDialog
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
-from Dialogs.split_greek_text_linesDialog import Ui_splitgreektextlinesDialog
-from Dialogs.rename_greek_text_linesDialog import Ui_renamegreektextlinesDialog
 
 class VLine(QFrame):
     # a simple VLine, like the one you get from designer
@@ -118,6 +107,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             [self, getattr(self.ui, 'GlypherWidget', None)],
             image_handler=self.getImage,
             text_handler=self.getText,
+        )
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Image": image_target(
+                    lambda: self.qimage if hasattr(self, 'qimage') else self.ui.Image.pixmap(),
+                    "There is currently no active image loaded to print.",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.GlyphBoxText.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Image",
         )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyGlypher')

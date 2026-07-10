@@ -5,7 +5,6 @@ import sys
 import os
 import re
 #import glob
-import shutil
 import json
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
@@ -32,20 +31,17 @@ from HelpSystem import add_help_menu
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import  Qt, QObject, QThread, pyqtSignal
+from PyQt5.QtCore import  Qt
 # Custom imports
 #from MainUI import Ui_MainUI
 from MyScannerUI import Ui_Scanner
 from PreProcess import PreProcess as pp
 
-import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
 from project_status_controller import ProjectStatusController
+from print_menu_support import install_print_menu_support, image_target, document_target
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -180,6 +176,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,
             text_handler=self.loadDropTextEvent,
+        )
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Image": image_target(
+                    lambda: self.qimage if hasattr(self, 'qimage') else self.ui.Image.pixmap(),
+                    "There is currently no active reference image loaded to print.",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.OCRText.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Ref_Image",
         )
         self.session_manager = SessionManager()
         self.scannerManager = ScanManager()

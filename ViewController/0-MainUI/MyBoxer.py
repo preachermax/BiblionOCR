@@ -51,6 +51,7 @@ from PreProcess import PreProcess as pp
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
 from project_status_controller import ProjectStatusController
+from print_menu_support import install_print_menu_support, image_target, document_target
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
 #from PyQt5.QtCore import QObject, QThread, pyqtSignal
@@ -200,6 +201,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             [self, getattr(self.ui, 'BoxWidget', None)],
             image_handler=self.getImage,
             text_handler=self.getText,
+        )
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Image": image_target(
+                    lambda: self.qimage if hasattr(self, 'qimage') else self.ui.SourceImage.pixmap(),
+                    "There is currently no active reference image loaded to print.",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.currentTextTable.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Ref_Image",
         )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyBoxer')

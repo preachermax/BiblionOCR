@@ -6,7 +6,6 @@ import shutil
 import json
 import csv
 import time
-import platform
 from HelpSystem import add_help_menu
 import subprocess
 
@@ -34,6 +33,7 @@ from project_status_controller import ProjectStatusController
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 from LocalFileDrop import LocalFileDropMixin
+from print_menu_support import install_print_menu_support, document_target
 import ChrReference as chrref
 #import pytesseract
 
@@ -64,6 +64,21 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Text": document_target(
+                    lambda: self.ui.RefText.document(),
+                    "There is currently no reference text document loaded to print.",
+                    empty_title="No Text Loaded",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.VerseText.document(),
+                    "There is currently no verse text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Text",
+        )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyVersifier')
         self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
@@ -2032,7 +2047,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             rowline = row[0]
             textline = rowline.replace("\n","")
             #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
-            pattern = re.compile('(\w+\s)(\d+:)(\d+\s)')
+            pattern = re.compile(r'(\w+\s)(\d+:)(\d+\s)')
             matches = pattern.finditer(textline)
             for match in matches:
                     #print(match)
@@ -2050,24 +2065,6 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         txtfile.close()
 
-    '''
-    def parseLinesRegEx(self):
-        #***This is the original parse routine.  Keep for reference***
-        # Each line is a verse => pares and label each verse
-        rowline = row[0]
-        textline = rowline.replace("\n","")
-        #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
-        pattern = re.compile('(\w+\s)(\d+:)(\d+\s)(.*)')
-        matches = pattern.finditer(textline)
-        for match in matches:
-            book = match[1]
-            chcolon = match[2]
-            chapter = chcolon.replace(":","")
-            verse = match[3]
-            scripture = match[4]
-            #print(row[0])
-            print(book,"\t", chapter,"\t", verse,"\t",scripture)
-    '''
     def wordCount(self):
 
         wc = versifiercount.WordCount(self)
@@ -2417,7 +2414,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             rowline = row[0]
             textline = rowline.replace("\n","")
             #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
-            pattern = re.compile('(\w+\s)(\d+:)(\d+\s)')
+            pattern = re.compile(r'(\w+\s)(\d+:)(\d+\s)')
             matches = pattern.finditer(textline)
             for match in matches:
                     #print(match)

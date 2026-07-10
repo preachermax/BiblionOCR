@@ -3,11 +3,8 @@
 # Python imports
 import sys
 import os
-import re
-import shlex
 import subprocess
 #import glob
-import shutil
 import json
 
 from gui_runtime_env import sanitize_current_process_and_reexec
@@ -24,37 +21,22 @@ sanitize_current_process_and_reexec()
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 #from subprocess import Popen, PIPE, CalledProcessError
-import pytesseract
-import tiffcapture
-import qimage2ndarray
-from queue import Queue
-from ext import mainfind
 from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # Custom imports
 from MyLauncherUI import Ui_MainUI
-from PreProcess import PreProcess as pp
 from LocalFileDrop import LocalFileDropMixin
 
 # Dialog Imports
-from Dialogs.ExtractDialog import Ui_ExtractDialog
-from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
-from Dialogs.tif2monoDialog import Ui_tif2monoDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
-from Dialogs.mono2pngDialog import Ui_mono2pngDialog
-from Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
 
 #import MyPixler as pixler
 #import CropTif as croptif
 #import QtCropImage as cropimg
 #import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -73,6 +55,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        if hasattr(self.ui, 'actionExit'):
+            self.ui.actionExit.triggered.connect(self.close)
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyServer')
