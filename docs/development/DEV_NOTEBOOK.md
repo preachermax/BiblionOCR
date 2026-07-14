@@ -131,6 +131,7 @@
 
 * a browser-native preview surface now exists under `docs/portal/PortalPreviewHarness/` so portal feed behavior can be previewed closer to the eventual Django/browser runtime instead of only through Qt
 * `MyLauncher` now uses its launcher-button context menus as a secondary discovery surface for project help, including a `Generate Project Help in Mainwidget` action that renders `HelpSystem.py` content into the embedded main portal panel
+* `MyLauncher.py` now resolves the staged portal helpers from `docs/portal/PortalFeed/` explicitly, and the legacy local `HTMLUIMain.py` preview harness was aligned the same way where present so `PortalHtmlPanel.py` remains importable even though those helpers are not colocated with the main UI controllers
 * current direction:
 
   * preserve the feed contract as the stable seam
