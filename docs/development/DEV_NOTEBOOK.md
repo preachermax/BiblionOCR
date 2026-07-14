@@ -112,6 +112,33 @@
 
   ---
 
+## Portal And Editor Migration Staging
+
+* `ViewController/0-MainUI/HTMLeditor.py` was repaired and extended to support:
+
+  * real multi-selection editing
+  * Markdown-preserving editing and HTML export
+  * JSON import/export as a transport or storage format
+  * source inspection in HTML, Markdown, and JSON modes
+  * pre-Qt GUI environment sanitization through `gui_runtime_env.py`
+
+* the portable editor runtime was then copied into `docs/portal/HTMLEditorStandalone/` so it can be transferred into BiblionPortal as a self-contained bundle
+* portal helper prototypes were collapsed into a smaller transfer surface:
+
+  * `PortalFeedClient.py`
+  * `PortalFeedViews.py`
+  * `PortalHtmlPanel.py`
+
+* a browser-native preview surface now exists under `docs/portal/PortalPreviewHarness/` so portal feed behavior can be previewed closer to the eventual Django/browser runtime instead of only through Qt
+* current direction:
+
+  * preserve the feed contract as the stable seam
+  * let Django publish normalized panel payloads
+  * let browser surfaces render those payloads
+  * treat TipTap as the likely authoring layer rather than the rendering contract itself
+
+---
+
 
 ## 🧪 Developer Mode Milestones
 

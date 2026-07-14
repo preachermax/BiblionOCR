@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblion Portal Preview Harness</title>
+  <style>
+    :root {
+      --bg: #f3efe4;
+      --panel: rgba(255, 252, 246, 0.88);
+      --panel-border: rgba(59, 49, 37, 0.15);
+      --ink: #2f281f;
+      --muted: #6d6254;
+      --accent: #8b5e34;
+      --accent-soft: #e2c59f;
+      --shadow: 0 20px 45px rgba(53, 39, 22, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 35%),
+        linear-gradient(160deg, #efe7d5 0%, #e5dcc5 45%, #f7f3ea 100%);
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 48px));
+      margin: 32px auto 48px;
+    }
+
+    .hero {
+      padding: 28px 30px;
+      border: 1px solid var(--panel-border);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(255, 251, 244, 0.95), rgba(245, 238, 225, 0.9));
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 3vw, 3.1rem);
+      letter-spacing: 0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 70ch;
+      line-height: 1.55;
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .controls label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.86rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .controls input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(82, 68, 49, 0.2);
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .controls button {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7b5230, #a87647);
+      color: #fffaf3;
+      font: inherit;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(120, 82, 50, 0.22);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+      align-self: end;
+    }
+
+    .controls button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(120, 82, 50, 0.28);
+    }
+
+    .status {
+      margin: 18px 0 0;
+      min-height: 1.4rem;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(59, 49, 37, 0.08);
+      background: linear-gradient(180deg, rgba(255, 252, 246, 0.86), rgba(243, 235, 221, 0.72));
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .panel-header span {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .panel-body {
+      min-height: 180px;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .panel-body :first-child {
+      margin-top: 0;
+    }
+
+    .panel-body :last-child {
+      margin-bottom: 0;
+    }
+
+    .inspector {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      background: rgba(43, 35, 27, 0.94);
+      color: #f5ead8;
+      box-shadow: var(--shadow);
+    }
+
+    .inspector h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #e8d0ae;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        width: min(100vw - 24px, 1180px);
+        margin: 16px auto 28px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <h1>Biblion Portal Preview Harness</h1>
+      <p>
+        This browser harness replaces the narrow role of HTMLUIMain.py. It previews the Django
+        portal feed contract in a web-native shell that can later be hosted directly by Django or
+        paired with a TipTap editor surface.
+      </p>
+
+      <div class="controls">
+        <div>
+          <label for="feed-endpoint">Feed endpoint</label>
+          <input id="feed-endpoint" type="text" value="/portal/feed/" spellcheck="false">
+        </div>
+        <button id="load-feed" type="button">Load Feed</button>
+        <button id="load-sample" type="button">Load Sample</button>
+      </div>
+
+      <p class="status" id="status-line">Ready. Load the sample payload or point this page at a Django JSON feed.</p>
+    </section>
+
+    <section class="layout">
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Main Panel</h2>
+          <span>Primary landing card</span>
+        </div>
+        <div class="panel-body" id="panel-main"></div>
+      </article>
+
+      <div class="stack">
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Secondary Panel</h2>
+            <span>Status / metrics</span>
+          </div>
+          <div class="panel-body" id="panel-secondary"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Tertiary Panel</h2>
+            <span>Activity / notices</span>
+          </div>
+          <div class="panel-body" id="panel-tertiary"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="inspector">
+      <h3>Payload Inspector</h3>
+      <pre id="payload-output"></pre>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

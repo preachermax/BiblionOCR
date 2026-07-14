@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HTMLDialog</class>
+ <widget class="QDialog" name="HTMLDialog">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>900</width><height>650</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>HTML Editor Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>2</number></property>
+   <property name="leftMargin"><number>6</number></property>
+   <property name="topMargin"><number>6</number></property>
+   <property name="rightMargin"><number>6</number></property>
+   <property name="bottomMargin"><number>6</number></property>
+   <item>
+    <widget class="QMenuBar" name="menuBar">
+     <property name="maximumSize">
+      <size><width>16777215</width><height>25</height></size>
+     </property>
+     <widget class="QMenu" name="menuFile">
+      <property name="title"><string>&amp;File</string></property>
+      <addaction name="actionNew"/>
+      <addaction name="actionOpen"/>
+      <addaction name="actionSave"/>
+      <addaction name="actionSaveAs"/>
+     </widget>
+     <widget class="QMenu" name="menuEdit">
+      <property name="title"><string>&amp;Edit</string></property>
+      <addaction name="actionCut"/>
+      <addaction name="actionCopy"/>
+      <addaction name="actionPaste"/>
+      <addaction name="addSeparator"/>
+      <addaction name="actionToggleWrap"/>
+     </widget>
+     <widget class="QMenu" name="menuInsert">
+      <property name="title"><string>&amp;Insert</string></property>
+      <addaction name="actionInsertLink"/>
+      <addaction name="actionInsertImage"/>
+      <addaction name="actionInsertDiv"/>
+     </widget>
+     <addaction name="menuFile"/>
+     <addaction name="menuEdit"/>
+     <addaction name="menuInsert"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolBar" name="formatToolBar">
+     <property name="windowTitle"><string>Formatting Toolbar</string></property>
+     <property name="movable"><bool>false</bool></property>
+     <addaction name="actionBold"/>
+     <addaction name="actionColor"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="editor">
+     <property name="acceptRichText"><bool>true</bool></property>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionNew">
+   <property name="text"><string>&amp;New Document</string></property>
+   <property name="shortcut"><string>Ctrl+N</string></property>
+  </action>
+  <action name="actionOpen">
+   <property name="text"><string>&amp;Open File...</string></property>
+   <property name="shortcut"><string>Ctrl+O</string></property>
+  </action>
+  <action name="actionSave">
+   <property name="text"><string>&amp;Save</string></property>
+   <property name="shortcut"><string>Ctrl+S</string></property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text"><string>Save &amp;As...</string></property>
+  </action>
+  <action name="actionCut">
+   <property name="text"><string>Cu&amp;t</string></property>
+   <property name="shortcut"><string>Ctrl+X</string></property>
+  </action>
+  <action name="actionCopy">
+   <property name="text"><string>&amp;Copy</string></property>
+   <property name="shortcut"><string>Ctrl+C</string></property>
+  </action>
+  <action name="actionPaste">
+   <property name="text"><string>&amp;Paste</string></property>
+   <property name="shortcut"><string>Ctrl+V</string></property>
+  </action>
+  <action name="actionToggleWrap">
+   <property name="text"><string>Word Wrap: ON</string></property>
+  </action>
+  <action name="actionBold">
+   <property name="text"><string>Bold</string></property>
+   <property name="shortcut"><string>Ctrl+B</string></property>
+  </action>
+  <action name="actionColor">
+   <property name="text"><string>Text Color</string></property>
+  </action>
+  <action name="actionInsertLink">
+   <property name="text"><string>Hyperlink...</string></property>
+  </action>
+  <action name="actionInsertImage">
+   <property name="text"><string>Local Image...</string></property>
+  </action>
+  <action name="actionInsertDiv">
+   <property name="text"><string>Division Container (Div)...</string></property>
+  </action>
+ </widget>
+</ui>

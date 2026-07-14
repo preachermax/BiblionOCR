@@ -103,7 +103,13 @@ Current prototype highlights:
 Portal strategy and operational-planning material for the canonical Biblion public platform.
 
 Key documents:
+- [README.md](portal/README.md)
 - [portal.md](portal/portal.md)
+
+Current staging bundles:
+- `HTMLEditorStandalone/`: portable PyQt editor bundle for later migration into BiblionPortal
+- `PortalFeed/`: reference feed client, feed views, and reusable HTML panel code copied for transfer
+- `PortalPreviewHarness/`: browser-based preview harness for the portal feed contract
 
 ### `patreon/`
 

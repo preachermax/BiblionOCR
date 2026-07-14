@@ -1,0 +1,14 @@
+{
+  "title": "Biblion Portal Feed",
+  "panels": {
+    "main": {
+      "html": "<h1>Portal Landing Feed</h1><p>This primary panel is intended for the launcher landing page.</p>"
+    },
+    "secondary": {
+      "html": "<h3>Project Status</h3><ul><li>OCR queue healthy</li><li>Trainer idle</li></ul>"
+    },
+    "tertiary": {
+      "html": "<h3>Recent Activity</h3><p>Use this card for announcements, tasks, or community notices.</p>"
+    }
+  }
+}
