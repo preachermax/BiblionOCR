@@ -27,6 +27,8 @@ The BiblionOCR Help System provides comprehensive, integrated documentation for 
 
 ✅ **Tabbed Interface** - Organized information in readable format
 
+✅ **Launcher Context Help Surface** - MyLauncher can now push a tool's structured help content into the main landing panel through its right-click context menu
+
 ✅ **Release Workflow Coverage** - Documentation now reflects the cross-platform font refresh path used for release builds and Tesseract retraining updates
 
 ## Quick Start
@@ -39,6 +41,13 @@ The BiblionOCR Help System provides comprehensive, integrated documentation for 
    - 📖 Overview - What the program does
    - 🎯 Usage Guide - How to use it
    - 🔧 Development - Technical details
+
+### For MyLauncher Users
+
+1. **Right-click a launcher button** such as MyReader, MyWriter, or MyServer
+2. **Choose `Generate Project Help in Mainwidget`**
+3. **Review the generated help surface** in the main landing panel without leaving MyLauncher
+4. Use **`Open Program Help Dialog`** when the tabbed F1-style dialog is preferred instead
 
 ### For Developers
 
@@ -191,6 +200,10 @@ from PyQt5.QtWidgets import QPushButton
 help_btn = QPushButton('Help')
 help_btn.clicked.connect(lambda: show_help(self, 'MyBoxer'))
 ```
+
+### Method 4: Launcher Context Menu Surface
+
+MyLauncher now supports a secondary integration path for high-level tool discovery. A launcher button can expose a context menu entry that renders the existing `PROGRAM_HELP` content into the main embedded portal panel instead of opening a modal dialog immediately.
 
 ## Accessing Help Programmatically
 

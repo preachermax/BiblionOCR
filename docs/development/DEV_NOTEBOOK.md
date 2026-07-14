@@ -114,7 +114,7 @@
 
 ## Portal And Editor Migration Staging
 
-* `ViewController/0-MainUI/HTMLeditor.py` was repaired and extended to support:
+* the portable HTML editor runtime was repaired and extended to support:
 
   * real multi-selection editing
   * Markdown-preserving editing and HTML export
@@ -122,7 +122,7 @@
   * source inspection in HTML, Markdown, and JSON modes
   * pre-Qt GUI environment sanitization through `gui_runtime_env.py`
 
-* the portable editor runtime was then copied into `docs/portal/HTMLEditorStandalone/` so it can be transferred into BiblionPortal as a self-contained bundle
+* that editor runtime was later moved into the BiblionPortal project and removed from BiblionOCR after the transfer bundle was no longer needed here
 * portal helper prototypes were collapsed into a smaller transfer surface:
 
   * `PortalFeedClient.py`
@@ -130,6 +130,7 @@
   * `PortalHtmlPanel.py`
 
 * a browser-native preview surface now exists under `docs/portal/PortalPreviewHarness/` so portal feed behavior can be previewed closer to the eventual Django/browser runtime instead of only through Qt
+* `MyLauncher` now uses its launcher-button context menus as a secondary discovery surface for project help, including a `Generate Project Help in Mainwidget` action that renders `HelpSystem.py` content into the embedded main portal panel
 * current direction:
 
   * preserve the feed contract as the stable seam
