@@ -1,0 +1,260 @@
+[
+  {
+    "scheduled_date": "2026-07-10",
+    "slug": "dependabot-and-public-launch-housekeeping",
+    "title": "Why Infrastructure Housekeeping Counts as Real Progress",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A public post about why dependency updates, release cleanup, and documentation passes are part of serious software stewardship rather than side work.",
+    "tags": [
+      "maintenance",
+      "github",
+      "release",
+      "stewardship"
+    ],
+    "call_to_action": "If these public maintenance notes are useful, I can keep showing the invisible work that makes Biblion more trustworthy instead of only posting visible feature changes.",
+    "links": [
+      {
+        "label": "Live Biblion home page",
+        "path": "https://biblionocr.onrender.com/",
+        "note": "The public site is now live, but keeping the project credible also requires maintenance, cleanup, and documentation discipline behind the scenes."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Translate invisible maintenance into visible trust-building.",
+          "Frame it as the cost of making a project durable enough for public scholarship."
+        ]
+      },
+      {
+        "heading": "Points to Emphasize",
+        "paragraphs": [
+          "A public repository has to be navigable, buildable, and understandable, not merely visible.",
+          "Dependabot work, release cleanup, and docs passes reduce fragility even when they do not produce dramatic screenshots.",
+          "For preservation-oriented software, trust is built partly through maintenance discipline and not only through new features."
+        ]
+      }
+    ],
+    "pre_post_body": "A lot of meaningful project progress looks invisible from the outside. Dependabot work, release hygiene, documentation passes, and repository cleanup rarely produce dramatic visuals, but they are part of what makes a public project credible.\n\nWhen Biblion moved further into the open on GitHub and the public home page went live, that changed the standard the project has to meet. Public code is not only about showing source files. It is also about making the repository safer to consume, easier to navigate, and more responsible to maintain. That means dependency updates, documentation clarity, and release discipline become real development work, not distractions from it.\n\nI think this matters especially for projects in the humanities and preservation space. If the software is meant to support serious long-term work, then stability and transparency are not optional extras. They are part of the intellectual and practical trust model.\n\nSo when I talk about infrastructure housekeeping as progress, I mean it quite literally. It is the work that keeps a project from becoming fragile, confusing, or difficult to build on. A cleaner release surface and a clearer repository are part of what makes the public-facing site worth trusting in the first place.\n\nIf you want the broader public entry point, the live Biblion site is here as well:\nhttps://biblionocr.onrender.com/\n\nIf you are following Biblion from outside the repo, this is one of the reasons ongoing support matters: it buys the time to do the invisible work properly instead of only chasing visible features."
+  },
+  {
+    "scheduled_date": "2026-07-11",
+    "slug": "preservation-before-convenience",
+    "title": "Preservation Before Convenience: A Biblion Design Principle",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A principle-focused post that turns an internal design value into a public-facing argument.",
+    "tags": [
+      "principles",
+      "preservation",
+      "design"
+    ],
+    "call_to_action": "If this principle resonates, I can keep turning Biblion's internal design commitments into public essays that explain why the software is being shaped this way.",
+    "links": [
+      {
+        "label": "Live Biblion home page",
+        "path": "https://biblionocr.onrender.com/",
+        "note": "The public site now offers a broader introduction to the project that sits behind this design principle."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Connect source fidelity, traceability, and archival responsibility.",
+          "Avoid product-language and keep the emphasis on stewardship."
+        ]
+      },
+      {
+        "heading": "Points to Emphasize",
+        "paragraphs": [
+          "Convenience is useful, but it becomes dangerous when it hides provenance or flattens evidence.",
+          "Preservation-first design does not reject automation; it constrains automation so that evidence remains recoverable and interpretable.",
+          "This principle explains many downstream workflow and architecture decisions across the project."
+        ]
+      }
+    ],
+    "pre_post_body": "One of the design principles behind Biblion is preservation before convenience. That phrase is simple, but it shapes a large number of technical decisions.\n\nConvenience-driven systems often optimize for speed, minimal friction, and the appearance of immediate results. That can be useful, but it becomes dangerous when working with historical texts and source materials that need to remain intelligible over time. Once context is stripped away, evidence is flattened, or provenance disappears, it becomes much harder to trust the output.\n\nPreservation before convenience means the source should remain recoverable. It means transformations should be traceable. It means the workflow should help scholars and editors understand what changed, not simply present a final answer as if it emerged from nowhere.\n\nThis principle does not reject automation. It places automation in the right position. The machine helps with labor, pattern recognition, and acceleration, but it does not get to erase the documentary logic of the work.\n\nThat distinction matters for Biblion because the goal is not merely to process text. The goal is to steward materials responsibly while making them more usable for real scholarship. It is also one of the ideas now sitting underneath the public-facing home page and the broader story the project is starting to tell:\nhttps://biblionocr.onrender.com/\n\nIf people are going to trust tools like this, they need to understand that the software is not being built only for convenience. It is being built to preserve evidence while making serious work more possible."
+  },
+  {
+    "scheduled_date": "2026-07-12",
+    "slug": "members-lab-note-on-dialog-ux",
+    "title": "Lab Note: Making Scholarly Workflow Visible in the UI",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "A more intimate members post about interface decisions, friction, and iteration logic.",
+    "tags": [
+      "members",
+      "ux",
+      "development notes"
+    ],
+    "call_to_action": "If this more candid studio-journal style is useful, I can keep reserving these rougher interface notes for members while the public posts stay cleaner and broader in scope.",
+    "links": [
+      {
+        "label": "Live Biblion home page",
+        "path": "https://biblionocr.onrender.com/",
+        "note": "The public site shows the outward-facing shell; this members note is about the messier workflow decisions taking shape underneath it."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Talk plainly about tradeoffs, status-bar density, and why editability matters more than polish at this stage.",
+          "This should feel closer to a studio journal than a polished announcement."
+        ]
+      },
+      {
+        "heading": "Open Tensions",
+        "paragraphs": [
+          "A compact status surface is valuable only if it stays legible and does not compete with the actual work area.",
+          "Editable workflow state is more important than polished chrome right now, because the software is still deciding what information really needs to remain visible.",
+          "The interface is trying to expose just enough project memory to help the user without turning every screen into a dashboard."
+        ]
+      }
+    ],
+    "pre_post_body": "This is the kind of post I like to keep for members because it deals less with polished outcomes and more with the friction of active design decisions. The immediate topic is interface work around workflow visibility, but the deeper subject is how much the tool should expose while it is still evolving.\n\nMaking scholarly workflow visible in the UI sounds straightforward until the interface starts competing for space and attention. A status bar can become useful very quickly, but it can also become noisy. The milestone dialog solves part of that by making the data editable in a dedicated surface instead of forcing everything into one strip of screen space.\n\nWhat I care about most in this phase is not visual perfection. It is whether the interface helps the user keep track of what state a project is in, what changed recently, and what still remains. That is a much more important threshold than whether the first pass looks especially elegant.\n\nThis is also one of those places where development tradeoffs become unusually visible. A compact surface can feel efficient, but only if it remains legible. An editable surface can feel more complex, but only if the added complexity actually pays for itself.\n\nThe public home page now gives people a cleaner outward-facing entry to the project:\nhttps://biblionocr.onrender.com/\n\nThis members note is about the opposite side of that experience: the messier internal choices that determine whether the working environment actually feels trustworthy once the public shell gives way to real use. That tension is exactly the kind of thing members get to see more directly. It is where the software stops being an abstract plan and starts revealing its working compromises."
+  },
+  {
+    "scheduled_date": "2026-07-13",
+    "slug": "week-ahead-what-support-enables",
+    "title": "Week Ahead: What Support Enables Next",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A forward-looking wrap-up that sets the next week’s expectations and invites support.",
+    "tags": [
+      "roadmap",
+      "support",
+      "weekly"
+    ],
+    "call_to_action": "If you want to help Biblion keep this pace without losing clarity, support is what buys time for the next round of refinement, integration, and public explanation.",
+    "links": [
+      {
+        "label": "Live Biblion home page",
+        "path": "https://biblionocr.onrender.com/",
+        "note": "The public site is now live and gives a clearer front door into the work described in this weekly wrap-up."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Summarize what moved this week and what the next build targets are.",
+          "Keep the call for support concrete by naming the kind of work it makes possible."
+        ]
+      },
+      {
+        "heading": "Next Steps",
+        "paragraphs": [
+          "Name the current momentum clearly: public site live, Patreon posting flow working, shared project-status surfaces in place, and queue tooling stabilized.",
+          "Point toward the next layer of work: workflow refinement, content tooling, and making the platform easier to understand without constant manual explanation.",
+          "Keep the support ask concrete by tying it to sustained refinement rather than vague growth language."
+        ]
+      }
+    ],
+    "pre_post_body": "As one week closes, the most useful thing I can do is set up the next one clearly. That matters for me as a builder, but it also matters for anyone supporting the project and trying to understand what momentum looks like in practice.\n\nThis past stretch has been about making Biblion more legible and more coherent: a live public home page, a working Patreon publishing flow, clearer public documentation, a more credible repository surface, better cross-module project state, and a stronger internal sense of workflow progress. None of those things finish the platform, but together they reduce ambiguity.\n\nThe next phase needs to keep that same discipline while moving back toward daily production usefulness. That means continuing to improve the project workflow surfaces, strengthening content and publication tooling, and making it easier to communicate progress without breaking stride every time a new surface is exposed publicly.\n\nThis is where support genuinely matters. It is not just about adding features faster. It is about sustaining the slower work of refinement, documentation, integration, and editorial clarity that keeps the whole project from fragmenting.\n\nIf you want the broader public-facing entry point into that work, the live Biblion site is here:\nhttps://biblionocr.onrender.com/\n\nThe week ahead will build on that foundation. I want the next round of work to make Biblion easier to use, easier to explain, and easier to trust."
+  },
+  {
+    "scheduled_date": "2026-07-14",
+    "slug": "portable-html-editor-bundle-for-portal-migration",
+    "title": "Why the HTML Editor Was Packaged as a Portable Bundle",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A public post explaining why the editor was extracted into a self-contained transfer bundle before the BiblionPortal migration.",
+    "tags": [
+      "portal",
+      "editor",
+      "migration",
+      "public"
+    ],
+    "call_to_action": "If this kind of behind-the-scenes engineering note is useful, support helps keep the migration work disciplined instead of rushed.",
+    "links": [
+      {
+        "label": "Standalone editor bundle README",
+        "path": "../../../portal/HTMLEditorStandalone/README.md",
+        "note": "This explains what was packaged into the transfer-ready editor bundle and why it can now run from a self-contained folder."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Explain why portability matters before a project-to-project migration.",
+          "Frame the editor bundle as preparation work that reduces risk and clarifies boundaries before the Django move."
+        ]
+      }
+    ],
+    "pre_post_body": "One useful kind of progress does not look dramatic at first glance: making a tool portable enough to move cleanly into its next home. That is what happened with the HTML editor in the current Biblion work.\n\nInstead of leaving the editor tangled up inside a larger desktop application context, I packaged it into a small standalone bundle. That bundle now contains the editor controller, the compiled UI module, the original Qt Designer source, and the runtime environment helper needed to start cleanly on Linux. The point was not merely to duplicate files. The point was to define the actual runtime boundary of the editor before moving it into BiblionPortal.\n\nThat kind of boundary work matters because migrations become much harder when a tool still depends on accidental local context. If the editor can run from a self-contained folder, then it is much easier to evaluate whether it belongs inside the portal project, beside it, or only as a transitional utility.\n\nThis is the sort of engineering work that often stays invisible from the outside, but it is part of what makes a larger platform migration realistic instead of chaotic. A portable editor bundle is not the final portal experience. It is a disciplined staging step that helps keep the next move clean.\n\nIf you want to see the current handoff note for that bundle, it is documented here:\n../../../portal/HTMLEditorStandalone/README.md"
+  },
+  {
+    "scheduled_date": "2026-07-15",
+    "slug": "portal-feed-contract-and-browser-preview",
+    "title": "The Portal Feed Contract Now Has a Browser Preview Surface",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "A members post about turning the portal feed contract into a browser-native preview harness instead of relying only on Qt test windows.",
+    "tags": [
+      "portal",
+      "django",
+      "preview",
+      "members"
+    ],
+    "call_to_action": "Members get the more technical build notes because this is where architecture starts turning into an actual integration surface.",
+    "links": [
+      {
+        "label": "Portal preview harness README",
+        "path": "../../../portal/PortalPreviewHarness/README.md",
+        "note": "This records the browser-based preview harness that now mirrors the Django portal feed contract."
+      },
+      {
+        "label": "Portal feed planning bundle",
+        "path": "../../../portal/README.md",
+        "note": "This documents how the transfer bundles are being staged before they move into BiblionPortal."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Show why a browser preview harness is a more honest test surface for portal work than a Qt-only preview window.",
+          "Use the post to explain the emerging contract between Django feed publication and browser-side rendering."
+        ]
+      }
+    ],
+    "pre_post_body": "A useful threshold was crossed in the portal work this week: the feed contract now has a browser-native preview surface instead of depending only on a Qt-side preview window.\n\nThat change matters because the eventual portal runtime is not a desktop Qt application. It is a browser experience backed by Django. Once that is true, the right place to test the shape of a landing feed is in a browser harness that consumes the same JSON contract the real portal pages will use.\n\nThe preview harness now renders the main, secondary, and tertiary portal panels from the normalized feed payload. That makes it much easier to reason about what belongs in the feed itself, what belongs in the page shell, and what should remain separate as authoring infrastructure.\n\nThis is also part of why I do not want to overcommit to a Qt preview path for portal design. Qt was useful for proving some early reusable surfaces, but the browser is the actual destination. The harness makes that architectural truth more explicit.\n\nThe current preview-harness staging note is here:\n../../../portal/PortalPreviewHarness/README.md"
+  },
+  {
+    "scheduled_date": "2026-07-16",
+    "slug": "tiptap-django-and-the-editorial-seam",
+    "title": "TipTap, Django, and the Editorial Seam the Portal Needs",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A public architecture post about why authoring, feed publication, and rendering should remain separate in the future portal stack.",
+    "tags": [
+      "tiptap",
+      "django",
+      "architecture",
+      "portal"
+    ],
+    "call_to_action": "If this architecture-first approach resonates, support helps keep Biblion from collapsing into a pile of shortcuts that become expensive later.",
+    "links": [
+      {
+        "label": "TipTap integration sketch",
+        "path": "../../../portal/PortalPreviewHarness/TIPTAP_INTEGRATION.md",
+        "note": "This note captures the current thinking about how TipTap authoring should relate to Django persistence and portal feed rendering."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Explain the difference between authoring, publishing, and rendering in plain language.",
+          "Use TipTap as the likely authoring layer and Django as the publishing layer without claiming the architecture is final."
+        ]
+      }
+    ],
+    "pre_post_body": "One of the architectural questions taking shape in the portal work is where editing should end and publishing should begin. I do not want those layers blurred together too early, because that usually creates confusing tools and brittle content flow.\n\nThe current direction is fairly simple. A browser editor such as TipTap should own authoring. Django should own persistence, validation, and publication. The portal feed should remain the normalized rendering contract that downstream surfaces consume.\n\nThat separation matters because editing rich content is a different problem from publishing stable content. The first is about expressive authoring. The second is about trustworthy delivery. If those concerns collapse into one improvised surface, the system gets harder to reason about and harder to migrate.\n\nSo the goal is not to make TipTap do everything. The goal is to let TipTap handle the work it is good at, while Django publishes the resulting content through a stable feed contract that the portal shell can render cleanly.\n\nThat editorial seam is one of the structural decisions that will make BiblionPortal either coherent or chaotic later on. The current sketch for that split lives here:\n../../../portal/PortalPreviewHarness/TIPTAP_INTEGRATION.md"
+  }
+]
