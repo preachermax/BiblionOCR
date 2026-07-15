@@ -89,10 +89,11 @@ for launcher in *.desktop; do
   echo "Installed: ${launcher}"
 done
 
-# Ensure wrapper launcher script is executable when present.
-if [[ -f "${REPO_ROOT}/launchers/run-myserver.sh" ]]; then
-  chmod +x "${REPO_ROOT}/launchers/run-myserver.sh"
-fi
+# Ensure all Linux wrapper launcher scripts are executable when present.
+for sh_launcher in "${REPO_ROOT}"/launchers/run-*.sh; do
+  [[ -e "${sh_launcher}" ]] || continue
+  chmod +x "${sh_launcher}"
+done
 
 if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "${APPS_DIR}" || true

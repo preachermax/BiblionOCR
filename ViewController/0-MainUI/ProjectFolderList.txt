@@ -1,6 +1,41 @@
+Biblion Explorer.desktop
+BiblionBoxer.desktop
 Core/MyServer.py => ViewController/0-MainUI/MyServer.py
 Core/MyServerUI.py => ViewController/0-MainUI/MyServerUI.py
 Core/MyServerUI.ui => ViewController/QtDesignerUI/MyServerUI.ui
+launchers/install-biblionocr-ubuntu24.sh
+launchers/restore-desktop-launchers.sh
+launchers/restore_desktop_launchers.py
+launchers/run-myboxer.cmd
+launchers/run-myboxer.sh
+launchers/run-myexplorer.cmd
+launchers/run-myexplorer.sh
+launchers/run-myglypher.cmd
+launchers/run-myglypher.sh
+launchers/run-mygrounder.cmd
+launchers/run-mygrounder.sh
+launchers/run-mylauncher.cmd
+launchers/run-mylauncher.sh
+launchers/run-mylexer.cmd
+launchers/run-mylexer.sh
+launchers/run-mypixler.cmd
+launchers/run-mypixler.sh
+launchers/run-myreader.cmd
+launchers/run-myreader.sh
+launchers/run-myresolver.cmd
+launchers/run-myresolver.sh
+launchers/run-myscanner.cmd
+launchers/run-myscanner.sh
+launchers/run-myserver.cmd
+launchers/run-myserver.sh
+launchers/run-mysliders.cmd
+launchers/run-mysliders.sh
+launchers/run-mytrainer.cmd
+launchers/run-mytrainer.sh
+launchers/run-myversifier.cmd
+launchers/run-myversifier.sh
+launchers/run-mywriter.cmd
+launchers/run-mywriter.sh
 Model/Project/Data
 Model/Project/Data/esword
 Model/Project/Data/esword/rmac.dctx
@@ -103,15 +138,12 @@ Model/Project/Utilities/striprtf
 Model/Project/Utilities/Web
 Model/Project/Utilities/xml2csv
 Model/Project/Utilities/xml2json
+My Server.desktop
 requirements.txt
 ViecMyLexer.py
 ViewController/0-MainUI
 ViewController/0-MainUI/Adjust.py
-ViewController/0-MainUI/advanced_scanner-twain py
-ViewController/0-MainUI/advanced_scanner-twain-too much.py
-ViewController/0-MainUI/advanced_scanner.py
 ViewController/0-MainUI/AIcommitWorkflow.md
-ViewController/0-MainUI/ChrReference copy.py
 ViewController/0-MainUI/ChrReference.py
 ViewController/0-MainUI/ChrReferenceDialog.py
 ViewController/0-MainUI/cmap2csv2 json.py
@@ -119,7 +151,6 @@ ViewController/0-MainUI/Co-pilot diff text on FROMVS in Windows.txt
 ViewController/0-MainUI/Co-pilot Instructions.odt
 ViewController/0-MainUI/Co-pilot Instructions.txt
 ViewController/0-MainUI/commit_checklist.md
-ViewController/0-MainUI/CropTif.py
 ViewController/0-MainUI/DEPENDENCIES_AND_RELATIONSHIPS.md
 ViewController/0-MainUI/DESIGN_SPECIFICATION.md
 ViewController/0-MainUI/dev_notebook.md
@@ -202,6 +233,7 @@ ViewController/0-MainUI/fonts/FROMVSold.xml
 ViewController/0-MainUI/fonts/FROMVSpost.ttx
 ViewController/0-MainUI/getFontInfo.py
 ViewController/0-MainUI/getPlatform.py
+ViewController/0-MainUI/gui_runtime_env.py
 ViewController/0-MainUI/HELP_INTEGRATION_GUIDE.md
 ViewController/0-MainUI/HelpSystem.py
 ViewController/0-MainUI/ImageFileRenameMove4GroundTruth.py
@@ -256,16 +288,18 @@ ViewController/0-MainUI/PageVerseCrossReferenceUI.py
 ViewController/0-MainUI/PageVerseHelper.ipynb
 ViewController/0-MainUI/PreProcess.py
 ViewController/0-MainUI/PreviewStudio.py
+ViewController/0-MainUI/print_handlerUI.py
+ViewController/0-MainUI/print_menu_support.py
 ViewController/0-MainUI/PROJECT_ARCHITECTURE.md
+ViewController/0-MainUI/project_status_controller.py
 ViewController/0-MainUI/ProjectFolderList.py
 ViewController/0-MainUI/ProjectFolderList.txt
+ViewController/0-MainUI/ProjectTrackingDialog.py
 ViewController/0-MainUI/pyTesseractTrainer-1.03.py
-ViewController/0-MainUI/Qt5SelectRegion.py
-ViewController/0-MainUI/QtCropImage.py
 ViewController/0-MainUI/QUICK_REFERENCE.md
 ViewController/0-MainUI/README_HELP_SYSTEM.md
 ViewController/0-MainUI/RenameFiles.py
-ViewController/0-MainUI/scanner_app.py
+ViewController/0-MainUI/scan_runtime.py
 ViewController/0-MainUI/ScanWorkflow.py
 ViewController/0-MainUI/SessionManager.py
 ViewController/0-MainUI/sqlite3-mysql.txt
@@ -292,3 +326,5 @@ ViewController/2-TrainTesseract
 ViewController/3-ConductOCR
 ViewController/4-PostProcess
 ViewController/QtDesignerUI
+βιϐλιον Boxer.desktop
+βιϐλιον Explorer.desktop

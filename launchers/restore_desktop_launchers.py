@@ -248,9 +248,8 @@ def main() -> int:
                 os.chmod(desktop_target, 0o755)
                 installed.append(str(desktop_target))
 
-    run_myserver = repo_root / "launchers" / "run-myserver.sh"
-    if run_myserver.exists():
-        run_myserver.chmod(run_myserver.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    for wrapper in (repo_root / "launchers").glob("run-*.sh"):
+        wrapper.chmod(wrapper.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     refresh_desktop_database(apps_dir)
 
