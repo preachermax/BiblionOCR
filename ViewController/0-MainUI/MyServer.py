@@ -42,6 +42,10 @@ developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
 if developer_view_dir not in sys.path:
     sys.path.insert(0, developer_view_dir)
 
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 # Debug (optional toggle)
 DEBUG_PATHS = True
 if DEBUG_PATHS:
@@ -109,7 +113,27 @@ from PyQt5.QtCore import QBuffer, QIODevice
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtWidgets import QMainWindow, QAction
-from print_handlerUI import ProjectPrintHandler
+try:
+    from print_handlerUI import ProjectPrintHandler
+except ModuleNotFoundError:
+    class ProjectPrintHandler:
+        """Fallback print handler used when print_handlerUI is unavailable."""
+
+        def __init__(self, parent=None):
+            self.parent = parent
+
+        def _warn_unavailable(self, owner):
+            qtw.QMessageBox.warning(
+                owner,
+                "Printing Unavailable",
+                "print_handlerUI.py is missing in this checkout. Printing features are disabled.",
+            )
+
+        def handle_image(self, image, owner, preview=False):
+            self._warn_unavailable(owner)
+
+        def handle_print(self, target_file, owner, preview=False):
+            self._warn_unavailable(owner)
 
 import numpy as np
 import tifffile
@@ -282,12 +306,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
 
-        self.ui.actionPrint_Ref_Image.triggered.connect(
-            lambda: self.execute_print_flow(target="primary")
-        )
-        self.ui.actionPrint_Text.triggered.connect(self.print_text_document)
-        self.ui.actionPrint_Preview.triggered.connect(self.print_active_preview)
-        self.ui.actionExit.triggered.connect(self.close)
+        if hasattr(self.ui, "actionPrint_Ref_Image"):
+            self.ui.actionPrint_Ref_Image.triggered.connect(
+                lambda: self.execute_print_flow(target="primary")
+            )
+        if hasattr(self.ui, "actionPrint_Text"):
+            self.ui.actionPrint_Text.triggered.connect(self.print_text_document)
+        if hasattr(self.ui, "actionPrint_Preview"):
+            self.ui.actionPrint_Preview.triggered.connect(self.print_active_preview)
+        if hasattr(self.ui, "actionExit"):
+            self.ui.actionExit.triggered.connect(self.close)
 
         self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
         self.ui.actionpdf_for_tiff_tb.triggered.connect(self.actionpdf_for_tiff)

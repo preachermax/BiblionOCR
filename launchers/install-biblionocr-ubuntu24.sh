@@ -58,6 +58,15 @@ OCR_PACKAGES=(
   enchant-2
 )
 
+PRINT_PACKAGES=(
+  cups
+  cups-client
+  cups-filters
+  avahi-daemon
+  avahi-utils
+  ipp-usb
+)
+
 PYTHON_RUNTIME_PACKAGES=(
   python3-sane
   python3-fontforge
@@ -198,6 +207,9 @@ main() {
 
   log "Installing OCR, scanner, and imaging packages"
   install_apt_packages "${OCR_PACKAGES[@]}"
+
+  log "Installing AirPrint and CUPS discovery packages"
+  install_apt_packages "${PRINT_PACKAGES[@]}"
 
   log "Installing Python runtime packages provided by Ubuntu"
   install_apt_packages "${PYTHON_RUNTIME_PACKAGES[@]}"
