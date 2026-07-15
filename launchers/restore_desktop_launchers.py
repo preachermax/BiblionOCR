@@ -11,6 +11,7 @@ import subprocess
 from typing import Dict, Iterable, List, Tuple
 
 LEGACY_REPO_ROOT = "/home/jetson/Projects/BiblionOCR"
+GREEK_BRAND = "βιϐλιον"
 
 CANONICAL_MODULES: List[Tuple[str, str, str]] = [
     ("MyServer", "My Server", "BiblionServer.png"),
@@ -98,6 +99,12 @@ def format_desktop_entry(name: str, comment: str, exec_cmd: str, try_exec: str, 
     return "\n".join(lines) + "\n"
 
 
+def greek_label(label: str) -> str:
+    if label.startswith("Biblion "):
+        return label.replace("Biblion ", f"{GREEK_BRAND} ", 1)
+    return label
+
+
 def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
     launchers: Dict[str, str] = {}
     icons_dir = repo_root / "ViewController" / "0-MainUI" / "Icons"
@@ -132,6 +139,18 @@ def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
             icon=str(icon_path),
             cwd=str(repo_root),
         )
+
+        greek_name = greek_label(label)
+        if greek_name != label:
+            greek_desktop_name = f"{greek_name}.desktop"
+            launchers[greek_desktop_name] = format_desktop_entry(
+                name=greek_name,
+                comment=f"Launch {greek_name}",
+                exec_cmd=exec_cmd,
+                try_exec=try_exec,
+                icon=str(icon_path),
+                cwd=str(repo_root),
+            )
 
     return launchers
 
