@@ -12,6 +12,9 @@ from typing import Dict, Iterable, List, Tuple
 
 LEGACY_REPO_ROOT = "/home/jetson/Projects/BiblionOCR"
 GREEK_BRAND = "βιϐλιον"
+GREEK_LABEL_ALIASES = {
+    "My Server": [f"{GREEK_BRAND} Server"],
+}
 
 CANONICAL_MODULES: List[Tuple[str, str, str]] = [
     ("MyServer", "My Server", "BiblionServer.png"),
@@ -105,6 +108,25 @@ def greek_label(label: str) -> str:
     return label
 
 
+def greek_label_variants(label: str) -> List[str]:
+    variants: List[str] = []
+    alias_variants = GREEK_LABEL_ALIASES.get(label, [])
+    variants.extend(alias_variants)
+
+    transformed = greek_label(label)
+    if transformed != label:
+        variants.append(transformed)
+
+    seen = set()
+    unique: List[str] = []
+    for variant in variants:
+        if variant and variant not in seen:
+            seen.add(variant)
+            unique.append(variant)
+
+    return unique
+
+
 def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
     launchers: Dict[str, str] = {}
     icons_dir = repo_root / "ViewController" / "0-MainUI" / "Icons"
@@ -140,8 +162,7 @@ def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
             cwd=str(repo_root),
         )
 
-        greek_name = greek_label(label)
-        if greek_name != label:
+        for greek_name in greek_label_variants(label):
             greek_desktop_name = f"{greek_name}.desktop"
             launchers[greek_desktop_name] = format_desktop_entry(
                 name=greek_name,
