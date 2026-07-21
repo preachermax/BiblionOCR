@@ -63,10 +63,15 @@ class CytoscapeExporterTests(unittest.TestCase):
             with open(output_file, "r", encoding="utf-8") as handle:
                 payload = json.load(handle)
 
-            self.assertIsInstance(payload, list)
-            self.assertGreaterEqual(len(payload), 8)
-            self.assertTrue(any("id" in item.get("data", {}) for item in payload))
-            self.assertTrue(any("source" in item.get("data", {}) for item in payload))
+            self.assertIsInstance(payload, dict)
+            self.assertEqual(1, payload.get("schema_version"))
+            self.assertEqual("launch_graph.py", payload.get("generated_from"))
+            self.assertIsInstance(payload.get("nodes"), list)
+            self.assertIsInstance(payload.get("edges"), list)
+            self.assertEqual(4, len(payload["nodes"]))
+            self.assertEqual(4, len(payload["edges"]))
+            self.assertTrue(any("id" in item for item in payload["nodes"]))
+            self.assertTrue(any("source" in item for item in payload["edges"]))
 
 
 if __name__ == "__main__":

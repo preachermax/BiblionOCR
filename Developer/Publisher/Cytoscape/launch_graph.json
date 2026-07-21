@@ -1,36 +1,32 @@
-[
-    {
-        "data": {
+{
+    "schema_version": 1,
+    "generated_from": "launch_graph.py",
+    "nodes": [
+        {
             "id": "MyServer",
             "label": "MyServer",
             "order": 999,
             "help": "",
             "animation": "idle",
             "script": "MyServer.py"
-        }
-    },
-    {
-        "data": {
+        },
+        {
             "id": "MyScanner",
             "label": "MyScanner",
             "order": 999,
             "help": "",
             "animation": "idle",
             "script": "MyScanner.py"
-        }
-    },
-    {
-        "data": {
+        },
+        {
             "id": "MyPixler",
             "label": "MyPixler",
             "order": 999,
             "help": "",
             "animation": "idle",
             "script": "MyPixler.py"
-        }
-    },
-    {
-        "data": {
+        },
+        {
             "id": "MyExplorer",
             "label": "MyExplorer",
             "order": 999,
@@ -38,29 +34,23 @@
             "animation": "idle",
             "script": "MyExplorer.py"
         }
-    },
-    {
-        "data": {
+    ],
+    "edges": [
+        {
             "source": "MyLauncher",
             "target": "MyServer"
-        }
-    },
-    {
-        "data": {
+        },
+        {
             "source": "MyLauncher",
             "target": "MyScanner"
-        }
-    },
-    {
-        "data": {
+        },
+        {
             "source": "MyLauncher",
             "target": "MyPixler"
-        }
-    },
-    {
-        "data": {
+        },
+        {
             "source": "MyLauncher",
             "target": "MyExplorer"
         }
-    }
-]
+    ]
+}

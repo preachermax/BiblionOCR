@@ -76,6 +76,26 @@ class CytoscapeExporter:
 
         return elements
 
+    def export_payload(self):
+        """Return a versioned payload for downstream consumers."""
+
+        nodes = []
+        edges = []
+
+        for element in self.export_elements():
+            data = element.get("data", {})
+            if "id" in data:
+                nodes.append(data)
+            elif "source" in data and "target" in data:
+                edges.append(data)
+
+        return {
+            "schema_version": 1,
+            "generated_from": "launch_graph.py",
+            "nodes": nodes,
+            "edges": edges,
+        }
+
 
     def export_json(self, filename):
 
@@ -86,7 +106,7 @@ class CytoscapeExporter:
         ) as file:
 
             json.dump(
-                self.export_elements(),
+                self.export_payload(),
                 file,
                 indent=4
             )
