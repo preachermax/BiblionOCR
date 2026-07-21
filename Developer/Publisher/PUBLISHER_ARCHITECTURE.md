@@ -8,9 +8,48 @@
 
 **Subsystem:** Developer / Publisher
 
-**Status:** Design Approved
+**Status:** Graph Model v1 Complete
 
-**Version:** 1.0
+**Version:** 1.1
+
+---
+
+## Milestone Update (2026-07-20)
+
+## Current Milestone Complete
+
+**Publisher Graph Model v1 complete. Cytoscape export contract established.**
+
+Implemented and verified in code:
+
+* `ApplicationUIModel` remains the source of truth for interface and launch relationships.
+* `LaunchGraph` is now a relationship projection over `ApplicationUIModel` (not a duplicate metadata model).
+* `launcher_registry.py` now lives in `Developer/Publisher` and is imported from that canonical path.
+* Launcher integration path validated for first workflow chain modules:
+    * `MyServer`
+    * `MyScanner`
+    * `MyPixler`
+    * `MyExplorer`
+* Cytoscape exporter contract verified:
+    * `exporter.export_json("launch_graph.json")` succeeds
+    * Node and edge payloads are generated from launch graph + UI metadata contract
+
+Validation coverage added:
+
+* `tests/test_launcher_registry_integration.py`
+* `tests/test_launch_graph_alignment.py`
+* `tests/test_cytoscape_exporter.py`
+
+## Next Milestone
+
+### Interactive Cytoscape Launcher View + Tutorial Navigation
+
+Planned scope:
+
+* Interactive graph rendering in the launcher/tutorial context
+* Node-driven module selection and route highlighting
+* Tutorial step navigation synchronized with graph state
+* Help panel and tutorial metadata linkage for active nodes
 
 ---
 
@@ -319,6 +358,12 @@ interactive architecture graphs.
 Each module becomes a node.
 
 Dependencies become edges.
+
+Current implementation alignment:
+
+* `launch_graph.py` builds launch edges from `ApplicationUIModel` navigation.
+* `Cytoscape/cytoscape_exporter.py` exports Cytoscape element JSON from derived nodes and edges.
+* Export format supports launcher workflow visualization and tutorial navigation overlays.
 
 ---
 

@@ -29,6 +29,10 @@ from PyQt5 import QtCore as qtc
 # Custom imports
 from MyLauncherUI import Ui_MainUI
 from LocalFileDrop import LocalFileDropMixin
+from Developer.Publisher.launcher_registry import (
+    LauncherIntegrationController,
+    build_default_launcher_registry,
+)
 
 # Dialog Imports
 
@@ -91,6 +95,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.MyTrainerbutton.clicked.connect(self.OpenWithMyTrainer)
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
+        if hasattr(self.ui, 'MyServerbutton'):
+            self.ui.MyServerbutton.clicked.connect(self.OpenWithMyServer)
 
         # UI and slots code ends here.
 
@@ -107,6 +113,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
 
         self.ui.RightPanelwidget.setDocument(self.ui.OCRDocument)
+
+        self.launcher_registry = build_default_launcher_registry()
+        self.launch_controller = LauncherIntegrationController(
+            self.launcher_registry,
+            launch_callback=self.run_child_module,
+            help_panel_callback=self._swap_help_panel_text,
+        )
 
         # Restore Session settings
         self.get_session_settings()
@@ -404,7 +417,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyReader.py')
 
     def OpenWithMyScanner(self):
-        self.run_child_module('MyScanner.py')
+        if not self.launch_controller.launch_module('MyScanner'):
+            self.run_child_module('MyScanner.py')
 
     def OpenWithMyGlypher(self):
         self.run_child_module('MyGlypher.py')
@@ -413,7 +427,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyBoxer.py')
 
     def OpenWithMyPixler(self):
-        self.run_child_module('MyPixler.py')
+        if not self.launch_controller.launch_module('MyPixler'):
+            self.run_child_module('MyPixler.py')
 
     def OpenWithMyVersifier(self):
         self.run_child_module('MyVersifier.py')
@@ -434,7 +449,24 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyWriter.py')
 
     def OpenWithMyExplorer(self):
-        self.run_child_module('MyExplorer.py')
+        if not self.launch_controller.launch_module('MyExplorer'):
+            self.run_child_module('MyExplorer.py')
+
+    def OpenWithMyServer(self):
+        self._launch_registered_module('MyServer')
+
+    def _launch_registered_module(self, module_id):
+        if not self.launch_controller.launch_module(module_id):
+            qtw.QMessageBox.warning(
+                self,
+                'Launch Not Registered',
+                f'{module_id} is not registered as a launcher target.',
+            )
+
+    def _swap_help_panel_text(self, text):
+        self.ui.RightPanelwidget.clear()
+        self.ui.RightPanelwidget.setPlainText(text)
+        self.on_font_update()
 
     def on_font_update(self):
         # update font to selection and size
