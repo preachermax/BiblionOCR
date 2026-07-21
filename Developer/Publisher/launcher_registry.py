@@ -26,6 +26,7 @@ class LauncherRegistry:
     application_model: ApplicationUIModel
     launcher_interface_id: str = "MyLauncher"
     module_scripts: Dict[str, str] = field(default_factory=dict)
+    module_metadata: Dict[str, Dict[str, object]] = field(default_factory=dict)
 
     def resolve_script(self, module_id: str) -> Optional[str]:
         """Return the script filename if module is a registered launch target."""
@@ -194,5 +195,32 @@ def build_default_launcher_registry() -> LauncherRegistry:
             "MyScanner": "MyScanner.py",
             "MyPixler": "MyPixler.py",
             "MyExplorer": "MyExplorer.py",
+        },
+        module_metadata={
+            "MyLauncher": {
+                "order": 0,
+                "help": "HelpSystem:MyLauncher",
+                "animation": "idle",
+            },
+            "MyServer": {
+                "order": 1,
+                "help": "HelpSystem:MyServer",
+                "animation": "pulse",
+            },
+            "MyScanner": {
+                "order": 2,
+                "help": "HelpSystem:MyScanner",
+                "animation": "pulse",
+            },
+            "MyPixler": {
+                "order": 3,
+                "help": "HelpSystem:MyPixler",
+                "animation": "pulse",
+            },
+            "MyExplorer": {
+                "order": 4,
+                "help": "HelpSystem:MyExplorer",
+                "animation": "pulse",
+            },
         },
     )

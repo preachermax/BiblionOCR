@@ -28,12 +28,17 @@ class LaunchGraphAlignmentTests(unittest.TestCase):
 
         node_ids = {node.interface_id for node in graph.get_nodes()}
         launch_targets = set(registry.application_model.launches("MyLauncher"))
+        expected_nodes = launch_targets.union({"MyLauncher"})
 
-        self.assertEqual(launch_targets, node_ids)
+        self.assertEqual(expected_nodes, node_ids)
 
         explorer_node = next(node for node in graph.get_nodes() if node.interface_id == "MyExplorer")
         self.assertEqual("MyExplorerUI.ui", explorer_node.ui_filename)
         self.assertIn("Project browsing", explorer_node.description)
+
+        launcher_node = next(node for node in graph.get_nodes() if node.interface_id == "MyLauncher")
+        self.assertEqual("MyLauncherUI.ui", launcher_node.ui_filename)
+        self.assertEqual("NON_MODAL", launcher_node.launch_mode)
 
     def test_edges_are_derived_from_launch_navigation_links(self) -> None:
         registry = build_default_launcher_registry()

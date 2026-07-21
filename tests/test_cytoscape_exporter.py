@@ -17,6 +17,7 @@ class CytoscapeExporterTests(unittest.TestCase):
             application_model=registry.application_model,
             launcher_interface_id=registry.launcher_interface_id,
             module_scripts=registry.module_scripts,
+            module_metadata=registry.module_metadata,
         )
         return CytoscapeExporter(launch_graph)
 
@@ -31,7 +32,7 @@ class CytoscapeExporterTests(unittest.TestCase):
         node_ids = {e["data"]["id"] for e in node_elements}
         edge_pairs = {(e["data"]["source"], e["data"]["target"]) for e in edge_elements}
 
-        self.assertEqual({"MyServer", "MyScanner", "MyPixler", "MyExplorer"}, node_ids)
+        self.assertEqual({"MyLauncher", "MyServer", "MyScanner", "MyPixler", "MyExplorer"}, node_ids)
         self.assertEqual(
             {
                 ("MyLauncher", "MyServer"),
@@ -50,6 +51,13 @@ class CytoscapeExporterTests(unittest.TestCase):
         self.assertEqual("MyScanner.py", script_by_node["MyScanner"])
         self.assertEqual("MyPixler.py", script_by_node["MyPixler"])
         self.assertEqual("MyExplorer.py", script_by_node["MyExplorer"])
+        self.assertEqual("", script_by_node["MyLauncher"])
+
+        by_node = {e["data"]["id"]: e["data"] for e in node_elements}
+        self.assertEqual(0, by_node["MyLauncher"]["order"])
+        self.assertEqual("HelpSystem:MyLauncher", by_node["MyLauncher"]["help"])
+        self.assertEqual(1, by_node["MyServer"]["order"])
+        self.assertEqual("HelpSystem:MyServer", by_node["MyServer"]["help"])
 
     def test_export_json_writes_cytoscape_payload(self) -> None:
         exporter = self._build_exporter()
@@ -68,7 +76,7 @@ class CytoscapeExporterTests(unittest.TestCase):
             self.assertEqual("launch_graph.py", payload.get("generated_from"))
             self.assertIsInstance(payload.get("nodes"), list)
             self.assertIsInstance(payload.get("edges"), list)
-            self.assertEqual(4, len(payload["nodes"]))
+            self.assertEqual(5, len(payload["nodes"]))
             self.assertEqual(4, len(payload["edges"]))
             self.assertTrue(any("id" in item for item in payload["nodes"]))
             self.assertTrue(any("source" in item for item in payload["edges"]))

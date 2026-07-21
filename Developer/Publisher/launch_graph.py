@@ -40,15 +40,29 @@ class LaunchGraph:
         application_model: ApplicationUIModel,
         launcher_interface_id: str = "MyLauncher",
         module_scripts: Optional[Dict[str, str]] = None,
+        module_metadata: Optional[Dict[str, Dict[str, object]]] = None,
     ) -> None:
         self.application_model = application_model
         self.launcher_interface_id = launcher_interface_id
         self.module_scripts = dict(module_scripts or {})
+        self.module_metadata = dict(module_metadata or {})
 
     def get_nodes(self) -> List[LaunchNode]:
         """Return launch-target nodes derived from interface metadata."""
 
         nodes: List[LaunchNode] = []
+
+        launcher_interface = self.application_model.get_interface(self.launcher_interface_id)
+        if launcher_interface is not None:
+            nodes.append(
+                LaunchNode(
+                    interface_id=launcher_interface.interface_id,
+                    display_name=launcher_interface.display_name,
+                    ui_filename=launcher_interface.ui_filename,
+                    description=launcher_interface.description,
+                    launch_mode=launcher_interface.launch_mode.name,
+                )
+            )
 
         for interface_id in self.application_model.launches(self.launcher_interface_id):
             interface = self.application_model.get_interface(interface_id)

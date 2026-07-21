@@ -37,6 +37,10 @@ class CytoscapeExporter:
                     {
                         "id": node_id,
                         "label": node_label,
+                        "module_name": node_id,
+                        "ui_file": getattr(node, "ui_filename", ""),
+                        "description": getattr(node, "description", ""),
+                        "launch_mode": getattr(node, "launch_mode", "UNKNOWN"),
 
                         # UI Model supplied values
                         "order": metadata.get(
@@ -122,15 +126,22 @@ class CytoscapeExporter:
         """
 
         if self.ui_model is None:
-            return {}
+            return self._graph_metadata(module_name)
 
         if not hasattr(self.ui_model, "get_module_metadata"):
-            return {}
+            return self._graph_metadata(module_name)
 
 
         return self.ui_model.get_module_metadata(
             module_name
         )
+
+    def _graph_metadata(self, module_name):
+        module_metadata = getattr(self.launch_graph, "module_metadata", {})
+        metadata = module_metadata.get(module_name)
+        if isinstance(metadata, dict):
+            return metadata
+        return {}
 
     def _node_id(self, node):
         if hasattr(node, "interface_id"):

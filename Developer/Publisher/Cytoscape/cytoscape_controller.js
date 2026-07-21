@@ -50,7 +50,7 @@ async function loadGraph(){
                     {
 
                         "label":
-                            "data(label)",
+                            "data(node_label)",
 
                         "text-valign":
                             "center",
@@ -147,7 +147,20 @@ function buildElements(payload){
 
     const nodeElements =
         nodes.map(
-            (node) => ({ data: node })
+            (node) => {
+                const order =
+                    node.order !== undefined
+                        ? node.order
+                        : "";
+                const label =
+                    node.label || node.id || "";
+                return {
+                    data: {
+                        ...node,
+                        node_label: `${label}${order !== "" ? ` (#${order})` : ""}`,
+                    }
+                };
+            }
         );
 
     const edgeElements =
@@ -170,10 +183,14 @@ function buildElements(payload){
                 data: {
                     id: source,
                     label: source,
+                    node_label: source,
                     order: 0,
                     help: "",
                     animation: "idle",
                     script: "",
+                    ui_file: "",
+                    description: "",
+                    launch_mode: "UNKNOWN",
                 }
             });
             nodeIds.add(source);
@@ -184,10 +201,14 @@ function buildElements(payload){
                 data: {
                     id: target,
                     label: target,
+                    node_label: target,
                     order: 0,
                     help: "",
                     animation: "idle",
                     script: "",
+                    ui_file: "",
+                    description: "",
+                    launch_mode: "UNKNOWN",
                 }
             });
             nodeIds.add(target);
@@ -203,6 +224,11 @@ function showNodeInfo(node){
     const nameEl = document.getElementById("node-name");
     const helpEl = document.getElementById("node-help");
     const orderEl = document.getElementById("node-order");
+    const scriptEl = document.getElementById("node-script");
+    const modeEl = document.getElementById("node-launch-mode");
+    const uiFileEl = document.getElementById("node-ui-file");
+    const animationEl = document.getElementById("node-animation");
+    const descriptionEl = document.getElementById("node-description");
 
     if (!nameEl || !helpEl || !orderEl) {
         return;
@@ -211,6 +237,22 @@ function showNodeInfo(node){
     nameEl.textContent = node.data("label") || node.data("id") || "";
     helpEl.textContent = node.data("help") || "(none)";
     orderEl.textContent = String(node.data("order") ?? "");
+
+    if (scriptEl) {
+        scriptEl.textContent = node.data("script") || "(none)";
+    }
+    if (modeEl) {
+        modeEl.textContent = node.data("launch_mode") || "UNKNOWN";
+    }
+    if (uiFileEl) {
+        uiFileEl.textContent = node.data("ui_file") || "(none)";
+    }
+    if (animationEl) {
+        animationEl.textContent = node.data("animation") || "idle";
+    }
+    if (descriptionEl) {
+        descriptionEl.textContent = node.data("description") || "(none)";
+    }
 }
 
 
