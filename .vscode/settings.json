@@ -16,5 +16,6 @@
     "python.testing.unittestEnabled": true,
     "github.copilot.chat.githubMcpServer.enabled": true,
     "github.copilot.chat.languageContext.typescript.includeDocumentation": true,
-    "github.copilot.chat.localIndex.enabled": true
+    "github.copilot.chat.localIndex.enabled": true,
+    "chat.byokUtilityModelDefault": "copilot"
 }

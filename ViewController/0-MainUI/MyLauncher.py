@@ -95,7 +95,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # UI and slots code ends here.
 
         # Show the Main user interface
-        self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
+        self.ui.OCRDocument = qtg.QTextDocument(self.ui.RightPanelwidget)
         font = qtg.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(20)
@@ -103,10 +103,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.OCRDocument.setDefaultFont(font)
         self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
-        self.ui.OCRTextFormat = qtg.QTextFormat()
+        self.ui.RightPanelwidgetFormat = qtg.QTextFormat()
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
 
-        self.ui.OCRText.setDocument(self.ui.OCRDocument)
+        self.ui.RightPanelwidget.setDocument(self.ui.OCRDocument)
 
         # Restore Session settings
         self.get_session_settings()
@@ -252,12 +252,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
-                self.ui.OCRText.clear()
+                self.ui.RightPanelwidget.clear()
                 if info.completeSuffix() == 'txt':
                     #self.ui.editor_text.setHtml(text
-                    self.ui.OCRText.insertPlainText(text)
+                    self.ui.RightPanelwidget.insertPlainText(text)
                 else:
-                    self.ui.OCRText.setPlainText(text)
+                    self.ui.RightPanelwidget.setPlainText(text)
 
                 # update font to selection and size
                 self.on_font_update()
@@ -304,12 +304,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
-                self.ui.OCRText.clear()
+                self.ui.RightPanelwidget.clear()
                 if info.completeSuffix() == 'txt':
                     #self.ui.editor_text.setHtml(text
-                    self.ui.OCRText.insertPlainText(text)
+                    self.ui.RightPanelwidget.insertPlainText(text)
                 else:
-                    self.ui.OCRText.setPlainText(text)
+                    self.ui.RightPanelwidget.setPlainText(text)
             #textfile.close()
             #txtdirpath = os.path.dirname(self.textpath)
 
@@ -446,7 +446,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #font = qtg.QFont(self.font)
         #font.setPointSize(int(self.fontsize))
 
-        self.ui.OCRText.setFont(font)
+        self.ui.RightPanelwidget.setFont(font)
 
     def on_lang_select(self):
         pass
