@@ -1,0 +1,66 @@
+[
+    {
+        "data": {
+            "id": "MyServer",
+            "label": "MyServer",
+            "order": 999,
+            "help": "",
+            "animation": "idle",
+            "script": "MyServer.py"
+        }
+    },
+    {
+        "data": {
+            "id": "MyScanner",
+            "label": "MyScanner",
+            "order": 999,
+            "help": "",
+            "animation": "idle",
+            "script": "MyScanner.py"
+        }
+    },
+    {
+        "data": {
+            "id": "MyPixler",
+            "label": "MyPixler",
+            "order": 999,
+            "help": "",
+            "animation": "idle",
+            "script": "MyPixler.py"
+        }
+    },
+    {
+        "data": {
+            "id": "MyExplorer",
+            "label": "MyExplorer",
+            "order": 999,
+            "help": "",
+            "animation": "idle",
+            "script": "MyExplorer.py"
+        }
+    },
+    {
+        "data": {
+            "source": "MyLauncher",
+            "target": "MyServer"
+        }
+    },
+    {
+        "data": {
+            "source": "MyLauncher",
+            "target": "MyScanner"
+        }
+    },
+    {
+        "data": {
+            "source": "MyLauncher",
+            "target": "MyPixler"
+        }
+    },
+    {
+        "data": {
+            "source": "MyLauncher",
+            "target": "MyExplorer"
+        }
+    }
+]
