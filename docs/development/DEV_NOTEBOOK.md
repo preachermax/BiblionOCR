@@ -28,6 +28,23 @@
   * EventBus dispatches events
   * SQLiteEventStore persists events
 
+---
+
+## Pre-Structural Modification Checkpoint (Page Workflow Lifecycle)
+
+Before Phase 1 implementation, the architecture plan for page-centric project workflow tracking is captured in:
+
+* `docs/development/PROJECT_PAGE_WORKFLOW_TODO.md`
+
+This checkpoint defines:
+
+* new project database fields for page lifecycle context
+* Scriptural/Secular project structure strategy
+* per-column source page folder model
+* status-bar propagation requirements across modules
+* SessionManager tracked-field integration scope
+* tabbed `ProjectSettingsDialog` redesign with Qt Designer-editable `.ui`
+
   ---
 
   ## Project Status and Milestones
@@ -68,6 +85,7 @@
   * `docs/website/` now contains a minimal React + Cytoscape website prototype
   * `docs/website/src/App.jsx` is the maintained source version of the demo
   * `docs/website/preview.html` is the no-build browser preview for environments without local Node.js
+  * the public website milestone is now live at `https://biblionocr.onrender.com/`
   * the current demo includes:
 
     * static overview graph
@@ -989,6 +1007,7 @@ DO NOT update for:
 * 2026-07-03: `MyServer.py` now redirects ADF scan requests to `MyScanner.py`, while `MyScanner.py` supports both flatbed and ADF requests through the shared scanner workflow
 * 2026-07-03: `QtDesignerUI/MyScannerUI.ui` was updated to restore a Designer-owned scan UI contract for `MyScanner`, adding MyServer-style `imageScannerbutton`, `actionImageScanner`, and `actionImageScanner_tb`, then regenerating `MyScannerUI.py` from that source
 * 2026-07-04: project documentation was consolidated under `docs/`, and the active developer notebook was renamed to uppercase `docs/development/DEV_NOTEBOOK.md` to match the new library convention
+* 2026-07-07: the public Biblion home page went live at `https://biblionocr.onrender.com/`, the Patreon posting flow succeeded against the hosted site URL, and the local weekly queue was tuned and regenerated for the remaining week
 
 ---
 
@@ -1040,12 +1059,6 @@ DO NOT update for:
 * 2026-07-04: `ProjectFolderList.py` now prunes new-project generation down to runtime-safe `Model/Project/Data/json` plus minimal workflow/training scaffolding, instead of restoring `Data/SQLite`, `Data/csv`, or deep training payloads from older manifests
 * 2026-07-04: `Model/Project/Data/esword` remains intentionally preserved in the curated manifest because MyWriter is expected to generate and update those files later
 * 2026-07-04: `MyServer` file/directory pickers now share a Projects-root fallback helper, and `actionOpen_Project` launches `MyExplorer` at the selected validated project root so both project browsing entry points start from the same anchor
-* 2026-07-09: `SessionManager` now owns the shared runtime directory bootstrap through `build_runtime_paths(...)`, `runtime_paths_for(...)`, and `export_runtime_paths(...)`, so modules can derive `script_dir`, `project_root`, `model_dir`, `data_dir`, and related paths from one source instead of re-declaring them inconsistently
-* 2026-07-09: `MyServer` remains the authoritative owner of the active project root, while the main runtime windows now restore saved image/text session documents without immediately clobbering those restored paths on startup
-* 2026-07-09: `MyExplorer` is now intentionally project-bounded: its tree roots at the active project root, its initial focus prefers the project `Model` directory, and the tree is sorted to show folders before files; OS-wide browsing is still reserved for file-picker dialogs rather than the explorer tree itself
-* 2026-07-09: Ubuntu dependency guidance and install scripts were expanded to include the Linux packages currently required by the scanner/network/font/text stack, including `python3-sane`, `python3-scapy`, `python3-zeroconf`, `python3-fontforge`, `python3-enchant`, `python3-reportlab`, and `enchant-2`, while preserving `sane` support in the default setup flow
-* 2026-07-09: launch-stability cleanup also fixed several constructor/session regressions exposed during validation, including early-tab initialization in `MyBoxer` and missing UI/session defaults in `MyLexer`
-* 2026-07-09: `Core/compute_profile.py` now defines schema-only dataclasses for the normalized compute hardware profile surface (`CPUProfile`, `MemoryProfile`, `StorageProfile`, `OSProfile`, `PythonProfile`, `GPUProfile`, `CUDAProfile`, `ProviderProfileEntry`, and `HardwareProfile`) without adding provider logic or engine integration yet; the refinement pass keeps capacities in bytes, renames CPU topology fields to `physical_cores` / `logical_cores`, and preserves provider-native diagnostics through `HardwareProfile.raw`
 * 2026-07-04: physically pruned unreferenced workspace folders `Model/Project/Data/Archive`, `Model/Project/Training/tesstrain`, `Model/Project/Training/staged_ground_truth`, and `ViewController/0-MainUI/TessTrainBoxFiles`; retained `Data/csv`, `Data/SQLite`, and `Data/esword` because `csv`/`SQLite` are still referenced by active modules and `esword` is reserved for MyWriter output
 * 2026-07-04: offscreen validation against `C:/Users/Max/Projects/Erasmus1516` confirmed `MyExplorer(start_dir=...)` roots the tree at the selected project folder as intended
 * 2026-07-04: added `DESIGN_SPECIFICATION.md` to define the repo vocabulary around System, Workspace, Project, Workflow, Process, Stage, Module, Artifact, Session, Event, and Reference Data so future cleanup and MyTrainer discussions use consistent boundaries
@@ -1138,10 +1151,18 @@ With the public introduction complete, development focus returns to core applica
 * Architecture visualization.
 * Preparation for future Introduction Video revisions as the software evolves.
 
+## Housekeeping Log (2026-07-20)
+
+* Promoted the active checkpoint commit to both `origin/master` and `origin/development`.
+* Added tracking for the `Developer/Publisher` tutorial-generation prototype.
+* Added ignore rules for machine-local artifacts generated by the Patreon local blog tooling runtime.
+* Removed tracked Playwright profile runtime cache/state data from repository history going forward.
+* Current intentionally uncommitted local path: `.venv/`.
+
 ---
 
 ## 📅 Last Updated
 
-2026-07-07
+2026-07-20
 
 ---
