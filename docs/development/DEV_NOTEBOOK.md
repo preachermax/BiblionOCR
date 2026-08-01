@@ -28,6 +28,23 @@
   * EventBus dispatches events
   * SQLiteEventStore persists events
 
+---
+
+## Pre-Structural Modification Checkpoint (Page Workflow Lifecycle)
+
+Before Phase 1 implementation, the architecture plan for page-centric project workflow tracking is captured in:
+
+* `docs/development/PROJECT_PAGE_WORKFLOW_TODO.md`
+
+This checkpoint defines:
+
+* new project database fields for page lifecycle context
+* Scriptural/Secular project structure strategy
+* per-column source page folder model
+* status-bar propagation requirements across modules
+* SessionManager tracked-field integration scope
+* tabbed `ProjectSettingsDialog` redesign with Qt Designer-editable `.ui`
+
   ---
 
   ## Project Status and Milestones

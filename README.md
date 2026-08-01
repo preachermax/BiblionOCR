@@ -6,7 +6,7 @@ BiblionOCR is an OCR and document-processing system built around observable work
 
 The public introduction video is available here:
 
-https://www.youtube.com/watch?v=zrJQzivQwT4
+[BiblionOCR Introduction Video](https://www.youtube.com/watch?v=zrJQzivQwT4)
 
 This short video presents the project's philosophy, architectural direction, and public identity.
 
@@ -14,7 +14,7 @@ This short video presents the project's philosophy, architectural direction, and
 
 The live public home page is now available here:
 
-https://biblionocr.onrender.com/
+[BiblionOCR Home Page](https://biblionocr.onrender.com/)
 
 ## Start Here
 
@@ -35,6 +35,21 @@ This repository currently contains:
 - publication and video-production materials for the first public introduction
 
 BiblionOCR is designed to make systems visible.
+
+## Developer Utility: Project Wizard Preview
+
+To preview and iterate on the Qt Designer-backed project creation wizard without launching MyServer:
+
+```bash
+source .venv/bin/activate
+python Core/preview_project_creation_wizard.py
+```
+
+For a non-interactive check that the dialog loads correctly:
+
+```bash
+python Core/preview_project_creation_wizard.py --smoke-test
+```
 
 ## License
 
