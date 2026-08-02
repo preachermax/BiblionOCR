@@ -39,14 +39,25 @@ from dataclasses import dataclass, field, asdict
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Set
 
-from ui_model import (
-    UIModel,
-    ModuleModel,
-    ModuleState,
-    WidgetID,
-    ModuleID,
-    enum_to_value,
-)
+try:
+    from .ui_model import (
+        UIModel,
+        ModuleModel,
+        ModuleState,
+        WidgetID,
+        ModuleID,
+        enum_to_value,
+    )
+except ImportError:
+    # Fallback for direct execution from this folder.
+    from ui_model import (
+        UIModel,
+        ModuleModel,
+        ModuleState,
+        WidgetID,
+        ModuleID,
+        enum_to_value,
+    )
 
 # ============================================================
 # Enumerations

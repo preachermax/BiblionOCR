@@ -46,18 +46,6 @@ REQUIRED_PROJECT_FILES = {
     "requirements.txt",
 }
 
-REQUIRED_LAUNCHER_ROOT_GLOBS = (
-    "*.desktop",
-)
-
-REQUIRED_LAUNCHER_DIR_GLOBS = (
-    "run-my*.sh",
-    "run-my*.cmd",
-    "restore-desktop-launchers.sh",
-    "restore_desktop_launchers.py",
-    "install-biblionocr-ubuntu24.sh",
-)
-
 # Manifest copy overrides use the form:
 #   source_template => generated_project_destination
 # New projects must receive the project-safe MyServer bundle from Core/, not
@@ -209,20 +197,20 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/0-MainUI/MyScannerWin.py",
     *PROJECT_MANIFEST_TEMPLATE_OVERRIDES,
     "ViewController/0-MainUI/MyReader.py",
-    "ViewController/0-MainUI/MyPixlerUI.py",
-    "ViewController/0-MainUI/MyPixler.py",
+    "ViewController/1-PreProcess/MyPixlerUI.py",
+    "ViewController/1-PreProcess/MyPixler.py",
     "ViewController/0-MainUI/MyLexerUI.py",
     "ViecMyLexer.py",
     "ViewController/0-MainUI/MyLauncherUI.py",
     "ViewController/0-MainUI/MyLauncher.py",
     "ViewController/0-MainUI/MyGrounderUI.py",
     "ViewController/0-MainUI/MyGrounder.py",
-    "ViewController/0-MainUI/MyGlypherUI.py",
-    "ViewController/0-MainUI/MyGlypher.py",
+    "ViewController/1-PreProcess/MyGlypherUI.py",
+    "ViewController/1-PreProcess/MyGlypher.py",
     "ViewController/0-MainUI/MyExplorerUI.py",
     "ViewController/0-MainUI/MyExplorer.py",
-    "ViewController/0-MainUI/MyBoxerUI.py",
-    "ViewController/0-MainUI/MyBoxer.py",
+    "ViewController/1-PreProcess/MyBoxerUI.py",
+    "ViewController/1-PreProcess/MyBoxer.py",
     "ViewController/0-MainUI/MainUI.py",
     "ViewController/0-MainUI/mainfind.py",
     "ViewController/0-MainUI/main.py",
@@ -361,7 +349,6 @@ class ProjectFolderListBuilder:
         folders.update(self._collect_workflow_image_folders())
         files.update(self._collect_mainui_module_files())
         files.update(self._collect_mainui_font_files())
-        files.update(self._collect_launcher_files())
 
         # Explicit project-local folder used by SessionManager font handling.
         folders.add("ViewController/0-MainUI/fonts")
@@ -607,31 +594,6 @@ class ProjectFolderListBuilder:
             project_relative = self._to_project_relative(candidate)
             if project_relative:
                 files.add(project_relative)
-
-        return files
-
-    def _collect_launcher_files(self) -> Set[str]:
-        files: Set[str] = set()
-
-        for pattern in REQUIRED_LAUNCHER_ROOT_GLOBS:
-            for candidate in sorted(self.project_root.glob(pattern)):
-                if not candidate.is_file():
-                    continue
-                project_relative = self._to_project_relative(candidate)
-                if project_relative:
-                    files.add(project_relative)
-
-        launchers_dir = self.project_root / "launchers"
-        if not launchers_dir.exists() or not launchers_dir.is_dir():
-            return files
-
-        for pattern in REQUIRED_LAUNCHER_DIR_GLOBS:
-            for candidate in sorted(launchers_dir.glob(pattern)):
-                if not candidate.is_file():
-                    continue
-                project_relative = self._to_project_relative(candidate)
-                if project_relative:
-                    files.add(project_relative)
 
         return files
 

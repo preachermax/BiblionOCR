@@ -36,6 +36,10 @@ body {
   grid-template-columns: minmax(200px, 260px) minmax(320px, 1fr);
 }
 
+.page-shell-autoplay {
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+}
+
 .intro-panel,
 .graph-panel {
   background: rgba(255, 255, 255, 0.72);
@@ -47,6 +51,11 @@ body {
 .intro-panel {
   padding: 24px;
   align-self: start;
+  position: sticky;
+  top: 24px;
+}
+
+.intro-panel-autoplay {
   position: sticky;
   top: 24px;
 }
@@ -244,6 +253,10 @@ body {
   gap: 24px;
   padding: 24px;
   align-self: start;
+}
+
+.graph-panel-autoplay {
+  gap: 32px;
 }
 
 .graph-panel-autoplay {

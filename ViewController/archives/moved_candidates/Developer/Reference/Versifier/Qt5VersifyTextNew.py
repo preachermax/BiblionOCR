@@ -1,0 +1,3899 @@
+# Python imports
+import sys
+import os
+import re
+import shutil
+import json
+import csv
+import time
+
+# PyQt5 imports
+from PyQt5 import QtWidgets as qtw
+from PyQt5 import QtGui as qtg
+from PyQt5 import QtCore as qtc
+
+from ext import *
+from ext import versifiercount, versefind, reffind, versewordcount, refwordcount
+# Custom imports
+from VersifyTextUI import Ui_VersifyText
+from VariantRecorderDialog import Ui_RecorderDialog
+
+from SqliteHelper import *
+#import pytesseract
+
+class Ui_MainWindow(qtw.QMainWindow):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:        
+        # load the pre-compiled QtDesigner Ui_MainUI user interface
+        self.ui = Ui_VersifyText()
+        self.ui.setupUi(self)
+
+        self.ui.BothPrevBookButton.clicked.connect(self.findPrevVerseBook)
+        self.ui.BothPrevBookButton.clicked.connect(self.findPrevRefBook)
+        self.ui.BothPrevBookButton.clicked.connect(self.updateBothVerse)
+        self.ui.BothPrevChapterButton.clicked.connect(self.findPrevVerseChapter)
+        self.ui.BothPrevChapterButton.clicked.connect(self.findPrevRefChapter)
+        self.ui.BothPrevChapterButton.clicked.connect(self.updateBothVerse)
+        self.ui.BothPrevVerseButton.clicked.connect(self.findPrevVerseVerse)
+        self.ui.BothPrevVerseButton.clicked.connect(self.findPrevRefVerse)
+        self.ui.BothPrevVerseButton.clicked.connect(self.updateBothVerse)
+        self.ui.BothPrevWordButton.clicked.connect(self.findPrevVerseWord)
+        self.ui.BothPrevWordButton.clicked.connect(self.findPrevRefWord)
+
+
+        self.ui.BothNextBookButton.clicked.connect(self.findNextVerseBook)
+        self.ui.BothNextBookButton.clicked.connect(self.findNextRefBook)
+        self.ui.BothNextBookButton.clicked.connect(self.updateBothVerse)
+        self.ui.BothNextChapterButton.clicked.connect(self.findNextVerseChapter)
+        self.ui.BothNextChapterButton.clicked.connect(self.findNextRefChapter)       
+        self.ui.BothNextChapterButton.clicked.connect(self.updateBothVerse)
+        self.ui.BothNextVerseButton.clicked.connect(self.findNextVerseVerse)
+        self.ui.BothNextVerseButton.clicked.connect(self.findNextRefVerse)
+        self.ui.BothNextVerseButton.clicked.connect(self.updateBothVerse)
+        self.ui.BothNextWordButton.clicked.connect(self.findNextVerseWord)
+        self.ui.BothNextWordButton.clicked.connect(self.findNextRefWord)
+
+        self.ui.WordCountbutton.clicked.connect(self.wordCount)
+
+        self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
+        self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
+        self.ui.bookComboBox.currentTextChanged.connect(self.loadChapterCombo)
+        self.ui.chapterComboBox.currentTextChanged.connect(self.loadVerseCombo)
+        self.ui.AnchorCkBox.stateChanged.connect(self.weighAnchor)
+        self.ui.Anchorbutton.clicked.connect(self.dropAnchor)
+        self.ui.AddVersebutton.clicked.connect(self.addVerse)        
+        self.ui.Synchronizebutton.clicked.connect(self.findBothVerse)
+        self.ui.Recorderbutton.clicked.connect(self.VarianceRecorder)
+        self.ui.Resolvebutton.clicked.connect(self.OpenResolver)
+        self.ui.NormcheckBox.stateChanged.connect(self.bothNormCheckbox)
+ 
+        self.ui.VersebookComboBox.currentTextChanged.connect(self.loadVerseChapterCombo)
+        self.ui.VersechapterComboBox.currentTextChanged.connect(self.loadVerseVerseCombo)       
+        self.ui.VersechapterComboBox.currentTextChanged.connect(self.loadVerseLineCombo) 
+        self.ui.VerseverseComboBox.currentTextChanged.connect(self.updateVerseLineCombo)
+        self.ui.VersefindPushButton.clicked.connect(self.findVerseVerse)
+
+        self.ui.RefbookComboBox.currentTextChanged.connect(self.loadRefChapterCombo)
+        self.ui.RefchapterComboBox.currentTextChanged.connect(self.loadRefVerseCombo)
+        self.ui.RefchapterComboBox.currentTextChanged.connect(self.loadRefLineCombo)
+        self.ui.RefverseComboBox.currentTextChanged.connect(self.updateRefLineCombo)
+        self.ui.ReffindPushButton.clicked.connect(self.findRefVerse) 
+
+        #Setup Verse Text
+        self.ui.VersePrevBookButton.clicked.connect(self.findPrevVerseBook)
+        self.ui.VerseNextBookButton.clicked.connect(self.findNextVerseBook)
+        self.ui.VersePrevChapterButton.clicked.connect(self.findPrevVerseChapter)
+        self.ui.VerseNextChapterButton.clicked.connect(self.findNextVerseChapter)        
+        self.ui.PrevVerseButton.clicked.connect(self.findPrevVerseVerse)
+        self.ui.NextVerseButton.clicked.connect(self.findNextVerseVerse)
+        self.ui.PrevVerseWordButton.clicked.connect(self.findPrevVerseWord)
+        self.ui.NextVerseWordButton.clicked.connect(self.findNextVerseWord)       
+        
+        self.ui.LHDialogtbutton.clicked.connect(self.GetLineSpacing)
+        self.ui.LHslider.valueChanged.connect(self.SetLineSpacing)
+        self.ui.LHslider.sliderReleased.connect(self.DisableLHSlider)
+        self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
+        self.ui.LHslider.hide()
+        self.ui.VerseFindReplacebutton.clicked.connect(versefind.Find(self).show)
+        self.ui.VerseNormcheckBox.stateChanged.connect(self.showNormText)
+        self.ui.VerseNormcheckBox.stateChanged.connect(self.showText)
+        self.ui.VerseNormButton.clicked.connect(self.VerseNormalize)
+        self.ui.VerseTextbutton.clicked.connect(self.loadText)
+        self.ui.SaveAsVerseTextbutton.clicked.connect(self.SaveAsVerseTextDialog)
+        self.ui.SaveVerseTextbutton.clicked.connect(self.SaveVerseTextDialog)         
+        self.ui.VerseMyWriterbutton.clicked.connect(self.OpenWithMyWriter)
+        self.ui.reloadVerseTextbutton.clicked.connect(self.ReloadText)
+        self.ui.VersefontComboBox.currentFontChanged.connect(self.on_versefont_update)
+        self.ui.VersefontSizeBox.valueChanged.connect(self.on_versefont_update)        
+        self.ui.VerseDocument = qtg.QTextDocument(self.ui.VerseText)
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(20)
+        self.ui.VerseDocument.setDefaultFont(font)
+        self.ui.VerseBlockFormat = qtg.QTextBlockFormat()
+        self.ui.VerseTextFormat = qtg.QTextFormat()
+        self.ui.VerseCursor = qtg.QTextCursor(self.ui.VerseDocument)
+        self.ui.VerseText.setDocument(self.ui.VerseDocument)
+        self.Versefont = self.ui.VerseText.font()
+        self.VersefontMetrics = qtg.QFontMetricsF(self.Versefont)
+        self.VersespaceWidth = self.VersefontMetrics.width(' ')
+        self.ui.VerseText.setTabStopWidth(self.VersespaceWidth * 4)
+
+        #Setup Reference Text
+        self.ui.RefPrevBookButton.clicked.connect(self.findPrevRefBook)
+        self.ui.RefNextBookButton.clicked.connect(self.findNextRefBook)
+        self.ui.RefPrevChapterButton.clicked.connect(self.findPrevRefChapter)
+        self.ui.RefNextChapterButton.clicked.connect(self.findNextRefChapter)
+        self.ui.PrevRefVerseButton.clicked.connect(self.findPrevRefVerse)
+        self.ui.NextRefVerseButton.clicked.connect(self.findNextRefVerse)
+        self.ui.PrevRefWordButton.clicked.connect(self.findPrevRefWord)
+        self.ui.NextRefWordButton.clicked.connect(self.findNextRefWord)
+        self.ui.RefLHDialogtbutton.clicked.connect(self.GetRefLineSpacing)
+        self.ui.RefLHslider.valueChanged.connect(self.SetRefLineSpacing)
+        self.ui.RefLHslider.sliderReleased.connect(self.DisableRefLHSlider)
+        self.ui.RefLHlineEdit.textChanged.connect(self.MoveRefLHSlider)
+        self.ui.RefLHslider.hide()
+        self.ui.RefFindReplacebutton.clicked.connect(reffind.Find(self).show)
+        self.ui.RefNormcheckBox.stateChanged.connect(self.showRefNormText)
+        self.ui.RefNormcheckBox.stateChanged.connect(self.showRefText)
+        self.ui.RefNormButton.clicked.connect(self.RefNormalize)
+        self.ui.RefTextbutton.clicked.connect(self.loadRefText)    
+        self.ui.reloadRefTextbutton.clicked.connect(self.ReloadRefText)
+        self.ui.ReffontComboBox.currentFontChanged.connect(self.on_reffont_update)
+        self.ui.ReffontSizeBox.valueChanged.connect(self.on_reffont_update)        
+        self.ui.ReferenceDocument = qtg.QTextDocument(self.ui.RefText)
+        font = qtg.QFont()
+        font.setFamily("FROMVS [MAXR]")
+        font.setPointSize(20)
+        self.ui.ReferenceDocument.setDefaultFont(font)
+        self.ui.ReferenceBlockFormat = qtg.QTextBlockFormat()
+        self.ui.ReferenceTextFormat = qtg.QTextFormat()
+        self.ui.ReferenceCursor = qtg.QTextCursor(self.ui.ReferenceDocument)
+        self.ui.RefText.setDocument(self.ui.ReferenceDocument)
+        self.Reffont = self.ui.RefText.font()
+        self.ReffontMetrics = qtg.QFontMetricsF(self.Reffont)
+        self.RefspaceWidth = self.ReffontMetrics.width(' ')
+        self.ui.RefText.setTabStopWidth(self.RefspaceWidth * 4)      
+        
+        ChrRefText = open('/home/max/Projects/BiblionOCR/ViewController/Application/3-ConductOCR/FROMVS ChrReference.txt').read()
+        self.ui.ChrRefplainTextEdit.setPlainText(ChrRefText)
+        
+        # Restore Session settings
+        self.get_session_settings()
+
+        self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
+        self.ui.chapterComboBox.setCurrentText(self.bothchapter)
+        self.ui.verseComboBox.setCurrentText(self.bothverse)
+        print(f'Book: {self.bothbookabbr} Chapter: {self.bothchapter} Verse: {self.bothverse}')
+    
+        self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
+        self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
+        self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
+        self.ui.VerselineComboBox.setCurrentText(self.verseline)
+        print(f'Book: {self.versebookabbr} Chapter: {self.versechapter} Verse: {self.verseverse} Line: {self.verseline}')
+
+        self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
+        self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
+        self.ui.RefverseComboBox.setCurrentText(self.refverse)
+        self.ui.ReflineComboBox.setCurrentText(self.refline)
+        print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')
+        
+        self.show()
+        self.showRefText(self.refpath)       
+        self.showText(self.versepath)
+
+        #self.versenum = ""
+        #self.selectRefBookCombo()
+        #self.selectVerseBookCombo()
+        
+        #self.loadChapterCombo()
+        #self.loadVerseCombo()
+        
+        self.findBothVerse()
+        
+        self.verseverse = self.ui.verseComboBox.currentText()
+        #self.verseline = self.ui.lineComboBox..currentText()
+        self.refverse = self.ui.verseComboBox.currentText()
+        #self.refline = self.ui.lineComboBox.currentText()
+        self.verseversenum = int(self.verseverse)
+        self.refversenum = int(self.refverse)
+        
+        self.verseversecount = self.ui.verseComboBox.count()
+        self.refversecount = self.ui.verseComboBox.count()      
+        
+        self.nexttextversenum = int(self.ui.verseComboBox.currentText()) + 1
+        self.nextrefversenum = int(self.ui.verseComboBox.currentText()) + 1
+
+        self.prevtextversenum = int(self.ui.verseComboBox.currentText()) - 1
+        self.prevrefversenum = int(self.ui.verseComboBox.currentText()) - 1
+
+        self.versebook = self.ui.bookComboBox.currentText()
+        self.versebookindex = self.ui.bookComboBox.currentIndex()
+        self.versebooknum = self.versebookindex + 40
+        self.versebookcount = self.ui.bookComboBox.count()        
+        
+        self.refbook = self.ui.bookComboBox.currentText()
+        self.refbookindex = self.ui.bookComboBox.currentIndex()
+        self.refbooknum = self.refbookindex + 40
+        self.refbookcount = self.ui.bookComboBox.count()
+
+        print(f'self.verseverse = {self.verseverse}')
+        print(f'self.verseversenum = {self.verseversenum}')
+        print(f'self.verseversecount = {self.verseversecount}')
+        print(f'self.prevtextversenum = {self.prevtextversenum}')
+        print(f'self.nexttextversenum = {self.nexttextversenum}')
+
+    def get_session_settings(self):
+        # get session settings
+        # Define json data        
+        print("loading session")
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json') as f:
+            # returns JSON object as a dictionary
+            data = json.load(f)
+            
+            # Set json key values
+            ocrlang_key = r"self.ocrlang"
+            ocrmodel_key = r"self.ocrmodel"
+            sqldir_key = r"self.sqldir"
+            bothbookabbr_key = r"self.bothbookabbr"
+            bothchapter_key = r"self.bothchapter"
+            bothverse_key = r"self.bothverse"
+            
+            anchorbook_key = r"self.anchorbook"
+            anchorchapter_key = r"self.anchorchapter"
+            anchorverse_key = r"self.anchorverse"
+            anchorline_key = r"self.anchorline"
+
+            versebookabbr_key = r"self.versebookabbr"
+            versechapter_key = r"self.versechapter"
+            verseverse_key = r"self.verseverse"
+            verseline_key = r"self.verseline"
+            
+            verselastbook_key = r"self.verselastbook"
+            verselastchapter_key = r"self.verselastchapter"
+            verselastverse_key = r"self.verselastverse"
+            verselastline_key = r"self.verselastline"
+            verselastword_key = r"self.verselastword"
+
+            refbookabbr_key = r"self.refbookabbr"
+            refchapter_key = r"self.refchapter"
+            refverse_key = r"self.refverse"
+            refline_key = r"self.refline"
+
+            fontinstallpath_key = r"self.fontinstallpath"
+            homefontinstallpath_key = r"self.homefontinstallpath"
+            usrfontinstallpath_key = r"self.usrfontinstallpath"
+            sourcebookmarkdown_key = r"self.sourcebookmarkdown"
+            greekbookmarkdown_key = r"self.greekbookmarkdown"
+            latinbookmarkdown_key = r"self.latinbookmarkdown"
+            variantdb_key = r"self.variantdb"
+            variantcorrected_key = r"self.variantcorrected"
+            variantpreserved_key = r"self.variantpreserved"
+            variantkey_key = r"self.variantkey"
+            versedbpath_key = r"self.versedbpath"
+            versetable_key = r"self.versetable"
+            versepath_key = r"self.versepath"
+            versedir_key = r"self.versedir"
+            versenormpathsel_key = r"self.versenormpathsel"
+            versenormpath_key = r"self.versenormpath"
+            versenormdir_key = r"self.versenormdir"
+            versefont_key = r"self.versefont"
+            versefontsize_key = r"self.versefontsize"
+            versewordnumber_key = r"self.versewordnumber"
+            verseword_key = r"self.verseword"
+            selverseword_key = r"self.selverseword"
+            verselineheight_key = r"self.verselineheight"
+            refdbpath_key = r"self.refdbpath"
+            reftable_key = r"self.reftable"
+            refpath_key = r"self.refpath"
+            refdir_key = r"self.refdir"
+            refnormpathsel_key = r"self.refnormpathsel"
+            refnormpath_key = r"self.refnormpath"
+            refnormdir_key = r"self.refnormdir"
+            reffont_key = r"self.reffont"
+            reffontsize_key = r"self.reffontsize"
+            refwordnumber_key = r"self.refwordnumber"
+            refword_key = r"self.refword"
+            selrefword_key = r"self.selrefword"
+            reflineheight_key = r"self.reflineheight"
+
+
+            #print(bookabbr_key,chapter_key)
+            # Find the json key values using 'in' operator
+            # Define session variables from json key values
+            for Setting in data:
+                print('Setting: ',Setting['Setting'],Setting['CurrentValue'])
+                
+                if Setting['Setting'] == ocrlang_key:
+                    self.ocrlang = Setting['CurrentValue']
+                    self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+                elif Setting['Setting'] == ocrmodel_key:
+                    self.ocrmodel= Setting['CurrentValue']
+                    self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+                elif Setting['Setting'] == sqldir_key:
+                    self.sqldir = Setting['CurrentValue']
+                elif Setting['Setting'] == bothbookabbr_key:
+                    self.bothbookabbr = Setting['CurrentValue']
+                    self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
+                elif Setting['Setting'] == bothchapter_key:  
+                    self.bothchapter = Setting['CurrentValue']
+                    self.ui.chapterComboBox.setCurrentText(self.bothchapter)
+                    print('chapter type: ' + str(type(self.bothchapter)))
+                elif Setting['Setting'] == bothverse_key:
+                    self.bothverse = Setting['CurrentValue']
+                    self.ui.verseComboBox.setCurrentText(self.bothverse)
+                    print('verse type: ' + str(type(self.bothverse)))
+                elif Setting['Setting'] == anchorbook_key:
+                    self.anchorbook = Setting['CurrentValue']
+                elif Setting['Setting'] == anchorchapter_key:
+                    self.anchorchapter = Setting['CurrentValue']
+                elif Setting['Setting'] == anchorverse_key:
+                    self.anchorverse = Setting['CurrentValue']
+                elif Setting['Setting'] == anchorline_key:
+                    self.anchorline = Setting['CurrentValue']
+                elif Setting['Setting'] == versebookabbr_key:
+                    self.versebookabbr = Setting['CurrentValue']
+                    self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
+                elif Setting['Setting'] == versechapter_key:  
+                    self.versechapter = Setting['CurrentValue']
+                    self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
+                    print('chapter type: ' + str(type(self.versechapter)))
+                elif Setting['Setting'] == verseverse_key:
+                    self.verseverse = Setting['CurrentValue']
+                    self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
+                    print('verse type: ' + str(type(self.verseverse)))
+                elif Setting['Setting'] == verseline_key:
+                    self.verseline = Setting['CurrentValue']
+                    self.ui.VerselineComboBox.setCurrentText(self.verseline)
+                    print('verse type: ' + str(type(self.verseverse)))
+                elif Setting['Setting'] == verselastbook_key:
+                    self.verselastbook = Setting['CurrentValue']
+                elif Setting['Setting'] == verselastchapter_key:
+                    self.verselastchapter = Setting['CurrentValue']
+                elif Setting['Setting'] == verselastverse_key:
+                    self.verselastverse = Setting['CurrentValue']
+                elif Setting['Setting'] == verselastline_key:
+                    self.verselastline = Setting['CurrentValue']
+                elif Setting['Setting'] == verselastword_key:
+                    self.verselastword = Setting['CurrentValue']                
+                elif Setting['Setting'] == refbookabbr_key:
+                    self.refbookabbr = Setting['CurrentValue']
+                    self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
+                elif Setting['Setting'] == refchapter_key:  
+                    self.refchapter = Setting['CurrentValue']
+                    self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
+                    print('ref chapter: ' + str(type(self.refchapter)))
+                elif Setting['Setting'] == refverse_key:
+                    self.refverse = Setting['CurrentValue']
+                    self.ui.RefverseComboBox.setCurrentText(self.refverse)
+                    print('ref verse: ' + str(type(self.refverse)))
+                elif Setting['Setting'] == refline_key:
+                    self.refline = Setting['CurrentValue']
+                    self.ui.ReflineComboBox.setCurrentText(self.refline)
+                    print('ref line: ' + str(type(self.refline)))
+                elif Setting['Setting'] == fontinstallpath_key:
+                    self.fontinstallpath = Setting['CurrentValue']                    
+                elif Setting['Setting'] == homefontinstallpath_key:
+                    self.homefontinstallpath = Setting['CurrentValue'] 
+                elif Setting['Setting'] == usrfontinstallpath_key:
+                    self.usrfontinstallpath = Setting['CurrentValue']
+                elif Setting['Setting'] == sourcebookmarkdown_key:
+                    self.sourcebookmarkdown = Setting['CurrentValue']
+                elif Setting['Setting'] == greekbookmarkdown_key:
+                    self.greekbookmarkdown = Setting['CurrentValue']
+                elif Setting['Setting'] == latinbookmarkdown_key:
+                    self.latinbookmarkdown = Setting['CurrentValue']
+                elif Setting['Setting'] == variantdb_key:
+                    self.variantdb = Setting['CurrentValue']
+                elif Setting['Setting'] == variantcorrected_key:
+                    self.variantcorrected = Setting['CurrentValue']
+                elif Setting['Setting'] == variantpreserved_key:
+                    self.variantpreserved = Setting['CurrentValue']
+                elif Setting['Setting'] == variantkey_key:
+                    self.variantkey = Setting['CurrentValue']
+                elif Setting['Setting'] == versedbpath_key:
+                    self.versedbpath = Setting['CurrentValue']
+                elif Setting['Setting'] == versetable_key:
+                    self.versetable = Setting['CurrentValue']
+                elif Setting['Setting'] == versepath_key:
+                    self.versepath = Setting['CurrentValue']
+                    self.ui.TextLE.setText(os.path.basename(self.versepath))
+                elif Setting['Setting'] == versedir_key:
+                    self.versedir = Setting['CurrentValue']
+                elif Setting['Setting'] == versenormpathsel_key:
+                    self.versenormpathsel = Setting['CurrentValue']
+                elif Setting['Setting'] == versenormpath_key:
+                    self.versenormpath = Setting['CurrentValue']
+                elif Setting['Setting'] == versenormdir_key:
+                    self.versenormdir = Setting['CurrentValue']
+                elif Setting['Setting'] == versefont_key:
+                    self.versefont = Setting['CurrentValue']
+                elif Setting['Setting'] == versefontsize_key:
+                    self.versefontsize = Setting['CurrentValue']
+                elif Setting['Setting'] == versewordnumber_key:
+                    self.versewordnumber = Setting['CurrentValue']
+                elif Setting['Setting'] == verseword_key:
+                    self.verseword = Setting['CurrentValue']
+                elif Setting['Setting'] == selverseword_key:
+                    self.selverseword = Setting['CurrentValue']
+                elif Setting['Setting'] == verselineheight_key:
+                    self.verselineheight = Setting['CurrentValue']
+                elif Setting['Setting'] == refdbpath_key:
+                    self.refdbpath = Setting['CurrentValue']
+                elif Setting['Setting'] == reftable_key:
+                    self.reftable = Setting['CurrentValue']
+                elif Setting['Setting'] == refpath_key:
+                    self.refpath = Setting['CurrentValue']
+                    self.ui.RefTextLE.setText(os.path.basename(self.refpath))
+                elif Setting['Setting'] == refdir_key:
+                    self.refdir = Setting['CurrentValue']
+                elif Setting['Setting'] == refnormpathsel_key:
+                    self.refnormpathsel = Setting['CurrentValue']
+                elif Setting['Setting'] == refnormpath_key:
+                    self.refnormpath = Setting['CurrentValue']
+                elif Setting['Setting'] == refnormdir_key:
+                    self.refnormdir = Setting['CurrentValue']
+                elif Setting['Setting'] == reffont_key:
+                    self.reffont = Setting['CurrentValue']
+                elif Setting['Setting'] == reffontsize_key:
+                    self.reffontsize = Setting['CurrentValue']
+                elif Setting['Setting'] == refwordnumber_key:
+                    self.refwordnumber = Setting['CurrentValue']
+                elif Setting['Setting'] == refword_key:
+                    self.refword = Setting['CurrentValue']
+                elif Setting['Setting'] == selrefword_key:
+                    self.selrefword = Setting['CurrentValue']
+                elif Setting['Setting'] == reflineheight_key:
+                    self.reflineheight = Setting['CurrentValue']
+                
+                print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
+            f.close()
+
+    def get_workflow_settings(self):
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/SQLite/json/Workflow.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+        
+        # Iterating through the json
+        # list
+        for Sequence in data:
+            print(Sequence['Sequence'], Sequence['DialogUi'],Sequence['DefaultSource'])
+        
+        # Closing file
+        f.close()
+
+    def save_session_settings(self):
+        print("Saving Versifier session settings")
+
+    def dropAnchor(self):
+        print("Set Anchor!")
+        self.ui.bookComboBox.setCurrentText(self.anchorbook)
+        self.ui.chapterComboBox.setCurrentText(self.anchorchapter)
+        self.ui.verseComboBox.setCurrentText(self.anchorverse)
+        self.findBothVerse()
+        print("Anchor's Fast!")
+
+    def weighAnchor(self):
+        if self.ui.AnchorCkBox.isChecked():
+            print("Drop Anchor!")
+            self.anchorbook = self.ui.bookComboBox.currentText()
+            self.anchorchapter = self.ui.chapterComboBox.currentText()
+            self.anchorverse =  self.ui.verseComboBox.currentText()
+            #self.ui.AnchoredCkBox.setChecked(False)
+            #self.dropAnchor()
+        elif not self.ui.AnchorCkBox.isChecked():
+            print("Anchor's Aweigh!")
+        
+        self.updateSessionAnchor()
+
+    def getSessionAnchor(self):
+        print(f'Getting the anchor session settings')
+        
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            anchorbook_key = r"self.anchorbook"
+            anchorchapter_key = r"self.anchorchapter"
+            anchorverse_key = r"self.anchorverse"
+            anchorline_key = r"self.anchorline"
+            for Setting in data:
+                    if Setting['Setting'] == anchorbook_key:
+                        self.anchorbook = Setting['CurrentValue']
+                        self.ui.VersebookComboBox.setCurrentText(self.anchorbook)
+                    elif Setting['Setting'] == anchorchapter_key:
+                        self.anchorchapter = Setting['CurrentValue']
+                        self.ui.VersechapterComboBox.setCurrentText(self.anchorchapter)
+                    elif Setting['Setting'] == anchorverse_key:
+                        self.anchorverse = Setting['CurrentValue']
+                        self.ui.VerseverseComboBox.setCurrentText(self.anchorverse)
+                    elif Setting['Setting'] == anchorline_key:
+                        self.anchorline = Setting['CurrentValue']
+                        self.ui.VerselineComboBox.setCurrentText(self.anchorline)
+        f.close()
+        self.anchor = f'{self.anchorbook} {self.anchorchapter}:{self.anchorverse}'
+
+    def updateSessionAnchor(self):
+        print(f'Updating the anchor session setting')
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json'
+        # Opening JSON file
+        with open(jsonfile, 'r') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            anchorbook_key = r"self.anchorbook"
+            anchorchapter_key = r"self.anchorchapter"
+            anchorverse_key = r"self.anchorverse"
+            anchorline_key = r"self.anchorline"
+            for Setting in data:
+                    if Setting['Setting'] == anchorbook_key:
+                        Setting['CurrentValue'] = self.ui.VersebookComboBox.currentText()
+                    elif Setting['Setting'] == anchorchapter_key:
+                        Setting['CurrentValue'] = self.ui.VersechapterComboBox.currentText()
+                    elif Setting['Setting'] == anchorverse_key:
+                        Setting['CurrentValue'] = self.ui.VerseverseComboBox.currentText()
+                    elif Setting['Setting'] == anchorline_key:
+                        self.anchorline = self.ui.VerselineComboBox.currentText()
+                        Setting['CurrentValue'] = self.anchorline
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()  
+
+    def addVerse(self):
+        if self.ui.VerseNormcheckBox.isChecked():
+            print("New verses cannot be added in Normalized text view.")
+        else:
+        
+            print(f'Adding new verse:')
+            self.getSessionLastVerse()
+            addversenum = int(self.ui.VerseverseComboBox.currentText()) + 1
+            addchapternum = int(self.ui.VersechapterComboBox.currentText())
+            #addbookindex = self.ui.VersebookComboBox.currentIndex()
+            addbooktext = self.ui.VersebookComboBox.currentText()
+            print(f'addbooktext 1: {addbooktext}')
+            if self.verselastverse:
+                #self.findVerseVerse()
+                cursor = self.ui.VerseText.textCursor()
+                self.currentpos = cursor.position()
+                self.ui.VerseText.find(self.lastverse)
+                cursor.movePosition(cursor.EndOfBlock, cursor.MoveAnchor)
+                cursor.insertBlock()
+                #print(f'addbooktext 1: {addbooktext}')
+                if addversenum > self.ui.VerseverseComboBox.count():           
+                    addversenum = 1
+                    addchapternum += 1
+                    if addchapternum > self.ui.VersechapterComboBox.count():
+                        addchapternum += 1
+                        #addbookindex += 1
+                        addbooktext = self.ui.VersebookComboBox.itemText(self.ui.VersebookComboBox.currentIndex() + 1)
+                        print(f'addbooktext +1: {addbooktext}')              
+                
+                self.ui.VersebookComboBox.setCurrentText(addbooktext)
+                self.ui.VersechapterComboBox.setCurrentText(str(addchapternum))
+                self.ui.VerseverseComboBox.setCurrentText(str(addversenum))
+                
+                addbooktext = self.ui.VersebookComboBox.currentText()
+                addchaptertext = self.ui.VersechapterComboBox.currentText()
+                addversetext = self.ui.VerseverseComboBox.currentText()
+
+                self.verselastbook = addbooktext
+                self.verselastchapter = addchaptertext
+                self.verselastverse = addversetext
+                #self.verselastline = str(addlinenum)
+                self.lastverse = self.verselastbook + " " + self.verselastchapter + ":" + self.verselastverse
+                #self.ui.radioButtonVerses.setChecked(True)
+                self.ui.bookComboBox.setCurrentText(self.verselastbook)
+                self.ui.chapterComboBox.setCurrentText(self.verselastchapter)
+                self.ui.verseComboBox.setCurrentText(self.verselastverse)        
+                
+                #self.ui.AnchoredCkBox.setChecked(True)
+                cursor.insertText(self.lastverse + " ")
+                self.findBothVerse()
+                self.updateSessionLastVerse()
+
+    def getSessionLastVerse(self):
+        print(f'Getting the last verse session setting')
+        
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            verselastbook_key = r"self.verselastbook"
+            verselastchapter_key = r"self.verselastchapter"
+            verselastverse_key = r"self.verselastverse"
+            verselastline_key = r"self.verselastline"
+            verselastword_key = r"self.verselastword"
+            for Setting in data:
+                    if Setting['Setting'] == verselastbook_key:
+                        self.verselastbook = Setting['CurrentValue']
+                        self.ui.VersebookComboBox.setCurrentText(self.verselastbook)
+                    elif Setting['Setting'] == verselastchapter_key:
+                        self.verselastchapter = Setting['CurrentValue']
+                        self.ui.VersechapterComboBox.setCurrentText(self.verselastchapter)
+                    elif Setting['Setting'] == verselastverse_key:
+                        self.verselastverse = Setting['CurrentValue']
+                        self.ui.VerseverseComboBox.setCurrentText(self.verselastverse)
+                    elif Setting['Setting'] == verselastline_key:
+                        self.verselastline = Setting['CurrentValue']
+                        self.ui.VerselineComboBox.setCurrentText(self.verselastline)
+                    elif Setting['Setting'] == verselastword_key:
+                        self.verselastword = Setting['CurrentValue']
+                        self.ui.VerseWordNumlineEdit.setText(self.verselastword)
+        f.close()
+        self.lastverse = f'{self.verselastbook} {self.verselastchapter}:{self.verselastverse}'
+
+    def updateSessionLastVerse(self):
+        print(f'Updating the last verse session setting')
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json'
+        # Opening JSON file
+        with open(jsonfile, 'r') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            verselastbook_key = r"self.verselastbook"
+            verselastchapter_key = r"self.verselastchapter"
+            verselastverse_key = r"self.verselastverse"
+            verselastline_key = r"self.verselastline"
+            for Setting in data:
+                    if Setting['Setting'] == verselastbook_key:
+                        Setting['CurrentValue'] = self.verselastbook
+                    elif Setting['Setting'] == verselastchapter_key:
+                        Setting['CurrentValue'] = self.verselastchapter
+                    elif Setting['Setting'] == verselastverse_key:
+                        Setting['CurrentValue'] = self.verselastverse
+                    elif Setting['Setting'] == verselastline_key:
+                        self.verselastline = self.ui.VerselineComboBox.currentText()
+                        Setting['CurrentValue'] = self.verselastline
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()        
+
+    '''def getLastVerse(self):
+        print(f'Finding the last verse:')
+        versecount = self.ui.VerseDocument.blockCount()
+        
+        cursor3 = self.ui.VerseText.textCursor()
+        cursor3.setPosition(cursor3.End)
+        #cursor3.movePosition(cursor3.PreviousBlock, cursor3.MoveAnchor)
+        #loopcount = versecount
+        loopcount = 1470
+        # perform checks
+        
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/LineBookChapterVerse.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+        while loopcount > 0:
+            loopcount -= 1
+            print(f"Loop Count: {str(loopcount)}")
+            print(f"Combo Book: {self.ui.VersebookComboBox.currentText()} Combo Chapter: {str(self.ui.VersechapterComboBox.currentText())} Combo Verse: {self.ui.VerseverseComboBox.currentText()}")
+            cursor3.movePosition(cursor3.PreviousBlock, cursor3.MoveAnchor)
+
+            for Verse in data:
+                if loopcount == 0:
+                    pass
+                elif Verse['Book'] == self.ui.VersebookComboBox.currentText() and str(Verse['Chapter']) == str(self.ui.VersechapterComboBox.currentText()) and str(Verse['Verse']) == str(self.ui.VerseverseComboBox.currentText()):
+                    cursor3.movePosition(cursor3.StartOfBlock, cursor3.MoveAnchor)
+                    #cursor3.movePosition(cursor3.NextWord, cursor3.MoveAnchor)
+                    cursor3.movePosition(cursor3.StartOfWord, cursor3.MoveAnchor)
+                    #cursor3.movePosition(cursor3.EndOfWord, cursor3.KeepAnchor)
+                    cursor3.movePosition(cursor3.NextWord, cursor3.KeepAnchor,3)
+                    cursor3.movePosition(cursor3.StartOfWord, cursor3.KeepAnchor)
+                    cursor3.movePosition(cursor3.EndOfWord, cursor3.KeepAnchor)
+                    self.lastversepos = cursor3.position()
+                    bcv = cursor3.selectedText()
+                    print(f"Selected First Word: {bcv}")
+                    self.lastversebook = Verse['Book']
+                    self.lastversechapter = str(Verse['Chapter'])
+                    self.lastverseverse = str(Verse['Verse'])
+                    #self.lastverseline = str(Verse['Line'])
+                    if bcv == f"{self.lastversebook} {self.lastversechapter}:{self.lastverseverse}":
+                        self.lastverse = self.lastversebook + " " + self.lastversechapter + ":" + self.lastverseverse                    
+                        print(f"Book: {Verse['Book']} Chapter: {str(Verse['Chapter'])} Verse: {str(Verse['Verse'])}")
+                    loopcount = 0
+                #else:
+                    #print("unable to identify previous block")
+     
+        f.close()'''
+
+    def selectBookCombo(self):
+        oldbookabbr = self.bothbookabbr
+        self.bothbookabbr = self.ui.bookComboBox.currentText()
+        
+        if self.ui.bookComboBox.currentText() != oldbookabbr:
+                  
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/BooksMarkDown.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                for BookAbbr in data:
+                    if BookAbbr['BookAbbr'] == self.bothbookabbr:
+                        bookmarkdown = BookAbbr['BookMarkdown']
+                        self.sourcebookmarkdown = 'source'+bookmarkdown
+                        self.greekbookmarkdown = 'greek'+bookmarkdown
+                        self.latinbookmarkdown = 'latin'+bookmarkdown
+                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
+            f.close()
+              
+            '''jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                bothbookabbr_key = r"self.bothbookabbr"
+                source_book_markdown_key = r"self.sourcebookmarkdown"
+                greek_book_markdown_key = r"self.greekbookmarkdown"
+                latin_book_markdown_key = r"self.latinbookmarkdown"
+
+                for Setting in data:
+                    if Setting['Setting'] == bothbookabbr_key:
+                        Setting['CurrentValue'] = self.bookabbr
+                    elif Setting['Setting'] == source_book_markdown_key:
+                        Setting['CurrentValue'] = self.sourcebookmarkdown
+                    elif Setting['Setting'] == greek_book_markdown_key:
+                        Setting['CurrentValue'] = self.greekbookmarkdown
+                    elif Setting['Setting'] == latin_book_markdown_key:
+                        Setting['CurrentValue'] = self.latinbookmarkdown
+                    print(Setting['CurrentValue'])
+            f.close()'''
+            
+            os.remove(jsonfile)
+            with open(jsonfile, 'w') as f:
+                json.dump(data, f, indent=4)
+            f.close()
+
+            # Opening JSON file
+            '''with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+                # returns JSON object as
+                    # a dictionary
+                data = json.load(f)'''
+            
+            #self.ui.bookComboBox.clear()
+            
+            # Iterating through the json
+            # list          
+            '''for booknumber in data:
+                print(booknumber['bookabbr'])
+                self.ui.bookComboBox.addItem(booknumber['bookabbr'])
+            
+            # Closing file
+            f.close()'''
+            
+        self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
+        self.refbookabbr = self.ui.bookComboBox.currentText()
+        self.refbooknum = self.ui.bookComboBox.currentIndex() + 40
+        self.refbookindex = self.ui.bookComboBox.currentIndex()
+        self.refbookcount = self.ui.bookComboBox.count()
+
+        self.versebookabbr = self.ui.bookComboBox.currentText()
+        self.versebookindex = self.ui.bookComboBox.currentIndex()
+        self.versebooknum = self.refbookindex + 40
+        self.versebookcount = self.ui.bookComboBox.count()
+
+    def loadChapterCombo(self):
+        self.ui.chapterComboBox.clear()
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BookChapter.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+        # Iterating through the json
+        # list
+        for Chapter in data:
+            if Chapter['Book'] == self.ui.bookComboBox.currentText():
+                self.ui.chapterComboBox.addItem(str(Chapter['Chapter']))
+        # Closing file
+        f.close()
+        
+        #self.ui.bookComboBox.setEditText(self.bookabbr)
+        self.refchapter = self.ui.chapterComboBox.currentText()
+        self.refchapternum = int(self.refchapter)
+        self.refchaptercount = self.ui.chapterComboBox.count()
+
+        self.versechapter = self.ui.chapterComboBox.currentText()
+        self.versechapternum = int(self.versechapter)
+        self.versechaptercount = self.ui.chapterComboBox.count()
+
+    def loadVerseCombo(self):
+        self.ui.verseComboBox.clear()
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BookChapterVerse.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+            
+        # Iterating through the json
+        # list
+        for Verse in data:
+            if Verse['Book'] == self.ui.bookComboBox.currentText() and str(Verse['Chapter']) == self.ui.chapterComboBox.currentText():
+                self.ui.verseComboBox.addItem(str(Verse["Verse"]))
+        # Closing file
+        f.close()
+        #self.loadLineCombo()
+
+    def resolvercount(self):
+            # Get the text currently in selection
+            self.selected_verseverse = self.ui.VerseText.textCursor().selectedText()
+            self.selected_refverse = self.ui.RefText.textCursor().selectedText()
+            
+            
+            # Split the text to get the word count
+            self.verseverse_words = len(self.selected_verseverse.split())
+            self.refverse_words = len(self.selected_refverse.split())
+
+            # And just get the length of the text for the symbols
+            # count
+            self.verseverse_symbols = len(self.selected_verseverse)
+            self.refverse_symbols = len(self.selected_refverse)
+
+            # For the total count, same thing as above but for the
+            # total text
+            versetext = self.VerseText.toPlainText()
+            reftext = self.parent.ui.RefText.toPlainText()
+
+            self.versewords = len(versetext.split())
+            self.refwords = len(reftext.split())
+
+            self.versesymbols = len(versetext)
+            self.refsymbols = len(reftext)
+
+    def OpenResolver(self):
+        print("Starting up QT5ResolveVariants")
+        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/Qt5ResolveVariants.py"
+        print(mw_cmd)
+        os.system(mw_cmd)
+    '''def popupbox(self):
+
+        popup = qtw.QMessageBox(self)
+        popup.setIcon(qtw.QMessageBox.Warning)
+        popup.setText(f"Resolving current word {word}")
+        #popup.setInformativeText("Do you want to preserve this record?")
+        #popup.setStandardButtons(qtw.QMessageBox.Save   |
+                                #qtw.QMessageBox.Cancel |
+                                #qtw.QMessageBox.Discard)
+        #popup.setDefaultButton(qtw.QMessageBox.Save)
+        popup.exec_()
+        answer = popup.exec_()
+        if answer == qtw.QMessageBox.Save:
+            #self.save()
+            print("check preserved check box and add unresolved variant to database")
+        elif answer == qtw.QMessageBox.Discard:
+            #event.accept()
+            print("Select replacement word and replace, or type over word")
+            print("Uncheck preserved check box")
+        else:
+            print("Nevermind. Moving on")
+            stopresolver = True
+            break'''
+    
+    def loadVarWordCombo(self):
+        #helper = SqliteHelper("/home/max/Projects/Python/SQLite/TRBibleWords.db")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/TRiBibleWords.db")
+        varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
+        #print(varwords)
+
+        for varword in varwords:
+            self.varrecorder_ui.VarWordSelCombo.addItem(varword[0])
+        
+        self.selectVarWordCombo()
+
+    def selectVarWordCombo(self):
+        
+        selvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
+        #helper = SqliteHelper("/home/max/Projects/Python/SQLite/TRBibleWords.db")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/TRiBibleWords.db")
+        varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
+        
+        # This is only a partial solution.  It locks onto the first match only.
+        
+        varfields = varwords[0]
+
+        print(varfields[0])
+
+    def loadReplaceWordCombo(self):
+        #helper = SqliteHelper("/home/max/Projects/Python/SQLite/TRBibleWords.db")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        replacewords = helper.select("SELECT DISTINCT Word FROM Bible UNION SELECT DISTINCT Word FROM IntBibleWords ORDER BY Word ASC")
+        #print(varwords)
+
+        for repword in replacewords:
+            self.varrecorder_ui.ReplaceWordSelCombo.addItem(repword[0])
+        
+        self.selectReplaceWordCombo()
+    
+    def selectReplaceWordCombo(self):
+        
+        selrepword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
+        #helper = SqliteHelper("/home/max/Projects/Python/SQLite/TRBibleWords.db")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/TRiBibleWords.db")
+        repwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE Word =" + "'" + selrepword + "'")
+        
+        # This is only a partial solution.  It locks onto the first match only.
+        
+        #repfields = repwords[0]
+        #print(repfields[0])
+
+    def findResolverVariant(self,line,wordnum):
+        if self.stoprecorder == True:
+            return 
+        
+        print("Check if variant already exists in Resolver. If found, populate dialog.")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
+                WHERE Line = ? and WordNum = ?"""
+        data = (line,wordnum)
+        variant = helper.selectone(query,data)
+        if not variant:
+            self.varrecorder_ui.NewradioButton.setChecked(True)
+        else: 
+            self.varrecorder_ui.ExistingradioButton.setChecked(True)
+            print(f'Variant: {variant}')
+
+            self.resline = variant[0]
+            self.reswordnum = variant[1]
+            resword = variant[2]
+            resvarword = variant[3]
+            reserrorcode = variant[4]
+            respreserved = variant[5]
+            rescorrected = variant[6]       
+            self.varrecorder_ui.VarWordSelCombo.setCurrentText(resvarword)
+            self.varrecorder_ui.ReplaceWordSelCombo.setCurrentText(resword)
+            self.varrecorder_ui.VariantCodeCombo.setCurrentText(reserrorcode)
+            if respreserved == 1:
+                self.varrecorder_ui.PreservedcheckBox.setChecked(True)
+            if rescorrected == 1:
+                self.varrecorder_ui.CorrectedcheckBox.setChecked(True)
+    
+    def findAutoResolverVariant(self,line,wordnum):
+        if self.stoprecorder == True:
+            return 
+        
+        print("Check if variant already exists in Resolver. If found, populate dialog.")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
+                WHERE Line = ? and WordNum = ?"""
+        data = (int(line),int(wordnum))
+        variant = helper.selectone(query,data)
+        if not variant:
+            self.isvariant = False
+            print("Variant does not exist")
+            #self.varrecorder_ui.NewradioButton.setChecked(True)
+        else: 
+            self.isvariant = True
+            #self.varrecorder_ui.ExistingradioButton.setChecked(True)
+            print(f'Variant exists: {variant}')
+            self.resline = variant[0]
+            self.reswordnum = variant[1]
+        #resword = variant[2]
+        #resvarword = variant[3]
+        #reserrorcode = variant[4]
+        #respreserved = variant[5]
+        #rescorrected = variant[6]       
+        #self.varrecorder_ui.VarWordSelCombo.setCurrentText(resvarword)
+        #self.varrecorder_ui.ReplaceWordSelCombo.setCurrentText(resword)
+        #self.varrecorder_ui.VariantCodeCombo.setCurrentText(reserrorcode)
+        '''if respreserved == 1:
+            self.varrecorder_ui.PreservedcheckBox.setChecked(True)
+        if rescorrected == 1:
+            self.varrecorder_ui.CorrectedcheckBox.setChecked(True)'''
+
+    def insertResolverVariant(self,line,wordnum):
+        varline = self.varrecorder_ui.VerseLinelineEdit.text()
+        varbook = self.varrecorder_ui.VerseBooklineEdit.text()
+        varchapter = self.varrecorder_ui.VerseChapterlineEdit.text()
+        varverse = self.varrecorder_ui.VerseVerselineEdit.text()
+        varwordnum = self.varrecorder_ui.VerseWordNumlineEdit.text()
+        varnormword = self.varrecorder_ui.VerseNormWordlineEdit.text()
+        refline = self.varrecorder_ui.RefLinelineEdit.text()    
+        refwordnum = self.varrecorder_ui.RefWordNumlineEdit.text()
+        refvarnormword = self.varrecorder_ui.VerseNormWordlineEdit.text()
+        if self.stoprecorder == True:
+            return
+        print(f'Inserting new variant for line: {line} and word number: {wordnum}')
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word FROM Bible
+                WHERE Line = ? and WordNum = ?"""
+        data = (varline,varwordnum)
+        variant = helper.selectone(query,data)
+        print(f'Variant: {variant}')
+        verseline = variant[0]
+        versewordnum = variant[1]
+        verseword = variant[2]
+                
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word, Strong, RMAC, Lemma FROM IntBibleWords
+                WHERE Line = ? and WordNum = ?"""
+        data = (refline,refwordnum)
+        variant = helper.selectone(query,data)
+        print(f'Variant: {variant}')
+
+        refline = variant[0]
+        refwordnum = variant[1]
+        refword = variant[2]
+        refstrong = variant[3]
+        refrmac = variant[4]
+        reflemma = variant[5]
+        
+        errorcode = self.varrecorder_ui.VariantCodeCombo.currentText()
+        preserved = 0
+        Corrected = 0
+        if self.varrecorder_ui.PreservedcheckBox.isChecked():
+            preserved = 1
+        if self.varrecorder_ui.CorrectedcheckBox.isChecked():   
+            Corrected = 1
+        varword = self.varrecorder_ui.VarWordSelCombo.currentText()
+        verseword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
+
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """INSERT INTO Variants (Line, Book, Chapter, Verse, WordNum, Word, NoDiaWord, VarWord, Strong, RMAC, Lemma, ErrorCode, Preserved, Corrected) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+        data = (varline,varbook,varchapter,varverse,varwordnum,verseword,varnormword,varword,refstrong,refrmac,reflemma,errorcode,preserved,Corrected)
+        #startProgressBar()
+        helper.insert(query,data)
+
+    def insertAutoResolverVariant(self,line,wordnum):
+        '''varline = self.varrecorder_ui.VerseLinelineEdit.text()
+        varbook = self.varrecorder_ui.VerseBooklineEdit.text()
+        varchapter = self.varrecorder_ui.VerseChapterlineEdit.text()
+        varverse = self.varrecorder_ui.VerseVerselineEdit.text()
+        varwordnum = self.varrecorder_ui.VerseWordNumlineEdit.text()
+        varnormword = self.varrecorder_ui.VerseNormWordlineEdit.text()
+        refline = self.varrecorder_ui.RefLinelineEdit.text()    
+        refwordnum = self.varrecorder_ui.RefWordNumlineEdit.text()
+        refvarnormword = self.varrecorder_ui.VerseNormWordlineEdit.text()'''
+        if self.stoprecorder == True:
+            return
+        print(f'Inserting new variant for line: {line} and word number: {wordnum}')
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, Book, Chapter, Verse, WordNum, Word, NormWord FROM Bible
+                WHERE Line = ? and WordNum = ?"""
+        data = (line,wordnum)
+        variant = helper.selectone(query,data)
+        print(f'Variant: {variant}')
+        verseline = variant[0]
+        versebook = variant[1]
+        versechapter = variant[2]
+        verseverse = variant[3]
+        versewordnum = variant[4]
+        verseword = variant[5]
+                
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word, NoDiaWord, Strong, RMAC, Lemma FROM IntBibleWords
+                WHERE Line = ? and WordNum = ?"""
+        data = (refline,refwordnum)
+        variant = helper.selectone(query,data)
+        print(f'Variant: {variant}')
+
+        refline = variant[0]
+        refwordnum = variant[1]
+        refword = variant[2]
+        refnodiaword = variant[3]
+        refstrong = variant[4]
+        refrmac = variant[5]
+        reflemma = variant[6]
+        
+        errorcode = "None"
+        preserved = 1
+        Corrected = 0
+
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """INSERT INTO Variants (Line, Book, Chapter, Verse, WordNum, Word, NoDiaWord, VarWord, Strong, RMAC, Lemma, ErrorCode, Preserved, Corrected) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+        data = (line,versebook,versechapter,verseverse,versewordnum,verseword,varnormword,refword,refstrong,refrmac,reflemma,errorcode,preserved,Corrected)
+        #startProgressBar()
+        helper.insert(query,data)
+
+    def updateResolverVariant(self,line,wordnum):
+        if self.stoprecorder == True:
+            return
+        print('Updating existing variant') 
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
+                WHERE Line = ? and WordNum = ?"""
+        data = (line,wordnum)
+        variant = helper.selectone(query,data)
+        print(f'Variant: {variant}')
+
+        resline = variant[0]
+        reswordnum = variant[1]
+        resword = variant[2]
+        resvarword = variant[3]
+        reserrorcode = variant[4]
+        respreserved = variant[5]
+        rescorrected = variant[6] 
+        pckvar = ""
+        cckvar = ""
+        preserved = 0
+        Corrected= 0
+        if respreserved == 1:
+            resword = self.varrecorder_ui.VerseWordlineEdit.text()
+            if self.varrecorder_ui.PreservedcheckBox.isChecked():
+                preserved = 1
+                pckvar="P"
+            else:
+                preserved = 0
+                pckvar = ""
+        if rescorrected == 1:
+            resword = self.varrecorder_ui.ReplaceWordSelCombo.currentText()
+            if self.varrecorder_ui.CorrectedcheckBox.isChecked():
+                Corrected = 1
+                cckvar = "C"
+            else:
+                Corrected= 0
+                cckvar = "" 
+        resvarword = self.varrecorder_ui.VarWordSelCombo.currentText()
+        varform = pckvar + cckvar
+        query = """UPDATE Variants SET Word = ?, VarWord = ?, ErrorCode = ?, Preserved = ?, Corrected = ?
+                WHERE Line = ? and WordNum = ?"""
+        data = (resword,resvarword,reserrorcode,preserved,Corrected,resline,reswordnum)
+        #startProgressBar()
+        helper.update(query,data)
+    
+    def updateAutoResolverVariant(self,line,wordnum):
+        if self.stoprecorder == True:
+            return
+        print('Updating existing variant') 
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        query = """SELECT Line, WordNum, Word, VarWord, ErrorCode, Preserved, Corrected FROM Variants 
+                WHERE Line = ? and WordNum = ?"""
+        data = (line,wordnum)
+        variant = helper.selectone(query,data)
+        print(f'Variant: {variant}')
+
+        resline = variant[0]
+        reswordnum = variant[1]
+        resword = variant[2]
+        resvarword = variant[3]
+        reserrorcode = variant[4]
+        respreserved = variant[5]
+        rescorrected = variant[6]
+        #resword = self.verseword 
+        #resvarword = self.refword
+        query = """UPDATE Variants SET Word = ?, VarWord = ?, ErrorCode = ?, Preserved = ?, Corrected = ?
+                WHERE Line = ? and WordNum = ?"""
+        data = (resword,resvarword,reserrorcode,respreserved,rescorrected,resline,reswordnum)
+        #startProgressBar()
+        helper.update(query,data)
+
+    def acceptVariant(self):
+        print("VARIANT ACCEPTED!!!!!!")
+        if self.varrecorder_ui.ExistingradioButton.isChecked():
+            print("Updating existing variant in Resolver")
+            self.updateResolverVariant(self.resline,self.reswordnum)
+        elif self.varrecorder_ui.NewradioButton.isChecked():
+            print("Adding new variant to Resolver")
+            self.insertResolverVariant(self.resline,self.reswordnum)
+    
+    def rejectVariant(self):
+        print("Moving on")
+
+    def AutoVarianceRecorderDialog(self):
+        self.stoprecorder = False
+        def accept():
+            print("VARIANT ACCEPTED!!!!!!")
+
+            if self.varrecorder_ui.ExistingradioButton.isChecked():
+                print("Updating existing variant in Resolver")
+                self.updateResolverVariant(self.resline,self.reswordnum)
+            elif self.varrecorder_ui.NewradioButton.isChecked():
+                print("Adding new variant to Resolver")
+                self.insertResolverVariant(self.resline,self.reswordnum)
+        
+        def close():
+            print("Closing Resolver")
+            self.stoprecorder = True
+            self.VariantRecorderDialog.close()
+            reject()
+
+        def reject():
+            print("Moving on")
+            #self.contresolver = True
+
+        self.VariantRecorderDialog = qtw.QDialog()
+        self.varrecorder_ui = Ui_RecorderDialog()
+        self.varrecorder_ui.setupUi(self.VariantRecorderDialog)
+        #self.VariantRecorderDialog.exec()
+
+
+        self.varrecorder_ui.buttonBox.accepted.connect(self.acceptVariant)
+        self.varrecorder_ui.buttonBox.rejected.connect(self.rejectVariant)
+        self.varrecorder_ui.ClosepushButton.clicked.connect(close) 
+
+
+        self.varrecorder_ui.RefLinelineEdit.setText(self.ui.ReflineComboBox.currentText())
+        self.varrecorder_ui.RefBooklineEdit.setText(self.ui.RefbookComboBox.currentText())
+        self.varrecorder_ui.RefChapterlineEdit.setText(self.ui.RefchapterComboBox.currentText())
+        self.varrecorder_ui.RefVerselineEdit.setText(self.ui.RefverseComboBox.currentText())
+        self.varrecorder_ui.RefWordNumlineEdit.setText(self.ui.RefWordNumlineEdit.text())
+        self.varrecorder_ui.RefNormWordlineEdit.setText(self.ui.RefText.textCursor().selectedText())
+        self.loadVarWordCombo()
+        
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/TRiBibleWords.db")
+        refwords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
+        for word in refwords:
+            refline = word[0]
+            refbook = word[1]
+            refchapter = word[2]
+            refverse = word[3]
+            refwordnum = word[4]
+            refword = word[5]
+            if str(refline) == self.varrecorder_ui.RefLinelineEdit.text() and str(refwordnum) == self.varrecorder_ui.RefWordNumlineEdit.text():
+                self.varrecorder_ui.RefWordlineEdit.setText(refword)
+                self.varrecorder_ui.VarWordSelCombo.setCurrentText(refword)            
+        
+        
+        self.varrecorder_ui.VerseLinelineEdit.setText(self.ui.VerselineComboBox.currentText())
+        self.varrecorder_ui.VerseBooklineEdit.setText(self.ui.VersebookComboBox.currentText())
+        self.varrecorder_ui.VerseChapterlineEdit.setText(self.ui.VersechapterComboBox.currentText())
+        self.varrecorder_ui.VerseVerselineEdit.setText(self.ui.VerseverseComboBox.currentText())
+        self.varrecorder_ui.VerseWordNumlineEdit.setText(self.ui.VerseWordNumlineEdit.text())
+        self.varrecorder_ui.VerseNormWordlineEdit.setText(self.ui.VerseText.textCursor().selectedText())
+
+        self.loadReplaceWordCombo()
+        #helper = SqliteHelper("/home/max/Projects/Python/SQLite/TRBibleWords.db")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        versewords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
+        for word in versewords:
+            self.verseline = word[0]
+            versebook = word[1]
+            versechapter = word[2]
+            verseverse = word[3]
+            self.versewordnum = word[4]
+            verseword = word[5]
+            self.varrecorder_ui.ReplaceWordSelCombo.setCurrentText(verseword)
+            self.varrecorder_ui.VerseWordlineEdit.setText(verseword)
+            if str(self.verseline) == self.varrecorder_ui.VerseLinelineEdit.text() and str(self.versewordnum) == self.varrecorder_ui.VerseWordNumlineEdit.text():
+                if self.runauto == False:
+                    self.varrecorder_ui.VerseWordlineEdit.setText(verseword)           
+                    self.findResolverVariant(self.verseline,self.versewordnum)
+                elif self.runauto == True:
+                    self.findAutoResolverVariant(self.verseline,self.versewordnum)
+        self.VariantRecorderDialog.exec()
+        #print(str(f'Next Verse Num: {self.nextverseversenum}'))
+
+    def AutoVarianceRecorder(self):        
+        self.stoprecorder = False
+        # default: run with recorder ui
+        self.runauto = False
+        
+        if self.ui.AutocheckBox.isChecked():
+            print("# running in auto mode => without recorder ui")
+            self.runauto = True 
+        
+        if not self.ui.VerseNormcheckBox.isChecked():
+            print("Normalized verse text is required for variant resolution")
+        
+        if not self.ui.RefNormcheckBox.isChecked():
+            print("Normalized reference text is required for variant resolution")
+
+        elif self.ui.NormcheckBox.isChecked():
+            
+            self.findBothVerse()
+
+            self.verseversecount = self.ui.VerseDocument.blockCount()
+            self.refversecount = self.ui.ReferenceDocument.blockCount()
+            
+            if self.refversecount >= self.verseversecount:
+                self.versecount = self.verseversecount
+            elif self.refversecount < self.verseversecount:
+                self.versecount = self.refversecount
+
+            versecursor = self.ui.VerseText.textCursor()
+            refcursor = self.ui.RefText.textCursor()
+            self.initverse = True
+            self.stoprecorder = False
+        
+            for x in range(self.versecount):
+                if self.initverse == True:
+                    versecursor.setPosition(0)
+                    self.initverse = False
+                    #versecursor.setPosition(versecursor.Start)
+                elif self.initverse == False:
+                    versecursor.movePosition(versecursor.NextBlock, versecursor.MoveAnchor)
+                versecursor.movePosition(versecursor.StartOfBlock,versecursor.MoveAnchor)
+                versecursor.movePosition(versecursor.NextWord, versecursor.MoveAnchor)
+                versecursor.movePosition(versecursor.EndOfBlock, versecursor.KeepAnchor)
+                self.ui.VerseText.setTextCursor(versecursor)
+                self.selected_verseverse = versecursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_verseverse}')
+                self.versewords = []
+                self.versewords = self.selected_verseverse.split()
+                self.versewordcount = len(self.versewords)
+                print(f'Verse verse words: {self.versewords} Verse verse word count: {str(self.versewordcount)}')
+                versecursor.movePosition(versecursor.StartOfBlock,versecursor.MoveAnchor)
+                #print(f'Verse versecursor start of first Verse verse position: {str(versecursor.position())}')
+                versecursor.movePosition(versecursor.NextWord, versecursor.MoveAnchor)
+                versecursor.movePosition(versecursor.StartOfWord, versecursor.MoveAnchor)
+                versecursor.movePosition(versecursor.EndOfWord, versecursor.KeepAnchor)
+                self.ui.VerseText.setTextCursor(versecursor)
+                #print(f'Verse versecursor start of first verse word position: {str(versecursor.position())}')
+                self.versewordnum = 1
+                self.ui.VerseWordNumlineEdit.setText(str(self.versewordnum))
+                
+
+                if self.initverse == True:
+                    refcursor.setPosition(0)
+                    refcursor.setPosition(refcursor.Start)
+                elif self.initverse == False:
+                    refcursor.movePosition(refcursor.NextBlock, refcursor.MoveAnchor)
+                refcursor.movePosition(refcursor.StartOfBlock,refcursor.MoveAnchor)
+                refcursor.movePosition(refcursor.NextWord, refcursor.MoveAnchor)
+                refcursor.movePosition(refcursor.EndOfBlock, refcursor.KeepAnchor)
+                self.ui.RefText.setTextCursor(refcursor)
+                self.selected_refverse = refcursor.selectedText()
+                print(f'Selected Reference verse: {self.selected_refverse}')
+                self.refwords = []
+                self.refwords = self.selected_refverse.split()
+                self.refwordcount = len(self.refwords)
+                print(f'Reference ref words: {self.refwords} Reference ref word count: {str(self.refwordcount)}')
+                refcursor.movePosition(refcursor.StartOfBlock,refcursor.MoveAnchor)
+                #print(f'Reference refcursor start of first ref verse position: {str(refcursor.position())}')
+                refcursor.movePosition(refcursor.NextWord, refcursor.MoveAnchor)
+                refcursor.movePosition(refcursor.StartOfWord, refcursor.MoveAnchor)
+                refcursor.movePosition(refcursor.EndOfWord, refcursor.KeepAnchor)
+                self.refword = refcursor.selectedText()
+                self.ui.RefText.setTextCursor(refcursor)
+                #print(f'Reference versecursor start of first ref word position: {str(refcursor.position())}')
+                self.refwordnum = 1
+                self.ui.RefWordNumlineEdit.setText(str(self.refwordnum))
+                
+                if self.initverse == True:
+                    self.initverse = False
+                
+                #if versewordcount == refwordcount:
+                    #print('Additions anticipated')
+                    # Since there are extra ref words,
+                for word in self.versewords:
+                    print("Running Resolver")
+                    #self.versebook = self.ui.VersebookComboBox.currentText()
+                    #self.refbook = self.ui.RefbookComboBox.currentText()
+                    #self.refchapter = self.ui.RefchapterComboBox.currentText()
+                    self.refwordnum += 1
+                    self.findNextRefWord()
+                    self.ui.RefWordNumlineEdit.setText(str(self.refwordnum))
+                    self.refword = self.ui.RefText.textCursor().selectedText()
+                    self.versewordnum += 1
+                    self.findNextVerseWord()
+                    self.ui.VerseWordNumlineEdit.setText(str(self.versewordnum))
+                    self.verseword = self.ui.VerseText.textCursor().selectedText()
+                    print(f'Verse wordnum: {str(self.versewordnum)} Verse word: {self.verseword} Ref wordnum: {str(self.refwordnum)} Ref word: {self.refword}')
+                    #if self.versebook == self.refbook and self.versechapter == self.refchapter and self.verseversenum ==  self.refversenum and self.verseword != self.refword:
+                    if self.stoprecorder == True:
+                        print("Stopping the Variant Recorder")
+                        return
+                    if self.verseword != self.refword and not self.ui.AutocheckBox.isChecked():
+                        self.VarianceRecorderDialog()
+                        self.varrecorder_ui.buttonBox.accepted.connect(self.acceptVariant)
+                        self.varrecorder_ui.buttonBox.rejected.connect(self.rejectVariant)
+                        #print("Closing Recorder Dialog")
+                        #self.VariantRecorderDialog.close()  
+                    if self.verseword != self.refword and self.ui.AutocheckBox.isChecked():
+                        line = self.ui.VerselineComboBox.currentText()
+                        self.findAutoResolverVariant(self.verseline,self.versewordnum)
+                        if self.isvariant == True:
+                            print("Updating existing variant in Resolver")
+                            print(f'Verse Line: {self.verseline} Verse Word Num: {self.versewordnum}')
+                            print(f'Res Line: {self.resline} Res Word Num: {self.reswordnum}')
+                            self.updateAutoResolverVariant(self.resline,self.reswordnum)
+                        elif self.isvariant == False:
+                            print("Adding new variant to Resolver")
+                            print(f'Verse Line: {self.verseline} Verse Word Num: {self.versewordnum}')
+                            self.insertAutoResolverVariant(self.verseline,self.versewordnum)
+                       
+                        #if self.VariantRecorderDialog.Accepted == True:
+                            #  accept()
+                        #elif: self.VariantRecorderDialog.Rejected == True:
+                            #reject()
+                    
+                #if self.stoprecorder == True:
+                    #print("Stopping the Variant Recorder")
+                    #break         
+                self.verseversenum = int(self.ui.VerseverseComboBox.currentText())
+                self.nextverseversenum = int(self.ui.VerseverseComboBox.currentText()) + 1
+                print(str(f'Next Verse Num: {self.nextverseversenum}'))            
+                
+                self.ui.VersebookComboBox.setCurrentText(str(self.versebook))
+                self.ui.VersechapterComboBox.setCurrentText(str(self.versechapter))
+                self.ui.VerseverseComboBox.setCurrentText(str(self.nextverseversenum))
+                
+                self.ui.RefbookComboBox.setCurrentText(str(self.versebook))
+                self.ui.RefchapterComboBox.setCurrentText(str(self.versechapter))
+                self.ui.RefverseComboBox.setCurrentText(str(self.nextverseversenum))
+                
+                self.ui.bookComboBox.setCurrentText(self.ui.VersebookComboBox.currentText())
+                self.ui.chapterComboBox.setCurrentText(self.ui.VersechapterComboBox.currentText())
+                self.ui.verseComboBox.setCurrentText(self.ui.VerseverseComboBox.currentText())
+
+                print(str(f'Next Verse Num: {self.nextverseversenum}'))
+                #self.findVerseVerse()
+                self.findBothVerse()
+
+
+    def VarianceRecorderDialog(self):
+        self.stoprecorder = False
+        def accept():
+            print("VARIANT ACCEPTED!!!!!!")
+            if self.varrecorder_ui.ExistingradioButton.isChecked():
+                print("Updating existing variant in Resolver")
+                self.updateResolverVariant(self.resline,self.reswordnum)
+            elif self.varrecorder_ui.NewradioButton.isChecked():
+                print("Adding new variant to Resolver")
+                self.insertResolverVariant(self.resline,self.reswordnum)
+        
+        '''def add():
+            if self.varrecorder_ui.NewradioButton.isChecked():
+                print("Adding new variant to Resolver")
+                self.insertResolverVariant(self.resline,self.reswordnum)'''
+        
+        def close():
+            print("Closing Resolver")
+            self.stoprecorder = True
+            self.VariantRecorderDialog.close()
+            reject()
+
+        def reject():
+            print("Moving on")
+            #self.contresolver = True
+        
+        '''def update():
+            print("VARIANT ACCEPTED!!!!!!")
+            if self.varrecorder_ui.ExistingradioButton.isChecked():
+                self.updateResolverVariant(self.resline,self.reswordnum)'''
+
+        self.VariantRecorderDialog = qtw.QDialog()
+        self.varrecorder_ui = Ui_RecorderDialog()
+        self.varrecorder_ui.setupUi(self.VariantRecorderDialog)
+        self.VariantRecorderDialog.show()
+        self.varrecorder_ui.buttonBox.accepted.connect(accept)
+        self.varrecorder_ui.buttonBox.rejected.connect(reject)
+        self.varrecorder_ui.ClosepushButton.clicked.connect(close) 
+        self.varrecorder_ui.RefLinelineEdit.setText(self.ui.ReflineComboBox.currentText())
+        self.varrecorder_ui.RefBooklineEdit.setText(self.ui.RefbookComboBox.currentText())
+        self.varrecorder_ui.RefChapterlineEdit.setText(self.ui.RefchapterComboBox.currentText())
+        self.varrecorder_ui.RefVerselineEdit.setText(self.ui.RefverseComboBox.currentText())
+        self.varrecorder_ui.RefWordNumlineEdit.setText(self.ui.RefWordNumlineEdit.text())
+        self.varrecorder_ui.RefNormWordlineEdit.setText(self.ui.RefText.textCursor().selectedText())
+        self.loadVarWordCombo()
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/TRiBibleWords.db")
+        refwords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
+        for word in refwords:
+            refline = word[0]
+            refbook = word[1]
+            refchapter = word[2]
+            refverse = word[3]
+            refwordnum = word[4]
+            refword = word[5]
+            if str(refline) == self.varrecorder_ui.RefLinelineEdit.text() and str(refwordnum) == self.varrecorder_ui.RefWordNumlineEdit.text():
+                self.varrecorder_ui.RefWordlineEdit.setText(refword)
+                self.varrecorder_ui.VarWordSelCombo.setCurrentText(refword)            
+        self.varrecorder_ui.VerseLinelineEdit.setText(self.ui.VerselineComboBox.currentText())
+        self.varrecorder_ui.VerseBooklineEdit.setText(self.ui.VersebookComboBox.currentText())
+        self.varrecorder_ui.VerseChapterlineEdit.setText(self.ui.VersechapterComboBox.currentText())
+        self.varrecorder_ui.VerseVerselineEdit.setText(self.ui.VerseverseComboBox.currentText())
+        self.varrecorder_ui.VerseWordNumlineEdit.setText(self.ui.VerseWordNumlineEdit.text())
+        self.varrecorder_ui.VerseNormWordlineEdit.setText(self.ui.VerseText.textCursor().selectedText())
+
+        self.loadReplaceWordCombo()
+        #helper = SqliteHelper("/home/max/Projects/Python/SQLite/TRBibleWords.db")
+        helper = SqliteHelper("/home/max/Projects/BiblionOCR/Model/Data/SQLite/FROMVS.db")
+        versewords = helper.select("SELECT Line, Book, Chapter, Verse, WordNum, Word FROM Bible")
+        for word in versewords:
+            self.verseline = word[0]
+            versebook = word[1]
+            versechapter = word[2]
+            verseverse = word[3]
+            self.versewordnum = word[4]
+            verseword = word[5]
+            self.varrecorder_ui.ReplaceWordSelCombo.setCurrentText(verseword)
+            if str(self.verseline) == self.varrecorder_ui.VerseLinelineEdit.text() and str(self.versewordnum) == self.varrecorder_ui.VerseWordNumlineEdit.text():
+                self.varrecorder_ui.VerseWordlineEdit.setText(verseword)           
+                self.findResolverVariant(self.verseline,self.versewordnum) 
+                self.VariantRecorderDialog.exec()
+                #print(str(f'Next Verse Num: {self.nextverseversenum}'))
+
+    def VarianceRecorder(self):        
+        self.stoprecorder = False
+        
+        if not self.ui.VerseNormcheckBox.isChecked():
+            print("Normalized verse text is required for variant resolution")
+        
+        if not self.ui.RefNormcheckBox.isChecked():
+            print("Normalized reference text is required for variant resolution")
+
+        elif self.ui.VerseNormcheckBox.isChecked():
+            self.ui.bookComboBox.setCurrentText("Mat")
+            self.ui.chapterComboBox.setCurrentText("1")
+            self.ui.verseComboBox.setCurrentText("1")
+            self.findBothVerse()
+
+        self.verseversecount = self.ui.VerseDocument.blockCount()
+        self.refversecount = self.ui.ReferenceDocument.blockCount()
+        
+        if self.refversecount >= self.verseversecount:
+            self.versecount = self.verseversecount
+        elif self.refversecount < self.verseversecount:
+            self.versecount = self.refversecount
+
+        versecursor = self.ui.VerseText.textCursor()
+        refcursor = self.ui.RefText.textCursor()
+        self.initverse = True
+        self.stoprecorder = False
+    
+        for x in range(self.versecount):
+            if self.initverse == True:
+                versecursor.setPosition(0)
+                versecursor.setPosition(versecursor.Start)
+            elif self.initverse == False:
+                versecursor.movePosition(versecursor.NextBlock, versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.StartOfBlock,versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.NextWord, versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.EndOfBlock, versecursor.KeepAnchor)
+            self.ui.VerseText.setTextCursor(versecursor)
+            self.selected_verseverse = versecursor.selectedText()
+            print(f'Selected Verse verse: {self.selected_verseverse}')
+            self.versewords = []
+            self.versewords = self.selected_verseverse.split()
+            self.versewordcount = len(self.versewords)
+            print(f'Verse verse words: {self.versewords} Verse verse word count: {str(self.versewordcount)}')
+            versecursor.movePosition(versecursor.StartOfBlock,versecursor.MoveAnchor)
+            #print(f'Verse versecursor start of first Verse verse position: {str(versecursor.position())}')
+            versecursor.movePosition(versecursor.NextWord, versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.StartOfWord, versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.EndOfWord, versecursor.KeepAnchor)
+            self.ui.VerseText.setTextCursor(versecursor)
+            #print(f'Verse versecursor start of first verse word position: {str(versecursor.position())}')
+            self.versewordnum = 1
+            self.ui.VerseWordNumlineEdit.setText(str(self.versewordnum))
+            
+
+            if self.initverse == True:
+                refcursor.setPosition(0)
+                refcursor.setPosition(refcursor.Start)
+            elif self.initverse == False:
+                refcursor.movePosition(refcursor.NextBlock, refcursor.MoveAnchor)
+            refcursor.movePosition(refcursor.StartOfBlock,refcursor.MoveAnchor)
+            refcursor.movePosition(refcursor.NextWord, refcursor.MoveAnchor)
+            refcursor.movePosition(refcursor.EndOfBlock, refcursor.KeepAnchor)
+            self.ui.RefText.setTextCursor(refcursor)
+            self.selected_refverse = refcursor.selectedText()
+            print(f'Selected Reference verse: {self.selected_refverse}')
+            self.refwords = []
+            self.refwords = self.selected_refverse.split()
+            self.refwordcount = len(self.refwords)
+            print(f'Reference ref words: {self.refwords} Reference ref word count: {str(self.refwordcount)}')
+            refcursor.movePosition(refcursor.StartOfBlock,refcursor.MoveAnchor)
+            #print(f'Reference refcursor start of first ref verse position: {str(refcursor.position())}')
+            refcursor.movePosition(refcursor.NextWord, refcursor.MoveAnchor)
+            refcursor.movePosition(refcursor.StartOfWord, refcursor.MoveAnchor)
+            refcursor.movePosition(refcursor.EndOfWord, refcursor.KeepAnchor)
+            self.refword = refcursor.selectedText()
+            self.ui.RefText.setTextCursor(refcursor)
+            #print(f'Reference versecursor start of first ref word position: {str(refcursor.position())}')
+            self.refwordnum = 1
+            self.ui.RefWordNumlineEdit.setText(str(self.refwordnum))
+            
+            if self.initverse == True:
+                self.initverse = False
+            
+            #if versewordcount == refwordcount:
+                #print('Additions anticipated')
+                # Since there are extra ref words,
+            for word in self.versewords:
+                print("Running Resolver")
+                #self.versebook = self.ui.VersebookComboBox.currentText()
+                #self.refbook = self.ui.RefbookComboBox.currentText()
+                #self.refchapter = self.ui.RefchapterComboBox.currentText()
+                self.refwordnum += 1
+                self.findNextRefWord()
+                self.ui.RefWordNumlineEdit.setText(str(self.refwordnum))
+                self.refword = self.ui.RefText.textCursor().selectedText()
+                self.versewordnum += 1
+                self.findNextVerseWord()
+                self.ui.VerseWordNumlineEdit.setText(str(self.versewordnum))
+                self.verseword = self.ui.VerseText.textCursor().selectedText()
+                print(f'Verse wordnum: {str(self.versewordnum)} Verse word: {self.verseword} Ref wordnum: {str(self.refwordnum)} Ref word: {self.refword}')
+                #if self.versebook == self.refbook and self.versechapter == self.refchapter and self.verseversenum ==  self.refversenum and self.verseword != self.refword:
+                if self.stoprecorder == True:
+                    print("Stopping the Variant Recorder")
+                    return
+
+                if self.verseword != self.refword:
+                    self.VarianceRecorderDialog()
+
+                    #if self.VariantRecorderDialog.Accepted == True:
+                        #  accept()
+                    #elif: self.VariantRecorderDialog.Rejected == True:
+                        #reject()
+                
+            #if self.stoprecorder == True:
+                #print("Stopping the Variant Recorder")
+                #break         
+            self.verseversenum = int(self.ui.VerseverseComboBox.currentText())
+            self.nextverseversenum = int(self.ui.VerseverseComboBox.currentText()) + 1
+            print(str(f'Next Verse Num: {self.nextverseversenum}'))            
+            
+            self.ui.VersebookComboBox.setCurrentText(str(self.versebook))
+            self.ui.VersechapterComboBox.setCurrentText(str(self.versechapter))
+            self.ui.VerseverseComboBox.setCurrentText(str(self.nextverseversenum))
+            
+            self.ui.RefbookComboBox.setCurrentText(str(self.versebook))
+            self.ui.RefchapterComboBox.setCurrentText(str(self.versechapter))
+            self.ui.RefverseComboBox.setCurrentText(str(self.nextverseversenum))
+            
+            self.ui.bookComboBox.setCurrentText(self.ui.VersebookComboBox.currentText())
+            self.ui.chapterComboBox.setCurrentText(self.ui.VersechapterComboBox.currentText())
+            self.ui.verseComboBox.setCurrentText(self.ui.VerseverseComboBox.currentText())
+
+            print(str(f'Next Verse Num: {self.nextverseversenum}'))
+            #self.findVerseVerse()
+            self.findBothVerse()
+  
+
+    def selectVerseBookCombo(self):
+        oldbookabbr = self.versebookabbr
+        self.versebookabbr = self.ui.VersebookComboBox.currentText()
+        
+        if self.ui.VersebookComboBox.currentText() != oldbookabbr:
+                  
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/BooksMarkDown.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                for BookAbbr in data:
+                    if BookAbbr['BookAbbr'] == self.versebookabbr:
+                        bookmarkdown = BookAbbr['BookMarkdown']
+                        self.sourcebookmarkdown = 'source'+bookmarkdown
+                        self.greekbookmarkdown = 'greek'+bookmarkdown
+                        self.latinbookmarkdown = 'latin'+bookmarkdown
+                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
+            f.close()
+            
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                versebookabbr_key = r"self.versebookabbr"
+                source_book_markdown_key = r"self.sourcebookmarkdown"
+                greek_book_markdown_key = r"self.greekbookmarkdown"
+                latin_book_markdown_key = r"self.latinbookmarkdown"
+
+                for Setting in data:
+                    if Setting['Setting'] == versebookabbr_key:
+                        Setting['CurrentValue'] = self.veersebookabbr
+                    elif Setting['Setting'] == source_book_markdown_key:
+                        Setting['CurrentValue'] = self.sourcebookmarkdown
+                    elif Setting['Setting'] == greek_book_markdown_key:
+                        Setting['CurrentValue'] = self.greekbookmarkdown
+                    elif Setting['Setting'] == latin_book_markdown_key:
+                        Setting['CurrentValue'] = self.latinbookmarkdown
+                    print(Setting['CurrentValue'])
+            f.close()
+            
+            os.remove(jsonfile)
+            with open(jsonfile, 'w') as f:
+                json.dump(data, f, indent=4)
+            f.close()
+
+            # Opening JSON file
+            '''with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+                # returns JSON object as
+                    # a dictionary
+                data = json.load(f)'''
+            
+            #self.ui.VersebookComboBox.clear()
+            
+            # Iterating through the json
+            # list          
+            '''for booknumber in data:
+                print(booknumber['bookabbr'])
+                self.ui.VersebookComboBox.addItem(booknumber['bookabbr'])
+            
+            # Closing file
+            f.close()'''
+            
+        self.ui.VersebookComboBox.setCurrentText(self.versebookabbr)
+        '''self.refbookabbr = self.ui.bookComboBox.currentText()
+        self.refbooknum = self.ui.bookComboBox.currentIndex() + 40
+        self.refbookindex = self.ui.bookComboBox.currentIndex()
+        self.refbookcount = self.ui.bookComboBox.count()'''
+        self.versebookabbr = self.ui.VersebookComboBox.currentText()
+        self.versebookindex = self.ui.VersebookComboBox.currentIndex()
+        self.versebooknum = self.refbookindex + 40
+        self.versebookcount = self.ui.VersebookComboBox.count()
+
+    def loadVerseChapterCombo(self):
+        self.ui.VersechapterComboBox.clear()
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BookChapter.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+        # Iterating through the json
+        # list
+        for Chapter in data:
+            if Chapter['Book'] == self.ui.VersebookComboBox.currentText():
+                self.ui.VersechapterComboBox.addItem(str(Chapter['Chapter']))
+        # Closing file
+        f.close()
+        
+        #self.ui.VersebookComboBox.setEditText(self.bookabbr)
+        self.versechapter = self.ui.VersechapterComboBox.currentText()
+        self.versechapternum = int(self.versechapter)
+        self.versechaptercount = self.ui.VersechapterComboBox.count()
+
+    def loadVerseVerseCombo(self):
+        self.ui.VerseverseComboBox.clear()
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BookChapterVerse.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+            
+        # Iterating through the json
+        # list
+        for Verse in data:
+            if Verse['Book'] == self.ui.VersebookComboBox.currentText() and str(Verse['Chapter']) == self.ui.VersechapterComboBox.currentText():
+                self.ui.VerseverseComboBox.addItem(str(Verse["Verse"]))
+        # Closing file
+        f.close()
+
+    def loadVerseLineCombo(self):
+        self.ui.VerselineComboBox.clear()
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/LineBookChapterVerse.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+            
+        # Iterating through the json
+        # list
+        for Line in data:
+            if Line['Book'] == self.ui.VersebookComboBox.currentText() and str(Line['Chapter']) == self.ui.VersechapterComboBox.currentText():
+                self.ui.VerselineComboBox.addItem(str(Line["Line"]))
+        # Closing file
+        f.close()
+        #self.updateVerseLineCombo()
+    
+    def updateVerseLineCombo(self):
+        #self.ui.VerselineComboBox.clear()
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/LineBookChapterVerse.json') as f:
+            # returns JSON object as a dictionary
+            data = json.load(f)
+        
+        # Iterating through the json list
+        for Line in data:
+            if Line['Book'] == self.ui.VersebookComboBox.currentText() and str(Line['Chapter']) == self.ui.VersechapterComboBox.currentText() and str(Line['Verse']) == self.ui.VerseverseComboBox.currentText():
+                self.ui.VerselineComboBox.setCurrentText(str(Line["Line"]))
+                #self.ui.VerseverseComboBox.setCurrentText(str(Line["Verse"]))
+                self.verseline = str(Line["Line"])
+                #self.findVerseVerse()                      
+
+        # Closing file
+        f.close()
+
+    def selectRefBookCombo(self):
+        oldbookabbr = self.refbookabbr
+        self.refbookabbr = self.ui.RefbookComboBox.currentText()
+        
+        if self.ui.RefbookComboBox.currentText() != oldbookabbr:
+                  
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/BooksMarkDown.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                for BookAbbr in data:
+                    if BookAbbr['BookAbbr'] == self.refbookabbr:
+                        bookmarkdown = BookAbbr['BookMarkdown']
+                        self.sourcebookmarkdown = 'source'+bookmarkdown
+                        self.greekbookmarkdown = 'greek'+bookmarkdown
+                        self.latinbookmarkdown = 'latin'+bookmarkdown
+                        print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
+            f.close()
+            
+            jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+            
+            with open(jsonfile, 'r') as f:
+                data = json.load(f)
+                refbookabbr_key = r"self.bookabbr"
+                source_book_markdown_key = r"self.sourcebookmarkdown"
+                greek_book_markdown_key = r"self.greekbookmarkdown"
+                latin_book_markdown_key = r"self.latinbookmarkdown"
+
+                for Setting in data:
+                    if Setting['Setting'] == refbookabbr_key:
+                        Setting['CurrentValue'] = self.refbookabbr
+                    elif Setting['Setting'] == source_book_markdown_key:
+                        Setting['CurrentValue'] = self.sourcebookmarkdown
+                    elif Setting['Setting'] == greek_book_markdown_key:
+                        Setting['CurrentValue'] = self.greekbookmarkdown
+                    elif Setting['Setting'] == latin_book_markdown_key:
+                        Setting['CurrentValue'] = self.latinbookmarkdown
+                    print(Setting['CurrentValue'])
+            f.close()
+            
+            os.remove(jsonfile)
+            with open(jsonfile, 'w') as f:
+                json.dump(data, f, indent=4)
+            f.close()
+
+            # Opening JSON file
+            '''with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrName.json') as f:
+                # returns JSON object as
+                    # a dictionary
+                data = json.load(f)'''
+            
+            #self.ui.RefbookComboBox.clear()
+            
+            # Iterating through the json
+            # list          
+            '''for booknumber in data:
+                print(booknumber['bookabbr'])
+                self.ui.RefbookComboBox.addItem(booknumber['bookabbr'])
+            
+            # Closing file
+            f.close()'''
+            
+        self.ui.RefbookComboBox.setCurrentText(self.refbookabbr)
+        self.refbookabbr = self.ui.RefbookComboBox.currentText()
+        self.refbooknum = self.ui.RefbookComboBox.currentIndex() + 40
+        self.refbookindex = self.ui.RefbookComboBox.currentIndex()
+        self.refbookcount = self.ui.RefbookComboBox.count()
+    
+    def loadRefChapterCombo(self):
+        self.ui.RefchapterComboBox.clear()
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BookChapter.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+        # Iterating through the json
+        # list
+        for Chapter in data:
+            if Chapter['Book'] == self.ui.RefbookComboBox.currentText():
+                self.ui.RefchapterComboBox.addItem(str(Chapter['Chapter']))
+        # Closing file
+        f.close()
+        
+        #self.ui.RefbookComboBox.setEditText(self.bookabbr)
+        self.refchapter = self.ui.RefchapterComboBox.currentText()
+        self.refchapternum = int(self.refchapter)
+        self.refchaptercount = self.ui.RefchapterComboBox.count()
+
+    def loadRefVerseCombo(self):
+        self.ui.RefverseComboBox.clear()
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BookChapterVerse.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+            
+        # Iterating through the json
+        # list
+        for Verse in data:
+            if Verse['Book'] == self.ui.RefbookComboBox.currentText() and str(Verse['Chapter']) == self.ui.RefchapterComboBox.currentText():
+                self.ui.RefverseComboBox.addItem(str(Verse["Verse"]))
+        # Closing file
+        f.close()
+        #self.loadRefLineCombo()
+
+    def loadRefLineCombo(self):
+        self.ui.ReflineComboBox.clear()
+
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/LineBookChapterVerse.json') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)
+            
+        # Iterating through the json
+        # list
+        for Line in data:
+            if Line['Book'] == self.ui.RefbookComboBox.currentText() and str(Line['Chapter']) == self.ui.RefchapterComboBox.currentText():
+                self.ui.ReflineComboBox.addItem(str(Line["Line"]))
+        # Closing file
+        f.close()
+        #self.updateRefLineCombo()
+
+    def updateRefLineCombo(self):
+        #self.ui.ReflineComboBox.clear()
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/LineBookChapterVerse.json') as f:
+            # returns JSON object as a dictionary
+            data = json.load(f)
+        
+        # Iterating through the json list
+        for Line in data:
+            if Line['Book'] == self.ui.RefbookComboBox.currentText() and str(Line['Chapter']) == self.ui.RefchapterComboBox.currentText() and str(Line['Verse']) == self.ui.RefverseComboBox.currentText():
+                #self.ui.RefverseComboBox.setCurrentText(str(Line["Verse"]))
+                self.ui.ReflineComboBox.setCurrentText(str(Line["Line"]))
+                self.refline = self.ui.ReflineComboBox.currentText()        
+                #self.findRefVerse()
+        # Closing file
+        f.close()
+
+    def bothLoad(self):
+        ''' load the matching file for either the current image or the current text '''
+        def accept():
+            #if self.ImageTextPairDialog.Accepted:
+            if self.ImageTextPairDialog_ui.MatchTxt2Imgbutton.isChecked():
+                print("matching text file to current image file")
+                print(self.imgpath)
+                if self.imgpath:
+                    print("finding matched text file for " + self.imgpath)
+                    imgfilename = self.imgpath
+                    file = qtc.QFile(imgfilename)
+                    filestr = os.path.basename(imgfilename)           
+                    filedir = os.path.dirname(imgfilename)
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]                    
+                    namesplit = filename.split("_")                    
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    print(self.versedir +r"/"+ versionref + "_Page_" + pagestr + r".txt")    
+                else:
+                    print(self.imgpath + " does not exist")
+                
+                self.trytxtpath = self.versedir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
+                if self.trytxtpath:
+                    print("opening " + self.trytxtpath)
+                    self.versepath = self.trytxtpath
+                    self.showText(self.versepath)
+                    #self.ReloadText()
+                else:
+                    print(self.trytxtpath + " does not exist")
+
+            elif self.ImageTextPairDialog_ui.MatchImg2Txtbutton.isChecked():
+                print("matching image file to current text file")
+                print(self.versepath)
+                if self.versepath:
+                    print("finding matched image file for " + self.versepath)
+                    txtfilename = self.versepath
+                    file = qtc.QFile(txtfilename)
+                    filestr = os.path.basename(txtfilename)           
+                    filedir = os.path.dirname(txtfilename)
+                    filesplit = os.path.splitext(filestr)
+                    filename = filesplit[0]
+                    fileext = filesplit[1]                    
+                    namesplit = filename.split("_")                    
+                    versionref = namesplit[0]
+                    pagestr = namesplit[2]
+                    pagenum = int(pagestr)
+                    print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")    
+                else:
+                    print(self.versepath + " does not exist")
+                
+                self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
+                if self.tryimgpath:
+                    print("opening " + self.tryimgpath)
+                    self.imgpath = self.tryimgpath
+                    self.showImage(self.imgpath)
+                else:
+                    print(self.tryimgpath + " does not exist")
+
+
+        def reject():
+            pass        
+        
+        self.ImageTextPairDialog = qtw.QDialog()
+        self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
+        self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
+        self.ImageTextPairDialog.show()
+
+        self.ImageTextPairDialog_ui.buttonBox.accepted.connect(accept)
+        self.ImageTextPairDialog_ui.buttonBox.rejected.connect(reject)
+
+    def findVerseBook(self):
+        findversebook = self.ui.VersebookComboBox.currentText() + " "
+        print(f'find book = {findversebook}')
+        cursor = self.ui.VerseText.textCursor()
+        cursor.setPosition(0)
+        self.ui.VerseText.setTextCursor(cursor)
+        self.ui.VerseText.verticalScrollBar().setValue(self.ui.VerseText.verticalScrollBar().maximum())
+        #if not self.ui.VerseText.find(verseverse):
+        versebookfound = self.ui.VerseText.find(findversebook)
+        if versebookfound:
+            self.versebook = self.ui.VersebookComboBox.currentText()
+            self.versebookindex = self.ui.VersebookComboBox.currentIndex()
+            #self.ui.VerseText.setTextCursor(cursor)
+            #self.ui.VerseText.find(verseverse)
+            print(f'found = {findversebook}')              
+            self.versebookcount = self.ui.VersebookComboBox.count()
+            self.prevversebookindex = str(int(self.versebookindex) - 1)
+            self.nextversebookindex = str(int(self.versebookindex) + 1)
+            #comment out the line of code below to highlight the entire verse
+            #self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+            print(f'self.versebook = {self.versebook}')
+            print(f'self.versebookindex = {self.versebookindex}')
+            print(f'self.versebookcount = {self.versebookcount}')
+            print(f'self.prevversebookindex = {self.prevversebookindex}')
+            print(f'self.nextversebookindex = {self.nextversebookindex}')
+        else:
+            print(f'Unable to find verse book: {findversebook}')
+        self.ui.VersebookComboBox.setCurrentIndex(self.versebookindex)
+        self.ui.VersechapterComboBox.setCurrentText("1")
+        self.ui.VerseverseComboBox.setCurrentText("1")
+        self.findVerseVerse()
+
+    def findNextVerseBook(self):
+        self.ui.VersebookComboBox.setCurrentIndex(self.ui.VersebookComboBox.currentIndex() + 1)
+        self.findVerseBook()
+
+    def findPrevVerseBook(self):
+        self.ui.VersebookComboBox.setCurrentIndex(self.ui.VersebookComboBox.currentIndex() - 1)
+        self.findVerseBook()       
+
+    def findVerseChapter(self):
+        versebook = self.ui.VersebookComboBox.currentText()
+        print(f' versebook: {versebook}')
+        self.versechapter = self.ui.VersechapterComboBox.currentText()
+        print(self.versechapter)
+        findversechapter = self.versebook + " " + self.ui.VersechapterComboBox.currentText() + ":"
+        print(f'find verse chapter = {findversechapter}')
+        cursor = self.ui.VerseText.textCursor()
+        cursor.setPosition(0)
+        self.ui.VerseText.setTextCursor(cursor)
+        self.ui.VerseText.verticalScrollBar().setValue(self.ui.VerseText.verticalScrollBar().maximum())
+        versechapterfound = self.ui.VerseText.find(findversechapter)
+        if versechapterfound:
+            self.versechapter = self.ui.VersechapterComboBox.currentText()
+            print(f'found verse chapter = {findversechapter}')              
+            self.versechaptercount = self.ui.VersechapterComboBox.count()
+            print(f'self.versechapter = {self.versechapter}')
+            print(f'self.versechaptercount = {self.versechaptercount}')
+        else:
+            print(f'Unable to find verse chapter: {findversechapter}')
+        self.ui.VersebookComboBox.setCurrentText(versebook)
+        self.ui.VersechapterComboBox.setCurrentText(self.versechapter)
+        self.ui.VerseverseComboBox.setCurrentText("1")
+        self.findVerseVerse()
+
+    def findNextVerseChapter(self):
+        self.ui.VersechapterComboBox.setCurrentText(str(int(self.ui.VersechapterComboBox.currentText()) + 1))
+        versechapternum = int(self.ui.VersechapterComboBox.currentText())
+        versechapter = self.ui.VersechapterComboBox.currentText()
+        versechaptercount =  self.ui.VersechapterComboBox.count()
+        nextversechapternum = int(self.ui.VersechapterComboBox.currentText()) + 1
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrNameNumIndex.json') as f:
+            # returns JSON object as a dictionary
+            books = json.load(f)  
+        # Iterating through the json list  
+        for book in books:
+            versebookabbr = str(book["bookabbr"])
+            if versebookabbr == self.ui.VersebookComboBox.currentText():
+                versebookindex = int(book["bookindex"])
+                versebook = str(book["bookabbr"])
+                nextversebookindex = versebookindex + 1
+        # Closing json file
+        f.close()
+        nextversebook = self.ui.VersebookComboBox.itemText(nextversebookindex)
+        versebookcount = self.ui.VersebookComboBox.count()
+        print(f'Verse Chapter Count: {versechaptercount} Verse Chapter Num: {versechapternum} Next Verse Chapter Num: {nextversechapternum}')
+        print(f'versebookindex: {versebookindex} versebook: {versebook} nextversebookindex: {nextversebookindex} nextversebook: {nextversebook}')
+        if versechapternum > versechaptercount:                    
+            self.ui.VersebookComboBox.setCurrentText(versebook)
+            self.ui.VersechapterComboBox.setCurrentText("1")
+            self.ui.VerseverseComboBox.setCurrentText("1")
+            self.versechapter = versechapter 
+            if nextversechapternum > versechaptercount:
+                self.ui.VersebookComboBox.setCurrentText(nextversebook)
+                self.ui.VersechapterComboBox.setCurrentText("1")
+                self.ui.VerseverseComboBox.setCurrentText("1")
+
+        self.findVerseChapter()
+
+    def findPrevVerseChapter(self):
+        self.ui.VersechapterComboBox.setCurrentText(str(int(self.ui.VersechapterComboBox.currentText()) - 1))
+        versechapternum = int(self.ui.VersechapterComboBox.currentText())
+        versechapter = self.ui.VersechapterComboBox.currentText()
+        versechaptercount =  self.ui.VersechapterComboBox.count()
+        prevversechapternum = int(self.ui.VersechapterComboBox.currentText()) - 1
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrNameNumIndex.json') as f:
+            # returns JSON object as a dictionary
+            books = json.load(f)  
+        # Iterating through the json list  
+        for book in books:
+            versebookabbr = str(book["bookabbr"])
+            if versebookabbr == self.ui.VersebookComboBox.currentText():
+                versebookindex = int(book["bookindex"])
+                versebook = str(book["bookabbr"])
+                prevversebookindex = versebookindex - 1
+        # Closing json file
+        f.close()
+        prevversebook = self.ui.VersebookComboBox.itemText(prevversebookindex)     
+        versebookcount = self.ui.VersebookComboBox.count()
+        print(f'Verse Chapter Num: {versechapternum} Prev Verse Chapter Num: {prevversechapternum}')
+        print(f'versebookindex: {versebookindex} versebook: {versebook} prevversebookindex: {prevversebookindex} prevversebook: {prevversebook}')
+        if versechapternum == 0:                    
+            self.ui.VersebookComboBox.setCurrentText(versebook)
+            self.ui.VersechapterComboBox.setCurrentText(str(self.ui.VersechapterComboBox.count()))
+            self.ui.VerseverseComboBox.setCurrentText("1")
+            self.versechapter = versechapter
+            if prevversechapternum < 0:
+                self.ui.VersebookComboBox.setCurrentText(str(prevversebook))
+                self.ui.VersechapterComboBox.setCurrentText(str(self.ui.VersechapterComboBox.count()))
+                self.ui.VerseverseComboBox.setCurrentText("1")
+
+        self.findVerseChapter()       
+
+    def findBothVerse(self):
+        
+        if self.ui.radioButtonRef.isChecked():
+            verse = self.ui.RefbookComboBox.currentText() + " " + self.ui.RefchapterComboBox.currentText() + ":" + self.ui.RefverseComboBox.currentText() + " "
+        elif self.ui.radioButtonVerses.isChecked():
+            verse = self.ui.VersebookComboBox.currentText() + " " + self.ui.VersechapterComboBox.currentText() + ":" + self.ui.VerseverseComboBox.currentText() + " "
+        elif self.ui.radioButtonSel.isChecked():
+            verse = self.ui.bookComboBox.currentText() + " " + self.ui.chapterComboBox.currentText() + ":" + self.ui.verseComboBox.currentText() + " "
+        elif self.ui.radioButtonLast.isChecked():
+            verse = self.verselastbook + " " + self.verselastchapter + ":" + self.verselastverse + " "       
+        elif self.ui.AnchoredCkBox.isChecked():
+            verse = self.anchorbook + " " + self.anchorchapter + ":" + self.anchorverse + " "
+
+        print(f'find both Verse verse = {verse}')
+        cursor = self.ui.VerseText.textCursor()
+        cursor.setPosition(0)
+        self.ui.VerseText.setTextCursor(cursor)
+        self.ui.VerseText.verticalScrollBar().setValue(self.ui.VerseText.verticalScrollBar().maximum())
+        
+        '''if self.ui.VerseNormcheckBox.isChecked():
+            findline = self.ui.VerselineComboBox.currentText()
+            print(f'find verse = {verse} find line = {findline}')           
+            linefound = self.ui.VerseText.find(findline)
+            #comment out the line of code below to highlight the entire verse
+            #self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+            if linefound:
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+                self.selected_verseverse = cursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_verseverse}')
+                self.versewords = []
+                self.versewords = self.selected_verseverse.split()
+                self.versewordcount = len(self.versewords)
+                print(f'Verse verse words: {self.versewords} Verse verse word count: {str(self.versewordcount)}')
+                self.verseline = self.ui.VerselineComboBox.currentText()
+                #self.ui.VerseText.setTextCursor(cursor)
+                #self.ui.VerseText.find(verseverse)
+                print(f'found = {linefound}')              
+                self.verselinenum = int(self.verseline)
+                self.verselinecount = self.ui.VerselineComboBox.count()
+                self.prevtextversenum = str(int(self.verseversenum) - 1)
+                self.nexttextversenum = str(int(self.verseversenum) + 1)
+                print(f'self.verseline = {self.verseline}')
+                print(f'self.verselinecount = {self.verselinecount}')
+                print(f'self.prevtextversenum = {self.prevtextversenum}')
+                print(f'self.nexttextversenum = {self.nexttextversenum}')
+                self.ui.VerselineComboBox.setCurrentText(self.verseline)
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfWord, cursor.KeepAnchor)
+            else:
+                print(f'Unable to find verse line: {findline}')
+        else:
+            versefound = self.ui.VerseText.find(verse)
+            if versefound:
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+                self.selected_verseverse = cursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_verseverse}')
+                self.versewords = []
+                self.versewords = self.selected_verseverse.split()
+                self.versewordcount = len(self.versewords)
+                print(f'Verse verse words: {self.versewords} Verse verse word count: {str(self.versewordcount)}')
+                self.ui.VerseWordCntlineEdit.setText(str(self.versewordcount))
+                self.verseverse = self.ui.verseComboBox.currentText()
+                print(f'find self.verseverse = {self.verseverse}')              
+                self.verseversenum = int(self.verseverse)
+                self.verseversecount = self.ui.verseComboBox.count()
+                self.prevtextversenum = str(int(self.verseverse) - 1)
+                self.nexttextversenum = str(int(self.verseverse) + 1)
+                #comment out the line of code below to highlight the entire verse
+                #self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+                print(f'self.verseverse = {self.verseverse}')
+                print(f'self.verseversenum = {self.verseversenum}')
+                print(f'self.verseversecount = {self.verseversecount}')
+                print(f'self.prevtextversenum = {self.prevtextversenum}')
+                print(f'self.nexttextversenum = {self.nexttextversenum}')
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfWord, cursor.KeepAnchor)
+            else:
+                print(f'Unable to find verse: {findline}')'''
+        
+
+        '''print(f'find both Ref verse = {verse}')
+        refcursor = self.ui.RefText.textCursor()
+        refcursor.setPosition(0)
+        self.ui.RefText.setTextCursor(refcursor)
+        self.ui.RefText.verticalScrollBar().setValue(self.ui.RefText.verticalScrollBar().maximum())
+        
+        if self.ui.RefNormcheckBox.isChecked():
+            findline = self.ui.ReflineComboBox.currentText()
+            print(f'find verse = {verse} find line = {findline}')
+            linefound = self.ui.RefText.find(findline)
+            #comment out the line of code below to highlight the entire verse
+
+            if linefound:
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor) 
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfBlock, refcursor.KeepAnchor)
+                self.selected_refverse = refcursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_refverse}')
+                self.refwords = []
+                self.refwords = self.selected_refverse.split()
+                self.refwordcount = len(self.refwords)
+                print(f'Reference verse words: {self.refwords} Reference verse word count: {str(self.refwordcount)}')
+                self.refline = self.ui.ReflineComboBox.currentText()
+                #self.ui.RefText.setTextCursor(cursor)
+                #self.ui.RefText.find(refverse)
+                print(f'found = {linefound}')              
+                self.reflinenum = int(self.refline)
+                self.reflinecount = self.ui.ReflineComboBox.count()
+                self.prevtextrefnum = str(int(self.refversenum) - 1)
+                self.nexttextrefnum = str(int(self.refversenum) + 1)
+
+                print(f'self.refline = {self.refline}')
+                print(f'self.reflinecount = {self.reflinecount}')
+                print(f'self.prevrefversenum = {self.prevrefversenum}')
+                print(f'self.nextrefversenum = {self.nextrefversenum}')
+                self.ui.ReflineComboBox.setCurrentText(self.refline)
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor) 
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfWord, refcursor.KeepAnchor)
+            else:
+                print(f'Unable to find ref verse line: {findline}')
+        
+        else:
+            refversefound = self.ui.RefText.find(verse)
+            if refversefound:
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfBlock, refcursor.KeepAnchor)
+                self.selected_refverse = refcursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_refverse}')
+                self.refwords = []
+                self.refwords = self.selected_refverse.split()
+                self.refwordcount = len(self.refwords)
+                print(f'Reference verse words: {self.refwords} Reference verse word count: {str(self.refwordcount)}')          
+                self.ui.RefWordCntlineEdit.setText(str(self.refwordcount))
+                self.refverse = self.ui.verseComboBox.currentText()
+                print(f'find self.refverse = {self.refverse}')
+                self.refversenum = int(self.refverse)
+                self.refversecount = self.ui.verseComboBox.count()
+                self.prevrefversenum = str(int(self.refverse) - 1)
+                self.nextrefversenum = str(int(self.refverse) + 1)
+
+                #refcursor.EndOfLine()
+                print(f'self.refverse = {self.refverse}')
+                print(f'self.refversenum = {self.refversenum}')
+                print(f'self.refversecount = {self.refversecount}')
+                print(f'self.prevrefversenum = {self.prevrefversenum}')
+                print(f'self.nextrefversenum = {self.nextrefversenum}')
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor) 
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfWord, refcursor.KeepAnchor)
+
+            else:
+                print(f'Unable to find ref verse: {refversefound}') '''
+
+        self.ui.VersebookComboBox.setCurrentText(self.ui.bookComboBox.currentText())
+        self.ui.VersechapterComboBox.setCurrentText(self.ui.chapterComboBox.currentText())
+        self.ui.VerseverseComboBox.setCurrentText(self.ui.verseComboBox.currentText())
+        self.updateVerseLineCombo()
+        self.versebook = self.ui.bookComboBox.currentText()
+        self.versebookindex = self.ui.bookComboBox.currentIndex()
+        self.versechapter = self.ui.chapterComboBox.currentText()
+        self.versechapterindex = self.ui.chapterComboBox.currentIndex()
+        self.getSessionAnchor()
+        self.findVerseVerse()
+
+        checkverse = f'{self.versebook} {self.versechapter}:{self.verseverse}'
+        print(f'checkverse: {checkverse}')
+        print(f'anchor: {self.anchor}')
+        #anchorverse = f'{self.anchorbook} {self.anchorchapter}:{self.anchorverse}'
+        if checkverse == self.anchor:
+            print("Drop Anchor!")
+            self.ui.AnchorCkBox.setChecked(True)
+        else:
+            print("Anchor's Aweigh!")
+            self.ui.AnchorCkBox.setChecked(False)
+
+        self.getSessionLastVerse()
+        print(f'last verse: {self.lastverse}')
+        if checkverse == self.lastverse:
+            print("Setting Last Verse")
+            self.ui.LastCkBox.setEnabled(True)
+            self.ui.LastCkBox.setChecked(True)
+            self.ui.LastCkBox.setEnabled(False)
+        else:
+            print("Last Verse Unassigned")
+            self.ui.LastCkBox.setEnabled(True)
+            self.ui.LastCkBox.setChecked(False)
+            self.ui.LastCkBox.setEnabled(False)
+
+        self.ui.RefbookComboBox.setCurrentText(self.ui.bookComboBox.currentText())
+        self.ui.RefchapterComboBox.setCurrentText(self.ui.chapterComboBox.currentText())
+        self.ui.RefverseComboBox.setCurrentText(self.ui.verseComboBox.currentText())
+        self.updateRefLineCombo()
+        self.refbook = self.ui.bookComboBox.currentText()
+        self.refbookindex = self.ui.bookComboBox.currentIndex()
+        self.refchapter = self.ui.chapterComboBox.currentText()
+        self.refchapterindex = self.ui.chapterComboBox.currentIndex()
+        
+        self.findVerseVerse()
+        #self.findRefVerse()
+        #self.updateSessionBothVerse()
+
+    def updateBothVerse(self):
+            self.ui.bookComboBox.setCurrentText(self.ui.VersebookComboBox.currentText())
+            self.ui.chapterComboBox.setCurrentText(self.ui.VersechapterComboBox.currentText())
+            self.ui.verseComboBox.setCurrentText(self.ui.VerseverseComboBox.currentText())
+            self.book = self.ui.VersebookComboBox.currentText()
+            self.bookindex = self.ui.VersebookComboBox.currentIndex()
+            self.bookchapter = self.ui.VersechapterComboBox.currentText()
+            self.bookverse = self.ui.VersechapterComboBox.currentText()
+
+    def updateSessionBothVerse(self):
+        print(f'Updating the both verse session settings')
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json'
+        # Opening JSON file
+        with open(jsonfile, 'r') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            bothbookabbr_key = r"self.bothbookabbr"
+            bothchapter_key = r"self.bothchapter"
+            bothverse_key = r"self.bothverse"
+            for Setting in data:
+                    if Setting['Setting'] == bothbookabbr_key:
+                        Setting['CurrentValue'] = self.bothbookabbr
+                    elif Setting['Setting'] == bothchapter_key:
+                        Setting['CurrentValue'] = self.bothchapter
+                    elif Setting['Setting'] == bothverse_key:
+                        Setting['CurrentValue'] = self.bothverse
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close() 
+
+    def updateBothWord(self):
+            self.ui.RefWordNumlineEdit.setCurrentText(self.refwordnumber)
+            self.ui.VerseWordNumlineEdit.setCurrentText(self.versewordnumber)
+            self.ui.VerseverseComboBox.count()
+            versecursor.movePosition(versecursor.StartOfBlock,versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.NextWord, versecursor.MoveAnchor)
+            versecursor.movePosition(versecursor.EndOfBlock, versecursor.KeepAnchor)
+            self.ui.VerseText.setTextCursor(versecursor)
+            self.selected_verseverse = versecursor.selectedText()
+            print(f'Selected Verse verse: {self.selected_verseverse}')
+            self.versewords = []
+            self.versewords = self.selected_verseverse.split()
+            self.versewordcount = len(self.versewords)
+            print(f'Verse verse words: {self.versewords} Verse verse word count: {str(self.versewordcount)}')
+
+    def updateSessionBothWord(self):
+        print(f'Updating the both verse session settings')
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json'
+        # Opening JSON file
+        with open(jsonfile, 'r') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+
+            versewordnumber_key = r"self.versewordnumber"
+            verseword_key = r"self.verseword"
+            selverseword_key = r"self.selverseword"
+            refwordnumber_key = r"self.refwordnumber"
+            refword_key = r"self.refword"
+            selrefword_key = r"self.selrefword"
+
+            for Setting in data:
+                    if Setting['Setting'] == versewordnumber_key:
+                        Setting['CurrentValue'] = self.versewordnumber
+                    elif Setting['Setting'] == verseword_key:
+                        Setting['CurrentValue'] = self.verseword
+                    elif Setting['Setting'] == selverseword_key:
+                        Setting['CurrentValue'] = self.selverseword
+                    elif Setting['Setting'] == refwordnumber_key:
+                        Setting['CurrentValue'] = self.refwordnumber
+                    elif Setting['Setting'] == refword_key:
+                        Setting['CurrentValue'] = self.refword
+                    elif Setting['Setting'] == selrefword_key:
+                        Setting['CurrentValue'] = self.selrefword
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close() 
+
+    def findVerseVerse(self):
+        self.vwc = versewordcount.WordCount(self)
+        #self.verseversenum = self.refversenum
+        findverse = self.ui.VersebookComboBox.currentText() + " " + self.ui.VersechapterComboBox.currentText() + ":" + self.ui.VerseverseComboBox.currentText() + " "
+        findline = self.ui.VerselineComboBox.currentText()
+        print(f'find verse = {findverse} find line = {findline}')
+        cursor = self.ui.VerseText.textCursor()
+        cursor.setPosition(0)
+        self.ui.VerseText.setTextCursor(cursor)
+        self.ui.VerseText.verticalScrollBar().setValue(self.ui.VerseText.verticalScrollBar().maximum())
+        #self.VersewordCount()
+        if self.ui.VerseNormcheckBox.isChecked():
+            linefound = self.ui.VerseText.find(findline)
+            #comment out the line of code below to highlight the entire verse
+            if linefound:
+                self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+                self.selected_verseverse = cursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_verseverse}')
+                self.versewords = []
+                self.versewords = self.selected_verseverse.split()
+                self.versewordcount = len(self.versewords)
+                print(f'Verse verse words: {self.versewords} Verse verse word count: {str(self.versewordcount)}')
+                self.verseline = self.ui.VerselineComboBox.currentText()
+                #self.ui.VerseText.setTextCursor(cursor)
+                #self.ui.VerseText.find(verseverse)
+                print(f'found = {linefound}')              
+                self.verselinenum = int(self.verseline)
+                self.verselinecount = self.ui.VerselineComboBox.count()
+                self.prevtextversenum = str(int(self.verseversenum) - 1)
+                self.nexttextversenum = str(int(self.verseversenum) + 1)
+                print(f'self.verseline = {self.verseline}')
+                print(f'self.verselinecount = {self.verselinecount}')
+                print(f'self.prevtextversenum = {self.prevtextversenum}')
+                print(f'self.nexttextversenum = {self.nexttextversenum}')
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfWord, cursor.KeepAnchor)
+                self.ui.VerseWordNumlineEdit.setText("1")
+            else:
+                print(f'Unable to find verse line: {findline}')
+            self.ui.VerselineComboBox.setCurrentText(self.verseline)
+        elif not self.ui.VerseNormcheckBox.isChecked():
+            versefound = self.ui.VerseText.find(findverse)
+            if versefound:
+
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+
+                # Get the text currently in selection 
+                Versetext = self.ui.VerseText.textCursor().selectedText()
+                self.selected_verseverse = Versetext
+                # Split the text to get the word count
+                self.versewordcount = len(Versetext.split())
+                print(f'Selected Verse verse: {self.selected_verseverse}')
+                print(f'Verse word count: {str(self.versewordcount)}')
+                self.ui.VerseWordCntlineEdit.setText(str(self.versewordcount))
+                self.verseverse = self.ui.VerseverseComboBox.currentText()
+                #self.ui.VerseText.setTextCursor(cursor)
+                #self.ui.VerseText.find(verseverse)
+                print(f'found = {findverse}')              
+                self.verseversenum = int(self.verseverse)
+                self.verseversecount = self.ui.VerseverseComboBox.count()
+                self.prevtextversenum = str(int(self.verseversenum) - 1)
+                self.nexttextversenum = str(int(self.verseversenum) + 1)
+                #comment out the line of code below to highlight the entire verse
+                #self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+                print(f'self.verseverse = {self.verseverse}')
+                print(f'self.verseversenum = {self.verseversenum}')
+                print(f'self.verseversecount = {self.verseversecount}')
+                print(f'self.prevtextversenum = {self.prevtextversenum}')
+                print(f'self.nexttextversenum = {self.nexttextversenum}')
+                self.ui.VerseText.moveCursor(cursor.StartOfBlock, cursor.MoveAnchor) 
+                self.ui.VerseText.moveCursor(cursor.StartOfWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.NextWord, cursor.MoveAnchor)
+                self.ui.VerseText.moveCursor(cursor.EndOfWord, cursor.KeepAnchor)
+                self.ui.VerseWordNumlineEdit.setText("1")              
+            else:
+                print(f'Unable to find verse verse: {findverse}')
+            self.ui.VerseverseComboBox.setCurrentText(self.verseverse)
+        
+        self.versebook = self.ui.VersebookComboBox.currentText()
+        self.versebookindex = self.ui.VersebookComboBox.currentIndex()
+        self.versechapter = self.ui.VersechapterComboBox.currentText()
+        self.versechapterindex = self.ui.VersechapterComboBox.currentIndex()
+        
+        checkverse = f'{self.versebook} {self.versechapter}:{self.verseverse}'
+        
+        #self.getSessionAnchor()
+        anchorverse = f'{self.anchorbook} {self.anchorchapter}:{self.anchorverse}'
+        if checkverse == self.anchor:
+            print("Drop Anchor!")
+            self.ui.AnchorCkBox.setChecked(True)
+        else:
+            print("Anchor's Aweigh!")
+            self.ui.AnchorCkBox.setChecked(False)
+
+        #self.getSessionLastVerse()
+        '''print(f'last verse: {self.lastverse}')
+        if checkverse == self.lastverse:
+            print("Setting Last Verse")
+            self.ui.LastCkBox.setEnabled(True)
+            self.ui.LastCkBox.setChecked(True)
+            self.ui.LastCkBox.setEnabled(False)
+        else:
+            print("Last Verse Unassigned")
+            self.ui.LastCkBox.setEnabled(True)
+            self.ui.LastCkBox.setChecked(False)
+            self.ui.LastCkBox.setEnabled(False)'''
+
+        self.updateSessionVerseVerse()
+
+    def updateSessionVerseVerse(self):
+        print(f'Updating the verse text session settings')
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json'
+        # Opening JSON file
+        with open(jsonfile, 'r') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            versebookabbr_key = r"self.versebookabbr"
+            versechapter_key = r"self.versechapter"
+            verseverse_key = r"self.verseverse"
+            verseline_key = r"self.verseline"
+            for Setting in data:
+                    if Setting['Setting'] == versebookabbr_key:
+                        Setting['CurrentValue'] = self.versebookabbr
+                    elif Setting['Setting'] == versechapter_key:
+                        Setting['CurrentValue'] = self.versechapter
+                    elif Setting['Setting'] == verseverse_key:
+                        Setting['CurrentValue'] = self.verseverse
+                    elif Setting['Setting'] == verseline_key:
+                        self.verseline = self.ui.VerselineComboBox.currentText()
+                        Setting['CurrentValue'] = self.verseline
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close() 
+
+    def findNextVerseVerse(self):
+        self.ui.VerseverseComboBox.setCurrentText(str(int(self.ui.VerseverseComboBox.currentText()) + 1))
+        verseversenum = int(self.ui.VerseverseComboBox.currentText())
+        nextverseversenum = int(self.ui.VerseverseComboBox.currentText()) + 1
+        nextversechapter = int(self.ui.VersechapterComboBox.currentText()) + 1
+        versebook = self.ui.VersebookComboBox.currentText()
+        versebookindex = self.ui.VersebookComboBox.currentIndex()
+        nextversebookindex = self.ui.VersebookComboBox.currentIndex() + 1
+        versechaptercount = self.ui.VersechapterComboBox.count()
+        print(f'Next Text Verse: {nextverseversenum}')
+        if verseversenum == self.ui.VerseverseComboBox.count() + 1:                     
+            self.ui.VersebookComboBox.setCurrentText(versebook)
+            self.ui.VersechapterComboBox.setCurrentText(str(nextversechapter))
+            self.ui.VerseverseComboBox.setCurrentText("1")
+            self.versechapter = str(nextversechapter)
+            if nextversechapter > versechaptercount:
+                self.ui.VersebookComboBox.setCurrentIndex(nextversebookindex)
+                self.ui.VersechapterComboBox.setCurrentText("1")
+                self.ui.VerseverseComboBox.setCurrentText("1")
+        self.updateVerseLineCombo()
+        self.findVerseVerse()
+
+    def findPrevVerseVerse(self):
+        self.ui.VerseverseComboBox.setCurrentText(str(int(self.ui.VerseverseComboBox.currentText()) - 1))
+        verseversenum = int(self.ui.VerseverseComboBox.currentText())
+        prevverseversenum = int(self.ui.VerseverseComboBox.currentText()) - 1
+        prevversechapter = int(self.ui.VersechapterComboBox.currentText()) - 1
+        versechapter = int(self.ui.VersechapterComboBox.currentText())
+        versebook = self.ui.VersebookComboBox.currentText()
+        versebookindex = self.ui.VersebookComboBox.currentIndex()
+        prevversebook =  self.ui.VersebookComboBox.itemText(versebookindex)
+        print(f'Prev Text Verse: {prevverseversenum}')
+        print(f'Text Chapter: {versechapter}')
+        print(f'Prev Text Chapter: {prevversechapter}')
+        print(f'Prev Verse Book: {prevversebook}')
+        if verseversenum == 0:                     
+            self.ui.VersebookComboBox.setCurrentText(versebook)
+            self.ui.VersechapterComboBox.setCurrentText(str(prevversechapter))
+            self.ui.VerseverseComboBox.setCurrentText(str(self.ui.VerseverseComboBox.count()))
+            self.versechapter = str(prevversechapter)
+            if prevversechapter == 0:
+                self.ui.VersebookComboBox.setCurrentText(prevversebook)
+                versechaptercount = self.ui.VersechapterComboBox.count()
+                self.ui.VersechapterComboBox.setCurrentText(str(versechaptercount))
+                self.ui.VerseverseComboBox.setCurrentText(str(self.ui.VerseverseComboBox.count())) 
+        self.updateVerseLineCombo()
+        self.findVerseVerse()
+
+    def updateVerseVerseRegEx(self):   
+        self.refword = self.ui.RefText.textCursor().selectedText()
+        print(self.refword)
+        txtfile = open(self.refpath)
+        csv_f = csv.reader(txtfile, delimiter = "\t")
+        #print(csv_f)
+        # Parse lines of biblical text(tab delimited) as a csv with regexp
+        for row in csv_f:
+            #print(row[0])
+            
+            # Each line is a verse => parse and label each book chapter:verse reference
+            
+            rowline = row[0]
+            textline = rowline.replace("\n","")
+            #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
+            pattern = re.compile('(\w+\s)(\d+:)(\d+\s)')
+            matches = pattern.finditer(textline)
+            for match in matches:
+                    #print(match)
+                    if match[0] == self.refword:
+                        book = match[1]
+                        self.ui.RefbookComboBox.setCurrentText(book)
+                        print(book)
+                        chcolon = match[2]
+                        chapter = str(chcolon.replace(":","")).strip()
+                        self.ui.RefchapterComboBox.setCurrentText(chapter)
+                        print(chapter)
+                        verse = str(match[3]).strip()
+                        self.ui.RefverseComboBox.setCurrentText(verse)
+                        print(verse)                                       
+                    
+        txtfile.close()        
+    
+    def parseLinesRegEx(self):
+        #***This is the original parse routine.  Keep for reference***
+        # Each line is a verse => pares and label each verse
+        rowline = row[0]
+        textline = rowline.replace("\n","")
+        #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
+        pattern = re.compile('(\w+\s)(\d+:)(\d+\s)(.*)')
+        matches = pattern.finditer(textline)  
+        for match in matches:
+            book = match[1]
+            chcolon = match[2]
+            chapter = chcolon.replace(":","")
+            verse = match[3]
+            scripture = match[4]
+            #print(row[0])
+            print(book,"\t", chapter,"\t", verse,"\t",scripture)
+
+    def wordCount(self):
+
+        self.wc = versifiercount.WordCount(self)
+
+        self.wc.getText()
+
+        self.wc.show()
+
+    def VersewordCount(self):
+
+        self.vwc = versewordcount.WordCount(self)
+
+        self.vwc.getText()
+
+        self.vwc.show()
+
+    def RefwordCount(self):
+
+        self.rwc = refwordcount.WordCount(self)
+
+        self.rwc.getText()
+
+        self.rwc.show()
+
+    def getVerseLinePositions(self):
+        cursor = self.ui.VerseText.textCursor()
+        self.currentpos = cursor.position()
+        
+        cursor2 = self.ui.VerseText.textCursor()
+        cursor2.setPosition(self.currentpos)
+
+        cursor2.movePosition(cursor.EndOfBlock, cursor.KeepAnchor)
+        self.endofline = cursor2.position()
+
+        cursor2.movePosition(cursor.PreviousWord, cursor.KeepAnchor)
+        self.lastwordstart = cursor2.position()
+        
+        cursor2.movePosition(cursor.EndOfWord, cursor.KeepAnchor)
+        self.lastwordend = cursor2.position()
+        
+        cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
+        self.startofline = cursor2.position()
+        self.bookwordstart = self.startofline
+        '''cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
+        cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor)
+        cursor2.movePosition(cursor.StartOfWord, cursor.MoveAnchor)
+        self.bookwordstart = cursor2.position()
+        cursor2.movePosition(cursor.EndOfWord,cursor.MoveAnchor )
+        self.bookwordend = cursor2.position()'''
+        cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
+        if self.ui.VerseNormcheckBox.isChecked():
+            cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor,1)
+        else:
+            cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor,4)
+        cursor2.movePosition(cursor.StartOfWord, cursor.MoveAnchor)
+        self.firstwordstart = cursor2.position()
+
+        cursor2.movePosition(cursor.EndOfWord, cursor.KeepAnchor)
+        self.firstwordend = cursor2.position()
+
+        print(f'current position: {self.currentpos} start of line: {self.startofline} first word start: {self.firstwordstart} first word end: {self.firstwordend}')
+        print(f'end of line: {self.endofline} last word start: {self.lastwordstart} last word end: {self.lastwordend}')
+
+    def findNextVerseWord(self):
+        self.getVerseLinePositions()
+        self.versewordnumber = str(int(self.versewordnumber) + 1)
+        cursor = self.ui.VerseText.textCursor()
+        print(f'next word: {cursor.selectedText()}')
+        if cursor.position() <= self.firstwordstart:
+            cursor.setPosition(self.firstwordstart - 1)
+            self.versewordnumber = 1
+        if cursor.position() >= self.endofline:
+            self.findNextVerseVerse()
+            self.getVerseLinePositions()
+            cursor.setPosition(self.firstwordstart - 1)
+            self.versewordnumber = 1
+        cursor.movePosition(cursor.NextWord,cursor.MoveAnchor)
+        cursor.movePosition(cursor.EndOfWord,cursor.KeepAnchor)
+        self.ui.VerseText.setTextCursor(cursor)
+        self.selverseword = cursor.selectedText()
+        print(f'selected position: {cursor.position()} selected word: {self.verseword}')
+        #self.versewordnumber = str(int(self.versewordnumber) + 1)
+        if self.ui.radioButtonSel.isChecked() or self.ui.radioButtonVerses.isChecked():
+            self.ui.VerseWordNumlineEdit.setText(str(self.versewordnumber))
+            self.ui.RefWordNumlineEdit.setText(str(self.refwordnumber))
+        self.verseword = self.selverseword
+        self.updateSessionBothWord()
+
+    def findPrevVerseWord(self):
+        self.getVerseLinePositions()
+        self.versewordnumber = str(int(self.versewordnumber) - 1)
+        cursor = self.ui.VerseText.textCursor()
+        print(f'previous word: {cursor.selectedText()}')
+        if cursor.selectedText() == self.verseword:
+            cursor.setPosition(cursor.position() - 1)
+        if cursor.position() <= self.firstwordend:
+        #if self.versewordnumber == 1 and cursor.position() <= self.firstwordend:
+            self.findPrevVerseVerse()
+            self.versewordnumber = self.ui.VerseWordCntlineEdit.text()
+            self.getVerseLinePositions()
+            print(f'cursor position after findPreviousVerse: {cursor.position()}')
+            cursor.setPosition(self.endofline)
+            print(f'cursor position at endofline: {cursor.position()}')
+        #if cursor.position() != self.endofline:
+        if self.versewordnumber != self.ui.VerseWordCntlineEdit.text():
+            cursor.movePosition(cursor.StartOfWord,cursor.MoveAnchor)
+        cursor.movePosition(cursor.PreviousWord,cursor.MoveAnchor)
+        cursor.movePosition(cursor.EndOfWord,cursor.KeepAnchor)
+        self.ui.VerseText.setTextCursor(cursor)
+        self.selverseword = cursor.selectedText()
+        if self.selverseword == r"." or self.selverseword == r"," or self.selverseword == r";" or self.selverseword == r"ʼ":
+            self.versewordnumber = str(int(self.versewordnumber) + 1)
+        print(f'selected position: {cursor.position()} selected word: {self.verseword}')
+        if self.ui.radioButtonSel.isChecked() or self.ui.radioButtonVerses.isChecked():
+            self.ui.VerseWordNumlineEdit.setText(str(self.versewordnumber))
+            self.ui.RefWordNumlineEdit.setText(str(self.refwordnumber))
+        self.verseword = self.selverseword
+        self.updateSessionBothWord()
+
+    def findRefBook(self):
+        findrefbook = self.ui.RefbookComboBox.currentText() + " "
+        print(f'find book = {findrefbook}')
+        cursor = self.ui.RefText.textCursor()
+        cursor.setPosition(0)
+        self.ui.RefText.setTextCursor(cursor)
+        self.ui.RefText.verticalScrollBar().setValue(self.ui.RefText.verticalScrollBar().maximum())
+        refbookfound = self.ui.RefText.find(findrefbook)
+        if refbookfound:
+            self.refbook = self.ui.RefbookComboBox.currentText()
+            self.refbookindex = self.ui.RefbookComboBox.currentIndex()
+            #self.ui.VerseText.setTextCursor(cursor)
+            #self.ui.VerseText.find(refverse)
+            print(f'found = {findrefbook}')              
+            self.refbookcount = self.ui.RefbookComboBox.count()
+            self.prevrefbookindex = str(int(self.refbookindex) - 1)
+            self.nextrefbookindex = str(int(self.refbookindex) + 1)
+            #comment out the line of code below to highlight the entire verse
+            #self.ui.VerseText.moveCursor(cursor.EndOfBlock, cursor.KeepAnchor)
+            print(f'self.refbook = {self.refbook}')
+            print(f'self.refbookindex = {self.refbookindex}')
+            print(f'self.refbookcount = {self.refbookcount}')
+            print(f'self.prevrefbookindex = {self.prevrefbookindex}')
+            print(f'self.nextrefbookindex = {self.nextrefbookindex}')
+        else:
+            print(f'Unable to find verse book: {findrefbook}')
+        self.ui.RefbookComboBox.setCurrentIndex(self.refbookindex)
+        self.ui.RefchapterComboBox.setCurrentText("1")
+        self.ui.RefverseComboBox.setCurrentText("1")
+        self.findRefVerse()
+    
+    def findNextRefBook(self):
+        self.ui.RefbookComboBox.setCurrentIndex(self.ui.RefbookComboBox.currentIndex() + 1)
+        self.findRefBook()
+
+    def findPrevRefBook(self):
+        self.ui.RefbookComboBox.setCurrentIndex(self.ui.RefbookComboBox.currentIndex() - 1)
+        self.findRefBook() 
+
+    def findRefChapter(self):
+        refbook = self.ui.RefbookComboBox.currentText()
+        print(f' refbook: {refbook}')
+        self.refchapter = self.ui.RefchapterComboBox.currentText()
+        print(self.refchapter)
+        findrefchapter = self.refbook + " " + self.ui.RefchapterComboBox.currentText() + ":"
+        print(f'find ref chapter = {findrefchapter}')
+        refcursor = self.ui.RefText.textCursor()
+        refcursor.setPosition(0)
+        self.ui.RefText.setTextCursor(refcursor)
+        self.ui.RefText.verticalScrollBar().setValue(self.ui.RefText.verticalScrollBar().maximum())
+        refchapterfound = self.ui.RefText.find(findrefchapter)
+        if refchapterfound:
+            self.refchapter = self.ui.RefchapterComboBox.currentText()
+            print(f'found ref chapter = {findrefchapter}')              
+            self.refchaptercount = self.ui.RefchapterComboBox.count()
+            print(f'self.refchapter = {self.refchapter}')
+            print(f'self.refchaptercount = {self.refchaptercount}')
+        else:
+            print(f'Unable to find ref chapter: {findrefchapter}')
+        self.ui.RefbookComboBox.setCurrentText(refbook)
+        self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
+        self.ui.RefverseComboBox.setCurrentText("1")
+        self.findRefVerse()
+    
+    def findNextRefChapter(self):       
+        self.ui.RefchapterComboBox.setCurrentText(str(int(self.ui.RefchapterComboBox.currentText()) + 1))
+        refchapternum = int(self.ui.RefchapterComboBox.currentText())
+        refchapter = self.ui.RefchapterComboBox.currentText()
+        refchaptercount =  self.ui.RefchapterComboBox.count()
+        nextrefchapternum = int(self.ui.RefchapterComboBox.currentText()) + 1
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrNameNumIndex.json') as f:
+            # returns JSON object as a dictionary
+            books = json.load(f)  
+        # Iterating through the json list  
+        for book in books:
+            refbookabbr = str(book["bookabbr"])
+            if refbookabbr == self.ui.RefbookComboBox.currentText():
+                refbookindex = int(book["bookindex"])
+                refbook = str(book["bookabbr"])
+                nextrefbookindex = refbookindex + 1
+        # Closing json file
+        f.close()
+        nextrefbook = self.ui.RefbookComboBox.itemText(nextrefbookindex)
+        refbookcount = self.ui.RefbookComboBox.count()
+        print(f'Ref Chapter Count: {refchaptercount} Ref Chapter Num: {refchapternum} Next Ref Chapter Num: {nextrefchapternum}')
+        print(f'refbookindex: {refbookindex} refbook: {refbook} nextrefbookindex: {nextrefbookindex} nextrefbook: {nextrefbook}')
+        if refchapternum > refchaptercount:                    
+            self.ui.RefbookComboBox.setCurrentText(refbook)
+            self.ui.RefchapterComboBox.setCurrentText("1")
+            self.ui.RefverseComboBox.setCurrentText("1")
+            self.refchapter = refchapter 
+            if nextrefchapternum > refchaptercount:
+                self.ui.RefbookComboBox.setCurrentText(nextrefbook)
+                self.ui.RefchapterComboBox.setCurrentText("1")
+                self.ui.RefverseComboBox.setCurrentText("1")
+
+        self.findRefChapter()
+
+    def findPrevRefChapter(self):
+        self.ui.RefchapterComboBox.setCurrentText(str(int(self.ui.RefchapterComboBox.currentText()) - 1))
+        refchapternum = int(self.ui.RefchapterComboBox.currentText())
+        refchapter = self.ui.RefchapterComboBox.currentText()
+        refchaptercount =  self.ui.RefchapterComboBox.count()
+        prevrefchapternum = int(self.ui.RefchapterComboBox.currentText()) - 1
+        # Opening JSON file
+        with open('/home/max/Projects/BiblionOCR/Model/Data/json/BooksAbbrNameNumIndex.json') as f:
+            # returns JSON object as a dictionary
+            books = json.load(f)  
+        # Iterating through the json list  
+        for book in books:
+            refbookabbr = str(book["bookabbr"])
+            if refbookabbr == self.ui.RefbookComboBox.currentText():
+                refbookindex = int(book["bookindex"])
+                refbook = str(book["bookabbr"])
+                prevrefbookindex = refbookindex - 1
+        # Closing json file
+        f.close()
+        prevrefbook = self.ui.RefbookComboBox.itemText(prevrefbookindex)     
+        refbookcount = self.ui.RefbookComboBox.count()
+        print(f'Ref Chapter Num: {refchapternum} Prev Ref Chapter Num: {prevrefchapternum}')
+        print(f'refbookindex: {refbookindex} refbook: {refbook} prevrefbookindex: {prevrefbookindex} prevrefbook: {prevrefbook}')
+        if refchapternum == 0:                    
+            self.ui.RefbookComboBox.setCurrentText(refbook)
+            self.ui.RefchapterComboBox.setCurrentText(str(self.ui.RefchapterComboBox.count()))
+            self.ui.RefverseComboBox.setCurrentText("1")
+            self.refchapter = refchapter
+            if prevrefchapternum < 0:
+                self.ui.RefbookComboBox.setCurrentText(str(prevrefbook))
+                self.ui.RefchapterComboBox.setCurrentText(str(self.ui.RefchapterComboBox.count()))
+                self.ui.RefverseComboBox.setCurrentText("1")
+
+        self.findRefChapter()
+
+    def findRefVerse(self):
+        self.rwc = refwordcount.WordCount(self)
+        findverse = self.ui.RefbookComboBox.currentText() + " " + self.ui.RefchapterComboBox.currentText() + ":" + self.ui.RefverseComboBox.currentText() + " "
+        findline = self.ui.ReflineComboBox.currentText()
+        print(f'find ref verse = {findverse}')
+        refcursor = self.ui.RefText.textCursor()
+        refcursor.setPosition(0)
+        self.ui.RefText.setTextCursor(refcursor)
+        self.ui.RefText.verticalScrollBar().setValue(self.ui.RefText.verticalScrollBar().maximum())
+        if self.ui.RefNormcheckBox.isChecked():
+            linefound = self.ui.RefText.find(findline)
+            #comment out the line of code below to highlight the entire verse
+            self.ui.RefText.moveCursor(refcursor.EndOfBlock, refcursor.KeepAnchor)
+            if linefound:
+                self.ui.RefText.moveCursor(refcursor.EndOfBlock, refcursor.KeepAnchor)
+                self.selected_refverse = refcursor.selectedText()
+                print(f'Selected Verse verse: {self.selected_refverse}')
+                self.refwords = []
+                self.refwords = self.selected_refverse.split()
+                self.refwordcount = len(self.refwords)
+                print(f'Reference verse words: {self.refwords} Reference verse word count: {str(self.refwordcount)}')
+                self.ui.RefWordCntlineEdit.setText(str(self.refwordcount))
+                
+                self.refline = self.ui.ReflineComboBox.currentText()
+                #self.ui.RefText.setTextCursor(cursor)
+                #self.ui.RefText.find(refverse)
+                print(f'found = {linefound}')              
+                self.reflinenum = int(self.refline)
+                self.reflinecount = self.ui.ReflineComboBox.count()
+                self.prevtextrefnum = str(int(self.refversenum) - 1)
+                self.nexttextrefnum = str(int(self.refversenum) + 1)
+                print(f'self.refline = {self.refline}')
+                print(f'self.reflinecount = {self.reflinecount}')
+                print(f'self.prevrefversenum = {self.prevrefversenum}')
+                print(f'self.nextrefversenum = {self.nextrefversenum}')
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor) 
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfWord, refcursor.KeepAnchor)
+                self.ui.RefWordNumlineEdit.setText("1")
+            else:
+                print(f'Unable to find verse line: {findline}')
+            self.ui.ReflineComboBox.setCurrentText(self.refline)
+        elif not self.ui.RefNormcheckBox.isChecked(): 
+            reffound = self.ui.RefText.find(findverse)
+            if reffound:
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfBlock, refcursor.KeepAnchor)
+                # Get the text currently in selection 
+                Reftext = self.ui.RefText.textCursor().selectedText()
+                self.selected_refverse = Reftext
+                # Split the text to get the word count
+                self.refwordcount = len(Reftext.split())
+                print(f'Selected Reference verse: {self.selected_refverse}')
+                print(f'Reference word count: {str(self.refwordcount)}')
+                self.ui.RefWordCntlineEdit.setText(str(self.refwordcount))
+                self.refverse = self.ui.RefverseComboBox.currentText()
+                #self.ui.RefText.setTextCursor(refcursor)
+                #self.ui.RefText.find(refverse)
+                print(f'found = {findverse}')
+                self.refversenum = int(self.refverse)
+                self.refversecount = self.ui.RefverseComboBox.count()
+                self.prevrefversenum = str(int(self.refversenum) - 1)
+                self.nextrefversenum = str(int(self.refversenum) + 1)
+
+                #refcursor.EndOfLine()
+                print(f'self.refverse = {self.refverse}')
+                print(f'self.refversenum = {self.refversenum}')
+                print(f'self.refversecount = {self.refversecount}')
+                print(f'self.prevrefversenum = {self.prevrefversenum}')
+                print(f'self.nextrefversenum = {self.nextrefversenum}')
+                self.ui.RefText.moveCursor(refcursor.StartOfBlock, refcursor.MoveAnchor) 
+                self.ui.RefText.moveCursor(refcursor.StartOfWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.NextWord, refcursor.MoveAnchor)
+                self.ui.RefText.moveCursor(refcursor.EndOfWord, refcursor.KeepAnchor)
+                self.ui.RefWordNumlineEdit.setText("1")
+            else:
+                print(f'Unable to find ref verse: {findverse}')
+            self.ui.RefverseComboBox.setCurrentText(self.refverse)
+        #self.updateRefLineCombo()
+        self.refbook = self.ui.RefbookComboBox.currentText()
+        self.refbookindex = self.ui.RefbookComboBox.currentIndex()
+        self.refchapter = self.ui.RefchapterComboBox.currentText()
+        self.refchapterindex = self.ui.RefchapterComboBox.currentIndex()
+        self.updateSessionRefVerse()
+
+    def updateSessionRefVerse(self):
+        print(f'Updating the reference text session settings')
+        jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/VersifierSession.json'
+        # Opening JSON file
+        with open(jsonfile, 'r') as f:
+            # returns JSON object as
+            # a dictionary
+            data = json.load(f)  
+        # Iterating through the json
+        # list
+            refbookabbr_key = r"self.refbookabbr"
+            refchapter_key = r"self.refchapter"
+            refverse_key = r"self.refverse"
+            refline_key = r"self.refline"
+            for Setting in data:
+                    if Setting['Setting'] == refbookabbr_key:
+                        Setting['CurrentValue'] = self.refbookabbr
+                    elif Setting['Setting'] == refchapter_key:
+                        Setting['CurrentValue'] = self.refchapter
+                    elif Setting['Setting'] == refverse_key:
+                        Setting['CurrentValue'] = self.refverse
+                    elif Setting['Setting'] == refline_key:
+                        self.refline = self.ui.VerselineComboBox.currentText()
+                        Setting['CurrentValue'] = self.refline
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close() 
+
+    def findNextRefVerse(self):
+        self.ui.RefverseComboBox.setCurrentText(str(int(self.ui.RefverseComboBox.currentText()) + 1))
+        refversenum = int(self.ui.RefverseComboBox.currentText())
+        nextrefversenum = int(self.ui.RefverseComboBox.currentText()) + 1
+        nextrefchapter = int(self.ui.RefchapterComboBox.currentText()) + 1
+        refbook = self.ui.RefbookComboBox.currentText()
+        refbookindex = self.ui.RefbookComboBox.currentIndex()
+        nextrefbookindex = self.ui.RefbookComboBox.currentIndex() + 1
+        refchaptercount = self.ui.RefchapterComboBox.count()
+        print(f'Next Ref Verse: {nextrefversenum}')
+        if refversenum == self.ui.RefverseComboBox.count() + 1:                    
+            self.ui.RefchapterComboBox.setCurrentText(str(nextrefchapter))
+            self.ui.RefverseComboBox.setCurrentText("1")
+            self.refchapter = str(nextrefchapter)
+            if nextrefchapter > refchaptercount:
+                self.ui.RefbookComboBox.setCurrentIndex(nextrefbookindex)
+                self.ui.RefchapterComboBox.setCurrentText("1")
+                self.ui.RefverseComboBox.setCurrentText("1")
+        #self.updateRefLineCombo()
+        self.findRefVerse()
+
+    def findPrevRefVerse(self):
+        self.ui.RefverseComboBox.setCurrentText(str(int(self.ui.RefverseComboBox.currentText()) - 1))
+        refversenum = int(self.ui.RefverseComboBox.currentText())
+        prevrefversenum = int(self.ui.RefverseComboBox.currentText()) - 1
+        prevrefchapter = int(self.ui.RefchapterComboBox.currentText()) - 1
+        refchapter = int(self.ui.RefchapterComboBox.currentText())
+        refbook = self.ui.RefbookComboBox.currentText()
+        refbookindex = self.ui.RefbookComboBox.currentIndex()
+        prevrefbook =  self.ui.RefbookComboBox.itemText(refbookindex - 1)
+        print(f'Prev Ref Verse: {prevrefversenum}')
+        print(f'Ref Chapter: {refchapter}')
+        print(f'Prev Ref Chapter: {prevrefchapter}')
+        print(f'Prev Ref Book: {prevrefbook}')
+        if refversenum == 0:                     
+            self.ui.RefbookComboBox.setCurrentText(refbook)
+            self.ui.RefchapterComboBox.setCurrentText(str(prevrefchapter))
+            self.ui.RefverseComboBox.setCurrentText(str(self.ui.RefverseComboBox.count()))
+            self.refchapter = str(prevrefchapter)
+            if prevrefchapter == 0:
+                self.ui.RefbookComboBox.setCurrentText(prevrefbook)
+                refchaptercount = self.ui.RefchapterComboBox.count()
+                self.ui.RefchapterComboBox.setCurrentText(str(refchaptercount))
+                self.ui.RefverseComboBox.setCurrentText(str(self.ui.RefverseComboBox.count())) 
+        #self.updateRefLineCombo()
+        self.findRefVerse()
+
+    def updateRefVerse(self):
+        self.refword = self.ui.RefText.textCursor().selectedText()
+        print(self.refword)
+        txtfile = open(self.refpath)
+        csv_f = csv.reader(txtfile, delimiter = "\t")
+        #print(csv_f)
+        # Parse lines of biblical text(tab delimited) as a csv with regexp
+        for row in csv_f:
+            #print(row[0])
+            
+            # Each line is a verse => parse and label each book chapter:verse reference
+            
+            rowline = row[0]
+            textline = rowline.replace("\n","")
+            #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
+            pattern = re.compile('(\w+\s)(\d+:)(\d+\s)')
+            matches = pattern.finditer(textline)
+            for match in matches:
+                    #print(match)
+                    if match[0] == self.refword:
+                        book = match[1]
+                        self.ui.RefbookComboBox.setCurrentText(book)
+                        print(book)
+                        chcolon = match[2]
+                        chapter = str(chcolon.replace(":","")).strip()
+                        self.ui.RefchapterComboBox.setCurrentText(chapter)
+                        print(chapter)
+                        verse = str(match[3]).strip()
+                        self.ui.RefverseComboBox.setCurrentText(verse)
+                        print(verse)                                       
+                    
+        txtfile.close()
+        #self.updateRefLineCombo()        
+
+    def getRefLinePositions(self):
+        cursor = self.ui.RefText.textCursor()
+        self.currentpos = cursor.position()
+        
+        cursor2 = self.ui.RefText.textCursor()
+        cursor2.setPosition(self.currentpos)
+
+        cursor2.movePosition(cursor.EndOfBlock, cursor.KeepAnchor)
+        self.endofline = cursor2.position()
+
+        cursor2.movePosition(cursor.PreviousWord, cursor.KeepAnchor)
+        self.lastwordstart = cursor2.position()
+        
+        cursor2.movePosition(cursor.EndOfWord, cursor.KeepAnchor)
+        self.lastwordend = cursor2.position()
+        
+        cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
+        self.startofline = cursor2.position()
+        self.bookwordstart = self.startofline
+        '''cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
+        cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor)
+        cursor2.movePosition(cursor.StartOfWord, cursor.MoveAnchor)
+        self.bookwordstart = cursor2.position()
+        cursor2.movePosition(cursor.EndOfWord,cursor.MoveAnchor )
+        self.bookwordend = cursor2.position()'''
+        cursor2.movePosition(cursor.StartOfBlock, cursor.KeepAnchor)
+        
+        if self.ui.RefNormcheckBox.isChecked():
+            cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor,1)
+        else:
+            cursor2.movePosition(cursor.NextWord, cursor.MoveAnchor,4)
+
+        cursor2.movePosition(cursor.StartOfWord, cursor.MoveAnchor)
+        self.firstwordstart = cursor2.position()
+
+        cursor2.movePosition(cursor.EndOfWord, cursor.KeepAnchor)
+        self.firstwordend = cursor2.position()
+
+        print(f'current position: {self.currentpos} start of line: {self.startofline} first word start: {self.firstwordstart} first word end: {self.firstwordend}')
+        print(f'end of line: {self.endofline} last word start: {self.lastwordstart} last word end: {self.lastwordend}')
+
+    def findNextRefWord(self):
+        self.getRefLinePositions()
+        self.refwordnumber = str(int(self.refwordnumber) + 1)
+        cursor = self.ui.RefText.textCursor()
+        print(f'next word: {cursor.selectedText()}')
+        if cursor.position() <= self.firstwordstart:
+            cursor.setPosition(self.firstwordstart - 1)
+            self.refwordnumber = 1
+        if cursor.position() >= self.endofline:
+            self.findNextRefVerse()
+            self.getRefLinePositions()
+            cursor.setPosition(self.firstwordstart - 1)
+            self.refwordnumber = 1
+        cursor.movePosition(cursor.NextWord,cursor.MoveAnchor)
+        cursor.movePosition(cursor.EndOfWord,cursor.KeepAnchor)
+        self.ui.RefText.setTextCursor(cursor)
+        self.selrefword = cursor.selectedText()
+        print(f'selected position: {cursor.position()} selected word: {self.refword}')
+        #self.refwordnumber = str(int(self.refwordnumber) + 1)
+        if self.ui.radioButtonSel.isChecked() or self.ui.radioButtonRef.isChecked():
+            self.ui.RefWordNumlineEdit.setText(str(self.refwordnumber))
+            self.ui.VerseWordNumlineEdit.setText(str(self.versewordnumber))
+        self.refword = self.selrefword
+        self.updateSessionBothWord()
+
+    def findPrevRefWord(self):
+        self.getRefLinePositions()
+        self.refwordnumber = str(int(self.refwordnumber) - 1)
+        cursor = self.ui.RefText.textCursor()
+        print(f'previous word: {cursor.selectedText()}')
+        if cursor.selectedText() == self.refword:
+            cursor.setPosition(cursor.position() - 1)
+        if cursor.position() <= self.firstwordend:
+            self.findPrevRefVerse()
+            self.refwordnumber = self.ui.RefWordCntlineEdit.text()
+            self.getRefLinePositions()
+            print(f'cursor position after findPreviousVerse: {cursor.position()}')
+            cursor.setPosition(self.endofline)
+            print(f'cursor position at endofline: {cursor.position()}')
+        if cursor.position() != self.endofline:
+            cursor.movePosition(cursor.StartOfWord,cursor.MoveAnchor)
+        cursor.movePosition(cursor.PreviousWord,cursor.MoveAnchor)
+        cursor.movePosition(cursor.EndOfWord,cursor.KeepAnchor)
+        self.ui.RefText.setTextCursor(cursor)
+        self.selrefword = cursor.selectedText()
+        if self.selrefword == r"." or self.selrefword == r"," or self.selrefword == r";" or self.selrefword == r"ʼ":
+            self.refwordnumber = str(int(self.refwordnumber) + 1)
+        print(f'selected position: {cursor.position()} selected word: {self.refword}')
+        if self.ui.radioButtonSel.isChecked() or self.ui.radioButtonRef.isChecked():
+            self.ui.RefWordNumlineEdit.setText(str(self.refwordnumber))
+            self.ui.VerseWordNumlineEdit.setText(str(self.versewordnumber))
+        self.refword = self.selrefword
+        self.updateSessionBothWord()
+
+    def OpenWithMyWriter(self):
+        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/MyWriter.py"
+        print(mw_cmd)
+        os.system(mw_cmd)
+
+    def OpenWithLibreCalc(self):
+        lo_cmd = 'libreoffice --calc ' + self.versepath
+        print(lo_cmd)
+        os.system(lo_cmd)
+
+    def OpenWithLibreWriter(self):
+        lo_cmd = 'libreoffice --writer ' + self.versepath
+        print(lo_cmd)
+        os.system(lo_cmd)
+
+    def on_versefont_update(self):
+        # update font to selection and size       
+        font = qtg.QFont(self.ui.VersefontComboBox.currentFont())
+        font.setPointSize(self.ui.VersefontSizeBox.value())
+        
+        self.ui.VerseText.setFont(font)
+
+    def on_reffont_update(self):
+        # update font to selection and size       
+        font = qtg.QFont(self.ui.ReffontComboBox.currentFont())
+        font.setPointSize(self.ui.ReffontSizeBox.value())
+        
+        self.ui.RefText.setFont(font)
+
+    def on_lang_select(self):
+        pass
+
+    def GetLineSpacing(self):
+        self.ui.LHslider.setEnabled(True)
+        self.ui.LHslider.show()
+        self.ui.LHlineEdit.setPlaceholderText(str(self.ui.LHslider.value()))
+
+    def DisableLHSlider(self):
+        self.ui.LHslider.hide()
+        self.ui.LHslider.setEnabled(False)
+
+    def MoveLHSlider(self):
+        self.ui.LHslider.setEnabled(True)
+        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+    
+    def SetLineSpacing(self):
+
+        lineSpacing = self.ui.LHslider.value()
+        self.ui.LHlineEdit.setText(str(lineSpacing))
+            
+        cursor = self.ui.VerseText.textCursor()
+        if not cursor.hasSelection():
+            cursor.select(qtg.QTextCursor.Document)
+        bf = self.ui.VerseCursor.blockFormat()
+        bf.setLineHeight(lineSpacing, self.ui.VerseBlockFormat.ProportionalHeight) 
+        cursor.mergeBlockFormat(bf)
+
+    def GetRefLineSpacing(self):
+        self.ui.RefLHslider.setEnabled(True)
+        self.ui.RefLHslider.show()
+        self.ui.RefLHlineEdit.setPlaceholderText(str(self.ui.RefLHslider.value()))
+
+    def DisableRefLHSlider(self):
+        self.ui.RefLHslider.hide()
+        self.ui.RefLHslider.setEnabled(False)
+
+    def MoveRefLHSlider(self):
+        self.ui.RefLHslider.setEnabled(True)
+        self.ui.RefLHslider.setValue(int(self.ui.RefLHlineEdit.text()))
+    
+    def SetRefLineSpacing(self):
+
+        lineSpacing = self.ui.RefLHslider.value()
+        self.ui.RefLHlineEdit.setText(str(lineSpacing))
+            
+        cursor = self.ui.RefText.textCursor()
+        if not cursor.hasSelection():
+            cursor.select(qtg.QTextCursor.Document)
+        bf = self.ui.ReferenceCursor.blockFormat()
+        bf.setLineHeight(lineSpacing, self.ui.ReferenceBlockFormat.ProportionalHeight) 
+        cursor.mergeBlockFormat(bf)
+
+    def SaveAsVerseTextDialog(self):
+
+        path = qtw.QFileDialog.getSaveFileName(
+        self.ui.centralwidget, 'Save Corrected text file', '',
+                'Text files (*.txt)')[0]
+        filename = os.path.basename(path)        
+
+        with open(path, 'w') as file:
+            my_CorrectedText = self.ui.VerseDocument.toPlainText()
+            file.write(my_CorrectedText)
+        
+        self.ui.TextLE.setText(filename)
+        file.close()
+
+    def SaveVerseTextDialog(self):
+        
+        defaultdir = self.versedir + r"/"
+        defaultfile = self.ui.TextLE.displayText()
+        defaultpath = defaultdir + defaultfile
+        
+        if defaultpath:
+            path = defaultpath
+            filename = defaultfile
+        else:
+            path = QtWidgets.QFileDialog.getSaveFileName(
+                self.ui.centralwidget, 'Save Corrected text file', '',
+                'Text files (*.txt)')[0]
+            filename = os.path.basename(path)        
+
+        with open(path, 'w') as file:
+            my_CorrectedText = self.ui.VerseDocument.toPlainText()
+            file.write(my_CorrectedText)
+        
+        self.ui.TextLE.setText(filename)
+        file.close()
+
+    def loadText(self):
+        
+        self.versepath = qtw.QFileDialog.getOpenFileName(
+        self.ui.centralwidget, 'Open text file',self.versedir,
+        'Text files (*.txt *.csv)')[0]
+        
+        if self.versepath:
+            file = qtc.QFile(self.versepath)
+            filename = os.path.basename(self.versepath)
+            self.versedir = os.path.dirname(self.versepath)
+            self.ui.TextLE.setText(filename)
+            #self.sortTextFiles(MainWindow)
+            self.showText(self.versepath)
+            self.sortTextFiles()
+
+    def showText(self, txtfilename):        
+        #self.textfile = txtfilename
+        if self.versepath and not self.ui.VerseNormcheckBox.isChecked():
+            file = qtc.QFile(self.versepath)
+            filename = os.path.basename(self.versepath)
+            self.versedir = os.path.dirname(self.versepath)
+            self.ui.TextLE.setText(filename)
+        
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.versepath)
+                self.ui.VerseText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.VerseText.insertPlainText(text)
+                else:
+                    self.ui.VerseText.setPlainText(text)
+            #textfile.close()
+            #txtdirpath = os.path.dirname(self.textpath)
+
+            # update font to selection and size       
+            self.on_versefont_update()
+            
+            # update line spacing
+            self.SetLineSpacing()
+            file.close()
+      
+        '''jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            txtpath_key = r"self.versepath"
+            txtdir_key = r"self.versedir"
+            for Setting in data:
+                if Setting['Setting'] == txtpath_key:
+                    Setting['CurrentValue'] = self.versepath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == txtdir_key:  
+                    Setting['CurrentValue'] = self.versedir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()'''
+
+        self.txtfileList = []
+        for t in os.listdir(self.versedir):
+            tpath = os.path.join(self.versedir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.txtfileList.append(tpath)
+
+        self.sortTextFiles()
+
+    def showNormText(self, txtfilename):        
+        #self.textfile = txtfilename
+        if self.versenormpath and self.ui.VerseNormcheckBox.isChecked():
+            file = qtc.QFile(self.versenormpath)
+            filename = os.path.basename(self.versenormpath)
+            self.versenormdir = os.path.dirname(self.versenormpath)
+            self.ui.TextLE.setText(filename)
+        
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.versepath)
+                self.ui.VerseText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.VerseText.insertPlainText(text)
+                else:
+                    self.ui.VerseText.setPlainText(text)
+            #textfile.close()
+            #txtdirpath = os.path.dirname(self.textpath)
+
+            # update font to selection and size       
+            self.on_versefont_update()
+            
+            # update line spacing
+            self.SetLineSpacing()
+            file.close()
+      
+        '''jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            txtpath_key = r"self.versepath"
+            txtdir_key = r"self.versedir"
+            for Setting in data:
+                if Setting['Setting'] == txtpath_key:
+                    Setting['CurrentValue'] = self.versepath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == txtdir_key:  
+                    Setting['CurrentValue'] = self.versedir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()'''
+
+        '''self.txtfileList = []
+        for t in os.listdir(self.versenormdir):
+            tpath = os.path.join(self.versenormdir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.txtfileList.append(tpath)
+
+        #self.sortTextFiles()'''
+    
+    def bothNormCheckbox(self):
+        if self.ui.NormcheckBox.isChecked():
+            self.ui.bookComboBox.setCurrentText("Mat")
+            self.ui.chapterComboBox.setCurrentText("1")
+            self.ui.verseComboBox.setCurrentText("1")
+            self.ui.VersebookComboBox.setCurrentText("Mat")
+            self.ui.VersechapterComboBox.setCurrentText("1")
+            self.ui.VerseverseComboBox.setCurrentText("1")
+            self.ui.VerselineComboBox.setCurrentText("1")
+            self.ui.VerseWordNumlineEdit.setText("1")
+            self.ui.RefbookComboBox.setCurrentText("Mat")
+            self.ui.RefchapterComboBox.setCurrentText("1")
+            self.ui.RefverseComboBox.setCurrentText("1")
+            self.ui.VerselineComboBox.setCurrentText("1")
+            self.ui.RefWordNumlineEdit.setText("1")
+            self.ui.RefNormcheckBox.setChecked(True)
+            self.ui.VerseNormcheckBox.setChecked(True)
+            self.findVerseVerse()
+            self.findRefVerse()
+        elif not self.ui.NormcheckBox.isChecked():
+            self.ui.RefNormcheckBox.setChecked(False)
+            self.ui.VerseNormcheckBox.setChecked(False)
+                    
+
+    def VerseNormalize(self):
+        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/NormalizeVerseText.py"
+        print(mw_cmd)
+        os.system(mw_cmd)
+
+    def sortTextFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_txtfilelist = sorted(self.txtfileList, key=alphanum_key)
+        #self.fileList.sort()
+        #print(self.sorted_txtfilelist)
+        self.versedirIterator = iter(self.sorted_txtfilelist)
+        self.versedirRevIterator = reversed(self.sorted_txtfilelist)
+        while True:
+            # cycle through the iterator until the current file is found
+            if next(self.versedirIterator) == self.versepath:
+                break
+        while True:
+            # cycle through the reverse iterator until the current file is found
+            if next(self.versedirRevIterator) == self.versepath:
+                break
+
+    def nextText(self):
+        # ensure that the file list has not been cleared due to missing files
+        filestr = os.path.basename(self.versepath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.txtfileList:
+            try:
+                txtfile = next(self.versedirIterator)
+                self.ui.TextLE.setText(os.path.basename(txtfile))
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                    #QtCore.Qt.KeepAspectRatio)
+                self.txtfile = qtc.QFile(txtfile)
+                self.txtfilename = os.path.basename(txtfile)
+                self.dirname = os.path.dirname(self.versepath)
+                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
+                self.versepath = txtfile
+                print(txtfile,"\t",self.versepath,"\t",self.txtfile,"\t",self.txtfilename)
+                #print(self.txtfilename)
+                self.showText(self.txtfilename)
+            except:
+                # the iterator has finished, restart it
+                self.versedirIterator = iter(self.sorted_txtfilelist)
+                self.versedirRevIterator = reversed(self.sorted_txtfilelist)
+                self.prevText()
+            self.versepath = txtfile
+            self.showText(txtfile)
+        else:
+            # no file list found, load an image
+            self.loadText()
+    
+    def prevText(self):
+        # ensure that the file list has not been cleared due to missing files
+        filestr = os.path.basename(self.versepath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.txtfileList:
+            try:
+                #txtfile = self.textfile
+                txtfile = next(self.versedirRevIterator)
+                self.ui.TextLE.setText(os.path.basename(txtfile))
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                    #QtCore.Qt.KeepAspectRatio)
+                self.txtfile = qtc.QFile(txtfile)
+                self.txtfilename = os.path.basename(txtfile)
+                self.dirname = os.path.dirname(self.versepath)
+                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
+                self.versepath = txtfile
+                print(txtfile,"\t",self.versepath,"\t",self.txtfile,"\t",self.txtfilename)
+                #print(self.txtfilename)
+                self.showText(self.txtfilename)
+            except:
+                # the iterator has finished, restart it
+                self.versedirRevIterator = reversed(sorted_txtfilelist)
+                self.versedirIterator = iter(sorted_txtfilelist)
+                self.nextText()
+            self.versepath = txtfile
+            self.showText(txtfile)    
+        else:
+            # no file list found, load an image
+            self.loadText()      
+
+    def ReloadText(self):
+        if self.versepath:
+            print("Reloading "+ self.versepath)
+            file = qtc.QFile(self.versepath)
+            filename = os.path.basename(self.versepath)
+            self.ui.TextLE.setText(filename)
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.versepath)
+                self.ui.VerseText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.VerseText.insertPlainText(text)
+                else:
+                    self.ui.VerseText.setPlainText(text)
+                
+                # update font to selection and size       
+                self.on_versefont_update()
+                
+                # update line spacing
+                self.SetLineSpacing()
+
+    def loadRefText(self):
+        
+        self.refpath = qtw.QFileDialog.getOpenFileName(
+        self.ui.centralwidget, 'Open text file',self.refdir,
+        'Text files (*.txt *.csv)')[0]
+        
+        if self.refpath:
+            file = qtc.QFile(self.refpath)
+            filename = os.path.basename(self.refpath)
+            self.versedir = os.path.dirname(self.refpath)
+            self.ui.RefTextLE.setText(filename)
+            #self.sortTextFiles(MainWindow)
+            self.showRefText(self.refpath)
+            self.sortRefTextFiles()
+
+    def showRefText(self, txtfilename):        
+        #self.textfile = txtfilename
+        if self.refpath and not self.ui.RefNormcheckBox.isChecked():
+            file = qtc.QFile(self.refpath)
+            filename = os.path.basename(self.refpath)
+            self.reftxtdir = os.path.dirname(self.refpath)
+            self.ui.RefTextLE.setText(filename)
+        
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.refpath)
+                self.ui.RefText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.RefText.insertPlainText(text)
+                else:
+                    self.ui.RefText.setPlainText(text)
+            #textfile.close()
+            #txtdirpath = os.path.dirname(self.textpath)
+
+            self.on_reffont_update()
+            
+            # update line spacing
+            self.SetRefLineSpacing()
+            file.close()
+      
+        '''jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            txtpath_key = r"self.versepath"
+            txtdir_key = r"self.versedir"
+            for Setting in data:
+                if Setting['Setting'] == txtpath_key:
+                    Setting['CurrentValue'] = self.versepath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == txtdir_key:  
+                    Setting['CurrentValue'] = self.versedir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()'''
+
+        self.reftxtfileList = []
+        for t in os.listdir(self.reftxtdir):
+            tpath = os.path.join(self.reftxtdir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.reftxtfileList.append(tpath)
+
+        self.sortRefTextFiles()
+
+    def showRefNormText(self, txtfilename):        
+        #self.textfile = txtfilename
+        if self.refnormpath and self.ui.RefNormcheckBox.isChecked():
+            file = qtc.QFile(self.refnormpath)
+            filename = os.path.basename(self.refnormpath)
+            self.refnormdir = os.path.dirname(self.refnormpath)
+            self.ui.RefTextLE.setText(filename)
+        
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.refnormpath)
+                self.ui.RefText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.RefText.insertPlainText(text)
+                else:
+                    self.ui.RefText.setPlainText(text)
+            #textfile.close()
+            #txtdirpath = os.path.dirname(self.textpath)
+
+            self.on_reffont_update()
+            
+            # update line spacing
+            self.SetRefLineSpacing()
+            file.close()
+      
+        '''jsonfile = '/home/max/Projects/BiblionOCR/Model/Data/json/Session.json'
+        
+        with open(jsonfile, 'r') as f:
+            data = json.load(f)
+            txtpath_key = r"self.versepath"
+            txtdir_key = r"self.versedir"
+            for Setting in data:
+                if Setting['Setting'] == txtpath_key:
+                    Setting['CurrentValue'] = self.versepath
+                    print(Setting['CurrentValue'])
+                elif Setting['Setting'] == txtdir_key:  
+                    Setting['CurrentValue'] = self.versedir
+                    print(Setting['CurrentValue'])
+        f.close()
+
+        os.remove(jsonfile)
+        with open(jsonfile, 'w') as f:
+            json.dump(data, f, indent=4)
+        f.close()'''
+
+        self.reftxtfileList = []
+        for t in os.listdir(self.refnormdir):
+            tpath = os.path.join(self.refnormdir, t)
+            if os.path.isfile(tpath) and t.endswith(('.txt')):
+                self.reftxtfileList.append(tpath)
+
+        self.sortRefTextFiles()
+
+    def RefNormalize(self):
+        mw_cmd = "python3 /home/max/Projects/BiblionOCR/ViewController/Application/0-MainUI/NormalizeRefText.py"
+        print(mw_cmd)
+        os.system(mw_cmd)
+
+    def sortRefTextFiles(self):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+        self.sorted_reftxtfilelist = sorted(self.reftxtfileList, key=alphanum_key)
+        #self.fileList.sort()
+        #print(self.sorted_txtfilelist)
+        self.reftxtdirIterator = iter(self.sorted_reftxtfilelist)
+        self.reftxtdirRevIterator = reversed(self.sorted_reftxtfilelist)
+        while True:
+            # cycle through the iterator until the current file is found
+            if next(self.reftxtdirIterator) == self.refpath:
+                break
+        while True:
+            # cycle through the reverse iterator until the current file is found
+            if next(self.reftxtdirRevIterator) == self.refpath:
+                break
+
+    def nextRefText(self):
+        # ensure that the file list has not been cleared due to missing files
+        filestr = os.path.basename(self.refpath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.reftxtfileList:
+            try:
+                reftxtfile = next(self.reftxtdirIterator)
+                self.ui.RefTextLE.setText(os.path.basename(reftxtfile))
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                    #QtCore.Qt.KeepAspectRatio)
+                self.reftxtfile = qtc.QFile(reftxtfile)
+                self.reftxtfilename = os.path.basename(reftxtfile)
+                self.refdirname = os.path.dirname(self.refpath)
+                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
+                self.refpath = reftxtfile
+                print(reftxtfile,"\t",self.refpath,"\t",self.reftxtfile,"\t",self.reftxtfilename)
+                #print(self.txtfilename)
+                self.showText(self.reftxtfilename)
+            except:
+                # the iterator has finished, restart it
+                self.reftxtdirIterator = iter(self.sorted_reftxtfilelist)
+                self.reftxtdirRevIterator = reversed(self.sorted_reftxtfilelist)
+                self.prevRefText()
+            self.refpath = reftxtfile
+            self.showText(txtfile)
+        else:
+            # no file list found, load an image
+            self.loadRefText()
+    
+    def prevRefText(self):
+        # ensure that the file list has not been cleared due to missing files
+        filestr = os.path.basename(self.refpath)           
+        filesplit = os.path.splitext(filestr)
+        filename = filesplit[0]
+        fileext = filesplit[1]
+        
+        if self.reftxtfileList:
+            try:
+                #txtfile = self.textfile
+                txtfile = next(self.reftxtdirRevIterator)
+                self.ui.TextLE.setText(os.path.basename(reftxtfile))
+                #pixmap = QtGui.QPixmap(textfile).scaled(self.ImageView.size(), 
+                    #QtCore.Qt.KeepAspectRatio)
+                self.reftxtfile = qtc.QFile(reftxtfile)
+                self.reftxtfilename = os.path.basename(reftxtfile)
+                self.refdirname = os.path.dirname(self.refpath)
+                #self.textpath = os.path.join(self.dirname, "/",self.txtfilename)
+                self.refpath = reftxtfile
+                print(reftxtfile,"\t",self.refpath,"\t",self.reftxtfile,"\t",self.reftxtfilename)
+                #print(self.txtfilename)
+                self.showText(self.reftxtfilename)
+            except:
+                # the iterator has finished, restart it
+                self.reftxtdirRevIterator = reversed(sorted_reftxtfilelist)
+                self.reftxtdirIterator = iter(sorted_reftxtfilelist)
+                self.nextRefText()
+            self.refpath = reftxtfile
+            self.showText(reftxtfile)    
+        else:
+            # no file list found, load an image
+            self.loadRefText()      
+
+    def ReloadRefText(self):
+        if self.refpath:
+            print("Reloading "+ self.refpath)
+            file = qtc.QFile(self.refpath)
+            filename = os.path.basename(self.refpath)
+            self.ui.TextLE.setText(filename)
+            if file.open(qtc.QIODevice.ReadOnly):
+                stream = qtc.QTextStream(file)
+                text = stream.readAll()
+                info = qtc.QFileInfo(self.refpath)
+                self.ui.RefText.clear()
+                if info.completeSuffix() == 'txt':
+                    #self.ui.editor_text.setHtml(text
+                    self.ui.RefText.insertPlainText(text)
+                else:
+                    self.ui.RefText.setPlainText(text)
+                
+                # update font to selection and size       
+                self.on_reffont_update()
+                
+                # update line spacing
+                self.SetRefLineSpacing()
+
+    def OpenRefWithLibreCalc(self):
+        lo_cmd = 'libreoffice --calc ' + self.refpath
+        print(lo_cmd)
+        os.system(lo_cmd)
+
+    def OpenRefWithLibreWriter(self):
+        lo_cmd = 'libreoffice --writer ' + self.refpath
+        print(lo_cmd)
+        os.system(lo_cmd)
+
+
+
+if __name__ == "__main__":
+    app = qtw.QApplication(sys.argv)
+    w = Ui_MainWindow()
+    w.show()
+    app.exec()
+

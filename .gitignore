@@ -9,12 +9,15 @@ __pycache__/
 .ruff_cache/
 build/
 dist/
+node_modules/
 *.egg-info/
 
 # IDE/local machine files
 .vs/
 .vscode/
 .idea/
+.tools/
+.venv/
 
 # OS metadata
 .DS_Store
@@ -60,3 +63,11 @@ Developer/video/generated/
 Developer/video/masters/
 Developer/video/audio/generated/
 Developer/video/*.kdenlive.ass
+
+# Patreon local tooling runtime artifacts
+docs/patreon/local_blog_tool/playwright_profile/
+docs/patreon/local_blog_tool_transfer_*.zip
+docs/patreon/local_blog_tool_transfer_*.tar.gz
+docs/patreon/local_blog_tool_transfer_portable/
+docs/patreon/local_blog_tool_transfer_portable_*.zip
+docs/patreon/local_blog_tool_transfer_portable_*.tar.gz

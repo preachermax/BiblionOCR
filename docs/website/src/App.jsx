@@ -7,9 +7,7 @@ import { EventRunner } from "./EventRunner.js";
 import { emitEvent } from "./eventLogger.js";
 import { setActiveNode, setLastEvent } from "./stateManager.js";
 
-const autoplayIntervalMs = 2600;
-const autoplayCycleCount = 2;
-const systemStateCollapseStorageKey = "biblion.website.systemStateCollapsed";
+const autoplayIntervalMs = 1200;
 
 function delay(ms) {
   return new Promise((resolve) => {
@@ -160,7 +158,6 @@ const overviewNodeDataById = Object.fromEntries(
 );
 
 const overviewSequenceNodes = overviewSequence.map((nodeId) => overviewNodeDataById[nodeId]);
-const initialOverviewNode = overviewSequenceNodes[0];
 
 const stylesheet = [
   {
@@ -192,12 +189,31 @@ const stylesheet = [
     }
   },
   {
+    selector: ".sequence-active",
+    style: {
+      "background-color": "#cda15c",
+      color: "#143642",
+      "border-color": "#7d5a22",
+      "border-width": 4
+    }
+  },
+  {
     selector: ".active-node",
     style: {
       "background-color": "#f0e6c8",
       color: "#143642",
       "border-color": "#d46a1f",
       "border-width": 5,
+      "overlay-opacity": 0
+    }
+  },
+  {
+    selector: ".visited-node",
+    style: {
+      "background-color": "#e4d4af",
+      color: "#143642",
+      "border-color": "#b38132",
+      "border-width": 3,
       "overlay-opacity": 0
     }
   },
@@ -220,8 +236,25 @@ function joinClasses(...values) {
 
 function GraphView({ title, description, elements, layoutConfig, onNodeSelect, activeNode }) {
   const [cy, setCy] = useState(null);
+  const [visitedNodeIds, setVisitedNodeIds] = useState(() => new Set());
   const zoomMultiplier = title === "Guiding Principles" ? 1.06 : 1.02;
   const activeNodeId = activeNode?.id ?? null;
+
+  useEffect(() => {
+    if (!activeNodeId) {
+      return;
+    }
+
+    setVisitedNodeIds((currentVisitedNodeIds) => {
+      if (currentVisitedNodeIds.has(activeNodeId)) {
+        return currentVisitedNodeIds;
+      }
+
+      const nextVisitedNodeIds = new Set(currentVisitedNodeIds);
+      nextVisitedNodeIds.add(activeNodeId);
+      return nextVisitedNodeIds;
+    });
+  }, [activeNodeId]);
 
   const renderedElements = elements.map((element) => {
     if (!element.data?.id || element.data.source) {
@@ -232,6 +265,7 @@ function GraphView({ title, description, elements, layoutConfig, onNodeSelect, a
       ...element,
       classes: joinClasses(
         element.classes,
+        visitedNodeIds.has(element.data.id) ? "visited-node" : "",
         element.data.id === activeNodeId ? "active-node" : ""
       )
     };
@@ -290,32 +324,12 @@ function GraphView({ title, description, elements, layoutConfig, onNodeSelect, a
 }
 
 export default function App() {
-  const [selectedNode, setSelectedNode] = useState(initialOverviewNode);
+  const [selectedNode, setSelectedNode] = useState(null);
   const [sequenceStep, setSequenceStep] = useState(0);
   const [isAutoplaying, setIsAutoplaying] = useState(false);
-  const [isSystemStateCollapsed, setIsSystemStateCollapsed] = useState(() => {
-    if (typeof window === "undefined") {
-      return true;
-    }
-
-    const storedValue = window.localStorage.getItem(systemStateCollapseStorageKey);
-
-    if (storedValue === null) {
-      return true;
-    }
-
-    return storedValue === "true";
-  });
   const sequenceStepRef = useRef(0);
   const eventBusRef = useRef(null);
   const eventRunnerRef = useRef(null);
-
-  const applySequenceStep = (index, nodeData) => {
-    sequenceStepRef.current = index;
-    setSequenceStep(index);
-    setSelectedNode(nodeData);
-    setActiveNode(nodeData);
-  };
 
   if (!eventBusRef.current) {
     eventBusRef.current = new EventBus();
@@ -333,24 +347,20 @@ export default function App() {
         } = context;
         const { startIndex = 0 } = payload;
         const trail = [];
-        const autoplayStepCount = overviewSequenceNodes.length * autoplayCycleCount - 1;
 
-        for (let advanceOffset = 0; advanceOffset < autoplayStepCount; advanceOffset += 1) {
+        for (let index = startIndex; index < overviewSequenceNodes.length; index += 1) {
           if (!isCurrentRun()) {
             break;
           }
 
-          const index = (startIndex + advanceOffset) % overviewSequenceNodes.length;
           const nodeData = overviewSequenceNodes[index];
-          applySequenceStep(index, nodeData);
-          const previousStep =
-            index === 0 ? overviewSequenceNodes.length - 1 : index - 1;
+          setActiveNode(nodeData);
 
           const entry = emitEvent(
             "sequence_step_advanced",
             {
               source: "autoplay",
-              previousStep,
+              previousStep: index === 0 ? null : index - 1,
               nextStep: index,
               nodeId: nodeData.id
             },
@@ -367,7 +377,7 @@ export default function App() {
           });
           trail.push(entry);
 
-          if (advanceOffset < autoplayStepCount - 1) {
+          if (index < overviewSequenceNodes.length - 1) {
             await delay(delayMs);
           }
         }
@@ -381,17 +391,6 @@ export default function App() {
   useEffect(() => {
     sequenceStepRef.current = sequenceStep;
   }, [sequenceStep]);
-
-  useEffect(() => {
-    setActiveNode(initialOverviewNode);
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      systemStateCollapseStorageKey,
-      String(isSystemStateCollapsed)
-    );
-  }, [isSystemStateCollapsed]);
 
   useEffect(() => {
     const eventBus = eventBusRef.current;
@@ -418,9 +417,18 @@ export default function App() {
     };
   }, []);
 
+  const highlightedNodeIds = new Set(overviewSequence.slice(0, sequenceStep + 1));
+  const highlightedEdgeIds = new Set(overviewSequenceEdges.slice(0, sequenceStep));
+
   const overviewElements = [
-    ...overviewNodes,
-    ...overviewEdges
+    ...overviewNodes.map((node) => ({
+      ...node,
+      classes: highlightedNodeIds.has(node.data.id) ? "sequence-active" : ""
+    })),
+    ...overviewEdges.map((edge) => ({
+      ...edge,
+      classes: highlightedEdgeIds.has(edge.data.id) ? "sequence-edge" : ""
+    }))
   ];
 
   const handleNodeSelect = (nodeData) => {
@@ -448,7 +456,7 @@ export default function App() {
     const nextStep = (previousStep + 1) % overviewSequenceNodes.length;
     const nodeData = overviewSequenceNodes[nextStep];
 
-    applySequenceStep(nextStep, nodeData);
+    setActiveNode(nodeData);
 
     const entry = emitEvent("sequence_step_advanced", {
       source: "manual",
@@ -472,7 +480,7 @@ export default function App() {
     const previousStep = sequenceStepRef.current;
     const nodeData = overviewSequenceNodes[0];
 
-    applySequenceStep(0, nodeData);
+    setActiveNode(nodeData);
 
     const entry = emitEvent("sequence_reset", {
       previousStep,
@@ -577,8 +585,14 @@ export default function App() {
           Autoplay is {isAutoplaying ? "running" : "stopped"} at {autoplayIntervalMs} ms per step.
         </p>
 
+        {isAutoplaying ? (
+          <p className="autoplay-focus-note">
+            Diagnostic panels are hidden while autoplay runs so the graph animation stays in focus.
+          </p>
+        ) : null}
+
         <section className="selected-node-panel" aria-label="Selected node details">
-          <p className="eyebrow">Selected Node Function</p>
+          <p className="eyebrow">Selected Node</p>
           {selectedNode ? (
             <>
               <h2>{selectedNode.label}</h2>
@@ -592,25 +606,8 @@ export default function App() {
           )}
         </section>
 
-        {isAutoplaying ? null : (
-          <div className="system-state-controls">
-            <button
-              className="system-state-toggle"
-              type="button"
-              onClick={() => setIsSystemStateCollapsed((currentValue) => !currentValue)}
-              aria-expanded={!isSystemStateCollapsed}
-              aria-controls="webmaster-widgets"
-            >
-              {isSystemStateCollapsed ? "Expand webmaster widgets" : "Collapse webmaster widgets"}
-            </button>
-          </div>
-        )}
-        {isAutoplaying || isSystemStateCollapsed ? null : (
-          <div id="webmaster-widgets">
-            <SystemStatePanel isCollapsed={false} />
-            <EventLogList />
-          </div>
-        )}
+        {isAutoplaying ? null : <SystemStatePanel />}
+        {isAutoplaying ? null : <EventLogList />}
       </section>
 
       <section

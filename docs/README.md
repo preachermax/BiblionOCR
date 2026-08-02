@@ -59,10 +59,6 @@ Key documents:
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
 - [LOCAL_MASTER_SYNC_AFTER_PR.md](development/LOCAL_MASTER_SYNC_AFTER_PR.md)
-- [PRINT_AND_EXIT_MENU_SUPPORT.md](development/PRINT_AND_EXIT_MENU_SUPPORT.md)
-- [UBUNTU_RESET.md](development/UBUNTU_RESET.md)
-- [UBUNTU_DEPENDENCIES.md](development/UBUNTU_DEPENDENCIES.md)
-- [UBUNTU24_RESET_AND_SETUP_CHECKLIST.md](development/UBUNTU24_RESET_AND_SETUP_CHECKLIST.md)
 - [README_HELP_SYSTEM.md](development/README_HELP_SYSTEM.md)
 - [QUICK_REFERENCE.md](development/QUICK_REFERENCE.md)
 
@@ -97,13 +93,8 @@ Current prototype highlights:
 - React + Cytoscape demo under `docs/website/`
 - EventBus + EventRunner + EventGraphExecutor runtime path for demo traversal
 - traceable event logging, state inspection, and visited-node highlighting in the graph view
-
-### `portal/`
-
-Portal strategy and operational-planning material for the canonical Biblion public platform.
-
-Key documents:
-- [portal.md](portal/portal.md)
+- Render-ready static deployment blueprint at `render.yaml` with `docs/website/` as the first public hosting surface
+- live public home page deployed at `https://biblionocr.onrender.com/`
 
 ### `patreon/`
 
@@ -155,7 +146,6 @@ When a document feels misplaced, move or rewrite it so the directory purpose rem
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
 - [community/README.md](community/README.md)
 - [website/README.md](website/README.md)
-- [portal/portal.md](portal/portal.md)
 
 ---
 
