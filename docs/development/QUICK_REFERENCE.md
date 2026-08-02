@@ -23,21 +23,22 @@
 
 ### To Start The Project:
 ```
-# Full OCR Pipeline
-python3 Qt5BiblionOCR.py
+# Main Runtime Entrypoints
+python3 ViewController/0-MainUI/MyLauncher.py
+python3 ViewController/0-MainUI/MyServer.py
 
 # Individual Tools
-python3 MyBoxer.py              # Box creation
-python3 MyPixler.py             # Image processing
-python3 MyGlypher.py            # Character extraction
-python3 MyGrounder.py           # Ground truth review
-python3 MyScanner.py            # Line scanning
-python3 MyReader.py             # OCR reading
-python3 MyTrainer.py            # Model training
-python3 MyWriter.py             # Text editing
-python3 MyVersifier.py          # Verse verification
-python3 MyResolver.py           # Variant resolution
-python3 MyExplorer.py           # File browser
+python3 ViewController/1-PreProcess/MyBoxer.py             # Box creation
+python3 ViewController/1-PreProcess/MyPixler.py            # Image processing
+python3 ViewController/1-PreProcess/MyGlypher.py           # Character extraction
+python3 ViewController/2-TrainTesseract/MyGrounder.py      # Ground truth review
+python3 ViewController/0-MainUI/MyScanner.py               # Line scanning
+python3 ViewController/2-TrainTesseract/MyReader.py        # OCR reading
+python3 ViewController/2-TrainTesseract/MyTrainer.py       # Model training
+python3 ViewController/4-PostProcess/MyWriter.py           # Text editing
+python3 ViewController/3-Process/MyVersifier.py            # Verse verification
+python3 ViewController/3-Process/MyResolver.py             # Variant resolution
+python3 ViewController/0-MainUI/MyExplorer.py              # File browser
 ```
 
 ---
@@ -99,7 +100,7 @@ Modules with the common project-status surface:
 ## Shared Print And Exit Menu Support
 
 - `MyServer` remains the source implementation for print flow behavior.
-- `ViewController/0-MainUI/print_menu_support.py` now provides shared controller-side print wiring for `MyScanner`, `MyReader`, `MyGlypher`, `MyVersifier`, `MyWriter`, `MyPixler`, and `MyBoxer`.
+- `ViewController/0-MainUI/helpers/print_menu_support.py` now provides shared controller-side print wiring for `MyScanner`, `MyReader`, `MyGlypher`, `MyVersifier`, `MyWriter`, `MyPixler`, and `MyBoxer`.
 - `actionPrint_Preview` now follows the active or first available print target for those modules instead of each module duplicating its own preview routing.
 - `actionExit` is wired in the controller layer for `MyServer`, `MyGrounder`, `MyLauncher`, `MyLexer`, and `MyTrainer` when the matching UI action exists.
 - `MyExplorer` and `MyResolver` are intentionally excluded from the `actionExit` rollout.
@@ -168,7 +169,7 @@ Model/Project/
 | FROMVS Font | fonts/ | Greek text display |
 | Icons | Icons/ | UI icons |
 | Stylesheets | Stylesheets/ | Theme definitions |
-| Character Reference | ../3-ConductOCR/FROMVS ChrReference.txt | Character codes |
+| Character Reference | ViewController/3-Process/helpers/FROMVS ChrReference.txt | Character codes |
 
 ### Release Font Update
 
@@ -233,7 +234,7 @@ All applications use consistent patterns:
 
 ## Typical User Actions
 
-1. **Load PDF**: Qt5BiblionOCR → File menu
+1. **Load PDF**: MyServer → File/processing menu
 2. **Preprocess**: MyPixler → drag & drop or file dialog
 3. **Create Ground Truth**: MyBoxer → draw boxes
 4. **Review**: MyGrounder → validate data

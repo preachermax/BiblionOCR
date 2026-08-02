@@ -14,8 +14,12 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
    - Coordinates all preprocessing and OCR operations
    - Handles session settings and workflow configuration
 
-2. **MyBoxer.py** - Main UI for box creation and editing
-   - Standalone application that can launch from Qt5BiblionOCR
+2. **MyLauncher.py** - Main launcher for stage-based tools
+   - Launches runtime entry points across 0-MainUI through 4-PostProcess
+   - Provides the primary module-selection shell
+
+3. **ViewController/1-PreProcess/MyBoxer.py** - Main UI for box creation and editing
+   - Standalone preprocessing-stage application
    - Core tool for creating and editing character/word/line boxes
 
 ### Desktop Launch Files
@@ -292,7 +296,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 
 ## 3. WORKFLOW PIPELINE
 
-### Primary OCR Workflow (from Qt5BiblionOCR.py)
+### Primary OCR Workflow (from MyServer/MyLauncher orchestration)
 
 ```
 1. Source PDF Input
@@ -357,7 +361,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - **Model/Data/json/BooksMarkDown.json** - Folder structure naming for each book
 
 ### Character References
-- **ViewController/3-ConductOCR/FROMVS ChrReference.txt** - Character reference guide
+- **ViewController/3-Process/helpers/FROMVS ChrReference.txt** - Character reference guide
 
 ---
 
@@ -402,7 +406,7 @@ Extensive dialog support for workflow steps:
 - **Staging Dialogs**: For workflow transitions
 - **Text Processing Dialogs**: Text splitting, verse pairing
 
-Located in: `ViewController/0-MainUI/Dialogs/` directory
+Located in: `ViewController/0-MainUI/helpers/Dialogs/` and stage helper directories.
 
 ---
 
@@ -447,19 +451,26 @@ Located in: `ViewController/0-MainUI/Dialogs/` directory
 ### Standalone Execution
 Each program can run independently:
 ```bash
-python3 ViewController/0-MainUI/MyBoxer.py
-python3 ViewController/0-MainUI/MyPixler.py
-python3 ViewController/0-MainUI/MyGlypher.py
-python3 ViewController/0-MainUI/MyGrounder.py
 python3 ViewController/0-MainUI/MyScanner.py
-python3 ViewController/0-MainUI/MyReader.py
-python3 ViewController/0-MainUI/MyWriter.py
-python3 ViewController/0-MainUI/MyVersifier.py
+python3 ViewController/0-MainUI/MyServer.py
+python3 ViewController/0-MainUI/MyExplorer.py
+python3 ViewController/0-MainUI/MyLauncher.py
+python3 ViewController/1-PreProcess/MyBoxer.py
+python3 ViewController/1-PreProcess/MyGlypher.py
+python3 ViewController/1-PreProcess/MyPixler.py
+python3 ViewController/2-TrainTesseract/MyGrounder.py
+python3 ViewController/2-TrainTesseract/MyReader.py
+python3 ViewController/2-TrainTesseract/MyTrainer.py
+python3 ViewController/3-Process/MyLexer.py
+python3 ViewController/3-Process/MyResolver.py
+python3 ViewController/3-Process/MyVersifier.py
+python3 ViewController/4-PostProcess/MyWriter.py
 ```
 
-### Main Entry Point
+### Main Entry Points
 ```bash
-python3 ViewController/0-MainUI/Qt5BiblionOCR.py
+python3 ViewController/0-MainUI/MyLauncher.py
+python3 ViewController/0-MainUI/MyServer.py
 ```
 
 ### Desktop Launchers
@@ -472,11 +483,12 @@ python3 ViewController/0-MainUI/Qt5BiblionOCR.py
 ```
 BiblionOCR/
 ├── ViewController/
-│   ├── 0-MainUI/           # Main UI and applications
+│   ├── 0-MainUI/           # Main UI runtime shell and launcher/server/scanner/explorer entries
 │   ├── 1-PreProcess/       # Preprocessing tools
 │   ├── 2-TrainTesseract/   # Training utilities
-│   ├── 3-ConductOCR/       # OCR execution tools
+│   ├── 3-Process/          # OCR execution tools
 │   └── 4-PostProcess/      # Post-processing tools
+│   └── Developer/SeparatedDevFiles/  # Non-runtime artifacts separated from stage roots
 ├── Model/
 │   ├── Project/
 │   │   ├── Data/           # Project data, JSON configs, SQLite DBs
@@ -492,7 +504,7 @@ BiblionOCR/
 ## 12. TYPICAL USER WORKFLOWS
 
 ### Workflow A: Complete OCR from PDF
-1. Launch Qt5BiblionOCR
+1. Launch MyLauncher or MyServer
 2. Extract PDF pages
 3. Convert to monochrome TIFF
 4. Deskew images

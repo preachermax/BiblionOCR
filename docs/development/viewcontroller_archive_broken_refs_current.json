@@ -1,0 +1,14 @@
+{
+  "_normalized_for_current_layout": true,
+  "_normalized_date": "2026-08-02",
+  "_source_snapshot": "docs/development/viewcontroller_archive_broken_refs.json",
+  "items": [
+    {
+      "src": "ViewController/Developer/SeparatedDevFiles/0-MainUI/MyPixler-one-shot works.py",
+      "dst": "ViewController/archives/moved_candidates/0-MainUI/MyPixler-one-shot works.py",
+      "refs": [
+        "tmp_unused_data_files.json"
+      ]
+    }
+  ]
+}

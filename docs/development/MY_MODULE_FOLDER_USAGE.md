@@ -1,6 +1,6 @@
 # My Module Folder Usage Reference
 
-This list is derived from explicit `Model/Project/...` path references in `ViewController/0-MainUI/My*.py` files.
+This list is derived from explicit `Model/Project/...` path references in stage runtime entry modules (`ViewController/0-MainUI`, `1-PreProcess`, `2-TrainTesseract`, `3-Process`, and `4-PostProcess`) plus compatibility helper modules in `ViewController/0-MainUI/helpers`.
 
 ## MyBoxer
 

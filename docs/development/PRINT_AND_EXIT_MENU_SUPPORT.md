@@ -8,7 +8,7 @@ The 0-MainUI module family now has a shared pattern for wiring print-related men
 
 The shared controller-side helper lives at:
 
-`ViewController/0-MainUI/print_menu_support.py`
+`ViewController/0-MainUI/helpers/print_menu_support.py`
 
 It provides a small adapter layer around `print_handlerUI.ProjectPrintHandler` and handles:
 
@@ -21,32 +21,32 @@ It provides a small adapter layer around `print_handlerUI.ProjectPrintHandler` a
 
 Modules using shared print menu support:
 
-- `MyScanner.py`
-- `MyReader.py`
-- `MyGlypher.py`
-- `MyVersifier.py`
-- `MyWriter.py`
-- `MyPixler.py`
-- `MyBoxer.py`
+- `ViewController/0-MainUI/MyScanner.py`
+- `ViewController/2-TrainTesseract/MyReader.py`
+- `ViewController/1-PreProcess/MyGlypher.py`
+- `ViewController/3-Process/MyVersifier.py`
+- `ViewController/4-PostProcess/MyWriter.py`
+- `ViewController/1-PreProcess/MyPixler.py`
+- `ViewController/1-PreProcess/MyBoxer.py`
 
 Modules with controller-side `actionExit` support added separately:
 
-- `MyServer.py`
-- `MyGrounder.py`
-- `MyLauncher.py`
-- `MyLexer.py`
-- `MyTrainer.py`
+- `ViewController/0-MainUI/MyServer.py`
+- `ViewController/2-TrainTesseract/MyGrounder.py`
+- `ViewController/0-MainUI/MyLauncher.py`
+- `ViewController/3-Process/MyLexer.py`
+- `ViewController/2-TrainTesseract/MyTrainer.py`
 
 Modules intentionally excluded from `actionExit` rollout in this pass:
 
-- `MyExplorer.py`
-- `MyResolver.py`
+- `ViewController/0-MainUI/MyExplorer.py`
+- `ViewController/3-Process/MyResolver.py`
 
 ## MyServer Exception
 
-`MyServer.py` remains the source implementation for the full print flow.
+`ViewController/0-MainUI/MyServer.py` remains the source implementation for the full print flow.
 
-It still owns its native print logic directly instead of delegating that flow to `print_menu_support.py`, because it already had a concrete print implementation with active-target tracking and preview behavior.
+It still owns its native print logic directly instead of delegating that flow to `helpers/print_menu_support.py`, because it already had a concrete print implementation with active-target tracking and preview behavior.
 
 Only `actionExit` was added there.
 
@@ -71,17 +71,17 @@ Targeted compile validation for the rollout used:
 
 ```bash
 python -m py_compile \
-  ViewController/0-MainUI/print_menu_support.py \
+  ViewController/0-MainUI/helpers/print_menu_support.py \
   ViewController/0-MainUI/MyServer.py \
   ViewController/0-MainUI/MyScanner.py \
-  ViewController/0-MainUI/MyReader.py \
-  ViewController/0-MainUI/MyGlypher.py \
-  ViewController/0-MainUI/MyVersifier.py \
-  ViewController/0-MainUI/MyWriter.py \
-  ViewController/0-MainUI/MyPixler.py \
-  ViewController/0-MainUI/MyBoxer.py \
-  ViewController/0-MainUI/MyGrounder.py \
+  ViewController/2-TrainTesseract/MyReader.py \
+  ViewController/1-PreProcess/MyGlypher.py \
+  ViewController/3-Process/MyVersifier.py \
+  ViewController/4-PostProcess/MyWriter.py \
+  ViewController/1-PreProcess/MyPixler.py \
+  ViewController/1-PreProcess/MyBoxer.py \
+  ViewController/2-TrainTesseract/MyGrounder.py \
   ViewController/0-MainUI/MyLauncher.py \
-  ViewController/0-MainUI/MyLexer.py \
-  ViewController/0-MainUI/MyTrainer.py
+  ViewController/3-Process/MyLexer.py \
+  ViewController/2-TrainTesseract/MyTrainer.py
 ```

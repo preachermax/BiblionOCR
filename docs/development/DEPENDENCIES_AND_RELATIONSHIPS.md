@@ -3,7 +3,7 @@
 ## Dependency Graph
 
 ```
-                           Qt5BiblionOCR.py (Main Entry)
+                              MyLauncher.py / MyServer.py (Main Entries)
                                     |
                   __________________|__________________
                  |                  |                  |
@@ -54,7 +54,7 @@
   - Dialog modules (user input)
   
 - **Used By**:
-  - Qt5BiblionOCR (main pipeline)
+  - MyLauncher / MyServer (main pipeline)
   - MyScanner (line extraction)
   - MyBoxer (image display)
   
@@ -71,7 +71,7 @@
   - Dialogs for various tasks
   
 - **Used By**:
-  - Qt5BiblionOCR (menu access)
+  - MyLauncher / MyServer (menu access)
   - MyGrounder (for validation)
   - Manual box creation workflows
   
@@ -88,7 +88,7 @@
   - MyBoxer (box info)
   
 - **Used By**:
-  - Qt5BiblionOCR (pipeline)
+  - MyLauncher / MyServer (pipeline)
   - Line extraction workflows
   
 - **Provides To**:
@@ -366,7 +366,7 @@ MyWriter (finalize)
 ## Module Import Chain
 
 ```
-Qt5BiblionOCR.py
+MyLauncher.py / MyServer.py
 ├── MainUI (UI definition)
 ├── PreProcess
 ├── Training
@@ -380,15 +380,15 @@ Qt5BiblionOCR.py
 ├── Qt5SelectRegion
 └── ext.mainfind
 
-MyBoxer.py
+ViewController/1-PreProcess/MyBoxer.py
 ├── MyBoxerUI.py
 ├── Training
 ├── PreProcess
 ├── Dialog modules
 ├── ext.mainfind
-└── MySlidersUI.py
+└── (legacy slider UI removed from active runtime)
 
-MyGrounder.py
+ViewController/2-TrainTesseract/MyGrounder.py
 ├── MyGrounderUI.py
 ├── Training
 ├── SqliteHelper
@@ -398,7 +398,7 @@ MyGrounder.py
 ├── MyExplorer
 └── ChrReference
 
-MyReader.py
+ViewController/2-TrainTesseract/MyReader.py
 ├── MyReaderUI.py
 ├── PreProcess
 ├── MyPixler
@@ -408,7 +408,7 @@ MyReader.py
 ├── Training
 └── ChrReference
 
-MyVersifier.py
+ViewController/3-Process/MyVersifier.py
 ├── MyVersifierUI.py
 ├── SqliteHelper
 ├── ChrReference
@@ -416,11 +416,11 @@ MyVersifier.py
 ├── ext.reffind
 └── ext.versifiercount
 
-MyResolver.py
+ViewController/3-Process/MyResolver.py
 ├── SqliteHelper
 └── UI_Icons
 
-MyWriter.py
+ViewController/4-PostProcess/MyWriter.py
 ├── MyWriterUI.py
 └── ext modules
 ```
@@ -474,8 +474,8 @@ MyWriter.py
 - Persistent across sessions
 
 ### Via Command Line (os.system)
-- Qt5BiblionOCR launches other programs as separate processes
-- E.g., `python3 ViewController/0-MainUI/MyWriter.py`
+- MyLauncher and MyServer launch other programs as separate processes
+- E.g., `python3 ViewController/4-PostProcess/MyWriter.py`
 
 ### Via Database
 - Shared SQLite databases
