@@ -1,19 +1,43 @@
-#print(len(locals()))
-
+import importlib.util
 import os
 import sys
 
+_CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
 _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "helpers"))
-if _LEGACY_MAINUI_DIR not in sys.path:
-    sys.path.insert(0, _LEGACY_MAINUI_DIR)
+_PROJECT_ROOT = os.path.abspath(os.path.join(_CURRENT_DIR, "..", ".."))
+_VIEWCONTROLLER_DIR = os.path.join(_PROJECT_ROOT, "ViewController")
+_PREPROCESS_DIR = os.path.join(_VIEWCONTROLLER_DIR, "1-PreProcess")
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_HELPERS_DIR)
+if _LEGACY_MAINUI_DIR not in sys.path:
+    sys.path.insert(0, _LEGACY_MAINUI_DIR)
 if _LOCAL_HELPERS_DIR not in sys.path:
     sys.path.insert(0, _LOCAL_HELPERS_DIR)
+if _PREPROCESS_DIR not in sys.path:
+    sys.path.insert(0, _PREPROCESS_DIR)
+if _CURRENT_DIR not in sys.path:
+    sys.path.insert(0, _CURRENT_DIR)
 
-from gui_runtime_env import sanitize_current_process_and_reexec
+
+def _load_module_from_path(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault(module_name, module)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+_HELPERS_DIR = _LEGACY_MAINUI_HELPERS_DIR
+_DIALOGS_DIR = os.path.join(_HELPERS_DIR, "Dialogs")
+
+sanitize_current_process_and_reexec = _load_module_from_path(
+    "viewcontroller_helpers_gui_runtime_env_reader",
+    os.path.join(_HELPERS_DIR, "gui_runtime_env.py"),
+).sanitize_current_process_and_reexec
 
 sanitize_current_process_and_reexec()
 
@@ -28,8 +52,14 @@ import pytesseract
 import tiffcapture
 import qimage2ndarray
 from queue import Queue
-from ext import mainfind
-from HelpSystem import add_help_menu
+mainfind = _load_module_from_path(
+    "viewcontroller_helpers_ext_mainfind_reader",
+    os.path.join(_HELPERS_DIR, "ext", "mainfind.py"),
+)
+add_help_menu = _load_module_from_path(
+    "viewcontroller_helpers_helpsystem_reader",
+    os.path.join(_HELPERS_DIR, "HelpSystem.py"),
+).add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
@@ -37,19 +67,52 @@ from PyQt5 import QtCore as qtc
 from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
 # Custom imports
 #from MainUI import Ui_MainUI
-from MyReaderUI import Ui_Reader
-from PreProcess import PreProcess as pp
+Ui_Reader = _load_module_from_path(
+    "viewcontroller_2_traintesseract_myreaderui",
+    os.path.join(_CURRENT_DIR, "MyReaderUI.py"),
+).Ui_Reader
+pp = _load_module_from_path(
+    "viewcontroller_helpers_preprocess_reader",
+    os.path.join(_HELPERS_DIR, "PreProcess.py"),
+).PreProcess
 
-import MyPixler as pixler
-import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
+pixler = _load_module_from_path(
+    "viewcontroller_1_preprocess_mypixler",
+    os.path.join(_PREPROCESS_DIR, "MyPixler.py"),
+)
+croptif = _load_module_from_path(
+    "viewcontroller_helpers_croptif_reader",
+    os.path.join(_HELPERS_DIR, "CropTif.py"),
+)
+cropimg = _load_module_from_path(
+    "viewcontroller_helpers_qtcropimage_reader",
+    os.path.join(_HELPERS_DIR, "QtCropImage.py"),
+)
+Qt5SelectRegion = _load_module_from_path(
+    "viewcontroller_helpers_qt5selectregion_reader",
+    os.path.join(_HELPERS_DIR, "Qt5SelectRegion.py"),
+)
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
-import ChrReference as chrref
-from SessionManager import SessionManager
-from LocalFileDrop import LocalFileDropMixin
-from project_status_controller import ProjectStatusController
+tr = _load_module_from_path(
+    "viewcontroller_helpers_training_reader",
+    os.path.join(_HELPERS_DIR, "Training.py"),
+).Train
+chrref = _load_module_from_path(
+    "viewcontroller_helpers_chrreference_reader",
+    os.path.join(_HELPERS_DIR, "ChrReference.py"),
+)
+SessionManager = _load_module_from_path(
+    "viewcontroller_helpers_sessionmanager_reader",
+    os.path.join(_HELPERS_DIR, "SessionManager.py"),
+).SessionManager
+LocalFileDropMixin = _load_module_from_path(
+    "viewcontroller_helpers_localfiledrop_reader",
+    os.path.join(_HELPERS_DIR, "LocalFileDrop.py"),
+).LocalFileDropMixin
+ProjectStatusController = _load_module_from_path(
+    "viewcontroller_helpers_project_status_controller_reader",
+    os.path.join(_HELPERS_DIR, "project_status_controller.py"),
+).ProjectStatusController
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -57,7 +120,10 @@ from project_status_controller import ProjectStatusController
 #import Qt5ResolveVariants as resolver
 
 # Dialog Imports
-from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
+Ui_ImageTextPairDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_image_text_pair_reader",
+    os.path.join(_DIALOGS_DIR, "ImageTextPairDialog.py"),
+).Ui_ImageTextPairDialog
 
 #print(len(locals()))
 

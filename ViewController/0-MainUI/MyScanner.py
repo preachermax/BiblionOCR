@@ -13,12 +13,23 @@ import subprocess
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
-if helpers_dir not in sys.path:
-    sys.path.insert(0, helpers_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+viewcontroller_dir = os.path.join(project_root, "ViewController")
+preprocess_dir = os.path.join(viewcontroller_dir, "1-PreProcess")
+training_dir = os.path.join(viewcontroller_dir, "2-TrainTesseract")
+process_dir = os.path.join(viewcontroller_dir, "3-Process")
+postprocess_dir = os.path.join(viewcontroller_dir, "4-PostProcess")
+runtime_module_paths = [
+    script_dir,
+    preprocess_dir,
+    training_dir,
+    process_dir,
+    postprocess_dir,
+    helpers_dir,
+    project_root,
+]
+for path in reversed(runtime_module_paths):
+    if path not in sys.path:
+        sys.path.insert(0, path)
 
 
 def _safe_optional_import(module_name):

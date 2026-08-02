@@ -26,6 +26,11 @@ from enum import Enum
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+viewcontroller_dir = os.path.join(project_root, "ViewController")
+preprocess_dir = os.path.join(viewcontroller_dir, "1-PreProcess")
+training_dir = os.path.join(viewcontroller_dir, "2-TrainTesseract")
+process_dir = os.path.join(viewcontroller_dir, "3-Process")
+postprocess_dir = os.path.join(viewcontroller_dir, "4-PostProcess")
 
 # Define directories
 model_dir = os.path.join(project_root, "Model")
@@ -35,15 +40,34 @@ text_dir = os.path.join(model_dir, "Text")
 train_dir = os.path.join(model_dir, "Training")
 session_dir = os.path.join(data_dir, "json")
 
-# Add project root to path
+# Add current runtime module roots to the import path.
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 if helpers_dir not in sys.path:
     sys.path.insert(0, helpers_dir)
+if postprocess_dir not in sys.path:
+    sys.path.insert(0, postprocess_dir)
+if process_dir not in sys.path:
+    sys.path.insert(0, process_dir)
+if training_dir not in sys.path:
+    sys.path.insert(0, training_dir)
+if preprocess_dir not in sys.path:
+    sys.path.insert(0, preprocess_dir)
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
 
 developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
 if developer_view_dir not in sys.path:
     sys.path.insert(0, developer_view_dir)
+
+
+def _load_module_from_path(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault(module_name, module)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 from helpers.gui_runtime_env import sanitize_current_process_and_reexec
 
@@ -142,15 +166,27 @@ import numpy as np
 import tifffile
 
 # Custom impor
-from helpers.MyServerUI import Ui_MainUI
+Ui_MainUI = _load_module_from_path(
+    "viewcontroller_0_mainui_myserverui",
+    os.path.join(script_dir, "MyServerUI.py"),
+).Ui_MainUI
 from helpers.PreProcess import PreProcess as pp
 import helpers.ChrReference as chrref
-import helpers.MyVersifier as versify
-import helpers.MyBoxer as boxer
+versify = _load_module_from_path(
+    "viewcontroller_3_process_myversifier",
+    os.path.join(process_dir, "MyVersifier.py"),
+)
+boxer = _load_module_from_path(
+    "viewcontroller_1_preprocess_myboxer",
+    os.path.join(preprocess_dir, "MyBoxer.py"),
+)
 import MyScanner as scanner
 import MyExplorer as explorer
 from helpers.ProjectTrackingDialog import ProjectTrackingDialog
-import helpers.MyGrounder as gtr
+gtr = _load_module_from_path(
+    "viewcontroller_2_traintesseract_mygrounder",
+    os.path.join(training_dir, "MyGrounder.py"),
+)
 from helpers.ImageLoadWorker import ImageLoadWorker
 from helpers.ProjectCreationWorker import ProjectCreationWorker
 from helpers.Training import Train as tr

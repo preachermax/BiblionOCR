@@ -6,20 +6,49 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+import importlib.util
 import os
 import sys
 
+_CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
 _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "helpers"))
-if _LEGACY_MAINUI_DIR not in sys.path:
-    sys.path.insert(0, _LEGACY_MAINUI_DIR)
+_PROJECT_ROOT = os.path.abspath(os.path.join(_CURRENT_DIR, "..", ".."))
+_VIEWCONTROLLER_DIR = os.path.join(_PROJECT_ROOT, "ViewController")
+_PREPROCESS_DIR = os.path.join(_VIEWCONTROLLER_DIR, "1-PreProcess")
+_PROCESS_DIR = os.path.join(_VIEWCONTROLLER_DIR, "3-Process")
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_HELPERS_DIR)
+if _LEGACY_MAINUI_DIR not in sys.path:
+    sys.path.insert(0, _LEGACY_MAINUI_DIR)
 if _LOCAL_HELPERS_DIR not in sys.path:
     sys.path.insert(0, _LOCAL_HELPERS_DIR)
+if _PROCESS_DIR not in sys.path:
+    sys.path.insert(0, _PROCESS_DIR)
+if _PREPROCESS_DIR not in sys.path:
+    sys.path.insert(0, _PREPROCESS_DIR)
+if _CURRENT_DIR not in sys.path:
+    sys.path.insert(0, _CURRENT_DIR)
 
-from gui_runtime_env import sanitize_current_process_and_reexec
+
+def _load_module_from_path(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault(module_name, module)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+_HELPERS_DIR = _LEGACY_MAINUI_HELPERS_DIR
+_DIALOGS_DIR = os.path.join(_HELPERS_DIR, "Dialogs")
+
+sanitize_current_process_and_reexec = _load_module_from_path(
+    "viewcontroller_helpers_gui_runtime_env_grounder",
+    os.path.join(_HELPERS_DIR, "gui_runtime_env.py"),
+).sanitize_current_process_and_reexec
 
 sanitize_current_process_and_reexec()
 
@@ -47,32 +76,91 @@ import json
 import shutil
 from decimal import Decimal
 from tempfile import NamedTemporaryFile
-from HelpSystem import add_help_menu
+add_help_menu = _load_module_from_path(
+    "viewcontroller_helpers_helpsystem_grounder",
+    os.path.join(_HELPERS_DIR, "HelpSystem.py"),
+).add_help_menu
 import platform
-from HelpSystem import add_help_menu
 
 # Dialog Imports
-from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
-from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
-from Dialogs.renumber_greek_text_linesDialog import Ui_renumbergreektextlinesDialog
-from Dialogs.tif_greek_lines_renumberDialog import Ui_tifgreekrenumberlinesDialog
-from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
-from Dialogs.tif_greek_lines_stageDialog import Ui_tifgreekstagelinesDialog
-from Dialogs.PageVerseXrefDialog import Ui_PageVerseXrefDialog
+Ui_ImageTextPairDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_image_text_pair_grounder",
+    os.path.join(_DIALOGS_DIR, "ImageTextPairDialog.py"),
+).Ui_ImageTextPairDialog
+Ui_tifgreekrenamelinesDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_tif_greek_lines_rename_grounder",
+    os.path.join(_DIALOGS_DIR, "tif_greek_lines_renameDialog.py"),
+).Ui_tifgreekrenamelinesDialog
+Ui_renumbergreektextlinesDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_renumber_greek_text_lines_grounder",
+    os.path.join(_DIALOGS_DIR, "renumber_greek_text_linesDialog.py"),
+).Ui_renumbergreektextlinesDialog
+Ui_tifgreekrenumberlinesDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_tif_greek_lines_renumber_grounder",
+    os.path.join(_DIALOGS_DIR, "tif_greek_lines_renumberDialog.py"),
+).Ui_tifgreekrenumberlinesDialog
+Ui_tiflatinmovelinesDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_tif_latin_lines_move_grounder",
+    os.path.join(_DIALOGS_DIR, "tif_latin_lines_moveDialog.py"),
+).Ui_tiflatinmovelinesDialog
+Ui_tifgreekstagelinesDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_tif_greek_lines_stage_grounder",
+    os.path.join(_DIALOGS_DIR, "tif_greek_lines_stageDialog.py"),
+).Ui_tifgreekstagelinesDialog
+Ui_PageVerseXrefDialog = _load_module_from_path(
+    "viewcontroller_helpers_dialog_page_verse_xref_grounder",
+    os.path.join(_DIALOGS_DIR, "PageVerseXrefDialog.py"),
+).Ui_PageVerseXrefDialog
 
 # Custom imports
-from ext import *
-from ext import versefind, scanfind
-from Training import Train as tr
-from MyGrounderUI import Ui_Grounder
-import MyVersifier as versifier
-import MyBoxer as boxer
-import MyScanner as scanner
-import MyExplorer as explorer
-import ChrReference as chrref
-from SessionManager import SessionManager
-from LocalFileDrop import LocalFileDropMixin
-from project_status_controller import ProjectStatusController
+versefind = _load_module_from_path(
+    "viewcontroller_helpers_ext_versefind_grounder",
+    os.path.join(_HELPERS_DIR, "ext", "versefind.py"),
+)
+scanfind = _load_module_from_path(
+    "viewcontroller_helpers_ext_scanfind_grounder",
+    os.path.join(_HELPERS_DIR, "ext", "scanfind.py"),
+)
+tr = _load_module_from_path(
+    "viewcontroller_helpers_training_grounder",
+    os.path.join(_HELPERS_DIR, "Training.py"),
+).Train
+Ui_Grounder = _load_module_from_path(
+    "viewcontroller_2_traintesseract_mygrounderui",
+    os.path.join(_CURRENT_DIR, "MyGrounderUI.py"),
+).Ui_Grounder
+versifier = _load_module_from_path(
+    "viewcontroller_3_process_myversifier_for_grounder",
+    os.path.join(_PROCESS_DIR, "MyVersifier.py"),
+)
+boxer = _load_module_from_path(
+    "viewcontroller_1_preprocess_myboxer_for_grounder",
+    os.path.join(_PREPROCESS_DIR, "MyBoxer.py"),
+)
+scanner = _load_module_from_path(
+    "viewcontroller_0_mainui_myscanner_for_grounder",
+    os.path.join(_LEGACY_MAINUI_DIR, "MyScanner.py"),
+)
+explorer = _load_module_from_path(
+    "viewcontroller_0_mainui_myexplorer_for_grounder",
+    os.path.join(_LEGACY_MAINUI_DIR, "MyExplorer.py"),
+)
+chrref = _load_module_from_path(
+    "viewcontroller_helpers_chrreference_grounder",
+    os.path.join(_HELPERS_DIR, "ChrReference.py"),
+)
+SessionManager = _load_module_from_path(
+    "viewcontroller_helpers_sessionmanager_grounder",
+    os.path.join(_HELPERS_DIR, "SessionManager.py"),
+).SessionManager
+LocalFileDropMixin = _load_module_from_path(
+    "viewcontroller_helpers_localfiledrop_grounder",
+    os.path.join(_HELPERS_DIR, "LocalFileDrop.py"),
+).LocalFileDropMixin
+ProjectStatusController = _load_module_from_path(
+    "viewcontroller_helpers_project_status_controller_grounder",
+    os.path.join(_HELPERS_DIR, "project_status_controller.py"),
+).ProjectStatusController
 
 #import PageVerseCrossReference as xref
 
