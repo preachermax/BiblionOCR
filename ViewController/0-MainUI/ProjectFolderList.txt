@@ -261,7 +261,6 @@ ViewController/0-MainUI/MyLauncherUI.py
 ViewController/0-MainUI/MyLexer.py
 ViewController/0-MainUI/MyLexerUI.py
 ViewController/0-MainUI/MyPixler.py
-ViewController/0-MainUI/MyPixlerGVUI.py
 ViewController/0-MainUI/MyPixlerUI.py
 ViewController/0-MainUI/MyReader.py
 ViewController/0-MainUI/MyReaderUI.py

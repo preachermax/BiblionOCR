@@ -210,7 +210,6 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     *PROJECT_MANIFEST_TEMPLATE_OVERRIDES,
     "ViewController/0-MainUI/MyReader.py",
     "ViewController/0-MainUI/MyPixlerUI.py",
-    "ViewController/0-MainUI/MyPixlerGVUI.py",
     "ViewController/0-MainUI/MyPixler.py",
     "ViewController/0-MainUI/MyLexerUI.py",
     "ViecMyLexer.py",
