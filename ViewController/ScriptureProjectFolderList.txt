@@ -1,15 +1,9 @@
-Core/MyServer.py => ViewController/0-MainUI/MyServer.py
-Core/MyServerUI.py => ViewController/0-MainUI/MyServerUI.py
-Core/MyServerUI.ui => ViewController/QtDesignerUI/MyServerUI.ui
+
 Model/Project/Data
-Model/Project/Data/esword
-Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json
 Model/Project/Data/json/BookChapter.json
 Model/Project/Data/json/BookChapterVerse.json
-Model/Project/Data/json/BookChapterVerseTotals.json
 Model/Project/Data/json/BooksAbbrName.json
-Model/Project/Data/json/BooksAbbrNameNumIndex.json
 Model/Project/Data/json/BooksMarkDown.json
 Model/Project/Data/json/BoxerSession.json
 Model/Project/Data/json/ChrRef.json
@@ -17,19 +11,15 @@ Model/Project/Data/json/GlypherSession.json
 Model/Project/Data/json/GlyphMap.json
 Model/Project/Data/json/GrounderSession.json
 Model/Project/Data/json/LineBookChapterVerse.json
-Model/Project/Data/json/PageVerseCrossReference copy.json
 Model/Project/Data/json/PageVerseCrossReference.json
-Model/Project/Data/json/PageVerseCrossReference_Matthew.json
 Model/Project/Data/json/PixlerSession.json
 Model/Project/Data/json/ProjectUnicodeRanges.json
 Model/Project/Data/json/ReaderSession.json
 Model/Project/Data/json/RMAC.json
 Model/Project/Data/json/ScannerSession.json
 Model/Project/Data/json/Session.json
-Model/Project/Data/json/UnicodeRanges.json
 Model/Project/Data/json/VersifierSession.json
 Model/Project/Data/json/Workflow.json
-Model/Project/Data/json/WriterSession.json
 Model/Project/Images
 Model/Project/Images/Complete
 Model/Project/Images/Complete/Greek
@@ -216,20 +206,20 @@ ViewController/0-MainUI/mainfind.py
 ViewController/0-MainUI/MainUI.py
 ViewController/0-MainUI/MorphologyDialog.py
 ViewController/0-MainUI/MorphologyDialogUI.py
-ViewController/0-MainUI/MyBoxer.py
-ViewController/0-MainUI/MyBoxerUI.py
+ViewController/1-PreProcess/MyBoxer.py
+ViewController/1-PreProcess/MyBoxerUI.py
 ViewController/0-MainUI/MyExplorer.py
 ViewController/0-MainUI/MyExplorerUI.py
-ViewController/0-MainUI/MyGlypher.py
-ViewController/0-MainUI/MyGlypherUI.py
+ViewController/1-PreProcess/MyGlypher.py
+ViewController/1-PreProcess/MyGlypherUI.py
 ViewController/0-MainUI/MyGrounder.py
 ViewController/0-MainUI/MyGrounderUI.py
 ViewController/0-MainUI/MyLauncher.py
 ViewController/0-MainUI/MyLauncherUI.py
 ViewController/0-MainUI/MyLexer.py
 ViewController/0-MainUI/MyLexerUI.py
-ViewController/0-MainUI/MyPixler.py
-ViewController/0-MainUI/MyPixlerUI.py
+ViewController/1-PreProcess/MyPixler.py
+ViewController/1-PreProcess/MyPixlerUI.py
 ViewController/0-MainUI/MyReader.py
 ViewController/0-MainUI/MyReaderUI.py
 ViewController/0-MainUI/MyResolver.py

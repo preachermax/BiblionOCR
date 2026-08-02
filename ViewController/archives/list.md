@@ -2,7 +2,7 @@
 
 - Generated: 2026-08-02 11:46:21
 - Source report: docs/development/viewcontroller_archive_candidates.json
-- Files moved: 189
+- Files moved: 190
 - Skipped missing: 0
 - Skipped already under ViewController/archives: 0
 
@@ -11,6 +11,7 @@
 - ViewController/0-MainUI/Dialogs/crop_greek_linesDialog copy.py -> ViewController/archives/moved_candidates/0-MainUI/Dialogs/crop_greek_linesDialog copy.py
 - ViewController/0-MainUI/Icons/document-page-last.png -> ViewController/archives/moved_candidates/0-MainUI/Icons/document-page-last.png
 - ViewController/0-MainUI/MyPixler-one-shot works.py -> ViewController/archives/moved_candidates/0-MainUI/MyPixler-one-shot works.py
+- ViewController/0-MainUI/MyPixlerGVUI.py -> ViewController/archives/moved_candidates/0-MainUI/MyPixlerGVUI.py
 - ViewController/0-MainUI/QtDesignerUI/Archives/CropTif copy.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/Archives/CropTif copy.ui
 - ViewController/0-MainUI/QtDesignerUI/Archives/CropTif-old.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/Archives/CropTif-old.ui
 - ViewController/0-MainUI/QtDesignerUI/Archives/MainUI copy.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/Archives/MainUI copy.ui
