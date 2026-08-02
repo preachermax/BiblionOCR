@@ -1,6 +1,7 @@
 # BiblionOCR Project Architecture
 
 ## Overview
+
 BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifically designed for processing ancient text manuscripts, particularly supporting both Greek and Latin languages. The system manages the complete workflow from PDF source documents through image preprocessing, character training, OCR execution, and text correction/verification.
 
 ---
@@ -8,6 +9,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 1. MAIN ENTRY POINTS
 
 ### Primary Entry Points
+
 1. **MyServer.py** - Main OCR workflow manager
    - Central hub for the entire OCR pipeline
    - Manages image/text loading and display
@@ -23,6 +25,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
    - Core tool for creating and editing character/word/line boxes
 
 ### Desktop Launch Files
+
 - `BiblionBoxer.desktop` - Quick launcher for MyBoxer
 - `βιϐλιον Boxer.desktop` - Greek language variant of launcher
 
@@ -31,9 +34,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 2. MAJOR PROGRAM FUNCTIONS & WORKFLOWS
 
 ### **MyBoxer** - Box Editor & Manager
+
 **Primary Function**: Create, edit, and manage bounding boxes for OCR training data
 
 **Key Operations**:
+
 - Manual/automatic cropping of pages into language sections
 - Box creation for pages, lines, glyphs/characters, and words
 - Deskew operations on images
@@ -52,9 +57,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyPixler** - Image Processing & Manipulation
+
 **Primary Function**: Pixel-level image editing and preprocessing
 
 **Key Operations**:
+
 - PDF extraction to TIFF/PNG formats
 - Image format conversions (PDF→TIFF→PNG, indexed/monochrome)
 - Auto-cropping of language regions
@@ -65,6 +72,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Support for both Greek and Latin language workflows
 
 **Key Classes**:
+
 - `PixlerMain` - Main application window
 - `Images` - Image processing wrapper
 - `Brightness` - Brightness/contrast adjustment UI
@@ -76,9 +84,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyGlypher** - Character/Glyph Extraction & Management
+
 **Primary Function**: Extract, categorize, and manage individual character glyphs
 
 **Key Operations**:
+
 - Automatic glyph/character box creation from line images
 - Character reference integration
 - Line spacing controls
@@ -90,6 +100,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
   - Find and replace functionality
 
 **Key Classes**:
+
 - `MainWindow` - Main application UI (extends Ui_Glypher)
 
 **Related UI File**: [MyGlypherUI.py](MyGlypherUI.py)
@@ -99,9 +110,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyGrounder** - Ground Truth Establishment & Review
+
 **Primary Function**: Validate and establish ground truth training data
 
 **Key Operations**:
+
 - Review page/line/glyph images with corresponding text
 - Verify OCR-generated boxes against manual corrections
 - Ground truth data validation
@@ -109,6 +122,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Cross-reference management
 
 **Key Classes**:
+
 - `Ui_MainWindow` - Main ground truth review interface
 - `pandasModel` - Table model for data display
 - Custom exception classes for error handling
@@ -120,9 +134,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyScanner** - Image Line Scanning & Cropping
+
 **Primary Function**: Automatically scan and crop images into individual text lines
 
 **Key Operations**:
+
 - Auto-crop images to text lines with configurable parameters
 - Rename line images for ground truth tracking
 - Organize lines into directories by language/book
@@ -130,6 +146,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Batch processing capabilities
 
 **Key Classes**:
+
 - `MainWindow` - Scanner application interface
 
 **Related UI File**: [MyScannerUI.py](MyScannerUI.py)
@@ -139,9 +156,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyReader** - OCR Text Reading & Display
+
 **Primary Function**: Execute OCR on images and display results
 
 **Key Operations**:
+
 - Load images and perform Tesseract OCR
 - Display raw OCR output
 - Text/image side-by-side comparison
@@ -149,6 +168,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Line height and zoom controls
 
 **Key Classes**:
+
 - `MainWindow` - OCR reader interface
 
 **Related UI File**: [MyReaderUI.py](MyReaderUI.py)
@@ -158,9 +178,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyTrainer** - Tesseract OCR Model Training
+
 **Primary Function**: Train custom Tesseract models for improved OCR accuracy
 
 **Key Operations**:
+
 - Manage training data and parameters
 - Track training sessions
 - Load and save session settings
@@ -168,6 +190,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Refresh the release font path before final compilation when training updates change the font assets
 
 **Key Classes**:
+
 - `Ui_MainWindow` - Trainer interface
 
 **Related UI File**: [MyTrainerUI.py](MyTrainerUI.py)
@@ -175,12 +198,14 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 **Dependencies**: SqliteHelper, ext modules
 
 **Release Notes**:
+
 - Final release builds should include the current font installation path used by `update_fonts.py`
 - MyTrainer is the last planned development module, so its release state should be verified against the font refresh workflow
 
 ---
 
 ### **MyLexer** - Lexical Analysis
+
 **Primary Function**: Analyze word/character patterns for linguistic processing
 
 **Note**: Uses same UI structure as MyGlypher (MyGlypherUI.py)
@@ -189,9 +214,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyWriter** - Text Document Editing
+
 **Primary Function**: Create and edit corrected OCR text with formatting
 
 **Key Operations**:
+
 - Text editing with Greek font support (FROMVS font)
 - Document formatting (bold, italic, alignment)
 - File import/export
@@ -201,6 +228,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Word count and statistics
 
 **Key Classes**:
+
 - `Main` - Writer application window
 - Session management from JSON config
 
@@ -211,9 +239,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyVersifier** - Verse/Text Verification & Correction
+
 **Primary Function**: Verify and correct OCR text against reference texts at verse level
 
 **Key Operations**:
+
 - Book/chapter/verse navigation
 - Side-by-side verse comparison (OCR vs. reference)
 - Variant recording and tracking
@@ -224,6 +254,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Integration with MyResolver for complex cases
 
 **Key Classes**:
+
 - `Ui_MainWindow` - Versifier interface with extensive signal connections
 
 **Related UI File**: [MyVersifierUI.py](MyVersifierUI.py)
@@ -233,9 +264,11 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyResolver** - Variant Resolution
+
 **Primary Function**: Resolve OCR errors and text variants
 
 **Key Operations**:
+
 - Load variant/error database
 - Filter by variant type (preserved, corrected, errors, unresolved)
 - Display variant word information with Strong/RMAC/Lemma codes
@@ -244,6 +277,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 - Batch operations on similar variants
 
 **Key Classes**:
+
 - Variant table management
 - SQL operations on error database
 
@@ -254,20 +288,24 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyExplorer** - Project File Browser
+
 **Primary Function**: Navigate and open project files and folders
 
 **Key Operations**:
+
 - Tree view bounded to the active project root with initial focus at the project `Model` directory
 - Drag and drop support
 - Open files with system default applications
 - Context menu operations
 
 **Behavior Notes**:
+
 - The explorer tree is intentionally project-scoped rather than OS-scoped
 - File-picker dialogs remain the correct surface for full operating-system browsing
 - The primary tree view is sorted to show folders before files
 
 **Key Classes**:
+
 - `MyFileBrowser` - File explorer window extending Ui_Explorer
 
 **Related UI File**: [MyExplorerUI.py](MyExplorerUI.py)
@@ -275,14 +313,17 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ---
 
 ### **MyServer** - OCR Processing Server
+
 **Primary Function**: Server-based OCR processing (infrastructure for batch operations)
 
 **Key Operations**:
+
 - Manages various image transformation dialogs
 - PDF extraction/conversion operations
 - Image processing pipeline orchestration
 
 **Supported Dialogs**:
+
 - Extract PDF pages
 - PDF to TIFF conversion
 - TIFF to monochrome conversion
@@ -298,44 +339,82 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 
 ### Primary OCR Workflow (from MyServer/MyLauncher orchestration)
 
-```
+```text
+
 1. Source PDF Input
+
    ↓
+
 2. PDF Page Extraction (actionextract_pdf)
+
    ↓
+
 3. PDF to TIFF Conversion (actionpdf_to_tiff)
+
    ↓
+
 4. TIFF Indexing/Monochrome (actiontiff_to_mono)
+
    ↓
+
 5. Deskewing (actiondeskew_mono)
+
    ↓
+
 6. PNG Conversion (actionmono_to_png)
+
    ↓
+
 7. Language Cropping - Separate Greek/Latin (actionCrop_Languages)
+
    ↓
+
 8. Format Conversion - Greek/Latin to PNG/TIFF (actionConvert_*_tiff_To_png)
+
    ↓
+
 9. Deskew Language-Specific (actionDeskew_*_tiff)
+
    ↓
+
 10. Resize PNG Pages (actionResize_*_png)
+
    ↓
+
 11. Crop to Lines (actionCrop_*_To_tiff_Lines)
+
    ↓
+
 12. Rename Lines (actionRename_*_tiff_Lines)
+
    ↓
+
 13. Stage Lines (actionStage_*_tiff_Lines)
+
    ↓
+
 14. Text Line Splitting (actionSplit_*_text_lines)
+
    ↓
+
 15. Text Line Renaming (actionRename*_text_lines)
+
    ↓
+
 16. Ground Truth Review (actionReview_Ground_Truth → MyGrounder)
+
    ↓
+
 17. Train Tesseract Model (actionTrain_Tesseract)
+
    ↓
+
 18. Conduct OCR & Correction (actionCorrect_OCR)
+
    ↓
+
 19. Verse Verification (actionVerse_Correction → MyVersifier)
+
 ```
 
 ---
@@ -343,6 +422,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 4. KEY CONFIGURATION FILES
 
 ### Session Management
+
 - **Model/Project/Data/json/Session.json** - Current session state
   - OCR language and model selection
   - Current book/chapter/verse position
@@ -351,16 +431,19 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
   - File paths and directories
 
 ### Workflow Configuration
+
 - **Model/Data/json/Workflow.json** - Pipeline step definitions
   - Sequence identifiers (SP1-SP11, GP1-GP10, LP1-LP2)
   - Default source folders
   - Workflow and complete output paths
 
 ### Book Reference
+
 - **Model/Data/json/BooksAbbrName.json** - Book abbreviations and names
 - **Model/Data/json/BooksMarkDown.json** - Folder structure naming for each book
 
 ### Character References
+
 - **ViewController/3-Process/helpers/FROMVS ChrReference.txt** - Character reference guide
 
 ---
@@ -368,6 +451,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 5. DATABASE SCHEMA
 
 ### Main Databases
+
 - **Model/Project/Data/SQLite/FROMVS.db** - Main OCR results and variants
   - `Variants` table - OCR errors and variants
   - `Resolved` table - Resolved variants
@@ -382,7 +466,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 6. UI FILE RELATIONSHIPS
 
 | Program | UI File | Purpose |
-|---------|---------|---------|
+| --------- | --------- | --------- |
 | MyBoxer | MyBoxerUI.py | Box editing interface |
 | MyPixler | MyPixlerUI.py | Image manipulation |
 | MyGlypher | MyGlypherUI.py | Glyph extraction |
@@ -400,6 +484,7 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 ## 7. DIALOG COMPONENTS
 
 Extensive dialog support for workflow steps:
+
 - **Image Processing Dialogs**: PDF extraction, format conversion, deskewing
 - **Cropping Dialogs**: Language separation, line extraction
 - **Renaming Dialogs**: For ground truth file organization
@@ -413,11 +498,13 @@ Located in: `ViewController/0-MainUI/helpers/Dialogs/` and stage helper director
 ## 8. LANGUAGE SUPPORT
 
 ### Supported Languages
+
 - **Greek**: Primary focus with comprehensive tooling
 - **Latin**: Secondary support with parallel workflows
 - **Source**: Common language for reference manuscripts
 
 ### Language-Specific Workflows
+
 - Separate processing pipelines for Greek and Latin
 - Individual font support (FROMVS for Greek)
 - Language-specific OCR models (feg, lat models in Tesseract)
@@ -428,6 +515,7 @@ Located in: `ViewController/0-MainUI/helpers/Dialogs/` and stage helper director
 ## 9. KEY DEPENDENCIES & IMPORTS
 
 ### Python Libraries
+
 - **PyQt5**: UI framework (QtWidgets, QtGui, QtCore)
 - **OpenCV (cv2)**: Image processing
 - **PIL/Pillow**: Image manipulation
@@ -438,6 +526,7 @@ Located in: `ViewController/0-MainUI/helpers/Dialogs/` and stage helper director
 - **SQLite3**: Database backend
 
 ### Custom Modules
+
 - **PreProcess (PreProcess.py)**: Image preprocessing utilities
 - **Training (Training.py)**: Training data management
 - **ChrReference**: Character reference data
@@ -449,7 +538,9 @@ Located in: `ViewController/0-MainUI/helpers/Dialogs/` and stage helper director
 ## 10. EXECUTION & LAUNCHING
 
 ### Standalone Execution
+
 Each program can run independently:
+
 ```bash
 python3 ViewController/0-MainUI/MyScanner.py
 python3 ViewController/0-MainUI/MyServer.py
@@ -468,19 +559,21 @@ python3 ViewController/4-PostProcess/MyWriter.py
 ```
 
 ### Main Entry Points
+
 ```bash
 python3 ViewController/0-MainUI/MyLauncher.py
 python3 ViewController/0-MainUI/MyServer.py
 ```
 
 ### Desktop Launchers
+
 - Double-click `.desktop` files for quick access
 
 ---
 
 ## 11. PROJECT STRUCTURE ORGANIZATION
 
-```
+```text
 BiblionOCR/
 ├── ViewController/
 │   ├── 0-MainUI/           # Main UI runtime shell and launcher/server/scanner/explorer entries
@@ -504,6 +597,7 @@ BiblionOCR/
 ## 12. TYPICAL USER WORKFLOWS
 
 ### Workflow A: Complete OCR from PDF
+
 1. Launch MyLauncher or MyServer
 2. Extract PDF pages
 3. Convert to monochrome TIFF
@@ -518,6 +612,7 @@ BiblionOCR/
 12. Export corrected text (MyWriter)
 
 ### Workflow B: Manual Ground Truth Creation
+
 1. Launch MyBoxer to create boxes
 2. Use MyPixler to preprocess images
 3. Use MyGlypher for character extraction
@@ -525,6 +620,7 @@ BiblionOCR/
 5. Stage data for training
 
 ### Workflow C: Text Correction
+
 1. Load OCR results in MyReader
 2. Compare with reference in MyVersifier
 3. Record variants
@@ -536,18 +632,21 @@ BiblionOCR/
 ## 13. CONFIGURATION & CUSTOMIZATION
 
 ### Fonts
+
 - FROMVS [MAXR]: Main display font (Greek-specific)
 - Located in: `ViewController/0-MainUI/fonts/`
 
 ### Stylesheets
+
 - Located in: `ViewController/0-MainUI/Stylesheets/`
 - Themes: Classic, Dark Blue, Dark Orange
 
 ### Icons
+
 - Located in: `ViewController/0-MainUI/Icons/`
 - Dynamic icon resource system (UI_Icons.py)
 
 ### Extensions
+
 - Glyph tracing and vector tracing rely on optional external tools; GPL vendored copies are intentionally excluded from the public-tracked repo surface.
 - Additional third-party integrations in `ext/` folder
-

@@ -2,15 +2,15 @@
 
 ## Dependency Graph
 
-```
+```text
                               MyLauncher.py / MyServer.py (Main Entries)
                                     |
                   __________________|__________________
-                 |                  |                  |
+| --- | --- |
            MyPixler.py      MyScanner.py      MyGrounder.py
-                 |                  |                  |
+| --- | --- |
            [Images]          [Line Images]      [Validation]
-                 |                  |                  |
+| --- | --- |
                  └──────────┬───────┬──────────────────┘
                             |
                       MyBoxer.py (Boxes)
@@ -47,6 +47,7 @@
 ## Program Relationships & Dependencies
 
 ### 1. MyPixler (Image Processing Hub)
+
 - **Depends On**:
   - PreProcess module (image operations)
   - PyQt5 (GUI)
@@ -64,6 +65,7 @@
 ---
 
 ### 2. MyBoxer (Box Creation & Management)
+
 - **Depends On**:
   - MyBoxerUI.py (UI definition)
   - Training module (box operations)
@@ -81,6 +83,7 @@
 ---
 
 ### 3. MyScanner (Line Scanning)
+
 - **Depends On**:
   - MyScannerUI.py (UI)
   - Training module (line operations)
@@ -97,6 +100,7 @@
 ---
 
 ### 4. MyGlypher (Character Extraction)
+
 - **Depends On**:
   - MyGlypherUI.py (UI)
   - ChrReference (character info)
@@ -112,6 +116,7 @@
 ---
 
 ### 5. MyGrounder (Ground Truth Review)
+
 - **Depends On**:
   - MyGrounderUI.py (UI)
   - Training module
@@ -128,6 +133,7 @@
 ---
 
 ### 6. MyReader (OCR Execution)
+
 - **Depends On**:
   - MyReaderUI.py (UI)
   - PyTesseract (OCR engine)
@@ -145,6 +151,7 @@
 ---
 
 ### 7. MyTrainer (Model Training)
+
 - **Depends On**:
   - MyTrainerUI.py (UI)
   - Training module
@@ -166,6 +173,7 @@
 ---
 
 ### 8. MyVersifier (Verse Verification)
+
 - **Depends On**:
   - MyVersifierUI.py (UI)
   - SqliteHelper (database queries)
@@ -183,6 +191,7 @@
 ---
 
 ### 9. MyResolver (Variant Resolution)
+
 - **Depends On**:
   - SqliteHelper (variant database)
   - UI_Icons (icon resources)
@@ -198,6 +207,7 @@
 ---
 
 ### 10. MyWriter (Text Document Editing)
+
 - **Depends On**:
   - MyWriterUI.py (UI)
   - ext modules (utilities)
@@ -213,6 +223,7 @@
 ---
 
 ### 11. MyExplorer (File Browser)
+
 - **Depends On**:
   - MyExplorerUI.py (UI)
   - PyQt5 file system model
@@ -227,6 +238,7 @@
 ---
 
 ### 12. MyServer (Batch Processing)
+
 - **Depends On**:
   - MyServerUI.py (UI)
   - PreProcess module
@@ -244,18 +256,22 @@
 ## Shared Module Dependencies
 
 ### Training Module (Training.py)
+
 Used by: MyBoxer, MyScanner, MyGlypher, MyGrounder, MyTrainer, MyReader
 
 Functions provided:
+
 - `sortcroplines()` - Crop and sort line images
 - `renameimages()` - Rename images for ground truth
 - `splittextlines()` - Split text into lines
 - `text2groundtruth()` - Convert text to ground truth format
 
 ### PreProcess Module (PreProcess.py)
+
 Used by: MyPixler, MyReader, MyServer
 
 Functions provided:
+
 - `pdfExtractPages()` - Extract PDF pages
 - `pdf4tif()` - PDF to TIFF with 4-page layout
 - `pdf2tif()` - PDF to TIFF conversion
@@ -267,17 +283,21 @@ Functions provided:
 - `resizepngs()` - Batch resize PNG
 
 ### SqliteHelper Module
+
 Used by: MyTrainer, MyVersifier, MyResolver
 
 Functions provided:
+
 - `select()` - Query database
 - `insert()` - Insert records
 - `update()` - Update records
 
 ### ChrReference Module (ChrReference.py)
+
 Used by: MyGlypher, MyReader, MyVersifier
 
 Functions provided:
+
 - Character code lookup
 - Unicode mappings
 - Reference displays
@@ -287,7 +307,8 @@ Functions provided:
 ## Data Flow Paths
 
 ### Path 1: Complete OCR Pipeline
-```
+
+```text
 PDF File
     ↓
 MyPixler.actionextract_pdf()
@@ -332,7 +353,8 @@ MyWriter (output)
 ```
 
 ### Path 2: Manual Box Creation
-```
+
+```text
 Images
     ↓
 MyPixler (preprocess)
@@ -345,7 +367,8 @@ Training Data → MyTrainer
 ```
 
 ### Path 3: Text Verification
-```
+
+```text
 OCR Output
     ↓
 MyReader (display)
@@ -365,7 +388,7 @@ MyWriter (finalize)
 
 ## Module Import Chain
 
-```
+```text
 MyLauncher.py / MyServer.py
 ├── MainUI (UI definition)
 ├── PreProcess
@@ -430,6 +453,7 @@ ViewController/4-PostProcess/MyWriter.py
 ## Data Flow: Key Variables
 
 ### Session State (Session.json)
+
 - Current book/chapter/verse
 - Image and text file paths
 - Font and display settings
@@ -438,11 +462,13 @@ ViewController/4-PostProcess/MyWriter.py
 - All programs read/write this file
 
 ### Workflow Configuration (Workflow.json)
+
 - Processing step definitions
 - Default source/destination folders
 - Referenced by MyServer and dialogs
 
 ### Database Connections
+
 - FROMVS.db: Variants, Resolved tables
 - TRiBibleWords.db: Reference words
 - Accessed by MyVersifier, MyResolver, MyTrainer
@@ -452,16 +478,20 @@ ViewController/4-PostProcess/MyWriter.py
 ## Execution Dependencies
 
 ### Before Running MyReader
+
 ✓ MyPixler (images preprocessed)
 ✓ MyTrainer (model trained)
 
 ### Before Running MyVersifier
+
 ✓ MyReader (OCR completed)
 
 ### Before Running MyResolver
+
 ✓ MyVersifier (variants identified)
 
 ### Before Running MyTrainer
+
 ✓ MyGrounder (ground truth validated)
 
 ---
@@ -469,20 +499,24 @@ ViewController/4-PostProcess/MyWriter.py
 ## Communication Between Programs
 
 ### Via Session Files
+
 - All programs share Session.json
 - Changes in one program visible to all
 - Persistent across sessions
 
 ### Via Command Line (os.system)
+
 - MyLauncher and MyServer launch other programs as separate processes
 - E.g., `python3 ViewController/4-PostProcess/MyWriter.py`
 
 ### Via Database
+
 - Shared SQLite databases
 - MyVersifier and MyResolver coordinate through FROMVS.db
 - Variant tables track changes across tools
 
 ### Via File System
+
 - Images passed between tools
 - Boxes stored in JSON or database
 - Text files exchanged
@@ -492,7 +526,7 @@ ViewController/4-PostProcess/MyWriter.py
 ## Key Integration Points
 
 | Integration Type | Programs | Method |
-|-----------------|----------|--------|
+| ----------------- | ---------- | -------- |
 | Image Display | MyBoxer, MyPixler, MyReader | Shared display code |
 | Database Queries | MyVersifier, MyResolver | SqliteHelper |
 | Settings | All programs | Session.json |
@@ -511,4 +545,3 @@ ViewController/4-PostProcess/MyWriter.py
 - **MyReader** → **MyPixler**: For image display
 
 These are resolved through module imports and runtime instantiation rather than circular imports.
-

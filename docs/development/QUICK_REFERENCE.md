@@ -3,7 +3,7 @@
 ## Program Quick Functions
 
 | Program | Purpose | Key Actions | Input | Output | Related UI |
-|---------|---------|-------------|-------|--------|-----------|
+| --------- | --------- | ------------- | ------- | -------- | ----------- |
 | **MyBoxer** | Box editing & creation | Create/edit boxes for pages, lines, glyphs, words; deskew; crop | Images | Box coordinates | MyBoxerUI.py |
 | **MyPixler** | Image processing | PDF→TIFF→PNG; format conversion; deskew; crop; adjust colors | PDF, TIFF, PNG | Processed images | MyPixlerUI.py |
 | **MyGlypher** | Character extraction | Extract glyphs; character reference; line height control | Line images | Glyph boxes | MyGlypherUI.py |
@@ -21,13 +21,17 @@
 
 ## Main Entry Points
 
-### To Start The Project:
-```
+### To Start The Project
+
+```text
+
 # Main Runtime Entrypoints
+
 python3 ViewController/0-MainUI/MyLauncher.py
 python3 ViewController/0-MainUI/MyServer.py
 
 # Individual Tools
+
 python3 ViewController/1-PreProcess/MyBoxer.py             # Box creation
 python3 ViewController/1-PreProcess/MyPixler.py            # Image processing
 python3 ViewController/1-PreProcess/MyGlypher.py           # Character extraction
@@ -45,7 +49,8 @@ python3 ViewController/0-MainUI/MyExplorer.py              # File browser
 
 ## OCR Pipeline Sequence
 
-```
+```text
+
 1. PDF Input → MyPixler (Extract Pages)
 2. Pages → MyPixler (PDF→TIFF→PNG)
 3. Pages → MyPixler (Crop to Languages: Greek/Latin)
@@ -57,6 +62,7 @@ python3 ViewController/0-MainUI/MyExplorer.py              # File browser
 9. OCR Text → MyVersifier (Verify/Correct)
 10. Variants → MyResolver (Resolve Errors)
 11. Final Text → MyWriter (Export)
+
 ```
 
 ---
@@ -111,15 +117,19 @@ Modules with the common project-status surface:
 ## Key Workflows
 
 ### Workflow 1: Complete OCR from PDF
+
 MyPixler → MyScanner → MyGrounder → MyTrainer → MyReader → MyVersifier → MyResolver → MyWriter
 
 ### Workflow 2: Manual Box Creation
+
 MyBoxer → MyGrounder → MyTrainer
 
 ### Workflow 3: Text Correction
+
 MyReader + MyVersifier → MyResolver → MyWriter
 
 ### Workflow 4: Image Preprocessing
+
 MyPixler → MyGlypher → MyGrounder
 
 ---
@@ -127,10 +137,12 @@ MyPixler → MyGlypher → MyGrounder
 ## Database Tables
 
 ### FROMVS.db (Main OCR Database)
+
 - `Variants` - OCR errors and variants with Strong's/RMAC codes
 - `Resolved` - Resolved variants
 
 ### TRiBibleWords.db (Reference Words)
+
 - Word forms with linguistic codes
 
 ---
@@ -138,7 +150,7 @@ MyPixler → MyGlypher → MyGrounder
 ## Configuration Files
 
 | File | Purpose | Location |
-|------|---------|----------|
+| ------ | --------- | ---------- |
 | Session.json | Current state (book, font, paths) | Model/Project/Data/json/ |
 | Workflow.json | Pipeline steps and folders | Model/Data/json/ |
 | BooksAbbrName.json | Book names and abbreviations | Model/Data/json/ |
@@ -148,7 +160,7 @@ MyPixler → MyGlypher → MyGrounder
 
 ## File Organization
 
-```
+```text
 Model/Project/
 ├── Data/               # JSON configs, SQLite databases
 ├── Images/             # Image files by processing stage
@@ -165,7 +177,7 @@ Model/Project/
 ## Key Fonts & Resources
 
 | Resource | Location | Usage |
-|----------|----------|-------|
+| ---------- | ---------- | ------- |
 | FROMVS Font | fonts/ | Greek text display |
 | Icons | Icons/ | UI icons |
 | Stylesheets | Stylesheets/ | Theme definitions |
@@ -181,7 +193,7 @@ Model/Project/
 ## Language Support
 
 | Language | File Prefix | Processing | Model |
-|----------|-----------|-----------|-------|
+| ---------- | ----------- | ----------- | ------- |
 | Greek | greek_ | Full pipeline | feg (Tesseract) |
 | Latin | latin_ | Full pipeline | lat (Tesseract) |
 | Source | source_ | Reference | (comparison) |
@@ -191,6 +203,7 @@ Model/Project/
 ## Common Menu Options
 
 ### Image Processing (MyPixler)
+
 - Extract PDF → actionextract_pdf
 - PDF to TIFF → actionpdf_to_tiff
 - TIFF to Mono → actiontiff_to_mono
@@ -198,11 +211,13 @@ Model/Project/
 - Crop Languages → actionCrop_Languages
 
 ### Line Processing (MyScanner/MyBoxer)
+
 - Crop to Lines → actionCrop_Greek_To_tiff_Lines
 - Rename Lines → actionRename_Greek_tiff_Lines
 - Stage Lines → actionStage_Greek_tiff_Lines
 
 ### Verification (MyVersifier)
+
 - Navigate verses → BothPrevBookButton, BothNextBookButton, etc.
 - Record variants → Recorderbutton
 - Resolve issues → Resolvebutton
@@ -213,6 +228,7 @@ Model/Project/
 ## UI Integration Points
 
 All applications use consistent patterns:
+
 - Session loading/saving (JSON)
 - Project path management
 - Standardized dialogs
@@ -224,7 +240,7 @@ All applications use consistent patterns:
 ## Extensions & Tools
 
 | Tool | Location | Purpose |
-|------|----------|---------|
+| ------ | ---------- | --------- |
 | glyphtracer | external/local tool | Glyph tracing |
 | potrace | external/local tool | Vector tracing |
 | Version finder | ext/versefind.py | Locate verses |
@@ -266,4 +282,3 @@ All applications use consistent patterns:
 - OCR: Speed depends on Tesseract model and image quality
 - Database: Optimize variant queries in MyResolver
 - UI responsiveness: Long operations may block UI (consider threading)
-
