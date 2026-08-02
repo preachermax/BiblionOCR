@@ -1,5 +1,0 @@
-﻿Update UI Files:
-pyuic5 -x ./QtDesignerUI/MainUI.ui -o MainUI.py --resource-suffix=""
-
-Update UI Resource Files:
-pyrcc5 /home/max/Projects/Python/Workflow/0-MainUI/UI_Icons.qrc  -o /home/max/Projects/Python/Workflow/0-MainUI/UI_Icons.py

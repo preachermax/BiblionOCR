@@ -1,5 +1,15 @@
 # Biblion Documentation Library
 
+## Public Introduction Video
+
+The public introduction video for BiblionOCR is available here:
+
+https://www.youtube.com/watch?v=zrJQzivQwT4
+
+Use this link when pointing GitHub visitors to the project's public-facing introduction.
+
+---
+
 ## Purpose
 
 This directory is the documentation root for the Biblion project.
@@ -48,6 +58,7 @@ Active engineering notebook, developer references, runtime notes, and implementa
 Key documents:
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
+- [LOCAL_MASTER_SYNC_AFTER_PR.md](development/LOCAL_MASTER_SYNC_AFTER_PR.md)
 - [README_HELP_SYSTEM.md](development/README_HELP_SYSTEM.md)
 - [QUICK_REFERENCE.md](development/QUICK_REFERENCE.md)
 
@@ -63,6 +74,10 @@ Publication-facing writing and editorial support material.
 
 Contributor-facing and participation-oriented project material.
 
+Key documents:
+- [README.md](community/README.md)
+- [MEMBERSHIP.md](community/MEMBERSHIP.md)
+
 ### `roadmap/`
 
 Forward-looking planning, milestones, and future initiatives.
@@ -70,6 +85,16 @@ Forward-looking planning, milestones, and future initiatives.
 ### `website/`
 
 Website planning, structure, and public presentation material.
+
+Key documents:
+- [README.md](website/README.md)
+
+Current prototype highlights:
+- React + Cytoscape demo under `docs/website/`
+- EventBus + EventRunner + EventGraphExecutor runtime path for demo traversal
+- traceable event logging, state inspection, and visited-node highlighting in the graph view
+- Render-ready static deployment blueprint at `render.yaml` with `docs/website/` as the first public hosting surface
+- live public home page deployed at `https://biblionocr.onrender.com/`
 
 ### `patreon/`
 
@@ -106,6 +131,7 @@ Use this README to decide where new documentation belongs:
 - active implementation state or debugging notes → `development/`
 - supporting investigation → `research/`
 - outward-facing publishing material → `publications/`
+- contribution workflow or participation rules → `community/`
 
 When a document feels misplaced, move or rewrite it so the directory purpose remains clear.
 
@@ -118,6 +144,8 @@ When a document feels misplaced, move or rewrite it so the directory purpose rem
 - [PROJECT_ARCHITECTURE.md](architecture/PROJECT_ARCHITECTURE.md)
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
+- [community/README.md](community/README.md)
+- [website/README.md](website/README.md)
 
 ---
 

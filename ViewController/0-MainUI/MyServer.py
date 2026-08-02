@@ -5,8 +5,7 @@ print("RUNNING:", __file__)
 # OCR Preprocess Tool (OpenCV morphology + tiffcapture bridge)
 # Next steps: OCR preview, multi-page TIFF, pipeline integration
 # Python imports
-import ipaddress
-import socket
+import importlib.util
 import sys
 import os
 import re
@@ -38,6 +37,14 @@ session_dir = os.path.join(data_dir, "json")
 # Add project root to path
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
+if developer_view_dir not in sys.path:
+    sys.path.insert(0, developer_view_dir)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
 
 # Debug (optional toggle)
 DEBUG_PATHS = True
@@ -77,7 +84,9 @@ from ext import mainfind
 from HelpSystem import add_help_menu
 from Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
-from Core.Scanner import ScanManager, ScanWorker
+from Core.project_tracking import ProjectWorkflowTracker
+from Core.Scanner import NetworkScanner, ScanManager
+from scan_runtime import start_scan_workflow
 # EventBus is still defined below in this module during the Core migration.
 # ProjectCreationEngine remains below as a temporary fallback, but runtime wiring now uses CoreProjectCreationEngine.
 # Do not import MainWindow from MainUI.py; that file only contains the generated Ui_MainUI class.
@@ -99,21 +108,37 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
-try:
-    from scapy.all import ARP, Ether, srp
-except Exception:
-    ARP = None
-    Ether = None
-    srp = None
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QBuffer, QIODevice
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QFileInfo
+from PyQt5.QtWidgets import QMainWindow, QAction
+try:
+    from print_handlerUI import ProjectPrintHandler
+except ModuleNotFoundError:
+    class ProjectPrintHandler:
+        """Fallback print handler used when print_handlerUI is unavailable."""
+
+        def __init__(self, parent=None):
+            self.parent = parent
+
+        def _warn_unavailable(self, owner):
+            qtw.QMessageBox.warning(
+                owner,
+                "Printing Unavailable",
+                "print_handlerUI.py is missing in this checkout. Printing features are disabled.",
+            )
+
+        def handle_image(self, image, owner, preview=False):
+            self._warn_unavailable(owner)
+
+        def handle_print(self, target_file, owner, preview=False):
+            self._warn_unavailable(owner)
+
 import numpy as np
 import tifffile
 
-# Custom imports
+# Custom impor
 from MyServerUI import Ui_MainUI
 from PreProcess import PreProcess as pp
 import ChrReference as chrref
@@ -121,6 +146,7 @@ import MyVersifier as versify
 import MyBoxer as boxer
 import MyScanner as scanner
 import MyExplorer as explorer
+from ProjectTrackingDialog import ProjectTrackingDialog
 import MyGrounder as gtr
 import ImageLoadWorker
 from ProjectCreationWorker import ProjectCreationWorker
@@ -149,12 +175,15 @@ from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
 from Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
 from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
+from Developer.developer_services import DeveloperServices
 
 #import MyPixler as pixler
 #import CropTif as croptif
 #import QtCropImage as cropimg
 from ImagePreviewDialog import ImagePreviewDialog
+from project_creation_wizard_dialog import ProjectCreationWizardDialog
 #from MultiPreProcess import MultiPreProcess as mpp
+
 def configure_tesseract():
 
     import pytesseract
@@ -179,1177 +208,6 @@ def configure_tesseract():
 
     print("Ã¢Å¡Â Ã¯Â¸Â Tesseract not found.")
 
-
-class ProjectCreationWizardDialog(qtw.QDialog):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("New Project")
-        self.setModal(True)
-        self.resize(640, 420)
-        self._page_titles = [
-            "Step 1 of 2: RIS import",
-            "Step 2 of 2: Project details",
-        ]
-        self.imported_provenance = {}
-        self._build_ui()
-        self._update_page_state()
-
-    def _build_ui(self):
-        layout = qtw.QVBoxLayout(self)
-        layout.setSpacing(10)
-
-        intro_label = qtw.QLabel(
-            "Create a new project from the current trimmed manifest. You can also load provenance from JSON, RIS, TXT, or CSV before creation starts."
-        )
-        intro_label.setWordWrap(True)
-        layout.addWidget(intro_label)
-
-        self.page_title_label = qtw.QLabel("")
-        layout.addWidget(self.page_title_label)
-
-        self.page_stack = qtw.QStackedWidget(self)
-        layout.addWidget(self.page_stack, 1)
-
-        ris_page = qtw.QWidget()
-        ris_layout = qtw.QVBoxLayout(ris_page)
-        ris_layout.setSpacing(10)
-
-        ris_label = qtw.QLabel("Optional: load an existing RIS file")
-        ris_layout.addWidget(ris_label)
-
-        ris_help = qtw.QLabel(
-            "If you already have provenance metadata, load it here to prefill the project fields before continuing."
-        )
-        ris_help.setWordWrap(True)
-        ris_layout.addWidget(ris_help)
-
-        ris_row = qtw.QHBoxLayout()
-        self.ris_path_edit = qtw.QLineEdit()
-        self.ris_path_edit.setPlaceholderText("project.ris.json, Primo_RIS_Export.ris, or similar")
-        self.ris_path_edit.setReadOnly(True)
-        ris_row.addWidget(self.ris_path_edit, 1)
-
-        self.ris_browse_button = qtw.QPushButton("Load RIS...")
-        self.ris_browse_button.clicked.connect(self._browse_for_ris)
-        ris_row.addWidget(self.ris_browse_button)
-
-        self.ris_clear_button = qtw.QPushButton("Clear RIS")
-        self.ris_clear_button.clicked.connect(self._clear_ris)
-        ris_row.addWidget(self.ris_clear_button)
-
-        ris_layout.addLayout(ris_row)
-
-        self.status_label = qtw.QLabel("")
-        self.status_label.setWordWrap(True)
-        ris_layout.addWidget(self.status_label)
-
-        ris_layout.addStretch(1)
-        self.page_stack.addWidget(ris_page)
-
-        details_page = qtw.QWidget()
-        details_layout = qtw.QVBoxLayout(details_page)
-        details_layout.setSpacing(10)
-
-        details_label = qtw.QLabel("Project details")
-        details_layout.addWidget(details_label)
-
-        self.project_name_label = qtw.QLabel("Project name")
-        self.project_name_edit = qtw.QLineEdit()
-        self.project_name_edit.setPlaceholderText("Erasmus1523")
-        details_layout.addWidget(self.project_name_label)
-        details_layout.addWidget(self.project_name_edit)
-
-        self.project_name_hint_label = qtw.QLabel("")
-        self.project_name_hint_label.setWordWrap(True)
-        details_layout.addWidget(self.project_name_hint_label)
-
-        self.project_purpose_label = qtw.QLabel("Project purpose")
-        self.project_purpose_edit = qtw.QPlainTextEdit()
-        self.project_purpose_edit.setPlaceholderText("Create a readable text version of the source file with duplicate font")
-        self.project_purpose_edit.setFixedHeight(72)
-        details_layout.addWidget(self.project_purpose_label)
-        details_layout.addWidget(self.project_purpose_edit)
-
-        self.user_intent_label = qtw.QLabel("User intent summary")
-        self.user_intent_edit = qtw.QPlainTextEdit()
-        self.user_intent_edit.setPlaceholderText("Describe the user intent for this project")
-        self.user_intent_edit.setFixedHeight(72)
-        details_layout.addWidget(self.user_intent_label)
-        details_layout.addWidget(self.user_intent_edit)
-
-        metadata_row = qtw.QHBoxLayout()
-
-        trigger_column = qtw.QVBoxLayout()
-        trigger_column.addWidget(qtw.QLabel("Creation trigger"))
-        self.creation_trigger_edit = qtw.QLineEdit("MyServer_button")
-        trigger_column.addWidget(self.creation_trigger_edit)
-        metadata_row.addLayout(trigger_column)
-
-        context_column = qtw.QVBoxLayout()
-        context_column.addWidget(qtw.QLabel("Source context"))
-        self.source_context_edit = qtw.QLineEdit("MyServer_UI")
-        context_column.addWidget(self.source_context_edit)
-        metadata_row.addLayout(context_column)
-
-        details_layout.addLayout(metadata_row)
-
-        details_layout.addWidget(qtw.QLabel("Creator (optional)"))
-        self.creator_edit = qtw.QLineEdit()
-        self.creator_edit.setPlaceholderText("Optional")
-        details_layout.addWidget(self.creator_edit)
-
-        details_layout.addWidget(qtw.QLabel("Review"))
-        self.review_label = qtw.QLabel("")
-        self.review_label.setWordWrap(True)
-        details_layout.addWidget(self.review_label)
-
-        self.details_status_label = qtw.QLabel("")
-        self.details_status_label.setWordWrap(True)
-        details_layout.addWidget(self.details_status_label)
-
-        details_layout.addStretch(1)
-        self.page_stack.addWidget(details_page)
-
-        button_row = qtw.QHBoxLayout()
-        self.back_button = qtw.QPushButton("Back")
-        self.back_button.clicked.connect(self._go_back)
-        button_row.addWidget(self.back_button)
-
-        self.next_button = qtw.QPushButton("Next")
-        self.next_button.clicked.connect(self._go_next)
-        button_row.addWidget(self.next_button)
-
-        button_row.addStretch(1)
-        self.cancel_button = qtw.QPushButton("Cancel")
-        self.cancel_button.clicked.connect(self.reject)
-        button_row.addWidget(self.cancel_button)
-
-        self.create_button = qtw.QPushButton("Create Project")
-        self.create_button.clicked.connect(self._attempt_accept)
-        button_row.addWidget(self.create_button)
-        layout.addLayout(button_row)
-
-        self.project_name_edit.textChanged.connect(self._update_validation_state)
-        self.project_purpose_edit.textChanged.connect(self._update_validation_state)
-        self.user_intent_edit.textChanged.connect(self._update_validation_state)
-        self.creation_trigger_edit.textChanged.connect(self._update_validation_state)
-        self.source_context_edit.textChanged.connect(self._update_validation_state)
-        self.creator_edit.textChanged.connect(self._update_validation_state)
-
-    def _go_back(self):
-        index = self.page_stack.currentIndex()
-        if index > 0:
-            self.page_stack.setCurrentIndex(index - 1)
-            self._update_page_state()
-
-    def _go_next(self):
-        index = self.page_stack.currentIndex()
-        if index < self.page_stack.count() - 1:
-            self.page_stack.setCurrentIndex(index + 1)
-            self._update_page_state()
-
-    def _update_page_state(self):
-        index = self.page_stack.currentIndex()
-        self.page_title_label.setText(self._page_titles[index])
-        self.back_button.setEnabled(index > 0)
-        self.next_button.setVisible(index < self.page_stack.count() - 1)
-        self.create_button.setVisible(index == self.page_stack.count() - 1)
-        self._update_validation_state()
-
-    def _required_field_errors(self):
-        errors = []
-        if not self.project_name_edit.text().strip():
-            errors.append("Project name is required.")
-        if not self.project_purpose_edit.toPlainText().strip():
-            errors.append("Project purpose is required.")
-        if not self.user_intent_edit.toPlainText().strip():
-            errors.append("User intent summary is required.")
-        return errors
-
-    def _update_validation_state(self):
-        errors = self._required_field_errors()
-        entered_name = self.project_name_edit.text().strip()
-        sanitized_name = self._sanitize_project_name(entered_name)
-        self._refresh_review()
-        self._apply_required_field_state(self.project_name_edit, self.project_name_label, not self.project_name_edit.text().strip())
-        self._apply_required_field_state(self.project_purpose_edit, self.project_purpose_label, not self.project_purpose_edit.toPlainText().strip())
-        self._apply_required_field_state(self.user_intent_edit, self.user_intent_label, not self.user_intent_edit.toPlainText().strip())
-
-        if not entered_name:
-            self.project_name_hint_label.setText("Enter the project name you want to create.")
-            self.project_name_hint_label.setStyleSheet("")
-        elif sanitized_name != entered_name:
-            self.project_name_hint_label.setText(f"Project will be created as: {sanitized_name}")
-            self.project_name_hint_label.setStyleSheet("color: #8a6d1f;")
-        else:
-            self.project_name_hint_label.setText(f"Project will be created as: {sanitized_name}")
-            self.project_name_hint_label.setStyleSheet("color: #2f6b3b;")
-
-        if errors:
-            self.details_status_label.setText("Complete the required fields before creating the project.")
-            self.details_status_label.setStyleSheet("color: #9f3a38;")
-        else:
-            self.details_status_label.setText("Required fields are complete. Review the summary and create the project when ready.")
-            self.details_status_label.setStyleSheet("color: #2f6b3b;")
-
-        self.create_button.setEnabled(not errors)
-
-    def _apply_required_field_state(self, widget, label, is_missing):
-        if is_missing:
-            label.setStyleSheet("color: #9f3a38;")
-            widget.setStyleSheet("border: 1px solid #9f3a38;")
-        else:
-            label.setStyleSheet("")
-            widget.setStyleSheet("")
-
-    def _attempt_accept(self):
-        errors = self._required_field_errors()
-        if errors:
-            self._update_validation_state()
-            return
-        self.accept()
-
-    def _sanitize_project_name(self, name):
-        stripped = name.strip()
-        if not stripped:
-            return ""
-        return re.sub(r"[^A-Za-z0-9_. -]+", "_", stripped).strip(" .")
-
-    def _refresh_review(self):
-        creator = self.creator_edit.text().strip() or "Not set"
-        entered_name = self.project_name_edit.text().strip()
-        sanitized_name = self._sanitize_project_name(entered_name) or "Not set"
-        name_line = f"Project name: {entered_name or 'Not set'}"
-        if entered_name and sanitized_name != entered_name:
-            name_line += f" -> {sanitized_name}"
-        review_lines = [
-            name_line,
-            f"Purpose: {self.project_purpose_edit.toPlainText().strip() or 'Not set'}",
-            f"Intent: {self.user_intent_edit.toPlainText().strip() or 'Not set'}",
-            f"Trigger: {self.creation_trigger_edit.text().strip() or 'MyServer_button'}",
-            f"Source context: {self.source_context_edit.text().strip() or 'MyServer_UI'}",
-            f"Creator: {creator}",
-        ]
-        self.review_label.setText("\n".join(review_lines))
-
-    def _browse_for_ris(self):
-        start_dir = self._projects_base_path()
-        path, _ = qtw.QFileDialog.getOpenFileName(
-            self,
-            "Select Provenance File",
-            start_dir,
-            "Provenance files (*.json *.ris *.txt *.csv);;JSON files (*.json);;RIS text files (*.ris *.txt);;CSV files (*.csv);;All Files (*.*)"
-        )
-        if not path:
-            return
-
-        try:
-            payload = self._load_provenance_file(path)
-        except (OSError, ValueError, json.JSONDecodeError, csv.Error) as exc:
-            qtw.QMessageBox.warning(self, "Load Provenance", f"Could not load provenance file.\n\n{exc}")
-            return
-
-        self.ris_path_edit.setText(path)
-        self._apply_ris_payload(payload)
-        self.status_label.setText("Provenance loaded. You can adjust any field before creating the project.")
-        self.page_stack.setCurrentIndex(1)
-        self._update_page_state()
-
-    def _clear_ris(self):
-        self.ris_path_edit.clear()
-        self.imported_provenance = {}
-        self.status_label.setText("Imported provenance cleared. Continue with manual entry.")
-
-    def _apply_ris_payload(self, payload):
-        self.imported_provenance = {
-            key: value
-            for key, value in payload.items()
-            if key not in {
-                "project_name",
-                "project_purpose",
-                "creation_trigger",
-                "source_context",
-                "user_intent_summary",
-                "creator",
-            }
-        }
-
-        if not self.project_name_edit.text().strip():
-            self.project_name_edit.setText(str(payload.get("project_name", "")))
-        if not self.project_purpose_edit.toPlainText().strip():
-            self.project_purpose_edit.setPlainText(str(payload.get("project_purpose", "")))
-        if not self.user_intent_edit.toPlainText().strip():
-            self.user_intent_edit.setPlainText(str(payload.get("user_intent_summary", "")))
-        self.creation_trigger_edit.setText(str(payload.get("creation_trigger", "MyServer_button")))
-        self.source_context_edit.setText(str(payload.get("source_context", "MyServer_UI")))
-        if payload.get("creator") and not self.creator_edit.text().strip():
-            self.creator_edit.setText(str(payload.get("creator", "")))
-        self._refresh_review()
-
-    def _load_provenance_file(self, path):
-        extension = os.path.splitext(path)[1].lower()
-        if extension == ".json":
-            payload = self._load_json_provenance(path)
-        elif extension == ".csv":
-            payload = self._load_csv_provenance(path)
-        elif extension in {".ris", ".txt"}:
-            payload = self._load_text_provenance(path)
-        else:
-            raise ValueError(f"Unsupported provenance file type: {extension}")
-
-        payload.setdefault("creation_trigger", "MyServer_button")
-        payload.setdefault("source_context", "MyServer_UI")
-        payload.setdefault("user_intent_summary", "Create project using imported provenance")
-        payload.setdefault("project_name", self._project_name_from_source(path, payload))
-        payload.setdefault("project_purpose", self._project_purpose_from_source(payload))
-        payload["source_provenance_path"] = path
-        return payload
-
-    def _load_json_provenance(self, path):
-        with open(path, "r", encoding="utf-8-sig") as handle:
-            payload = json.load(handle)
-        if isinstance(payload, list):
-            if not payload:
-                raise ValueError("JSON provenance file is empty.")
-            payload = payload[0]
-        if not isinstance(payload, dict):
-            raise ValueError("JSON provenance file must contain an object.")
-        payload = dict(payload)
-        payload.setdefault("source_provenance_format", "json")
-        return payload
-
-    def _load_csv_provenance(self, path):
-        with open(path, "r", encoding="utf-8-sig", newline="") as handle:
-            sample = handle.read()
-        if not sample.strip():
-            raise ValueError("CSV provenance file is empty.")
-
-        rows = list(csv.reader(sample.splitlines()))
-        if not rows:
-            raise ValueError("CSV provenance file is empty.")
-
-        payload = {"source_provenance_format": "csv"}
-        normalized_rows = [row for row in rows if any(cell.strip() for cell in row)]
-        if not normalized_rows:
-            raise ValueError("CSV provenance file is empty.")
-
-        is_key_value = all(len(row) >= 2 for row in normalized_rows) and any(
-            row[0].strip().lower() in {
-                "project_name", "project_purpose", "title", "creator", "author", "user_intent_summary", "source_context", "creation_trigger"
-            }
-            for row in normalized_rows
-        )
-
-        if is_key_value:
-            for row in normalized_rows:
-                key = row[0].strip()
-                value = row[1].strip() if len(row) > 1 else ""
-                if key:
-                    payload[key] = value
-        else:
-            with open(path, "r", encoding="utf-8-sig", newline="") as handle:
-                reader = csv.DictReader(handle)
-                first_row = next(reader, None)
-            if not first_row:
-                raise ValueError("CSV provenance file must contain at least one data row.")
-            payload.update({key: value for key, value in first_row.items() if key})
-
-        return self._normalize_imported_payload(payload)
-
-    def _load_text_provenance(self, path):
-        with open(path, "r", encoding="utf-8-sig") as handle:
-            text = handle.read()
-        if not text.strip():
-            raise ValueError("Text provenance file is empty.")
-
-        stripped = text.lstrip()
-        if stripped.startswith("{"):
-            payload = json.loads(text)
-            if not isinstance(payload, dict):
-                raise ValueError("JSON text provenance file must contain an object.")
-            payload = dict(payload)
-            payload.setdefault("source_provenance_format", "json-text")
-            return payload
-
-        if self._looks_like_ris_text(text):
-            return self._parse_ris_text(text)
-
-        payload = self._parse_key_value_text(text)
-        if payload:
-            payload.setdefault("source_provenance_format", "text-key-value")
-            return self._normalize_imported_payload(payload)
-
-        return {
-            "source_provenance_format": "plain-text",
-            "source_provenance_raw_text": text,
-        }
-
-    def _looks_like_ris_text(self, text):
-        return bool(re.search(r"^([A-Z0-9]{2})\s{1,2}-\s", text, re.MULTILINE))
-
-    def _parse_ris_text(self, text):
-        tags = {}
-        current_tag = None
-        for raw_line in text.splitlines():
-            line = raw_line.rstrip()
-            if not line.strip():
-                continue
-            match = re.match(r"^([A-Z0-9]{2})\s{1,2}-\s(.*)$", line)
-            if match:
-                current_tag = match.group(1)
-                tags.setdefault(current_tag, []).append(match.group(2).strip())
-            elif current_tag is not None:
-                tags[current_tag][-1] = (tags[current_tag][-1] + " " + line.strip()).strip()
-
-        payload = {
-            "source_provenance_format": "ris",
-            "source_provenance_tags": tags,
-        }
-        if tags.get("T1"):
-            payload["title"] = tags["T1"][0]
-        elif tags.get("TI"):
-            payload["title"] = tags["TI"][0]
-        if tags.get("AU"):
-            payload["authors"] = tags["AU"]
-        if tags.get("A1"):
-            payload.setdefault("authors", tags["A1"])
-        if tags.get("Y1"):
-            payload["publication_year"] = tags["Y1"][0]
-        elif tags.get("PY"):
-            payload["publication_year"] = tags["PY"][0]
-        if tags.get("DO"):
-            payload["doi"] = tags["DO"][0]
-        if tags.get("PB"):
-            payload["publisher"] = tags["PB"][0]
-        if tags.get("CY"):
-            payload["publication_place"] = tags["CY"][0]
-        if tags.get("ID"):
-            payload["source_identifier"] = tags["ID"][0]
-        return self._normalize_imported_payload(payload)
-
-    def _parse_key_value_text(self, text):
-        payload = {}
-        for raw_line in text.splitlines():
-            line = raw_line.strip()
-            if not line:
-                continue
-            match = re.match(r"^([^:=\t]+)\s*[:=\t]\s*(.+)$", line)
-            if not match:
-                continue
-            key = match.group(1).strip()
-            value = match.group(2).strip()
-            if key:
-                payload[key] = value
-        return payload
-
-    def _normalize_imported_payload(self, payload):
-        normalized = dict(payload)
-        lowered = {str(key).strip().lower(): value for key, value in payload.items()}
-
-        title = lowered.get("title") or lowered.get("t1") or lowered.get("ti")
-        if title:
-            normalized.setdefault("project_purpose", str(title))
-
-        project_name = lowered.get("project_name") or lowered.get("name")
-        if project_name:
-            normalized.setdefault("project_name", str(project_name))
-
-        creator = lowered.get("creator")
-        if creator:
-            normalized.setdefault("creator", str(creator))
-
-        intent = lowered.get("user_intent_summary") or lowered.get("intent")
-        if intent:
-            normalized.setdefault("user_intent_summary", str(intent))
-
-        source_context = lowered.get("source_context")
-        if source_context:
-            normalized.setdefault("source_context", str(source_context))
-
-        creation_trigger = lowered.get("creation_trigger")
-        if creation_trigger:
-            normalized.setdefault("creation_trigger", str(creation_trigger))
-
-        return normalized
-
-    def _project_name_from_source(self, path, payload):
-        title = payload.get("title") or payload.get("project_name") or ""
-        if title:
-            sanitized = re.sub(r"[^A-Za-z0-9_. -]+", "_", str(title)).strip(" .")
-            if sanitized:
-                words = sanitized.split()
-                if len(words) > 6:
-                    sanitized = " ".join(words[:6])
-                return sanitized
-        return os.path.splitext(os.path.basename(path))[0]
-
-    def _project_purpose_from_source(self, payload):
-        title = payload.get("title") or payload.get("project_purpose")
-        if title:
-            return str(title)
-        return "Create project using imported provenance"
-
-    def get_payload(self):
-        sanitized_name = self._sanitize_project_name(self.project_name_edit.text())
-        payload = {
-            "project_name": sanitized_name,
-            "project_purpose": self.project_purpose_edit.toPlainText().strip(),
-            "creation_trigger": self.creation_trigger_edit.text().strip() or "MyServer_button",
-            "source_context": self.source_context_edit.text().strip() or "MyServer_UI",
-            "user_intent_summary": self.user_intent_edit.toPlainText().strip(),
-        }
-        creator = self.creator_edit.text().strip()
-        if creator:
-            payload["creator"] = creator
-        if self.imported_provenance:
-            payload.update(self.imported_provenance)
-        return payload
-class ScanWizardLoadWorker(qtc.QObject):
-    finished = qtc.pyqtSignal(object)
-    error = qtc.pyqtSignal(str)
-
-    def __init__(self, scan_manager, request=None, load_backend_options=False, discover_devices=False):
-        super().__init__()
-        self.scan_manager = scan_manager
-        self.request = request or {}
-        self.load_backend_options = load_backend_options
-        self.discover_devices = discover_devices
-
-    def run(self):
-        try:
-            payload = {}
-            if self.load_backend_options:
-                payload["backend_options"] = self.scan_manager.backend_options()
-            if self.discover_devices:
-                payload["request"] = dict(self.request)
-                payload["devices"] = self.scan_manager.discover_devices(self.request)
-            self.finished.emit(payload)
-        except Exception as exc:
-            self.error.emit(str(exc))
-
-
-class ScanWizardDialog(qtw.QDialog):
-
-    def __init__(self, scan_manager, default_destination, parent=None, initial_request=None):
-        super().__init__(parent)
-        self.scan_manager = scan_manager
-        self.default_destination = default_destination
-        self.initial_request = self.scan_manager.default_request(default_destination)
-        self.initial_request.update(initial_request or {})
-        self._backend_options_cache = []
-        self._backend_options_by_value = {}
-        self._loading_backends = False
-        self._loading_devices = False
-        self._device_request_token = 0
-        self._backend_loader_thread = None
-        self._backend_loader_worker = None
-        self._device_loader_thread = None
-        self._device_loader_worker = None
-        self._page_titles = [
-            "Step 1 of 2: Scan source",
-            "Step 2 of 2: Scan options",
-        ]
-        self.setWindowTitle("Scan Image")
-        self.setModal(True)
-        self.resize(640, 420)
-        self._build_ui()
-        self._apply_initial_request()
-        self._start_backend_load()
-        self._update_page_state()
-
-    def _build_ui(self):
-        layout = qtw.QVBoxLayout(self)
-        layout.setSpacing(10)
-
-        intro_label = qtw.QLabel(
-            "Choose a scan backend, review the destination, and dispatch a normalized scan request into the Core scanner workflow."
-        )
-        intro_label.setWordWrap(True)
-        layout.addWidget(intro_label)
-
-        self.page_title_label = qtw.QLabel("")
-        layout.addWidget(self.page_title_label)
-
-        self.page_stack = qtw.QStackedWidget(self)
-        layout.addWidget(self.page_stack, 1)
-
-        source_page = qtw.QWidget()
-        source_layout = qtw.QVBoxLayout(source_page)
-        source_layout.setSpacing(10)
-        source_layout.addWidget(qtw.QLabel("Backend selection"))
-
-        self.backend_combo = qtw.QComboBox()
-        self.backend_combo.addItem("Loading scanner backends...", None)
-        self.backend_combo.setEnabled(False)
-        source_layout.addWidget(self.backend_combo)
-
-        self.loading_label = qtw.QLabel("Loading scanner backends...")
-        self.loading_label.setWordWrap(True)
-        source_layout.addWidget(self.loading_label)
-
-        self.loading_progress = qtw.QProgressBar()
-        self.loading_progress.setRange(0, 0)
-        source_layout.addWidget(self.loading_progress)
-
-        self.allow_network_fallback_checkbox = qtw.QCheckBox("Allow AirScan fallback while testing SANE")
-        self.allow_network_fallback_checkbox.setChecked(bool(self.initial_request.get("allow_network_fallback", True)))
-        source_layout.addWidget(self.allow_network_fallback_checkbox)
-
-        source_layout.addWidget(qtw.QLabel("Device name (optional)"))
-        self.device_name_edit = qtw.QLineEdit()
-        self.device_name_edit.setPlaceholderText("Leave blank to use backend default device, or enter an AirScan IP/URL")
-        source_layout.addWidget(self.device_name_edit)
-
-        source_layout.addWidget(qtw.QLabel("Detected devices"))
-        self.detected_devices_label = qtw.QLabel("Scanner discovery has not completed yet.")
-        self.detected_devices_label.setWordWrap(True)
-        source_layout.addWidget(self.detected_devices_label)
-        source_layout.addStretch(1)
-        self.page_stack.addWidget(source_page)
-
-        options_page = qtw.QWidget()
-        options_layout = qtw.QVBoxLayout(options_page)
-        options_layout.setSpacing(10)
-        options_layout.addWidget(qtw.QLabel("Destination folder"))
-
-        self.destination_edit = qtw.QLineEdit(self.initial_request["destination_folder"])
-        options_layout.addWidget(self.destination_edit)
-
-        grid = qtw.QGridLayout()
-        grid.addWidget(qtw.QLabel("Mode"), 0, 0)
-        self.mode_combo = qtw.QComboBox()
-        self.mode_combo.addItems(["color", "grayscale", "mono"])
-        grid.addWidget(self.mode_combo, 0, 1)
-
-        grid.addWidget(qtw.QLabel("DPI"), 1, 0)
-        self.dpi_combo = qtw.QComboBox()
-        self.dpi_combo.addItems(["150", "300", "600"])
-        self.dpi_combo.setCurrentText("300")
-        grid.addWidget(self.dpi_combo, 1, 1)
-
-        grid.addWidget(qtw.QLabel("Source type"), 2, 0)
-        self.source_type_combo = qtw.QComboBox()
-        self.source_type_combo.addItems(["flatbed", "adf"])
-        grid.addWidget(self.source_type_combo, 2, 1)
-
-        grid.addWidget(qtw.QLabel("Persist format"), 3, 0)
-        self.persist_format_combo = qtw.QComboBox()
-        self.persist_format_combo.addItems(["tiff"])
-        grid.addWidget(self.persist_format_combo, 3, 1)
-        options_layout.addLayout(grid)
-
-        self.duplex_checkbox = qtw.QCheckBox("Use duplex when supported")
-        options_layout.addWidget(self.duplex_checkbox)
-
-        options_layout.addWidget(qtw.QLabel("Review"))
-        self.review_label = qtw.QLabel("")
-        self.review_label.setWordWrap(True)
-        options_layout.addWidget(self.review_label)
-
-        self.status_label = qtw.QLabel("")
-        self.status_label.setWordWrap(True)
-        options_layout.addWidget(self.status_label)
-        options_layout.addStretch(1)
-        self.page_stack.addWidget(options_page)
-
-        button_row = qtw.QHBoxLayout()
-        self.back_button = qtw.QPushButton("Back")
-        self.back_button.clicked.connect(self._go_back)
-        button_row.addWidget(self.back_button)
-
-        self.next_button = qtw.QPushButton("Next")
-        self.next_button.clicked.connect(self._go_next)
-        button_row.addWidget(self.next_button)
-
-        button_row.addStretch(1)
-        self.cancel_button = qtw.QPushButton("Cancel")
-        self.cancel_button.clicked.connect(self.reject)
-        button_row.addWidget(self.cancel_button)
-
-        self.scan_button = qtw.QPushButton("Start Scan")
-        self.scan_button.clicked.connect(self._attempt_accept)
-        button_row.addWidget(self.scan_button)
-        layout.addLayout(button_row)
-
-        self.backend_combo.currentTextChanged.connect(self._update_validation_state)
-        self.backend_combo.currentIndexChanged.connect(self._refresh_detected_devices)
-        self.backend_combo.currentIndexChanged.connect(self._sync_backend_specific_controls)
-        self.device_name_edit.textChanged.connect(self._update_validation_state)
-        self.destination_edit.textChanged.connect(self._update_validation_state)
-        self.mode_combo.currentTextChanged.connect(self._update_validation_state)
-        self.dpi_combo.currentTextChanged.connect(self._update_validation_state)
-        self.source_type_combo.currentTextChanged.connect(self._update_validation_state)
-        self.persist_format_combo.currentTextChanged.connect(self._update_validation_state)
-        self.duplex_checkbox.toggled.connect(self._update_validation_state)
-        self.allow_network_fallback_checkbox.toggled.connect(self._refresh_detected_devices)
-        self.allow_network_fallback_checkbox.toggled.connect(self._update_validation_state)
-
-    def _populate_backend_options(self):
-        self.backend_combo.clear()
-        for option in self._backend_options_cache:
-            label = option["label"]
-            if not option.get("available", False):
-                reason = option.get("unavailable_reason")
-                if reason and option["label"] == "TWAIN":
-                    label = f"{label} (unavailable on this system)"
-                else:
-                    label = f"{label} (unavailable)"
-            self.backend_combo.addItem(label, option["value"])
-
-    def _detected_devices_text(self):
-        request = {
-            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference"),
-            "allow_network_fallback": self.allow_network_fallback_checkbox.isChecked(),
-        }
-        return self._format_detected_devices([], request)
-
-    def _refresh_detected_devices(self):
-        if self._loading_backends:
-            return
-        request = {
-            "backend_preference": self.backend_combo.currentData() or self.initial_request.get("backend_preference"),
-            "allow_network_fallback": self.allow_network_fallback_checkbox.isChecked(),
-        }
-        self._start_device_load(request)
-
-    def _apply_initial_request(self):
-        backend_index = self.backend_combo.findData(self.initial_request.get("backend_preference", "auto"))
-        if backend_index >= 0:
-            self.backend_combo.setCurrentIndex(backend_index)
-
-        self.device_name_edit.setText(self.initial_request.get("device_name", ""))
-        self.destination_edit.setText(self.initial_request.get("destination_folder", self.default_destination))
-
-        mode = self.initial_request.get("mode", "color")
-        if self.mode_combo.findText(mode) >= 0:
-            self.mode_combo.setCurrentText(mode)
-
-        dpi = str(self.initial_request.get("dpi", 300))
-        if self.dpi_combo.findText(dpi) >= 0:
-            self.dpi_combo.setCurrentText(dpi)
-
-        source_type = self.initial_request.get("source_type", "flatbed")
-        if self.source_type_combo.findText(source_type) >= 0:
-            self.source_type_combo.setCurrentText(source_type)
-
-        persist_format = self.initial_request.get("persist_format", "tiff")
-        if self.persist_format_combo.findText(persist_format) >= 0:
-            self.persist_format_combo.setCurrentText(persist_format)
-
-        self.duplex_checkbox.setChecked(bool(self.initial_request.get("duplex", False)))
-        self.allow_network_fallback_checkbox.setChecked(bool(self.initial_request.get("allow_network_fallback", True)))
-
-    def _sync_backend_specific_controls(self):
-        is_sane_backend = self.backend_combo.currentData() == "SaneScanner"
-        self.allow_network_fallback_checkbox.setEnabled(is_sane_backend)
-        if is_sane_backend:
-            self.allow_network_fallback_checkbox.setText("Allow AirScan fallback while testing SANE")
-        else:
-            self.allow_network_fallback_checkbox.setText("AirScan fallback applies only to the SANE backend")
-
-    def _go_back(self):
-        index = self.page_stack.currentIndex()
-        if index > 0:
-            self.page_stack.setCurrentIndex(index - 1)
-            self._update_page_state()
-
-    def _go_next(self):
-        index = self.page_stack.currentIndex()
-        if index < self.page_stack.count() - 1:
-            self.page_stack.setCurrentIndex(index + 1)
-            self._update_page_state()
-
-    def _update_page_state(self):
-        index = self.page_stack.currentIndex()
-        self.page_title_label.setText(self._page_titles[index])
-        self.back_button.setEnabled(index > 0)
-        self.next_button.setVisible(index < self.page_stack.count() - 1)
-        self.scan_button.setVisible(index == self.page_stack.count() - 1)
-        self._update_validation_state()
-
-    def _update_validation_state(self):
-        request = self.get_request()
-        if not request["destination_folder"].strip():
-            self.status_label.setText("Destination folder is required before the scan can start.")
-            self.status_label.setStyleSheet("color: #9f3a38;")
-            self.scan_button.setEnabled(False)
-        elif self._loading_backends or self._loading_devices:
-            self.status_label.setText("Loading scanner backends and devices. Please wait.")
-            self.status_label.setStyleSheet("color: #8a6d1d;")
-            self.scan_button.setEnabled(False)
-        else:
-            backend_option = self._backend_options_by_value.get(request["backend_preference"])
-            if backend_option is None:
-                self.status_label.setText("Select a valid scan backend before starting.")
-                self.status_label.setStyleSheet("color: #9f3a38;")
-                self.scan_button.setEnabled(False)
-            elif not backend_option.get("available", False):
-                unavailable_reason = backend_option.get("unavailable_reason")
-                if unavailable_reason:
-                    self.status_label.setText(unavailable_reason)
-                else:
-                    self.status_label.setText(
-                        f"{backend_option['label']} is not available on this system. Choose another backend to test."
-                    )
-                self.status_label.setStyleSheet("color: #9f3a38;")
-                self.scan_button.setEnabled(False)
-            else:
-                self.status_label.setText("Review the scan request and start when ready.")
-                self.status_label.setStyleSheet("color: #2f6b3b;")
-                self.scan_button.setEnabled(True)
-
-        review_lines = [
-            f"Backend: {self.backend_combo.currentText()}",
-            f"Device: {request['device_name'] or 'Default device'}",
-            f"Allow AirScan fallback: {'Yes' if request['allow_network_fallback'] else 'No'}",
-            f"Destination: {request['destination_folder']}",
-            f"Mode: {request['mode']}",
-            f"DPI: {request['dpi']}",
-            f"Source type: {request['source_type']}",
-            f"Duplex: {'Yes' if request['duplex'] else 'No'}",
-            f"Persist format: {request['persist_format']}",
-        ]
-        self.review_label.setText("\n".join(review_lines))
-
-    def _attempt_accept(self):
-        if not self.destination_edit.text().strip():
-            self._update_validation_state()
-            return
-        self.accept()
-
-    def get_request(self):
-        return {
-            "destination_folder": self.destination_edit.text().strip(),
-            "backend_preference": self.backend_combo.currentData(),
-            "device_name": self.device_name_edit.text().strip(),
-            "allow_network_fallback": self.allow_network_fallback_checkbox.isChecked(),
-            "mode": self.mode_combo.currentText(),
-            "dpi": int(self.dpi_combo.currentText()),
-            "source_type": self.source_type_combo.currentText(),
-            "duplex": self.duplex_checkbox.isChecked(),
-            "persist_format": self.persist_format_combo.currentText(),
-        }
-
-    def _format_detected_devices(self, devices, request):
-        if not devices:
-            if request["backend_preference"] == "ESCLScanner":
-                return "No AirScan devices were discovered automatically. Enter a scanner IP or URL above to connect directly."
-            if request["backend_preference"] == "SaneScanner" and not request.get("allow_network_fallback", True):
-                return "No native SANE devices were reported by scanimage -L. AirScan fallback is currently disabled for this test."
-            return "No devices reported by the current backend selection."
-        if request["backend_preference"] == "SaneScanner":
-            legend_lines = [
-                "[native SANE] = reported directly by scanimage -L via local SANE backend",
-                "[AirScan fallback] = network fallback path, not native USB SANE",
-            ]
-            return "\n".join(legend_lines + [""] + [str(device) for device in devices])
-        return "\n".join(str(device) for device in devices)
-
-    def _set_loading_state(self, message, active):
-        self.loading_label.setText(message)
-        self.loading_label.setVisible(active)
-        self.loading_progress.setVisible(active)
-        self._update_validation_state()
-
-    def _start_backend_load(self):
-        if self._backend_loader_thread is not None:
-            return
-        self._loading_backends = True
-        self._set_loading_state("Loading scanner backends...", True)
-        self.detected_devices_label.setText("Scanner discovery will start after the backend list loads.")
-
-        self._backend_loader_thread = qtc.QThread(self)
-        self._backend_loader_worker = ScanWizardLoadWorker(
-            self.scan_manager,
-            load_backend_options=True,
-        )
-        self._backend_loader_worker.moveToThread(self._backend_loader_thread)
-        self._backend_loader_thread.started.connect(self._backend_loader_worker.run)
-        self._backend_loader_worker.finished.connect(self._on_backend_load_finished)
-        self._backend_loader_worker.error.connect(self._on_backend_load_error)
-        self._backend_loader_worker.finished.connect(self._backend_loader_thread.quit)
-        self._backend_loader_worker.error.connect(self._backend_loader_thread.quit)
-        self._backend_loader_thread.finished.connect(self._cleanup_backend_loader)
-        self._backend_loader_thread.start()
-
-    def _on_backend_load_finished(self, payload):
-        self._loading_backends = False
-        self._backend_options_cache = payload.get("backend_options", [])
-        self._backend_options_by_value = {
-            option["value"]: option for option in self._backend_options_cache
-        }
-        self.backend_combo.blockSignals(True)
-        self._populate_backend_options()
-        self.backend_combo.setEnabled(bool(self._backend_options_cache))
-
-        backend_value = self.initial_request.get("backend_preference", "auto")
-        backend_index = self.backend_combo.findData(backend_value)
-        if backend_index < 0 and self.backend_combo.count() > 0:
-            backend_index = 0
-        if backend_index >= 0:
-            self.backend_combo.setCurrentIndex(backend_index)
-        self.backend_combo.blockSignals(False)
-        self._sync_backend_specific_controls()
-
-        self._set_loading_state("", False)
-        self._refresh_detected_devices()
-        self._update_validation_state()
-
-    def _on_backend_load_error(self, message):
-        self._loading_backends = False
-        self.backend_combo.clear()
-        self.backend_combo.addItem("Scanner backends unavailable", None)
-        self.backend_combo.setEnabled(False)
-        self.detected_devices_label.setText(f"Device discovery unavailable: {message}")
-        self._set_loading_state("Failed to load scanner backends.", False)
-        self._update_validation_state()
-
-    def _cleanup_backend_loader(self):
-        finished_thread = self.sender()
-        if self._backend_loader_worker is not None:
-            self._backend_loader_worker.deleteLater()
-            self._backend_loader_worker = None
-        if finished_thread is not None:
-            finished_thread.deleteLater()
-        if self._backend_loader_thread is finished_thread:
-            self._backend_loader_thread = None
-
-    def _start_device_load(self, request):
-        if self._device_loader_thread is not None and self._device_loader_thread.isRunning():
-            return
-
-        self._device_request_token += 1
-        request_payload = dict(request)
-        request_payload["_token"] = self._device_request_token
-        self._loading_devices = True
-        self.detected_devices_label.setText("Detecting devices for the selected backend...")
-        self._set_loading_state("Detecting scanner devices...", True)
-
-        self._device_loader_thread = qtc.QThread(self)
-        self._device_loader_worker = ScanWizardLoadWorker(
-            self.scan_manager,
-            request=request_payload,
-            discover_devices=True,
-        )
-        self._device_loader_worker.moveToThread(self._device_loader_thread)
-        self._device_loader_thread.started.connect(self._device_loader_worker.run)
-        self._device_loader_worker.finished.connect(self._on_device_load_finished)
-        self._device_loader_worker.error.connect(self._on_device_load_error)
-        self._device_loader_worker.finished.connect(self._device_loader_thread.quit)
-        self._device_loader_worker.error.connect(self._device_loader_thread.quit)
-        self._device_loader_thread.finished.connect(self._cleanup_device_loader)
-        self._device_loader_thread.start()
-
-    def _on_device_load_finished(self, payload):
-        request = payload.get("request", {})
-        if request.get("_token") != self._device_request_token:
-            return
-        self._loading_devices = False
-        visible_request = dict(request)
-        visible_request.pop("_token", None)
-        devices = payload.get("devices", [])
-        self.detected_devices_label.setText(self._format_detected_devices(devices, visible_request))
-        self._set_loading_state("", False)
-        self._update_validation_state()
-
-    def _on_device_load_error(self, message):
-        self._loading_devices = False
-        self.detected_devices_label.setText(f"Device discovery unavailable: {message}")
-        self._set_loading_state("", False)
-        self._update_validation_state()
-
-    def _cleanup_device_loader(self):
-        finished_thread = self.sender()
-        if self._device_loader_worker is not None:
-            self._device_loader_worker.deleteLater()
-            self._device_loader_worker = None
-        if finished_thread is not None:
-            finished_thread.deleteLater()
-        if self._device_loader_thread is finished_thread:
-            self._device_loader_thread = None
-
-    def closeEvent(self, event):
-        for thread in (self._backend_loader_thread, self._device_loader_thread):
-            if thread is not None and thread.isRunning():
-                thread.quit()
-                thread.wait(1000)
-        super().closeEvent(event)
-
-# network_scanner.py
-# PyQt5 + Scapy threaded network scanner
-
-def get_local_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # doesn't have to succeed; just forces OS routing decision
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-    except Exception:
-        ip = "127.0.0.1"
-    finally:
-        s.close()
-
-    return ip
-
-def get_subnet():
-    ip = get_local_ip()
-    net = ipaddress.ip_network(ip + "/24", strict=False)
-    return str(net)
-
-import socket
-import ipaddress
-
-from PyQt5 import QtCore as qtc
-class NetworkScanner(qtc.QThread):
-
-    deviceFound = qtc.pyqtSignal(dict)
-    progress = qtc.pyqtSignal(int)
-    finished = qtc.pyqtSignal()
-
-    def __init__(self, subnet=None, timeout=2.0, parent=None):
-        super().__init__(parent)
-        self.timeout = timeout
-        self._running = True
-        self.subnet = subnet or self.get_subnet()
-
-    def stop(self):
-        self._running = False
-
-    def run(self):
-        try:
-            print(f"[NETWORK] Scanning subnet: {self.subnet}")
-
-            if ARP is None or Ether is None or srp is None:
-                print("[NETWORK] Scapy is unavailable; skipping ARP scan")
-                return
-
-            arp = ARP(pdst=self.subnet)
-            ether = Ether(dst="ff:ff:ff:ff:ff:ff")
-            packet = ether / arp
-
-            answered, _ = srp(
-                packet,
-                timeout=5,
-                retry=2,
-                verbose=False
-            )
-
-            total = max(len(answered), 1)
-            print("===== ARP Responses =====")
-
-            for _, received in answered:
-                print(received.psrc, received.hwsrc)
-
-            for i, (sent, received) in enumerate(answered):
-
-                if not self._running:
-                    break
-
-                device = {
-                    "ip": received.psrc,
-                    "mac": received.hwsrc
-                }
-
-                print("[FOUND]", device)
-                self.deviceFound.emit(device)
-
-                self.progress.emit(int((i + 1) / total * 100))
-
-        except Exception as e:
-            print("[NETWORK ERROR]", e)
-
-        finally:
-            self._running = True
-            self.finished.emit()
-
-    def get_subnet(self):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            ip = s.getsockname()[0]
-            s.close()
-
-            net = ipaddress.ip_network(ip + "/24", strict=False)
-            return str(net)
-
-        except Exception:
-            return "192.168.2.0/24"
-# network_scanner.py
-# PyQt5 + Scapy threaded network scanner
-# assume your scanner already exists:
-# from your_scanner_file import NetworkScanner
-
-from PyQt5 import QtCore as qtc
-from PyQt5.QtWidgets import (
-    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QLabel, QHeaderView
-)
-class NetworkScanDialog(QDialog):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.setWindowTitle("Network Scanner")
-        self.resize(600, 400)
-
-        # ---------------- UI ----------------
-        self.layout = QVBoxLayout(self)
-
-        self.statusLabel = QLabel("Ready")
-        self.layout.addWidget(self.statusLabel)
-
-        self.table = QTableWidget(0, 2)
-        self.table.setHorizontalHeaderLabels(["IP", "MAC"])
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.layout.addWidget(self.table)
-
-        self.scanButton = QPushButton("Start Scan")
-        self.layout.addWidget(self.scanButton)
-
-        # ---------------- Scanner ----------------
-        self.scanner = None
-
-        # ---------------- Signals ----------------
-        self.scanButton.clicked.connect(self.startScan)
-
-    # ---------------- Core Actions ----------------
-
-    def startScan(self):
-
-        # stop old scan safely
-        if self.scanner and self.scanner.isRunning():
-            self.scanner.stop()
-            self.scanner.wait()
-
-        # create fresh scanner EVERY run (important)
-        self.scanner = NetworkScanner()
-
-        self.scanner.deviceFound.connect(self.onDeviceFound)
-        self.scanner.progress.connect(self.onProgress)
-        self.scanner.finished.connect(self.onFinished)
-
-        self.table.setRowCount(0)
-        self.statusLabel.setText("Scanning...")
-
-        self.scanner.start()
-
-    # ---------------- Slots ----------------
-
-    def onDeviceFound(self, device):
-        row = self.table.rowCount()
-        self.table.insertRow(row)
-
-        self.table.setItem(row, 0, QTableWidgetItem(device["ip"]))
-        self.table.setItem(row, 1, QTableWidgetItem(device["mac"]))
-
-    def onProgress(self, value):
-        self.statusLabel.setText(f"Scanning... {value}%")
-
-    def onFinished(self):
-        self.statusLabel.setText("Scan complete")
-
-
 class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
@@ -1358,6 +216,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._progress_bar_scale = 10
 
+        # 1. Initialize the global print handler
+        self.print_handler = ProjectPrintHandler(self)
+
+        
         configure_tesseract()
 
         # -------------------------
@@ -1375,6 +237,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._scan_worker = None
         self._project_success_title = ""
         self._project_success_message = ""
+        self.developer_services = None
+        self.runtime_inspector_panel = None
+        self.runtime_inspector_dock = None
+        self._developer_services_active = False
+        self.current_project_root = None
+        self._pending_project_root = None
+        self._active_print_target = "primary"
+        self.imgdir = ""
+        self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+        self.txtfileList = []
+        self.pixler_return_path = ""
+        self.pending_pixler_source_path = ""
+        self._pixler_return_poll_timer = None
+        self.pixler_return_prompt_dialog = None
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -1400,6 +278,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.scannerManager = ScanManager()
 
         self.session_manager = SessionManager()
+        self.current_project_root = self.session_manager.get_active_project_root() or self.current_project_root
 
         # -------------------------
         # Progress Bar (FIXED)
@@ -1408,12 +287,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.progress_bar.setRange(0, 100 * self._progress_bar_scale)
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
+        self._init_project_status_widgets()
         self.statusBar().addPermanentWidget(self.progress_bar)
 
         # -------------------------
         # Help System
         # -------------------------
         add_help_menu(self, 'MyServer')
+        self._setup_developer_mode_ui()
 
         # -------------------------
         # Actions / Signals
@@ -1424,6 +305,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
 
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+
+        if hasattr(self.ui, "actionPrint_Ref_Image"):
+            self.ui.actionPrint_Ref_Image.triggered.connect(
+                lambda: self.execute_print_flow(target="primary")
+            )
+        if hasattr(self.ui, "actionPrint_Text"):
+            self.ui.actionPrint_Text.triggered.connect(self.print_text_document)
+        if hasattr(self.ui, "actionPrint_Preview"):
+            self.ui.actionPrint_Preview.triggered.connect(self.print_active_preview)
+        if hasattr(self.ui, "actionExit"):
+            self.ui.actionExit.triggered.connect(self.close)
+
         self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
         self.ui.actionpdf_for_tiff_tb.triggered.connect(self.actionpdf_for_tiff)
         self.ui.actionpdf_to_tiff_tb.triggered.connect(self.actionpdf_to_tiff)
@@ -1523,6 +416,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionImageScanner.triggered.connect(self.actionScanNetwork)
         self.ui.actionImageScanner_tb.triggered.connect(self.actionScanNetwork)
 
+        self.ui.actionMyExplorer.triggered.connect(self.OpenWithMyExplorer)
         self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
         self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
         self.ui.actionMyVersifier.triggered.connect(lambda: self.open_module("MyVersifier"))
@@ -1532,6 +426,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
 
         # Button Modules
+        self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
         self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
 
@@ -1575,21 +470,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.get_session_settings()
         self.OpenChrReference()
 
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = ""
-        self.imgpath = ""
-        self.pixler_return_path = ""
-        self.pending_pixler_source_path = ""
-        self._pixler_return_poll_timer = None
-        self.pixler_return_prompt_dialog = None
-
         print('current book:', self.bookabbr)
 
         # -------------------------
         # Final UI State
         # -------------------------
         self.show()
+        qtc.QTimer.singleShot(0, self._restore_session_content)
 
         self.toggleLatinToolbars()
 
@@ -1612,6 +499,215 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             "project_created",
             self.on_project_created
         )
+        self._refresh_project_status()
+
+    def get_file_paths(self):
+        active_image_path = getattr(self, 'imgpath', None)
+        if not active_image_path and self.imgfileList and 0 <= self.current_img_index < len(self.imgfileList):
+            active_image_path = self.imgfileList[self.current_img_index]
+
+        active_text_path = getattr(self, 'txtpath', None)
+
+        return {
+            "primary": active_image_path,  # Maps directly to Print Ref Image
+            "secondary": active_text_path   # Maps directly to Print Text
+        }
+
+    def execute_print_flow(self, target="primary", preview=False):
+        """Routes the targeted path straight to the central print_handlerUI engine."""
+        self._active_print_target = target
+
+        if target == "primary":
+            image = self._current_print_image()
+            if image is None:
+                qtw.QMessageBox.information(
+                    self,
+                    "No File Loaded",
+                    "There is currently no active reference image loaded to print.",
+                )
+                return
+
+            self.print_handler.handle_image(image, self, preview=preview)
+            return
+
+        file_paths = self.get_file_paths()
+        target_file = file_paths.get(target)
+        
+        # Guard against blank or unselected file states
+        if not target_file:
+            from PyQt5.QtWidgets import QMessageBox
+            label_name = "reference image" if target == "primary" else "text document"
+            QMessageBox.information(self, "No File Loaded", f"There is currently no active {label_name} loaded to print.")
+            return
+            
+        # Send the file location over to the central print handler
+        self.print_handler.handle_print(target_file, self, preview=preview)
+
+    def _current_print_image(self):
+        live_qimage = getattr(self, "imgqimage", None)
+        if live_qimage is not None and not live_qimage.isNull():
+            return live_qimage
+
+        pixmap = getattr(self, "imagepixmap", None)
+        if pixmap is not None and not pixmap.isNull():
+            return pixmap
+
+        return None
+
+    def _current_text_document(self):
+        return getattr(self.ui, "OCRText", None).document() if hasattr(self.ui, "OCRText") else None
+
+    def _document_has_content(self, document):
+        if document is None:
+            return False
+
+        if document.isEmpty():
+            return False
+
+        return bool(document.toPlainText().strip() or document.toHtml().strip())
+
+    def print_text_document(self, preview=False):
+        document = self._current_text_document()
+        if not self._document_has_content(document):
+            qtw.QMessageBox.information(
+                self,
+                "No Text Loaded",
+                "There is currently no text document loaded to print.",
+            )
+            return
+
+        self._active_print_target = "secondary"
+        self.print_handler.handle_document(document, self, preview=preview)
+
+    def print_active_preview(self):
+        document = self._current_text_document()
+        text_has_content = self._document_has_content(document)
+        active_target = getattr(self, "_active_print_target", "primary")
+
+        if active_target == "secondary" and text_has_content:
+            self.print_text_document(preview=True)
+            return
+
+        if active_target == "primary" and self._current_print_image() is not None:
+            self.execute_print_flow(target="primary", preview=True)
+            return
+
+        if text_has_content:
+            self._active_print_target = "secondary"
+            self.print_text_document(preview=True)
+            return
+
+        if self._current_print_image() is not None:
+            self._active_print_target = "primary"
+            self.execute_print_flow(target="primary", preview=True)
+            return
+
+        qtw.QMessageBox.information(
+            self,
+            "No File Loaded",
+            "Load an image or text document before opening print preview.",
+        )
+
+    def _setup_developer_mode_ui(self):
+        """Create hidden-by-default Developer Mode entry points.
+
+        The Runtime Inspector is exposed through a Developer menu and remains
+        inactive until the user explicitly opens it.
+        """
+        menu_bar = self.menuBar()
+        self.developer_menu = menu_bar.addMenu("Developer")
+
+        self.action_runtime_inspector = qtw.QAction("Runtime Inspector", self)
+        self.action_runtime_inspector.setCheckable(True)
+        self.action_runtime_inspector.setChecked(False)
+        self.action_runtime_inspector.triggered.connect(
+            self._toggle_runtime_inspector
+        )
+        self.developer_menu.addAction(self.action_runtime_inspector)
+
+    def _toggle_runtime_inspector(self, checked):
+        """Show or hide the Runtime Inspector dock on demand."""
+        self._ensure_runtime_inspector_dock()
+
+        if checked:
+            self.runtime_inspector_dock.show()
+            self.runtime_inspector_dock.raise_()
+        else:
+            self.runtime_inspector_dock.hide()
+
+    def _ensure_runtime_inspector_dock(self):
+        """Create the Runtime Inspector dock lazily."""
+        if self.runtime_inspector_dock is not None:
+            return
+
+        self._ensure_developer_services()
+        panel_module_path = os.path.join(
+            developer_view_dir,
+            "RuntimeInspectorPanel.py",
+        )
+        panel_module_spec = importlib.util.spec_from_file_location(
+            "biblion_runtime_inspector_panel",
+            panel_module_path,
+        )
+        panel_module = importlib.util.module_from_spec(panel_module_spec)
+        panel_module_spec.loader.exec_module(panel_module)
+        runtime_inspector_panel_class = panel_module.RuntimeInspectorPanel
+        self.runtime_inspector_panel = runtime_inspector_panel_class(
+            developer_services=self.developer_services,
+            parent=self,
+        )
+        self.runtime_inspector_dock = qtw.QDockWidget(
+            "Runtime Inspector",
+            self,
+        )
+        self.runtime_inspector_dock.setObjectName("runtimeInspectorDock")
+        self.runtime_inspector_dock.setWidget(self.runtime_inspector_panel)
+        self.runtime_inspector_dock.setAllowedAreas(
+            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea
+        )
+        self.runtime_inspector_dock.visibilityChanged.connect(
+            self._on_runtime_inspector_visibility_changed
+        )
+        self.addDockWidget(Qt.RightDockWidgetArea, self.runtime_inspector_dock)
+        self.runtime_inspector_dock.hide()
+
+    def _ensure_developer_services(self):
+        """Create DeveloperServices only when a Developer panel is used."""
+        if self.developer_services is not None:
+            return
+
+        self.developer_services = DeveloperServices(event_bus=self.event_bus)
+
+    def _on_runtime_inspector_visibility_changed(self, visible):
+        """Activate DeveloperServices observation only while the panel is in use."""
+        if visible:
+            self._activate_developer_services()
+            if self.runtime_inspector_panel is not None:
+                self.runtime_inspector_panel.refresh()
+        else:
+            self._deactivate_developer_services()
+
+        if hasattr(self, "action_runtime_inspector"):
+            self.action_runtime_inspector.blockSignals(True)
+            self.action_runtime_inspector.setChecked(bool(visible))
+            self.action_runtime_inspector.blockSignals(False)
+
+    def _activate_developer_services(self):
+        """Attach DeveloperServices to passive EventBus observation."""
+        self._ensure_developer_services()
+        if self._developer_services_active:
+            return
+
+        self.event_bus.subscribe("*", self.developer_services.observe_event)
+        self._developer_services_active = True
+
+    def _deactivate_developer_services(self):
+        """Detach DeveloperServices when Developer Mode is not in use."""
+        if not self._developer_services_active or self.developer_services is None:
+            return
+
+        self.event_bus.unsubscribe("*", self.developer_services.observe_event)
+        self._developer_services_active = False
 
     def _apply_scan_icon(self):
         scan_icon = qtg.QIcon()
@@ -1643,12 +739,141 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionImageScanner_tb.setIcon(scan_icon)
             self.ui.actionImageScanner_tb.setIconVisibleInMenu(True)
 
+    def _init_project_status_widgets(self):
+        self.workflow_tracker = ProjectWorkflowTracker(workspace_root=project_root)
+
+        self.project_name_status_label = qtw.QLabel("Project: none")
+        self.project_name_status_label.setMinimumWidth(180)
+
+        self.workflow_status_label = qtw.QLabel("MyServer 0/4 | Next: Project initialized")
+        self.workflow_status_label.setMinimumWidth(360)
+
+        self.project_overall_status_bar = qtw.QProgressBar()
+        self.project_overall_status_bar.setRange(0, 100)
+        self.project_overall_status_bar.setValue(0)
+        self.project_overall_status_bar.setTextVisible(True)
+        self.project_overall_status_bar.setFormat("Project 0%")
+        self.project_overall_status_bar.setFixedWidth(140)
+        self.project_overall_status_bar.setAlignment(Qt.AlignCenter)
+
+        self.project_tracking_button = qtw.QPushButton("Milestones")
+        self.project_tracking_button.setFixedHeight(24)
+        self.project_tracking_button.clicked.connect(self._open_project_tracking_dialog)
+
+        self.statusBar().addPermanentWidget(self.project_name_status_label)
+        self.statusBar().addPermanentWidget(self.workflow_status_label)
+        self.statusBar().addPermanentWidget(self.project_overall_status_bar)
+        self.statusBar().addPermanentWidget(self.project_tracking_button)
+
+    def _format_module_workflow_status(self, module_name, snapshot):
+        module_total = int(snapshot.get("module_total_count", 0))
+        module_completed = int(snapshot.get("module_completed_count", 0))
+        next_label = snapshot.get("module_next_label", "")
+
+        if module_total <= 0:
+            return f"{module_name} | No milestones configured"
+        if next_label == "Complete":
+            return f"{module_name} {module_completed}/{module_total} | Complete"
+        return f"{module_name} {module_completed}/{module_total} | Next: {next_label}"
+
+    def _shared_active_project_root(self):
+        return self.session_manager.get_active_project_root()
+
+    def _set_current_project(self, project_root):
+        if not project_root:
+            return None
+
+        resolved_root = self.workflow_tracker.resolve_project_root(project_root) or os.path.abspath(os.path.normpath(project_root))
+        self.current_project_root = resolved_root
+        self.session_manager.set_active_project(resolved_root)
+        return resolved_root
+
+    def _refresh_project_status(self, candidate_path=None):
+        snapshot = self.workflow_tracker.snapshot(
+            "MyServer",
+            project_root=self.current_project_root,
+            candidate_paths=(
+                self._shared_active_project_root(),
+                candidate_path,
+                self.current_project_root,
+                getattr(self, "imgpath", ""),
+                getattr(self, "imgdir", ""),
+                getattr(self, "txtpath", ""),
+                getattr(self, "txtdir", ""),
+            ),
+        )
+
+        project_root_value = snapshot.get("project_root")
+        if project_root_value:
+            self._set_current_project(project_root_value)
+
+        project_name = snapshot.get("project_name", "none")
+        self.project_name_status_label.setText(f"Project: {project_name}")
+        self.project_name_status_label.setToolTip(project_root_value or "No active project selected")
+
+        completed_labels = snapshot.get("completed_labels", [])
+        completed_text = ", ".join(completed_labels) if completed_labels else "None yet"
+        overall_percent = int(snapshot.get("overall_percent", 0))
+        overall_next = snapshot.get("overall_next_label", "")
+        tooltip = f"Overall {overall_percent}%\nCompleted: {completed_text}\nNext: {overall_next}"
+
+        self.workflow_status_label.setText(self._format_module_workflow_status("MyServer", snapshot))
+        self.workflow_status_label.setToolTip(tooltip)
+        self.project_overall_status_bar.setValue(overall_percent)
+        self.project_overall_status_bar.setFormat(f"Project {overall_percent}%")
+        self.project_overall_status_bar.setToolTip(tooltip)
+
+    def _record_project_milestone(self, milestone_key, candidate_path=None, details=None):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            candidate_path,
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+        )
+        if not project_root:
+            return None
+
+        self._set_current_project(project_root)
+        self.workflow_tracker.record_milestone(
+            project_root,
+            milestone_key,
+            module_name="MyServer",
+            details=details,
+        )
+        self._refresh_project_status(project_root)
+        return project_root
+
+    def _open_project_tracking_dialog(self):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+            getattr(self, "txtpath", ""),
+            getattr(self, "txtdir", ""),
+        )
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                "Project Milestones",
+                "Open or create a project first so milestone state can be edited.",
+            )
+            return
+
+        self._set_current_project(project_root)
+        self.workflow_tracker.ensure_tracking_state(project_root)
+        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, "MyServer", self)
+        dialog.exec_()
+        self._refresh_project_status(project_root)
+
     def on_new_project_clicked(self):
         payload = self.collect_new_project_payload()
         if payload is None:
             return None
 
         project_path = os.path.join(self.project_engine.base_path, payload["project_name"])
+        self._pending_project_root = project_path
         if os.path.exists(project_path):
             answer = qtw.QMessageBox.question(
                 self,
@@ -1658,6 +883,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 qtw.QMessageBox.No,
             )
             if answer != qtw.QMessageBox.Yes:
+                self._pending_project_root = None
                 return None
             payload["overwrite_existing"] = True
 
@@ -1681,6 +907,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
             return None
 
+        self._set_current_project(project_path)
+        self.workflow_tracker.ensure_tracking_state(project_path)
+        self._record_project_milestone("project_ready", project_path)
+        self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
         self.run_child_module('MyExplorer.py', project_path)
         return project_path
@@ -1727,6 +957,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._hide_progress(100)
 
         if result.get("status") in {"success", "ok"}:
+            if self._pending_project_root:
+                self._set_current_project(self._pending_project_root)
+                self.workflow_tracker.ensure_tracking_state(self._pending_project_root)
+                self._record_project_milestone(
+                    "project_ready",
+                    self._pending_project_root,
+                    details={"source": "project_creation"},
+                )
+                self._refresh_project_status(self._pending_project_root)
             qtw.QMessageBox.information(
                 self,
                 self._project_success_title,
@@ -1738,9 +977,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 "Project Creation Failed",
                 result.get("error", "Unknown error")
             )
+        self._pending_project_root = None
 
     def on_project_creation_error(self, msg):
         self._hide_progress()
+        self._pending_project_root = None
 
         qtw.QMessageBox.warning(
             self,
@@ -1779,7 +1020,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         dialog.exec_()
 
     def collect_new_project_payload(self):
-        dialog = ProjectCreationWizardDialog(self)
+        dialog = ProjectCreationWizardDialog(self._projects_base_path(), self)
         if dialog.exec_() != qtw.QDialog.Accepted:
             return None
 
@@ -1846,33 +1087,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # self.netDialog.show()
 
     def _start_scan_workflow(self, request):
-        if self._scan_thread is not None:
-            qtw.QMessageBox.information(
-                self,
-                "Scan In Progress",
-                "Wait for the current scan task to finish."
-            )
-            return None
-
-        self._scan_thread = qtc.QThread()
-        self._scan_worker = ScanWorker(self.scannerManager, request)
-        self._scan_worker.moveToThread(self._scan_thread)
-
-        self._scan_thread.started.connect(self._scan_worker.run)
-        self._scan_worker.progress.connect(self.on_scan_progress)
-        self._scan_worker.finished.connect(self.on_scan_result)
-        self._scan_worker.error.connect(self.on_scan_error)
-
-        self._scan_worker.finished.connect(self._scan_thread.quit)
-        self._scan_worker.finished.connect(self._scan_worker.deleteLater)
-        self._scan_worker.error.connect(self._scan_thread.quit)
-        self._scan_worker.error.connect(self._scan_worker.deleteLater)
-        self._scan_thread.finished.connect(self._scan_thread.deleteLater)
-        self._scan_thread.finished.connect(self._on_scan_thread_finished)
-
-        self._scan_thread.start()
-        self._show_progress(0)
-        return request
+        return start_scan_workflow(
+            self,
+            self.scannerManager,
+            request,
+            self.on_scan_progress,
+            self.on_scan_result,
+            self.on_scan_error,
+            self._on_scan_thread_finished,
+            before_start=lambda: self._show_progress(0),
+        )
 
     def on_scan_progress(self, value):
         self._set_progress_percent(value)
@@ -1889,6 +1113,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         self.showImage(result["path"])
+        self._record_project_milestone(
+            "source_acquired",
+            result["path"],
+            details={"backend": result.get("backend", "scanner backend")},
+        )
         self.statusBar().showMessage(
             f"Scanned via {result.get('backend', 'scanner backend')}: {result['path']}",
             5000,
@@ -1903,73 +1132,25 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._scan_worker = None
 
     def _default_scan_request(self):
-        request = self.scannerManager.default_request(SCANNED_FOLDER)
-        request.update(
-            {
-                "destination_folder": getattr(self, "scan_destination_folder", SCANNED_FOLDER),
-                "backend_preference": getattr(self, "scan_backend_preference", "ESCLScanner"),
-                "device_name": getattr(self, "scan_device_name", ""),
-                "allow_network_fallback": getattr(self, "scan_allow_network_fallback", True),
-                "mode": getattr(self, "scan_mode", "color"),
-                "dpi": getattr(self, "scan_dpi", 300),
-                "source_type": getattr(self, "scan_source_type", "flatbed"),
-                "duplex": getattr(self, "scan_duplex", False),
-                "persist_format": getattr(self, "scan_persist_format", "tiff"),
-            }
-        )
-        return request
+        return self.scannerManager.request_from_state(self, SCANNED_FOLDER)
 
     def _persist_scan_request(self, request):
-        normalized_request = self.scannerManager.default_request(
-            (request or {}).get("destination_folder") or SCANNED_FOLDER
-        )
-        normalized_request.update(request or {})
-
-        self.scan_destination_folder = normalized_request["destination_folder"]
-        self.scan_backend_preference = normalized_request["backend_preference"]
-        self.scan_device_name = normalized_request["device_name"]
-        self.scan_allow_network_fallback = normalized_request.get("allow_network_fallback", True)
-        self.scan_mode = normalized_request["mode"]
-        self.scan_dpi = normalized_request["dpi"]
-        self.scan_source_type = normalized_request["source_type"]
-        self.scan_duplex = normalized_request["duplex"]
-        self.scan_persist_format = normalized_request["persist_format"]
+        normalized_request = self.scannerManager.apply_request_state(self, request, SCANNED_FOLDER)
 
         self.session_manager.update(
             'Session.json',
-            {
-                'self.scan_destination_folder': self.scan_destination_folder,
-                'self.scan_backend_preference': self.scan_backend_preference,
-                'self.scan_device_name': self.scan_device_name,
-                'self.scan_allow_network_fallback': self.scan_allow_network_fallback,
-                'self.scan_mode': self.scan_mode,
-                'self.scan_dpi': self.scan_dpi,
-                'self.scan_source_type': self.scan_source_type,
-                'self.scan_duplex': self.scan_duplex,
-                'self.scan_persist_format': self.scan_persist_format,
-            },
+            self.scannerManager.session_payload(normalized_request),
         )
 
     def _redirect_scan_to_myscanner(self, request):
-        normalized_request = self.scannerManager.default_request(
-            (request or {}).get("destination_folder") or SCANNED_FOLDER
-        )
-        normalized_request.update(request or {})
+        normalized_request = self.scannerManager.normalize_request(request, SCANNED_FOLDER)
 
         self.session_manager.update(
             'ScannerSession.json',
-            {
-                'self.scan_destination_folder': normalized_request['destination_folder'],
-                'self.scan_backend_preference': normalized_request['backend_preference'],
-                'self.scan_device_name': normalized_request['device_name'],
-                'self.scan_allow_network_fallback': normalized_request.get('allow_network_fallback', True),
-                'self.scan_mode': normalized_request['mode'],
-                'self.scan_dpi': normalized_request['dpi'],
-                'self.scan_source_type': normalized_request['source_type'],
-                'self.scan_duplex': normalized_request['duplex'],
-                'self.scan_persist_format': normalized_request['persist_format'],
-                'self.pending_scan_handoff': True,
-            },
+            self.scannerManager.session_payload(
+                normalized_request,
+                pending_scan_handoff=True,
+            ),
         )
         self.run_child_module('MyScanner.py')
         qtw.QMessageBox.information(
@@ -2067,43 +1248,55 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.zoomslidervalue = get_setting('zoomslidervalue', 0)
         self.txtpath = get_setting('txtpath', '')
         self.txtdir = get_setting('txtdir', '')
-        self.scan_destination_folder = get_setting('scan_destination_folder', SCANNED_FOLDER)
-        self.scan_backend_preference = get_setting('scan_backend_preference', 'ESCLScanner')
-        self.scan_device_name = get_setting('scan_device_name', '')
-        self.scan_allow_network_fallback = get_setting('scan_allow_network_fallback', True)
-        self.scan_mode = get_setting('scan_mode', 'color')
-        self.scan_dpi = get_setting('scan_dpi', 300)
-        self.scan_source_type = get_setting('scan_source_type', 'flatbed')
-        self.scan_duplex = get_setting('scan_duplex', False)
-        self.scan_persist_format = get_setting('scan_persist_format', 'tiff')
+        self.scannerManager.apply_request_state(
+            self,
+            {
+                'destination_folder': get_setting('scan_destination_folder', SCANNED_FOLDER),
+                'backend_preference': get_setting('scan_backend_preference', 'ESCLScanner'),
+                'device_name': get_setting('scan_device_name', ''),
+                'allow_network_fallback': get_setting('scan_allow_network_fallback', True),
+                'mode': get_setting('scan_mode', 'color'),
+                'dpi': get_setting('scan_dpi', 300),
+                'source_type': get_setting('scan_source_type', 'flatbed'),
+                'duplex': get_setting('scan_duplex', False),
+                'persist_format': get_setting('scan_persist_format', 'tiff'),
+            },
+            SCANNED_FOLDER,
+        )
 
-        try:
-            self.scan_dpi = int(self.scan_dpi)
-        except (TypeError, ValueError):
-            self.scan_dpi = 300
+        self._apply_session_ui_state()
 
-        if isinstance(self.scan_duplex, str):
-            self.scan_duplex = self.scan_duplex.strip().lower() in {'1', 'true', 'yes', 'on'}
-        else:
-            self.scan_duplex = bool(self.scan_duplex)
+    def _apply_session_ui_state(self):
+        if not hasattr(self, 'ui'):
+            return
 
-        if isinstance(self.scan_allow_network_fallback, str):
-            self.scan_allow_network_fallback = self.scan_allow_network_fallback.strip().lower() in {'1', 'true', 'yes', 'on'}
-        else:
-            self.scan_allow_network_fallback = bool(self.scan_allow_network_fallback)
-
-        #self.origpixmap = qtg.QPixmap.fromImage(qtg.QImage())
-        if hasattr(self, 'ui'):
-            self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-            self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
-            self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+        self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+        self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        if self.font:
             self.ui.fontComboBox.setCurrentText(self.font)
-            if str(self.fontsize).isdigit():
-                self.ui.fontSizeBox.setValue(int(self.fontsize))
-            self.ui.LHlineEdit.setText(self.linespacing)
+        if str(self.fontsize).isdigit():
+            self.ui.fontSizeBox.setValue(int(self.fontsize))
+        self.ui.LHlineEdit.setText(self.linespacing)
+        if self.zoom:
             self.ui.ZoomComboBox.setCurrentText(self.zoom)
-            if str(self.zoomslidervalue).isdigit():
-                self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+        if str(self.zoomslidervalue).isdigit():
+            self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _restore_session_content(self):
+        self._apply_session_ui_state()
+
+        restored_imgpath = getattr(self, 'imgpath', '')
+        restored_txtpath = getattr(self, 'txtpath', '')
+
+        if restored_imgpath and os.path.isfile(restored_imgpath):
+            self.showImage(restored_imgpath)
+
+        if restored_txtpath and os.path.isfile(restored_txtpath):
+            self.showText(restored_txtpath)
+
+        self._apply_session_ui_state()
+        self.on_font_update()
 
     def get_workflow_settings(self):
 
@@ -3768,8 +2961,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def showImage(self,imgfilename):
         self.imgpath = imgfilename
+        self._active_print_target = "primary"
         print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
         self.imgfilename = self.imgpath
+        self.imgdir = os.path.dirname(imgfilename)
         file = qtc.QFile(imgfilename)
         filestr = os.path.basename(imgfilename)
         filesplit = os.path.splitext(filestr)
@@ -3799,6 +2994,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
         })
+        self._record_project_milestone(
+            "source_acquired",
+            self.imgpath,
+            details={"source": "showImage"},
+        )
+        self._refresh_project_status(self.imgpath)
 
         self.imgfileList = []
         for i in sorted(os.listdir(self.imgdir)):
@@ -3951,53 +3152,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.on_zoom_combobox()
 
-
-        # jsonfile = 'Model/Project/Data/json/Session.json'
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
-        with open(jsonfile, 'r') as f:
-            # data = json.load(f)
-            # imgpath_key = r"self.imgpath"
-            # imgdir_key = r"self.imgdir"
-            data = {
-            "path": self.imgpath if isinstance(self.imgpath, str) else str(self.imgpath),
-            "dir": self.imgdir if isinstance(self.imgdir, str) else str(self.imgdir)
-}
-
-
-            for Setting in data:
-                # -------------------------------------------------
-                # SAFE SESSION CHECK (NO CRASH VERSION)
-                # -------------------------------------------------
-                Setting = locals().get("Setting", None)
-
-                if isinstance(Setting, dict):
-                    setting_value = Setting.get("Setting")
-                else:
-                    setting_value = None
-
-                imgpath_key = getattr(self, "imgpath", None)
-                imgdir_key = getattr(self, "imgdir", None)
-
-                # SAFE COMPARE ONLY IF VALID
-                if setting_value == imgpath_key:
-                    pass
-                                #if Setting['Setting'] == imgpath_key:
-
-                f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
-
-        self.imgfileList = []
-
-        for i in sorted(os.listdir(self.imgdir)):
-            ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)
-        self.sortImgFiles()
-
     def sortImgFiles(self):
         import re
 
@@ -4103,12 +3257,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not txtfilename:
             return
 
-        import os
-        import json
         from PyQt5 import QtCore as qtc
 
         # Ã¢Å“â€¦ Always sync internal state
         self.txtpath = txtfilename
+        self._active_print_target = "secondary"
         filename = os.path.basename(self.txtpath)
         self.txtdir = os.path.dirname(self.txtpath)
 
@@ -4138,20 +3291,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             file.close()
 
-        # Ã¢Å“â€¦ Update session JSON safely
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
-        if os.path.exists(jsonfile):
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-            for Setting in data:
-                if Setting['Setting'] == r"self.txtpath":
-                    Setting['CurrentValue'] = self.txtpath
-                elif Setting['Setting'] == r"self.txtdir":
-                    Setting['CurrentValue'] = self.txtdir
-
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
+        self.session_manager.update('Session.json', {
+            'self.txtpath': self.txtpath if self.txtpath is not None else '',
+            'self.txtdir': self.txtdir if self.txtdir is not None else '',
+        })
 
         # Ã¢Å“â€¦ Build file list (FIXED for Windows + CSV)
         self.txtfileList = []
@@ -4605,6 +3748,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         bf = self.ui.OCRCursor.blockFormat()
         bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
+        self.session_manager.update('Session.json', {
+            'self.linespacing': str(lineSpacing),
+        })
 
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
@@ -4708,6 +3854,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         self.ui.Image.setPixmap(scaled)
+        self.session_manager.update('Session.json', {
+            'self.zoom': combo_text,
+            'self.zoomslidervalue': value,
+        })
 
 
     def run_child_module(self, filename, *args):
@@ -4960,11 +4110,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         font.setPointSize(self.ui.fontSizeBox.value())
 
         self.ui.OCRText.setFont(font)
+        self.font = font.family()
+        self.fontsize = self.ui.fontSizeBox.value()
+        self.session_manager.update('Session.json', {
+            'self.font': self.font,
+            'self.fontsize': self.fontsize,
+        })
 
     def on_lang_select(self):
         pass
-
-
 
 # ================================
 # PROJECT CREATION STATE MACHINE
@@ -5330,7 +4484,11 @@ class EventBus:
         name = event["event"]
 
         if name in self.listeners:
-            for cb in self.listeners[name]:
+            for cb in list(self.listeners[name]):
+                cb(event)
+
+        if "*" in self.listeners:
+            for cb in list(self.listeners["*"]):
                 cb(event)
 
 # ================================

@@ -1,1 +1,0 @@
-Prior to using 1-TiffBW2png.py and 2-SortCropLangs.py, it is better to use GIMP to manually check that both the greek and latin blocks of text are cropped away from the surrounding margins.  Also, ensure that the center region between the two language blocks contains no noise.

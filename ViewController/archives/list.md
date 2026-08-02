@@ -1,0 +1,200 @@
+# Archived ViewController Files
+
+- Generated: 2026-08-02 11:46:21
+- Source report: docs/development/viewcontroller_archive_candidates.json
+- Files moved: 190
+- Skipped missing: 0
+- Skipped already under ViewController/archives: 0
+
+## Moved Files
+
+- ViewController/0-MainUI/Dialogs/crop_greek_linesDialog copy.py -> ViewController/archives/moved_candidates/0-MainUI/Dialogs/crop_greek_linesDialog copy.py
+- ViewController/0-MainUI/Icons/document-page-last.png -> ViewController/archives/moved_candidates/0-MainUI/Icons/document-page-last.png
+- ViewController/0-MainUI/MyPixler-one-shot works.py -> ViewController/archives/moved_candidates/0-MainUI/MyPixler-one-shot works.py
+- ViewController/0-MainUI/MyPixlerGVUI.py -> ViewController/archives/moved_candidates/0-MainUI/MyPixlerGVUI.py
+- ViewController/0-MainUI/QtDesignerUI/Archives/CropTif copy.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/Archives/CropTif copy.ui
+- ViewController/0-MainUI/QtDesignerUI/Archives/CropTif-old.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/Archives/CropTif-old.ui
+- ViewController/0-MainUI/QtDesignerUI/Archives/MainUI copy.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/Archives/MainUI copy.ui
+- ViewController/0-MainUI/QtDesignerUI/MyServerUI_Last.ui -> ViewController/archives/moved_candidates/0-MainUI/QtDesignerUI/MyServerUI_Last.ui
+- ViewController/1-PreProcess/3-DeskewLatin copy.py -> ViewController/archives/moved_candidates/1-PreProcess/3-DeskewLatin copy.py
+- ViewController/1-PreProcess/Reference/0-TextLines2FileGreek.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/0-TextLines2FileGreek.py
+- ViewController/1-PreProcess/Reference/1-Tif2Binary.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/1-Tif2Binary.py
+- ViewController/1-PreProcess/Reference/12-TextLines2FileGreekSynthetic.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/12-TextLines2FileGreekSynthetic.py
+- ViewController/1-PreProcess/Reference/13-DeskewGreekSynthetic.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/13-DeskewGreekSynthetic.py
+- ViewController/1-PreProcess/Reference/14-SortCropLinesGreekSynthetic.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/14-SortCropLinesGreekSynthetic.py
+- ViewController/1-PreProcess/Reference/15-SyntheticImageFileRenameMove.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/15-SyntheticImageFileRenameMove.py
+- ViewController/1-PreProcess/Reference/3-DeskewLatin.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/3-DeskewLatin.py
+- ViewController/1-PreProcess/Reference/5-SortCropLinesGreek2.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/5-SortCropLinesGreek2.py
+- ViewController/1-PreProcess/Reference/6-SortCropLinesLatin.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/6-SortCropLinesLatin.py
+- ViewController/1-PreProcess/Reference/ImWrite.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/ImWrite.py
+- ViewController/1-PreProcess/Reference/numpyversion.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/numpyversion.py
+- ViewController/1-PreProcess/Reference/png2tif.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/png2tif.py
+- ViewController/1-PreProcess/Reference/tif2jpg.py -> ViewController/archives/moved_candidates/1-PreProcess/Reference/tif2jpg.py
+- ViewController/1-PreProcess/Reference/untitled.ui -> ViewController/archives/moved_candidates/1-PreProcess/Reference/untitled.ui
+- ViewController/2-TrainTesseract/Reference/2-Move_feg_GroundTruth2Tesstrain,py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/2-Move_feg_GroundTruth2Tesstrain,py
+- ViewController/2-TrainTesseract/Reference/2-TextFileRenameMove.py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/2-TextFileRenameMove.py
+- ViewController/2-TrainTesseract/Reference/3-Move_feg_wordlist2Tesstrain,py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/3-Move_feg_wordlist2Tesstrain,py
+- ViewController/2-TrainTesseract/Reference/4-Tessrain_feg.sh -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/4-Tessrain_feg.sh
+- ViewController/2-TrainTesseract/Reference/4-TextFileRenameMove--check.py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/4-TextFileRenameMove--check.py
+- ViewController/2-TrainTesseract/Reference/5-Move_fel_GroundTruth2Tesstrain,py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/5-Move_fel_GroundTruth2Tesstrain,py
+- ViewController/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewNew.py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewNew.py
+- ViewController/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewOld.py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewOld.py
+- ViewController/2-TrainTesseract/Reference/6-Tessrain_fel.sh -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/6-Tessrain_fel.sh
+- ViewController/2-TrainTesseract/Reference/QT5ImageIterator.py -> ViewController/archives/moved_candidates/2-TrainTesseract/Reference/QT5ImageIterator.py
+- ViewController/3-ConductOCR/Reference/1-Qt5CorrectGreekOCR copy.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/1-Qt5CorrectGreekOCR copy.py
+- ViewController/3-ConductOCR/Reference/1-Qt5CorrectGreekOCROld.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/1-Qt5CorrectGreekOCROld.py
+- ViewController/3-ConductOCR/Reference/2-Qt5VersifyOld.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/2-Qt5VersifyOld.py
+- ViewController/3-ConductOCR/Reference/3-TR2Wordlist.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/3-TR2Wordlist.py
+- ViewController/3-ConductOCR/Reference/7-VersifyText.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/7-VersifyText.py
+- ViewController/3-ConductOCR/Reference/ComboFilter.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/ComboFilter.py
+- ViewController/3-ConductOCR/Reference/MulitpleClasses.txt -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/MulitpleClasses.txt
+- ViewController/3-ConductOCR/Reference/MySpellTextEdit.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/MySpellTextEdit.py
+- ViewController/3-ConductOCR/Reference/OCRCorrection.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/OCRCorrection.py
+- ViewController/3-ConductOCR/Reference/OCRCorrection2.ui -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/OCRCorrection2.ui
+- ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 2.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 2.py
+- ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 3.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 3.py
+- ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 4.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 4.py
+- ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy.py
+- ViewController/3-ConductOCR/Reference/RichTextEdit.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/RichTextEdit.py
+- ViewController/3-ConductOCR/Reference/TextEdit.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/TextEdit.py
+- ViewController/3-ConductOCR/Reference/TextEditSpellCheck.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/TextEditSpellCheck.py
+- ViewController/3-ConductOCR/Reference/WordListCombo.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/WordListCombo.py
+- ViewController/3-ConductOCR/Reference/WordListComboFilter.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/WordListComboFilter.py
+- ViewController/3-ConductOCR/Reference/spelltextedit.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/spelltextedit.py
+- ViewController/3-ConductOCR/Reference/tif2jpg.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/tif2jpg.py
+- ViewController/3-ConductOCR/Reference/tkGreekOCR.py -> ViewController/archives/moved_candidates/3-ConductOCR/Reference/tkGreekOCR.py
+- ViewController/4-PostProcess/Erasmvs/E4_GreekTxtPagesFontChange copy.py -> ViewController/archives/moved_candidates/4-PostProcess/Erasmvs/E4_GreekTxtPagesFontChange copy.py
+- ViewController/4-PostProcess/Reference/0-DBOperations.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/0-DBOperations.py
+- ViewController/4-PostProcess/Reference/0-DB_Codec.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/0-DB_Codec.py
+- ViewController/4-PostProcess/Reference/0-DB_Re.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/0-DB_Re.py
+- ViewController/4-PostProcess/Reference/1-DB_FROMVS2TW_Rebuild.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/1-DB_FROMVS2TW_Rebuild.py
+- ViewController/4-PostProcess/Reference/1-DB_TR2ES.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/1-DB_TR2ES.py
+- ViewController/4-PostProcess/Reference/1-DB_TRa2ES.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/1-DB_TRa2ES.py
+- ViewController/4-PostProcess/Reference/11-DB_Word2UnicodeLong.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/11-DB_Word2UnicodeLong.py
+- ViewController/4-PostProcess/Reference/2-DB_WordNormalize.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/2-DB_WordNormalize.py
+- ViewController/4-PostProcess/Reference/5-DB_StrongDistinct2FROMVS_wordlineloop.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/5-DB_StrongDistinct2FROMVS_wordlineloop.py
+- ViewController/4-PostProcess/Reference/5-DB_StrongDistinct2FROMVS_wordloop.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/5-DB_StrongDistinct2FROMVS_wordloop.py
+- ViewController/4-PostProcess/Reference/5-DB_StrongLine2FROMVS_broadwordloop.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/5-DB_StrongLine2FROMVS_broadwordloop.py
+- ViewController/4-PostProcess/Reference/5-DB_StrongTR2FROMVS_lemma.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/5-DB_StrongTR2FROMVS_lemma.py
+- ViewController/4-PostProcess/Reference/5-DB_StrongTR2FROMVS_nodia.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/5-DB_StrongTR2FROMVS_nodia.py
+- ViewController/4-PostProcess/Reference/6-DB_CopyLemma2LcLemma.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/6-DB_CopyLemma2LcLemma.py
+- ViewController/4-PostProcess/Reference/6-DB_LemmaLine2Erasmus.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/6-DB_LemmaLine2Erasmus.py
+- ViewController/4-PostProcess/Reference/6-DB_LemmaLowercase.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/6-DB_LemmaLowercase.py
+- ViewController/4-PostProcess/Reference/6-DB_VarForm2.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/6-DB_VarForm2.py
+- ViewController/4-PostProcess/Reference/6-DB_VariantsBackupResolved.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/6-DB_VariantsBackupResolved.py
+- ViewController/4-PostProcess/Reference/6-DB_VariantsRebuild.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/6-DB_VariantsRebuild.py
+- ViewController/4-PostProcess/Reference/7-DB_CopyLcLemma2NoDiaLemma.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/7-DB_CopyLcLemma2NoDiaLemma.py
+- ViewController/4-PostProcess/Reference/7-DB_LemmaNoDiacritics.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/7-DB_LemmaNoDiacritics.py
+- ViewController/4-PostProcess/Reference/7-DB_Strong2Variants.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/7-DB_Strong2Variants.py
+- ViewController/4-PostProcess/Reference/8-DB_VariantsRestoreResolved.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/8-DB_VariantsRestoreResolved.py
+- ViewController/4-PostProcess/Reference/8-Qt5ResolveVariants.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/8-Qt5ResolveVariants.py
+- ViewController/4-PostProcess/Reference/9-DB_EnglishLine2Erasmvs.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/9-DB_EnglishLine2Erasmvs.py
+- ViewController/4-PostProcess/Reference/9-DB_EnglishLine2ErasmvsJoinOld.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/9-DB_EnglishLine2ErasmvsJoinOld.py
+- ViewController/4-PostProcess/Reference/DB_ReplaceT.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/DB_ReplaceT.py
+- ViewController/4-PostProcess/Reference/DB_TRa2ES_bad.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/DB_TRa2ES_bad.py
+- ViewController/4-PostProcess/Reference/Qt5ResolveVariants_old.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Qt5ResolveVariants_old.py
+- ViewController/4-PostProcess/Reference/Recent/12-DB_Word2Unicode.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/12-DB_Word2Unicode.py
+- ViewController/4-PostProcess/Reference/Recent/12-DB_Word2UnicodeWord.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/12-DB_Word2UnicodeWord.py
+- ViewController/4-PostProcess/Reference/Recent/15-DB_FROMVS2TextTW+.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/15-DB_FROMVS2TextTW+.py
+- ViewController/4-PostProcess/Reference/Recent/2-DB_Word2NormWord.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/2-DB_Word2NormWord.py
+- ViewController/4-PostProcess/Reference/Recent/2-DB_WordNormalize.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/2-DB_WordNormalize.py
+- ViewController/4-PostProcess/Reference/Recent/3-DB_NormWord2LcWord.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/3-DB_NormWord2LcWord.py
+- ViewController/4-PostProcess/Reference/Recent/3-DB_WordLowercase.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/3-DB_WordLowercase.py
+- ViewController/4-PostProcess/Reference/Recent/4-DB_LcWord2NoDiaWord.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/4-DB_LcWord2NoDiaWord.py
+- ViewController/4-PostProcess/Reference/Recent/4-DB_WordNoDiacritics.py -> ViewController/archives/moved_candidates/4-PostProcess/Reference/Recent/4-DB_WordNoDiacritics.py
+- ViewController/Developer/Archives/MyBoxEditor.ui -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxEditor.ui
+- ViewController/Developer/Archives/MyBoxerGV.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxerGV.py
+- ViewController/Developer/Archives/MyBoxerGVUI.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxerGVUI.py
+- ViewController/Developer/Archives/MyBoxerUI copy.ui -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxerUI copy.ui
+- ViewController/Developer/Archives/MyBoxerUI_3.ui -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxerUI_3.ui
+- ViewController/Developer/Archives/MyBoxerUI_dev.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxerUI_dev.py
+- ViewController/Developer/Archives/MyBoxerUIold.ui -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxerUIold.ui
+- ViewController/Developer/Archives/MyBoxer_WindowsLast.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxer_WindowsLast.py
+- ViewController/Developer/Archives/MyBoxer_old.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxer_old.py
+- ViewController/Developer/Archives/MyBoxer_old1.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxer_old1.py
+- ViewController/Developer/Archives/MyBoxer_old2.py -> ViewController/archives/moved_candidates/Developer/Archives/MyBoxer_old2.py
+- ViewController/Developer/Reference/0-Qt5ManuscriptOCR.py -> ViewController/archives/moved_candidates/Developer/Reference/0-Qt5ManuscriptOCR.py
+- ViewController/Developer/Reference/Boxer/MyBoxerFull.py -> ViewController/archives/moved_candidates/Developer/Reference/Boxer/MyBoxerFull.py
+- ViewController/Developer/Reference/Boxer/MyBoxerHelp.py -> ViewController/archives/moved_candidates/Developer/Reference/Boxer/MyBoxerHelp.py
+- ViewController/Developer/Reference/CorrectOCR.py -> ViewController/archives/moved_candidates/Developer/Reference/CorrectOCR.py
+- ViewController/Developer/Reference/DeskewFiles.py -> ViewController/archives/moved_candidates/Developer/Reference/DeskewFiles.py
+- ViewController/Developer/Reference/ExtractPdf0.py -> ViewController/archives/moved_candidates/Developer/Reference/ExtractPdf0.py
+- ViewController/Developer/Reference/MainUI (another copy).ui -> ViewController/archives/moved_candidates/Developer/Reference/MainUI (another copy).ui
+- ViewController/Developer/Reference/MainUI (copy).ui -> ViewController/archives/moved_candidates/Developer/Reference/MainUI (copy).ui
+- ViewController/Developer/Reference/MainUI copy 2.ui -> ViewController/archives/moved_candidates/Developer/Reference/MainUI copy 2.ui
+- ViewController/Developer/Reference/MainUI copy.ui -> ViewController/archives/moved_candidates/Developer/Reference/MainUI copy.ui
+- ViewController/Developer/Reference/MainUI0.py -> ViewController/archives/moved_candidates/Developer/Reference/MainUI0.py
+- ViewController/Developer/Reference/MainUI0.ui -> ViewController/archives/moved_candidates/Developer/Reference/MainUI0.ui
+- ViewController/Developer/Reference/MainUI2.py -> ViewController/archives/moved_candidates/Developer/Reference/MainUI2.py
+- ViewController/Developer/Reference/MainUI_0.py -> ViewController/archives/moved_candidates/Developer/Reference/MainUI_0.py
+- ViewController/Developer/Reference/MulitprocessPoolExecutor.py -> ViewController/archives/moved_candidates/Developer/Reference/MulitprocessPoolExecutor.py
+- ViewController/Developer/Reference/MultiPreProcess.py -> ViewController/archives/moved_candidates/Developer/Reference/MultiPreProcess.py
+- ViewController/Developer/Reference/MultiThreadPreProcess.py -> ViewController/archives/moved_candidates/Developer/Reference/MultiThreadPreProcess.py
+- ViewController/Developer/Reference/Pdf4tiff.py -> ViewController/archives/moved_candidates/Developer/Reference/Pdf4tiff.py
+- ViewController/Developer/Reference/Pdf4tiffFileRenameMove.py -> ViewController/archives/moved_candidates/Developer/Reference/Pdf4tiffFileRenameMove.py
+- ViewController/Developer/Reference/PdfExtract.py -> ViewController/archives/moved_candidates/Developer/Reference/PdfExtract.py
+- ViewController/Developer/Reference/Pixler/ImageEditUI.py -> ViewController/archives/moved_candidates/Developer/Reference/Pixler/ImageEditUI.py
+- ViewController/Developer/Reference/Pixler/MyFixer.py -> ViewController/archives/moved_candidates/Developer/Reference/Pixler/MyFixer.py
+- ViewController/Developer/Reference/Pixler/MyFixerUI.py -> ViewController/archives/moved_candidates/Developer/Reference/Pixler/MyFixerUI.py
+- ViewController/Developer/Reference/Pixler/Qt5CropRegion.py -> ViewController/archives/moved_candidates/Developer/Reference/Pixler/Qt5CropRegion.py
+- ViewController/Developer/Reference/PreprocessMultiProcessPoolExecMap.py -> ViewController/archives/moved_candidates/Developer/Reference/PreprocessMultiProcessPoolExecMap.py
+- ViewController/Developer/Reference/Qt4CropImage.py -> ViewController/archives/moved_candidates/Developer/Reference/Qt4CropImage.py
+- ViewController/Developer/Reference/Qt5BiblicalOCR copy 2.py -> ViewController/archives/moved_candidates/Developer/Reference/Qt5BiblicalOCR copy 2.py
+- ViewController/Developer/Reference/Qt5BiblicalOCR copy 3.py -> ViewController/archives/moved_candidates/Developer/Reference/Qt5BiblicalOCR copy 3.py
+- ViewController/Developer/Reference/Qt5BiblicalOCR copy.py -> ViewController/archives/moved_candidates/Developer/Reference/Qt5BiblicalOCR copy.py
+- ViewController/Developer/Reference/Qt5BiblicalOCRMulti.py -> ViewController/archives/moved_candidates/Developer/Reference/Qt5BiblicalOCRMulti.py
+- ViewController/Developer/Reference/Qt5MssOCR.py -> ViewController/archives/moved_candidates/Developer/Reference/Qt5MssOCR.py
+- ViewController/Developer/Reference/Reader/2-Tiff2pngLatin.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/2-Tiff2pngLatin.py
+- ViewController/Developer/Reference/Reader/CropDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/CropDialog.py
+- ViewController/Developer/Reference/Reader/CropImage copy.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/CropImage copy.py
+- ViewController/Developer/Reference/Reader/CropLangsDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/CropLangsDialog.py
+- ViewController/Developer/Reference/Reader/CropLatin2tifLinesDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/CropLatin2tifLinesDialog.py
+- ViewController/Developer/Reference/Reader/CropTif copy.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/CropTif copy.py
+- ViewController/Developer/Reference/Reader/ExtractPdf.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/ExtractPdf.py
+- ViewController/Developer/Reference/Reader/FromToDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/FromToDialog.py
+- ViewController/Developer/Reference/Reader/FromToToDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/FromToToDialog.py
+- ViewController/Developer/Reference/Reader/GreekText2Wordlist.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/GreekText2Wordlist.py
+- ViewController/Developer/Reference/Reader/ImgMultiPreProcess.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/ImgMultiPreProcess.py
+- ViewController/Developer/Reference/Reader/MypdfViewer.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/MypdfViewer.py
+- ViewController/Developer/Reference/Reader/Qt5BiblicalOCR copy.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/Qt5BiblicalOCR copy.py
+- ViewController/Developer/Reference/Reader/Qt5BiblicalOCR.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/Qt5BiblicalOCR.py
+- ViewController/Developer/Reference/Reader/Qt5BiblicalOCRbad.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/Qt5BiblicalOCRbad.py
+- ViewController/Developer/Reference/Reader/Qt5Logger.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/Qt5Logger.py
+- ViewController/Developer/Reference/Reader/QtCropImage copy 2.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/QtCropImage copy 2.py
+- ViewController/Developer/Reference/Reader/QtCropImage copy.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/QtCropImage copy.py
+- ViewController/Developer/Reference/Reader/get_workflow_settings.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/get_workflow_settings.py
+- ViewController/Developer/Reference/Reader/pngResizeDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Reader/pngResizeDialog.py
+- ViewController/Developer/Reference/Resolver/VariantText.py -> ViewController/archives/moved_candidates/Developer/Reference/Resolver/VariantText.py
+- ViewController/Developer/Reference/Resolver/VariantsMainForm.py -> ViewController/archives/moved_candidates/Developer/Reference/Resolver/VariantsMainForm.py
+- ViewController/Developer/Reference/Resolver/old-Qt5ResolveVariants.py -> ViewController/archives/moved_candidates/Developer/Reference/Resolver/old-Qt5ResolveVariants.py
+- ViewController/Developer/Reference/SqliteHelper copy.py -> ViewController/archives/moved_candidates/Developer/Reference/SqliteHelper copy.py
+- ViewController/Developer/Reference/Term2Text.py -> ViewController/archives/moved_candidates/Developer/Reference/Term2Text.py
+- ViewController/Developer/Reference/Trainer/2-Tiff2pngGreek.py -> ViewController/archives/moved_candidates/Developer/Reference/Trainer/2-Tiff2pngGreek.py
+- ViewController/Developer/Reference/Trainer/5-GroundTruthFileRenameMove--check.py -> ViewController/archives/moved_candidates/Developer/Reference/Trainer/5-GroundTruthFileRenameMove--check.py
+- ViewController/Developer/Reference/UI_Icons copy.py -> ViewController/archives/moved_candidates/Developer/Reference/UI_Icons copy.py
+- ViewController/Developer/Reference/Versifier/6-RemoveTRBookRef.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/6-RemoveTRBookRef.py
+- ViewController/Developer/Reference/Versifier/LowerizeText.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/LowerizeText.py
+- ViewController/Developer/Reference/Versifier/MainUI (copy).py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MainUI (copy).py
+- ViewController/Developer/Reference/Versifier/MainUI copy.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MainUI copy.py
+- ViewController/Developer/Reference/Versifier/MoveDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MoveDialog.py
+- ViewController/Developer/Reference/Versifier/MoveGreektextLinesDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MoveGreektextLinesDialog.py
+- ViewController/Developer/Reference/Versifier/MoveGreektifLines.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MoveGreektifLines.py
+- ViewController/Developer/Reference/Versifier/MoveLatintextLinesDialog.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MoveLatintextLinesDialog.py
+- ViewController/Developer/Reference/Versifier/MoveLatintifLines.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/MoveLatintifLines.py
+- ViewController/Developer/Reference/Versifier/NoDiacritisText.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/NoDiacritisText.py
+- ViewController/Developer/Reference/Versifier/NormalizeText.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/NormalizeText.py
+- ViewController/Developer/Reference/Versifier/Qt5Versify.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/Qt5Versify.py
+- ViewController/Developer/Reference/Versifier/Qt5VersifyTextNew.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/Qt5VersifyTextNew.py
+- ViewController/Developer/Reference/Versifier/verses_ui.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/verses_ui.py
+- ViewController/Developer/Reference/Versifier/verses_uic.py -> ViewController/archives/moved_candidates/Developer/Reference/Versifier/verses_uic.py
+- ViewController/Developer/Reference/Writer/MyWriterOrig.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/MyWriterOrig.py
+- ViewController/Developer/Reference/Writer/Part-1/part-1.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/Part-1/part-1.py
+- ViewController/Developer/Reference/Writer/Part-2/part-2.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/Part-2/part-2.py
+- ViewController/Developer/Reference/Writer/Part-3/part-3.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/Part-3/part-3.py
+- ViewController/Developer/Reference/Writer/Part-4/part-4.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/Part-4/part-4.py
+- ViewController/Developer/Reference/Writer/Qt5RichTextEdit.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/Qt5RichTextEdit.py
+- ViewController/Developer/Reference/Writer/Qt5TextEdit.py -> ViewController/archives/moved_candidates/Developer/Reference/Writer/Qt5TextEdit.py
+- ViewController/Developer/Reference/mulitestloop.py -> ViewController/archives/moved_candidates/Developer/Reference/mulitestloop.py
+- ViewController/Developer/Reference/mulitestloop2.py -> ViewController/archives/moved_candidates/Developer/Reference/mulitestloop2.py
+- ViewController/Developer/Reference/mulitestpool.py -> ViewController/archives/moved_candidates/Developer/Reference/mulitestpool.py
+- ViewController/Developer/Reference/mulitestpool2.py -> ViewController/archives/moved_candidates/Developer/Reference/mulitestpool2.py

@@ -1,6 +1,8 @@
 import os
 import json
 import platform
+import sys
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 from PyQt5 import QtGui as qtg
@@ -9,12 +11,98 @@ JSONItem = Dict[str, Any]
 SessionDict = Dict[str, JSONItem]
 SettingMap = Dict[str, Union[str, Callable[[Any], None]]]
 
+ACTIVE_PROJECT_ROOT_KEYS = (
+    'self.active_project_root',
+    'self.project_root',
+)
+ACTIVE_PROJECT_NAME_KEYS = (
+    'self.active_project_name',
+    'self.project_name',
+)
+
+
+@dataclass(frozen=True)
+class RuntimePaths:
+    script_dir: str
+    project_root: str
+    model_dir: str
+    data_dir: str
+    image_dir: str
+    text_dir: str
+    train_dir: str
+    session_dir: str
+    developer_view_dir: str
+
 
 def normalize_path(path: str) -> str:
     return os.path.abspath(os.path.expanduser(path))
 
 
+def build_runtime_paths(
+    module_file: Optional[str] = None,
+    *,
+    add_project_root: bool = True,
+    add_developer_view: bool = False,
+) -> RuntimePaths:
+    script_dir = os.path.dirname(os.path.realpath(module_file)) if module_file else os.path.dirname(os.path.abspath(__file__))
+    project_root = normalize_path(os.path.join(script_dir, '..', '..'))
+    model_dir = os.path.join(project_root, 'Model')
+    data_dir = os.path.join(model_dir, 'Data')
+    image_dir = os.path.join(model_dir, 'Images')
+    text_dir = os.path.join(model_dir, 'Text')
+    train_dir = os.path.join(model_dir, 'Training')
+    session_dir = os.path.join(data_dir, 'json')
+    developer_view_dir = os.path.join(project_root, 'ViewController', 'Developer')
+
+    if add_project_root and project_root not in sys.path:
+        sys.path.insert(0, project_root)
+
+    if add_developer_view and developer_view_dir not in sys.path:
+        sys.path.insert(0, developer_view_dir)
+
+    return RuntimePaths(
+        script_dir=script_dir,
+        project_root=project_root,
+        model_dir=model_dir,
+        data_dir=data_dir,
+        image_dir=image_dir,
+        text_dir=text_dir,
+        train_dir=train_dir,
+        session_dir=session_dir,
+        developer_view_dir=developer_view_dir,
+    )
+
+
 class SessionManager:
+    @staticmethod
+    def runtime_paths_for(
+        module_file: Optional[str] = None,
+        *,
+        add_project_root: bool = True,
+        add_developer_view: bool = False,
+    ) -> RuntimePaths:
+        return build_runtime_paths(
+            module_file,
+            add_project_root=add_project_root,
+            add_developer_view=add_developer_view,
+        )
+
+    @staticmethod
+    def export_runtime_paths(
+        namespace: Dict[str, Any],
+        module_file: Optional[str] = None,
+        *,
+        add_project_root: bool = True,
+        add_developer_view: bool = False,
+    ) -> RuntimePaths:
+        runtime_paths = SessionManager.runtime_paths_for(
+            module_file,
+            add_project_root=add_project_root,
+            add_developer_view=add_developer_view,
+        )
+        namespace.update(runtime_paths.__dict__)
+        return runtime_paths
+
     def __init__(self, base_dir: Optional[str] = None):
         if base_dir:
             self.base_dir = normalize_path(base_dir)
@@ -55,6 +143,51 @@ class SessionManager:
 
     def values(self, filename: str, keys: Optional[Iterable[str]] = None) -> Dict[str, Any]:
         return {key: item.get('CurrentValue') for key, item in self.load(filename, keys).items()}
+
+    def get_active_project(self, filename: str = 'Session.json') -> Dict[str, str]:
+        values = self.values(filename)
+
+        project_root = ''
+        for key in ACTIVE_PROJECT_ROOT_KEYS:
+            value = values.get(key)
+            if value:
+                project_root = normalize_path(str(value))
+                break
+
+        project_name = ''
+        for key in ACTIVE_PROJECT_NAME_KEYS:
+            value = values.get(key)
+            if value:
+                project_name = str(value).strip()
+                break
+
+        if project_root and not project_name:
+            project_name = os.path.basename(project_root)
+
+        return {
+            'project_root': project_root,
+            'project_name': project_name,
+        }
+
+    def get_active_project_root(self, filename: str = 'Session.json') -> str:
+        return self.get_active_project(filename).get('project_root', '')
+
+    def set_active_project(self, project_root: str, filename: str = 'Session.json') -> Dict[str, str]:
+        normalized_root = normalize_path(project_root)
+        project_name = os.path.basename(normalized_root)
+        self.update(
+            filename,
+            {
+                'self.active_project_root': normalized_root,
+                'self.active_project_name': project_name,
+                'self.project_root': normalized_root,
+                'self.project_name': project_name,
+            },
+        )
+        return {
+            'project_root': normalized_root,
+            'project_name': project_name,
+        }
 
     def update(self, filename: str, updates: Dict[str, Any]) -> None:
         path = self.session_path(filename)

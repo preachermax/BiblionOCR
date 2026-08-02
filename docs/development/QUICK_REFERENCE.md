@@ -60,6 +60,53 @@ python3 MyExplorer.py           # File browser
 
 ---
 
+## Current Project Contract
+
+- Select or create the active project in `MyServer` first.
+- `MyServer` now publishes the active project to shared session state for the rest of the runtime modules.
+- Other tools should treat that shared selection as the current project instead of inferring project identity only from the last opened file.
+- If a module shows `Project: none`, open or switch the project in `MyServer` and let the module refresh.
+
+---
+
+## Project Status and Milestones
+
+- Main runtime modules now show a common status-bar surface with the current project, workflow status, overall progress, and a `Milestones` button.
+- The `Milestones` button opens the shared milestone editor dialog for the currently selected project.
+- Milestones are persisted per project in `Model/Project/Data/json/ProjectTracking.json`.
+- Project selection is shared through `Model/Project/Data/json/Session.json`.
+- The milestone editor is intended to be user-visible and manually editable, not only auto-derived from file artifacts.
+
+Modules with the common project-status surface:
+
+- `MyServer`
+- `MyPixler`
+- `MyScanner`
+- `MyReader`
+- `MyWriter`
+- `MyGrounder`
+- `MyVersifier`
+- `MyTrainer`
+- `MyGlypher`
+- `MyBoxer`
+- `MyLexer`
+- `MyResolver`
+- `MyExplorer`
+- `MyLauncher`
+
+---
+
+## Shared Print And Exit Menu Support
+
+- `MyServer` remains the source implementation for print flow behavior.
+- `ViewController/0-MainUI/print_menu_support.py` now provides shared controller-side print wiring for `MyScanner`, `MyReader`, `MyGlypher`, `MyVersifier`, `MyWriter`, `MyPixler`, and `MyBoxer`.
+- `actionPrint_Preview` now follows the active or first available print target for those modules instead of each module duplicating its own preview routing.
+- `actionExit` is wired in the controller layer for `MyServer`, `MyGrounder`, `MyLauncher`, `MyLexer`, and `MyTrainer` when the matching UI action exists.
+- `MyExplorer` and `MyResolver` are intentionally excluded from the `actionExit` rollout.
+- See `PRINT_AND_EXIT_MENU_SUPPORT.md` for the full controller/UI contract.
+
+---
+
 ## Key Workflows
 
 ### Workflow 1: Complete OCR from PDF
@@ -177,8 +224,8 @@ All applications use consistent patterns:
 
 | Tool | Location | Purpose |
 |------|----------|---------|
-| glyphtracer | glyphtracer-master/ | Glyph tracing |
-| potrace | potrace-main/ | Vector tracing |
+| glyphtracer | external/local tool | Glyph tracing |
+| potrace | external/local tool | Vector tracing |
 | Version finder | ext/versefind.py | Locate verses |
 | Scan finder | ext/scanfind.py | Locate scan regions |
 

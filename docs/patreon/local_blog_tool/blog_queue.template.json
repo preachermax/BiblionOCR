@@ -1,0 +1,172 @@
+[
+  {
+    "scheduled_date": "2026-07-07",
+    "slug": "website-prototype-members-preview",
+    "title": "A Guided Look at the Biblion Website Prototype",
+    "audience_intent": "members_only",
+    "visibility": "public",
+    "excerpt": "A preview-style post that walks through the current website shell and explains why it matters for the public-facing story.",
+    "tags": [
+      "website",
+      "prototype",
+      "public launch",
+      "patreon"
+    ],
+    "call_to_action": "If this kind of build-note is useful, future deep-dive previews will move back into the members-only stream.",
+    "links": [
+      {
+        "label": "Website entry document",
+        "path": "../../../website/index.html",
+        "note": "This is the HTML entry point that mounts the React app driven by App.jsx."
+      },
+      {
+        "label": "React application shell",
+        "path": "../../../website/src/App.jsx",
+        "note": "This component drives the graph-based prototype experience behind the entry document."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Why this post exists",
+        "paragraphs": [
+          "This is the sort of development note I would normally reserve for members, because it sits close to the working edge of the project rather than the finished public surface.",
+          "For now it is public because the website prototype helps explain what Biblion is becoming and gives people a concrete artifact to explore."
+        ]
+      },
+      {
+        "heading": "What to open first",
+        "paragraphs": [
+          "Start with the website entry document at [docs/website/index.html](../../../website/index.html). That page is the outer shell that loads the React runtime.",
+          "The behavior behind that page lives in [docs/website/src/App.jsx](../../../website/src/App.jsx), where the project overview graph, principles graph, and interaction flow are defined."
+        ]
+      },
+      {
+        "heading": "Why it matters",
+        "paragraphs": [
+          "The prototype turns Biblion from a code repository into a navigable explanation of vision, architecture, development, and publication goals.",
+          "That matters for Patreon because ongoing support is easier to justify when supporters can see the shape of the platform and not just hear about it abstractly."
+        ]
+      }
+    ]
+  },
+  {
+    "scheduled_date": "2026-07-08",
+    "slug": "workflow-milestones-status-surface",
+    "title": "How the New Workflow Milestone Surface Changes Daily Work",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "Explain the shared milestone model and why persistent project status matters across modules.",
+    "tags": ["workflow", "ui", "milestones"],
+    "call_to_action": "Members will get the detailed screenshots and iteration notes.",
+    "links": [],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Show how the shared status bar and milestone dialog turn project progress into something visible and editable.",
+          "Use this to connect interface polish with actual scholarly workflow control."
+        ]
+      }
+    ]
+  },
+  {
+    "scheduled_date": "2026-07-09",
+    "slug": "scanner-to-ocr-pipeline-explainer",
+    "title": "From Scan to OCR: The Pipeline Biblion Is Assembling",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A public explainer about how acquisition, preprocessing, OCR, and post-processing fit together.",
+    "tags": ["ocr", "pipeline", "public"],
+    "call_to_action": "This is a good shareable overview for people following the project from outside the codebase.",
+    "links": [],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Keep this approachable and narrative rather than deeply technical.",
+          "Emphasize why modularity helps preservation-grade workflows."
+        ]
+      }
+    ]
+  },
+  {
+    "scheduled_date": "2026-07-10",
+    "slug": "dependabot-and-public-launch-housekeeping",
+    "title": "Why Infrastructure Housekeeping Counts as Real Progress",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A short post connecting Dependabot, docs, and publication hygiene to long-term project stability.",
+    "tags": ["maintenance", "github", "release"],
+    "call_to_action": "Use this to normalize maintenance work as part of serious software stewardship.",
+    "links": [],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Translate invisible maintenance into visible trust-building.",
+          "Frame it as the cost of making a project durable enough for public scholarship."
+        ]
+      }
+    ]
+  },
+  {
+    "scheduled_date": "2026-07-11",
+    "slug": "preservation-before-convenience",
+    "title": "Preservation Before Convenience: A Biblion Design Principle",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A principle-focused post that turns an internal design value into a public-facing argument.",
+    "tags": ["principles", "preservation", "design"],
+    "call_to_action": "This is a strong weekend post because it explains the philosophy behind many later technical decisions.",
+    "links": [],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Connect source fidelity, traceability, and archival responsibility.",
+          "Avoid product-language and keep the emphasis on stewardship."
+        ]
+      }
+    ]
+  },
+  {
+    "scheduled_date": "2026-07-12",
+    "slug": "members-lab-note-on-dialog-ux",
+    "title": "Lab Note: Making Scholarly Workflow Visible in the UI",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "A more intimate members post about interface decisions, friction, and iteration logic.",
+    "tags": ["members", "ux", "development notes"],
+    "call_to_action": "Good slot for a candid post with rough edges and open questions.",
+    "links": [],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Talk plainly about tradeoffs, status-bar density, and why editability matters more than polish at this stage.",
+          "This should feel closer to a studio journal than a polished announcement."
+        ]
+      }
+    ]
+  },
+  {
+    "scheduled_date": "2026-07-13",
+    "slug": "week-ahead-what-support-enables",
+    "title": "Week Ahead: What Support Enables Next",
+    "audience_intent": "public",
+    "visibility": "public",
+    "excerpt": "A forward-looking wrap-up that sets the next week’s expectations and invites support.",
+    "tags": ["roadmap", "support", "weekly"],
+    "call_to_action": "Use this as the bridge into the next seven-post refresh.",
+    "links": [],
+    "sections": [
+      {
+        "heading": "Angle",
+        "paragraphs": [
+          "Summarize what moved this week and what the next build targets are.",
+          "Keep the call for support concrete by naming the kind of work it makes possible."
+        ]
+      }
+    ]
+  }
+]

@@ -2,9 +2,20 @@
 
 import sys
 import os
-import json
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 from PyQt5 import QtPrintSupport
 #from PyQt5 import QPrintPreviewDialog, QPrintDialog
 from PyQt5 import QtWidgets as qtw
@@ -14,6 +25,7 @@ from PyQt5.QtCore import Qt
 
 from ext import *
 from LocalFileDrop import LocalFileDropMixin
+from print_menu_support import install_print_menu_support, document_target
 
 from MyWriterUI import Ui_MyWriterUI
 
@@ -29,6 +41,16 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui = Ui_MyWriterUI()
         self.ui.setupUi(self)
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.textEdit.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Text",
+        )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyWriter')
         self.session_manager = SessionManager()
@@ -51,6 +73,9 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('Session.json')
 
         def get_setting(name: str, default=None):
@@ -214,6 +239,12 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         # more or less 8 spaces
         self.ui.textEdit.setTabStopWidth(33)
         self.get_session_settings()
+        if not hasattr(self, 'project_status_controller'):
+            self.project_status_controller = ProjectStatusController(
+                self,
+                'MyWriter',
+                session_manager=self.session_manager,
+            )
         self.initMenubar()
         self.initToolbar()
         self.initFormatbar()

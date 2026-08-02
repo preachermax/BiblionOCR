@@ -1,0 +1,9 @@
+[
+  {
+    "src": "ViewController/0-MainUI/MyPixler-one-shot works.py",
+    "dst": "ViewController/archives/moved_candidates/0-MainUI/MyPixler-one-shot works.py",
+    "refs": [
+      "tmp_unused_data_files.json"
+    ]
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "compose_url": "https://www.patreon.com/posts/new",
+  "public_website_url": "https://biblionocr.onrender.com/",
+  "post_success_url_patterns": [
+    "/posts/(?!new)"
+  ],
+  "selectors": {
+    "title": [
+      "input[placeholder*='title' i]",
+      "textarea[placeholder*='title' i]",
+      "[contenteditable='true']"
+    ],
+    "body": [
+      "textarea[placeholder*='write' i]",
+      "textarea[placeholder*='text' i]",
+      "div[contenteditable='true'][role='textbox']",
+      "textarea",
+      "[contenteditable='true']"
+    ]
+  },
+  "buttons": {
+    "access": [
+      "Who can see this post",
+      "Edit access",
+      "Public",
+      "Members only",
+      "Paid members only"
+    ],
+    "publish": [
+      "Publish now",
+      "Publish"
+    ]
+  },
+  "visibility_options": {
+    "public": [
+      "Anyone can see this post",
+      "Public",
+      "Anyone can view"
+    ],
+    "members_only": [
+      "Paid members only",
+      "Members only",
+      "Patrons only"
+    ]
+  }
+}

@@ -30,6 +30,172 @@
 
 ---
 
+## Pre-Structural Modification Checkpoint (Page Workflow Lifecycle)
+
+Before Phase 1 implementation, the architecture plan for page-centric project workflow tracking is captured in:
+
+* `docs/development/PROJECT_PAGE_WORKFLOW_TODO.md`
+
+This checkpoint defines:
+
+* new project database fields for page lifecycle context
+* Scriptural/Secular project structure strategy
+* per-column source page folder model
+* status-bar propagation requirements across modules
+* SessionManager tracked-field integration scope
+* tabbed `ProjectSettingsDialog` redesign with Qt Designer-editable `.ui`
+
+  ---
+
+  ## Project Status and Milestones
+
+  * `MyServer` is now the authoritative selector for the active project across the runtime toolchain
+  * the selected project is persisted through shared session state in `Model/Project/Data/json/Session.json`
+  * `SessionManager` now exposes active-project helpers so modules can read and publish the same project identity consistently
+  * `Core/project_tracking.py` now owns the shared workflow milestone model, project-root resolution, persisted tracking state, and weighted progress calculation
+  * milestone state is persisted per project in `Model/Project/Data/json/ProjectTracking.json`
+  * `ViewController/0-MainUI/ProjectTrackingDialog.py` is now the common user-facing milestone editor
+  * the `Milestones` dialog is no longer `MyServer`/`MyPixler` only; the shared controller in `ViewController/0-MainUI/project_status_controller.py` mounts the same project-status surface across the main runtime modules
+  * the common status surface now includes:
+
+    * current project name
+    * module workflow summary
+    * weighted overall project progress bar
+    * `Milestones` button opening the shared editor dialog
+
+  * `MyPixler` follows `MyServer` project selection live while open
+  * the remaining main windows now read the same active project and expose the same milestone dialog / status-bar workflow surface
+  * this work turns project progress from inferred, local, and mostly invisible state into a shared, user-visible, and manually editable development contract
+
+  ---
+
+  ## Repository Policy Surface
+
+  * public contribution policy is now defined in the repository root through `CONTRIBUTING.md`
+  * non-code submission and rights screening policy is now defined through `CONTENT_POLICY.md`
+  * repository review ownership for sensitive paths is now expressed through `.github/CODEOWNERS`
+  * developer and content-creator intake are intentionally treated as different workflows because software licensing and content redistribution rights are not the same problem
+
+---
+
+  ## 🌐 Website Prototype Notes
+
+  ### Current Website Demo State
+
+  * `docs/website/` now contains a minimal React + Cytoscape website prototype
+  * `docs/website/src/App.jsx` is the maintained source version of the demo
+  * `docs/website/preview.html` is the no-build browser preview for environments without local Node.js
+  * the public website milestone is now live at `https://biblionocr.onrender.com/`
+  * the current demo includes:
+
+    * static overview graph
+    * static guiding-principles graph derived from `docs/vision/THE_BIBLION_PROJECT.md`
+    * node-click selection routed into parent state
+    * advance, reset, and autoplay sequence controls for the overview graph
+    * EventBus + EventRunner + EventGraphExecutor wiring for recursive event-graph traversal
+    * in-memory event logger with per-run `traceId` grouping
+    * live event log panel and system-state panel
+    * graph highlighting for both the current active node and previously visited nodes
+
+  ### Current Layout / Readability Contract
+
+  * graph cards now use a single-column layout so the canvas can consume the full card width
+  * graph nodes use wrapped text inside rounded rectangle geometry rather than circular targets
+  * the overview graph now uses explicit preset positions across the horizontal axis to avoid vertical scrolling
+  * the guiding-principles graph also uses preset positions so larger readable targets can fit the available canvas
+  * GraphView now persists visual visited-node highlighting across an execution run while still emphasizing the current active node
+  * label readability was validated through the local browser preview before the final website commits were published
+
+  ### Current Runtime / Instrumentation Contract
+
+  * `eventBus.js` is the local publish/subscribe channel for website demo events
+  * `eventGraph.js` defines the next-event adjacency map used by the runtime traversal layer
+  * `EventRunner.js` now delegates execution to an injected executor instead of iterating a sequence directly
+  * `EventGraphExecutor.js` recursively traverses the event graph, emits through the EventBus, and guards against cycles / runaway depth
+  * `eventLogger.js` records each runtime event with timestamp plus `traceId` so one execution run can be grouped end-to-end
+  * `stateManager.js` exposes subscribable `activeNode`, `lastEvent`, and `isRunning` state for the React side panels
+
+  ### Commit / Branch State
+
+  * the website prototype landed first on `development` as:
+
+    * `e27f513` Add website Cytoscape graph demo
+    * `c99d010` Refine website graph readability
+
+  * the same work was promoted onto `master`, and both branches now reconcile at merge commit `d48a643`
+
+  * the event-graph runtime milestone then landed on `development` as:
+
+    * `cf5f483` v1.6 complete: event graph execution engine with traceable runtime traversal
+
+  ---
+
+
+## 🧪 Developer Mode Milestones
+
+### v1.7 Foundation
+
+* `Developer/` now exists as the initial Developer Mode package
+* `DeveloperServices` is the sole runtime instrumentation boundary for Developer Mode
+* the initial runtime model now tracks observed modules with:
+
+  * module name
+  * current state
+  * last observed event
+  * last update timestamp
+  * status
+
+* lightweight metrics currently include:
+
+  * total observed event count
+  * event count per module
+
+* trace recording currently stores:
+
+  * trace identifier
+  * event name
+  * source module
+  * destination module
+  * timestamp
+
+* the public read-only `DeveloperServices` API now exposes runtime model, modules, individual module state, metrics, traces, and recent events through defensive-copy accessors suitable for future Developer Mode panels
+* milestone commit published on `development`:
+
+  * `7ca2bfd` v1.7 milestone 7.6: add DeveloperServices instrumentation API
+
+### v1.8 First Visible Developer Panel
+
+* the first visible Developer Mode milestone is intentionally narrow: a Runtime Inspector that proves the architecture boundary instead of expanding feature scope
+* `ViewController/Developer/RuntimeInspectorPanel.py` renders module state using only the public `DeveloperServices` API
+* the Runtime Inspector now displays:
+
+  * registered modules
+  * standardized runtime status
+  * last observed event
+  * last update timestamp
+  * selected-module detail view
+
+* runtime status is currently normalized to the canonical set:
+
+  * `OPEN`
+  * `CLOSED`
+  * `OBSERVED`
+  * `UNKNOWN`
+
+* `DeveloperServices` now publishes runtime updates through an event-driven subscriber model so the Runtime Inspector refreshes without polling
+* `MyServer.py` now hosts the first Developer Mode panel through a hidden-by-default `Developer` menu entry
+* Runtime Inspector activation is lazy:
+
+  * the panel dock is created only when opened
+  * `DeveloperServices` observation is attached only while the panel is visible
+  * normal application behavior remains unaffected when Developer Mode is unused
+
+* milestone commit published on `development`:
+
+  * `ac2a93c` v1.8: integrate visible Runtime Inspector milestone
+
+---
+
 
 ## 📠 Scanner Acquisition Architecture
 
@@ -266,7 +432,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Local `master` was fast-forwarded to the merged remote `master` after the Branch5 / Branch6 integration work
 * Branches `Biblion-Branch1` through `Biblion-Branch6` were deleted from both local and remote
 * Duplicate remote names were removed; the repo now standardizes on a single remote: `origin`
-* Jetson-facing Git instructions were captured in the root note `LOCAL_MASTER_SYNC_AFTER_PR.md`
+* Jetson-facing Git instructions are captured in `docs/development/LOCAL_MASTER_SYNC_AFTER_PR.md`
 
 ### Jetson Runtime Constraint
 
@@ -841,6 +1007,7 @@ DO NOT update for:
 * 2026-07-03: `MyServer.py` now redirects ADF scan requests to `MyScanner.py`, while `MyScanner.py` supports both flatbed and ADF requests through the shared scanner workflow
 * 2026-07-03: `QtDesignerUI/MyScannerUI.ui` was updated to restore a Designer-owned scan UI contract for `MyScanner`, adding MyServer-style `imageScannerbutton`, `actionImageScanner`, and `actionImageScanner_tb`, then regenerating `MyScannerUI.py` from that source
 * 2026-07-04: project documentation was consolidated under `docs/`, and the active developer notebook was renamed to uppercase `docs/development/DEV_NOTEBOOK.md` to match the new library convention
+* 2026-07-07: the public Biblion home page went live at `https://biblionocr.onrender.com/`, the Patreon posting flow succeeded against the hosted site URL, and the local weekly queue was tuned and regenerated for the remaining week
 
 ---
 
@@ -899,10 +1066,103 @@ DO NOT update for:
 * 2026-07-04: active preview dialogs now preserve one comparison contract across the repo: left = original/reference input, right = processed/output result; `MorphologyDialog` was corrected to match `ImagePreviewDialog`
 * 2026-07-04: final broad checkpoint commit is expected to bundle outstanding scanner/session/UI/icon resource changes, including `MyScanner`, `Core/Scanner/*`, regenerated UI resources, session JSON updates, and new scan-workflow support files, even though further test-driven cleanup is still expected afterward
 
+
+---
+
+# 🚀 Milestone — Public Introduction Video v1.0
+
+**Date:** July 2026
+
+## Summary
+
+BiblionOCR reached its first major public-facing milestone with the completion and publication of the **Introduction Video v1.0**. This marks the project's transition from an architecture and development effort into a publicly demonstrable software system.
+
+That public-facing transition is now backed by the repository itself being live on GitHub as a public repository, with contributor intake routed through the documented membership and policy workflow.
+
+The introduction video serves as the project's visual identity and provides a concise overview of the philosophy behind BiblionOCR rather than an exhaustive feature demonstration.
+
+## Production Artifacts
+
+The following production assets were completed:
+
+* Approved production storyboard.
+* Production execution sequence.
+* Licensed Shutterstock asset organization.
+* Narration generation pipeline.
+* Kdenlive editing workflow.
+* Final public YouTube publication.
+
+Public introduction video:
+
+https://youtu.be/zrJQzivQwT4
+
+## Production Lessons Learned
+
+### Narration
+
+* Initial attempts to use OpenAI Text-to-Speech were unsuccessful because the project API did not include access to audio speech models.
+* Edge TTS was adopted as the production narration engine for RC1.
+* Phonetic spelling was used where necessary to improve pronunciation of "BiblionOCR."
+
+### Video Editing
+
+* DaVinci Resolve could not be used on the current Windows development workstation because of OpenGL compatibility limitations with the installed Intel HD Graphics hardware.
+* Kdenlive was adopted as the production editor and performed successfully throughout the remainder of the project.
+
+### Asset Management
+
+A dedicated production asset hierarchy was established under the Developer workspace, including:
+
+* Storyboards
+* Narration
+* Audio
+* Licensed imagery
+* Production documentation
+
+Licensed Shutterstock imagery is organized into semantic production categories:
+
+* A — Emergence
+* B — Cognition
+* C — Systems
+* D — Architecture
+* E — Identity
+
+## Project Status
+
+The following milestones are complete:
+
+* Developer Services v1.8
+* Observable Runtime architecture
+* Developer Mode architecture documentation
+* Public Introduction Video v1.0
+* Public YouTube publication
+* Public GitHub repository launch
+
+The repository now contains both the software architecture and the supporting public-facing project identity.
+
+## Next Development Phase
+
+With the public introduction complete, development focus returns to core application capabilities, including:
+
+* Continued Developer Services integration.
+* Runtime observability enhancements.
+* OCR workflow improvements.
+* Scanner integration.
+* Architecture visualization.
+* Preparation for future Introduction Video revisions as the software evolves.
+
+## Housekeeping Log (2026-07-20)
+
+* Promoted the active checkpoint commit to both `origin/master` and `origin/development`.
+* Added tracking for the `Developer/Publisher` tutorial-generation prototype.
+* Added ignore rules for machine-local artifacts generated by the Patreon local blog tooling runtime.
+* Removed tracked Playwright profile runtime cache/state data from repository history going forward.
+* Current intentionally uncommitted local path: `.venv/`.
+
 ---
 
 ## 📅 Last Updated
 
-2026-07-04
+2026-07-20
 
 ---

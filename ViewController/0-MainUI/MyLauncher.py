@@ -3,12 +3,11 @@
 # Python imports
 import sys
 import os
-import re
-import shlex
 import subprocess
 #import glob
-import shutil
 import json
+
+from gui_runtime_env import sanitize_current_process_and_reexec
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
@@ -17,39 +16,31 @@ if script_dir not in sys.path:
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+sanitize_current_process_and_reexec()
+
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 #from subprocess import Popen, PIPE, CalledProcessError
-import pytesseract
-import tiffcapture
-import qimage2ndarray
-from queue import Queue
-from ext import mainfind
 from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
 # Custom imports
 from MyLauncherUI import Ui_MainUI
-from PreProcess import PreProcess as pp
 from LocalFileDrop import LocalFileDropMixin
+from Developer.Publisher.launcher_registry import (
+    LauncherIntegrationController,
+    build_default_launcher_registry,
+)
 
 # Dialog Imports
-from Dialogs.ExtractDialog import Ui_ExtractDialog
-from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
-from Dialogs.tif2monoDialog import Ui_tif2monoDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
-from Dialogs.mono2pngDialog import Ui_mono2pngDialog
-from Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
 
 #import MyPixler as pixler
 #import CropTif as croptif
 #import QtCropImage as cropimg
 #import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -68,6 +59,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        if hasattr(self.ui, 'actionExit'):
+            self.ui.actionExit.triggered.connect(self.close)
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyServer')
@@ -102,11 +95,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.MyTrainerbutton.clicked.connect(self.OpenWithMyTrainer)
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
+        if hasattr(self.ui, 'MyServerbutton'):
+            self.ui.MyServerbutton.clicked.connect(self.OpenWithMyServer)
 
         # UI and slots code ends here.
 
         # Show the Main user interface
-        self.ui.OCRDocument = qtg.QTextDocument(self.ui.OCRText)
+        self.ui.OCRDocument = qtg.QTextDocument(self.ui.RightPanelwidget)
         font = qtg.QFont()
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(20)
@@ -114,19 +109,34 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.OCRDocument.setDefaultFont(font)
         self.ui.OCRBlockFormat = qtg.QTextBlockFormat()
-        self.ui.OCRTextFormat = qtg.QTextFormat()
+        self.ui.RightPanelwidgetFormat = qtg.QTextFormat()
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
 
-        self.ui.OCRText.setDocument(self.ui.OCRDocument)
+        self.ui.RightPanelwidget.setDocument(self.ui.OCRDocument)
+
+        self.launcher_registry = build_default_launcher_registry()
+        self.launch_controller = LauncherIntegrationController(
+            self.launcher_registry,
+            launch_callback=self.run_child_module,
+            help_panel_callback=self._swap_help_panel_text,
+        )
 
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyLauncher',
+            session_manager=self.session_manager,
+        )
 
         self.show()
 
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('Session.json')
 
         def get_setting(name: str, default=None):
@@ -255,12 +265,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
-                self.ui.OCRText.clear()
+                self.ui.RightPanelwidget.clear()
                 if info.completeSuffix() == 'txt':
                     #self.ui.editor_text.setHtml(text
-                    self.ui.OCRText.insertPlainText(text)
+                    self.ui.RightPanelwidget.insertPlainText(text)
                 else:
-                    self.ui.OCRText.setPlainText(text)
+                    self.ui.RightPanelwidget.setPlainText(text)
 
                 # update font to selection and size
                 self.on_font_update()
@@ -307,12 +317,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
-                self.ui.OCRText.clear()
+                self.ui.RightPanelwidget.clear()
                 if info.completeSuffix() == 'txt':
                     #self.ui.editor_text.setHtml(text
-                    self.ui.OCRText.insertPlainText(text)
+                    self.ui.RightPanelwidget.insertPlainText(text)
                 else:
-                    self.ui.OCRText.setPlainText(text)
+                    self.ui.RightPanelwidget.setPlainText(text)
             #textfile.close()
             #txtdirpath = os.path.dirname(self.textpath)
 
@@ -407,7 +417,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyReader.py')
 
     def OpenWithMyScanner(self):
-        self.run_child_module('MyScanner.py')
+        if not self.launch_controller.launch_module('MyScanner'):
+            self.run_child_module('MyScanner.py')
 
     def OpenWithMyGlypher(self):
         self.run_child_module('MyGlypher.py')
@@ -416,7 +427,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyBoxer.py')
 
     def OpenWithMyPixler(self):
-        self.run_child_module('MyPixler.py')
+        if not self.launch_controller.launch_module('MyPixler'):
+            self.run_child_module('MyPixler.py')
 
     def OpenWithMyVersifier(self):
         self.run_child_module('MyVersifier.py')
@@ -437,7 +449,24 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyWriter.py')
 
     def OpenWithMyExplorer(self):
-        self.run_child_module('MyExplorer.py')
+        if not self.launch_controller.launch_module('MyExplorer'):
+            self.run_child_module('MyExplorer.py')
+
+    def OpenWithMyServer(self):
+        self._launch_registered_module('MyServer')
+
+    def _launch_registered_module(self, module_id):
+        if not self.launch_controller.launch_module(module_id):
+            qtw.QMessageBox.warning(
+                self,
+                'Launch Not Registered',
+                f'{module_id} is not registered as a launcher target.',
+            )
+
+    def _swap_help_panel_text(self, text):
+        self.ui.RightPanelwidget.clear()
+        self.ui.RightPanelwidget.setPlainText(text)
+        self.on_font_update()
 
     def on_font_update(self):
         # update font to selection and size
@@ -449,7 +478,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #font = qtg.QFont(self.font)
         #font.setPointSize(int(self.fontsize))
 
-        self.ui.OCRText.setFont(font)
+        self.ui.RightPanelwidget.setFont(font)
 
     def on_lang_select(self):
         pass

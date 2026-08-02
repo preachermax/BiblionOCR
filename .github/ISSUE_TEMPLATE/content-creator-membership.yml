@@ -1,0 +1,72 @@
+name: Content Creator Membership Request
+description: Request content-creator intake approval for editorial, design, media, or dataset contributions.
+title: "[Content Membership]: "
+labels:
+  - membership
+  - content-creator
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request content-creator membership for BiblionOCR.
+
+        Content-creator membership does not imply broad write access to the main repository. It is an approval path for curated intake, provenance review, and publication-rights screening.
+  - type: input
+    id: github_username
+    attributes:
+      label: GitHub username
+      description: The account that should be considered for content-intake membership.
+      placeholder: preachermax
+    validations:
+      required: true
+  - type: input
+    id: display_name
+    attributes:
+      label: Display name
+      description: Your real name or the public name you want associated with approval notes.
+  - type: dropdown
+    id: requested_access
+    attributes:
+      label: Requested intake level
+      description: Content creators should normally use the curated intake path unless maintainers explicitly approve PR-based submission.
+      options:
+        - curated_intake
+        - pull_request_only
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribution_types
+    attributes:
+      label: Content types you expect to submit
+      options:
+        - label: Editorial or documentation content
+        - label: Images, graphics, or design assets
+        - label: Audio or video assets
+        - label: OCR training or reference material
+        - label: Other publication-facing assets
+  - type: textarea
+    id: provenance
+    attributes:
+      label: Provenance and rights basis
+      description: Explain who created the material, who owns it, and why BiblionOCR can publish it on public GitHub.
+      placeholder: The assets are original work created by me and may be redistributed publicly under the repository policy.
+    validations:
+      required: true
+  - type: textarea
+    id: review_scope
+    attributes:
+      label: Intended contribution scope
+      description: Describe the material you expect to submit and how often you expect to contribute.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safeguards
+    attributes:
+      label: Content safeguards
+      options:
+        - label: I have read CONTENT_POLICY.md and understand the provenance and publication-rights review bar.
+          required: true
+        - label: I will only submit material that I own or have clear rights to redistribute publicly.
+          required: true
+        - label: I understand that content-creator membership does not automatically grant write access to the code repository.
+          required: true

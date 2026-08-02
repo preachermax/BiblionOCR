@@ -1,0 +1,15 @@
+TITLE: A Guided Look at the Biblion Website Prototype
+VISIBILITY: Public
+
+I wanted to make this post public even though it was planned as a members-only development note, because the current website prototype is one of the clearest ways to show what Biblion is becoming. The project has a public code repository, but that alone does not communicate the shape of the platform very well. This prototype starts to solve that.
+
+If you want to look directly at the current website shell, use the runnable browser preview link below. That opens the standalone preview.html page directly instead of dropping you into a repository code view. For this post, that is the real preview target.
+
+What matters to me about this prototype is not just presentation. It is the first serious attempt to make Biblion legible as a system instead of a pile of modules and notes. A visitor can begin to see how the public story, the preservation principles, and the implementation work connect to each other. That is important if this project is going to earn trust and support over time.
+
+For Patreon, this is also a useful threshold artifact. It gives supporters something concrete to inspect while the internal toolchain keeps evolving. Future posts of this kind will likely return to the members-only stream, but for now I want this one to be easy to share.
+
+Runnable browser preview:
+https://biblionocr.onrender.com/
+
+If this kind of guided build note is useful, I can keep turning active development surfaces into readable public updates while saving the rougher lab notes for members.
