@@ -7,19 +7,40 @@ import re
 #import glob
 import json
 #from subprocess import Popen, PIPE, CalledProcessError
-import pytesseract
-import tiffcapture
-import qimage2ndarray
 from queue import Queue
-from ext import mainfind
 import subprocess
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
+helpers_dir = os.path.join(script_dir, "helpers")
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
 if script_dir not in sys.path:
     sys.path.insert(0, script_dir)
+if helpers_dir not in sys.path:
+    sys.path.insert(0, helpers_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+
+def _safe_optional_import(module_name):
+    try:
+        module = __import__(module_name)
+        return module, None
+    except Exception as exc:
+        return None, str(exc)
+
+
+pytesseract, _pytesseract_import_error = _safe_optional_import("pytesseract")
+tiffcapture, _tiffcapture_import_error = _safe_optional_import("tiffcapture")
+qimage2ndarray, _qimage2ndarray_import_error = _safe_optional_import("qimage2ndarray")
+
+_MISSING_OCR_DEPS = {
+    "pytesseract": _pytesseract_import_error,
+    "tiffcapture": _tiffcapture_import_error,
+    "qimage2ndarray": _qimage2ndarray_import_error,
+}
+_MISSING_OCR_DEPS = {k: v for k, v in _MISSING_OCR_DEPS.items() if v is not None}
+
+from ext import mainfind
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 
@@ -198,6 +219,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyScanner')
+
+        if _MISSING_OCR_DEPS:
+            missing = ", ".join(sorted(_MISSING_OCR_DEPS.keys()))
+            qtw.QMessageBox.warning(
+                self,
+                'Optional OCR Dependencies Missing',
+                f'MyScanner loaded with reduced OCR functionality. Missing packages: {missing}.',
+            )
 
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
         self.ui.actionPixler_Image_Editor.triggered.connect(self.OpenWithMyPixler)

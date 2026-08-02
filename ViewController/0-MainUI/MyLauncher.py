@@ -7,14 +7,17 @@ import subprocess
 #import glob
 import json
 
-from gui_runtime_env import sanitize_current_process_and_reexec
-
 script_dir = os.path.dirname(os.path.realpath(__file__))
+helpers_dir = os.path.join(script_dir, "helpers")
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
 if script_dir not in sys.path:
     sys.path.insert(0, script_dir)
+if helpers_dir not in sys.path:
+    sys.path.insert(0, helpers_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
 
 sanitize_current_process_and_reexec()
 

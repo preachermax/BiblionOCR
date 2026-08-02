@@ -3,8 +3,14 @@ import os
 import sys
 
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "0-MainUI"))
+_LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
+_LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "helpers"))
 if _LEGACY_MAINUI_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_DIR)
+if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
+    sys.path.insert(0, _LEGACY_MAINUI_HELPERS_DIR)
+if _LOCAL_HELPERS_DIR not in sys.path:
+    sys.path.insert(0, _LOCAL_HELPERS_DIR)
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 

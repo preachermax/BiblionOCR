@@ -24,6 +24,7 @@ from enum import Enum
 
 # Path configuration and directory setup
 script_dir = os.path.dirname(os.path.realpath(__file__))
+helpers_dir = os.path.join(script_dir, "helpers")
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 
 # Define directories
@@ -37,6 +38,8 @@ session_dir = os.path.join(data_dir, "json")
 # Add project root to path
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+if helpers_dir not in sys.path:
+    sys.path.insert(0, helpers_dir)
 
 developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
 if developer_view_dir not in sys.path:
@@ -58,8 +61,8 @@ SCAN_ICON_RESOURCES = (
     ":/Icons/Icons/BiblionScanner.png",
 )
 SCAN_ICON_FILES = (
-    os.path.join(script_dir, "Icons", "scanner.png"),
-    os.path.join(script_dir, "Icons", "BiblionScanner1.png"),
+    os.path.join(helpers_dir, "Icons", "scanner.png"),
+    os.path.join(helpers_dir, "Icons", "BiblionScanner1.png"),
 )
 
 

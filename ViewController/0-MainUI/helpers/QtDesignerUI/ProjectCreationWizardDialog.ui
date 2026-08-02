@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProjectCreationWizardDialog</class>
+ <widget class="QDialog" name="ProjectCreationWizardDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>760</width>
+    <height>680</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>New Project</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="introLabel">
+     <property name="text">
+      <string>Create a new project from the current trimmed manifest. You can also load provenance from JSON, RIS, TXT, or CSV before creation starts.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="page_title_label">
+     <property name="text">
+      <string>Step 1 of 3: RIS import</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="page_stack">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page_ris_import">
+      <layout class="QVBoxLayout" name="risLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="risLabel">
+         <property name="text">
+          <string>Optional: load an existing RIS file</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="risHelpLabel">
+         <property name="text">
+          <string>If you already have provenance metadata, load it here to prefill the project fields before continuing.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="risRowLayout">
+         <item>
+          <widget class="QLineEdit" name="ris_path_edit">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="placeholderText">
+            <string>project.ris.json, Primo_RIS_Export.ris, or similar</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ris_browse_button">
+           <property name="text">
+            <string>Load RIS...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ris_clear_button">
+           <property name="text">
+            <string>Clear RIS</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="status_label">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="risSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_project_details">
+      <layout class="QVBoxLayout" name="detailsLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="detailsHeadingLabel">
+         <property name="text">
+          <string>Project details</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="project_name_label">
+         <property name="text">
+          <string>Project name</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="project_name_edit">
+         <property name="placeholderText">
+          <string>Erasmus1523</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="project_name_hint_label">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="project_purpose_label">
+         <property name="text">
+          <string>Project purpose</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="project_purpose_edit">
+         <property name="placeholderText">
+          <string>Create a readable text version of the source file with duplicate font</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="user_intent_label">
+         <property name="text">
+          <string>User intent summary</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="user_intent_edit">
+         <property name="placeholderText">
+          <string>Describe the user intent for this project</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="metadataRowLayout">
+         <item>
+          <layout class="QVBoxLayout" name="triggerColumnLayout">
+           <item>
+            <widget class="QLabel" name="creationTriggerLabel">
+             <property name="text">
+              <string>Creation trigger</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="creation_trigger_edit">
+             <property name="text">
+              <string>MyServer_button</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="contextColumnLayout">
+           <item>
+            <widget class="QLabel" name="sourceContextLabel">
+             <property name="text">
+              <string>Source context</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="source_context_edit">
+             <property name="text">
+              <string>MyServer_UI</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="projectTypeRowLayout">
+         <item>
+          <layout class="QVBoxLayout" name="modeColumnLayout">
+           <item>
+            <widget class="QLabel" name="projectModeLabel">
+             <property name="text">
+              <string>Project mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="project_mode_combo">
+             <item>
+              <property name="text">
+               <string>development</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>collaboration</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="domainColumnLayout">
+           <item>
+            <widget class="QLabel" name="projectDomainLabel">
+             <property name="text">
+              <string>Content domain</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="project_domain_combo">
+             <item>
+              <property name="text">
+               <string>scriptural</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>secular</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+        <item>
+         <widget class="QGroupBox" name="scriptural_source_group">
+          <property name="title">
+           <string>Scriptural source (required for scriptural domain)</string>
+          </property>
+          <layout class="QHBoxLayout" name="scripturalSourceLayout">
+           <item>
+            <widget class="QRadioButton" name="scriptural_source_old_radio">
+             <property name="text">
+              <string>Old Testament</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="scriptural_source_new_radio">
+             <property name="text">
+              <string>New Testament</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="scriptural_source_both_radio">
+             <property name="text">
+              <string>Both</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       <item>
+        <widget class="QLabel" name="githubSectionLabel">
+         <property name="text">
+          <string>GitHub access credentials (optional)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="githubRowLayout">
+         <item>
+          <layout class="QVBoxLayout" name="githubUsernameLayout">
+           <item>
+            <widget class="QLabel" name="githubUsernameLabel">
+             <property name="text">
+              <string>GitHub username</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="github_username_edit">
+             <property name="placeholderText">
+              <string>Used only when publishing a branch/PR</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="githubTokenLayout">
+           <item>
+            <widget class="QLabel" name="githubTokenLabel">
+             <property name="text">
+              <string>Access token</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="github_token_edit">
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+             <property name="placeholderText">
+              <string>Used only when publishing a branch/PR</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="creatorLabel">
+         <property name="text">
+          <string>Creator (optional)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="creator_edit">
+         <property name="placeholderText">
+          <string>Optional</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="reviewHeadingLabel">
+         <property name="text">
+          <string>Review</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="review_label">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="details_status_label">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="detailsSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_project_database">
+      <layout class="QVBoxLayout" name="databaseLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="databaseLabel">
+         <property name="text">
+          <string>Project database values are stored in SQLite and mirrored to JSON for fast reloads.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="database_scroll">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="database_scroll_content">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>710</width>
+            <height>420</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="databaseContentLayout">
+           <item>
+            <widget class="QLabel" name="databasePlaceholderLabel">
+             <property name="text">
+              <string>Use this page to edit project database fields in Qt Designer.
+Runtime currently populates this area dynamically from build_project_field_definitions().
+Required for new projects: NumberColumns, ColumnName, ColumnLanguage.
+Default ColumnName values: 1= centercol, 2= leftcol,rightcol, 3= leftcol,centercol,rightcol.
+ColumnName and ColumnLanguage defaults can be manually overridden.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QFormLayout" name="database_form_layout">
+             <property name="horizontalSpacing">
+              <number>12</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>10</number>
+             </property>
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="databaseProjectTypeLabel">
+               <property name="text">
+                <string>ProjectType</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="database_project_type_combo">
+               <item>
+                <property name="text">
+                                 <string>Scriptural</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                                 <string>Secular</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="databaseSourceTypeLabel">
+               <property name="text">
+                <string>SourceType</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="database_source_type_combo">
+               <item>
+                <property name="text">
+                 <string>Scan</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                                 <string>PDF</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="databaseProvenancePathLabel">
+               <property name="text">
+                <string>ProvenancePath</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="database_provenance_path_edit"/>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="databaseNumberColumnsLabel">
+               <property name="text">
+                <string>NumberColumns (required)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="database_number_columns_spin">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>3</number>
+               </property>
+               <property name="value">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="databaseColumnNameLabel">
+               <property name="text">
+                <string>ColumnName (required)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="database_column_name_edit">
+               <property name="text">
+                <string>centercol</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="databaseColumnLanguageLabel">
+               <property name="text">
+                <string>ColumnLanguage (required)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="database_column_language_edit">
+               <property name="text">
+                <string>eng</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="language_count_label">
+             <property name="text">
+              <string>Languages selected: 0</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="databaseSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonRowLayout">
+     <item>
+      <widget class="QPushButton" name="back_button">
+       <property name="text">
+        <string>Back</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="next_button">
+       <property name="text">
+        <string>Next</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="buttonRowSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel_button">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="create_button">
+       <property name="text">
+        <string>Create Project</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
