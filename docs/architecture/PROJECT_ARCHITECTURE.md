@@ -253,10 +253,15 @@ BiblionOCR is a comprehensive Optical Character Recognition (OCR) system specifi
 **Primary Function**: Navigate and open project files and folders
 
 **Key Operations**:
-- Tree view of project structure starting at Model/Project/
+- Tree view bounded to the active project root with initial focus at the project `Model` directory
 - Drag and drop support
 - Open files with system default applications
 - Context menu operations
+
+**Behavior Notes**:
+- The explorer tree is intentionally project-scoped rather than OS-scoped
+- File-picker dialogs remain the correct surface for full operating-system browsing
+- The primary tree view is sorted to show folders before files
 
 **Key Classes**:
 - `MyFileBrowser` - File explorer window extending Ui_Explorer
@@ -531,7 +536,6 @@ BiblionOCR/
 - Dynamic icon resource system (UI_Icons.py)
 
 ### Extensions
-- `glyphtracer-master/`: Glyph tracing utilities
-- `potrace-main/`: Vector tracing for character shapes
+- Glyph tracing and vector tracing rely on optional external tools; GPL vendored copies are intentionally excluded from the public-tracked repo surface.
 - Additional third-party integrations in `ext/` folder
 

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "policy_refs": [
+    "CONTRIBUTING.md",
+    "CONTENT_POLICY.md"
+  ],
+  "allowed_roles": [
+    "developer",
+    "content_creator",
+    "maintainer"
+  ],
+  "allowed_access_levels": [
+    "curated_intake",
+    "pull_request_only",
+    "triage",
+    "write",
+    "maintain",
+    "admin"
+  ],
+  "members": []
+}

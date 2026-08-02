@@ -23,11 +23,11 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>βϊϐλίον OCR</string>
+   <string>βϊϐλίον Launcher</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../UI_Icons.qrc">
-    <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
+    <normaloff>:/Icons/Icons/BiblionLauncher.png</normaloff>:/Icons/Icons/BiblionLauncher.png</iconset>
   </property>
   <property name="animated">
    <bool>true</bool>
@@ -42,10 +42,10 @@
      <bold>false</bold>
     </font>
    </property>
-   <widget class="QTextEdit" name="OCRText">
+   <widget class="QTextEdit" name="RightPanelwidget">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>720</x>
       <y>30</y>
       <width>570</width>
       <height>831</height>
@@ -67,20 +67,20 @@
      </font>
     </property>
    </widget>
-   <widget class="QWidget" name="widget" native="true">
+   <widget class="QWidget" name="LeftPanelwidget" native="true">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>30</x>
       <y>30</y>
-      <width>551</width>
+      <width>641</width>
       <height>831</height>
      </rect>
     </property>
     <widget class="QPushButton" name="MyScannerbutton">
      <property name="geometry">
       <rect>
-       <x>100</x>
-       <y>210</y>
+       <x>280</x>
+       <y>460</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -110,12 +110,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Scanner Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyScanner OCR scans project source images and produces working text..</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionScanner1.png</normaloff>:/Icons/Icons/BiblionScanner1.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>2</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyWriterbutton">
      <property name="geometry">
       <rect>
-       <x>450</x>
-       <y>210</y>
+       <x>280</x>
+       <y>180</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -139,12 +155,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Explorer Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>Navigates the project folder structure.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>2</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyGlypherbutton">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>300</y>
+       <x>280</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -168,12 +200,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Glypher Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyGlypher extracts glyphs from working images for the development of the project font used in the precise training of the OCR Engine.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>6</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyGrounderbutton">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>120</y>
+       <x>140</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -197,18 +245,34 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Grounder Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyGrounder ensures the integrity of the ground truth line files used by the OCR engine for training.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>11</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyReaderbutton">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>210</y>
+       <x>210</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
      </property>
      <property name="toolTip">
-      <string>Begin Here! MyReader reads in project source images.</string>
+      <string>MyReader reads in current project images.</string>
      </property>
      <property name="text">
       <string/>
@@ -229,25 +293,41 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Reader</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyReader reads in current project images.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionReader2.png</normaloff>:/Icons/Icons/BiblionReader2.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>10</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyLexerbutton">
      <property name="geometry">
       <rect>
-       <x>380</x>
-       <y>210</y>
+       <x>490</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyLexer consoladates the working tezt into a project lexicon.</string>
+      <string>MyLexer consoladates the working text into a project lexicon.</string>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="icon">
       <iconset resource="../UI_Icons.qrc">
-       <normaloff>:/Icons/Icons/BiblionLexer.png</normaloff>:/Icons/Icons/BiblionLexer.png</iconset>
+       <normaloff>:/Icons/Icons/BiblionLexer2.png</normaloff>:/Icons/Icons/BiblionLexer2.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -258,12 +338,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Lexer Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyLexer consoladates the working text into a project lexicon.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionLexer2.png</normaloff>:/Icons/Icons/BiblionLexer2.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>9</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyResolverbutton">
      <property name="geometry">
       <rect>
-       <x>310</x>
-       <y>210</y>
+       <x>420</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -287,12 +383,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Resolver Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyResolver resolves variations between the versified text and a known reference text. </string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>8</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyBoxerbutton">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>210</y>
+       <x>280</x>
+       <y>320</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -316,11 +428,27 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Boxer Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyBoxer further segments the workflow images into box files used in training the OCR engine.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>5</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyPixlerbutton">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>280</x>
        <y>390</y>
        <width>71</width>
        <height>61</height>
@@ -345,12 +473,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Pixler Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyPixler converts , segments ,cleans and prepares source images into workflow images.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>4</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyVersifierbutton">
      <property name="geometry">
       <rect>
-       <x>170</x>
-       <y>210</y>
+       <x>350</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -374,12 +518,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Versifier Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyVersifier adds verses to unversed working text.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>7</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyTrainerbutton">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>40</y>
+       <x>70</x>
+       <y>250</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -403,12 +563,28 @@
      <property name="flat">
       <bool>true</bool>
      </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Trainer Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>MyTrainer tunes and retunes the OCR engine for precice recognition of the source images.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionTrainer1.png</normaloff>:/Icons/Icons/BiblionTrainer1.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>2</string>
+     </property>
     </widget>
     <widget class="QPushButton" name="MyExplorerbutton">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>490</y>
+       <x>280</x>
+       <y>530</y>
        <width>71</width>
        <height>61</height>
       </rect>
@@ -423,7 +599,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>Open current image</string>
+      <string>MyExplorer navigates the project folder structure.</string>
      </property>
      <property name="text">
       <string/>
@@ -440,6 +616,397 @@
      </property>
      <property name="flat">
       <bool>true</bool>
+     </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Explorer Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>Navigates the project folder structure.</string>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <string>2</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyServerbutton">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>600</y>
+       <width>51</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="toolTip">
+      <string>MyServer serves the project workflow and oversees progress.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="tutorial.enabled" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="tutorial.title" stdset="0">
+      <string>My Server Tutorial</string>
+     </property>
+     <property name="tutorial.help" stdset="0">
+      <string>Serves the project workflow and oversees progress.</string>
+     </property>
+     <property name="tutorial.order" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="tutorial.image" stdset="0">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
+     </property>
+    </widget>
+    <widget class="QLabel" name="StartHerelabel">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>640</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Start Here</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="StartHerearrow">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>620</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/back_alt.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="PreProcessImageslabel">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>500</y>
+       <width>61</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Pre-Process
+ Images</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="PreProcessImagesarrow">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>470</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/up_alt.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TrainingOCRlabel">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>310</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>OCR Training</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TrainingOCRarrow">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>310</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/back_alt.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ProcessTextlabel">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>310</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Process Text</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ProcessTextarrow">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>310</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/forward_text.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="FinishHerelabel">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>201</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Finish Here</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Finisharrow">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>200</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/back_image.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MyLauncherbutton">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>110</y>
+       <width>71</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string extracomment="This is a comment">MyWriter prepares completed text for export to external applications.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../UI_Icons.qrc">
+       <normaloff>:/Icons/Icons/BiblionLauncher.png</normaloff>:/Icons/Icons/BiblionLauncher.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>64</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ProcessTextarrow_2">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>130</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/back_text2.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ProcessTextlabel_2">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>130</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>FROMVS</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>You Are Here</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="bottom_container" native="true">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>730</y>
+       <width>461</width>
+       <height>91</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="left_center_container" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>340</y>
+       <width>161</width>
+       <height>481</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="top_left_container" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>9</y>
+       <width>161</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>101</width>
+        <height>91</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="../UI_Icons.qrc">:/Icons/Icons/BiblionProfile.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="top_right_container" native="true">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>10</y>
+       <width>461</width>
+       <height>91</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="right_center_container" native="true">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>340</y>
+       <width>161</width>
+       <height>391</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -470,12 +1037,12 @@
      <x>0</x>
      <y>0</y>
      <width>1319</width>
-     <height>32</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPre_Process">
     <property name="title">
-     <string>Pre Process</string>
+     <string>Pre-Process</string>
     </property>
     <widget class="QMenu" name="menuExtract_pdf">
      <property name="title">
@@ -519,41 +1086,40 @@
      <addaction name="actionHebrew"/>
      <addaction name="menuGreekDR"/>
      <addaction name="menuLatinDR"/>
-     <addaction name="actionEnglishh"/>
+     <addaction name="actionEnglish_5"/>
     </widget>
     <addaction name="separator"/>
     <addaction name="menuExtract_pdf"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="menuPrepare"/>
-    <addaction name="actionMy_Reader"/>
+    <addaction name="actionMy_Server"/>
+    <addaction name="actionMy_Explorer"/>
     <addaction name="actionMy_Scanner"/>
     <addaction name="actionMy_Pixler"/>
+    <addaction name="actionMy_Boxer"/>
     <addaction name="actionMy_Glypher"/>
    </widget>
    <widget class="QMenu" name="menuPost_Process">
     <property name="title">
      <string>Post Process</string>
     </property>
+    <addaction name="actionMy_Writer"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
     <addaction name="actionCreate_e_Sword_Bible_Module"/>
     <addaction name="actionCreate_theWord_Bible_Module"/>
-    <addaction name="actionMy_Writer"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
      <string>Project</string>
     </property>
-    <addaction name="actionExplorer"/>
-    <addaction name="actionNew"/>
-    <addaction name="actionEdit"/>
-    <addaction name="actionPrefernces"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="actionMy_Launcher"/>
    </widget>
    <widget class="QMenu" name="menuProcess">
     <property name="title">
      <string>Process</string>
     </property>
-    <addaction name="actionMy_Boxer"/>
     <addaction name="actionMy_Versifier"/>
     <addaction name="actionMy_Resolver"/>
     <addaction name="actionMy_Lexer"/>
@@ -562,6 +1128,7 @@
     <property name="title">
      <string>Training</string>
     </property>
+    <addaction name="actionMy_Reader"/>
     <addaction name="actionMy_Grounder"/>
     <addaction name="actionMy_Trainer"/>
    </widget>
@@ -1420,7 +1987,7 @@
     <string>English</string>
    </property>
   </action>
-  <action name="actionEnglishh">
+  <action name="actionEnglish_5">
    <property name="text">
     <string>English</string>
    </property>
@@ -1604,12 +2171,12 @@
      <normaloff>:/Icons/Icons/preview.png</normaloff>:/Icons/Icons/preview.png</iconset>
    </property>
    <property name="text">
-    <string>Pixer Image Editor</string>
+    <string>Pixler Image Editor</string>
    </property>
   </action>
-  <action name="actionNew">
+  <action name="actionOpen_Project">
    <property name="text">
-    <string>New</string>
+    <string>Open Project</string>
    </property>
   </action>
   <action name="actionEdit">
@@ -1630,6 +2197,22 @@
    <property name="text">
     <string>My Reader</string>
    </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Reader Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Check OCR of the project page image.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionReader2.png</normaloff>:/Icons/Icons/BiblionReader2.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>10</number>
+   </property>
   </action>
   <action name="actionMy_Scanner">
    <property name="icon">
@@ -1638,6 +2221,22 @@
    </property>
    <property name="text">
     <string>My Scanner</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Scanner Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Conducts scanning of multi-page source documents.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>3</number>
    </property>
   </action>
   <action name="actionMy_Pixler">
@@ -1648,6 +2247,22 @@
    <property name="text">
     <string>My Pixler</string>
    </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Pixler Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Launches project modules and monitors progress.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>4</number>
+   </property>
   </action>
   <action name="actionMy_Glypher">
    <property name="icon">
@@ -1656,6 +2271,22 @@
    </property>
    <property name="text">
     <string>My Glypher</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Glypher Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Creates glyphs from line images for the project font used in training the OCR engine.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>6</number>
    </property>
   </action>
   <action name="actionMy_Boxer">
@@ -1666,6 +2297,22 @@
    <property name="text">
     <string>My Boxer</string>
    </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>MyBoxer Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Creates and edits page, line, word, and character box files.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>5</number>
+   </property>
   </action>
   <action name="actionMy_Versifier">
    <property name="icon">
@@ -1674,6 +2321,22 @@
    </property>
    <property name="text">
     <string>My Versifier</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Versifier Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>My Versifier adds verses to unversed project text.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>7</number>
    </property>
   </action>
   <action name="actionMy_Resolver">
@@ -1684,6 +2347,22 @@
    <property name="text">
     <string>My Resolver</string>
    </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Resolver Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Resolves variants between the project text and the reference text.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>8</number>
+   </property>
   </action>
   <action name="actionMy_Lexer">
    <property name="icon">
@@ -1692,6 +2371,22 @@
    </property>
    <property name="text">
     <string>My Lexer</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Lexer Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Consolidates project text files into a Lexicon</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLexer2.png</normaloff>:/Icons/Icons/BiblionLexer2.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>9</number>
    </property>
   </action>
   <action name="actionMy_Grounder">
@@ -1702,6 +2397,22 @@
    <property name="text">
     <string>My Grounder</string>
    </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Grounder Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Validates that the project image and text lineboxes agree.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>11</number>
+   </property>
   </action>
   <action name="actionMy_Trainer">
    <property name="icon">
@@ -1711,6 +2422,22 @@
    <property name="text">
     <string>My Trainer</string>
    </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Trainer Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Trains the project OCR language model with grond truth data.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionTrainer.png</normaloff>:/Icons/Icons/BiblionTrainer.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>12</number>
+   </property>
   </action>
   <action name="actionMy_Writer">
    <property name="icon">
@@ -1719,6 +2446,97 @@
    </property>
    <property name="text">
     <string>My Writer</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Writer Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Prepares finished work for outside publishing.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>13</number>
+   </property>
+  </action>
+  <action name="actionMy_Server">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Server</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Server Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Serves the project workflow and oversees progress.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="actionMy_Explorer">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Explorer</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Explorer Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Navigates the project folder structure.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="actionMy_Launcher">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLauncher.png</normaloff>:/Icons/Icons/BiblionLauncher.png</iconset>
+   </property>
+   <property name="text">
+    <string>My Launcher</string>
+   </property>
+   <property name="tutorial.enabled" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="tutorial.title" stdset="0">
+    <string>My Launcher Tutorial</string>
+   </property>
+   <property name="tutorial.help" stdset="0">
+    <string>Launches project modules and monitors progress.</string>
+   </property>
+   <property name="tutorial.image" stdset="0">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLauncher.png</normaloff>:/Icons/Icons/BiblionLauncher.png</iconset>
+   </property>
+   <property name="tutorial.order" stdset="0">
+    <number>0</number>
    </property>
   </action>
  </widget>

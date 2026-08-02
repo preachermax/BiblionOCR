@@ -6,9 +6,18 @@ import shutil
 import json
 import csv
 import time
-import platform
 from HelpSystem import add_help_menu
 import subprocess
+
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
 
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
@@ -20,9 +29,11 @@ from ext import versifiercount, versefind, reffind
 # Custom imports
 from MyVersifierUI import Ui_Versifier
 from SessionManager import SessionManager
+from project_status_controller import ProjectStatusController
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 from LocalFileDrop import LocalFileDropMixin
+from print_menu_support import install_print_menu_support, document_target
 import ChrReference as chrref
 #import pytesseract
 
@@ -53,6 +64,21 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Text": document_target(
+                    lambda: self.ui.RefText.document(),
+                    "There is currently no reference text document loaded to print.",
+                    empty_title="No Text Loaded",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.VerseText.document(),
+                    "There is currently no verse text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Text",
+        )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyVersifier')
         self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
@@ -196,6 +222,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyVersifier',
+            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+        )
         #print(f'Reference File Path: {self.refpath}')
         #self.getRefText(self.refpath)
         # Startup
@@ -289,6 +320,9 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings
         self._startup_progress("loading session settings")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('VersifierSession.json')
         repo_root_name = os.path.basename(os.path.normpath(self.projecthome))
 
@@ -297,24 +331,50 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 default = getattr(self, name, None)
             return session.get(f'self.{name}', default)
 
+        def remap_legacy_project_path(path: str):
+            if not path:
+                return path
+
+            candidate = os.path.normpath(path)
+            if os.path.exists(candidate):
+                return candidate
+
+            alias_pairs = (
+                (
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'GroundTruth', 'Source', 'TR')),
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'EstablishTruth', 'Source', 'TR')),
+                ),
+                (
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'GroundTruth', 'Greek', 'txt_greek_verses')),
+                    os.path.normpath(os.path.join('Model', 'Project', 'Text', 'EstablishTruth', 'Greek', 'txt_greek_verses')),
+                ),
+            )
+
+            for old_fragment, new_fragment in alias_pairs:
+                if old_fragment in candidate:
+                    remapped = os.path.normpath(candidate.replace(old_fragment, new_fragment))
+                    if os.path.exists(remapped):
+                        return remapped
+
+            return candidate
+
         def abs_project_path(name: str, default=''):
             value = session.get(f'self.{name}')
             if value:
-                normalized_value = str(value).strip()
+                normalized_value = str(value).strip().replace('\\', '/')
 
                 if len(normalized_value) > 1 and normalized_value[1] == ':' and normalized_value[0].isalpha():
                     repo_marker = f'/{repo_root_name}/'
-                    posix_value = normalized_value.replace('\\', '/')
-                    marker_index = posix_value.lower().find(repo_marker.lower())
+                    marker_index = normalized_value.lower().find(repo_marker.lower())
                     if marker_index != -1:
-                        normalized_value = posix_value[marker_index + len(repo_marker):]
+                        normalized_value = normalized_value[marker_index + len(repo_marker):]
                     elif os.name == 'nt':
                         return os.path.normpath(normalized_value)
 
                 if os.path.isabs(normalized_value):
-                    return os.path.normpath(normalized_value)
+                    return remap_legacy_project_path(normalized_value)
 
-                return os.path.normpath(
+                return remap_legacy_project_path(
                     os.path.join(self.projecthome, normalized_value.lstrip('/\\'))
                 )
             return getattr(self, name, default)
@@ -473,8 +533,14 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.OpenChrReference()
 
     def OpenChrReference(self):
-        self.chrrefmain = chrref.CharacterReference()
-        self.chrrefmain.show()
+        chrref_window = getattr(self, 'chrrefmain', None)
+        if chrref_window is None:
+            chrref_window = chrref.CharacterReference()
+            self.chrrefmain = chrref_window
+
+        chrref_window.show()
+        chrref_window.raise_()
+        chrref_window.activateWindow()
 
     def dropAnchor(self):
         print("Drop Anchor!")
@@ -1981,7 +2047,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             rowline = row[0]
             textline = rowline.replace("\n","")
             #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
-            pattern = re.compile('(\w+\s)(\d+:)(\d+\s)')
+            pattern = re.compile(r'(\w+\s)(\d+:)(\d+\s)')
             matches = pattern.finditer(textline)
             for match in matches:
                     #print(match)
@@ -1999,24 +2065,6 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         txtfile.close()
 
-    '''
-    def parseLinesRegEx(self):
-        #***This is the original parse routine.  Keep for reference***
-        # Each line is a verse => pares and label each verse
-        rowline = row[0]
-        textline = rowline.replace("\n","")
-        #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
-        pattern = re.compile('(\w+\s)(\d+:)(\d+\s)(.*)')
-        matches = pattern.finditer(textline)
-        for match in matches:
-            book = match[1]
-            chcolon = match[2]
-            chapter = chcolon.replace(":","")
-            verse = match[3]
-            scripture = match[4]
-            #print(row[0])
-            print(book,"\t", chapter,"\t", verse,"\t",scripture)
-    '''
     def wordCount(self):
 
         wc = versifiercount.WordCount(self)
@@ -2366,7 +2414,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             rowline = row[0]
             textline = rowline.replace("\n","")
             #fbook, fchapt, fverse, fscrip  = (row[0], row[1], row[2], row[3])
-            pattern = re.compile('(\w+\s)(\d+:)(\d+\s)')
+            pattern = re.compile(r'(\w+\s)(\d+:)(\d+\s)')
             matches = pattern.finditer(textline)
             for match in matches:
                     #print(match)

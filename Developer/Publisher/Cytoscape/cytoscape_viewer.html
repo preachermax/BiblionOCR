@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8">
+
+<script src="
+https://unpkg.com/cytoscape/dist/cytoscape.min.js">
+</script>
+
+
+<style>
+
+body {
+    margin:0;
+    overflow:hidden;
+    font-family: sans-serif;
+}
+
+
+#cy {
+    width:calc(100vw - 320px);
+    height:100vh;
+}
+
+
+#info-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 16px;
+    border-left: 1px solid #ddd;
+    background: #fafafa;
+}
+
+
+#info-panel h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+
+.meta {
+    margin-bottom: 12px;
+}
+
+
+.label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="cy"></div>
+
+<aside id="info-panel">
+    <h2>Node Details</h2>
+    <div class="meta">
+        <div class="label">Module Name</div>
+        <div id="node-name">Click a node</div>
+    </div>
+    <div class="meta">
+        <div class="label">Help Reference</div>
+        <div id="node-help">(none)</div>
+    </div>
+    <div class="meta">
+        <div class="label">Order Number</div>
+        <div id="node-order"></div>
+    </div>
+    <div class="meta">
+        <div class="label">Script</div>
+        <div id="node-script">(none)</div>
+    </div>
+    <div class="meta">
+        <div class="label">Launch Mode</div>
+        <div id="node-launch-mode">UNKNOWN</div>
+    </div>
+    <div class="meta">
+        <div class="label">UI File</div>
+        <div id="node-ui-file">(none)</div>
+    </div>
+    <div class="meta">
+        <div class="label">Animation</div>
+        <div id="node-animation">idle</div>
+    </div>
+    <div class="meta">
+        <div class="label">Description</div>
+        <div id="node-description">(none)</div>
+    </div>
+</aside>
+
+
+<script src="cytoscape_controller.js"></script>
+
+
+</body>
+
+
+</html>

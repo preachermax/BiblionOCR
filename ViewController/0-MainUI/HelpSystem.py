@@ -500,24 +500,25 @@ PERFORMANCE TIPS:
         'icon': '📸',
         'description': '''Document Scanner Interface
 
-MyScanner manages integration with physical document scanners for acquiring
-high-quality document images for the OCR pipeline.
+MyScanner manages acquisition from physical scanners for the BiblionOCR pipeline.
+The current runtime path uses the shared Core scanner workflow rather than an
+isolated device dialog.
 
 FEATURES:
-• Scanner hardware detection
-• Real-time scanner preview
-• Batch scanning
-• Image quality adjustment
-• Automatic page numbering
-• Document organization
+• Shared scan wizard and persisted scan settings
+• Backend selection through Core Scanner services
+• AirScan / eSCL, WIA, TWAIN, and SANE support surfaces
+• Threaded scan execution with saved TIFF output
+• ADF handoff from MyServer into MyScanner when needed
+• Session-backed destination, backend, DPI, and mode restore
 
 PRIMARY WORKFLOW:
-1. Connect and detect scanner
-2. Configure scan settings
-3. Place document on scanner
-4. Scan pages
-5. Organize scanned pages
-6. Export to image files
+1. Open the scan workflow
+2. Choose backend, device, DPI, mode, and destination
+3. Let device discovery complete
+4. Acquire the scan through the selected backend
+5. Review the saved TIFF result
+6. Continue into OCR or image-processing workflows
 
 KEY SETTINGS:
 • Resolution: DPI (200-600 recommended)
@@ -527,9 +528,10 @@ KEY SETTINGS:
 • Contrast: Improve text visibility
 
 SCANNER SUPPORT:
-• TWAIN-compatible scanners
-• SANE (Linux)
-• SCANNER protocol
+• AirScan / eSCL for network-capable scanners
+• WIA on Windows
+• TWAIN where a compatible DSM/source is available
+• SANE on Linux and compatible Unix-like systems
 
 USES IN PIPELINE:
 • Acquires original documents
@@ -537,66 +539,61 @@ USES IN PIPELINE:
 • Organizes page sequence
 • First step in OCR pipeline
 
-See also: MyReader, MyPixler
+CURRENT NOTES:
+• AirScan is the preferred cross-platform path when supported.
+• Scan settings are persisted through the session manager.
+• MyServer redirects ADF-oriented workflows into MyScanner.
+
+See also: MyServer, MyReader, MyPixler
 ''',
         'usage': '''SCANNER USAGE GUIDE
 
-HARDWARE SETUP:
-1. Connect scanner to computer
-2. Install scanner drivers
-3. Verify scanner in system settings
-4. Open MyScanner
+STARTING THE WORKFLOW:
+1. Open MyScanner
+2. Launch the scan action from the toolbar or menu
+3. Wait for backend and device discovery to complete
+4. Review any restored session settings before scanning
 
-SCANNER DETECTION:
-1. Scanner > Detect
-2. Wait for hardware discovery
-3. Select scanner from list
-4. Click Connect
-5. Verify connection successful
+DEVICE SELECTION:
+1. Choose the backend first
+2. Select a discovered device, or provide an AirScan IP/URL when needed
+3. Confirm DPI, mode, source, duplex, and destination folder
+4. Continue only with backends reported as available
 
 CONFIGURING SETTINGS:
-1. Settings > Scanner Settings
-2. Resolution: 300 DPI recommended
-3. Color: Usually Color or Grayscale
-4. Paper size: Select actual size
-5. Brightness/Contrast: Test scan first
+1. Resolution: 300 DPI is the usual starting point
+2. Color: Usually Color or Grayscale
+3. Source: Flatbed or feeder depending on hardware
+4. Duplex: Enable only when hardware and workflow require it
+5. Destination: Confirm the folder where numbered TIFF output will be written
 
 SINGLE SCAN:
 1. Place document on scanner
-2. Scanner > Preview to check
-3. Click Scan
+2. Confirm settings in the scan workflow
+3. Start the scan
 4. Wait for scan completion
-5. Image appears in preview
-6. Save to file
+5. The saved TIFF appears in the image workflow
+6. Continue with OCR or image editing as needed
 
 BATCH SCANNING:
-1. Scanner > Batch Mode
-2. Set auto page numbering
-3. Configure auto-save folder
-4. Place first page
-5. Click Auto Scan
-6. Add each page and scan
-7. Naming handled automatically
+1. Use feeder/ADF-oriented scanning when the hardware supports it
+2. Confirm the destination and numbering behavior
+3. Acquire pages in sequence
+4. Review the saved TIFF results before downstream processing
 
 IMAGE QUALITY:
-• Preview before final scan
+• Use a first scan as the quality check
 • Adjust brightness if needed
 • Use automatic color detection
 • Ensure no skew
 • Check focus quality
 
-SAVING SCANS:
-1. File > Save
-2. Choose format (TIFF recommended)
-3. Set filename pattern
-4. Select output folder
-5. Confirm and save
-
 TROUBLESHOOTING:
-• Scanner not detected: Check drivers/connections
-• Poor quality: Adjust brightness/contrast
-• Skewed images: Check document placement
-• Paper jams: Follow scanner manual
+• Scanner not detected: Check backend availability, drivers, and network reachability
+• AirScan fallback needed: Provide direct device IP/URL when discovery is incomplete
+• Poor quality: Adjust DPI, mode, brightness, or source placement
+• TWAIN unavailable: Confirm a compatible DSM/source exists for the current Python/runtime architecture
+• Linux SANE issues: Treat AirScan as the preferred path when native SANE remains incomplete
 '''
     },
 
@@ -1223,61 +1220,86 @@ PROJECT TEMPLATES:
         'icon': '🖥️',
         'description': '''OCR Processing Server and Batch Orchestration
 
-MyServer provides a central interface for batch OCR processing and image
-transformation workflows in BiblionOCR. It orchestrates preprocessing,
-conversion, and document processing dialogs rather than serving a web API.
+    MyServer is the main runtime coordinator for BiblionOCR.
+    It is not a network server or web API. It wires project creation, scanning,
+    image loading, OCR-adjacent workflows, and developer-mode entry points.
 
 FEATURES:
-• Batch processing orchestration
-• PDF/TIFF extraction and conversion
-• Image preprocessing dialogs
-• Workflow management for Greek/Latin OCR
-• Integration with PreProcess and Training modules
-• Local server-style processing interface
+    • Project creation and project-opening workflows
+    • Shared scanner workflow integration
+    • PDF/TIFF extraction and conversion dialogs
+    • Launch points into downstream modules such as MyPixler and MyScanner
+    • Session-backed path and workflow restore
+    • Developer menu entry for Runtime Inspector / Developer Services
 
 PRIMARY WORKFLOW:
 1. Open MyServer
-2. Select source files and dialogs
-3. Apply preprocessing operations
-4. Run OCR pipeline
-5. Collect processed output
+    2. Create or open a project
+    3. Load or acquire source material
+    4. Route work into the appropriate module or dialog
+    5. Continue through the OCR and review pipeline
 
 KEY FUNCTIONS:
-• Extract pages from PDF documents
-• Convert TIFF and PNG formats
-• Deskew and normalize scans
-• Manage OCR preprocessing and workflow steps
-• Launch dialog-based transformation tools
+    • Create projects from the managed project structure
+    • Open project folders rooted under the user Projects directory
+    • Launch and coordinate scanner acquisition workflows
+    • Open images directly into MyPixler when editing is required
+    • Persist session state rather than rewriting ad hoc local settings
 
 CONFIGURATION:
-• Input/output folders
-• Temporary storage location
-• OCR model selection
-• Language/script processing options
-• Workflow dialog settings
+    • Active project path
+    • Session-backed image and scanner state
+    • Project creation inputs and provenance metadata
+    • Shared workflow font and UI startup state
+    • Developer-mode observation visibility
 
 USES IN PIPELINE:
-• Batch OCR preparation
-• Automated image conversion
-• Preprocessing workflow orchestration
-• Server-based document processing
+    • Main runtime entry point
+    • Project creation and routing surface
+    • Scan orchestration and preprocessing entry point
+    • Developer-mode hosting surface
 
-See also: PreProcess, Training, MyWriter
+    CURRENT NOTES:
+    • Project creation logic is moving into the Core engine rather than staying in UI code.
+    • MyServer and MyScanner share the same scanner workflow services.
+    • The Runtime Inspector is available through the Developer menu when enabled.
+    • Current repo policy and contribution guidance live in CONTRIBUTING.md and CONTENT_POLICY.md.
+
+    See also: MyScanner, MyPixler, MyWriter, Developer Services
 ''',
         'usage': '''APPLICATION USAGE
 
 STARTING MYSERVER:
-1. Run MyServer.py from terminal or launch from UI
+    1. Run MyServer.py from terminal or launch from the project UI
 2. Open the MyServer interface
-3. Choose the workflow or dialog you need
-4. Configure input/output paths and processing settings
-5. Execute the batch processing steps
+    3. Choose whether to create a project, open a project, scan, or load an image
+    4. Configure the selected workflow
+    5. Continue into the downstream module or dialog
 
-WORKFLOW:
-1. Select document source
-2. Use extraction/conversion dialogs
-3. Start processing and monitor progress
-4. Save results to the chosen output folder
+    PROJECT CREATION:
+    1. Start the new-project workflow
+    2. Review the normalized project name and provenance fields
+    3. Import RIS or other metadata only when useful
+    4. Confirm project creation into the user Projects area
+
+    SCANNING AND IMAGE INTAKE:
+    1. Start the shared scan workflow when acquiring new images
+    2. Use flatbed scanning locally in MyServer
+    3. Allow feeder/ADF-oriented handoff into MyScanner when prompted
+    4. Review the saved TIFF result and continue processing
+
+    MODULE ROUTING:
+    1. Use MyPixler for image editing and review
+    2. Use MyScanner for scanner-focused acquisition sessions
+    3. Use downstream OCR and text tools after acquisition/preprocessing is complete
+
+    DEVELOPER MODE:
+    1. Open the Developer menu when available
+    2. Launch Runtime Inspector to observe module state and recent events
+    3. Use documentation-first references for architecture and workflow context:
+       - docs/README.md
+       - docs/development/DEV_NOTEBOOK.md
+       - docs/development/QUICK_REFERENCE.md
 '''
     },
 
@@ -1494,7 +1516,16 @@ def show_about(parent=None, program_name='MyBoxer'):
 <li>Version: 1.0</li>
 <li>License: See LICENSE file</li>
 <li>Author: BiblionOCR Team</li>
-<li>Homepage: See PROJECT_ARCHITECTURE.md</li>
+<li>Architecture: See docs/architecture/PROJECT_ARCHITECTURE.md</li>
+</ul>
+
+<h3>Current Reference Surface:</h3>
+<ul>
+<li>Documentation root: docs/README.md</li>
+<li>Developer notebook: docs/development/DEV_NOTEBOOK.md</li>
+<li>Quick reference: docs/development/QUICK_REFERENCE.md</li>
+<li>Contribution policy: CONTRIBUTING.md</li>
+<li>Content rights policy: CONTENT_POLICY.md</li>
 </ul>
 
 <h3>Key Technologies:</h3>
@@ -1507,8 +1538,8 @@ def show_about(parent=None, program_name='MyBoxer'):
 
 <h3>Getting Help:</h3>
 <p>Press F1 in any program for detailed help.
-See PROJECT_ARCHITECTURE.md for system overview.
-See QUICK_REFERENCE.md for quick lookup.</p>
+See docs/architecture/PROJECT_ARCHITECTURE.md for system overview.
+See docs/development/QUICK_REFERENCE.md for quick lookup.</p>
 """
     
     from PyQt5.QtWidgets import QMessageBox

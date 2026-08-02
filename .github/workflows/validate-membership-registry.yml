@@ -1,0 +1,108 @@
+name: Validate Membership Registry
+
+on:
+  push:
+    paths:
+      - .github/membership-registry.json
+  pull_request:
+    paths:
+      - .github/membership-registry.json
+
+jobs:
+  validate-membership-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate membership registry schema
+        run: |
+          import json
+          from pathlib import Path
+
+          path = Path('.github/membership-registry.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+
+          required_top_level = {
+              'version',
+              'policy_refs',
+              'allowed_roles',
+              'allowed_access_levels',
+              'members',
+          }
+          missing = required_top_level.difference(data)
+          if missing:
+              raise SystemExit(f'Missing top-level keys: {sorted(missing)}')
+
+          if not isinstance(data['members'], list):
+              raise SystemExit('members must be a list')
+
+          allowed_roles = set(data['allowed_roles'])
+          allowed_access_levels = set(data['allowed_access_levels'])
+          seen_pairs = set()
+
+          for index, member in enumerate(data['members']):
+              required_member_keys = {
+                  'github_username',
+                  'role',
+                  'access_level',
+                  'status',
+                  'approved_by',
+                  'approved_at',
+                  'request_issue',
+              }
+              missing_member_keys = required_member_keys.difference(member)
+              if missing_member_keys:
+                  raise SystemExit(
+                      f'member {index} missing keys: {sorted(missing_member_keys)}'
+                  )
+
+              username = member['github_username']
+              role = member['role']
+              access_level = member['access_level']
+              status = member['status']
+
+              if role not in allowed_roles:
+                  raise SystemExit(f'member {index} has invalid role: {role}')
+              if access_level not in allowed_access_levels:
+                  raise SystemExit(
+                      f'member {index} has invalid access level: {access_level}'
+                  )
+              if status not in {'approved', 'suspended', 'revoked'}:
+                  raise SystemExit(f'member {index} has invalid status: {status}')
+
+              if not isinstance(member['request_issue'], int) or member['request_issue'] <= 0:
+                  raise SystemExit(
+                      f'member {index} must reference a positive GitHub issue number'
+                  )
+
+              unique_key = (username.lower(), role)
+              if unique_key in seen_pairs:
+                  raise SystemExit(
+                      f'duplicate membership entry for {username!r} and role {role!r}'
+                  )
+              seen_pairs.add(unique_key)
+
+              if role == 'content_creator' and access_level not in {
+                  'curated_intake',
+                  'pull_request_only',
+              }:
+                  raise SystemExit(
+                      'content_creator entries may only use curated_intake or pull_request_only'
+                  )
+
+              if role == 'developer' and access_level == 'curated_intake':
+                  raise SystemExit(
+                      'developer entries may not use curated_intake access'
+                  )
+
+              if role == 'maintainer' and access_level not in {'maintain', 'admin'}:
+                  raise SystemExit(
+                      'maintainer entries must use maintain or admin access'
+                  )
+        shell: python

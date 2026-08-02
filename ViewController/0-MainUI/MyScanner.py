@@ -5,7 +5,6 @@ import sys
 import os
 import re
 #import glob
-import shutil
 import json
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
@@ -15,25 +14,34 @@ from queue import Queue
 from ext import mainfind
 import subprocess
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 
 from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import  Qt, QObject, QThread, pyqtSignal
+from PyQt5.QtCore import  Qt
 # Custom imports
 #from MainUI import Ui_MainUI
 from MyScannerUI import Ui_Scanner
 from PreProcess import PreProcess as pp
 
-import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
+from project_status_controller import ProjectStatusController
+from print_menu_support import install_print_menu_support, image_target, document_target
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -42,20 +50,14 @@ import MyPixler as pixler
 import MyExplorer as explorer
 import ChrReference as chrref
 from SessionManager import SessionManager
-from Core.Scanner import ScanManager, ScanWorker
+from Core.Scanner import ScanManager
 from ScanWorkflow import ScanWizardDialog
+from scan_runtime import start_scan_workflow
 #import MyResolver as resolver
 #import MyGrounder as grounder
 
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
-
-script_dir = os.path.dirname(os.path.realpath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
 
 SCANNED_FOLDER = os.path.join(
     project_root,
@@ -175,6 +177,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             image_handler=self.showImage,
             text_handler=self.loadDropTextEvent,
         )
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Image": image_target(
+                    lambda: self.qimage if hasattr(self, 'qimage') else self.ui.Image.pixmap(),
+                    "There is currently no active reference image loaded to print.",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.OCRText.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Ref_Image",
+        )
         self.session_manager = SessionManager()
         self.scannerManager = ScanManager()
         self._scan_thread = None
@@ -266,14 +282,21 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.initBookCombo()
         #self.selectBookCombo()
 
-        # Restore Session settings
-        self.get_session_settings()
-
         self.dirIterator = None
         self.imgfileList = []
         self.txtfileList = []
         self.imgdir = ""
         self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+
+        # Restore Session settings
+        self.get_session_settings()
+        self.project_status_controller = ProjectStatusController(
+            self,
+            'MyScanner',
+            session_manager=self.session_manager,
+        )
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
 
@@ -315,6 +338,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #sys.stdout = Streamer(textWritten=self.output_terminal_written)'''
 
         self.show()
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
         qtc.QTimer.singleShot(0, self._resume_pending_scan_handoff)
         #self.toggleLatinToolbars()
 
@@ -380,6 +404,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
+        active_project = SessionManager().get_active_project('Session.json')
+        self.current_project_root = active_project.get('project_root', '')
+        self.current_project_name = active_project.get('project_name', '')
         session = self.session_manager.values('ScannerSession.json')
 
         def get_setting(name: str, default=None):
@@ -421,31 +448,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.glyph = get_setting('glyph', '')
         self.glyphname = get_setting('glyphname', '')
         self.glyphencode = get_setting('glyphencode', '')
-        self.scan_destination_folder = get_setting('scan_destination_folder', SCANNED_FOLDER)
-        self.scan_backend_preference = get_setting('scan_backend_preference', 'ESCLScanner')
-        self.scan_device_name = get_setting('scan_device_name', '')
-        self.scan_allow_network_fallback = get_setting('scan_allow_network_fallback', True)
-        self.scan_mode = get_setting('scan_mode', 'color')
-        self.scan_dpi = get_setting('scan_dpi', 300)
-        self.scan_source_type = get_setting('scan_source_type', 'flatbed')
-        self.scan_duplex = get_setting('scan_duplex', False)
-        self.scan_persist_format = get_setting('scan_persist_format', 'tiff')
+        self.scannerManager.apply_request_state(
+            self,
+            {
+                'destination_folder': get_setting('scan_destination_folder', SCANNED_FOLDER),
+                'backend_preference': get_setting('scan_backend_preference', 'ESCLScanner'),
+                'device_name': get_setting('scan_device_name', ''),
+                'allow_network_fallback': get_setting('scan_allow_network_fallback', True),
+                'mode': get_setting('scan_mode', 'color'),
+                'dpi': get_setting('scan_dpi', 300),
+                'source_type': get_setting('scan_source_type', 'flatbed'),
+                'duplex': get_setting('scan_duplex', False),
+                'persist_format': get_setting('scan_persist_format', 'tiff'),
+            },
+            SCANNED_FOLDER,
+        )
         self.pending_scan_handoff = get_setting('pending_scan_handoff', False)
-
-        try:
-            self.scan_dpi = int(self.scan_dpi)
-        except (TypeError, ValueError):
-            self.scan_dpi = 300
-
-        if isinstance(self.scan_duplex, str):
-            self.scan_duplex = self.scan_duplex.strip().lower() in {'1', 'true', 'yes', 'on'}
-        else:
-            self.scan_duplex = bool(self.scan_duplex)
-
-        if isinstance(self.scan_allow_network_fallback, str):
-            self.scan_allow_network_fallback = self.scan_allow_network_fallback.strip().lower() in {'1', 'true', 'yes', 'on'}
-        else:
-            self.scan_allow_network_fallback = bool(self.scan_allow_network_fallback)
 
         if isinstance(self.pending_scan_handoff, str):
             self.pending_scan_handoff = self.pending_scan_handoff.strip().lower() in {'1', 'true', 'yes', 'on'}
@@ -462,6 +480,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.ZoomComboBox.setCurrentText(self.zoom)
         if str(self.zoomslidervalue).isdigit():
             self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
+
     def get_workflow_settings(self):
 
         # Opening JSON file
@@ -598,53 +624,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyReader.py')
 
     def _default_scan_request(self):
-        request = self.scannerManager.default_request(SCANNED_FOLDER)
-        request.update(
-            {
-                'destination_folder': getattr(self, 'scan_destination_folder', SCANNED_FOLDER),
-                'backend_preference': getattr(self, 'scan_backend_preference', 'ESCLScanner'),
-                'device_name': getattr(self, 'scan_device_name', ''),
-                'allow_network_fallback': getattr(self, 'scan_allow_network_fallback', True),
-                'mode': getattr(self, 'scan_mode', 'color'),
-                'dpi': getattr(self, 'scan_dpi', 300),
-                'source_type': getattr(self, 'scan_source_type', 'flatbed'),
-                'duplex': getattr(self, 'scan_duplex', False),
-                'persist_format': getattr(self, 'scan_persist_format', 'tiff'),
-            }
-        )
-        return request
+        return self.scannerManager.request_from_state(self, SCANNED_FOLDER)
 
     def _persist_scan_request(self, request, pending_scan_handoff=False):
-        normalized_request = self.scannerManager.default_request(
-            (request or {}).get('destination_folder') or SCANNED_FOLDER
-        )
-        normalized_request.update(request or {})
-
-        self.scan_destination_folder = normalized_request['destination_folder']
-        self.scan_backend_preference = normalized_request['backend_preference']
-        self.scan_device_name = normalized_request['device_name']
-        self.scan_allow_network_fallback = normalized_request.get('allow_network_fallback', True)
-        self.scan_mode = normalized_request['mode']
-        self.scan_dpi = normalized_request['dpi']
-        self.scan_source_type = normalized_request['source_type']
-        self.scan_duplex = normalized_request['duplex']
-        self.scan_persist_format = normalized_request['persist_format']
+        normalized_request = self.scannerManager.apply_request_state(self, request, SCANNED_FOLDER)
         self.pending_scan_handoff = bool(pending_scan_handoff)
 
         self.session_manager.update(
             'ScannerSession.json',
-            {
-                'self.scan_destination_folder': self.scan_destination_folder,
-                'self.scan_backend_preference': self.scan_backend_preference,
-                'self.scan_device_name': self.scan_device_name,
-                'self.scan_allow_network_fallback': self.scan_allow_network_fallback,
-                'self.scan_mode': self.scan_mode,
-                'self.scan_dpi': self.scan_dpi,
-                'self.scan_source_type': self.scan_source_type,
-                'self.scan_duplex': self.scan_duplex,
-                'self.scan_persist_format': self.scan_persist_format,
-                'self.pending_scan_handoff': self.pending_scan_handoff,
-            },
+            self.scannerManager.session_payload(
+                normalized_request,
+                pending_scan_handoff=self.pending_scan_handoff,
+            ),
         )
 
     def _resume_pending_scan_handoff(self):
@@ -670,34 +661,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         return self._start_scan_workflow(request)
 
     def _start_scan_workflow(self, request):
-        if self._scan_thread is not None:
-            qtw.QMessageBox.information(
-                self,
-                'Scan In Progress',
-                'Wait for the current scan task to finish.'
-            )
-            return None
+        return start_scan_workflow(
+            self,
+            self.scannerManager,
+            request,
+            self.on_scan_progress,
+            self.on_scan_result,
+            self.on_scan_error,
+            self._on_scan_thread_finished,
+            before_start=self._before_scan_start,
+        )
 
-        self._scan_thread = qtc.QThread()
-        self._scan_worker = ScanWorker(self.scannerManager, request)
-        self._scan_worker.moveToThread(self._scan_thread)
-
-        self._scan_thread.started.connect(self._scan_worker.run)
-        self._scan_worker.progress.connect(self.on_scan_progress)
-        self._scan_worker.finished.connect(self.on_scan_result)
-        self._scan_worker.error.connect(self.on_scan_error)
-
-        self._scan_worker.finished.connect(self._scan_thread.quit)
-        self._scan_worker.finished.connect(self._scan_worker.deleteLater)
-        self._scan_worker.error.connect(self._scan_thread.quit)
-        self._scan_worker.error.connect(self._scan_worker.deleteLater)
-        self._scan_thread.finished.connect(self._scan_thread.deleteLater)
-        self._scan_thread.finished.connect(self._on_scan_thread_finished)
-
+    def _before_scan_start(self):
         qtw.QApplication.setOverrideCursor(Qt.WaitCursor)
         self.statusBar().showMessage('Starting scan...', 2000)
-        self._scan_thread.start()
-        return request
 
     def on_scan_progress(self, value):
         self.statusBar().showMessage(f'Scan in progress... {value}%')

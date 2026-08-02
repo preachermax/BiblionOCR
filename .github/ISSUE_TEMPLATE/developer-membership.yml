@@ -1,0 +1,63 @@
+name: Developer Membership Request
+description: Request developer access or recognition for code-focused contribution work.
+title: "[Developer Membership]: "
+labels:
+  - membership
+  - developer
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request developer membership for BiblionOCR.
+
+        Developer membership is for contributors who will work through pull requests on code, tests, build automation, architecture, or engineering documentation.
+  - type: input
+    id: github_username
+    attributes:
+      label: GitHub username
+      description: The account that should be considered for membership.
+      placeholder: preachermax
+    validations:
+      required: true
+  - type: input
+    id: display_name
+    attributes:
+      label: Display name
+      description: Your real name or the public name you want associated with approval notes.
+  - type: dropdown
+    id: requested_access
+    attributes:
+      label: Requested access level
+      description: Choose the least privilege that will let you contribute effectively.
+      options:
+        - pull_request_only
+        - triage
+        - write
+    validations:
+      required: true
+  - type: textarea
+    id: intended_work
+    attributes:
+      label: Intended contribution scope
+      description: Describe the code, test, tooling, or engineering-doc work you expect to do.
+      placeholder: I plan to contribute to scanner backends, workflow tests, and related architecture docs.
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: Relevant experience
+      description: Summarize the experience that supports the access level you requested.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safeguards
+    attributes:
+      label: Access safeguards
+      options:
+        - label: I will use a GitHub account protected by MFA.
+          required: true
+        - label: I will contribute through pull requests and accept maintainer review on protected areas.
+          required: true
+        - label: I have read CONTRIBUTING.md and understand the repository review model.
+          required: true

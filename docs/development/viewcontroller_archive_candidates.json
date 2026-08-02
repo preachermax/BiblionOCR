@@ -1,0 +1,2859 @@
+{
+  "candidate_count": 374,
+  "high_confidence_count": 189,
+  "medium_confidence_count": 3,
+  "keep_count": 182,
+  "high_confidence": [
+    {
+      "file": "ViewController/0-MainUI/Dialogs/crop_greek_linesDialog copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/0-MainUI/Icons/document-page-last.png",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/0-MainUI/MyPixler-one-shot works.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/0-MainUI/QtDesignerUI/Archives/CropTif copy.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/0-MainUI/QtDesignerUI/Archives/CropTif-old.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/0-MainUI/QtDesignerUI/Archives/MainUI copy.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/0-MainUI/QtDesignerUI/MyServerUI_Last.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/3-DeskewLatin copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/0-TextLines2FileGreek.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/1-Tif2Binary.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/12-TextLines2FileGreekSynthetic.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/13-DeskewGreekSynthetic.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/14-SortCropLinesGreekSynthetic.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/15-SyntheticImageFileRenameMove.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/3-DeskewLatin.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/5-SortCropLinesGreek2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/6-SortCropLinesLatin.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/ImWrite.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/numpyversion.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/png2tif.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/tif2jpg.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/untitled.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/2-Move_feg_GroundTruth2Tesstrain,py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/2-TextFileRenameMove.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/3-Move_feg_wordlist2Tesstrain,py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/4-Tessrain_feg.sh",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/4-TextFileRenameMove--check.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/5-Move_fel_GroundTruth2Tesstrain,py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewNew.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewOld.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/6-Tessrain_fel.sh",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/QT5ImageIterator.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/1-Qt5CorrectGreekOCR copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/1-Qt5CorrectGreekOCROld.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/2-Qt5VersifyOld.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/3-TR2Wordlist.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/7-VersifyText.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/ComboFilter.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/MulitpleClasses.txt",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/MySpellTextEdit.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/OCRCorrection.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/OCRCorrection2.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 3.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 4.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/RichTextEdit.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/TextEdit.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/TextEditSpellCheck.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/WordListCombo.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/WordListComboFilter.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/spelltextedit.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/tif2jpg.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/tkGreekOCR.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Erasmvs/E4_GreekTxtPagesFontChange copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/0-DBOperations.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/0-DB_Codec.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/0-DB_Re.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/1-DB_FROMVS2TW_Rebuild.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/1-DB_TR2ES.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/1-DB_TRa2ES.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/11-DB_Word2UnicodeLong.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/2-DB_WordNormalize.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/5-DB_StrongDistinct2FROMVS_wordlineloop.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/5-DB_StrongDistinct2FROMVS_wordloop.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/5-DB_StrongLine2FROMVS_broadwordloop.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/5-DB_StrongTR2FROMVS_lemma.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/5-DB_StrongTR2FROMVS_nodia.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/6-DB_CopyLemma2LcLemma.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/6-DB_LemmaLine2Erasmus.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/6-DB_LemmaLowercase.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/6-DB_VarForm2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/6-DB_VariantsBackupResolved.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/6-DB_VariantsRebuild.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/7-DB_CopyLcLemma2NoDiaLemma.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/7-DB_LemmaNoDiacritics.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/7-DB_Strong2Variants.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/8-DB_VariantsRestoreResolved.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/8-Qt5ResolveVariants.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/9-DB_EnglishLine2Erasmvs.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/9-DB_EnglishLine2ErasmvsJoinOld.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/DB_ReplaceT.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/DB_TRa2ES_bad.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Qt5ResolveVariants_old.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/12-DB_Word2Unicode.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/12-DB_Word2UnicodeWord.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/15-DB_FROMVS2TextTW+.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/2-DB_Word2NormWord.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/2-DB_WordNormalize.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/3-DB_NormWord2LcWord.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/3-DB_WordLowercase.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/4-DB_LcWord2NoDiaWord.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Recent/4-DB_WordNoDiacritics.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxEditor.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerGV.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerGVUI.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerUI copy.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerUI_3.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerUI_dev.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerUIold.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxer_WindowsLast.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxer_old.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxer_old1.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxer_old2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/0-Qt5ManuscriptOCR.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Boxer/MyBoxerFull.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Boxer/MyBoxerHelp.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/CorrectOCR.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/DeskewFiles.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/ExtractPdf0.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI (another copy).ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI (copy).ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI copy 2.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI copy.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI0.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI0.ui",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI_0.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MulitprocessPoolExecutor.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MultiPreProcess.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/MultiThreadPreProcess.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Pdf4tiff.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Pdf4tiffFileRenameMove.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/PdfExtract.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Pixler/ImageEditUI.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Pixler/MyFixer.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Pixler/MyFixerUI.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Pixler/Qt5CropRegion.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/PreprocessMultiProcessPoolExecMap.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Qt4CropImage.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Qt5BiblicalOCR copy 2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Qt5BiblicalOCR copy 3.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Qt5BiblicalOCR copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Qt5BiblicalOCRMulti.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Qt5MssOCR.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/2-Tiff2pngLatin.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/CropDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/CropImage copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/CropLangsDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/CropLatin2tifLinesDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/CropTif copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/ExtractPdf.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/FromToDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/FromToToDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/GreekText2Wordlist.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/ImgMultiPreProcess.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/MypdfViewer.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/Qt5BiblicalOCR copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/Qt5BiblicalOCR.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/Qt5BiblicalOCRbad.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/Qt5Logger.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/QtCropImage copy 2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/QtCropImage copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/get_workflow_settings.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/pngResizeDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Resolver/VariantText.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Resolver/VariantsMainForm.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Resolver/old-Qt5ResolveVariants.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/SqliteHelper copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Term2Text.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Trainer/2-Tiff2pngGreek.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Trainer/5-GroundTruthFileRenameMove--check.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/UI_Icons copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/6-RemoveTRBookRef.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/LowerizeText.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MainUI (copy).py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MainUI copy.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MoveDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MoveGreektextLinesDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MoveGreektifLines.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MoveLatintextLinesDialog.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MoveLatintifLines.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/NoDiacritisText.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/NormalizeText.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/Qt5Versify.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/Qt5VersifyTextNew.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/verses_ui.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/verses_uic.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/part-1.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/part-4.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Qt5RichTextEdit.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/mulitestloop.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/mulitestloop2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/mulitestpool.py",
+      "ref_count": 0,
+      "refs_sample": []
+    },
+    {
+      "file": "ViewController/Developer/Reference/mulitestpool2.py",
+      "ref_count": 0,
+      "refs_sample": []
+    }
+  ],
+  "medium_confidence": [
+    {
+      "file": "ViewController/0-MainUI/QtDesignerUI/Archives/MainUI2.ui",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/Developer/Reference/MainUI2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/MainUI2.ui",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/Developer/Reference/MainUI2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/multiprocess.py",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/Developer/Reference/MulitprocessPoolExecutor.py"
+      ]
+    }
+  ],
+  "keep": [
+    {
+      "file": "ViewController/0-MainUI/Icons/Part-4/icons/copy.png",
+      "ref_count": 13,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py"
+      ]
+    },
+    {
+      "file": "ViewController/0-MainUI/Icons/copy.png",
+      "ref_count": 13,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py"
+      ]
+    },
+    {
+      "file": "ViewController/0-MainUI/Icons/document-copy.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/0-MainUI/QtDesignerUI/MyGlypherUI.ui",
+        "ViewController/0-MainUI/QtDesignerUI/ChrReferenceDialog.ui"
+      ]
+    },
+    {
+      "file": "ViewController/0-MainUI/QtDesignerUI/Archives/MainUI.ui",
+      "ref_count": 8,
+      "refs_sample": [
+        "ViewController/0-MainUI/update_UI_Resources.txt",
+        "ViewController/0-MainUI/MainUI.py",
+        "ViewController/Developer/Reference/0-Qt5ManuscriptOCR.py",
+        "ViewController/Developer/Reference/MainUI0.py",
+        "ViewController/Developer/Reference/MainUI_0.py"
+      ]
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/MultiPageTIFFViewerQt.py",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/2-TrainTesseract/Reference/MultiPageTIFFViewerQt.py"
+      ]
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/QT5GroundTruthReview.ui",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyGrounder.py",
+        "ViewController/0-MainUI/Windows files copied over not committed/MyGrounder.py",
+        "ViewController/0-MainUI/Windows files copied over not committed/Qt5GroundTruthReview.py",
+        "ViewController/2-TrainTesseract/Greek Training/6-Qt5GroundTruthReview.py",
+        "ViewController/2-TrainTesseract/Reference/6-Qt5GroundTruthReviewNew.py"
+      ]
+    },
+    {
+      "file": "ViewController/1-PreProcess/Reference/QtImageViewer.py",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/2-TrainTesseract/Reference/QtImageViewer.py"
+      ]
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/MultiPageTIFFViewerQt.py",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/1-PreProcess/Reference/MultiPageTIFFViewerQt.py"
+      ]
+    },
+    {
+      "file": "ViewController/2-TrainTesseract/Reference/QtImageViewer.py",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/1-PreProcess/Reference/QtImageViewer.py"
+      ]
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/OCRCorrection.ui",
+      "ref_count": 12,
+      "refs_sample": [
+        "ViewController/3-ConductOCR/2-Qt5Versify.py",
+        "ViewController/3-ConductOCR/1-Qt5CorrectGreekOCR.py",
+        "ViewController/Developer/Reference/CorrectOCR.py",
+        "ViewController/Developer/Reference/Versifier/Qt5Versify.py",
+        "ViewController/3-ConductOCR/Reference/Qt5CorrectGreekOCR copy 4.py"
+      ]
+    },
+    {
+      "file": "ViewController/3-ConductOCR/Reference/el_GR_word_list.txt",
+      "ref_count": 3,
+      "refs_sample": [
+        "ViewController/3-ConductOCR/Reference/WordListCombo.py",
+        "ViewController/3-ConductOCR/Reference/TextEdit.py",
+        "ViewController/3-ConductOCR/Reference/WordListComboFilter.py"
+      ]
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/Variants.ui",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/4-PostProcess/Reference/Qt5ResolveVariants_old.py"
+      ]
+    },
+    {
+      "file": "ViewController/4-PostProcess/Reference/VariantsMainForm.ui",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/Qt5ResolveVariants.py",
+        "ViewController/4-PostProcess/Textus ReceptusInt/7-Qt5ResolveTRiVariants.py",
+        "ViewController/4-PostProcess/Textus Receptus/8-Qt5ResolveTRVariants.py",
+        "ViewController/4-PostProcess/Reference/8-Qt5ResolveVariants.py",
+        "ViewController/Developer/Reference/Resolver/VariantsMainForm.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxer.py",
+      "ref_count": 18,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "launchers/rebuild_desktop_launchers.py",
+        "ViewController/0-MainUI/HelpSystem.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerGVUI.ui",
+      "ref_count": 2,
+      "refs_sample": [
+        "ViewController/Developer/Archives/MyBoxerGVUI.py",
+        "ViewController/0-MainUI/QtDesignerUI/ui_MyBoxerGVUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerUI.py",
+      "ref_count": 11,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/HelpSystem.py",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Archives/MyBoxerUI.ui",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/update_UI_Resources.txt",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/Developer/Archives/MyBoxerUI.py",
+        "ViewController/0-MainUI/QtDesignerUI/ui_MyBoxerUI.py",
+        "Developer/Publisher/Cytoscape/mylauncher_ui_replica.js"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/MyReader.py",
+      "ref_count": 14,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Reader/crop_languagesDialog",
+      "ref_count": 24,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/MyBoxer.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Ui2Py.py",
+      "ref_count": 7,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Versifier/MainUI.py",
+      "ref_count": 11,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/align-center.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/align-justify.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/align-left.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/align-right.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/bold.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/bullet.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/calender.png",
+      "ref_count": 3,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/copy.png",
+      "ref_count": 13,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/count.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/cut.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/dedent.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/find.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/font-color.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/font-size.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/font.png",
+      "ref_count": 32,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/MyReaderUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/highlight.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/icon.png",
+      "ref_count": 20,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxer.py",
+        "ViewController/0-MainUI/MyGlypher.py",
+        "ViewController/0-MainUI/MyWriter.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/iconmonstr-license.pdf",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/image.png",
+      "ref_count": 71,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyPixlerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/VersifyTextUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/indent.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/italic.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/new.png",
+      "ref_count": 19,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/number.png",
+      "ref_count": 9,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/open.png",
+      "ref_count": 15,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/open2.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/open3.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/paste.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/preview.png",
+      "ref_count": 27,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyLauncherUI.py",
+        "ViewController/0-MainUI/MainUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/print.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/redo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/save.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/strike.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/subscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/superscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/table.png",
+      "ref_count": 21,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/time.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/underline.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-1/icons/undo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/align-center.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/align-justify.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/align-left.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/align-right.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/bold.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/bullet.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/calender.png",
+      "ref_count": 3,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/copy.png",
+      "ref_count": 13,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/count.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/cut.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/dedent.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/find.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/font-color.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/font-size.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/font.png",
+      "ref_count": 32,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/MyReaderUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/highlight.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/icon.png",
+      "ref_count": 20,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxer.py",
+        "ViewController/0-MainUI/MyGlypher.py",
+        "ViewController/0-MainUI/MyWriter.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/iconmonstr-license.pdf",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/image.png",
+      "ref_count": 71,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyPixlerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/VersifyTextUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/indent.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/italic.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/new.png",
+      "ref_count": 19,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/number.png",
+      "ref_count": 9,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/open.png",
+      "ref_count": 15,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/open2.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/open3.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/paste.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/preview.png",
+      "ref_count": 27,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyLauncherUI.py",
+        "ViewController/0-MainUI/MainUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/print.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/redo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/save.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/strike.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/subscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/superscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/table.png",
+      "ref_count": 21,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/time.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/underline.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-2/icons/undo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/ext/__init__.py",
+      "ref_count": 66,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "Core/__init__.py",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/ext/find.py",
+      "ref_count": 7,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/ext/wordcount.py",
+      "ref_count": 5,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/align-center.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/align-justify.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/align-left.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/align-right.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/bold.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/bullet.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/calender.png",
+      "ref_count": 3,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/copy.png",
+      "ref_count": 13,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/count.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/cut.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/dedent.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/find.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/font-color.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/font-size.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/font.png",
+      "ref_count": 32,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/MyReaderUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/highlight.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/icon.png",
+      "ref_count": 20,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxer.py",
+        "ViewController/0-MainUI/MyGlypher.py",
+        "ViewController/0-MainUI/MyWriter.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/iconmonstr-license.pdf",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/image.png",
+      "ref_count": 71,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyPixlerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/VersifyTextUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/indent.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/italic.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/new.png",
+      "ref_count": 19,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/number.png",
+      "ref_count": 9,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/open.png",
+      "ref_count": 15,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/open2.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/open3.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/paste.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/preview.png",
+      "ref_count": 27,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyLauncherUI.py",
+        "ViewController/0-MainUI/MainUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/print.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/redo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/save.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/strike.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/subscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/superscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/table.png",
+      "ref_count": 21,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/time.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/underline.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-3/icons/undo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/ext/__init__.py",
+      "ref_count": 66,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "Core/__init__.py",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/ext/datetime.py",
+      "ref_count": 5,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/ext/find.py",
+      "ref_count": 7,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/ext/table.py",
+      "ref_count": 7,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/ext/wordcount.py",
+      "ref_count": 5,
+      "refs_sample": [
+        "ProjectFolderList.txt",
+        "ViewController/ScriptureProjectFolderList.txt",
+        "ViewController/GeneralProjectFolderList.txt",
+        "ViewController/0-MainUI/ScriptureProjectFolderList.txt",
+        "ViewController/0-MainUI/ProjectFolderList.txt"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/align-center.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/align-justify.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/align-left.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/align-right.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/bold.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/bullet.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/calender.png",
+      "ref_count": 3,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/copy.png",
+      "ref_count": 13,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGlypherUI.py",
+        "ViewController/0-MainUI/ChrReferenceDialog.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/count.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/cut.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/dedent.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/find.png",
+      "ref_count": 4,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/font-color.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/font-size.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/font.png",
+      "ref_count": 32,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/MyReaderUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/highlight.png",
+      "ref_count": 5,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/icon.png",
+      "ref_count": 20,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxer.py",
+        "ViewController/0-MainUI/MyGlypher.py",
+        "ViewController/0-MainUI/MyWriter.py",
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/iconmonstr-license.pdf",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/image.png",
+      "ref_count": 71,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyPixlerUI.py",
+        "ViewController/0-MainUI/MyScannerUI.py",
+        "ViewController/0-MainUI/VersifyTextUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/indent.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/italic.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/new.png",
+      "ref_count": 19,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/number.png",
+      "ref_count": 9,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/open.png",
+      "ref_count": 15,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyServerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyGrounderUI.py",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/open2.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/open3.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/paste.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/preview.png",
+      "ref_count": 27,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyLauncherUI.py",
+        "ViewController/0-MainUI/MainUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/print.png",
+      "ref_count": 6,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py",
+        "ViewController/Developer/Reference/Writer/Part-4/part-4.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/redo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/save.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/strike.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/subscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/superscript.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/table.png",
+      "ref_count": 21,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/MyBoxerUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/0-MainUI/MyLexerUI.py",
+        "ViewController/0-MainUI/MyGlypherUI.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/time.png",
+      "ref_count": 1,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/underline.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/MyWriterUI.py",
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/Part-4/icons/undo.png",
+      "ref_count": 7,
+      "refs_sample": [
+        "ViewController/0-MainUI/UI_Icons.qrc",
+        "ViewController/Developer/Reference/Writer/MyWriterOrig.py",
+        "ViewController/Developer/Reference/Writer/Qt5TextEdit.py",
+        "ViewController/Developer/Reference/Writer/Part-3/part-3.py",
+        "ViewController/Developer/Reference/Writer/Part-2/part-2.py"
+      ]
+    },
+    {
+      "file": "ViewController/Developer/Reference/Writer/README.md",
+      "ref_count": 15,
+      "refs_sample": [
+        "CONTRIBUTING.md",
+        "README.md",
+        "docs/README.md",
+        "Core/engine.py",
+        "ViewController/0-MainUI/HelpSystem.py"
+      ]
+    }
+  ]
+}

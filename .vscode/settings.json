@@ -1,5 +1,8 @@
 {
     "sqltools.useNodeRuntime": true,
+    "terminal.integrated.env.windows": {
+        "PATH": "${workspaceFolder}\\.tools\\node-v22.23.1-win-x64;${env:PATH}"
+    },
     "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
     "git.autofetch": true,
     "python.testing.unittestArgs": [
@@ -13,5 +16,6 @@
     "python.testing.unittestEnabled": true,
     "github.copilot.chat.githubMcpServer.enabled": true,
     "github.copilot.chat.languageContext.typescript.includeDocumentation": true,
-    "github.copilot.chat.localIndex.enabled": true
+    "github.copilot.chat.localIndex.enabled": true,
+    "chat.byokUtilityModelDefault": "copilot"
 }
