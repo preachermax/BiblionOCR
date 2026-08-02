@@ -64,6 +64,10 @@ Developer/video/masters/
 Developer/video/audio/generated/
 Developer/video/*.kdenlive.ass
 
+# Ignore all Developer and archives folders (any depth) for local artifacts.
+**/Developer/**
+**/archives/**
+
 # Patreon local tooling runtime artifacts
 docs/patreon/local_blog_tool/playwright_profile/
 docs/patreon/local_blog_tool_transfer_*.zip
