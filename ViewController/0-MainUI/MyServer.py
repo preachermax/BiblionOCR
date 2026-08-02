@@ -45,7 +45,7 @@ developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
 if developer_view_dir not in sys.path:
     sys.path.insert(0, developer_view_dir)
 
-from gui_runtime_env import sanitize_current_process_and_reexec
+from helpers.gui_runtime_env import sanitize_current_process_and_reexec
 
 sanitize_current_process_and_reexec()
 
@@ -76,20 +76,20 @@ SCANNED_FOLDER = os.path.join(
 os.makedirs(SCANNED_FOLDER, exist_ok=True)
 
 
-from SessionManager import SessionManager
-from ocr_preprocess_tool import OCRPreprocessTool
+from helpers.SessionManager import SessionManager
+from helpers.ocr_preprocess_tool import OCRPreprocessTool
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
 import tiffcapture
 import qimage2ndarray
 from queue import Queue
-from ext import mainfind
-from HelpSystem import add_help_menu
-from Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
+from helpers.ext import mainfind
+from helpers.HelpSystem import add_help_menu
+from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
 from Core.Scanner import NetworkScanner, ScanManager
-from scan_runtime import start_scan_workflow
+from helpers.scan_runtime import start_scan_workflow
 # EventBus is still defined below in this module during the Core migration.
 # ProjectCreationEngine remains below as a temporary fallback, but runtime wiring now uses CoreProjectCreationEngine.
 # Do not import MainWindow from MainUI.py; that file only contains the generated Ui_MainUI class.
@@ -117,7 +117,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtWidgets import QMainWindow, QAction
 try:
-    from print_handlerUI import ProjectPrintHandler
+    from helpers.print_handlerUI import ProjectPrintHandler
 except ModuleNotFoundError:
     class ProjectPrintHandler:
         """Fallback print handler used when print_handlerUI is unavailable."""
@@ -142,49 +142,49 @@ import numpy as np
 import tifffile
 
 # Custom impor
-from MyServerUI import Ui_MainUI
-from PreProcess import PreProcess as pp
-import ChrReference as chrref
-import MyVersifier as versify
-import MyBoxer as boxer
+from helpers.MyServerUI import Ui_MainUI
+from helpers.PreProcess import PreProcess as pp
+import helpers.ChrReference as chrref
+import helpers.MyVersifier as versify
+import helpers.MyBoxer as boxer
 import MyScanner as scanner
 import MyExplorer as explorer
-from ProjectTrackingDialog import ProjectTrackingDialog
-import MyGrounder as gtr
-import ImageLoadWorker
-from ProjectCreationWorker import ProjectCreationWorker
-from Training import Train as tr
-from TiffStackWorker import TiffStackWorker
-from LocalFileDrop import LocalFileDropMixin
-from ScanWorkflow import ScanWizardDialog as SharedScanWizardDialog
+from helpers.ProjectTrackingDialog import ProjectTrackingDialog
+import helpers.MyGrounder as gtr
+from helpers.ImageLoadWorker import ImageLoadWorker
+from helpers.ProjectCreationWorker import ProjectCreationWorker
+from helpers.Training import Train as tr
+from helpers.TiffStackWorker import TiffStackWorker
+from helpers.LocalFileDrop import LocalFileDropMixin
+from helpers.ScanWorkflow import ScanWizardDialog as SharedScanWizardDialog
 # Dialog Imports
-from Dialogs.ExtractDialog import Ui_ExtractDialog
-from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
-from Dialogs.tif2monoDialog import Ui_tif2monoDialog
-from Dialogs.mono2pngDialog import Ui_mono2pngDialog
-from Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
-from Dialogs.crop_languagesDialog import Ui_crop_languagesDialog
-from Dialogs.greekmono2pngDialog import Ui_greekmono2pngDialog
-from Dialogs.deskew_greekmonoDialog import Ui_deskew_greekmonoDialog
-from Dialogs.greekresizepngDialog import Ui_greekresizepngDialog
-from Dialogs.latinmono2pngDialog import Ui_latinmono2pngDialog
-from Dialogs.deskew_latinmonoDialog import Ui_deskew_latinmonoDialog
-from Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
-from Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
-from Dialogs.crop_latin_linesDialog import Ui_crop_latin_linesDialog
-from Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
-from Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
-from Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
-from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
-from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
+from helpers.Dialogs.ExtractDialog import Ui_ExtractDialog
+from helpers.Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
+from helpers.Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
+from helpers.Dialogs.tif2monoDialog import Ui_tif2monoDialog
+from helpers.Dialogs.mono2pngDialog import Ui_mono2pngDialog
+from helpers.Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
+from helpers.Dialogs.crop_languagesDialog import Ui_crop_languagesDialog
+from helpers.Dialogs.greekmono2pngDialog import Ui_greekmono2pngDialog
+from helpers.Dialogs.deskew_greekmonoDialog import Ui_deskew_greekmonoDialog
+from helpers.Dialogs.greekresizepngDialog import Ui_greekresizepngDialog
+from helpers.Dialogs.latinmono2pngDialog import Ui_latinmono2pngDialog
+from helpers.Dialogs.deskew_latinmonoDialog import Ui_deskew_latinmonoDialog
+from helpers.Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
+from helpers.Dialogs.crop_greek_linesDialog import Ui_crop_greek_linesDialog
+from helpers.Dialogs.crop_latin_linesDialog import Ui_crop_latin_linesDialog
+from helpers.Dialogs.tif_greek_lines_renameDialog import Ui_tifgreekrenamelinesDialog
+from helpers.Dialogs.tif_greek_lines_moveDialog import Ui_tifgreekmovelinesDialog
+from helpers.Dialogs.tif_latin_lines_renameDialog import Ui_tiflatinrenamelinesDialog
+from helpers.Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
+from helpers.Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from Developer.developer_services import DeveloperServices
 
 #import MyPixler as pixler
 #import CropTif as croptif
 #import QtCropImage as cropimg
-from ImagePreviewDialog import ImagePreviewDialog
-from project_creation_wizard_dialog import ProjectCreationWizardDialog
+from helpers.ImagePreviewDialog import ImagePreviewDialog
+from helpers.project_creation_wizard_dialog import ProjectCreationWizardDialog
 #from MultiPreProcess import MultiPreProcess as mpp
 
 def configure_tesseract():

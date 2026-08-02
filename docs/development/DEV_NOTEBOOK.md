@@ -22,11 +22,11 @@
 * Project creation is being moved toward an **event-sourced Core Engine model**
 * The long-term target is:
 
-  * UI gathers input
-  * MyServer wires dependencies and routes signals
-  * Core Engine owns project lifecycle logic
-  * EventBus dispatches events
-  * SQLiteEventStore persists events
+* UI gathers input
+* MyServer wires dependencies and routes signals
+* Core Engine owns project lifecycle logic
+* EventBus dispatches events
+* SQLiteEventStore persists events
 
 ---
 
@@ -49,87 +49,86 @@ This checkpoint defines:
 
   ## Project Status and Milestones
 
-  * `MyServer` is now the authoritative selector for the active project across the runtime toolchain
-  * the selected project is persisted through shared session state in `Model/Project/Data/json/Session.json`
-  * `SessionManager` now exposes active-project helpers so modules can read and publish the same project identity consistently
-  * `Core/project_tracking.py` now owns the shared workflow milestone model, project-root resolution, persisted tracking state, and weighted progress calculation
-  * milestone state is persisted per project in `Model/Project/Data/json/ProjectTracking.json`
-  * `ViewController/0-MainUI/ProjectTrackingDialog.py` is now the common user-facing milestone editor
-  * the `Milestones` dialog is no longer `MyServer`/`MyPixler` only; the shared controller in `ViewController/0-MainUI/project_status_controller.py` mounts the same project-status surface across the main runtime modules
-  * the common status surface now includes:
+* `MyServer` is now the authoritative selector for the active project across the runtime toolchain
+* the selected project is persisted through shared session state in `Model/Project/Data/json/Session.json`
+* `SessionManager` now exposes active-project helpers so modules can read and publish the same project identity consistently
+* `Core/project_tracking.py` now owns the shared workflow milestone model, project-root resolution, persisted tracking state, and weighted progress calculation
+* milestone state is persisted per project in `Model/Project/Data/json/ProjectTracking.json`
+* `ViewController/0-MainUI/ProjectTrackingDialog.py` is now the common user-facing milestone editor
+* the `Milestones` dialog is no longer `MyServer`/`MyPixler` only; the shared controller in `ViewController/0-MainUI/project_status_controller.py` mounts the same project-status surface across the main runtime modules
+* the common status surface now includes:
 
-    * current project name
-    * module workflow summary
-    * weighted overall project progress bar
-    * `Milestones` button opening the shared editor dialog
+  * current project name
+  * module workflow summary
+  * weighted overall project progress bar
+  * `Milestones` button opening the shared editor dialog
 
-  * `MyPixler` follows `MyServer` project selection live while open
-  * the remaining main windows now read the same active project and expose the same milestone dialog / status-bar workflow surface
-  * this work turns project progress from inferred, local, and mostly invisible state into a shared, user-visible, and manually editable development contract
+* `MyPixler` follows `MyServer` project selection live while open
+* the remaining main windows now read the same active project and expose the same milestone dialog / status-bar workflow surface
+* this work turns project progress from inferred, local, and mostly invisible state into a shared, user-visible, and manually editable development contract
 
   ---
 
   ## Repository Policy Surface
 
-  * public contribution policy is now defined in the repository root through `CONTRIBUTING.md`
-  * non-code submission and rights screening policy is now defined through `CONTENT_POLICY.md`
-  * repository review ownership for sensitive paths is now expressed through `.github/CODEOWNERS`
-  * developer and content-creator intake are intentionally treated as different workflows because software licensing and content redistribution rights are not the same problem
+* public contribution policy is now defined in the repository root through `CONTRIBUTING.md`
+* non-code submission and rights screening policy is now defined through `CONTENT_POLICY.md`
+* repository review ownership for sensitive paths is now expressed through `.github/CODEOWNERS`
+* developer and content-creator intake are intentionally treated as different workflows because software licensing and content redistribution rights are not the same problem
 
 ---
 
-  ## 🌐 Website Prototype Notes
+## 🌐 Website Prototype Notes
 
-  ### Current Website Demo State
+### Current Website Demo State
 
-  * `docs/website/` now contains a minimal React + Cytoscape website prototype
-  * `docs/website/src/App.jsx` is the maintained source version of the demo
-  * `docs/website/preview.html` is the no-build browser preview for environments without local Node.js
-  * the public website milestone is now live at `https://biblionocr.onrender.com/`
-  * the current demo includes:
+* `docs/website/` now contains a minimal React + Cytoscape website prototype
+* `docs/website/src/App.jsx` is the maintained source version of the demo
+* `docs/website/preview.html` is the no-build browser preview for environments without local Node.js
+* the public website milestone is now live at `https://biblionocr.onrender.com/`
+* the current demo includes:
 
-    * static overview graph
-    * static guiding-principles graph derived from `docs/vision/THE_BIBLION_PROJECT.md`
-    * node-click selection routed into parent state
-    * advance, reset, and autoplay sequence controls for the overview graph
-    * EventBus + EventRunner + EventGraphExecutor wiring for recursive event-graph traversal
-    * in-memory event logger with per-run `traceId` grouping
-    * live event log panel and system-state panel
-    * graph highlighting for both the current active node and previously visited nodes
+* static overview graph
+* static guiding-principles graph derived from `docs/vision/THE_BIBLION_PROJECT.md`
+* node-click selection routed into parent state
+* advance, reset, and autoplay sequence controls for the overview graph
+* EventBus + EventRunner + EventGraphExecutor wiring for recursive event-graph traversal
+* in-memory event logger with per-run `traceId` grouping
+* live event log panel and system-state panel
+* graph highlighting for both the current active node and previously visited nodes
 
-  ### Current Layout / Readability Contract
+### Current Layout / Readability Contract
 
-  * graph cards now use a single-column layout so the canvas can consume the full card width
-  * graph nodes use wrapped text inside rounded rectangle geometry rather than circular targets
-  * the overview graph now uses explicit preset positions across the horizontal axis to avoid vertical scrolling
-  * the guiding-principles graph also uses preset positions so larger readable targets can fit the available canvas
-  * GraphView now persists visual visited-node highlighting across an execution run while still emphasizing the current active node
-  * label readability was validated through the local browser preview before the final website commits were published
+* graph cards now use a single-column layout so the canvas can consume the full card width
+* graph nodes use wrapped text inside rounded rectangle geometry rather than circular targets
+* the overview graph now uses explicit preset positions across the horizontal axis to avoid vertical scrolling
+* the guiding-principles graph also uses preset positions so larger readable targets can fit the available canvas
+* GraphView now persists visual visited-node highlighting across an execution run while still emphasizing the current active node
+* label readability was validated through the local browser preview before the final website commits were published
 
-  ### Current Runtime / Instrumentation Contract
+### Current Runtime / Instrumentation Contract
 
-  * `eventBus.js` is the local publish/subscribe channel for website demo events
-  * `eventGraph.js` defines the next-event adjacency map used by the runtime traversal layer
-  * `EventRunner.js` now delegates execution to an injected executor instead of iterating a sequence directly
-  * `EventGraphExecutor.js` recursively traverses the event graph, emits through the EventBus, and guards against cycles / runaway depth
-  * `eventLogger.js` records each runtime event with timestamp plus `traceId` so one execution run can be grouped end-to-end
-  * `stateManager.js` exposes subscribable `activeNode`, `lastEvent`, and `isRunning` state for the React side panels
+* `eventBus.js` is the local publish/subscribe channel for website demo events
+* `eventGraph.js` defines the next-event adjacency map used by the runtime traversal layer
+* `EventRunner.js` now delegates execution to an injected executor instead of iterating a sequence directly
+* `EventGraphExecutor.js` recursively traverses the event graph, emits through the EventBus, and guards against cycles / runaway depth
+* `eventLogger.js` records each runtime event with timestamp plus `traceId` so one execution run can be grouped end-to-end
+* `stateManager.js` exposes subscribable `activeNode`, `lastEvent`, and `isRunning` state for the React side panels
 
-  ### Commit / Branch State
+### Commit / Branch State
 
-  * the website prototype landed first on `development` as:
+* the website prototype landed first on `development` as:
 
-    * `e27f513` Add website Cytoscape graph demo
-    * `c99d010` Refine website graph readability
+* `e27f513` Add website Cytoscape graph demo
+* `c99d010` Refine website graph readability
 
-  * the same work was promoted onto `master`, and both branches now reconcile at merge commit `d48a643`
+* the same work was promoted onto `master`, and both branches now reconcile at merge commit `d48a643`
 
-  * the event-graph runtime milestone then landed on `development` as:
+* the event-graph runtime milestone then landed on `development` as:
 
-    * `cf5f483` v1.6 complete: event graph execution engine with traceable runtime traversal
+* `cf5f483` v1.6 complete: event graph execution engine with traceable runtime traversal
 
   ---
-
 
 ## 🧪 Developer Mode Milestones
 
@@ -139,29 +138,29 @@ This checkpoint defines:
 * `DeveloperServices` is the sole runtime instrumentation boundary for Developer Mode
 * the initial runtime model now tracks observed modules with:
 
-  * module name
-  * current state
-  * last observed event
-  * last update timestamp
-  * status
+* module name
+* current state
+* last observed event
+* last update timestamp
+* status
 
 * lightweight metrics currently include:
 
-  * total observed event count
-  * event count per module
+* total observed event count
+* event count per module
 
 * trace recording currently stores:
 
-  * trace identifier
-  * event name
-  * source module
-  * destination module
-  * timestamp
+* trace identifier
+* event name
+* source module
+* destination module
+* timestamp
 
 * the public read-only `DeveloperServices` API now exposes runtime model, modules, individual module state, metrics, traces, and recent events through defensive-copy accessors suitable for future Developer Mode panels
 * milestone commit published on `development`:
 
-  * `7ca2bfd` v1.7 milestone 7.6: add DeveloperServices instrumentation API
+* `7ca2bfd` v1.7 milestone 7.6: add DeveloperServices instrumentation API
 
 ### v1.8 First Visible Developer Panel
 
@@ -169,33 +168,32 @@ This checkpoint defines:
 * `ViewController/Developer/RuntimeInspectorPanel.py` renders module state using only the public `DeveloperServices` API
 * the Runtime Inspector now displays:
 
-  * registered modules
-  * standardized runtime status
-  * last observed event
-  * last update timestamp
-  * selected-module detail view
+* registered modules
+* standardized runtime status
+* last observed event
+* last update timestamp
+* selected-module detail view
 
 * runtime status is currently normalized to the canonical set:
 
-  * `OPEN`
-  * `CLOSED`
-  * `OBSERVED`
-  * `UNKNOWN`
+* `OPEN`
+* `CLOSED`
+* `OBSERVED`
+* `UNKNOWN`
 
 * `DeveloperServices` now publishes runtime updates through an event-driven subscriber model so the Runtime Inspector refreshes without polling
 * `MyServer.py` now hosts the first Developer Mode panel through a hidden-by-default `Developer` menu entry
 * Runtime Inspector activation is lazy:
 
-  * the panel dock is created only when opened
-  * `DeveloperServices` observation is attached only while the panel is visible
-  * normal application behavior remains unaffected when Developer Mode is unused
+* the panel dock is created only when opened
+* `DeveloperServices` observation is attached only while the panel is visible
+* normal application behavior remains unaffected when Developer Mode is unused
 
 * milestone commit published on `development`:
 
-  * `ac2a93c` v1.8: integrate visible Runtime Inspector milestone
+* `ac2a93c` v1.8: integrate visible Runtime Inspector milestone
 
 ---
-
 
 ## 📠 Scanner Acquisition Architecture
 
@@ -254,32 +252,32 @@ Future implementations should derive from a common `ScannerBackend` interface so
 
 * **AirScan / eSCL**
 
-  * real backend implemented in `Core/Scanner/escl_scanner.py`
-  * supports mDNS `_uscan` / `_uscans` discovery
-  * supports direct IP / URL entry in the wizard device field
-  * falls back to Scapy ARP sweep plus `/eSCL/ScannerCapabilities` probing when mDNS advertisements are missing
-  * validated against Canon device at `192.168.2.21`
+* real backend implemented in `Core/Scanner/escl_scanner.py`
+* supports mDNS `_uscan` / `_uscans` discovery
+* supports direct IP / URL entry in the wizard device field
+* falls back to Scapy ARP sweep plus `/eSCL/ScannerCapabilities` probing when mDNS advertisements are missing
+* validated against Canon device at `192.168.2.21`
 
 * **WIA**
 
-  * working on Windows
-  * COM initialization moved into thread-local backend calls to fix `CoInitialize has not been called`
-  * saves TIFF output reliably through the shared scan-result contract
+* working on Windows
+* COM initialization moved into thread-local backend calls to fix `CoInitialize has not been called`
+* saves TIFF output reliably through the shared scan-result contract
 
 * **TWAIN**
 
-  * backend code now exists in `Core/Scanner/twain_scanner.py`
-  * project-local `twaindsm.dll` loading is supported
-  * current Canon TS3700 state: 64-bit DSM loads, but no 64-bit TWAIN sources are registered; Canon source artifacts present on this machine remain under the 32-bit `C:\Windows\twain_32` tree
-  * treat TWAIN as unavailable for the current Canon path until a real 64-bit source or a 32-bit helper runtime is introduced
+* backend code now exists in `Core/Scanner/twain_scanner.py`
+* project-local `twaindsm.dll` loading is supported
+* current Canon TS3700 state: 64-bit DSM loads, but no 64-bit TWAIN sources are registered; Canon source artifacts present on this machine remain under the 32-bit `C:\Windows\twain_32` tree
+* treat TWAIN as unavailable for the current Canon path until a real 64-bit source or a 32-bit helper runtime is introduced
 
 * **SANE**
 
-  * Linux/macOS backend extracted from old `MyServer` commented prototype and moved into `Core/Scanner/sane_scanner.py`
-  * now uses a defensive split strategy on Linux: safe availability probing, `scanimage`-based enumeration, selective option probing, retry/caching for slow discovery, and AirScan-assisted fallback when `sane-airscan` discovery/acquisition is not self-sufficient
-  * Jetson Canon TS3700 result: SANE can be presented as a Linux-facing compatibility surface, but the reliable scan transport is still network AirScan/eSCL rather than a stable native SANE acquisition path
-  * strict USB-only Jetson validation result: with `airscan` removed from both `dll.conf` and `dll.d`, `scanimage -L` returned no devices and `SANE_DEBUG_PIXMA=4` reported `pixma_find_scanners() found 0 devices`, so native USB SANE should be treated as unavailable for the current TS3700 path
-  * not fully testable on this Windows machine because `python-sane` is not installed here
+* Linux/macOS backend extracted from old `MyServer` commented prototype and moved into `Core/Scanner/sane_scanner.py`
+* now uses a defensive split strategy on Linux: safe availability probing, `scanimage`-based enumeration, selective option probing, retry/caching for slow discovery, and AirScan-assisted fallback when `sane-airscan` discovery/acquisition is not self-sufficient
+* Jetson Canon TS3700 result: SANE can be presented as a Linux-facing compatibility surface, but the reliable scan transport is still network AirScan/eSCL rather than a stable native SANE acquisition path
+* strict USB-only Jetson validation result: with `airscan` removed from both `dll.conf` and `dll.d`, `scanimage -L` returned no devices and `SANE_DEBUG_PIXMA=4` reported `pixma_find_scanners() found 0 devices`, so native USB SANE should be treated as unavailable for the current TS3700 path
+* not fully testable on this Windows machine because `python-sane` is not installed here
 
 ### Recent Scanner Stabilization
 
@@ -304,7 +302,6 @@ Future implementations should derive from a common `ScannerBackend` interface so
 * The current scanner helpers follow the same pragmatic formatting style used elsewhere: short section-divider comments, thin wrapper classes, and simple return dictionaries like `{ "path": ..., "dir": ... }`
 * Discovery and acquisition helpers are now routed through `ScanManager`, but capability modeling and backend-specific diagnostics still need cleanup
 
-
 ---
 
 ## ⚠️ Critical UI / Import Correction
@@ -315,17 +312,17 @@ Future implementations should derive from a common `ScannerBackend` interface so
 * `ViewController/0-MainUI/MyServerUI.py` defines the generated `Ui_MainUI` class used by MyServer
 * `ViewController/0-MainUI/MainUI.py` is also a generated UI file and does **not** define:
 
-  * `MainWindow`
-  * `MainUI`
-  * `RISDialogController`
+* `MainWindow`
+* `MainUI`
+* `RISDialogController`
 
 ### ❌ Do Not Reintroduce
 
 * Do **not** use:
 
-  * `from MainUI import MainWindow`
-  * `from MainUI import MainUI`
-  * `from MainUI import RISDialogController`
+* `from MainUI import MainWindow`
+* `from MainUI import MainUI`
+* `from MainUI import RISDialogController`
 
 These imports caused recent startup tracebacks because those names do not exist in `MainUI.py`.
 
@@ -345,24 +342,24 @@ These imports caused recent startup tracebacks because those names do not exist 
 * `collect_new_project_payload()` now opens a guided two-step modal dialog instead of chained text prompts
 * The wizard currently supports:
 
-  * step 1: optional provenance import
-  * step 2: project details + review summary
-  * required-field validation before final submission
-  * visible project-name normalization before creation
+* step 1: optional provenance import
+* step 2: project details + review summary
+* required-field validation before final submission
+* visible project-name normalization before creation
 
 * `on_new_project_clicked()` now:
 
-  * collects required project/RIS payload fields from the wizard
-  * handles Cancel cleanly
-  * prompts before replacing an existing project
-  * reports success/failure with message boxes
+* collects required project/RIS payload fields from the wizard
+* handles Cancel cleanly
+* prompts before replacing an existing project
+* reports success/failure with message boxes
 
 * Supported provenance import formats in the wizard:
 
-  * `project.ris.json`
-  * standard RIS text exports such as Primo `.ris`
-  * `.txt` provenance files containing RIS, JSON text, or simple key/value pairs
-  * `.csv` provenance files with either key/value rows or a header row plus one data row
+* `project.ris.json`
+* standard RIS text exports such as Primo `.ris`
+* `.txt` provenance files containing RIS, JSON text, or simple key/value pairs
+* `.csv` provenance files with either key/value rows or a header row plus one data row
 
 * Imported provenance metadata is preserved into the final project RIS payload under source-provenance fields when available
 
@@ -370,34 +367,34 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * New projects should be created under the user Projects folder:
 
-  * Windows target: `C:/Users/Max/Projects`
-  * Code target: `os.path.join(os.path.expanduser("~"), "Projects")`
+* Windows target: `C:/Users/Max/Projects`
+* Code target: `os.path.join(os.path.expanduser("~"), "Projects")`
 
 * The previously created project was corrected:
 
-  * moved from `Model/Project/Erasmus1516`
-  * moved to `C:/Users/Max/Projects/Erasmus1516`
+* moved from `Model/Project/Erasmus1516`
+* moved to `C:/Users/Max/Projects/Erasmus1516`
 
 * The project registry was normalized to:
 
-  * `C:/Users/Max/Projects/_registry.json`
+* `C:/Users/Max/Projects/_registry.json`
 
 * Current manual test staging state:
 
-  * `Erasmus1519` content has replaced `Erasmus1516`
-  * `Erasmus1519` has been removed
-  * `Erasmus1522` has been removed so it can be recreated through the wizard
-  * Windows held an open handle on the `Erasmus1516` root directory, so the successful reset path was: clear `Erasmus1516` contents, then move `Erasmus1519` contents into that existing folder
+* `Erasmus1519` content has replaced `Erasmus1516`
+* `Erasmus1519` has been removed
+* `Erasmus1522` has been removed so it can be recreated through the wizard
+* Windows held an open handle on the `Erasmus1516` root directory, so the successful reset path was: clear `Erasmus1516` contents, then move `Erasmus1519` contents into that existing folder
 
 ### ⚠️ Temporary Architecture Drift
 
 * `MyServer.py` currently still contains local definitions for:
 
-  * `ProjectState`
-  * `ProjectCreationEngine`
-  * `EventBus`
-  * `ProjectReplayEngine`
-  * `RISDialogController`
+* `ProjectState`
+* `ProjectCreationEngine`
+* `EventBus`
+* `ProjectReplayEngine`
+* `RISDialogController`
 
 * The intended target is to move these responsibilities into `Core/` and keep `MyServer.py` as wiring only
 * Do not remove the local definitions until `Core/` is fully validated and wired
@@ -410,11 +407,11 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Events should follow this shape:
 
-  * `event`: event name
-  * `timestamp`: event time
-  * `state`: project engine state
-  * `project_name`: active project name, if any
-  * `metadata`: event metadata dict
+* `event`: event name
+* `timestamp`: event time
+* `state`: project engine state
+* `project_name`: active project name, if any
+* `metadata`: event metadata dict
 
 ### Current Status
 
@@ -446,9 +443,9 @@ These imports caused recent startup tracebacks because those names do not exist 
 * The current standard is to launch a small shell wrapper from the `.desktop` entry, run the module from that wrapper, print the exit status, and wait for Enter before closing
 * Canonical repo examples now exist for this pattern:
 
-  * `JETSON_PERSISTENT_LAUNCHERS.md`
-  * `launchers/run-myserver.sh`
-  * `My Server.desktop`
+* `JETSON_PERSISTENT_LAUNCHERS.md`
+* `launchers/run-myserver.sh`
+* `My Server.desktop`
 
 * The wrapper pattern is intended to be replicated across the other desktop modules after validation on `MyServer`
 
@@ -497,8 +494,8 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * `ProjectFolderList.py` regenerates both:
 
-  * `ProjectFolderList.txt`
-  * `ViewController/0-MainUI/ProjectFolderList.txt`
+* `ProjectFolderList.txt`
+* `ViewController/0-MainUI/ProjectFolderList.txt`
 
 * `Core/engine.py` can now generate new project folder structures from `ProjectFolderList.txt`
 * Core treats file entries in `ProjectFolderList.txt` as parent-directory requirements
@@ -509,22 +506,22 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Current future-project manifest baseline:
 
-  * include current ViewController runtime files
-  * include `Model/Project/Data` csv/json/SQLite folders and file contents
-  * include minimal `Model/Project/Images` folder skeleton only
-  * exclude deep image trees and image files themselves
+* include current ViewController runtime files
+* include `Model/Project/Data` csv/json/SQLite folders and file contents
+* include minimal `Model/Project/Images` folder skeleton only
+* exclude deep image trees and image files themselves
 
 * Deprecated references are excluded or redirected:
 
-  * `Model/Utilities` → `Model/Project/Utilities`
-  * `Model/Developer` → `Model/Project/Utilities`
+* `Model/Utilities` → `Model/Project/Utilities`
+* `Model/Developer` → `Model/Project/Utilities`
 
 * Explicitly excluded:
 
-  * external/system font paths
-  * Tesseract install paths
-  * home/user profile paths
-  * `Model/Project/Utilities/Reference`
+* external/system font paths
+* Tesseract install paths
+* home/user profile paths
+* `Model/Project/Utilities/Reference`
 
 * Required `ViewController/0-MainUI` files and selected module folders are explicitly restored during regeneration
 
@@ -538,12 +535,12 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Project creation temp directories are now unique per run to avoid stale temp-dir collisions
 * `Core/engine.py` smoke test confirmed:
 
-  * `.git/` initialization
-  * `Model/Project/Data/json`
-  * `Model/Project/Images/Workflow/pixler/pixler_pages_cropped`
-  * `ViewController/0-MainUI`
-  * `src/manifests/ProjectFolderList.txt`
-  * `logs/processing/project_folder_list_structure_rebuild.md`
+* `.git/` initialization
+* `Model/Project/Data/json`
+* `Model/Project/Images/Workflow/pixler/pixler_pages_cropped`
+* `ViewController/0-MainUI`
+* `src/manifests/ProjectFolderList.txt`
+* `logs/processing/project_folder_list_structure_rebuild.md`
 
 * `Erasmus1516` has been moved to `C:/Users/Max/Projects/Erasmus1516`
 * `_registry.json` now lives under `C:/Users/Max/Projects`
@@ -573,37 +570,37 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Constructor stabilized (no multi-parent / param conflicts)
 * Crop coordinates:
 
-  * correctly mapped
-  * converted to original image space
+* correctly mapped
+* converted to original image space
 
 * Preview behavior:
 
-  * Left = original
-  * Right = processed
-  * rotate preview now uses a reduced working image during slider drag for responsiveness, then recomputes the settled preview from the full-resolution source on slider release
-  * mono/bilevel preview rendering now uses a preview-only black/white display conversion instead of relying on Qt's default mono scaling path
+* Left = original
+* Right = processed
+* rotate preview now uses a reduced working image during slider drag for responsiveness, then recomputes the settled preview from the full-resolution source on slider release
+* mono/bilevel preview rendering now uses a preview-only black/white display conversion instead of relying on Qt's default mono scaling path
 
 * Crop apply:
 
-  * left mouse drag creates a crop rubberBand on the left/original preview
-  * rubberBand remains visible after mouse release
-  * 8 light-blue grip handles allow crop adjustment before Apply
-  * grip-handle release updates the right/processed preview
-  * Apply hides the rubberBand/handles and returns the processed crop to MyPixler
-  * correctly updates **processed (right) panel**
+* left mouse drag creates a crop rubberBand on the left/original preview
+* rubberBand remains visible after mouse release
+* 8 light-blue grip handles allow crop adjustment before Apply
+* grip-handle release updates the right/processed preview
+* Apply hides the rubberBand/handles and returns the processed crop to MyPixler
+* correctly updates **processed (right) panel**
 
 * Resolution behavior:
 
-  * crop coordinates are mapped from zoomed display space back to original image pixels
-  * preview zoom is display-only and does not determine the applied crop's pixel size
-  * `get_result()` returns the full-resolution processed crop
-  * QImage resolution metadata is copied from the source image through the crop result
+* crop coordinates are mapped from zoomed display space back to original image pixels
+* preview zoom is display-only and does not determine the applied crop's pixel size
+* `get_result()` returns the full-resolution processed crop
+* QImage resolution metadata is copied from the source image through the crop result
 
 * Current remaining gap:
 
-  * saved rotated mono TIFF output now matches document expectations materially better than preview
-  * preview has been tuned substantially closer, but still remains slightly lighter/thinner than the final saved result
-  * remaining work is preview-only calibration in `ImagePreviewDialog.py`, not TIFF processing or save-path correction
+* saved rotated mono TIFF output now matches document expectations materially better than preview
+* preview has been tuned substantially closer, but still remains slightly lighter/thinner than the final saved result
+* remaining work is preview-only calibration in `ImagePreviewDialog.py`, not TIFF processing or save-path correction
 
 ---
 
@@ -612,49 +609,49 @@ These imports caused recent startup tracebacks because those names do not exist 
 * Shared local file URL intake now lives in `ViewController/0-MainUI/LocalFileDrop.py`
 * `LocalFileDropMixin` now provides:
 
-  * `install_local_file_drop(...)` for standard single-target image/text modules
-  * `install_local_file_drop_target(...)` for widget-specific routing in multi-pane modules
-  * shared non-modal drag-capable file pickers for text and image loads
-  * visible file-load feedback through terminal/status/wait-cursor helpers
+* `install_local_file_drop(...)` for standard single-target image/text modules
+* `install_local_file_drop_target(...)` for widget-specific routing in multi-pane modules
+* shared non-modal drag-capable file pickers for text and image loads
+* visible file-load feedback through terminal/status/wait-cursor helpers
 
 * Primary file-open workflows were standardized to the shared non-modal picker path in:
 
-  * `MyVersifier`
-  * `MyReader`
-  * `MyScanner`
-  * `MyGrounder`
-  * `MyGlypher`
-  * `MyBoxer`
-  * `MyServer`
-  * `MyWriter`
-  * `MyPixler`
-  * `MyLexer`
-  * `MyLauncher`
+* `MyVersifier`
+* `MyReader`
+* `MyScanner`
+* `MyGrounder`
+* `MyGlypher`
+* `MyBoxer`
+* `MyServer`
+* `MyWriter`
+* `MyPixler`
+* `MyLexer`
+* `MyLauncher`
 
 * `MyVersifier` is the special multi-pane case:
 
-  * `RefText` was changed in Qt Designer so it is no longer read-only
-  * `MyVersifierUI.py` was regenerated from `QtDesignerUI/MyVersifierUI.ui`
-  * drops on `RefText` route to `getRefText(...)`
-  * drops on `VerseText` route to `getVerseText(...)`
-  * startup/file-load progress is now visible for long text loads and formatting passes
+* `RefText` was changed in Qt Designer so it is no longer read-only
+* `MyVersifierUI.py` was regenerated from `QtDesignerUI/MyVersifierUI.ui`
+* drops on `RefText` route to `getRefText(...)`
+* drops on `VerseText` route to `getVerseText(...)`
+* startup/file-load progress is now visible for long text loads and formatting passes
 
 * Expected behavior after the rollout:
 
-  * Windows Explorer drag/drop works on the main intake widgets
-  * `MyExplorer` can act as a drag source and can also accept external file/folder drops into the project tree with collision-safe copy naming
-  * shared picker windows can act as drag sources
-  * dropped files load contents instead of inserting URL text
-  * `.nt` is treated as a text-file extension
+* Windows Explorer drag/drop works on the main intake widgets
+* `MyExplorer` can act as a drag source and can also accept external file/folder drops into the project tree with collision-safe copy naming
+* shared picker windows can act as drag sources
+* dropped files load contents instead of inserting URL text
+* `.nt` is treated as a text-file extension
 
 * Constraint to preserve:
 
-  * native modal `QFileDialog` is not a reliable drag source back into the parent window on Windows
-  * keep using the shared non-modal picker path for drag-capable open workflows
+* native modal `QFileDialog` is not a reliable drag source back into the parent window on Windows
+* keep using the shared non-modal picker path for drag-capable open workflows
 
 * Repository status note:
 
-  * `MyScannerWin.py` was intentionally removed from version control and added to `.gitignore`; keep it out of the repo unless there is an explicit reason to restore it
+* `MyScannerWin.py` was intentionally removed from version control and added to `.gitignore`; keep it out of the repo unless there is an explicit reason to restore it
 
 ---
 
@@ -664,23 +661,23 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Responsibilities:
 
-  * UI startup
-  * dependency wiring
-  * signal routing
-  * event subscription
-  * image selection
-  * TIFF stack loading
-  * navigation
-  * launching MyPixler
+* UI startup
+* dependency wiring
+* signal routing
+* event subscription
+* image selection
+* TIFF stack loading
+* navigation
+* launching MyPixler
 
 * ❌ MUST NOT contain long-term:
 
-  * crop logic
-  * preview logic
-  * image processing
-  * project lifecycle state-machine logic
-  * RIS generation logic
-  * persistent event replay logic
+* crop logic
+* preview logic
+* image processing
+* project lifecycle state-machine logic
+* RIS generation logic
+* persistent event replay logic
 
 ---
 
@@ -688,17 +685,17 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Responsibilities:
 
-  * project lifecycle state machine
-  * validation
-  * RIS generation
-  * project filesystem writing
-  * event emission
+* project lifecycle state machine
+* validation
+* RIS generation
+* project filesystem writing
+* event emission
 
 * ❌ MUST NOT contain:
 
-  * UI imports
-  * direct widget manipulation
-  * PyQt dependencies
+* UI imports
+* direct widget manipulation
+* PyQt dependencies
 
 ---
 
@@ -706,13 +703,13 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Responsibilities:
 
-  * dispatch events
-  * notify subscribers
+* dispatch events
+* notify subscribers
 
 * ❌ MUST NOT:
 
-  * mutate project state
-  * perform business logic
+* mutate project state
+* perform business logic
 
 ---
 
@@ -720,13 +717,13 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Responsibilities:
 
-  * append event records
-  * later: load event records for replay
+* append event records
+* later: load event records for replay
 
 * ❌ MUST NOT:
 
-  * own project state transitions
-  * manipulate UI
+* own project state transitions
+* manipulate UI
 
 ---
 
@@ -734,10 +731,10 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Responsibilities:
 
-  * image processing
-  * crop logic
-  * preview dialog control
-  * session integration
+* image processing
+* crop logic
+* preview dialog control
+* session integration
 
 ---
 
@@ -745,18 +742,18 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 * Responsibilities:
 
-  * interactive preview UI
-  * parameter control via `params` dict
-  * rendering original vs processed comparison
+* interactive preview UI
+* parameter control via `params` dict
+* rendering original vs processed comparison
 
 * Input:
 
-  * `QImage`
-  * processor function
+* `QImage`
+* processor function
 
 * Output:
 
-  * processed `QImage`
+* processed `QImage`
 
 ---
 
@@ -764,39 +761,39 @@ These imports caused recent startup tracebacks because those names do not exist 
 
 1. **Scanner Framework**
 
-  * Keep `MyServer` backend-agnostic and continue pushing backend details into `Core/Scanner`
-  * Add a `mock_backend.py` for no-hardware tests and UI validation
-  * Add explicit backend diagnostics/capability reporting instead of only device-name lists
-  * Treat AirScan/eSCL as the default cross-platform transport for network-capable devices unless a future hardware path proves TWAIN or native SANE acquisition is materially better
-  * Validate `SaneScanner` against future genuinely local/non-AirScan Linux hardware rather than using the Jetson Canon path as the reference implementation
-  * Decide whether TWAIN should remain best-effort/optional or gain a future 32-bit helper process path
+* Keep `MyServer` backend-agnostic and continue pushing backend details into `Core/Scanner`
+* Add a `mock_backend.py` for no-hardware tests and UI validation
+* Add explicit backend diagnostics/capability reporting instead of only device-name lists
+* Treat AirScan/eSCL as the default cross-platform transport for network-capable devices unless a future hardware path proves TWAIN or native SANE acquisition is materially better
+* Validate `SaneScanner` against future genuinely local/non-AirScan Linux hardware rather than using the Jetson Canon path as the reference implementation
+* Decide whether TWAIN should remain best-effort/optional or gain a future 32-bit helper process path
 
-2. **Core / MyServer Unification**
+1. **Core / MyServer Unification**
 
    * Wire `MyServer.py` to use `Core.engine.ProjectCreationEngine`
    * Confirm `Core.event_bus.EventBus` can be imported cleanly
    * Confirm `Core.event_store.SQLiteEventStore` can be imported cleanly
    * Keep local `MyServer.py` engine classes until Core-driven UI project creation is runtime-tested
 
-2. **Move Project Logic Out of MyServer**
+1. **Move Project Logic Out of MyServer**
 
    * Make `Core/engine.py` the single source of truth for `ProjectCreationEngine`
    * Remove duplicate `ProjectCreationEngine` from `MyServer.py` only after Core is fully validated
    * Keep `MyServer.py` as wiring/controller only
 
-3. **SQLite Event Replay**
+1. **SQLite Event Replay**
 
    * Add event loading to `SQLiteEventStore`
    * Create or stabilize `ProjectReplayEngine` under `Core/`
    * Reconstruct project state from event history
 
-4. **UI Event Subscription Layer**
+1. **UI Event Subscription Layer**
 
    * Subscribe UI handlers to EventBus events
    * Replace console-only event feedback with status/output UI updates
    * Keep UI changes reactive and main-thread safe
 
-5. **Regression Test New Project Flow**
+1. **Regression Test New Project Flow**
 
    * Create another test project
    * Confirm it appears under `C:/Users/Max/Projects`
@@ -812,14 +809,14 @@ These imports caused recent startup tracebacks because those names do not exist 
 * `.continue/` configs unless intentional
 * Session files:
 
-  * `Session.json`
-  * CSV mirrors that may contain machine-specific paths
+* `Session.json`
+* CSV mirrors that may contain machine-specific paths
 
 * Generated UI/resource files:
 
-  * `UI_Icons.py` only if intentionally regenerated
-  * `MyServerUI.py` only if intentionally regenerated from Qt Designer
-  * `MyPixlerUI.py` only if intentionally regenerated from Qt Designer
+* `UI_Icons.py` only if intentionally regenerated
+* `MyServerUI.py` only if intentionally regenerated from Qt Designer
+* `MyPixlerUI.py` only if intentionally regenerated from Qt Designer
 
 ---
 
@@ -831,15 +828,15 @@ Always print/check:
 * scale factors
 * thread lifecycle:
 
-  * start
-  * progress
-  * finish
+* start
+* progress
+* finish
 
 * project creation path:
 
-  * `self.project_engine.base_path`
-  * final project path
-  * `_registry.json` path
+* `self.project_engine.base_path`
+* final project path
+* `_registry.json` path
 
 Rules:
 
@@ -920,10 +917,10 @@ DO NOT update for:
 
 * Focus:
 
-  * Project creation path correction
-  * MyServer import cleanup
-  * ProjectFolderList stabilization
-  * Core/EventBus architecture clarification
+* Project creation path correction
+* MyServer import cleanup
+* ProjectFolderList stabilization
+* Core/EventBus architecture clarification
 
 ### Key Stability Wins
 
@@ -1066,10 +1063,9 @@ DO NOT update for:
 * 2026-07-04: active preview dialogs now preserve one comparison contract across the repo: left = original/reference input, right = processed/output result; `MorphologyDialog` was corrected to match `ImagePreviewDialog`
 * 2026-07-04: final broad checkpoint commit is expected to bundle outstanding scanner/session/UI/icon resource changes, including `MyScanner`, `Core/Scanner/*`, regenerated UI resources, session JSON updates, and new scan-workflow support files, even though further test-driven cleanup is still expected afterward
 
-
 ---
 
-# 🚀 Milestone — Public Introduction Video v1.0
+## 🚀 Milestone — Public Introduction Video v1.0
 
 **Date:** July 2026
 
@@ -1094,7 +1090,7 @@ The following production assets were completed:
 
 Public introduction video:
 
-https://youtu.be/zrJQzivQwT4
+<https://youtu.be/zrJQzivQwT4>
 
 ## Production Lessons Learned
 
