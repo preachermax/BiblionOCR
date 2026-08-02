@@ -42,6 +42,10 @@ developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
 if developer_view_dir not in sys.path:
     sys.path.insert(0, developer_view_dir)
 
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 # Debug (optional toggle)
 DEBUG_PATHS = True
 if DEBUG_PATHS:
@@ -108,10 +112,33 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QBuffer, QIODevice
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QFileInfo
+from PyQt5.QtWidgets import QMainWindow, QAction
+try:
+    from print_handlerUI import ProjectPrintHandler
+except ModuleNotFoundError:
+    class ProjectPrintHandler:
+        """Fallback print handler used when print_handlerUI is unavailable."""
+
+        def __init__(self, parent=None):
+            self.parent = parent
+
+        def _warn_unavailable(self, owner):
+            qtw.QMessageBox.warning(
+                owner,
+                "Printing Unavailable",
+                "print_handlerUI.py is missing in this checkout. Printing features are disabled.",
+            )
+
+        def handle_image(self, image, owner, preview=False):
+            self._warn_unavailable(owner)
+
+        def handle_print(self, target_file, owner, preview=False):
+            self._warn_unavailable(owner)
+
 import numpy as np
 import tifffile
 
-# Custom imports
+# Custom impor
 from MyServerUI import Ui_MainUI
 from PreProcess import PreProcess as pp
 import ChrReference as chrref
@@ -156,6 +183,7 @@ from Developer.developer_services import DeveloperServices
 from ImagePreviewDialog import ImagePreviewDialog
 from project_creation_wizard_dialog import ProjectCreationWizardDialog
 #from MultiPreProcess import MultiPreProcess as mpp
+
 def configure_tesseract():
 
     import pytesseract
@@ -180,7 +208,6 @@ def configure_tesseract():
 
     print("Ã¢Å¡Â Ã¯Â¸Â Tesseract not found.")
 
-
 class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
@@ -189,6 +216,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._progress_bar_scale = 10
 
+        # 1. Initialize the global print handler
+        self.print_handler = ProjectPrintHandler(self)
+
+        
         configure_tesseract()
 
         # -------------------------
@@ -212,6 +243,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._developer_services_active = False
         self.current_project_root = None
         self._pending_project_root = None
+        self._active_print_target = "primary"
+        self.imgdir = ""
+        self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+        self.txtfileList = []
+        self.pixler_return_path = ""
+        self.pending_pixler_source_path = ""
+        self._pixler_return_poll_timer = None
+        self.pixler_return_prompt_dialog = None
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -264,6 +305,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
 
         self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+
+        if hasattr(self.ui, "actionPrint_Ref_Image"):
+            self.ui.actionPrint_Ref_Image.triggered.connect(
+                lambda: self.execute_print_flow(target="primary")
+            )
+        if hasattr(self.ui, "actionPrint_Text"):
+            self.ui.actionPrint_Text.triggered.connect(self.print_text_document)
+        if hasattr(self.ui, "actionPrint_Preview"):
+            self.ui.actionPrint_Preview.triggered.connect(self.print_active_preview)
+        if hasattr(self.ui, "actionExit"):
+            self.ui.actionExit.triggered.connect(self.close)
+
         self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
         self.ui.actionpdf_for_tiff_tb.triggered.connect(self.actionpdf_for_tiff)
         self.ui.actionpdf_to_tiff_tb.triggered.connect(self.actionpdf_to_tiff)
@@ -417,21 +470,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.get_session_settings()
         self.OpenChrReference()
 
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = ""
-        self.imgpath = ""
-        self.pixler_return_path = ""
-        self.pending_pixler_source_path = ""
-        self._pixler_return_poll_timer = None
-        self.pixler_return_prompt_dialog = None
-
         print('current book:', self.bookabbr)
 
         # -------------------------
         # Final UI State
         # -------------------------
         self.show()
+        qtc.QTimer.singleShot(0, self._restore_session_content)
 
         self.toggleLatinToolbars()
 
@@ -455,6 +500,113 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.on_project_created
         )
         self._refresh_project_status()
+
+    def get_file_paths(self):
+        active_image_path = getattr(self, 'imgpath', None)
+        if not active_image_path and self.imgfileList and 0 <= self.current_img_index < len(self.imgfileList):
+            active_image_path = self.imgfileList[self.current_img_index]
+
+        active_text_path = getattr(self, 'txtpath', None)
+
+        return {
+            "primary": active_image_path,  # Maps directly to Print Ref Image
+            "secondary": active_text_path   # Maps directly to Print Text
+        }
+
+    def execute_print_flow(self, target="primary", preview=False):
+        """Routes the targeted path straight to the central print_handlerUI engine."""
+        self._active_print_target = target
+
+        if target == "primary":
+            image = self._current_print_image()
+            if image is None:
+                qtw.QMessageBox.information(
+                    self,
+                    "No File Loaded",
+                    "There is currently no active reference image loaded to print.",
+                )
+                return
+
+            self.print_handler.handle_image(image, self, preview=preview)
+            return
+
+        file_paths = self.get_file_paths()
+        target_file = file_paths.get(target)
+        
+        # Guard against blank or unselected file states
+        if not target_file:
+            from PyQt5.QtWidgets import QMessageBox
+            label_name = "reference image" if target == "primary" else "text document"
+            QMessageBox.information(self, "No File Loaded", f"There is currently no active {label_name} loaded to print.")
+            return
+            
+        # Send the file location over to the central print handler
+        self.print_handler.handle_print(target_file, self, preview=preview)
+
+    def _current_print_image(self):
+        live_qimage = getattr(self, "imgqimage", None)
+        if live_qimage is not None and not live_qimage.isNull():
+            return live_qimage
+
+        pixmap = getattr(self, "imagepixmap", None)
+        if pixmap is not None and not pixmap.isNull():
+            return pixmap
+
+        return None
+
+    def _current_text_document(self):
+        return getattr(self.ui, "OCRText", None).document() if hasattr(self.ui, "OCRText") else None
+
+    def _document_has_content(self, document):
+        if document is None:
+            return False
+
+        if document.isEmpty():
+            return False
+
+        return bool(document.toPlainText().strip() or document.toHtml().strip())
+
+    def print_text_document(self, preview=False):
+        document = self._current_text_document()
+        if not self._document_has_content(document):
+            qtw.QMessageBox.information(
+                self,
+                "No Text Loaded",
+                "There is currently no text document loaded to print.",
+            )
+            return
+
+        self._active_print_target = "secondary"
+        self.print_handler.handle_document(document, self, preview=preview)
+
+    def print_active_preview(self):
+        document = self._current_text_document()
+        text_has_content = self._document_has_content(document)
+        active_target = getattr(self, "_active_print_target", "primary")
+
+        if active_target == "secondary" and text_has_content:
+            self.print_text_document(preview=True)
+            return
+
+        if active_target == "primary" and self._current_print_image() is not None:
+            self.execute_print_flow(target="primary", preview=True)
+            return
+
+        if text_has_content:
+            self._active_print_target = "secondary"
+            self.print_text_document(preview=True)
+            return
+
+        if self._current_print_image() is not None:
+            self._active_print_target = "primary"
+            self.execute_print_flow(target="primary", preview=True)
+            return
+
+        qtw.QMessageBox.information(
+            self,
+            "No File Loaded",
+            "Load an image or text document before opening print preview.",
+        )
 
     def _setup_developer_mode_ui(self):
         """Create hidden-by-default Developer Mode entry points.
@@ -1112,18 +1264,39 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             SCANNED_FOLDER,
         )
 
-        #self.origpixmap = qtg.QPixmap.fromImage(qtg.QImage())
-        if hasattr(self, 'ui'):
-            self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
-            self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
-            self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        self._apply_session_ui_state()
+
+    def _apply_session_ui_state(self):
+        if not hasattr(self, 'ui'):
+            return
+
+        self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
+        self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+        self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        if self.font:
             self.ui.fontComboBox.setCurrentText(self.font)
-            if str(self.fontsize).isdigit():
-                self.ui.fontSizeBox.setValue(int(self.fontsize))
-            self.ui.LHlineEdit.setText(self.linespacing)
+        if str(self.fontsize).isdigit():
+            self.ui.fontSizeBox.setValue(int(self.fontsize))
+        self.ui.LHlineEdit.setText(self.linespacing)
+        if self.zoom:
             self.ui.ZoomComboBox.setCurrentText(self.zoom)
-            if str(self.zoomslidervalue).isdigit():
-                self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+        if str(self.zoomslidervalue).isdigit():
+            self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _restore_session_content(self):
+        self._apply_session_ui_state()
+
+        restored_imgpath = getattr(self, 'imgpath', '')
+        restored_txtpath = getattr(self, 'txtpath', '')
+
+        if restored_imgpath and os.path.isfile(restored_imgpath):
+            self.showImage(restored_imgpath)
+
+        if restored_txtpath and os.path.isfile(restored_txtpath):
+            self.showText(restored_txtpath)
+
+        self._apply_session_ui_state()
+        self.on_font_update()
 
     def get_workflow_settings(self):
 
@@ -2788,6 +2961,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def showImage(self,imgfilename):
         self.imgpath = imgfilename
+        self._active_print_target = "primary"
         print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
         self.imgfilename = self.imgpath
         self.imgdir = os.path.dirname(imgfilename)
@@ -2978,53 +3152,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.on_zoom_combobox()
 
-
-        # jsonfile = 'Model/Project/Data/json/Session.json'
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
-        with open(jsonfile, 'r') as f:
-            # data = json.load(f)
-            # imgpath_key = r"self.imgpath"
-            # imgdir_key = r"self.imgdir"
-            data = {
-            "path": self.imgpath if isinstance(self.imgpath, str) else str(self.imgpath),
-            "dir": self.imgdir if isinstance(self.imgdir, str) else str(self.imgdir)
-}
-
-
-            for Setting in data:
-                # -------------------------------------------------
-                # SAFE SESSION CHECK (NO CRASH VERSION)
-                # -------------------------------------------------
-                Setting = locals().get("Setting", None)
-
-                if isinstance(Setting, dict):
-                    setting_value = Setting.get("Setting")
-                else:
-                    setting_value = None
-
-                imgpath_key = getattr(self, "imgpath", None)
-                imgdir_key = getattr(self, "imgdir", None)
-
-                # SAFE COMPARE ONLY IF VALID
-                if setting_value == imgpath_key:
-                    pass
-                                #if Setting['Setting'] == imgpath_key:
-
-                f.close()
-
-        os.remove(jsonfile)
-        with open(jsonfile, 'w') as f:
-            json.dump(data, f, indent=4)
-        f.close()
-
-        self.imgfileList = []
-
-        for i in sorted(os.listdir(self.imgdir)):
-            ipath = os.path.join(self.imgdir, i)
-            if os.path.isfile(ipath) and i.endswith(('.png', '.jpg', '.jpeg', '.tif')):
-                self.imgfileList.append(ipath)
-        self.sortImgFiles()
-
     def sortImgFiles(self):
         import re
 
@@ -3130,12 +3257,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not txtfilename:
             return
 
-        import os
-        import json
         from PyQt5 import QtCore as qtc
 
         # Ã¢Å“â€¦ Always sync internal state
         self.txtpath = txtfilename
+        self._active_print_target = "secondary"
         filename = os.path.basename(self.txtpath)
         self.txtdir = os.path.dirname(self.txtpath)
 
@@ -3165,20 +3291,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             file.close()
 
-        # Ã¢Å“â€¦ Update session JSON safely
-        jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
-        if os.path.exists(jsonfile):
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-            for Setting in data:
-                if Setting['Setting'] == r"self.txtpath":
-                    Setting['CurrentValue'] = self.txtpath
-                elif Setting['Setting'] == r"self.txtdir":
-                    Setting['CurrentValue'] = self.txtdir
-
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
+        self.session_manager.update('Session.json', {
+            'self.txtpath': self.txtpath if self.txtpath is not None else '',
+            'self.txtdir': self.txtdir if self.txtdir is not None else '',
+        })
 
         # Ã¢Å“â€¦ Build file list (FIXED for Windows + CSV)
         self.txtfileList = []
@@ -3632,6 +3748,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         bf = self.ui.OCRCursor.blockFormat()
         bf.setLineHeight(lineSpacing, self.ui.OCRBlockFormat.ProportionalHeight)
         cursor.mergeBlockFormat(bf)
+        self.session_manager.update('Session.json', {
+            'self.linespacing': str(lineSpacing),
+        })
 
     def SaveRawTextFileDialog(self, MainWindow):
         path = qtw.QFileDialog.getSaveFileName(
@@ -3735,6 +3854,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         self.ui.Image.setPixmap(scaled)
+        self.session_manager.update('Session.json', {
+            'self.zoom': combo_text,
+            'self.zoomslidervalue': value,
+        })
 
 
     def run_child_module(self, filename, *args):
@@ -3987,11 +4110,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         font.setPointSize(self.ui.fontSizeBox.value())
 
         self.ui.OCRText.setFont(font)
+        self.font = font.family()
+        self.fontsize = self.ui.fontSizeBox.value()
+        self.session_manager.update('Session.json', {
+            'self.font': self.font,
+            'self.fontsize': self.fontsize,
+        })
 
     def on_lang_select(self):
         pass
-
-
 
 # ================================
 # PROJECT CREATION STATE MACHINE

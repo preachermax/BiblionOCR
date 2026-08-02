@@ -4,15 +4,24 @@ from PyQt5.QtCore import QThread, pyqtSignal
 import json
 import os
 import sqlite3
+import sys
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 from SqliteHelper import *
 import time
 import UI_Icons
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 #import Qt5ResolveVariants as resolver
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 
 app = QtWidgets.QApplication([])
 varui = uic.loadUi(os.path.join(script_dir, "QtDesignerUI", "MyResolverUI.ui"))

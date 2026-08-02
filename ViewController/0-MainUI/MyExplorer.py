@@ -1,15 +1,24 @@
-from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5 import QtCore
 import os
 import shlex
 import shutil
 import sys
+from gui_runtime_env import sanitize_current_process_and_reexec
 from SessionManager import SessionManager
-from project_status_controller import ProjectStatusController
 
-script_dir = os.path.dirname(os.path.realpath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+
+sanitize_current_process_and_reexec()
+
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
+from PyQt5 import QtCore
+
+RUNTIME_PATHS = SessionManager.export_runtime_paths(
+    globals(),
+    __file__,
+    add_developer_view=True,
+)
+
+from project_status_controller import ProjectStatusController
 
 import MyExplorerUI
 
@@ -120,16 +129,81 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             session_manager=self.session_manager,
         )
 
+    def _resolve_initial_directory(self):
+        candidate = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else RUNTIME_PATHS.model_dir
+        if not os.path.isdir(candidate):
+            candidate = RUNTIME_PATHS.project_root
+
+        normalized = os.path.abspath(candidate)
+
+        if os.path.basename(normalized) == 'Project' and os.path.basename(os.path.dirname(normalized)) == 'Model':
+            normalized = os.path.dirname(normalized)
+        elif os.path.isdir(os.path.join(normalized, 'Model', 'Project')):
+            normalized = os.path.join(normalized, 'Model')
+
+        if os.path.isdir(normalized):
+            return normalized
+        if os.path.isdir(RUNTIME_PATHS.model_dir):
+            return RUNTIME_PATHS.model_dir
+        return RUNTIME_PATHS.project_root
+
+    def _resolve_project_root_directory(self):
+        active_project_root = self.session_manager.get_active_project_root()
+        candidates = [
+            active_project_root,
+            self.start_dir,
+            RUNTIME_PATHS.project_root,
+        ]
+
+        for candidate in candidates:
+            if not candidate or not os.path.isdir(candidate):
+                continue
+
+            normalized = os.path.abspath(candidate)
+
+            if os.path.basename(normalized) == 'Project' and os.path.basename(os.path.dirname(normalized)) == 'Model':
+                normalized = os.path.dirname(os.path.dirname(normalized))
+            elif os.path.basename(normalized) == 'Model' and os.path.isdir(os.path.join(normalized, 'Project')):
+                normalized = os.path.dirname(normalized)
+            elif os.path.isdir(os.path.join(normalized, 'Model', 'Project')):
+                return normalized
+
+            if os.path.isdir(os.path.join(normalized, 'Model', 'Project')):
+                return normalized
+
+        return RUNTIME_PATHS.project_root
+
     def populate(self):
-        dir_path = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else os.path.join(os.path.expanduser('~'), 'Projects')
-        if not os.path.isdir(dir_path):
-            dir_path = project_root
+        dir_path = self._resolve_initial_directory()
+        root_dir = self._resolve_project_root_directory()
+
         self.model = QtWidgets.QFileSystemModel()
-        self.model.setRootPath(dir_path)
+        self.model.setRootPath(root_dir)
         self.model.setReadOnly(False)
         self.treeView.setModel(self.model)
-        self.treeView.setRootIndex(self.model.index(dir_path))
+        root_index = self.model.index(root_dir)
+        self.treeView.setRootIndex(root_index)
+
+        try:
+            if os.path.commonpath([os.path.abspath(dir_path), os.path.abspath(root_dir)]) != os.path.abspath(root_dir):
+                dir_path = root_dir
+        except ValueError:
+            dir_path = root_dir
+
+        target_index = self.model.index(dir_path)
+        if target_index.isValid():
+            self.treeView.setCurrentIndex(target_index)
+            self.treeView.scrollTo(target_index, QtWidgets.QAbstractItemView.PositionAtCenter)
+
+            parent_index = target_index.parent()
+            while parent_index.isValid():
+                self.treeView.expand(parent_index)
+                parent_index = parent_index.parent()
+
+            self.treeView.expand(target_index)
         self.treeView.setSortingEnabled(True)
+        self.treeView.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        self.model.sort(0, QtCore.Qt.AscendingOrder)
 
     def context_menu(self):
         menu = QtWidgets.QMenu()

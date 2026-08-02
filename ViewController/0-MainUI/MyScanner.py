@@ -5,7 +5,6 @@ import sys
 import os
 import re
 #import glob
-import shutil
 import json
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
@@ -15,26 +14,34 @@ from queue import Queue
 from ext import mainfind
 import subprocess
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from gui_runtime_env import sanitize_current_process_and_reexec
+
+sanitize_current_process_and_reexec()
+
 
 from HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-from PyQt5.QtCore import  Qt, QObject, QThread, pyqtSignal
+from PyQt5.QtCore import  Qt
 # Custom imports
 #from MainUI import Ui_MainUI
 from MyScannerUI import Ui_Scanner
 from PreProcess import PreProcess as pp
 
-import CropTif as croptif
-import QtCropImage as cropimg
-import Qt5SelectRegion
 #from MultiPreProcess import MultiPreProcess as mpp
-from Training import Train as tr
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
 from project_status_controller import ProjectStatusController
+from print_menu_support import install_print_menu_support, image_target, document_target
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -51,13 +58,6 @@ from scan_runtime import start_scan_workflow
 
 # Dialog Imports
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
-
-script_dir = os.path.dirname(os.path.realpath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
 
 SCANNED_FOLDER = os.path.join(
     project_root,
@@ -177,6 +177,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             image_handler=self.showImage,
             text_handler=self.loadDropTextEvent,
         )
+        install_print_menu_support(
+            self,
+            {
+                "actionPrint_Ref_Image": image_target(
+                    lambda: self.qimage if hasattr(self, 'qimage') else self.ui.Image.pixmap(),
+                    "There is currently no active reference image loaded to print.",
+                ),
+                "actionPrint_Text": document_target(
+                    lambda: self.ui.OCRText.document(),
+                    "There is currently no text document loaded to print.",
+                ),
+            },
+            default_target="actionPrint_Ref_Image",
+        )
         self.session_manager = SessionManager()
         self.scannerManager = ScanManager()
         self._scan_thread = None
@@ -268,6 +282,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.initBookCombo()
         #self.selectBookCombo()
 
+        self.dirIterator = None
+        self.imgfileList = []
+        self.txtfileList = []
+        self.imgdir = ""
+        self.imgpath = ""
+        self.txtdir = ""
+        self.txtpath = ""
+
         # Restore Session settings
         self.get_session_settings()
         self.project_status_controller = ProjectStatusController(
@@ -275,12 +297,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyScanner',
             session_manager=self.session_manager,
         )
-
-        self.dirIterator = None
-        self.imgfileList = []
-        self.txtfileList = []
-        self.imgdir = ""
-        self.imgpath = ""
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
 
@@ -322,6 +338,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #sys.stdout = Streamer(textWritten=self.output_terminal_written)'''
 
         self.show()
+        qtc.QTimer.singleShot(0, self._restore_session_documents)
         qtc.QTimer.singleShot(0, self._resume_pending_scan_handoff)
         #self.toggleLatinToolbars()
 
@@ -463,6 +480,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.ZoomComboBox.setCurrentText(self.zoom)
         if str(self.zoomslidervalue).isdigit():
             self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _restore_session_documents(self):
+        if self.imgpath and os.path.isfile(self.imgpath):
+            self.showImage(self.imgpath)
+
+        if self.txtpath and os.path.isfile(self.txtpath):
+            self.showText(self.txtpath)
+
     def get_workflow_settings(self):
 
         # Opening JSON file
