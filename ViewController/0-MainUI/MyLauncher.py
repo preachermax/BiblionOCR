@@ -17,21 +17,21 @@ if helpers_dir not in sys.path:
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from gui_runtime_env import sanitize_current_process_and_reexec
+from helpers.gui_runtime_env import sanitize_current_process_and_reexec
 
 sanitize_current_process_and_reexec()
 
-from SessionManager import SessionManager
-from project_status_controller import ProjectStatusController
+from helpers.SessionManager import SessionManager
+from helpers.project_status_controller import ProjectStatusController
 #from subprocess import Popen, PIPE, CalledProcessError
-from HelpSystem import add_help_menu
+from helpers.HelpSystem import add_help_menu
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 # Custom imports
-from MyLauncherUI import Ui_MainUI
-from LocalFileDrop import LocalFileDropMixin
+from ViewController.archives.MyLauncherUI import Ui_MainUI
+from helpers.LocalFileDrop import LocalFileDropMixin
 from Developer.Publisher.launcher_registry import (
     LauncherIntegrationController,
     build_default_launcher_registry,
