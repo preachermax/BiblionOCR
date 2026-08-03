@@ -22,9 +22,10 @@ def sanitize_current_process_and_reexec() -> None:
 
     env = dict(os.environ)
     changed = False
+    snap_contamination_detected = False
 
     def _strip_snap_paths(var_name: str) -> None:
-        nonlocal changed
+        nonlocal changed, snap_contamination_detected
         value = env.get(var_name)
         if not value:
             return
@@ -36,6 +37,7 @@ def sanitize_current_process_and_reexec() -> None:
             return
 
         changed = True
+        snap_contamination_detected = True
         if new_value:
             env[var_name] = new_value
         else:
@@ -52,12 +54,36 @@ def sanitize_current_process_and_reexec() -> None:
     for var_name, value in list(env.items()):
         if var_name.endswith("_VSCODE_SNAP_ORIG"):
             changed = True
+            snap_contamination_detected = True
             env.pop(var_name, None)
             continue
 
         if isinstance(value, str) and "/snap/" in value and var_name.startswith(("GTK_", "GIO_", "GDK_")):
             changed = True
+            snap_contamination_detected = True
             env.pop(var_name, None)
+
+    # Keep system IME behavior by default for multilingual keyboard support.
+    # Use BIBLION_QT_IM_MODULE to force a backend in packaged releases.
+    # If no backend is configured, choose a stable fallback on Linux to avoid
+    # early Qt startup warnings and to keep IME handling predictable across
+    # desktop shells and Snap-hosted launches.
+    if sys.platform.startswith("linux"):
+        requested_im = env.get("BIBLION_QT_IM_MODULE", "").strip()
+        if requested_im:
+            lowered = requested_im.lower()
+            if lowered in ("auto", "system"):
+                pass
+            elif lowered == "unset":
+                if "QT_IM_MODULE" in env:
+                    changed = True
+                    env.pop("QT_IM_MODULE", None)
+            elif env.get("QT_IM_MODULE") != requested_im:
+                changed = True
+                env["QT_IM_MODULE"] = requested_im
+        elif env.get("QT_IM_MODULE", "") != "xim":
+            changed = True
+            env["QT_IM_MODULE"] = "xim"
 
     env[_SANITIZED_MARKER] = "1"
 

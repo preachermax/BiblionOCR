@@ -212,7 +212,7 @@ class ProjectCreationEngine:
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
         if folder_list_path:
-            for entry in self._read_folder_list_entries(folder_list_path):
+            for entry in self._read_project_structure_entries(folder_list_path):
                 normalized = self._normalize_structure_entry(entry, folder_list_path)
                 if normalized:
                     if self._is_file_structure_entry(normalized, folder_list_path):
@@ -319,6 +319,21 @@ class ProjectCreationEngine:
             candidates.append(self.folder_list_path)
 
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+        if self._is_scriptural_project():
+            candidates.extend([
+                os.path.join(os.getcwd(), "ViewController", "ScriptureProjectFolderList.txt"),
+                os.path.join(os.getcwd(), "ViewController", "0-MainUI", "helpers", "ScriptureProjectFolderList.txt"),
+                os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt"),
+                os.path.join(repo_root, "ViewController", "0-MainUI", "helpers", "ScriptureProjectFolderList.txt"),
+            ])
+        else:
+            candidates.extend([
+                os.path.join(os.getcwd(), "ViewController", "GeneralProjectFolderList.txt"),
+                os.path.join(os.getcwd(), "ViewController", "0-MainUI", "helpers", "GeneralProjectFolderList.txt"),
+                os.path.join(repo_root, "ViewController", "GeneralProjectFolderList.txt"),
+                os.path.join(repo_root, "ViewController", "0-MainUI", "helpers", "GeneralProjectFolderList.txt"),
+            ])
+
         candidates.extend([
             os.path.join(os.getcwd(), "ProjectFolderList.txt"),
             os.path.join(os.getcwd(), "ViewController", "0-MainUI", "ProjectFolderList.txt"),
@@ -332,11 +347,98 @@ class ProjectCreationEngine:
         return None
 
     # -----------------------
-    def _read_folder_list_entries(self, folder_list_path):
-        with open(folder_list_path, "r", encoding="utf-8-sig") as f:
-            return [line.strip() for line in f if line.strip()]
+    def _is_scriptural_project(self):
+        project_type = self.context.get("ProjectType") or self.context.get("project_type") or self.context.get("projectType")
+        if project_type is None:
+            return False
+        return str(project_type).strip().lower() in {"scriptural", "scripture"}
 
-            # -----------------------
+    def _normalize_scriptural_source(self):
+        raw_source = self.context.get("ScripturalSource") or self.context.get("scriptural_source") or self.context.get("scripturalSource")
+        if raw_source is None:
+            return "both"
+        normalized = str(raw_source).strip().lower()
+        if normalized in {"ot", "old", "old_testament", "old-testament"}:
+            return "old_testament"
+        if normalized in {"nt", "new", "new_testament", "new-testament"}:
+            return "new_testament"
+        if normalized in {"both", "all"}:
+            return "both"
+        return "both"
+
+    def _read_project_structure_entries(self, folder_list_path):
+        entries = []
+        with open(folder_list_path, "r", encoding="utf-8-sig") as f:
+            entries.extend(line.strip() for line in f if line.strip())
+
+        selected_folders = self._selected_project_folders()
+        if selected_folders:
+            filtered_entries = [entry for entry in entries if self._entry_matches_selected_folder(entry, selected_folders)]
+            if filtered_entries:
+                entries = filtered_entries
+            else:
+                entries = []
+
+        if self._is_scriptural_project():
+            source_choice = self._normalize_scriptural_source()
+            for entry in self._scriptural_project_entries(source_choice):
+                if entry in {"Model/OT_BookFolders", "Model/NT_BookFolders"} and selected_folders:
+                    if entry not in selected_folders:
+                        continue
+                if entry not in entries:
+                    entries.append(entry)
+
+        return entries
+
+    def _scriptural_project_entries(self, source_choice):
+        entries = [
+            "Model/Project/Data/csv/BooksAbbrName.csv",
+            "Model/Project/Data/csv/BooksAbbrNameNumIndex.csv",
+            "Model/Project/Data/csv/BooksMarkDown.csv",
+            "Model/Project/Data/csv/EnglishProperNames.csv",
+            "Model/Project/Data/csv/ProperNames.csv",
+            "Model/Project/Data/csv/FromvsDiacritics.csv",
+            "Model/Project/Data/csv/FROMVS3_0_PUA_Norm.csv",
+            "Model/Project/Data/json/BooksAbbrName.json",
+            "Model/Project/Data/json/BooksAbbrNameNumIndex.json",
+            "Model/Project/Data/json/BooksMarkDown.json",
+            "Model/Project/Data/json/EnglishProperNames.json",
+            "Model/Project/Data/json/ProperNames.json",
+            "Model/Project/Data/json/FromvsDiacritics.json",
+            "Model/Project/Data/json/FROMVS3_0_PUA_Norm.json",
+        ]
+
+        if source_choice in {"old_testament", "both"}:
+            entries.append("Model/OT_BookFolders")
+        if source_choice in {"new_testament", "both"}:
+            entries.append("Model/NT_BookFolders")
+
+        return entries
+
+    # -----------------------
+    def _selected_project_folders(self):
+        raw_selection = self.context.get("SelectedProjectFolders")
+        if isinstance(raw_selection, str):
+            return [raw_selection]
+        if isinstance(raw_selection, (list, tuple, set)):
+            return [str(item).strip() for item in raw_selection if str(item).strip()]
+        return []
+
+    def _entry_matches_selected_folder(self, entry, selected_folders):
+        normalized_entry = self._normalize_structure_entry(entry, None)
+        if not normalized_entry:
+            return False
+        source_entry, destination_entry = self._split_structure_copy_entry(normalized_entry)
+        candidate = destination_entry or source_entry
+        if not candidate:
+            return False
+        if candidate in selected_folders:
+            return True
+        for selected_folder in selected_folders:
+            if candidate.startswith(selected_folder + "/"):
+                return True
+        return False
+
     def _normalize_structure_entry(self, entry, folder_list_path):
 
         normalized = entry.replace("\\", "/").strip()
@@ -480,10 +582,10 @@ class ProjectCreationEngine:
         os.makedirs(manifest_dir, exist_ok=True)
         os.makedirs(log_dir, exist_ok=True)
 
-        shutil.copyfile(
-            folder_list_path,
-            os.path.join(manifest_dir, "ProjectFolderList.txt")
-        )
+        manifest_path = os.path.join(manifest_dir, "ProjectFolderList.txt")
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            for entry in self._read_project_structure_entries(folder_list_path):
+                f.write(f"{entry}\n")
 
         log_path = os.path.join(log_dir, "project_folder_list_structure_rebuild.md")
         with open(log_path, "w", encoding="utf-8") as f:

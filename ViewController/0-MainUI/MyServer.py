@@ -140,6 +140,33 @@ from PyQt5.QtCore import QBuffer, QIODevice
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtWidgets import QMainWindow, QAction
+
+_qt_previous_message_handler = None
+_qt_message_filter_installed = False
+
+
+def _qt_message_filter(msg_type, context, message):
+    if message and message.strip() == "QSocketNotifier: Can only be used with threads started with QThread":
+        return
+
+    if _qt_previous_message_handler is not None and _qt_previous_message_handler is not _qt_message_filter:
+        _qt_previous_message_handler(msg_type, context, message)
+        return
+
+    sys.stderr.write(f"{message}\n")
+
+
+def install_qt_warning_filter():
+    global _qt_previous_message_handler, _qt_message_filter_installed
+    if _qt_message_filter_installed:
+        return
+    if os.environ.get("BIBLION_SUPPRESS_QSOCKETNOTIFIER_WARNING", "1") != "1":
+        return
+    _qt_previous_message_handler = qtc.qInstallMessageHandler(_qt_message_filter)
+    _qt_message_filter_installed = True
+
+
+install_qt_warning_filter()
 try:
     from helpers.print_handlerUI import ProjectPrintHandler
 except ModuleNotFoundError:
@@ -277,10 +304,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._scan_worker = None
         self._project_success_title = ""
         self._project_success_message = ""
-        self.developer_services = None
-        self.runtime_inspector_panel = None
-        self.runtime_inspector_dock = None
-        self._developer_services_active = False
         self.current_project_root = None
         self._pending_project_root = None
         self._active_print_target = "primary"
@@ -334,7 +357,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Help System
         # -------------------------
         add_help_menu(self, 'MyServer')
-        self._setup_developer_mode_ui()
 
         # -------------------------
         # Actions / Signals
@@ -648,106 +670,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             "Load an image or text document before opening print preview.",
         )
 
-    def _setup_developer_mode_ui(self):
-        """Create hidden-by-default Developer Mode entry points.
-
-        The Runtime Inspector is exposed through a Developer menu and remains
-        inactive until the user explicitly opens it.
-        """
-        menu_bar = self.menuBar()
-        self.developer_menu = menu_bar.addMenu("Developer")
-
-        self.action_runtime_inspector = qtw.QAction("Runtime Inspector", self)
-        self.action_runtime_inspector.setCheckable(True)
-        self.action_runtime_inspector.setChecked(False)
-        self.action_runtime_inspector.triggered.connect(
-            self._toggle_runtime_inspector
-        )
-        self.developer_menu.addAction(self.action_runtime_inspector)
-
-    def _toggle_runtime_inspector(self, checked):
-        """Show or hide the Runtime Inspector dock on demand."""
-        self._ensure_runtime_inspector_dock()
-
-        if checked:
-            self.runtime_inspector_dock.show()
-            self.runtime_inspector_dock.raise_()
-        else:
-            self.runtime_inspector_dock.hide()
-
-    def _ensure_runtime_inspector_dock(self):
-        """Create the Runtime Inspector dock lazily."""
-        if self.runtime_inspector_dock is not None:
-            return
-
-        self._ensure_developer_services()
-        panel_module_path = os.path.join(
-            developer_view_dir,
-            "RuntimeInspectorPanel.py",
-        )
-        panel_module_spec = importlib.util.spec_from_file_location(
-            "biblion_runtime_inspector_panel",
-            panel_module_path,
-        )
-        panel_module = importlib.util.module_from_spec(panel_module_spec)
-        panel_module_spec.loader.exec_module(panel_module)
-        runtime_inspector_panel_class = panel_module.RuntimeInspectorPanel
-        self.runtime_inspector_panel = runtime_inspector_panel_class(
-            developer_services=self.developer_services,
-            parent=self,
-        )
-        self.runtime_inspector_dock = qtw.QDockWidget(
-            "Runtime Inspector",
-            self,
-        )
-        self.runtime_inspector_dock.setObjectName("runtimeInspectorDock")
-        self.runtime_inspector_dock.setWidget(self.runtime_inspector_panel)
-        self.runtime_inspector_dock.setAllowedAreas(
-            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea
-        )
-        self.runtime_inspector_dock.visibilityChanged.connect(
-            self._on_runtime_inspector_visibility_changed
-        )
-        self.addDockWidget(Qt.RightDockWidgetArea, self.runtime_inspector_dock)
-        self.runtime_inspector_dock.hide()
-
-    def _ensure_developer_services(self):
-        """Create DeveloperServices only when a Developer panel is used."""
-        if self.developer_services is not None:
-            return
-
-        self.developer_services = DeveloperServices(event_bus=self.event_bus)
-
-    def _on_runtime_inspector_visibility_changed(self, visible):
-        """Activate DeveloperServices observation only while the panel is in use."""
-        if visible:
-            self._activate_developer_services()
-            if self.runtime_inspector_panel is not None:
-                self.runtime_inspector_panel.refresh()
-        else:
-            self._deactivate_developer_services()
-
-        if hasattr(self, "action_runtime_inspector"):
-            self.action_runtime_inspector.blockSignals(True)
-            self.action_runtime_inspector.setChecked(bool(visible))
-            self.action_runtime_inspector.blockSignals(False)
-
-    def _activate_developer_services(self):
-        """Attach DeveloperServices to passive EventBus observation."""
-        self._ensure_developer_services()
-        if self._developer_services_active:
-            return
-
-        self.event_bus.subscribe("*", self.developer_services.observe_event)
-        self._developer_services_active = True
-
-    def _deactivate_developer_services(self):
-        """Detach DeveloperServices when Developer Mode is not in use."""
-        if not self._developer_services_active or self.developer_services is None:
-            return
-
-        self.event_bus.unsubscribe("*", self.developer_services.observe_event)
-        self._developer_services_active = False
 
     def _apply_scan_icon(self):
         scan_icon = qtg.QIcon()
@@ -4569,6 +4491,7 @@ class ProjectReplayEngine:
 
 # Only run this code if I am actually running this script
 if __name__ == '__main__':
+    install_qt_warning_filter()
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
     w.show()

@@ -14,10 +14,14 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.setModal(True)
         self.resize(640, 420)
         self._page_titles = [
-            "Step 1 of 2: RIS import",
-            "Step 2 of 2: Project details",
+            "Step 1 of 3: RIS import",
+            "Step 2 of 3: Project details",
+            "Step 3 of 3: Project folders",
         ]
         self.imported_provenance = {}
+        self.folder_selection_pages = {}
+        self.folder_selection_checkboxes = {}
+        self.folder_selection_state = {"scriptural": set(), "general": set()}
         self._build_ui()
         self._update_page_state()
 
@@ -97,6 +101,24 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         details_layout.addWidget(self.project_purpose_label)
         details_layout.addWidget(self.project_purpose_edit)
 
+        project_scope_row = qtw.QHBoxLayout()
+        project_scope_column = qtw.QVBoxLayout()
+        project_scope_column.addWidget(qtw.QLabel("Project type"))
+        self.project_type_combo = qtw.QComboBox()
+        self.project_type_combo.addItems(["Scriptural", "Secular"])
+        self.project_type_combo.setCurrentText("Scriptural")
+        project_scope_column.addWidget(self.project_type_combo)
+        project_scope_row.addLayout(project_scope_column)
+
+        scripture_scope_column = qtw.QVBoxLayout()
+        scripture_scope_column.addWidget(qtw.QLabel("Scriptural source"))
+        self.scriptural_source_combo = qtw.QComboBox()
+        self.scriptural_source_combo.addItems(["both", "OT", "NT"])
+        self.scriptural_source_combo.setCurrentText("both")
+        scripture_scope_column.addWidget(self.scriptural_source_combo)
+        project_scope_row.addLayout(scripture_scope_column)
+        details_layout.addLayout(project_scope_row)
+
         self.user_intent_label = qtw.QLabel("User intent summary")
         self.user_intent_edit = qtw.QPlainTextEdit()
         self.user_intent_edit.setPlaceholderText("Describe the user intent for this project")
@@ -137,6 +159,27 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         details_layout.addStretch(1)
         self.page_stack.addWidget(details_page)
 
+        folder_selection_page = qtw.QWidget()
+        folder_selection_layout = qtw.QVBoxLayout(folder_selection_page)
+        folder_selection_layout.setSpacing(10)
+
+        folder_selection_label = qtw.QLabel("Choose project folders")
+        folder_selection_layout.addWidget(folder_selection_label)
+
+        folder_selection_help = qtw.QLabel(
+            "The defaults below are already preselected. You can keep the current selection and continue with Next."
+        )
+        folder_selection_help.setWordWrap(True)
+        folder_selection_layout.addWidget(folder_selection_help)
+
+        self.folder_selection_stack = qtw.QStackedWidget(self)
+        folder_selection_layout.addWidget(self.folder_selection_stack, 1)
+
+        self._build_folder_selection_page("scriptural", "Scriptural project folders")
+        self._build_folder_selection_page("general", "General project folders")
+
+        self.page_stack.addWidget(folder_selection_page)
+
         button_row = qtw.QHBoxLayout()
         self.back_button = qtw.QPushButton("Back")
         self.back_button.clicked.connect(self._go_back)
@@ -162,6 +205,9 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.creation_trigger_edit.textChanged.connect(self._update_validation_state)
         self.source_context_edit.textChanged.connect(self._update_validation_state)
         self.creator_edit.textChanged.connect(self._update_validation_state)
+        self.project_type_combo.currentIndexChanged.connect(self._update_project_scope_state)
+        self.scriptural_source_combo.currentIndexChanged.connect(self._refresh_folder_selection_page)
+        self._update_project_scope_state()
 
     def _go_back(self):
         index = self.page_stack.currentIndex()
@@ -192,6 +238,14 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         if not self.user_intent_edit.toPlainText().strip():
             errors.append("User intent summary is required.")
         return errors
+
+    def _update_project_scope_state(self):
+        project_type = self.project_type_combo.currentText().strip()
+        scripture_enabled = project_type.lower() == "scriptural"
+        self.scriptural_source_combo.setEnabled(scripture_enabled)
+        self._refresh_review()
+        self._refresh_folder_selection_page()
+        self._update_validation_state()
 
     def _update_validation_state(self):
         errors = self._required_field_errors()
@@ -242,6 +296,130 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             return ""
         return re.sub(r"[^A-Za-z0-9_. -]+", "_", stripped).strip(" .")
 
+    def _build_folder_selection_page(self, page_key, title):
+        page = qtw.QWidget()
+        layout = qtw.QVBoxLayout(page)
+        layout.setSpacing(6)
+        layout.addWidget(qtw.QLabel(title))
+
+        scroll_area = qtw.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_content = qtw.QWidget()
+        scroll_layout = qtw.QVBoxLayout(scroll_content)
+        scroll_layout.setContentsMargins(0, 0, 0, 0)
+        scroll_layout.setSpacing(4)
+        scroll_area.setWidget(scroll_content)
+        layout.addWidget(scroll_area, 1)
+
+        self.folder_selection_pages[page_key] = scroll_content
+        self.folder_selection_checkboxes[page_key] = []
+        self.folder_selection_stack.addWidget(page)
+
+    def _refresh_folder_selection_page(self):
+        project_type = self.project_type_combo.currentText().strip()
+        page_key = "scriptural" if project_type.lower() == "scriptural" else "general"
+        self.folder_selection_stack.setCurrentWidget(self.folder_selection_stack.widget(0 if page_key == "scriptural" else 1))
+        self._populate_folder_selection_page(page_key)
+
+    def _populate_folder_selection_page(self, page_key):
+        container = self.folder_selection_pages.get(page_key)
+        if container is None:
+            return
+
+        for checkbox in self.folder_selection_checkboxes.get(page_key, []):
+            checkbox.deleteLater()
+        self.folder_selection_checkboxes[page_key] = []
+
+        layout = container.layout()
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
+        available_entries = self._folder_selection_entries(page_key)
+        if not available_entries:
+            empty_label = qtw.QLabel("No folder options are available for the current selection.")
+            layout.addWidget(empty_label)
+            return
+
+        for entry in available_entries:
+            checkbox = qtw.QCheckBox(entry)
+            checkbox.setChecked(entry in self.folder_selection_state.get(page_key, set()))
+            checkbox.toggled.connect(lambda checked, entry=entry: self._toggle_folder_selection(page_key, entry, checked))
+            self.folder_selection_checkboxes[page_key].append(checkbox)
+            layout.addWidget(checkbox)
+
+        self._apply_default_folder_selection_state(page_key, available_entries)
+
+    def _apply_default_folder_selection_state(self, page_key, available_entries):
+        current_selection = self.folder_selection_state.get(page_key)
+        if current_selection:
+            return
+        default_selection = set(available_entries)
+        self.folder_selection_state[page_key] = default_selection
+        for checkbox in self.folder_selection_checkboxes.get(page_key, []):
+            checkbox.setChecked(checkbox.text() in default_selection)
+
+    def _toggle_folder_selection(self, page_key, entry, checked):
+        selection = self.folder_selection_state.setdefault(page_key, set())
+        if checked:
+            selection.add(entry)
+        else:
+            selection.discard(entry)
+
+    def _folder_selection_entries(self, page_key):
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+        if page_key == "scriptural":
+            template_path = os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
+        else:
+            template_path = os.path.join(repo_root, "ViewController", "GeneralProjectFolderList.txt")
+
+        if not os.path.exists(template_path):
+            return []
+
+        entries = []
+        with open(template_path, "r", encoding="utf-8-sig") as handle:
+            for raw_line in handle:
+                candidate = raw_line.strip()
+                if not candidate:
+                    continue
+                normalized = candidate.replace("\\", "/").strip()
+                if not normalized:
+                    continue
+                source_entry, destination_entry = self._split_structure_copy_entry(normalized)
+                candidate_path = destination_entry or source_entry
+                if not candidate_path:
+                    continue
+                candidate_path = candidate_path.strip()
+                if candidate_path.endswith(".py") or candidate_path.endswith(".txt") or candidate_path.endswith(".md") or candidate_path.endswith(".json") or candidate_path.endswith(".csv") or candidate_path.endswith(".ui") or candidate_path.endswith(".qrc") or candidate_path.endswith(".rtf") or candidate_path.endswith(".xml"):
+                    continue
+                if candidate_path.startswith("Model/Project/Images") or candidate_path.startswith("Model/Project/Text") or candidate_path.startswith("Model/Project/Data") or candidate_path.startswith("Model/"):
+                    entries.append(candidate_path)
+
+        if page_key == "scriptural":
+            scripture_source = self.scriptural_source_combo.currentText().strip()
+            if scripture_source == "OT":
+                entries.append("Model/OT_BookFolders")
+            elif scripture_source == "NT":
+                entries.append("Model/NT_BookFolders")
+            else:
+                entries.append("Model/OT_BookFolders")
+                entries.append("Model/NT_BookFolders")
+
+        entries = list(dict.fromkeys(entries))
+        return sorted(entries)
+
+    def _split_structure_copy_entry(self, entry):
+        if "=>" not in entry:
+            return entry.strip(), None
+        source_entry, destination_entry = entry.split("=>", 1)
+        source_entry = source_entry.strip()
+        destination_entry = destination_entry.strip()
+        if not source_entry or not destination_entry:
+            return entry.strip(), None
+        return source_entry, destination_entry
+
     def _refresh_review(self):
         creator = self.creator_edit.text().strip() or "Not set"
         entered_name = self.project_name_edit.text().strip()
@@ -249,10 +427,14 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         name_line = f"Project name: {entered_name or 'Not set'}"
         if entered_name and sanitized_name != entered_name:
             name_line += f" -> {sanitized_name}"
+        project_type = self.project_type_combo.currentText().strip() or "Scriptural"
+        scripture_source = self.scriptural_source_combo.currentText().strip() or "both"
         review_lines = [
             name_line,
             f"Purpose: {self.project_purpose_edit.toPlainText().strip() or 'Not set'}",
             f"Intent: {self.user_intent_edit.toPlainText().strip() or 'Not set'}",
+            f"Project type: {project_type}",
+            f"Scriptural source: {scripture_source}",
             f"Trigger: {self.creation_trigger_edit.text().strip() or 'MyServer_button'}",
             f"Source context: {self.source_context_edit.text().strip() or 'MyServer_UI'}",
             f"Creator: {creator}",
@@ -306,6 +488,22 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self.project_purpose_edit.setPlainText(str(payload.get("project_purpose", "")))
         if not self.user_intent_edit.toPlainText().strip():
             self.user_intent_edit.setPlainText(str(payload.get("user_intent_summary", "")))
+        project_type = payload.get("ProjectType") or payload.get("project_type") or payload.get("projectType")
+        if project_type:
+            project_type_text = str(project_type).strip()
+            if project_type_text.lower() in {"scriptural", "scripture"}:
+                self.project_type_combo.setCurrentText("Scriptural")
+            elif project_type_text.lower() in {"secular", "general"}:
+                self.project_type_combo.setCurrentText("Secular")
+        scriptural_source = payload.get("ScripturalSource") or payload.get("scriptural_source") or payload.get("scripturalSource")
+        if scriptural_source:
+            source_value = str(scriptural_source).strip().lower()
+            if source_value in {"ot", "old", "old_testament", "old-testament"}:
+                self.scriptural_source_combo.setCurrentText("OT")
+            elif source_value in {"nt", "new", "new_testament", "new-testament"}:
+                self.scriptural_source_combo.setCurrentText("NT")
+            else:
+                self.scriptural_source_combo.setCurrentText("both")
         self.creation_trigger_edit.setText(str(payload.get("creation_trigger", "MyServer_button")))
         self.source_context_edit.setText(str(payload.get("source_context", "MyServer_UI")))
         if payload.get("creator") and not self.creator_edit.text().strip():
@@ -517,12 +715,23 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
     def get_payload(self):
         sanitized_name = self._sanitize_project_name(self.project_name_edit.text())
+        scriptural_source = self.scriptural_source_combo.currentText().strip()
+        if scriptural_source == "OT":
+            scriptural_source = "old_testament"
+        elif scriptural_source == "NT":
+            scriptural_source = "new_testament"
+        elif scriptural_source == "both":
+            scriptural_source = "both"
+
         payload = {
             "project_name": sanitized_name,
             "project_purpose": self.project_purpose_edit.toPlainText().strip(),
             "creation_trigger": self.creation_trigger_edit.text().strip() or "MyServer_button",
             "source_context": self.source_context_edit.text().strip() or "MyServer_UI",
             "user_intent_summary": self.user_intent_edit.toPlainText().strip(),
+            "ProjectType": self.project_type_combo.currentText().strip(),
+            "ScripturalSource": scriptural_source,
+            "SelectedProjectFolders": self._selected_project_folders(),
         }
         creator = self.creator_edit.text().strip()
         if creator:
@@ -530,3 +739,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         if self.imported_provenance:
             payload.update(self.imported_provenance)
         return payload
+
+    def _selected_project_folders(self):
+        project_type = self.project_type_combo.currentText().strip()
+        page_key = "scriptural" if project_type.lower() == "scriptural" else "general"
+        selection = self.folder_selection_state.get(page_key, set())
+        if not selection:
+            selection = set(self._folder_selection_entries(page_key))
+        return sorted(selection)

@@ -75,6 +75,21 @@ class CharacterReference(qtw.QMainWindow):
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
         self.ui.chrSelectedFontSize.valueChanged.connect(self.on_chrfont_update)
         #self.ui.OCRlangComboBox.currentTextChanged.connect(self.on_language_select)
+
+    def _resolve_unicode_ranges_json_path(self):
+        # Prefer primary project data, then fallback to known mirrored/backup trees.
+        candidate_paths = [
+            os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json'),
+            os.path.join(self.mod_abspath, 'ViewController', 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json'),
+            os.path.join(self.mod_abspath, 'Model', 'Backup Copies', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json'),
+        ]
+        for candidate in candidate_paths:
+            if os.path.isfile(candidate):
+                return candidate
+        raise FileNotFoundError(
+            'ProjectUnicodeRanges.json not found in expected locations: '
+            + ', '.join(candidate_paths)
+        )
     
     #def on_language_select(self):
     
@@ -82,7 +97,7 @@ class CharacterReference(qtw.QMainWindow):
 
     def initUCodeRangeCombo(self):
         # Opening JSON file
-        json_path = os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json')
+        json_path = self._resolve_unicode_ranges_json_path()
         with open(json_path) as f:
             # returns JSON object as
             # a dictionary
@@ -101,7 +116,7 @@ class CharacterReference(qtw.QMainWindow):
         self.ucoderange = self.ui.uCodeRangeComboBox.currentText()
         # self.ui.uCodeRangeComboBox.setEditText(self.ucoderange)
         # Reopening JSON file
-        json_path = os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json')
+        json_path = self._resolve_unicode_ranges_json_path()
         with open(json_path) as f:
             # returns JSON object as
             # a dictionary

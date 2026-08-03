@@ -27,9 +27,11 @@ Temporary implementation note:
 
 * `MyServer.py` still contains local Core-style project creation classes.
 * Long-term target is to make `Core/engine.py` the single source of truth and reduce `MyServer.py` to UI/controller wiring.
-* The current `MyServer` entry path now uses a guided two-step modal dialog instead of chained text prompts.
+* The current `MyServer` entry path now uses a guided three-step modal dialog instead of chained text prompts.
 * New project dialogs should follow the same stacked-label, direct-action format already used by existing BiblionOCR custom dialogs.
 * The dialog supports optional loading of user-provided provenance files in `json`, `ris`, `txt`, or `csv` format to prefill required provenance fields before project creation starts.
+* The dialog now includes a dedicated folder-selection step that switches between scripture-specific and general folder pages based on the project type. The default selections are pre-populated so the end user can proceed with the default choices without changing anything.
+* The selected folder list is carried forward as `SelectedProjectFolders` in the project creation payload and used by `Core/engine.py` when generating the manifest and project structure.
 * The provenance file picker now opens from the user Projects root rather than defaulting to `Downloads`.
 * The second step includes an in-dialog review summary before project creation is dispatched to the worker.
 * The new `Open Project` action and MyExplorer entry path both start from the same user Projects root, so project selection and file browsing share a single top-level anchor.

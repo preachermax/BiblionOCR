@@ -1,4 +1,43 @@
 bookabbr,bookname,booknumber
+Gen,Genesis,1
+Exo,Exodus,2
+Lev,Leviticus,3
+Num,Numbers,4
+Deu,Deuteronomy,5
+Jos,Joshua,6
+Jdg,Judges,7
+Rut,Ruth,8
+1Sa,1 Samuel,9
+2Sa,2 Samuel,10
+1Ki,1 Kings,11
+2Ki,2 Kings,12
+1Ch,1 Chronicles,13
+2Ch,2 Chronicles,14
+Ezr,Ezra,15
+Neh,Nehemiah,16
+Est,Esther,17
+Job,Job,18
+Psa,Psalms,19
+Pro,Proverbs,20
+Ecc,Ecclesiastes,21
+Sng,Song of Solomon,22
+Isa,Isaiah,23
+Jer,Jeremiah,24
+Lam,Lamentations,25
+Eze,Ezekiel,26
+Dan,Daniel,27
+Hos,Hosea,28
+Joe,Joel,29
+Amo,Amos,30
+Oba,Obadiah,31
+Jon,Jonah,32
+Mic,Micah,33
+Nah,Nahum,34
+Hab,Habakkuk,35
+Zep,Zephaniah,36
+Hag,Haggai,37
+Zec,Zechariah,38
+Mal,Malachi,39
 Mat,Matthew,40
 Mar,Mark,41
 Luk,Luke,42

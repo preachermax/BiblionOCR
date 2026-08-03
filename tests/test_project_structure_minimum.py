@@ -72,6 +72,52 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                         msg=f"Missing required directory: {relative_dir}",
                     )
 
+    def test_scriptural_projects_include_selected_scripture_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            engine = ProjectCreationEngine(tmpdir, _DummyEventBus())
+            engine.context = {
+                "project_name": "scripture_project",
+                "ProjectType": "Scriptural",
+                "ScripturalSource": "old_testament",
+            }
+            engine._resolve_folder_list_path = lambda: os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
+
+            project_root = os.path.join(tmpdir, "project")
+            os.makedirs(project_root, exist_ok=True)
+            engine._create_project_structure(project_root)
+
+            manifest_path = os.path.join(project_root, "src", "manifests", "ProjectFolderList.txt")
+            with open(manifest_path, "r", encoding="utf-8") as handle:
+                manifest_text = handle.read()
+
+            self.assertIn("Model/OT_BookFolders", manifest_text)
+            self.assertNotIn("Model/NT_BookFolders", manifest_text)
+            self.assertIn("Model/Project/Data/csv/BooksAbbrName.csv", manifest_text)
+
+    def test_explicit_folder_selection_controls_scripture_manifest_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            engine = ProjectCreationEngine(tmpdir, _DummyEventBus())
+            engine.context = {
+                "project_name": "scripture_project",
+                "ProjectType": "Scriptural",
+                "ScripturalSource": "both",
+                "SelectedProjectFolders": ["Model/NT_BookFolders"],
+            }
+            engine._resolve_folder_list_path = lambda: os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
+
+            project_root = os.path.join(tmpdir, "project")
+            os.makedirs(project_root, exist_ok=True)
+            engine._create_project_structure(project_root)
+
+            manifest_path = os.path.join(project_root, "src", "manifests", "ProjectFolderList.txt")
+            with open(manifest_path, "r", encoding="utf-8") as handle:
+                manifest_text = handle.read()
+
+            self.assertNotIn("Model/OT_BookFolders", manifest_text)
+            self.assertIn("Model/NT_BookFolders", manifest_text)
+
 
 if __name__ == "__main__":
     unittest.main()

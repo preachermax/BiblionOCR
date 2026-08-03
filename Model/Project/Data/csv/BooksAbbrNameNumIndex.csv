@@ -1,28 +1,67 @@
 bookabbr,bookname,booknumber,bookindex
-Mat,Matthew,40,0
-Mar,Mark,41,1
-Luk,Luke,42,2
-Joh,John,43,3
-Act,Acts,44,4
-Rom,Romans,45,5
-1Co,1 Corinthians,46,6
-2Co,2 Corinthians,47,7
-Gal,Galatians,48,8
-Eph,Ephesians,49,9
-Php,Philippians,50,10
-Col,Colossians,51,11
-1Th,1 Thessalonians,52,12
-2Th,2 Thessalonians,53,13
-1Ti,1 Timothy,54,14
-2Ti,2 Timothy,55,15
-Tit,Titus,56,16
-Phm,Philemon,57,17
-Heb,Hebrews,58,18
-Jas,James,59,19
-1Pe,1 Peter,60,20
-2Pe,2 Peter,61,21
-1Jn,1 John,62,22
-2Jn,2 John,63,23
-3Jn,3 John,64,24
-Jud,Jude,65,25
-Rev,Revelation,66,26
+Gen,Genesis,1,0
+Exo,Exodus,2,1
+Lev,Leviticus,3,2
+Num,Numbers,4,3
+Deu,Deuteronomy,5,4
+Jos,Joshua,6,5
+Jdg,Judges,7,6
+Rut,Ruth,8,7
+1Sa,1 Samuel,9,8
+2Sa,2 Samuel,10,9
+1Ki,1 Kings,11,10
+2Ki,2 Kings,12,11
+1Ch,1 Chronicles,13,12
+2Ch,2 Chronicles,14,13
+Ezr,Ezra,15,14
+Neh,Nehemiah,16,15
+Est,Esther,17,16
+Job,Job,18,17
+Psa,Psalms,19,18
+Pro,Proverbs,20,19
+Ecc,Ecclesiastes,21,20
+Sng,Song of Solomon,22,21
+Isa,Isaiah,23,22
+Jer,Jeremiah,24,23
+Lam,Lamentations,25,24
+Eze,Ezekiel,26,25
+Dan,Daniel,27,26
+Hos,Hosea,28,27
+Joe,Joel,29,28
+Amo,Amos,30,29
+Oba,Obadiah,31,30
+Jon,Jonah,32,31
+Mic,Micah,33,32
+Nah,Nahum,34,33
+Hab,Habakkuk,35,34
+Zep,Zephaniah,36,35
+Hag,Haggai,37,36
+Zec,Zechariah,38,37
+Mal,Malachi,39,38
+Mat,Matthew,40,39
+Mar,Mark,41,40
+Luk,Luke,42,41
+Joh,John,43,42
+Act,Acts,44,43
+Rom,Romans,45,44
+1Co,1 Corinthians,46,45
+2Co,2 Corinthians,47,46
+Gal,Galatians,48,47
+Eph,Ephesians,49,48
+Php,Philippians,50,49
+Col,Colossians,51,50
+1Th,1 Thessalonians,52,51
+2Th,2 Thessalonians,53,52
+1Ti,1 Timothy,54,53
+2Ti,2 Timothy,55,54
+Tit,Titus,56,55
+Phm,Philemon,57,56
+Heb,Hebrews,58,57
+Jas,James,59,58
+1Pe,1 Peter,60,59
+2Pe,2 Peter,61,60
+1Jn,1 John,62,61
+2Jn,2 John,63,62
+3Jn,3 John,64,63
+Jud,Jude,65,64
+Rev,Revelation,66,65
