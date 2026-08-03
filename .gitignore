@@ -71,13 +71,10 @@ Developer/video/masters/
 Developer/video/audio/generated/
 Developer/video/*.kdenlive.ass
 
-# Ignore all Developer and archives folders (any depth) for local artifacts.
-**/Developer/**
+# Ignore archives folders (any depth) for local artifacts.
 **/archives/**
 
 # Explicit local cleanup exclusions
-Developer/
-ViewController/Developer/
 ViewController/archives/
 Model/Project/Data/json/
 
