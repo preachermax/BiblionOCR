@@ -75,6 +75,12 @@ Developer/video/*.kdenlive.ass
 **/Developer/**
 **/archives/**
 
+# Explicit local cleanup exclusions
+Developer/
+ViewController/Developer/
+ViewController/archives/
+Model/Project/Data/json/
+
 # Patreon local tooling runtime artifacts
 docs/patreon/local_blog_tool/playwright_profile/
 docs/patreon/local_blog_tool_transfer_*.zip
