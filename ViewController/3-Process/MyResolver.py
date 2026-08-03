@@ -35,6 +35,7 @@ from project_status_controller import ProjectStatusController
 app = QtWidgets.QApplication([])
 ui_candidates = (
     os.path.join(script_dir, "QtDesignerUI", "MyResolverUI.ui"),
+    os.path.join(project_root, "Developer", "QtDesignerUI", "MyResolverUI.ui"),
     os.path.join(project_root, "ViewController", "0-MainUI", "helpers", "QtDesignerUI", "MyResolverUI.ui"),
 )
 ui_path = next((path for path in ui_candidates if os.path.exists(path)), None)

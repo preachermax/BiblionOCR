@@ -53,7 +53,7 @@ REQUIRED_PROJECT_FILES = {
 PROJECT_MANIFEST_TEMPLATE_OVERRIDES = {
     "Core/MyServer.py => ViewController/0-MainUI/MyServer.py",
     "Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py",
-    "Core/MyServerUI.ui => ViewController/QtDesignerUI/MyServerUI.ui",
+    "Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui",
 }
 
 # These are the source BiblionOCR MyServer files that must not be copied into
@@ -62,7 +62,7 @@ PROJECT_MANIFEST_TEMPLATE_OVERRIDES = {
 OMITTED_SOURCE_MYSERVER_REFERENCES = {
     "ViewController/0-MainUI/MyServer.py",
     "ViewController/0-MainUI/helpers/MyServerUI.py",
-    "ViewController/0-MainUI/helpers/QtDesignerUI/MyServerUI.ui",
+    "Developer/QtDesignerUI/MyServerUI.ui",
 }
 
 STATIC_EXTERNAL_FOLDERS = {
@@ -109,7 +109,7 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Images/Workflow/pixler/pixler_pages_cropped",
     "ViewController/0-MainUI",
     "ViewController/0-MainUI/helpers/fonts",
-    "ViewController/QtDesignerUI",
+    "Developer/QtDesignerUI",
 }
 
 MINIMAL_IMAGE_FOLDERS = {

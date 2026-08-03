@@ -165,10 +165,11 @@ except ModuleNotFoundError:
 import numpy as np
 import tifffile
 
-# Custom impor
+# Custom imports
+MY_SERVER_UI_MODULE_PATH = os.path.join(script_dir, "MyServerUI.py")
 Ui_MainUI = _load_module_from_path(
     "viewcontroller_0_mainui_myserverui",
-    os.path.join(script_dir, "MyServerUI.py"),
+    MY_SERVER_UI_MODULE_PATH,
 ).Ui_MainUI
 from helpers.PreProcess import PreProcess as pp
 import helpers.ChrReference as chrref

@@ -1,4 +1,5 @@
 # Python imports
+import importlib.util
 import os
 import sys
 import subprocess
@@ -15,6 +16,15 @@ if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_HELPERS_DIR)
 if _LOCAL_HELPERS_DIR not in sys.path:
     sys.path.insert(0, _LOCAL_HELPERS_DIR)
+
+
+def _load_module_from_path(module_name, file_path):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault(module_name, module)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 
@@ -58,7 +68,10 @@ from PyQt5.QtGui import QPainter, QPen, QBrush
 
 from queue import Queue
 from ext import mainfind
-from MyBoxerUI import Ui_Boxer
+Ui_Boxer = _load_module_from_path(
+    "viewcontroller_1_preprocess_myboxerui",
+    os.path.join(os.path.dirname(__file__), "MyBoxerUI.py"),
+).Ui_Boxer
 from Training import Train as tr
 from PreProcess import PreProcess as pp
 from SessionManager import SessionManager

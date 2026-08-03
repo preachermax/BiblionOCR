@@ -23,6 +23,11 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Repo-root local folders
+/.continue/
+/assets/
+/website/
+
 # BiblionOCR local runtime artifacts
 Model/Project/Data/json/Session.json
 ViewController/0-MainUI/__pycache__/
