@@ -45,6 +45,10 @@ def _load_module_from_path(module_name, file_path):
 _HELPERS_DIR = _LEGACY_MAINUI_HELPERS_DIR
 _DIALOGS_DIR = os.path.join(_HELPERS_DIR, "Dialogs")
 
+
+def _resolve_dialog_path(filename):
+    return os.path.join(_DIALOGS_DIR, filename)
+
 sanitize_current_process_and_reexec = _load_module_from_path(
     "viewcontroller_helpers_gui_runtime_env_grounder",
     os.path.join(_HELPERS_DIR, "gui_runtime_env.py"),
@@ -93,11 +97,11 @@ Ui_tifgreekrenamelinesDialog = _load_module_from_path(
 ).Ui_tifgreekrenamelinesDialog
 Ui_renumbergreektextlinesDialog = _load_module_from_path(
     "viewcontroller_helpers_dialog_renumber_greek_text_lines_grounder",
-    os.path.join(_DIALOGS_DIR, "renumber_greek_text_linesDialog.py"),
+    _resolve_dialog_path("renumber_greek_text_linesDialog.py"),
 ).Ui_renumbergreektextlinesDialog
 Ui_tifgreekrenumberlinesDialog = _load_module_from_path(
     "viewcontroller_helpers_dialog_tif_greek_lines_renumber_grounder",
-    os.path.join(_DIALOGS_DIR, "tif_greek_lines_renumberDialog.py"),
+    _resolve_dialog_path("tif_greek_lines_renumberDialog.py"),
 ).Ui_tifgreekrenumberlinesDialog
 Ui_tiflatinmovelinesDialog = _load_module_from_path(
     "viewcontroller_helpers_dialog_tif_latin_lines_move_grounder",
