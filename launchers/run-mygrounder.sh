@@ -13,7 +13,7 @@ else
   PYTHON_BIN="/usr/bin/python3"
 fi
 
-"${PYTHON_BIN}" "${REPO_ROOT}/ViewController/0-MainUI/MyGrounder.py" "$@"
+"${PYTHON_BIN}" "${REPO_ROOT}/ViewController/2-TrainTesseract/MyGrounder.py" "$@"
 status=$?
 
 echo

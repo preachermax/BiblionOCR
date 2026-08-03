@@ -253,6 +253,10 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             byte_count /= 1024
 
     def _read_text_file_with_progress(self, path, label):
+        if not path or not os.path.isfile(path):
+            self._startup_progress(f'{label}: file not found: {path}')
+            return ''
+
         total_size = os.path.getsize(path)
         self._startup_progress(f'{label}: reading {os.path.basename(path)} ({self._format_size(total_size)})')
 
@@ -1836,7 +1840,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 print(f'self.prevtextversenum = {self.prevtextversenum}')
                 print(f'self.nexttextversenum = {self.nexttextversenum}')
             else:
-                print(f'Unable to find verse: {findline}')
+                print(f'Unable to find verse: {verse}')
         #self.ui.VerselineComboBox.setCurrentText(self.verseline)
 
         print(f'find both Ref verse = {verse}')
@@ -2723,10 +2727,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         })
 
         self.versetxtfileList = []
-        for t in os.listdir(self.versedir):
-            tpath = os.path.join(self.versedir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.versetxtfileList.append(tpath)
+        if os.path.isdir(self.versedir):
+            for t in os.listdir(self.versedir):
+                tpath = os.path.join(self.versedir, t)
+                if os.path.isfile(tpath) and t.endswith(('.txt')):
+                    self.versetxtfileList.append(tpath)
 
         self.sortVerseTextFiles()
 
@@ -3057,10 +3062,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._startup_progress('Reference text: building directory file list')
         self.reftxtfileList = []
-        for t in os.listdir(self.refdir):
-            tpath = os.path.join(self.refdir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.reftxtfileList.append(tpath)
+        if os.path.isdir(self.refdir):
+            for t in os.listdir(self.refdir):
+                tpath = os.path.join(self.refdir, t)
+                if os.path.isfile(tpath) and t.endswith(('.txt')):
+                    self.reftxtfileList.append(tpath)
 
         self._startup_progress(f'Reference text: sorting {len(self.reftxtfileList)} text files')
         self.sortRefTextFiles()
@@ -3329,14 +3335,18 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 self.SetRefLineSpacing()
 
     def OpenRefWithLibreCalc(self):
-        lo_cmd = 'libreoffice --calc ' + self.refpath
-        print(lo_cmd)
-        os.system(lo_cmd)
+        lo = shutil.which('libreoffice') or shutil.which('soffice')
+        if lo:
+            subprocess.Popen([lo, '--calc', self.refpath], close_fds=True)
+            return
+        qtw.QMessageBox.warning(self, 'LibreOffice not found', 'LibreOffice/soffice not found on PATH.')
 
     def OpenRefWithLibreWriter(self):
-        lo_cmd = 'libreoffice --writer ' + self.refpath
-        print(lo_cmd)
-        os.system(lo_cmd)
+        lo = shutil.which('libreoffice') or shutil.which('soffice')
+        if lo:
+            subprocess.Popen([lo, '--writer', self.refpath], close_fds=True)
+            return
+        qtw.QMessageBox.warning(self, 'LibreOffice not found', 'LibreOffice/soffice not found on PATH.')
 
 if __name__ == "__main__":
     app = qtw.QApplication(sys.argv)

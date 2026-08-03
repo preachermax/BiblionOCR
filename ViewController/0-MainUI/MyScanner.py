@@ -9,6 +9,7 @@ import json
 #from subprocess import Popen, PIPE, CalledProcessError
 from queue import Queue
 import subprocess
+import shutil
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
@@ -755,16 +756,43 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 
     def actionGimpEdit(self):
-        #gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"
-        gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.imgpath + " @@"
+        image_path = getattr(self, 'imgpath', None)
+        if not image_path:
+            qtw.QMessageBox.warning(self, 'Launch failed', 'No image is currently loaded for editing.')
+            return
 
-        '''if 'self.imgpath' in locals():
-            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP @@ " + self.imgpath + " @@"
-            print(self.imgpath)
-        else:
-            gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''
+        if sys.platform.startswith('win'):
+            for candidate in ('gimp-2.10.exe', 'gimp.exe', 'gimp'):
+                executable = shutil.which(candidate)
+                if executable:
+                    subprocess.Popen([executable, image_path])
+                    return
+            qtw.QMessageBox.warning(self, 'GIMP not found', 'GIMP is not installed or not on PATH.')
+            return
 
-        os.system(gimp_cmd)
+        flatpak = shutil.which('flatpak')
+        if flatpak:
+            subprocess.Popen([
+                flatpak,
+                'run',
+                '--branch=stable',
+                '--arch=aarch64',
+                '--command=gimp-2.10',
+                '--file-forwarding',
+                'org.gimp.GIMP',
+                '@@',
+                image_path,
+                '@@',
+            ])
+            return
+
+        for candidate in ('gimp-2.10', 'gimp'):
+            executable = shutil.which(candidate)
+            if executable:
+                subprocess.Popen([executable, image_path])
+                return
+
+        qtw.QMessageBox.warning(self, 'GIMP not found', 'GIMP is not installed or not on PATH.')
 
     def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference()
@@ -1323,7 +1351,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+        text = self.ui.LHlineEdit.text().strip()
+        if not text:
+            return
+        try:
+            self.ui.LHslider.setValue(int(text))
+        except ValueError:
+            return
 
     def SetLineSpacing(self):
 
@@ -1431,8 +1465,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #elif seltext != "Best_Fit":
             #print("Best fit not selected")
         selnumtext = seltext.split(" ")
+        if not selnumtext or not selnumtext[0].strip():
+            return
         print(selnumtext[0])
-        self.scale = float(selnumtext[0])/100
+        try:
+            self.scale = float(selnumtext[0])/100
+        except ValueError:
+            return
         print(self.scale)
 
         self.resize_image()
@@ -1465,14 +1504,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.ImagescrollArea.adjustsize()
 
     def OpenWithCalc(self):
-        lo_cmd = 'libreoffice --calc ' + self.txtpath
-        print(lo_cmd)
-        os.system(lo_cmd)
+        lo = shutil.which('libreoffice') or shutil.which('soffice')
+        if lo:
+            subprocess.Popen([lo, '--calc', self.txtpath])
+            return
+        qtw.QMessageBox.warning(self, 'LibreOffice not found', 'LibreOffice/soffice not found on PATH.')
 
     def OpenWithWriter(self):
-        lo_cmd = 'libreoffice --writer ' + self.txtpath
-        print(lo_cmd)
-        os.system(lo_cmd)
+        lo = shutil.which('libreoffice') or shutil.which('soffice')
+        if lo:
+            subprocess.Popen([lo, '--writer', self.txtpath])
+            return
+        qtw.QMessageBox.warning(self, 'LibreOffice not found', 'LibreOffice/soffice not found on PATH.')
 
     def OpenMyBrowser(self):
 

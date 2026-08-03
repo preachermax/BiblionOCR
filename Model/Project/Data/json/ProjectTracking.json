@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "milestones": {
+    "project_ready": {
+      "label": "Project initialized",
+      "weight": 10,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    },
+    "source_acquired": {
+      "label": "Source images captured",
+      "weight": 15,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    },
+    "source_converted": {
+      "label": "Source images converted",
+      "weight": 20,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    },
+    "pages_prepared": {
+      "label": "Language pages prepared",
+      "weight": 20,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    },
+    "lines_prepared": {
+      "label": "Line images prepared",
+      "weight": 15,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    },
+    "ground_truth_started": {
+      "label": "Ground truth started",
+      "weight": 10,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    },
+    "text_outputs_started": {
+      "label": "Text outputs started",
+      "weight": 10,
+      "complete": false,
+      "completed_at": null,
+      "updated_by": null
+    }
+  }
+}

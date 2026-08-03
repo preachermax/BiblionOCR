@@ -1,10 +1,14 @@
 # Python imports
 import os
 import sys
+import subprocess
 
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
 _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "helpers"))
+_PROJECT_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _PROJECT_ROOT_DIR not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT_DIR)
 if _LEGACY_MAINUI_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_DIR)
 if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
@@ -775,9 +779,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
     def OpenProjectExplorer(self):
-        mw_cmd = f"python3 \"{os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyExplorer.py')}\""
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyExplorer.py')
+        print(f'Launching: {sys.executable} {script}')
+        subprocess.Popen([sys.executable, script])
         '''newapp = qtw.QApplication([])
         dirPath = rself.userdir + '/Projects/BiblionOCR/'
         self.explorer = qtw.QMainWindow()
@@ -789,15 +793,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         newapp.exec_()'''
 
     def OpenWithMyPixler(self):
-        mw_cmd = f"python3 \"{os.path.join(self.projecthome, 'ViewController', '1-PreProcess', 'MyPixler.py')}\""
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.projecthome, 'ViewController', '1-PreProcess', 'MyPixler.py')
+        print(f'Launching: {sys.executable} {script}')
+        subprocess.Popen([sys.executable, script])
 
     def OpenWithMyWriter(self):
-
-        mw_cmd = f"python3 \"{os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyWriter.py')}\""
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(self.projecthome, 'ViewController', '4-PostProcess', 'MyWriter.py')
+        print(f'Launching: {sys.executable} {script}')
+        subprocess.Popen([sys.executable, script])
         '''
         writer.MainWindow = qtw.QMainWindow()
         writer.ui = writer.Ui_MyWriterUI()

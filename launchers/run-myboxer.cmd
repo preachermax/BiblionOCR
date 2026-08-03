@@ -4,9 +4,9 @@ setlocal
 cd /d "%~dp0.." || exit /b 1
 
 if exist "C:\Program Files\Python311\python.exe" (
-    "C:\Program Files\Python311\python.exe" "ViewController\0-MainUI\MyBoxer.py" %*
+    "C:\Program Files\Python311\python.exe" "ViewController\1-PreProcess\MyBoxer.py" %*
 ) else (
-    py -3 "ViewController\0-MainUI\MyBoxer.py" %*
+    py -3 "ViewController\1-PreProcess\MyBoxer.py" %*
 )
 
 set "STATUS=%ERRORLEVEL%"

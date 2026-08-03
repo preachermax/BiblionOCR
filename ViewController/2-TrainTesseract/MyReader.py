@@ -1286,7 +1286,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+        text = self.ui.LHlineEdit.text().strip()
+        if not text:
+            return
+        try:
+            self.ui.LHslider.setValue(int(text))
+        except ValueError:
+            return
 
     def SetLineSpacing(self):
 
@@ -1391,8 +1397,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #elif seltext != "Best_Fit":
             #print("Best fit not selected")
         selnumtext = seltext.split(" ")
+        if not selnumtext or not selnumtext[0].strip():
+            return
         print(selnumtext[0])
-        self.scale = float(selnumtext[0])/100
+        try:
+            self.scale = float(selnumtext[0])/100
+        except ValueError:
+            return
         print(self.scale)
 
         self.resize_image()

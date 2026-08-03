@@ -33,7 +33,15 @@ from project_status_controller import ProjectStatusController
 #import Qt5ResolveVariants as resolver
 
 app = QtWidgets.QApplication([])
-varui = uic.loadUi(os.path.join(script_dir, "QtDesignerUI", "MyResolverUI.ui"))
+ui_candidates = (
+    os.path.join(script_dir, "QtDesignerUI", "MyResolverUI.ui"),
+    os.path.join(project_root, "ViewController", "0-MainUI", "helpers", "QtDesignerUI", "MyResolverUI.ui"),
+)
+ui_path = next((path for path in ui_candidates if os.path.exists(path)), None)
+if ui_path is None:
+    raise FileNotFoundError("MyResolverUI.ui was not found in expected UI locations.")
+
+varui = uic.loadUi(ui_path)
 project_status_controller = ProjectStatusController(
     varui,
     "MyResolver",
@@ -72,6 +80,10 @@ def main():
 
 def loadTableView(rowid):
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "FROMVS.db"))
+    if helper.cursor is None:
+        print("MyResolver: FROMVS.db not available; variance table remains empty.")
+        varui.VarianceTable.setRowCount(0)
+        return
     
     varui.VarianceTable.setRowCount(0)
     
@@ -100,6 +112,9 @@ def loadTableView(rowid):
 def loadVarWordsCombo():
     #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "TRiBibleWords.db"))
+    if helper.cursor is None:
+        print("MyResolver: TRiBibleWords.db not available; word selector remains empty.")
+        return
     varwords = helper.select("SELECT DISTINCT NoDiaWord FROM Bible ORDER BY NoDiaWord")
     #print(varwords)
 
@@ -111,9 +126,15 @@ def loadVarWordsCombo():
 def selectVarWordsCombo():
     
     selvarword = varui.VarWordSelCombo.currentText()
+    if not selvarword:
+        return
     #helper = SqliteHelper("~/Projects/Python/SQLite/TRBibleWords.db")
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "TRiBibleWords.db"))
+    if helper.cursor is None:
+        return
     varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
+    if not varwords:
+        return
     
     # This is only a partial solution.  It locks onto the first match only.
     
@@ -433,40 +454,54 @@ def updatebible():
 
 def loadFormView():
     #loadVarWordsCombo()  
-    varui.LineLE.setText(varui.VarianceTable.item(getSelectedRowId(),1).text())
-    varui.BookLE.setText(varui.VarianceTable.item(getSelectedRowId(),2).text())
-    varui.ChapterLE.setText(varui.VarianceTable.item(getSelectedRowId(),3).text())
-    varui.VerseLE.setText(varui.VarianceTable.item(getSelectedRowId(),4).text())
-    varui.WordNumLE.setText(varui.VarianceTable.item(getSelectedRowId(),5).text())
-    varui.WordLE.setText(varui.VarianceTable.item(getSelectedRowId(),6).text())
-    varui.NoDiaWordLE.setText(varui.VarianceTable.item(getSelectedRowId(),7).text())
-    if varui.VarianceTable.item(getSelectedRowId(),8).text() != "None":
-        varui.VarWordSelCombo.setCurrentText(varui.VarianceTable.item(getSelectedRowId(),8).text())
+    if varui.VarianceTable.rowCount() == 0:
+        print("MyResolver: no variance rows available for form view initialization.")
+        return
+
+    row_id = getSelectedRowId()
+    if row_id < 0 or row_id >= varui.VarianceTable.rowCount():
+        print("MyResolver: selected row is out of range for form initialization.")
+        return
+
+    first_item = varui.VarianceTable.item(row_id, 1)
+    if first_item is None:
+        print("MyResolver: selected row has no data; skipping form initialization.")
+        return
+
+    varui.LineLE.setText(varui.VarianceTable.item(row_id,1).text())
+    varui.BookLE.setText(varui.VarianceTable.item(row_id,2).text())
+    varui.ChapterLE.setText(varui.VarianceTable.item(row_id,3).text())
+    varui.VerseLE.setText(varui.VarianceTable.item(row_id,4).text())
+    varui.WordNumLE.setText(varui.VarianceTable.item(row_id,5).text())
+    varui.WordLE.setText(varui.VarianceTable.item(row_id,6).text())
+    varui.NoDiaWordLE.setText(varui.VarianceTable.item(row_id,7).text())
+    if varui.VarianceTable.item(row_id,8).text() != "None":
+        varui.VarWordSelCombo.setCurrentText(varui.VarianceTable.item(row_id,8).text())
     else:
-        varui.VarWordSelCombo.setCurrentText(varui.VarianceTable.item(getSelectedRowId(),7).text()[0:3])
+        varui.VarWordSelCombo.setCurrentText(varui.VarianceTable.item(row_id,7).text()[0:3])
     #varui.VarWordSelCombo.setCurrentText(varui.VarianceTable.item(getSelectedRowId(),8).text())
     #varui.VarWordSelCombo.setCompletionPrefix(varui.NoDiaWordLE.currentText()[0:2])
     #setCompletionPrefix(const QString &prefix)
-    varui.StrongsLE.setText(varui.VarianceTable.item(getSelectedRowId(),9).text())
-    varui.RMACLE.setText(varui.VarianceTable.item(getSelectedRowId(),10).text())
-    varui.LemmaLE.setText(varui.VarianceTable.item(getSelectedRowId(),11).text())
-    varui.ErrorCodeCombo.setCurrentText(varui.VarianceTable.item(getSelectedRowId(),12).text())
-    varui.VarianceCodeLE.setText(varui.VarianceTable.item(getSelectedRowId(),13).text())
-    varui.DescriptionTextEdit.setPlainText(varui.VarianceTable.item(getSelectedRowId(),14).text()) 
+    varui.StrongsLE.setText(varui.VarianceTable.item(row_id,9).text())
+    varui.RMACLE.setText(varui.VarianceTable.item(row_id,10).text())
+    varui.LemmaLE.setText(varui.VarianceTable.item(row_id,11).text())
+    varui.ErrorCodeCombo.setCurrentText(varui.VarianceTable.item(row_id,12).text())
+    varui.VarianceCodeLE.setText(varui.VarianceTable.item(row_id,13).text())
+    varui.DescriptionTextEdit.setPlainText(varui.VarianceTable.item(row_id,14).text()) 
 
-    if varui.VarianceTable.item(getSelectedRowId(),15).text() == "1" or varui.VarianceTable.item(getSelectedRowId(),13).text()[0] == "P":
+    if varui.VarianceTable.item(row_id,15).text() == "1" or varui.VarianceTable.item(row_id,13).text()[0] == "P":
         varui.PreservedCkBox.setChecked(True)
     else:
         varui.PreservedCkBox.setChecked(False)
-    if varui.VarianceTable.item(getSelectedRowId(),16).text() == "1" or varui.VarianceTable.item(getSelectedRowId(),13).text()[0] == "C" or varui.VarianceTable.item(getSelectedRowId(),13).text()[1] == "C":
+    if varui.VarianceTable.item(row_id,16).text() == "1" or varui.VarianceTable.item(row_id,13).text()[0] == "C" or varui.VarianceTable.item(row_id,13).text()[1] == "C":
         varui.CorrectedCkBox.setChecked(True)
     else:
         varui.CorrectedCkBox.setChecked(False)
-    if varui.VarianceTable.item(getSelectedRowId(),17).text() == "1" or varui.VarianceTable.item(getSelectedRowId(),13).text()[1] == "E" or varui.VarianceTable.item(getSelectedRowId(),13).text()[2] == "E" or varui.VarianceTable.item(getSelectedRowId(),13).text()[3] == "E":
+    if varui.VarianceTable.item(row_id,17).text() == "1" or varui.VarianceTable.item(row_id,13).text()[1] == "E" or varui.VarianceTable.item(row_id,13).text()[2] == "E" or varui.VarianceTable.item(row_id,13).text()[3] == "E":
         varui.ErrorCkBox.setChecked(True)
     else:
         varui.ErrorCkBox.setChecked(False)
-    if varui.VarianceTable.item(getSelectedRowId(),18).text() == "1" or varui.VarianceTable.item(getSelectedRowId(),13).text()[-2] == "V" or varui.VarianceTable.item(getSelectedRowId(),13).text()[-3] == "V" or varui.VarianceTable.item(getSelectedRowId(),13).text()[-4] == "V":
+    if varui.VarianceTable.item(row_id,18).text() == "1" or varui.VarianceTable.item(row_id,13).text()[-2] == "V" or varui.VarianceTable.item(row_id,13).text()[-3] == "V" or varui.VarianceTable.item(row_id,13).text()[-4] == "V":
         varui.VarianceCkBox.setChecked(True)
     else:
         varui.VarianceCkBox.setChecked(False)

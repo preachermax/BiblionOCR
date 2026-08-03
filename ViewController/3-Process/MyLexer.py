@@ -3,6 +3,7 @@ import csv
 import json
 import os
 import re
+import subprocess
 from pathlib import Path
 import sys
 
@@ -2006,9 +2007,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         file.close()
 
     def OpenProjectExplorer(self):
-        mw_cmd = "python3 ViewController/Application/0-MainUI/ProjectBrowser.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(project_root, 'ViewController', '0-MainUI', 'MyExplorer.py')
+        print(f'Launching: {sys.executable} {script}')
+        subprocess.Popen([sys.executable, script])
         '''newapp = qtw.QApplication([])
         dirPath = rself.userdir + '/Projects/BiblionOCR/'
         self.explorer = qtw.QMainWindow()
@@ -2020,15 +2021,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         newapp.exec_()'''
 
     def OpenWithMyPixler(self):
-        mw_cmd = "python3 ViewController/1-PreProcess/MyPixler.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(project_root, 'ViewController', '1-PreProcess', 'MyPixler.py')
+        print(f'Launching: {sys.executable} {script}')
+        subprocess.Popen([sys.executable, script])
 
     def OpenWithMyWriter(self):
-
-        mw_cmd = "python3 ViewController/4-PostProcess/MyWriter.py"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        script = os.path.join(project_root, 'ViewController', '4-PostProcess', 'MyWriter.py')
+        print(f'Launching: {sys.executable} {script}')
+        subprocess.Popen([sys.executable, script])
         '''
         writer.MainWindow = qtw.QMainWindow()
         writer.ui = writer.Ui_MyWriterUI()

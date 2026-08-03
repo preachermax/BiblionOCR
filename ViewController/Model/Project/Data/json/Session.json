@@ -1,0 +1,17 @@
+[
+    {
+        "Setting": "self.linespacing",
+        "CurrentValue": "100",
+        "DefaultValue": "100"
+    },
+    {
+        "Setting": "self.font",
+        "CurrentValue": "FROMVS",
+        "DefaultValue": "FROMVS"
+    },
+    {
+        "Setting": "self.fontsize",
+        "CurrentValue": 20,
+        "DefaultValue": 20
+    }
+]

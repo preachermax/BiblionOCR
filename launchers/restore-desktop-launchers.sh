@@ -79,6 +79,7 @@ for launcher in *.desktop; do
 
   # Rewrite legacy hardcoded paths to the current repository location.
   sed -i "s|/home/jetson/Projects/BiblionOCR|${REPO_ROOT}|g" "${tmp}"
+  sed -i "s|/ViewController/0-MainUI/Icons/|/ViewController/0-MainUI/helpers/Icons/|g" "${tmp}"
 
   install -m 644 "${tmp}" "${APPS_DIR}/${launcher}"
   if [[ ${COPY_TO_DESKTOP} -eq 1 ]]; then

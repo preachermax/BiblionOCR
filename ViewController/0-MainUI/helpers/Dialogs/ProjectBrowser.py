@@ -48,8 +48,13 @@ class MyFileBrowser(ProjectBrowserUI.Ui_MainWindow, QtWidgets.QMainWindow):
     def open_file(self):
         index = self.treeView.currentIndex()
         file_path = self.model.filePath(index)
-        #os.startfile(file_path)
-        os.system("xdg-open " + file_path)
+        if sys.platform.startswith("win"):
+            os.startfile(file_path)
+            return
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", file_path])
+            return
+        subprocess.Popen(["xdg-open", file_path])
 
 
     '''def maya_file_operations(self, reference=False, open_file=False):

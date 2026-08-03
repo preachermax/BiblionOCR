@@ -13,7 +13,7 @@ else
   PYTHON_BIN="/usr/bin/python3"
 fi
 
-"${PYTHON_BIN}" "${REPO_ROOT}/ViewController/0-MainUI/MyVersifier.py" "$@"
+"${PYTHON_BIN}" "${REPO_ROOT}/ViewController/3-Process/MyVersifier.py" "$@"
 status=$?
 
 echo

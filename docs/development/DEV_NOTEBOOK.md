@@ -30,6 +30,22 @@
 
 ---
 
+## Launcher Restore and Wrapper Notes (2026-08-02)
+
+* Linux launcher restore now targets icons under `ViewController/0-MainUI/helpers/Icons`
+* canonical launcher icon mapping now includes `MyLauncher -> BiblionLauncher.png`
+* canonical launcher icon mapping now includes `MyLexer -> BiblionLexer2.png`
+
+* desktop aliases in Greek are required and preserved (for example `βιϐλιον Glypher.desktop`)
+* launcher wrappers were repointed: `MyBoxer`, `MyGlypher`, `MyPixler` -> `ViewController/1-PreProcess`
+* launcher wrappers were repointed: `MyGrounder`, `MyReader`, `MyTrainer` -> `ViewController/2-TrainTesseract`
+* launcher wrappers were repointed: `MyLexer`, `MyResolver`, `MyVersifier` -> `ViewController/3-Process`
+* launcher wrappers were repointed: `MyWriter` -> `ViewController/4-PostProcess`
+
+* launcher smoke checks (timeout-based startup probes) were run across canonical `My*` modules to verify non-crashing startup behavior after path and restore fixes
+
+---
+
 ## Pre-Structural Modification Checkpoint (Page Workflow Lifecycle)
 
 Before Phase 1 implementation, the architecture plan for page-centric project workflow tracking is captured in:

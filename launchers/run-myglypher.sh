@@ -13,7 +13,7 @@ else
   PYTHON_BIN="/usr/bin/python3"
 fi
 
-"${PYTHON_BIN}" "${REPO_ROOT}/ViewController/0-MainUI/MyGlypher.py" "$@"
+"${PYTHON_BIN}" "${REPO_ROOT}/ViewController/1-PreProcess/MyGlypher.py" "$@"
 status=$?
 
 echo

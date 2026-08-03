@@ -10,12 +10,30 @@ import json
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
+viewcontroller_dir = os.path.join(project_root, "ViewController")
 if script_dir not in sys.path:
     sys.path.insert(0, script_dir)
 if helpers_dir not in sys.path:
     sys.path.insert(0, helpers_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+RUNTIME_MODULE_PATHS = {
+    "MyLauncher.py": os.path.join(script_dir, "MyLauncher.py"),
+    "MyServer.py": os.path.join(script_dir, "MyServer.py"),
+    "MyScanner.py": os.path.join(script_dir, "MyScanner.py"),
+    "MyExplorer.py": os.path.join(script_dir, "MyExplorer.py"),
+    "MyBoxer.py": os.path.join(viewcontroller_dir, "1-PreProcess", "MyBoxer.py"),
+    "MyGlypher.py": os.path.join(viewcontroller_dir, "1-PreProcess", "MyGlypher.py"),
+    "MyPixler.py": os.path.join(viewcontroller_dir, "1-PreProcess", "MyPixler.py"),
+    "MyGrounder.py": os.path.join(viewcontroller_dir, "2-TrainTesseract", "MyGrounder.py"),
+    "MyReader.py": os.path.join(viewcontroller_dir, "2-TrainTesseract", "MyReader.py"),
+    "MyTrainer.py": os.path.join(viewcontroller_dir, "2-TrainTesseract", "MyTrainer.py"),
+    "MyLexer.py": os.path.join(viewcontroller_dir, "3-Process", "MyLexer.py"),
+    "MyResolver.py": os.path.join(viewcontroller_dir, "3-Process", "MyResolver.py"),
+    "MyVersifier.py": os.path.join(viewcontroller_dir, "3-Process", "MyVersifier.py"),
+    "MyWriter.py": os.path.join(viewcontroller_dir, "4-PostProcess", "MyWriter.py"),
+}
 
 from helpers.gui_runtime_env import sanitize_current_process_and_reexec
 
@@ -36,6 +54,26 @@ from Developer.Publisher.launcher_registry import (
     LauncherIntegrationController,
     build_default_launcher_registry,
 )
+
+_qt_previous_message_handler = None
+
+
+def _qt_message_filter(msg_type, context, message):
+    if message and message.strip() == "QSocketNotifier: Can only be used with threads started with QThread":
+        return
+
+    if _qt_previous_message_handler is not None:
+        _qt_previous_message_handler(msg_type, context, message)
+        return
+
+    sys.stderr.write(f"{message}\n")
+
+
+def install_qt_warning_filter():
+    global _qt_previous_message_handler
+    if os.environ.get("BIBLION_SUPPRESS_QSOCKETNOTIFIER_WARNING", "1") != "1":
+        return
+    _qt_previous_message_handler = qtc.qInstallMessageHandler(_qt_message_filter)
 
 # Dialog Imports
 
@@ -413,8 +451,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         file.close()
 
     def run_child_module(self, filename):
-        module_path = os.path.join(script_dir, filename)
-        subprocess.Popen(['python3', module_path])
+        module_path = RUNTIME_MODULE_PATHS.get(filename, os.path.join(script_dir, filename))
+        creationflags = 0
+        if os.name == 'nt':
+            creationflags = getattr(subprocess, 'CREATE_NEW_CONSOLE', 0)
+        subprocess.Popen([sys.executable, module_path], creationflags=creationflags)
 
     def OpenWithMyReader(self):
         self.run_child_module('MyReader.py')
@@ -488,6 +529,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Only run this code if I am actually running this script
 if __name__ == '__main__':
+    install_qt_warning_filter()
     app = qtw.QApplication(sys.argv)
     w = MainWindow()
     w.show()

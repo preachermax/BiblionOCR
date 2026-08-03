@@ -55,14 +55,13 @@ class CharacterReference(qtw.QMainWindow):
         self.ui.setupUi(self)
         self.ucoderange = []
         
-        # Set Project Home (cross-platform)
+        # Set repository root from this file location:
+        # ViewController/0-MainUI/helpers/ChrReference.py -> project root
         self.mod_dirname = os.path.dirname(__file__)
-        up_once = os.path.join(self.mod_dirname, "..")
-        up_twice = os.path.join(up_once, "..")
-        self.mod_abspath = os.path.abspath(os.path.realpath(os.path.join(up_once, "..")))
+        self.mod_abspath = str(Path(__file__).resolve().parents[3])
         
-        self.fontpath = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'fonts', 'FROMVS.ttf')
-        self.xmlpath = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'fonts', 'FROMVS.xml')
+        self.fontpath = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'helpers', 'fonts', 'FROMVS.ttf')
+        self.xmlpath = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'helpers', 'fonts', 'FROMVS.xml')
         fontxml = ttFont.TTFont(self.fontpath)
         # fontxml.saveXML(self.xmlpath)
         print(f'FROMVS.xml => {fontxml}')
@@ -213,7 +212,7 @@ class CharacterReference(qtw.QMainWindow):
     def get_glyphname(self, glyphcode):
         print(f'Glyph Code: {glyphcode}')
         glyphname = ""
-        cmap_path = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'fonts', 'FROMVS_cmap.json')
+        cmap_path = os.path.join(self.mod_abspath, 'ViewController', '0-MainUI', 'helpers', 'fonts', 'FROMVS_cmap.json')
         with open(cmap_path) as f:
             # returns JSON object as
             # a dictionary

@@ -3,8 +3,12 @@ import os
 import sys
 
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "0-MainUI"))
+import subprocess
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
 _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "helpers"))
+_PROJECT_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _PROJECT_ROOT_DIR not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT_DIR)
 if _LEGACY_MAINUI_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_DIR)
 if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
@@ -90,10 +94,9 @@ class Ui_MainWindow(qtw.QMainWindow):
         print("Saving Trainer session settings")  
 
     def OpenWithMyWriter(self):
-        mw_file = os.path.join(self.projecthome, 'ViewController', '0-MainUI', 'MyWriter.py')
-        mw_cmd = f"python3 {mw_file}"
-        print(mw_cmd)
-        os.system(mw_cmd)
+        mw_file = os.path.join(self.projecthome, 'ViewController', '4-PostProcess', 'MyWriter.py')
+        print(f'Launching: {sys.executable} {mw_file}')
+        subprocess.Popen([sys.executable, mw_file])
 
 
 if __name__ == "__main__":

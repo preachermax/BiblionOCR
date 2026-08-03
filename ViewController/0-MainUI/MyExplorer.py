@@ -226,8 +226,13 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
     def open_file(self):
         index = self.treeView.currentIndex()
         file_path = self.model.filePath(index)
-        # For Windows: os.startfile(file_path)
-        os.system("xdg-open " + shlex.quote(file_path))
+        if sys.platform.startswith("win"):
+            os.startfile(file_path)
+            return
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", file_path])
+            return
+        subprocess.Popen(["xdg-open", file_path])
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])

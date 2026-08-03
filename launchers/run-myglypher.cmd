@@ -4,9 +4,9 @@ setlocal
 cd /d "%~dp0.." || exit /b 1
 
 if exist "C:\Program Files\Python311\python.exe" (
-    "C:\Program Files\Python311\python.exe" "ViewController\0-MainUI\MyGlypher.py" %*
+    "C:\Program Files\Python311\python.exe" "ViewController\1-PreProcess\MyGlypher.py" %*
 ) else (
-    py -3 "ViewController\0-MainUI\MyGlypher.py" %*
+    py -3 "ViewController\1-PreProcess\MyGlypher.py" %*
 )
 
 set "STATUS=%ERRORLEVEL%"

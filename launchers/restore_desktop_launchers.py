@@ -22,8 +22,8 @@ CANONICAL_MODULES: List[Tuple[str, str, str]] = [
     ("MyBoxer", "Biblion Boxer", "BiblionBoxer2.png"),
     ("MyGlypher", "Biblion Glypher", "BiblionGlypher.png"),
     ("MyGrounder", "Biblion Grounder", "BiblionGrounder.png"),
-    ("MyLauncher", "Biblion Launcher", "BiblionOCR.png"),
-    ("MyLexer", "Biblion Lexer", "BiblionLexer.png"),
+    ("MyLauncher", "Biblion Launcher", "BiblionLauncher.png"),
+    ("MyLexer", "Biblion Lexer", "BiblionLexer2.png"),
     ("MyPixler", "Biblion Pixler", "BiblionPixler1.png"),
     ("MyReader", "Biblion Reader", "BiblionReader2.png"),
     ("MyResolver", "Biblion Resolver", "BiblionResolver2.png"),
@@ -36,6 +36,14 @@ CANONICAL_MODULES: List[Tuple[str, str, str]] = [
 
 LEGACY_LAUNCHERS_TO_REMOVE: List[str] = [
     "BiblionBoxer.desktop",
+]
+
+MODULE_SEARCH_PATHS: List[Tuple[str, ...]] = [
+    ("ViewController", "0-MainUI"),
+    ("ViewController", "1-PreProcess"),
+    ("ViewController", "2-TrainTesseract"),
+    ("ViewController", "3-Process"),
+    ("ViewController", "4-PostProcess"),
 ]
 
 
@@ -127,28 +135,36 @@ def greek_label_variants(label: str) -> List[str]:
     return unique
 
 
+def resolve_module_file(repo_root: Path, module: str) -> Path | None:
+    for rel_parts in MODULE_SEARCH_PATHS:
+        candidate = repo_root.joinpath(*rel_parts) / f"{module}.py"
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
     launchers: Dict[str, str] = {}
-    icons_dir = repo_root / "ViewController" / "0-MainUI" / "Icons"
-    module_dir = repo_root / "ViewController" / "0-MainUI"
+    icons_dir = repo_root / "ViewController" / "0-MainUI" / "helpers" / "Icons"
     launcher_dir = repo_root / "launchers"
 
     for module, label, icon_name in CANONICAL_MODULES:
-        module_file = module_dir / f"{module}.py"
-        if not module_file.exists():
+        module_file = resolve_module_file(repo_root, module)
+        sh_wrapper = launcher_dir / f"run-{module.lower()}.sh"
+        if module_file is None and not sh_wrapper.exists():
             continue
 
         icon_path = icons_dir / icon_name
         if not icon_path.exists():
             icon_path = icons_dir / "BiblionBoxer2.png"
 
-        sh_wrapper = launcher_dir / f"run-{module.lower()}.sh"
         if sh_wrapper.exists():
             exec_cmd = f"{sh_wrapper} %f"
             try_exec = str(sh_wrapper)
             # Ensure local wrapper script is executable.
             sh_wrapper.chmod(sh_wrapper.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         else:
+            assert module_file is not None
             exec_cmd = f"/usr/bin/python3 {module_file} %f"
             try_exec = "/usr/bin/python3"
 
