@@ -1,9 +1,15 @@
-
+Core/MyServer.py => ViewController/0-MainUI/MyServer.py
+Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py
+Core/MyServerUI.ui => ViewController/QtDesignerUI/MyServerUI.ui
 Model/Project/Data
+Model/Project/Data/esword
+Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json
 Model/Project/Data/json/BookChapter.json
 Model/Project/Data/json/BookChapterVerse.json
+Model/Project/Data/json/BookChapterVerseTotals.json
 Model/Project/Data/json/BooksAbbrName.json
+Model/Project/Data/json/BooksAbbrNameNumIndex.json
 Model/Project/Data/json/BooksMarkDown.json
 Model/Project/Data/json/BoxerSession.json
 Model/Project/Data/json/ChrRef.json
@@ -11,15 +17,19 @@ Model/Project/Data/json/GlypherSession.json
 Model/Project/Data/json/GlyphMap.json
 Model/Project/Data/json/GrounderSession.json
 Model/Project/Data/json/LineBookChapterVerse.json
+Model/Project/Data/json/PageVerseCrossReference copy.json
 Model/Project/Data/json/PageVerseCrossReference.json
+Model/Project/Data/json/PageVerseCrossReference_Matthew.json
 Model/Project/Data/json/PixlerSession.json
 Model/Project/Data/json/ProjectUnicodeRanges.json
 Model/Project/Data/json/ReaderSession.json
 Model/Project/Data/json/RMAC.json
 Model/Project/Data/json/ScannerSession.json
 Model/Project/Data/json/Session.json
+Model/Project/Data/json/UnicodeRanges.json
 Model/Project/Data/json/VersifierSession.json
 Model/Project/Data/json/Workflow.json
+Model/Project/Data/json/WriterSession.json
 Model/Project/Images
 Model/Project/Images/Complete
 Model/Project/Images/Complete/Greek
