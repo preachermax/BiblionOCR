@@ -26,7 +26,7 @@
    <string>βϊϐλίον Server</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../UI_Icons.qrc">
+   <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
     <normaloff>:/Icons/Icons/BiblionServer.png</normaloff>:/Icons/Icons/BiblionServer.png</iconset>
   </property>
   <property name="animated">
@@ -213,7 +213,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
     </property>
    </widget>
@@ -242,7 +242,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
     </property>
    </widget>
@@ -271,7 +271,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
     </property>
    </widget>
@@ -316,7 +316,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/reload-text.png</normaloff>:/Icons/Icons/reload-text.png</iconset>
     </property>
    </widget>
@@ -336,7 +336,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/reload.png</normaloff>:/Icons/Icons/reload.png</iconset>
     </property>
    </widget>
@@ -356,7 +356,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/back_image.png</normaloff>:/Icons/Icons/back_image.png</iconset>
     </property>
    </widget>
@@ -376,7 +376,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/forward_image.png</normaloff>:/Icons/Icons/forward_image.png</iconset>
     </property>
    </widget>
@@ -396,7 +396,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/back_text.png</normaloff>:/Icons/Icons/back_text.png</iconset>
     </property>
    </widget>
@@ -416,7 +416,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/forward_text.png</normaloff>:/Icons/Icons/forward_text.png</iconset>
     </property>
    </widget>
@@ -436,7 +436,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/ui-button-navigation.png</normaloff>:/Icons/Icons/ui-button-navigation.png</iconset>
     </property>
    </widget>
@@ -456,7 +456,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/ui-button-navigation-back.png</normaloff>:/Icons/Icons/ui-button-navigation-back.png</iconset>
     </property>
    </widget>
@@ -479,7 +479,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/documents1.png</normaloff>:/Icons/Icons/documents1.png</iconset>
     </property>
    </widget>
@@ -671,7 +671,7 @@
       <string>OCR Raw</string>
      </property>
      <property name="icon">
-      <iconset resource="../UI_Icons.qrc">
+      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
        <normaloff>:/Icons/Icons/ocr3.png</normaloff>:/Icons/Icons/ocr3.png</iconset>
      </property>
     </widget>
@@ -1081,7 +1081,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/image-resize1.png</normaloff>:/Icons/Icons/image-resize1.png</iconset>
     </property>
    </widget>
@@ -1184,7 +1184,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/edit-line-spacing.png</normaloff>:/Icons/Icons/edit-line-spacing.png</iconset>
     </property>
    </widget>
@@ -1204,7 +1204,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
     </property>
    </widget>
@@ -1230,7 +1230,7 @@
      <string>Find and Replace</string>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
     </property>
    </widget>
@@ -1250,7 +1250,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
     </property>
    </widget>
@@ -1279,7 +1279,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
     </property>
    </widget>
@@ -1299,7 +1299,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
     </property>
    </widget>
@@ -1328,7 +1328,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../UI_Icons.qrc">
+     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
@@ -1339,7 +1339,7 @@
      <x>0</x>
      <y>0</y>
      <width>1319</width>
-     <height>32</height>
+      <height>32</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTraining">
@@ -1538,7 +1538,7 @@
       <string>Languages</string>
      </property>
      <property name="icon">
-      <iconset resource="../UI_Icons.qrc">
+      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
        <normaloff>:/Icons/Icons/folder-horizontal-open.png</normaloff>:/Icons/Icons/folder-horizontal-open.png</iconset>
      </property>
      <widget class="QMenu" name="menuGreek_3">
@@ -1838,7 +1838,7 @@
   </action>
   <action name="actionpdf_for_tiff_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/pdf4tiff.png</normaloff>:/Icons/Icons/pdf4tiff.png</iconset>
    </property>
    <property name="text">
@@ -1853,7 +1853,7 @@
   </action>
   <action name="actionpdf_to_tiff_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/pdf2tiff.png</normaloff>:/Icons/Icons/pdf2tiff.png</iconset>
    </property>
    <property name="text">
@@ -1868,7 +1868,7 @@
   </action>
   <action name="actiontiff_to_mono_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
    </property>
    <property name="text">
@@ -1883,7 +1883,7 @@
   </action>
   <action name="actionmono_to_png_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/png-file.png</normaloff>:/Icons/Icons/png-file.png</iconset>
    </property>
    <property name="text">
@@ -1913,7 +1913,7 @@
   </action>
   <action name="actionDeskewGreek_tiff_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
    </property>
    <property name="text">
@@ -1936,7 +1936,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
    </property>
    <property name="text">
@@ -1954,7 +1954,7 @@
   </action>
   <action name="actionResizeGreek_png_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
    </property>
    <property name="text">
@@ -1966,7 +1966,7 @@
   </action>
   <action name="actionResizeLatin_png_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
    </property>
    <property name="text">
@@ -1984,7 +1984,7 @@
   </action>
   <action name="actionCrop_Languages_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
    </property>
    <property name="text">
@@ -2004,7 +2004,7 @@
   </action>
   <action name="actionextract_pdf_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/pdf-extract1.png</normaloff>:/Icons/Icons/pdf-extract1.png</iconset>
    </property>
    <property name="text">
@@ -2092,7 +2092,7 @@
   </action>
   <action name="actionCorrect_OCR_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/ocr3.png</normaloff>:/Icons/Icons/ocr3.png</iconset>
    </property>
    <property name="text">
@@ -2162,7 +2162,7 @@
   </action>
   <action name="actionMyTrainer">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionTrainer1.png</normaloff>:/Icons/Icons/BiblionTrainer1.png</iconset>
    </property>
    <property name="text">
@@ -2177,7 +2177,7 @@
   </action>
   <action name="actionMyGrounder">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionGrounder.png</normaloff>:/Icons/Icons/BiblionGrounder.png</iconset>
    </property>
    <property name="text">
@@ -2192,7 +2192,7 @@
   </action>
   <action name="actionUpdate_Wordlist_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/update-greek-wordlist.png</normaloff>:/Icons/Icons/update-greek-wordlist.png</iconset>
    </property>
    <property name="text">
@@ -2207,7 +2207,7 @@
   </action>
   <action name="actionAutoCrop_Greek_to_tif_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
    </property>
    <property name="text">
@@ -2219,7 +2219,7 @@
   </action>
   <action name="actionRename_Greek_tif_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
    </property>
    <property name="text">
@@ -2231,7 +2231,7 @@
   </action>
   <action name="actionMove_Greek_tif_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
    </property>
    <property name="text">
@@ -2243,7 +2243,7 @@
   </action>
   <action name="actionSplitGreek_text_lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
    </property>
    <property name="text">
@@ -2255,7 +2255,7 @@
   </action>
   <action name="actionRenameGreek_text_lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
    </property>
    <property name="text">
@@ -2282,7 +2282,7 @@
   </action>
   <action name="actionAutoCrop_Latin_To_tif_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
    </property>
    <property name="text">
@@ -2306,7 +2306,7 @@
   </action>
   <action name="actionRename_Latin_tif_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
    </property>
    <property name="text">
@@ -2324,7 +2324,7 @@
   </action>
   <action name="actionMove_Latin_tif_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
    </property>
    <property name="text">
@@ -2342,7 +2342,7 @@
   </action>
   <action name="actionSplit_Latin_Text_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
    </property>
    <property name="text">
@@ -2360,7 +2360,7 @@
   </action>
   <action name="actionRename_Latin_Text_Lines_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
    </property>
    <property name="text">
@@ -2378,7 +2378,7 @@
   </action>
   <action name="actiondeskew_mono">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
    </property>
    <property name="text">
@@ -2393,7 +2393,7 @@
   </action>
   <action name="actionOpen_Image">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
    </property>
    <property name="text">
@@ -2402,7 +2402,7 @@
   </action>
   <action name="actionMyVersifier">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionVersifier.png</normaloff>:/Icons/Icons/BiblionVersifier.png</iconset>
    </property>
    <property name="text">
@@ -2417,7 +2417,7 @@
   </action>
   <action name="actionConvert_Greek_tiff_To_png">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/tiff2png-greek.png</normaloff>:/Icons/Icons/tiff2png-greek.png</iconset>
    </property>
    <property name="text">
@@ -2432,7 +2432,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/tiff2png-latin.png</normaloff>:/Icons/Icons/tiff2png-latin.png</iconset>
    </property>
    <property name="text">
@@ -2453,7 +2453,7 @@
   </action>
   <action name="actionMyGlypher">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionGlypher.png</normaloff>:/Icons/Icons/BiblionGlypher.png</iconset>
    </property>
    <property name="text">
@@ -2468,7 +2468,7 @@
   </action>
   <action name="actionLine_tif_to_bmp">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/tiff2bmp.png</normaloff>:/Icons/Icons/tiff2bmp.png</iconset>
    </property>
    <property name="text">
@@ -2483,7 +2483,7 @@
   </action>
   <action name="actionFontForge">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/fontforgenew.png</normaloff>:/Icons/Icons/fontforgenew.png</iconset>
    </property>
    <property name="text">
@@ -2503,7 +2503,7 @@
   </action>
   <action name="actionOpen_Text">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
    </property>
    <property name="text">
@@ -2522,7 +2522,7 @@
   </action>
   <action name="actionSave_Text">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
    </property>
    <property name="text">
@@ -2531,7 +2531,7 @@
   </action>
   <action name="actionSave_As_Text">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
    </property>
    <property name="text">
@@ -2620,7 +2620,7 @@
   </action>
   <action name="actionCreate_e_Sword_Bible_Module">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
    </property>
    <property name="text">
@@ -2629,7 +2629,7 @@
   </action>
   <action name="actionCreate_theWord_Bible_Module">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
    </property>
    <property name="text">
@@ -2663,7 +2663,7 @@
   </action>
   <action name="actionManual_Crop_Image_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/image-crop.png</normaloff>:/Icons/Icons/image-crop.png</iconset>
    </property>
    <property name="text">
@@ -2678,7 +2678,7 @@
   </action>
   <action name="actionEdit_Image_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
    </property>
    <property name="text">
@@ -2690,7 +2690,7 @@
   </action>
   <action name="actionLibreOffice_Writer">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/libreoffice-writer.png</normaloff>:/Icons/Icons/libreoffice-writer.png</iconset>
    </property>
    <property name="text">
@@ -2699,7 +2699,7 @@
   </action>
   <action name="actionLibreOffice_Calc">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
    </property>
    <property name="text">
@@ -2708,7 +2708,7 @@
   </action>
   <action name="actionDB_Browser_for_SQLite">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/server.png</normaloff>:/Icons/Icons/server.png</iconset>
    </property>
    <property name="text">
@@ -2717,7 +2717,7 @@
   </action>
   <action name="actionFind_and_Replace">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/search.png</normaloff>:/Icons/Icons/search.png</iconset>
    </property>
    <property name="text">
@@ -2726,7 +2726,7 @@
   </action>
   <action name="actionInstall_Font">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
@@ -2770,7 +2770,7 @@
   </action>
   <action name="actionGimp">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/gimp.png</normaloff>:/Icons/Icons/gimp.png</iconset>
    </property>
    <property name="text">
@@ -2779,7 +2779,7 @@
   </action>
   <action name="actionLibre_Office_Writer">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/libreoffice-writer.png</normaloff>:/Icons/Icons/libreoffice-writer.png</iconset>
    </property>
    <property name="text">
@@ -2788,7 +2788,7 @@
   </action>
   <action name="actionLibre_Office_Calc">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/libreoffice-calc.png</normaloff>:/Icons/Icons/libreoffice-calc.png</iconset>
    </property>
    <property name="text">
@@ -2821,7 +2821,7 @@
   </action>
   <action name="actionMyPixler">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
    </property>
    <property name="text">
@@ -2835,7 +2835,7 @@
   </action>
   <action name="actionMyExplorer">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
@@ -2879,7 +2879,7 @@
   </action>
   <action name="actionMyWriter">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionWriter.png</normaloff>:/Icons/Icons/BiblionWriter.png</iconset>
    </property>
    <property name="text">
@@ -2888,7 +2888,7 @@
   </action>
   <action name="actionMyResolver">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionResolver.png</normaloff>:/Icons/Icons/BiblionResolver.png</iconset>
    </property>
    <property name="text">
@@ -2897,8 +2897,8 @@
   </action>
   <action name="actionMyLexer">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/BiblionLexer.png</normaloff>:/Icons/Icons/BiblionLexer.png</iconset>
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionLexer2.png</normaloff>:/Icons/Icons/BiblionLexer2.png</iconset>
    </property>
    <property name="text">
     <string>MyLexer</string>
@@ -2906,7 +2906,7 @@
   </action>
   <action name="actionMyBoxer">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/BiblionBoxer2.png</normaloff>:/Icons/Icons/BiblionBoxer2.png</iconset>
    </property>
    <property name="text">
@@ -2915,7 +2915,7 @@
   </action>
   <action name="actionImageScanner">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
    </property>
    <property name="text">
@@ -2924,7 +2924,7 @@
   </action>
   <action name="actionImageScanner_tb">
    <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
    </property>
    <property name="text">
@@ -2938,7 +2938,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../UI_Icons.qrc"/>
+  <include location="../../ViewController/0-MainUI/helpers/UI_Icons.qrc"/>
  </resources>
  <connections/>
 </ui>

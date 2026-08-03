@@ -1,6 +1,6 @@
 Core/MyServer.py => ViewController/0-MainUI/MyServer.py
 Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py
-Core/MyServerUI.ui => ViewController/QtDesignerUI/MyServerUI.ui
+Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui
 Model/Project/Data
 Model/Project/Data/esword
 Model/Project/Data/esword/rmac.dctx
@@ -110,15 +110,15 @@ ViewController/0-MainUI/helpers/Adjust.py
 ViewController/0-MainUI/helpers/advanced_scanner-twain py
 ViewController/0-MainUI/helpers/advanced_scanner-twain-too much.py
 ViewController/0-MainUI/helpers/advanced_scanner.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/AIcommitWorkflow.md
+Developer/ViewController/SeparatedDevFiles/0-MainUI/AIcommitWorkflow.md
 ViewController/0-MainUI/helpers/ChrReference copy.py
 ViewController/0-MainUI/helpers/ChrReference.py
 ViewController/0-MainUI/helpers/ChrReferenceDialog.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/cmap2csv2 json.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/Co-pilot diff text on FROMVS in Windows.txt
-ViewController/Developer/SeparatedDevFiles/0-MainUI/Co-pilot Instructions.odt
-ViewController/Developer/SeparatedDevFiles/0-MainUI/Co-pilot Instructions.txt
-ViewController/Developer/SeparatedDevFiles/0-MainUI/commit_checklist.md
+Developer/ViewController/SeparatedDevFiles/0-MainUI/cmap2csv2 json.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/Co-pilot diff text on FROMVS in Windows.txt
+Developer/ViewController/SeparatedDevFiles/0-MainUI/Co-pilot Instructions.odt
+Developer/ViewController/SeparatedDevFiles/0-MainUI/Co-pilot Instructions.txt
+Developer/ViewController/SeparatedDevFiles/0-MainUI/commit_checklist.md
 ViewController/0-MainUI/helpers/CropTif.py
 ViewController/0-MainUI/helpers/DEPENDENCIES_AND_RELATIONSHIPS.md
 ViewController/0-MainUI/helpers/DESIGN_SPECIFICATION.md
@@ -152,7 +152,7 @@ ViewController/0-MainUI/helpers/Dialogs/tif_latin_lines_moveDialog.py
 ViewController/0-MainUI/helpers/Dialogs/tif_latin_lines_renameDialog.py
 ViewController/0-MainUI/helpers/Dialogs/VariantRecorderDialog.py
 ViewController/0-MainUI/helpers/DragandDrop.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/DragandDropNotes.txt
+Developer/ViewController/SeparatedDevFiles/0-MainUI/DragandDropNotes.txt
 ViewController/0-MainUI/helpers/ext/__init__.py
 ViewController/0-MainUI/helpers/ext/datetime.py
 ViewController/0-MainUI/helpers/ext/find.py
@@ -169,9 +169,9 @@ ViewController/0-MainUI/helpers/ext/versifiercount.py
 ViewController/0-MainUI/helpers/ext/wordcount.py
 ViewController/0-MainUI/helpers/FileExplorer.py
 ViewController/0-MainUI/helpers/find.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/font_cmap2csv2json.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/font_glyf2csv2json.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/font_glyf_splines2csv2json.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/font_cmap2csv2json.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/font_glyf2csv2json.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/font_glyf_splines2csv2json.py
 ViewController/0-MainUI/helpers/fonts
 ViewController/0-MainUI/helpers/fonts/FROMVS#gasp.ttx
 ViewController/0-MainUI/helpers/fonts/FROMVS.ttf
@@ -200,14 +200,14 @@ ViewController/0-MainUI/helpers/fonts/FROMVSmaxp.ttx
 ViewController/0-MainUI/helpers/fonts/FROMVSname.ttx
 ViewController/0-MainUI/helpers/fonts/FROMVSold.xml
 ViewController/0-MainUI/helpers/fonts/FROMVSpost.ttx
-ViewController/Developer/SeparatedDevFiles/0-MainUI/getFontInfo.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/getPlatform.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/getFontInfo.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/getPlatform.py
 ViewController/0-MainUI/helpers/HELP_INTEGRATION_GUIDE.md
 ViewController/0-MainUI/helpers/HelpSystem.py
 ViewController/0-MainUI/helpers/ImageFileRenameMove4GroundTruth.py
 ViewController/0-MainUI/helpers/ImageLoadWorker.py
 ViewController/0-MainUI/helpers/ImagePreviewDialog.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/keepforundo
+Developer/ViewController/SeparatedDevFiles/0-MainUI/keepforundo
 ViewController/0-MainUI/helpers/lexicon core.py
 ViewController/0-MainUI/helpers/LICENSE
 ViewController/0-MainUI/helpers/LocalFileDrop.py
@@ -247,16 +247,16 @@ ViewController/0-MainUI/helpers/NormalizeRefText.py
 ViewController/0-MainUI/helpers/NormalizeVerseText.py
 ViewController/0-MainUI/helpers/ocr_preprocess_tool.py
 ViewController/0-MainUI/helpers/ocr_preprocess_tool.ui
-ViewController/Developer/SeparatedDevFiles/0-MainUI/PageVerseCrossReference.ipynb
+Developer/ViewController/SeparatedDevFiles/0-MainUI/PageVerseCrossReference.ipynb
 ViewController/0-MainUI/helpers/PageVerseCrossReference.py
 ViewController/0-MainUI/helpers/PageVerseCrossReferenceUI.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/PageVerseHelper.ipynb
+Developer/ViewController/SeparatedDevFiles/0-MainUI/PageVerseHelper.ipynb
 ViewController/0-MainUI/helpers/PreProcess.py
 ViewController/0-MainUI/helpers/PreviewStudio.py
 ViewController/0-MainUI/helpers/PROJECT_ARCHITECTURE.md
 ViewController/0-MainUI/helpers/ProjectFolderList.py
 ViewController/0-MainUI/helpers/ProjectFolderList.txt
-ViewController/Developer/SeparatedDevFiles/0-MainUI/pyTesseractTrainer-1.03.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/pyTesseractTrainer-1.03.py
 ViewController/0-MainUI/helpers/Qt5SelectRegion.py
 ViewController/0-MainUI/helpers/QtCropImage.py
 ViewController/0-MainUI/helpers/QUICK_REFERENCE.md
@@ -265,7 +265,7 @@ ViewController/0-MainUI/helpers/RenameFiles.py
 ViewController/0-MainUI/helpers/scanner_app.py
 ViewController/0-MainUI/helpers/ScanWorkflow.py
 ViewController/0-MainUI/helpers/SessionManager.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/sqlite3-mysql.txt
+Developer/ViewController/SeparatedDevFiles/0-MainUI/sqlite3-mysql.txt
 ViewController/0-MainUI/helpers/SqliteHelper.py
 ViewController/0-MainUI/helpers/SqliteMain.py
 ViewController/0-MainUI/helpers/StageLineImages2GroundTruth.py
@@ -274,18 +274,18 @@ ViewController/0-MainUI/helpers/tif_greek_lines_stageDialog.py
 ViewController/0-MainUI/helpers/TiffStackWorker.py
 ViewController/0-MainUI/helpers/tift2mono.py
 ViewController/0-MainUI/helpers/Training.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/Ui2Py.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/Ui2Py.py
 ViewController/0-MainUI/helpers/UI_Icons.py
 ViewController/0-MainUI/helpers/UI_Icons.qrc
 ViewController/0-MainUI/helpers/UI_Icons_rc.py
 ViewController/0-MainUI/helpers/UI_Images
-ViewController/Developer/SeparatedDevFiles/0-MainUI/update_fonts.py
-ViewController/Developer/SeparatedDevFiles/0-MainUI/update_fonts.txt
-ViewController/Developer/SeparatedDevFiles/0-MainUI/update_UI_Resources.txt
+Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.py
+Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.txt
+Developer/update_UI_Resources.txt
 ViewController/0-MainUI/helpers/web
 ViewController/0-MainUI/helpers/worker.py
 ViewController/1-PreProcess
 ViewController/2-TrainTesseract
 ViewController/3-Process
 ViewController/4-PostProcess
-ViewController/QtDesignerUI
+Developer/QtDesignerUI

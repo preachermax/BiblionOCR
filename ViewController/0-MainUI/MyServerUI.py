@@ -1027,7 +1027,7 @@ class Ui_MainUI(object):
         self.actionMyResolver.setObjectName("actionMyResolver")
         self.actionMyLexer = QtWidgets.QAction(MainUI)
         icon64 = QtGui.QIcon()
-        icon64.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionLexer.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon64.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionLexer2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionMyLexer.setIcon(icon64)
         self.actionMyLexer.setObjectName("actionMyLexer")
         self.actionMyBoxer = QtWidgets.QAction(MainUI)
