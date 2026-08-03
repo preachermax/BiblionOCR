@@ -1,0 +1,120 @@
+name: Restrict Developer Folder Access
+
+on:
+  pull_request:
+    paths:
+      - Developer/**
+  push:
+    paths:
+      - Developer/**
+
+permissions:
+  contents: read
+
+jobs:
+  enforce-developer-folder-access:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enforce developer-only changes for Developer folder
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          def git_output(args):
+              return subprocess.check_output(["git", *args], text=True).strip()
+
+          def changed_files_from_range(range_spec):
+              out = git_output(["diff", "--name-only", range_spec])
+              if not out:
+                  return []
+              return [line.strip() for line in out.splitlines() if line.strip()]
+
+          event_name = os.environ["GITHUB_EVENT_NAME"]
+          actor = os.environ["GITHUB_ACTOR"].lower()
+          event_path = os.environ["GITHUB_EVENT_PATH"]
+
+          payload = json.loads(Path(event_path).read_text(encoding="utf-8"))
+
+          if event_name == "pull_request":
+              base_sha = payload["pull_request"]["base"]["sha"]
+              head_sha = payload["pull_request"]["head"]["sha"]
+              changed_files = changed_files_from_range(f"{base_sha}..{head_sha}")
+              try:
+                  registry_json = git_output([
+                      "show",
+                      f"{base_sha}:.github/membership-registry.json",
+                  ])
+              except subprocess.CalledProcessError:
+                  raise SystemExit(
+                      "Could not read .github/membership-registry.json from base branch."
+                  )
+          elif event_name == "push":
+              before_sha = payload.get("before", "")
+              after_sha = payload.get("after", "")
+              if before_sha and set(before_sha) == {"0"}:
+                  changed_files = [
+                      line.strip()
+                      for line in git_output([
+                          "show",
+                          "--name-only",
+                          "--pretty=format:",
+                          after_sha,
+                      ]).splitlines()
+                      if line.strip()
+                  ]
+              else:
+                  changed_files = changed_files_from_range(f"{before_sha}..{after_sha}")
+              registry_json = Path(".github/membership-registry.json").read_text(
+                  encoding="utf-8"
+              )
+          else:
+              print(f"Unsupported event: {event_name}")
+              sys.exit(0)
+
+          touches_developer = any(
+              path == "Developer" or path.startswith("Developer/")
+              for path in changed_files
+          )
+
+          if not touches_developer:
+              print("No changes under Developer/. Check passed.")
+              sys.exit(0)
+
+          registry = json.loads(registry_json)
+          members = registry.get("members", [])
+
+          allowed_users = set()
+          for member in members:
+              if str(member.get("status", "")).lower() != "approved":
+                  continue
+              role = str(member.get("role", "")).lower()
+              if role not in {"developer", "maintainer"}:
+                  continue
+              username = str(member.get("github_username", "")).strip().lower()
+              if username:
+                  allowed_users.add(username)
+
+          if actor not in allowed_users:
+              print("Developer folder access denied for this actor.")
+              print(f"Actor: {actor}")
+              print(f"Allowed users: {sorted(allowed_users)}")
+              print(
+                  "To gain access, request approved developer or maintainer membership "
+                  "in .github/membership-registry.json through the issue intake flow."
+              )
+              sys.exit(1)
+
+          print(f"Developer folder access granted for actor: {actor}")
+        shell: python

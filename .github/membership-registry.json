@@ -17,5 +17,15 @@
     "maintain",
     "admin"
   ],
-  "members": []
+  "members": [
+    {
+      "github_username": "preachermax",
+      "role": "developer",
+      "access_level": "maintain",
+      "status": "approved",
+      "approved_by": "preachermax",
+      "approved_at": "2026-08-03",
+      "request_issue": 1
+    }
+  ]
 }
