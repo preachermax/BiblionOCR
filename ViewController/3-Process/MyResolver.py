@@ -30,6 +30,7 @@ import time
 import UI_Icons
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
+from tesseract_wordlist_helper import update_tesseract_wordlist_for_variant
 #import Qt5ResolveVariants as resolver
 
 app = QtWidgets.QApplication([])
@@ -330,6 +331,9 @@ def updateone():
     data = (word,varword,strong,rmac,lemma,varcode,errorcode,desc,varform,vartype,impactcode,preserved,Corrected,error,variance,context,inflection,resolved,line,wordnum)
     #startProgressBar()
     helper.update(query,data)
+    if varword:
+        wordlist_output_path = os.path.join(project_root, "Model", "Project", "Data", "tesseract_wordlist.txt")
+        update_tesseract_wordlist_for_variant(word, varword, project_root=project_root, output_path=wordlist_output_path)
     rowid = varui.VarianceTable.currentRow()
     loadTableView(rowid)
     loadFormView()
@@ -399,6 +403,9 @@ def updatesim():
                             WHERE NoDiaWord = ?"""
     data = (varword,strong,rmac,lemma,varcode,errorcode,desc,varform,vartype,impactcode,preserved,Corrected,error,variance,context,inflection,resolved,nodiaword)
     helper.update(query,data)
+    if varword:
+        wordlist_output_path = os.path.join(project_root, "Model", "Project", "Data", "tesseract_wordlist.txt")
+        update_tesseract_wordlist_for_variant(nodiaword, varword, project_root=project_root, output_path=wordlist_output_path)
     rowid = varui.VarianceTable.currentRow()
     loadTableView(rowid)
     loadFormView()

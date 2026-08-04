@@ -24,6 +24,52 @@ class ProjectCreationEngine:
         "output/ocr",
         "output/corrected",
         "output/exports",
+        "Model/Project/Data",
+        "Model/Project/Images/MyServer/Source",
+        "Model/Project/Images/MyServer/Workflow",
+        "Model/Project/Images/MyServer/Complete",
+        "Model/Project/Images/MyScanner/Source",
+        "Model/Project/Images/MyScanner/Workflow",
+        "Model/Project/Images/MyScanner/Complete",
+        "Model/Project/Images/MyBoxer/Source",
+        "Model/Project/Images/MyBoxer/Workflow",
+        "Model/Project/Images/MyBoxer/Complete",
+        "Model/Project/Images/MyGlypher/Source",
+        "Model/Project/Images/MyGlypher/Workflow",
+        "Model/Project/Images/MyGlypher/Complete",
+        "Model/Project/Images/MyReader/Source",
+        "Model/Project/Images/MyReader/Workflow",
+        "Model/Project/Images/MyReader/Complete",
+        "Model/Project/Images/MyGrounder/Source",
+        "Model/Project/Images/MyGrounder/Workflow",
+        "Model/Project/Images/MyGrounder/Complete",
+        "Model/Project/Images/MyTrainer/Source",
+        "Model/Project/Images/MyTrainer/Workflow",
+        "Model/Project/Images/MyTrainer/Complete",
+        "Model/Project/Text/MyServer/Reference",
+        "Model/Project/Text/MyServer/Workflow",
+        "Model/Project/Text/MyServer/Complete",
+        "Model/Project/Text/MyScanner/Reference",
+        "Model/Project/Text/MyScanner/Workflow",
+        "Model/Project/Text/MyScanner/Complete",
+        "Model/Project/Text/MyBoxer/Reference",
+        "Model/Project/Text/MyBoxer/Workflow",
+        "Model/Project/Text/MyBoxer/Complete",
+        "Model/Project/Text/MyReader/Reference",
+        "Model/Project/Text/MyReader/Workflow",
+        "Model/Project/Text/MyReader/Complete",
+        "Model/Project/Text/MyGrounder/Reference",
+        "Model/Project/Text/MyGrounder/Workflow",
+        "Model/Project/Text/MyGrounder/Complete",
+        "Model/Project/Text/MyTrainer/Reference",
+        "Model/Project/Text/MyTrainer/Workflow",
+        "Model/Project/Text/MyTrainer/Complete",
+        "Model/Project/Text/MyLexer/Reference",
+        "Model/Project/Text/MyLexer/Workflow",
+        "Model/Project/Text/MyLexer/Complete",
+        "Model/Project/Text/MyWriter/Reference",
+        "Model/Project/Text/MyWriter/Workflow",
+        "Model/Project/Text/MyWriter/Complete",
     ]
 
     REQUIRED_TEMPLATE_FILES = [
@@ -373,18 +419,16 @@ class ProjectCreationEngine:
 
         selected_folders = self._selected_project_folders()
         if selected_folders:
-            filtered_entries = [entry for entry in entries if self._entry_matches_selected_folder(entry, selected_folders)]
-            if filtered_entries:
-                entries = filtered_entries
-            else:
-                entries = []
+            entries = [entry for entry in entries if self._entry_matches_selected_folder(entry, selected_folders)]
 
         if self._is_scriptural_project():
             source_choice = self._normalize_scriptural_source()
             for entry in self._scriptural_project_entries(source_choice):
-                if entry in {"Model/OT_BookFolders", "Model/NT_BookFolders"} and selected_folders:
-                    if entry not in selected_folders:
+                if entry in {"Model/OT_BookFolders", "Model/NT_BookFolders"}:
+                    if selected_folders and entry not in selected_folders:
                         continue
+                elif selected_folders and not self._entry_matches_selected_folder(entry, selected_folders):
+                    continue
                 if entry not in entries:
                     entries.append(entry)
 
@@ -394,14 +438,14 @@ class ProjectCreationEngine:
         entries = [
             "Model/Project/Data/csv/BooksAbbrName.csv",
             "Model/Project/Data/csv/BooksAbbrNameNumIndex.csv",
-            "Model/Project/Data/csv/BooksMarkDown.csv",
+            "Model/Project/Data/csv/BooksFolderList.csv",
             "Model/Project/Data/csv/EnglishProperNames.csv",
             "Model/Project/Data/csv/ProperNames.csv",
             "Model/Project/Data/csv/FromvsDiacritics.csv",
             "Model/Project/Data/csv/FROMVS3_0_PUA_Norm.csv",
             "Model/Project/Data/json/BooksAbbrName.json",
             "Model/Project/Data/json/BooksAbbrNameNumIndex.json",
-            "Model/Project/Data/json/BooksMarkDown.json",
+            "Model/Project/Data/json/BooksFolderList.json",
             "Model/Project/Data/json/EnglishProperNames.json",
             "Model/Project/Data/json/ProperNames.json",
             "Model/Project/Data/json/FromvsDiacritics.json",

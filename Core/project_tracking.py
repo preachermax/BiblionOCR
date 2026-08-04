@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Optional, Sequence
 
+from .project_database import load_project_database_record
+
 
 @dataclass(frozen=True)
 class WorkflowMilestone:
@@ -240,6 +242,8 @@ class ProjectWorkflowTracker:
         module_states = [item for item in milestone_states if item["key"] in module_keys]
         next_module = next((item for item in module_states if not item["complete"]), None)
 
+        project_context = self._load_project_context(resolved_root)
+
         return {
             "project_root": resolved_root,
             "project_name": os.path.basename(resolved_root),
@@ -252,6 +256,7 @@ class ProjectWorkflowTracker:
             "module_total_count": len(module_states),
             "module_next_label": next_module["label"] if next_module else "Complete",
             "tracking_file": self.tracking_file_path(resolved_root),
+            "project_context": project_context,
         }
 
     def _milestone_complete(
@@ -363,6 +368,57 @@ class ProjectWorkflowTracker:
             os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
         )
 
+    def _load_project_context(self, project_root: str) -> Dict[str, object]:
+        context = {}
+
+        for candidate_path in (
+            os.path.join(project_root, "project_metadata.json"),
+            os.path.join(project_root, "Model", "Project", "Data", "json", "project_metadata.json"),
+        ):
+            if not os.path.isfile(candidate_path):
+                continue
+            try:
+                with open(candidate_path, "r", encoding="utf-8") as handle:
+                    loaded = json.load(handle)
+            except (OSError, ValueError, TypeError):
+                continue
+            if isinstance(loaded, dict):
+                context = loaded
+                break
+
+        if context:
+            return self._normalize_project_context(context)
+
+        sqlite_path = os.path.join(project_root, "project_metadata.sqlite")
+        if os.path.isfile(sqlite_path):
+            loaded = load_project_database_record(sqlite_path)
+            if isinstance(loaded, dict):
+                context = loaded
+
+        return self._normalize_project_context(context)
+
+    def _normalize_project_context(self, context: Dict[str, object]) -> Dict[str, object]:
+        normalized = dict(context or {})
+        if isinstance(normalized.get("ColumnName"), str):
+            column_names = [part.strip() for part in normalized["ColumnName"].split(",") if part.strip()]
+            if column_names:
+                current_column = normalized.get("CurrentColumn")
+                try:
+                    current_index = max(1, int(current_column)) - 1
+                except (TypeError, ValueError):
+                    current_index = 0
+                if 0 <= current_index < len(column_names):
+                    normalized["ActiveColumnName"] = column_names[current_index]
+                else:
+                    normalized["ActiveColumnName"] = column_names[0]
+
+        if not normalized.get("CurrentLanguage") and normalized.get("Languages"):
+            languages = normalized.get("Languages")
+            if isinstance(languages, list) and languages:
+                normalized["CurrentLanguage"] = str(languages[0])
+
+        return normalized
+
     def _source_acquired(self, project_root: str) -> bool:
         images_root = os.path.join(project_root, "Model", "Project", "Images")
         return self._has_files_in_named_dirs(images_root, {"Scanned", "pdf_page_files"})
@@ -414,6 +470,7 @@ class ProjectWorkflowTracker:
             os.path.join(project_root, "Model", "Project", "Text", "TheWord"),
             os.path.join(project_root, "Model", "Project", "Text", "EstablishTruth"),
             os.path.join(project_root, "Model", "Project", "Text", "PriorTruth"),
+            os.path.join(project_root, "Model", "Project", "Text", "Workflow"),
         )
         return any(self._directory_has_files(path) for path in output_dirs)
 

@@ -78,6 +78,18 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
             self.assertEqual("eng", context.get("CurrentLanguage"))
             self.assertEqual("EB Garamond", context.get("ProjectFont"))
 
+    def test_text_outputs_started_detects_workflow_output_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = self._create_project_root(tmpdir)
+            workflow_dir = os.path.join(project_root, "Model", "Project", "Text", "Workflow")
+            os.makedirs(workflow_dir, exist_ok=True)
+            with open(os.path.join(workflow_dir, "sample.txt"), "w", encoding="utf-8") as handle:
+                handle.write("workflow output")
+
+            tracker = ProjectWorkflowTracker()
+
+            self.assertTrue(tracker._text_outputs_started(project_root))
+
 
 if __name__ == "__main__":
     unittest.main()

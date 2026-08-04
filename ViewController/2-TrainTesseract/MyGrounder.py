@@ -343,10 +343,17 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyGrounder',
             session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
         )
+        self.crossref = getattr(self, 'crossref', '') or ''
+        self.jsondir = getattr(self, 'jsondir', '') or ''
+        if self.crossref and not os.path.isabs(self.crossref):
+            self.crossref = os.path.join(self.projecthome, self.jsondir, self.crossref.lstrip('/'))
+        elif self.jsondir:
+            self.crossref = os.path.join(self.projecthome, self.jsondir)
+        else:
+            self.crossref = self.projecthome
         #self.bookmarkdown = self.greekbookmarkdown
         self.get_xref_last_image()
         #self.get_xref_settings()
-        self.crossref= self.projecthome + self.jsondir + "/" + self.crossref
         self.dirIterator = None
         self.findirection = None
         self.lastverse = None
@@ -626,7 +633,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             print(f"Grounder startup: crossref file not found: {xrefjsonfile}")
             self.imgpath = ""
             return
-        #markdownjsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+        #markdownjsonfile = 'Model/Project/Data/json/BooksFolderList.json'
         with open(xrefjsonfile, 'r') as f:
             data = json.load(f)
             # Iterating through the json LineImageFiles
@@ -1122,7 +1129,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             with open(markdownjsonfile, 'r') as f:
                 data = json.load(f)
-                # Iterating through the json BooksMarkDown
+                # Iterating through the json BooksFolderList
                 for BookAbbr in data:
                     if BookAbbr['BookAbbr'] == bookAbbr:
                         self.bookmarkdown = self.language + BookAbbr['BookMarkdown']

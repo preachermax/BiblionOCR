@@ -570,7 +570,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         if self.ui.bookComboBox.currentText() != oldbookabbr:
 
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksFolderList.json'
 
             with open(jsonfile, 'r') as f:
                 data = json.load(f)

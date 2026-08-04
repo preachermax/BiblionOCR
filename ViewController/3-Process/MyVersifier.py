@@ -14,6 +14,8 @@ _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(script_dir, "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
 _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(script_dir, "helpers"))
 
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 if _LEGACY_MAINUI_DIR not in sys.path:
@@ -252,6 +254,24 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 return f'{byte_count:.1f} {unit}' if unit != 'B' else f'{int(byte_count)} {unit}'
             byte_count /= 1024
 
+    @staticmethod
+    def _coerce_int(value, default=1):
+        try:
+            return int(str(value).strip())
+        except (TypeError, ValueError):
+            return default
+
+    def _combo_text_or_default(self, combo, default='1'):
+        value = combo.currentText()
+        if value is None:
+            value = ''
+        value = str(value).strip()
+        if value:
+            return value
+        if combo.count():
+            return combo.itemText(0)
+        return default
+
     def _read_text_file_with_progress(self, path, label):
         if not path or not os.path.isfile(path):
             self._startup_progress(f'{label}: file not found: {path}')
@@ -487,10 +507,19 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._startup_progress('starting initial text load')
         self._startup_progress(f'Reference File Path: {self.refpath}')
         self._startup_progress(f'Verse File Path: {self.versepath}')
-        self.getRefText(self.refpath)
-        self.getVerseText(self.versepath)
-        self._startup_progress('locating current verse')
-        self.findBothVerse()
+        if self.refpath and os.path.isfile(self.refpath):
+            self.getRefText(self.refpath)
+        else:
+            self._startup_progress('Reference text: no file selected yet; skipping initial load')
+        if self.versepath and os.path.isfile(self.versepath):
+            self.getVerseText(self.versepath)
+        else:
+            self._startup_progress('Verse text: no file selected yet; skipping initial load')
+        if self.refpath and self.versepath:
+            self._startup_progress('locating current verse')
+            self.findBothVerse()
+        else:
+            self._startup_progress('locating current verse skipped')
 
         self.ui.bookComboBox.setCurrentText(self.bothbookabbr)
         self.ui.chapterComboBox.setCurrentText(self.bothchapter)
@@ -510,21 +539,21 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         print(f'Book: {self.refbookabbr} Chapter: {self.refchapter} Verse: {self.refverse} Line: {self.refline}')
         self._startup_progress('ready')
-        self.verseverse = self.ui.verseComboBox.currentText()
+        self.verseverse = self._combo_text_or_default(self.ui.verseComboBox, '1')
         #self.verseline = self.ui.lineComboBox..currentText()
-        self.refverse = self.ui.verseComboBox.currentText()
+        self.refverse = self._combo_text_or_default(self.ui.verseComboBox, '1')
         #self.refline = self.ui.lineComboBox.currentText()
-        self.verseversenum = int(self.verseverse)
-        self.refversenum = int(self.refverse)
+        self.verseversenum = self._coerce_int(self.verseverse, 1)
+        self.refversenum = self._coerce_int(self.refverse, 1)
 
         self.verseversecount = self.ui.verseComboBox.count()
         self.refversecount = self.ui.verseComboBox.count()
 
-        self.nexttextversenum = int(self.ui.verseComboBox.currentText()) + 1
-        self.nextrefversenum = int(self.ui.verseComboBox.currentText()) + 1
+        self.nexttextversenum = self._coerce_int(self.verseverse, 1) + 1
+        self.nextrefversenum = self._coerce_int(self.refverse, 1) + 1
 
-        self.prevtextversenum = int(self.ui.verseComboBox.currentText()) - 1
-        self.prevrefversenum = int(self.ui.verseComboBox.currentText()) - 1
+        self.prevtextversenum = self._coerce_int(self.verseverse, 1) - 1
+        self.prevrefversenum = self._coerce_int(self.refverse, 1) - 1
 
         self.versebook = self.ui.bookComboBox.currentText()
         self.versebookindex = self.ui.bookComboBox.currentIndex()
@@ -833,8 +862,17 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def loadChapterCombo(self):
         self.ui.chapterComboBox.clear()
+        bookchapter_path = getattr(self, 'bookchapter', '')
+        if not bookchapter_path or not os.path.isfile(bookchapter_path):
+            self.refchapter = self.ui.chapterComboBox.currentText()
+            self.refchapternum = self._coerce_int(self.refchapter, 1)
+            self.refchaptercount = self.ui.chapterComboBox.count()
+            self.versechapter = self.ui.chapterComboBox.currentText()
+            self.versechapternum = self._coerce_int(self.versechapter, 1)
+            self.versechaptercount = self.ui.chapterComboBox.count()
+            return
         # Opening JSON file
-        with open(self.bookchapter) as f:
+        with open(bookchapter_path) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -848,11 +886,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         #self.ui.bookComboBox.setEditText(self.bookabbr)
         self.refchapter = self.ui.chapterComboBox.currentText()
-        self.refchapternum = int(self.refchapter)
+        self.refchapternum = self._coerce_int(self.refchapter, 1)
         self.refchaptercount = self.ui.chapterComboBox.count()
 
         self.versechapter = self.ui.chapterComboBox.currentText()
-        self.versechapternum = int(self.versechapter)
+        self.versechapternum = self._coerce_int(self.versechapter, 1)
         self.versechaptercount = self.ui.chapterComboBox.count()
 
     def loadVerseCombo(self):
@@ -1383,8 +1421,14 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def loadVerseChapterCombo(self):
         self.ui.VersechapterComboBox.clear()
+        bookchapter_path = getattr(self, 'bookchapter', '')
+        if not bookchapter_path or not os.path.isfile(bookchapter_path):
+            self.versechapter = self.ui.VersechapterComboBox.currentText()
+            self.versechapternum = self._coerce_int(self.versechapter, 1)
+            self.versechaptercount = self.ui.VersechapterComboBox.count()
+            return
         # Opening JSON file
-        with open(self.bookchapter) as f:
+        with open(bookchapter_path) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1398,7 +1442,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         #self.ui.VersebookComboBox.setEditText(self.bookabbr)
         self.versechapter = self.ui.VersechapterComboBox.currentText()
-        self.versechapternum = int(self.versechapter)
+        self.versechapternum = self._coerce_int(self.versechapter, 1)
         self.versechaptercount = self.ui.VersechapterComboBox.count()
 
     def loadVerseVerseCombo(self):
@@ -1505,8 +1549,14 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def loadRefChapterCombo(self):
         self.ui.RefchapterComboBox.clear()
+        bookchapter_path = getattr(self, 'bookchapter', '')
+        if not bookchapter_path or not os.path.isfile(bookchapter_path):
+            self.refchapter = self.ui.RefchapterComboBox.currentText()
+            self.refchapternum = self._coerce_int(self.refchapter, 1)
+            self.refchaptercount = self.ui.RefchapterComboBox.count()
+            return
         # Opening JSON file
-        with open(self.bookchapter) as f:
+        with open(bookchapter_path) as f:
             # returns JSON object as
             # a dictionary
             data = json.load(f)
@@ -1520,7 +1570,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         #self.ui.RefbookComboBox.setEditText(self.bookabbr)
         self.refchapter = self.ui.RefchapterComboBox.currentText()
-        self.refchapternum = int(self.refchapter)
+        self.refchapternum = self._coerce_int(self.refchapter, 1)
         self.refchaptercount = self.ui.RefchapterComboBox.count()
 
     def loadRefVerseCombo(self):
@@ -2588,7 +2638,12 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def MoveVerseLHSlider(self):
         self.ui.VerseLHslider.setEnabled(True)
-        self.ui.VerseLHslider.setValue(int(self.ui.VerseLHlineEdit.text()))
+        text_value = self.ui.VerseLHlineEdit.text().strip()
+        if text_value:
+            try:
+                self.ui.VerseLHslider.setValue(int(text_value))
+            except ValueError:
+                self.ui.VerseLHslider.setValue(self.ui.VerseLHslider.minimum())
 
     def SetVerseLineSpacing(self):
 
@@ -2613,7 +2668,12 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def MoveRefLHSlider(self):
         self.ui.RefLHslider.setEnabled(True)
-        self.ui.RefLHslider.setValue(int(self.ui.RefLHlineEdit.text()))
+        text_value = self.ui.RefLHlineEdit.text().strip()
+        if text_value:
+            try:
+                self.ui.RefLHslider.setValue(int(text_value))
+            except ValueError:
+                self.ui.RefLHslider.setValue(self.ui.RefLHslider.minimum())
 
     def SetRefLineSpacing(self):
 

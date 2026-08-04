@@ -13,6 +13,8 @@ _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(script_dir, "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
 _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(script_dir, "helpers"))
 
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 if _LEGACY_MAINUI_DIR not in sys.path:
@@ -51,6 +53,7 @@ from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeG
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
+from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
 
 
 from queue import Queue
@@ -186,19 +189,29 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
 
-        self.ui.actionBatchCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
-        self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
-        self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
+        if hasattr(self.ui, 'actionBatchCrop_Greek_to_tif_Lines_tb'):
+            self.ui.actionBatchCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
+        if hasattr(self.ui, 'actionRename_Greek_tif_Lines_tb'):
+            self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
+        if hasattr(self.ui, 'actionMove_Greek_tif_Lines_tb'):
+            self.ui.actionMove_Greek_tif_Lines_tb.triggered.connect(self.actionMove_Greek_tiff_Lines)
 
-        self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
-        self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
-        self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
+        if hasattr(self.ui, 'actionAutoCrop_Latin_To_tif_Lines_tb'):
+            self.ui.actionAutoCrop_Latin_To_tif_Lines_tb.triggered.connect(self.actionCrop_Latin_To_tiff_Lines)
+        if hasattr(self.ui, 'actionRename_Latin_tif_Lines_tb'):
+            self.ui.actionRename_Latin_tif_Lines_tb.triggered.connect(self.actionRename_Latin_tiff_Lines)
+        if hasattr(self.ui, 'actionMove_Latin_tif_Lines_tb'):
+            self.ui.actionMove_Latin_tif_Lines_tb.triggered.connect(self.actionMove_Latin_tiff_Lines)
 
-        self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
-        self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
+        if hasattr(self.ui, 'actionSplitGreek_text_lines_tb'):
+            self.ui.actionSplitGreek_text_lines_tb.triggered.connect(self.actionSplitGreek_text_lines)
+        if hasattr(self.ui, 'actionRenameGreek_text_lines_tb'):
+            self.ui.actionRenameGreek_text_lines_tb.triggered.connect(self.actionRenameGreek_text_lines)
 
-        self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.actionSplit_Latin_Text_Lines)
-        self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.actionRename_Latin_Text_Lines)
+        if hasattr(self.ui, 'actionSplit_Latin_Text_Lines_tb'):
+            self.ui.actionSplit_Latin_Text_Lines_tb.triggered.connect(self.actionSplit_Latin_Text_Lines)
+        if hasattr(self.ui, 'actionRename_Latin_Text_Lines_tb'):
+            self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.actionRename_Latin_Text_Lines)
 
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
@@ -209,18 +222,24 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionStandardUI.triggered.connect(self.standardUI)
         self.ui.actionProject_Explorer.triggered.connect(self.OpenProjectExplorer)
 
-        self.ui.actionMake_Greek_LineBox_File_Pair.triggered.connect(self.linebox_make_split)
-        self.ui.actionEdit_Greek_LineBox_Pair.triggered.connect(self.linebox_edit_split)
-        self.ui.actionDraw_Table_LineBox_tb.triggered.connect(self.putSbLineBox)
-        self.ui.actionDraw_Selected_LineBox_tb.triggered.connect(self.getRbLineBox)
+        if hasattr(self.ui, 'actionMake_Greek_LineBox_File_Pair'):
+            self.ui.actionMake_Greek_LineBox_File_Pair.triggered.connect(self.linebox_make_split)
+        if hasattr(self.ui, 'actionEdit_Greek_LineBox_Pair'):
+            self.ui.actionEdit_Greek_LineBox_Pair.triggered.connect(self.linebox_edit_split)
+        if hasattr(self.ui, 'actionDraw_Table_LineBox_tb'):
+            self.ui.actionDraw_Table_LineBox_tb.triggered.connect(self.putSbLineBox)
+        if hasattr(self.ui, 'actionDraw_Selected_LineBox_tb'):
+            self.ui.actionDraw_Selected_LineBox_tb.triggered.connect(self.getRbLineBox)
         #self.ui.actionEdit_Latin_LineBox_Pair.triggered.connect(self.linebox_edit_split)
 
         self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
-        self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
+        if hasattr(self.ui, 'MyPixlerbutton'):
+            self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
         #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)
 
-        self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
+        if hasattr(self.ui, 'FindReplacebutton'):
+            self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
         self.ui.BothPrevButton.clicked.connect(self.prevImage)
         self.ui.BothPrevButton.clicked.connect(self.prevText)
@@ -247,6 +266,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
         self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
         self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        if hasattr(self.ui, 'actionUpdate_Wordlist_tb'):
+            self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
 
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)
@@ -375,8 +396,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
+        defaults = {
+            'bookabbr': '',
+            'chapter': '',
+            'verse': '',
+            'word': '',
+            'chr': '',
+            'font': '',
+            'fontsize': 0,
+            'ocrlang': '',
+            'ocrmodel': '',
+            'linespacing': '',
+        }
+        for key, value in defaults.items():
+            if not hasattr(self, key):
+                setattr(self, key, value)
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
-        print('current book:',self.bookabbr)
+        print('current book:', getattr(self, 'bookabbr', ''))
 
         qtc.QTimer.singleShot(0, self._restore_session_documents)
 
@@ -675,11 +711,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             print(f'Absolute Path to User Directory: {self.userdir}')
 
     def _restore_session_documents(self):
-        if self.imgpath and os.path.isfile(self.imgpath):
-            self.showImage(self.imgpath)
+        imgpath = getattr(self, 'imgpath', None)
+        txtpath = getattr(self, 'txtpath', None)
+        if imgpath and os.path.isfile(imgpath):
+            self.showImage(imgpath)
 
-        if self.txtpath and os.path.isfile(self.txtpath):
-            self.showText(self.txtpath)
+        if txtpath and os.path.isfile(txtpath):
+            self.showText(txtpath)
 
     def get_workflow_settings(self):
 
@@ -1334,7 +1372,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         if self.ui.bookComboBox.currentText() != oldbookabbr:
 
-            jsonfile = 'Model/Project/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Project/Data/json/BooksFolderList.json'
 
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1979,6 +2017,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
         file.close()
+
+    def actionUpdate_Wordlist(self):
+        target_text = self.ui.BoxDocument.toPlainText()
+        output_path = os.path.join(self.current_project_root or '', 'tesseract_wordlist.txt') if getattr(self, 'current_project_root', '') else None
+        update_tesseract_wordlist_from_text(target_text, project_root=os.getcwd(), output_path=output_path)
+
+    def wordCount(self):
+        show_word_count_dialog(self, self.ui.BoxText)
 
     def SaveCorrectedTextFileDialog(self, MainWindow):
 

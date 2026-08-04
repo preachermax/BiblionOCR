@@ -35,6 +35,7 @@ from PyQt5.QtCore import Qt
 from ext import *
 from LocalFileDrop import LocalFileDropMixin
 from print_menu_support import install_print_menu_support, document_target
+from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
 
 from MyWriterUI import Ui_MyWriterUI
 
@@ -638,12 +639,15 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.statusbar.showMessage("Line: {} | Column: {}".format(line,col))
 
     def wordCount(self):
+        show_word_count_dialog(self, self.ui.textEdit)
 
-        wc = wordcount.WordCount(self)
-
-        wc.getText()
-
-        wc.show()
+    def update_wordlist(self, text=None, output_path=None):
+        target_text = text if text is not None else self.ui.textEdit.toPlainText()
+        return update_tesseract_wordlist_from_text(
+            target_text,
+            project_root=self.current_project_root or self.current_project_name or os.getcwd(),
+            output_path=output_path,
+        )
 
     def insertImage(self):
         def selected(filename):

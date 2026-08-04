@@ -1,6 +1,7 @@
 #print(len(locals()))
 
 # Python imports
+import importlib.util
 import sys
 import os
 import subprocess
@@ -48,7 +49,13 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 # Custom imports
-from ViewController.archives.MyLauncherUI import Ui_MainUI
+_UI_MODULE_PATH = os.path.join(script_dir, "MyLauncherUI.py")
+_UI_SPEC = importlib.util.spec_from_file_location("biblion_launcher_ui", _UI_MODULE_PATH)
+if _UI_SPEC is None or _UI_SPEC.loader is None:
+    raise ImportError(f"Unable to load launcher UI module from {_UI_MODULE_PATH}")
+_UI_MODULE = importlib.util.module_from_spec(_UI_SPEC)
+_UI_SPEC.loader.exec_module(_UI_MODULE)
+Ui_MainUI = _UI_MODULE.Ui_MainUI
 from helpers.LocalFileDrop import LocalFileDropMixin
 from Developer.Publisher.launcher_registry import (
     LauncherIntegrationController,

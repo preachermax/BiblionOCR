@@ -9,6 +9,7 @@ _LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "he
 _PROJECT_ROOT = os.path.abspath(os.path.join(_CURRENT_DIR, "..", ".."))
 _VIEWCONTROLLER_DIR = os.path.join(_PROJECT_ROOT, "ViewController")
 _PREPROCESS_DIR = os.path.join(_VIEWCONTROLLER_DIR, "1-PreProcess")
+_COMPAT_HELPERS_DIR = os.path.join(_VIEWCONTROLLER_DIR, "utilities", "0-MainUI", "helpers")
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
@@ -21,6 +22,8 @@ if _PREPROCESS_DIR not in sys.path:
     sys.path.insert(0, _PREPROCESS_DIR)
 if _CURRENT_DIR not in sys.path:
     sys.path.insert(0, _CURRENT_DIR)
+if _COMPAT_HELPERS_DIR not in sys.path:
+    sys.path.insert(0, _COMPAT_HELPERS_DIR)
 
 
 def _load_module_from_path(module_name, file_path):
@@ -84,13 +87,23 @@ croptif = _load_module_from_path(
     "viewcontroller_helpers_croptif_reader",
     os.path.join(_HELPERS_DIR, "CropTif.py"),
 )
+def _resolve_helper_path(module_name):
+    preferred = os.path.join(_HELPERS_DIR, module_name)
+    if os.path.exists(preferred):
+        return preferred
+    fallback = os.path.join(_COMPAT_HELPERS_DIR, module_name)
+    if os.path.exists(fallback):
+        return fallback
+    return preferred
+
+
 cropimg = _load_module_from_path(
     "viewcontroller_helpers_qtcropimage_reader",
-    os.path.join(_HELPERS_DIR, "QtCropImage.py"),
+    _resolve_helper_path("QtCropImage.py"),
 )
 Qt5SelectRegion = _load_module_from_path(
     "viewcontroller_helpers_qt5selectregion_reader",
-    os.path.join(_HELPERS_DIR, "Qt5SelectRegion.py"),
+    _resolve_helper_path("Qt5SelectRegion.py"),
 )
 #from MultiPreProcess import MultiPreProcess as mpp
 tr = _load_module_from_path(
@@ -604,7 +617,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         if self.ui.bookComboBox.currentText() != oldbookabbr:
 
-            jsonfile = 'Model/Data/json/BooksMarkDown.json'
+            jsonfile = 'Model/Data/json/BooksFolderList.json'
 
             with open(jsonfile, 'r') as f:
                 data = json.load(f)
@@ -1469,7 +1482,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         writer.MainWindow.show()'''
 
     def actionUpdate_Wordlist(self):
-        pass
+        target_text = self.ui.OCRText.toPlainText()
+        output_path = os.path.join(self.session_manager.get_active_project('Session.json').get('project_root', ''), 'tesseract_wordlist.txt') if self.session_manager else None
+        if output_path and not output_path.startswith('/'):
+            output_path = os.path.join(os.getcwd(), output_path)
+        update_tesseract_wordlist_from_text(target_text, project_root=os.getcwd(), output_path=output_path)
+
+    def wordCount(self):
+        show_word_count_dialog(self, self.ui.OCRText)
 
     def _launch_module(self, module_name):
         module_dir = os.path.dirname(os.path.realpath(__file__))

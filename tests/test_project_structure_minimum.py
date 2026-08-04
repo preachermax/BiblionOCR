@@ -118,6 +118,28 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             self.assertNotIn("Model/OT_BookFolders", manifest_text)
             self.assertIn("Model/NT_BookFolders", manifest_text)
 
+    def test_general_projects_exclude_scripture_only_modules(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            engine = ProjectCreationEngine(tmpdir, _DummyEventBus())
+            engine.context = {
+                "project_name": "general_project",
+                "ProjectType": "General",
+            }
+            engine._resolve_folder_list_path = lambda: os.path.join(repo_root, "ViewController", "GeneralProjectFolderList.txt")
+
+            project_root = os.path.join(tmpdir, "project")
+            os.makedirs(project_root, exist_ok=True)
+            engine._create_project_structure(project_root)
+
+            manifest_path = os.path.join(project_root, "src", "manifests", "ProjectFolderList.txt")
+            with open(manifest_path, "r", encoding="utf-8") as handle:
+                manifest_text = handle.read()
+
+            self.assertNotIn("ViewController/3-Process/MyLexer.py", manifest_text)
+            self.assertNotIn("ViewController/3-Process/MyResolver.py", manifest_text)
+            self.assertNotIn("ViewController/3-Process/MyVersifier.py", manifest_text)
+
 
 if __name__ == "__main__":
     unittest.main()
