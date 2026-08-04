@@ -9,6 +9,35 @@ from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
 
+class EmptyFolderFilterProxyModel(qtc.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._exclude_empty_dirs = True
+        self.setDynamicSortFilter(True)
+
+    def setExcludeEmptyDirs(self, enabled):
+        if self._exclude_empty_dirs == enabled:
+            return
+        self._exclude_empty_dirs = enabled
+        self.invalidateFilter()
+
+    def excludeEmptyDirs(self):
+        return self._exclude_empty_dirs
+
+    def filterAcceptsRow(self, source_row, source_parent):
+        if not self._exclude_empty_dirs:
+            return super().filterAcceptsRow(source_row, source_parent)
+
+        source_index = self.sourceModel().index(source_row, 0, source_parent)
+        if not source_index.isValid():
+            return False
+
+        if not self.sourceModel().isDir(source_index):
+            return super().filterAcceptsRow(source_row, source_parent)
+
+        return self.sourceModel().hasChildren(source_index)
+
+
 class FileDragTreeView(qtw.QTreeView):
     def startDrag(self, supported_actions):
         index = self.currentIndex()
@@ -48,15 +77,21 @@ class FilePickerDialog(qtw.QDialog):
         self.model.setReadOnly(True)
         self.model.setRootPath(start_directory)
 
+        self.proxy_model = EmptyFolderFilterProxyModel(self)
+        self.proxy_model.setSourceModel(self.model)
+        self.proxy_model.setExcludeEmptyDirs(True)
+
         self.path_edit = qtw.QLineEdit(start_directory)
         self.up_button = qtw.QPushButton('Up')
         self.open_button = qtw.QPushButton('Open')
         self.close_button = qtw.QPushButton('Close')
+        self.exclude_empty_checkbox = qtw.QCheckBox('Exclude empty folders', self)
+        self.exclude_empty_checkbox.setChecked(True)
         self.hint_label = qtw.QLabel('Drag a file to the application, double-click a file, or select a file and click Open.')
 
         self.tree = FileDragTreeView(self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(start_directory))
+        self.tree.setModel(self.proxy_model)
+        self.tree.setRootIndex(self.proxy_model.mapFromSource(self.model.index(start_directory)))
         self.tree.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
         self.tree.setDragEnabled(True)
         self.tree.setDragDropMode(qtw.QAbstractItemView.DragOnly)
@@ -76,6 +111,7 @@ class FilePickerDialog(qtw.QDialog):
 
         layout = qtw.QVBoxLayout(self)
         layout.addLayout(top_layout)
+        layout.addWidget(self.exclude_empty_checkbox)
         layout.addWidget(self.hint_label)
         layout.addWidget(self.tree, 1)
         layout.addLayout(button_layout)
@@ -84,14 +120,18 @@ class FilePickerDialog(qtw.QDialog):
         self.up_button.clicked.connect(self._go_up)
         self.open_button.clicked.connect(self._open_current)
         self.close_button.clicked.connect(self.close)
+        self.exclude_empty_checkbox.toggled.connect(self._toggle_empty_folder_filter)
         self.tree.doubleClicked.connect(self._open_or_enter)
 
     def _set_root_path(self, path):
         if not path or not os.path.isdir(path):
             return
         self.model.setRootPath(path)
-        self.tree.setRootIndex(self.model.index(path))
+        self.tree.setRootIndex(self.proxy_model.mapFromSource(self.model.index(path)))
         self.path_edit.setText(path)
+
+    def _toggle_empty_folder_filter(self, enabled):
+        self.proxy_model.setExcludeEmptyDirs(enabled)
 
     def _go_to_path(self):
         self._set_root_path(self.path_edit.text())
@@ -103,14 +143,16 @@ class FilePickerDialog(qtw.QDialog):
             self._set_root_path(parent)
 
     def _open_or_enter(self, index):
-        path = self.model.filePath(index)
+        source_index = self.proxy_model.mapToSource(index)
+        path = self.model.filePath(source_index)
         if os.path.isdir(path):
             self._set_root_path(path)
         elif os.path.isfile(path):
             self._select_file(path)
 
     def _open_current(self):
-        path = self.model.filePath(self.tree.currentIndex())
+        source_index = self.proxy_model.mapToSource(self.tree.currentIndex())
+        path = self.model.filePath(source_index)
         if os.path.isdir(path):
             self._set_root_path(path)
         elif os.path.isfile(path):

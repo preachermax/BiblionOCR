@@ -36,6 +36,10 @@ This repository currently contains:
 
 BiblionOCR is designed to make systems visible.
 
+## Current UI Behavior
+
+MyExplorer and the shared file-picker now exclude empty folders by default. The checkbox can still be toggled off when you want to see the full directory tree.
+
 ## Developer Utility: Project Wizard Preview
 
 To preview and iterate on the Qt Designer-backed project creation wizard without launching MyServer:

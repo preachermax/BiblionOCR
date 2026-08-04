@@ -31,6 +31,7 @@ RUNTIME_PATHS = SessionManager.export_runtime_paths(
 
 from project_status_controller import ProjectStatusController
 
+from LocalFileDrop import EmptyFolderFilterProxyModel
 import MyExplorerUI
 
 
@@ -97,8 +98,28 @@ class ExplorerTreeView(QtWidgets.QTreeView):
             index = index.parent()
 
         if index.isValid():
+            return self._resolve_model_path(model, index)
+        return self._resolve_root_path(model)
+
+    @staticmethod
+    def _resolve_model_path(model, index):
+        if hasattr(model, "mapToSource") and hasattr(model, "sourceModel"):
+            source_model = model.sourceModel()
+            if source_model is not None:
+                source_index = model.mapToSource(index)
+                if source_index.isValid():
+                    return source_model.filePath(source_index)
+        if hasattr(model, "filePath"):
             return model.filePath(index)
-        return model.rootPath()
+        return ""
+
+    @staticmethod
+    def _resolve_root_path(model):
+        if hasattr(model, "rootPath"):
+            return model.rootPath()
+        if hasattr(model, "sourceModel") and model.sourceModel() is not None:
+            return model.sourceModel().rootPath()
+        return ""
 
     @staticmethod
     def _has_local_urls(mime_data):
@@ -126,13 +147,20 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView = ExplorerTreeView(self.frame)
         self.gridLayout_2.replaceWidget(original_tree, self.treeView)
         original_tree.deleteLater()
+
+        self.exclude_empty_checkbox = QtWidgets.QCheckBox('Exclude empty folders', self.frame)
+        self.exclude_empty_checkbox.setChecked(True)
+        self.gridLayout_2.addWidget(self.exclude_empty_checkbox, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.treeView, 1, 0, 1, 1)
+
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.treeView.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         self.treeView.setDragEnabled(True)
         self.treeView.setAcceptDrops(True)
         self.treeView.customContextMenuRequested.connect(self.context_menu)
-        
+        self.exclude_empty_checkbox.toggled.connect(self._toggle_empty_folder_filter)
+
         self.populate()
         self.project_status_controller = ProjectStatusController(
             self,
@@ -191,9 +219,14 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.model = QtWidgets.QFileSystemModel()
         self.model.setRootPath(root_dir)
         self.model.setReadOnly(False)
-        self.treeView.setModel(self.model)
+
+        self.proxy_model = EmptyFolderFilterProxyModel(self)
+        self.proxy_model.setSourceModel(self.model)
+        self.proxy_model.setExcludeEmptyDirs(self.exclude_empty_checkbox.isChecked())
+        self.treeView.setModel(self.proxy_model)
+
         root_index = self.model.index(root_dir)
-        self.treeView.setRootIndex(root_index)
+        self.treeView.setRootIndex(self.proxy_model.mapFromSource(root_index))
 
         try:
             if os.path.commonpath([os.path.abspath(dir_path), os.path.abspath(root_dir)]) != os.path.abspath(root_dir):
@@ -203,18 +236,22 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         target_index = self.model.index(dir_path)
         if target_index.isValid():
-            self.treeView.setCurrentIndex(target_index)
-            self.treeView.scrollTo(target_index, QtWidgets.QAbstractItemView.PositionAtCenter)
+            proxy_index = self.proxy_model.mapFromSource(target_index)
+            self.treeView.setCurrentIndex(proxy_index)
+            self.treeView.scrollTo(proxy_index, QtWidgets.QAbstractItemView.PositionAtCenter)
 
-            parent_index = target_index.parent()
+            parent_index = proxy_index.parent()
             while parent_index.isValid():
                 self.treeView.expand(parent_index)
                 parent_index = parent_index.parent()
 
-            self.treeView.expand(target_index)
+            self.treeView.expand(proxy_index)
         self.treeView.setSortingEnabled(True)
         self.treeView.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.model.sort(0, QtCore.Qt.AscendingOrder)
+
+    def _toggle_empty_folder_filter(self, enabled):
+        self.proxy_model.setExcludeEmptyDirs(enabled)
 
     def context_menu(self):
         menu = QtWidgets.QMenu()
@@ -225,7 +262,13 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
     def open_file(self):
         index = self.treeView.currentIndex()
-        file_path = self.model.filePath(index)
+        if not index.isValid():
+            return
+        if hasattr(self.proxy_model, "mapToSource"):
+            source_index = self.proxy_model.mapToSource(index)
+            file_path = self.model.filePath(source_index)
+        else:
+            file_path = self.model.filePath(index)
         if sys.platform.startswith("win"):
             os.startfile(file_path)
             return
