@@ -164,6 +164,31 @@ For each created project, SQLite artifacts are stored in the project-local data 
 
 If no project has been created or opened yet, this folder may not exist in the workspace template tree.
 
+## Scripture Data Foundations
+
+The repo also ships shared scripture reference assets under:
+
+- `Model/Project/Data/SQLite/`
+- `Model/Project/Data/esword/`
+
+These large binary assets are tracked with Git LFS. A normal contributor setup should include:
+
+```bash
+git lfs install
+git lfs pull
+```
+
+CSV/JSON normalization parity is maintained with:
+
+```bash
+python3 Developer/utilities/scripture_data_parity.py --root . --write-json --force
+```
+
+Parity policy:
+
+- CSV and DB files are manually maintained.
+- JSON files are generated mirrors.
+
 ---
 
 *Documentation preserves understanding.*

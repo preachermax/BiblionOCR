@@ -4,6 +4,7 @@ Core/MyServer.py => ViewController/0-MainUI/MyServer.py
 Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py
 Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui
 Developer/QtDesignerUI
+Developer/update_UI_Resources.txt
 Developer/ViewController/SeparatedDevFiles/0-MainUI/AIcommitWorkflow.md
 Developer/ViewController/SeparatedDevFiles/0-MainUI/cmap2csv2 json.py
 Developer/ViewController/SeparatedDevFiles/0-MainUI/Co-pilot diff text on FROMVS in Windows.txt
@@ -24,7 +25,6 @@ Developer/ViewController/SeparatedDevFiles/0-MainUI/sqlite3-mysql.txt
 Developer/ViewController/SeparatedDevFiles/0-MainUI/Ui2Py.py
 Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.py
 Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.txt
-Developer/update_UI_Resources.txt
 launchers/install-biblionocr-ubuntu24.sh
 launchers/restore-desktop-launchers.sh
 launchers/restore_desktop_launchers.py
@@ -59,8 +59,6 @@ launchers/run-myversifier.sh
 launchers/run-mywriter.cmd
 launchers/run-mywriter.sh
 Model/Project/Data
-Model/Project/Data/sqlite
-Model/Project/Data/sqlite/project_metadata.sqlite
 Model/Project/Data/esword
 Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json
@@ -69,9 +67,13 @@ Model/Project/Data/json/BookChapterVerse.json
 Model/Project/Data/json/BookChapterVerseTotals.json
 Model/Project/Data/json/BooksAbbrName.json
 Model/Project/Data/json/BooksAbbrNameNumIndex.json
+Model/Project/Data/json/BooksFolderList.json
 Model/Project/Data/json/BooksMarkDown.json
 Model/Project/Data/json/BoxerSession.json
 Model/Project/Data/json/ChrRef.json
+Model/Project/Data/json/EnglishProperNames.json
+Model/Project/Data/json/FROMVS3_0_PUA_Norm.json
+Model/Project/Data/json/FromvsDiacritics.json
 Model/Project/Data/json/GlypherSession.json
 Model/Project/Data/json/GlyphMap.json
 Model/Project/Data/json/GrounderSession.json
@@ -82,6 +84,7 @@ Model/Project/Data/json/PageVerseCrossReference_Matthew.json
 Model/Project/Data/json/PixlerSession.json
 Model/Project/Data/json/ProjectTracking.json
 Model/Project/Data/json/ProjectUnicodeRanges.json
+Model/Project/Data/json/ProperNames.json
 Model/Project/Data/json/ReaderSession.json
 Model/Project/Data/json/RMAC.json
 Model/Project/Data/json/ScannerSession.json
@@ -90,6 +93,15 @@ Model/Project/Data/json/UnicodeRanges.json
 Model/Project/Data/json/VersifierSession.json
 Model/Project/Data/json/Workflow.json
 Model/Project/Data/json/WriterSession.json
+Model/Project/Data/SQLite
+Model/Project/Data/sqlite
+Model/Project/Data/SQLite/FROMVS.db
+Model/Project/Data/sqlite/project_metadata.sqlite
+Model/Project/Data/SQLite/RMAC.db
+Model/Project/Data/SQLite/TRBible.db
+Model/Project/Data/SQLite/TRBibleWords.db
+Model/Project/Data/SQLite/TRiBible.db
+Model/Project/Data/SQLite/TRiBibleWords.db
 Model/Project/Images
 Model/Project/Images/Complete
 Model/Project/Images/Complete/Greek
@@ -116,6 +128,21 @@ Model/Project/Text/EstablishTruth/TR
 Model/Project/Text/GroundTruth/Greek/txt_greek_verses
 Model/Project/Text/GroundTruth/Source/TR
 Model/Project/Training
+Model/Project/Training/Tesseract
+Model/Project/Training/Tesseract/configs
+Model/Project/Training/Tesseract/configs/feg
+Model/Project/Training/Tesseract/data
+Model/Project/Training/Tesseract/data/feg-ground-truth
+Model/Project/Training/Tesseract/logs
+Model/Project/Training/Tesseract/logs/feg
+Model/Project/Training/Tesseract/models
+Model/Project/Training/Tesseract/models/feg
+Model/Project/Training/Tesseract/plots
+Model/Project/Training/Tesseract/plots/feg
+Model/Project/Training/Tesseract/scripts
+Model/Project/Training/Tesseract/tesstrain
+Model/Project/Training/Tesseract/wordlists
+Model/Project/Training/Tesseract/wordlists/feg
 Model/Project/Utilities
 Model/Project/Utilities/CompareFiles
 Model/Project/Utilities/csv
@@ -226,6 +253,7 @@ ViewController/0-MainUI/MyExplorerUI.py
 ViewController/0-MainUI/MyLauncher.py
 ViewController/0-MainUI/MyScanner.py
 ViewController/0-MainUI/MyScannerUI.py
+ViewController/0-MainUI/UI_Icons.py
 ViewController/1-PreProcess
 ViewController/1-PreProcess/helpers/MyBoxerUI.py
 ViewController/1-PreProcess/helpers/MyGlypherUI.py

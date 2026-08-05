@@ -3,3 +3,5 @@
 *.eps binary
 *.png binary
 *.mp4 binary
+Model/Project/Data/SQLite/*.db filter=lfs diff=lfs merge=lfs -text
+Model/Project/Data/esword/*.dctx filter=lfs diff=lfs merge=lfs -text

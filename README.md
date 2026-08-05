@@ -57,6 +57,31 @@ Project databases are created in each generated project root under:
 
 These database files are created when project creation code executes (for example, when a new project is created through MyServer).
 
+## Scripture Data Foundations
+
+The repository now carries canonical scripture reference assets in two layers:
+
+- project-local generated metadata in `Model/Project/Data/sqlite/`
+- shared scripture reference payloads in `Model/Project/Data/SQLite/` and `Model/Project/Data/esword/`
+
+The large shared scripture DB assets are tracked with Git LFS. After cloning, initialize LFS before working with these files:
+
+```bash
+git lfs install
+git lfs pull
+```
+
+For CSV/JSON parity maintenance, use:
+
+```bash
+python3 Developer/utilities/scripture_data_parity.py --root . --write-json --force
+```
+
+Policy:
+
+- CSV and DB assets are manually curated source artifacts.
+- JSON files are code-generated mirrors for normalization/reference parity.
+
 ## Developer Utility: Project Wizard Preview
 
 To preview and iterate on the Qt Designer-backed project creation wizard without launching MyServer:
