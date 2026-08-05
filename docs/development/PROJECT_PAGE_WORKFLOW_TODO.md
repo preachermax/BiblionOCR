@@ -110,7 +110,7 @@ Track each source page through the full project lifecycle, including per-page an
 - [x] Add Project Workflow Wizard and Page Workflow Wizard actions to MyLauncher Project menu.
 - [x] Preserve manual launch actions while introducing macro orchestration.
 - [x] Add initial NumberColumns update surfaces in MyServer and MyScanner.
-- [ ] Propagate equivalent wizard workflow entry points to remaining modules.
+- [x] Propagate equivalent wizard workflow entry points to remaining modules.
 
 ## Phase 8: Testing And Migration Coverage
 

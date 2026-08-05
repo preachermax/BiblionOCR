@@ -49,6 +49,13 @@
 * this work is treated as a dedicated architecture milestone commit before broader module propagation
 * follow-up rollout to remaining modules should happen in separate commits to preserve testability and rollback clarity
 
+### Follow-Up Rollout Completion
+
+* follow-up module rollout is now complete in separate commit `4969da6`
+* `Core/workflow_wizard_actions.py` now provides shared runtime action injection for workflow wizard entry points
+* the remaining main runtime modules now expose workflow wizard entry actions without replacing their existing manual workflows
+* MyLauncher now supports direct CLI wizard startup for project and page modes
+
 ---
 
 ## Launcher Restore and Wrapper Notes (2026-08-02)

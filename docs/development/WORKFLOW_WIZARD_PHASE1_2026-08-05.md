@@ -114,7 +114,44 @@ This prevents a large, mixed commit that is hard to test, review, or rollback.
 - no broad behavior rewrite of module internals
 - no milestone weighting model changes beyond existing ProjectTracking behavior
 
-## Next Rollout Target (After This Commit)
+## Follow-Up Rollout Completed
+
+The follow-up module rollout was completed immediately after the foundation commit in a second, separate commit:
+
+- commit: `4969da6`
+- message: `Roll out workflow wizard menu actions across modules`
+
+The shared runtime entry helper added in this step is:
+
+- `Core/workflow_wizard_actions.py`
+
+This follow-up phase propagated workflow wizard entry actions to the remaining main runtime modules while preserving the same menu policy:
+
+- Project menu when available
+- File menu fallback when Project is not present
+
+Modules covered by the rollout:
+
+- `MyExplorer`
+- `MyPixler`
+- `MyBoxer`
+- `MyGlypher`
+- `MyReader`
+- `MyGrounder`
+- `MyTrainer`
+- `MyLexer`
+- `MyResolver`
+- `MyVersifier`
+- `MyWriter`
+
+MyLauncher was also extended to accept direct CLI wizard startup:
+
+- `--workflow-wizard project`
+- `--workflow-wizard page`
+
+Validation for the rollout remained the same targeted runtime set and passed successfully.
+
+## Next Rollout Target (After These Commits)
 
 - propagate wizard entry surfaces and contextual workflow guidance to remaining modules
 - keep menu policy: Project menu when available, otherwise File menu fallback

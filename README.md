@@ -56,6 +56,7 @@ Macro-like workflow wizard orchestration is now available as a first architectur
 - Wizard stage order is derived from numbered ViewController folders.
 - Existing manual module launch actions are preserved.
 - MyServer and MyScanner can now update columns-per-page and persist that update to project metadata.
+- The remaining main runtime modules now expose workflow wizard entry actions through shared runtime wiring.
 
 Architecture and procedure notes for this phase are documented in:
 
