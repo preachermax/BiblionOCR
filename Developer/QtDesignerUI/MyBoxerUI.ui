@@ -1176,7 +1176,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+      <number>6</number>
     </property>
     <property name="iconSize">
      <size>
@@ -1257,6 +1257,9 @@
       <property name="autoScrollMargin">
        <number>16</number>
       </property>
+      <property name="toolTip">
+       <string>Use the editable X, Y, W, and H columns to manually resize line boxes. The selected-row spinboxes commit back into the box table and saved box files.</string>
+      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::CurrentChanged|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
       </property>
@@ -1304,6 +1307,9 @@
        <property name="text">
         <string>X</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize X position. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1314,6 +1320,9 @@
        <property name="text">
         <string>Y</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize Y position. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1324,6 +1333,9 @@
        <property name="text">
         <string>W</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize width. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1334,6 +1346,9 @@
        <property name="text">
         <string>H</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize height. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1452,6 +1467,399 @@
       </column>
      </widget>
     </widget>
+    <widget class="QWidget" name="WordText">
+     <attribute name="title">
+      <string>Word Box Text</string>
+     </attribute>
+     <widget class="QTextEdit" name="WordBoxText">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>580</width>
+        <height>825</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>FROMVS</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="WordTable">
+     <attribute name="title">
+      <string>Word Box Table</string>
+     </attribute>
+     <widget class="QTableWidget" name="WordBoxTable">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>580</width>
+        <height>826</height>
+       </rect>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="autoScrollMargin">
+       <number>16</number>
+      </property>
+      <property name="toolTip">
+       <string>Use the editable X, Y, W, and H columns to manually resize word boxes. The selected-row spinboxes commit back into the box table and saved word box files.</string>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::CurrentChanged|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <property name="cornerButtonEnabled">
+       <bool>false</bool>
+      </property>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>20</number>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>30</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Word</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>X</string>
+       </property>
+       <property name="toolTip">
+        <string>Manual resize X position. Edit with the spinbox controls in the selected row.</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Y</string>
+       </property>
+       <property name="toolTip">
+        <string>Manual resize Y position. Edit with the spinbox controls in the selected row.</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>W</string>
+       </property>
+       <property name="toolTip">
+        <string>Manual resize width. Edit with the spinbox controls in the selected row.</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>H</string>
+       </property>
+       <property name="toolTip">
+        <string>Manual resize height. Edit with the spinbox controls in the selected row.</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>InsA</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/insertabove.png</normaloff>:/Icons/Icons/insertabove.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>InsB</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/insertbelow.png</normaloff>:/Icons/Icons/insertbelow.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Del</string>
+       </property>
+       <property name="toolTip">
+        <string>Delete Row</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/deleterow.png</normaloff>:/Icons/Icons/deleterow.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Rdraw</string>
+       </property>
+       <property name="toolTip">
+        <string>Draw wordbox with rubberBand</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/rubberband.png</normaloff>:/Icons/Icons/rubberband.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Sdraw</string>
+       </property>
+       <property name="toolTip">
+        <string>Draw wordbox with cell spinboxes</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/spinbox4.png</normaloff>:/Icons/Icons/spinbox4.png</iconset>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Accept</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>FROMVS</family>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="icon">
+        <iconset resource="../UI_Icons.qrc">
+         <normaloff>:/Icons/Icons/Valid.png</normaloff>:/Icons/Icons/Valid.png</iconset>
+       </property>
+      </column>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="WordImage">
+     <attribute name="title">
+      <string>Word Box Image</string>
+     </attribute>
+     <widget class="QScrollArea" name="WordBoxscrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>544</width>
+        <height>831</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>501</width>
+        <height>600</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <widget class="QWidget" name="WordBoxscrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>6600</width>
+         <height>9600</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>6600</width>
+         <height>9600</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>520</width>
+         <height>700</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <widget class="QLabel" name="WordBoxImage">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>6800</width>
+          <height>9600</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>520</width>
+          <height>700</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="margin">
+         <number>80</number>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
     <widget class="QWidget" name="PageText">
      <attribute name="title">
       <string>Page Box Text</string>
@@ -1519,6 +1927,9 @@
       <property name="autoScrollMargin">
        <number>16</number>
       </property>
+      <property name="toolTip">
+       <string>Use the editable X, Y, W, and H columns to manually resize page boxes. The selected-row spinboxes commit back into the box table and saved box files.</string>
+      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::CurrentChanged|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
       </property>
@@ -1566,6 +1977,9 @@
        <property name="text">
         <string>X</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize X position. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1576,6 +1990,9 @@
        <property name="text">
         <string>Y</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize Y position. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1586,6 +2003,9 @@
        <property name="text">
         <string>W</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize width. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -1596,6 +2016,9 @@
        <property name="text">
         <string>H</string>
        </property>
+        <property name="toolTip">
+         <string>Manual resize height. Edit with the spinbox controls in the selected row.</string>
+        </property>
        <property name="font">
         <font>
          <family>FROMVS</family>
@@ -4750,6 +5173,12 @@
    </property>
    <property name="text">
     <string>Make WordBox File</string>
+   </property>
+   <property name="toolTip">
+    <string>Stage the current image into the WordBox CSV, TXT, and TIF files using the same box-file workflow as the line and page exporters.</string>
+   </property>
+   <property name="statusTip">
+    <string>Creating WordBox CSV, TXT, and TIF files from the current image...</string>
    </property>
   </action>
   <action name="actionMake_Character_Box_Files">

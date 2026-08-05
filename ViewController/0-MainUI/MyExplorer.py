@@ -148,10 +148,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.gridLayout_2.replaceWidget(original_tree, self.treeView)
         original_tree.deleteLater()
 
-        self.exclude_empty_checkbox = QtWidgets.QCheckBox('Exclude empty folders', self.frame)
         self.exclude_empty_checkbox.setChecked(True)
-        self.gridLayout_2.addWidget(self.exclude_empty_checkbox, 0, 0, 1, 1)
-        self.gridLayout_2.addWidget(self.treeView, 1, 0, 1, 1)
 
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)

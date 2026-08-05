@@ -29,9 +29,13 @@ class Ui_Explorer(object):
         self.frame.setObjectName("frame")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.frame)
         self.gridLayout_2.setObjectName("gridLayout_2")
+        self.exclude_empty_checkbox = QtWidgets.QCheckBox(self.frame)
+        self.exclude_empty_checkbox.setChecked(True)
+        self.exclude_empty_checkbox.setObjectName("exclude_empty_checkbox")
+        self.gridLayout_2.addWidget(self.exclude_empty_checkbox, 0, 0, 1, 1)
         self.treeView = QtWidgets.QTreeView(self.frame)
         self.treeView.setObjectName("treeView")
-        self.gridLayout_2.addWidget(self.treeView, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.treeView, 1, 0, 1, 1)
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
         Explorer.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Explorer)
@@ -48,6 +52,7 @@ class Ui_Explorer(object):
     def retranslateUi(self, Explorer):
         _translate = QtCore.QCoreApplication.translate
         Explorer.setWindowTitle(_translate("Explorer", "Project Explorer"))
+        self.exclude_empty_checkbox.setText(_translate("Explorer", "Exclude empty folders"))
 import UI_Icons
 
 

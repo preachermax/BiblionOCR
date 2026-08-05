@@ -33,51 +33,200 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTextEdit" name="VerseText">
-    <property name="geometry">
-     <rect>
-      <x>750</x>
-      <y>60</y>
-      <width>581</width>
-      <height>671</height>
-     </rect>
+   <layout class="QVBoxLayout" name="centralLayout">
+    <property name="spacing">
+     <number>10</number>
     </property>
-    <property name="minimumSize">
-     <size>
-      <width>540</width>
-      <height>600</height>
-     </size>
+    <property name="leftMargin">
+     <number>10</number>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
+    <property name="topMargin">
+     <number>10</number>
     </property>
-   </widget>
-   <widget class="QTextEdit" name="RefText">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>581</width>
-      <height>671</height>
-     </rect>
+    <property name="rightMargin">
+     <number>10</number>
     </property>
-    <property name="minimumSize">
-     <size>
-      <width>540</width>
-      <height>600</height>
-     </size>
+    <property name="bottomMargin">
+     <number>10</number>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
+    <item>
+     <widget class="QLabel" name="trainerIntroLabel">
+      <property name="text">
+       <string>Step through source review, then launch training and watch the progress plot update from the training log.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="pageTitleLabel">
+      <property name="text">
+       <string>Step 1 of 2: Source review</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="page_stack">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page_review">
+       <layout class="QVBoxLayout" name="reviewLayout">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="reviewHeadingLabel">
+          <property name="text">
+           <string>Review the reference text and the current verse text before training.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="reviewTextLayout">
+          <item>
+           <widget class="QTextEdit" name="RefText">
+            <property name="minimumSize">
+             <size>
+              <width>540</width>
+              <height>600</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextEdit" name="VerseText">
+            <property name="minimumSize">
+             <size>
+              <width>540</width>
+              <height>600</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="reviewNavLayout">
+          <item>
+           <spacer name="reviewNavSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stepReviewNextButton">
+            <property name="text">
+             <string>Next: Training</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_training">
+       <layout class="QVBoxLayout" name="trainingLayout">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="trainingHeadingLabel">
+          <property name="text">
+           <string>Training workspace, progress plot, and launch controls.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="trainingSummaryLabel">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="trainingPlotContainer">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>360</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="trainingNavLayout">
+          <item>
+           <widget class="QPushButton" name="stepTrainingBackButton">
+            <property name="text">
+             <string>Back</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stepTrainingRefreshButton">
+            <property name="text">
+             <string>Refresh Progress</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stepTrainingStartButton">
+            <property name="text">
+             <string>Start Training</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="trainingNavSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

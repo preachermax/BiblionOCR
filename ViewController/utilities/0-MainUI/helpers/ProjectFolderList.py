@@ -246,6 +246,21 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
 
 MINIMAL_TRAINING_FOLDERS = {
     "Model/Project/Training",
+    "Model/Project/Training/Tesseract",
+    "Model/Project/Training/Tesseract/data",
+    "Model/Project/Training/Tesseract/data/feg-ground-truth",
+    "Model/Project/Training/Tesseract/wordlists",
+    "Model/Project/Training/Tesseract/wordlists/feg",
+    "Model/Project/Training/Tesseract/configs",
+    "Model/Project/Training/Tesseract/configs/feg",
+    "Model/Project/Training/Tesseract/logs",
+    "Model/Project/Training/Tesseract/logs/feg",
+    "Model/Project/Training/Tesseract/plots",
+    "Model/Project/Training/Tesseract/plots/feg",
+    "Model/Project/Training/Tesseract/models",
+    "Model/Project/Training/Tesseract/models/feg",
+    "Model/Project/Training/Tesseract/scripts",
+    "Model/Project/Training/Tesseract/tesstrain",
 }
 
 KNOWN_FILE_EXTENSIONS = {
@@ -844,8 +859,7 @@ class ProjectFolderListBuilder:
     def is_pruned_training_reference(path: str) -> bool:
         normalized = path.replace("\\", "/").strip("/")
         return (
-            normalized.startswith("Model/Project/Training/")
-            or normalized == "ViewController/0-MainUI/helpers/TessTrainBoxFiles"
+            normalized == "ViewController/0-MainUI/helpers/TessTrainBoxFiles"
             or normalized.startswith("ViewController/0-MainUI/helpers/TessTrainBoxFiles/")
         )
 
