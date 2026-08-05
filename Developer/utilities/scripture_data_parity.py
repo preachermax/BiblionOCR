@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 from typing import Iterable, List
 
@@ -40,8 +41,25 @@ REQUIRED_SCRIPTURE_SQLITE = (
     "RMAC.db",
 )
 
+CSV_SNIFFER_DELIMITERS = ",\t;|"
 
-def _read_csv_rows(csv_path: Path) -> List[object]:
+HEADERED_CSV_FILES = {
+    "BooksAbbrName.csv",
+    "BooksAbbrNameNumIndex.csv",
+    "BooksFolderList.csv",
+    "BookChapter",
+    "LineBookChapterVerse.csv",
+    "ProperNames.csv",
+    "FROMVS3_0_PUA_Norm.csv",
+    "UnicodeRanges.csv",
+    "ProjectUnicodeRanges.csv",
+    "rmac.csv",
+}
+
+
+def _read_csv_rows(csv_path: Path, csv_name: str) -> List[object]:
+    csv.field_size_limit(sys.maxsize)
+
     with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
         sample = handle.read(4096)
         handle.seek(0)
@@ -50,7 +68,10 @@ def _read_csv_rows(csv_path: Path) -> List[object]:
             return []
 
         try:
-            dialect = csv.Sniffer().sniff(sample)
+            if any(delimiter in sample for delimiter in CSV_SNIFFER_DELIMITERS):
+                dialect = csv.Sniffer().sniff(sample, delimiters=CSV_SNIFFER_DELIMITERS)
+            else:
+                raise csv.Error()
         except csv.Error:
             dialect = csv.excel
 
@@ -60,15 +81,16 @@ def _read_csv_rows(csv_path: Path) -> List[object]:
     if not rows:
         return []
 
-    header = [str(cell).strip() for cell in rows[0]]
-    has_named_header = all(header) and len(set(header)) == len(header)
-
-    if has_named_header:
+    if csv_name in HEADERED_CSV_FILES:
+        header = [str(cell).strip() for cell in rows[0]]
         payload = []
         for row in rows[1:]:
             record = {header[i]: (row[i] if i < len(row) else "") for i in range(len(header))}
             payload.append(record)
         return payload
+
+    if all(len(row) == 1 for row in rows):
+        return [row[0] for row in rows]
 
     return rows
 
@@ -113,7 +135,7 @@ def main() -> int:
             print(f"[missing-json] {json_name}")
 
         if args.write_json and (args.force or not json_path.exists()):
-            payload = _read_csv_rows(csv_path)
+            payload = _read_csv_rows(csv_path, csv_name)
             _write_json(json_path, payload)
             print(f"[wrote-json] {json_name} from {csv_name} ({len(payload)} rows)")
 
