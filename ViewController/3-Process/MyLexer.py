@@ -58,7 +58,7 @@ from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_w
 
 from queue import Queue
 from ext import mainfind
-from MyLexerUI import Ui_Glypher
+from MyLexerUI import Ui_Boxer
 from LocalFileDrop import LocalFileDropMixin
 from Training import Train as tr
 #from ProjectBrowserUI import Ui_Explorer
@@ -184,7 +184,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         super().__init__(*args, **kwargs)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
-        self.ui = Ui_Glypher()
+        self.ui = Ui_Boxer()
         self.ui.setupUi(self)
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
