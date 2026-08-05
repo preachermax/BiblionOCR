@@ -282,9 +282,11 @@ class ProjectCreationEngine:
         )
 
         for folder in sorted_folders:
-            _source_folder, destination_folder = self._split_structure_copy_entry(folder)
+            source_folder, destination_folder = self._split_structure_copy_entry(folder)
             folder_path = destination_folder or folder
             os.makedirs(os.path.join(project_path, *folder_path.split("/")), exist_ok=True)
+            if destination_folder or source_folder in {"Model/OT_BookFolders", "Model/NT_BookFolders"}:
+                self._create_directory_structure_from_template(repo_root, project_path, source_folder, folder_path)
             completed_steps += 1
             self._emit_structure_progress(
                 stage="folders",
@@ -417,13 +419,17 @@ class ProjectCreationEngine:
         with open(folder_list_path, "r", encoding="utf-8-sig") as f:
             entries.extend(line.strip() for line in f if line.strip())
 
+        source_choice = None
+        if self._is_scriptural_project():
+            source_choice = self._normalize_scriptural_source()
+            entries = [entry for entry in entries if self._scriptural_source_allows_entry(entry, source_choice)]
+
         selected_folders = self._selected_project_folders()
         if selected_folders:
             entries = [entry for entry in entries if self._entry_matches_selected_folder(entry, selected_folders)]
 
         if self._is_scriptural_project():
-            source_choice = self._normalize_scriptural_source()
-            for entry in self._scriptural_project_entries(source_choice):
+            for entry in self._scriptural_project_entries(source_choice, entries):
                 if entry in {"Model/OT_BookFolders", "Model/NT_BookFolders"}:
                     if selected_folders and entry not in selected_folders:
                         continue
@@ -434,7 +440,7 @@ class ProjectCreationEngine:
 
         return entries
 
-    def _scriptural_project_entries(self, source_choice):
+    def _scriptural_project_entries(self, source_choice, existing_entries=None):
         entries = [
             "Model/Project/Data/csv/BooksAbbrName.csv",
             "Model/Project/Data/csv/BooksAbbrNameNumIndex.csv",
@@ -452,12 +458,36 @@ class ProjectCreationEngine:
             "Model/Project/Data/json/FROMVS3_0_PUA_Norm.json",
         ]
 
-        if source_choice in {"old_testament", "both"}:
+        existing_entries = existing_entries or []
+
+        if source_choice in {"old_testament", "both"} and not self._has_scriptural_book_folder_mapping(existing_entries, "Model/OT_BookFolders"):
             entries.append("Model/OT_BookFolders")
-        if source_choice in {"new_testament", "both"}:
+        if source_choice in {"new_testament", "both"} and not self._has_scriptural_book_folder_mapping(existing_entries, "Model/NT_BookFolders"):
             entries.append("Model/NT_BookFolders")
 
         return entries
+
+    def _has_scriptural_book_folder_mapping(self, entries, source_root):
+        for entry in entries:
+            normalized = self._normalize_structure_entry(entry, None)
+            if not normalized:
+                continue
+            source_entry, destination_entry = self._split_structure_copy_entry(normalized)
+            if source_entry == source_root and destination_entry:
+                return True
+        return False
+
+    def _scriptural_source_allows_entry(self, entry, source_choice):
+        normalized = self._normalize_structure_entry(entry, None)
+        if not normalized:
+            return False
+
+        source_entry, _destination_entry = self._split_structure_copy_entry(normalized)
+        if source_entry == "Model/OT_BookFolders":
+            return source_choice in {"old_testament", "both"}
+        if source_entry == "Model/NT_BookFolders":
+            return source_choice in {"new_testament", "both"}
+        return True
 
     # -----------------------
     def _selected_project_folders(self):
@@ -581,6 +611,20 @@ class ProjectCreationEngine:
             if os.path.isfile(source_file):
                 total_bytes += os.path.getsize(source_file)
         return total_bytes
+
+    # -----------------------
+    def _create_directory_structure_from_template(self, repo_root, project_path, source_entry, destination_entry):
+        source_dir = os.path.join(repo_root, *source_entry.split("/"))
+        if not os.path.isdir(source_dir):
+            return
+
+        destination_dir = os.path.join(project_path, *destination_entry.split("/"))
+        for current_root, current_dirs, _current_files in os.walk(source_dir):
+            relative_root = os.path.relpath(current_root, source_dir)
+            target_root = destination_dir if relative_root == "." else os.path.join(destination_dir, relative_root)
+            os.makedirs(target_root, exist_ok=True)
+            for directory_name in current_dirs:
+                os.makedirs(os.path.join(target_root, directory_name), exist_ok=True)
 
 
     # -----------------------

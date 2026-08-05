@@ -387,6 +387,9 @@ class ProjectCreationWizardDialog(qtw.QDialog):
                 normalized = candidate.replace("\\", "/").strip()
                 if not normalized:
                     continue
+                source_choice = self._normalized_scriptural_source_choice()
+                if page_key == "scriptural" and not self._scriptural_source_allows_entry(normalized, source_choice):
+                    continue
                 source_entry, destination_entry = self._split_structure_copy_entry(normalized)
                 candidate_path = destination_entry or source_entry
                 if not candidate_path:
@@ -398,17 +401,42 @@ class ProjectCreationWizardDialog(qtw.QDialog):
                     entries.append(candidate_path)
 
         if page_key == "scriptural":
-            scripture_source = self.scriptural_source_combo.currentText().strip()
-            if scripture_source == "OT":
+            scripture_source = self._normalized_scriptural_source_choice()
+            if scripture_source == "old_testament" and not self._has_scriptural_book_folder_mapping(entries, "Model/OT_BookFolders"):
                 entries.append("Model/OT_BookFolders")
-            elif scripture_source == "NT":
+            elif scripture_source == "new_testament" and not self._has_scriptural_book_folder_mapping(entries, "Model/NT_BookFolders"):
                 entries.append("Model/NT_BookFolders")
             else:
-                entries.append("Model/OT_BookFolders")
-                entries.append("Model/NT_BookFolders")
+                if not self._has_scriptural_book_folder_mapping(entries, "Model/OT_BookFolders"):
+                    entries.append("Model/OT_BookFolders")
+                if not self._has_scriptural_book_folder_mapping(entries, "Model/NT_BookFolders"):
+                    entries.append("Model/NT_BookFolders")
 
         entries = list(dict.fromkeys(entries))
         return sorted(entries)
+
+    def _has_scriptural_book_folder_mapping(self, entries, source_root):
+        for entry in entries:
+            source_entry, destination_entry = self._split_structure_copy_entry(entry)
+            if source_entry == source_root and destination_entry:
+                return True
+        return False
+
+    def _normalized_scriptural_source_choice(self):
+        scripture_source = self.scriptural_source_combo.currentText().strip()
+        if scripture_source == "OT":
+            return "old_testament"
+        if scripture_source == "NT":
+            return "new_testament"
+        return "both"
+
+    def _scriptural_source_allows_entry(self, entry, source_choice):
+        source_entry, _destination_entry = self._split_structure_copy_entry(entry)
+        if source_entry == "Model/OT_BookFolders":
+            return source_choice in {"old_testament", "both"}
+        if source_entry == "Model/NT_BookFolders":
+            return source_choice in {"new_testament", "both"}
+        return True
 
     def _split_structure_copy_entry(self, entry):
         if "=>" not in entry:
