@@ -10,6 +10,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 PROJECT_DATABASE_FILENAME = "project_metadata.sqlite"
 PROJECT_DATABASE_EXPORT_FILENAME = "project_metadata.json"
 PROJECT_DATABASE_TABLE = "project_metadata"
+DEFAULT_SCRIPTURE_COLUMN_LANGUAGES = ["english", "greek", "hebrew", "latin"]
 
 
 @dataclass(frozen=True)
@@ -116,25 +117,25 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "NumberColumns",
             "Number of Columns",
             "int",
-            default=1,
+            default=4,
             required=True,
-            help_text="Maximum of 3 columns per source page.",
+            help_text="Maximum of 4 columns per source page.",
         ),
         ProjectFieldDefinition(
             "ColumnName",
             "Column Name",
             "text",
-            default="centercol",
+            default=",".join(language.title() for language in DEFAULT_SCRIPTURE_COLUMN_LANGUAGES),
             required=True,
-            help_text="Comma-separated column names based on NumberColumns. You can override the defaults manually.",
+            help_text="Comma-separated column names based on NumberColumns, defaulting to language names.",
         ),
         ProjectFieldDefinition(
             "ColumnLanguage",
             "Column Language",
             "text",
-            default="eng" if "eng" in languages else (languages[0] if languages else ""),
+            default=",".join(DEFAULT_SCRIPTURE_COLUMN_LANGUAGES),
             required=True,
-            help_text="Comma-separated column language codes based on NumberColumns. You can override the defaults manually.",
+            help_text="Comma-separated column language names based on NumberColumns.",
         ),
         ProjectFieldDefinition(
             "CurrentLanguage",
@@ -217,7 +218,7 @@ def normalize_project_database_values(
     normalized["ProjectPageNumber"] = max(1, _coerce_int(normalized.get("ProjectPageNumber"), 1))
     normalized["ProjectPageProgress"] = _clamp(_coerce_int(normalized.get("ProjectPageProgress"), 0), 0, 100)
 
-    normalized["NumberColumns"] = _clamp(_coerce_int(normalized.get("NumberColumns"), 1), 1, 3)
+    normalized["NumberColumns"] = _clamp(_coerce_int(normalized.get("NumberColumns"), 4), 1, 4)
     normalized["ColumnName"] = _normalize_column_names(
         normalized.get("ColumnName"),
         normalized["NumberColumns"],
@@ -432,11 +433,7 @@ def _normalize_project_type(value: Any) -> str:
 
 
 def _default_column_names(column_count: int) -> List[str]:
-    if column_count <= 1:
-        return ["centercol"]
-    if column_count == 2:
-        return ["leftcol", "rightcol"]
-    return ["leftcol", "centercol", "rightcol"]
+    return [language.title() for language in DEFAULT_SCRIPTURE_COLUMN_LANGUAGES[:max(1, column_count)]]
 
 
 def _normalize_column_names(value: Any, column_count: int) -> str:
@@ -460,9 +457,12 @@ def _normalize_column_names(value: Any, column_count: int) -> str:
 
 
 def _default_column_languages(column_count: int, base_language: str) -> List[str]:
-    language = str(base_language or "").strip()
+    if column_count <= len(DEFAULT_SCRIPTURE_COLUMN_LANGUAGES):
+        return DEFAULT_SCRIPTURE_COLUMN_LANGUAGES[:column_count]
+
+    language = str(base_language or "").strip().lower()
     if not language:
-        return [""] * column_count
+        language = "english"
     return [language] * column_count
 
 

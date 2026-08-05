@@ -1,5 +1,6 @@
 import os
 import json
+import csv
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Optional, Sequence
@@ -50,15 +51,41 @@ MODULE_MILESTONES: Dict[str, Sequence[str]] = {
 }
 
 TRACKING_FILENAME = "ProjectTracking.json"
+HANDSHAKE_FILENAME = os.path.join(
+    "Model",
+    "Project",
+    "Images",
+    "MyServer",
+    "Workflow",
+    "module_handshakes.csv",
+)
 ACTIVE_PROJECT_ROOT_KEYS = (
     "self.active_project_root",
     "self.project_root",
 )
 
+MODULE_LABOR_FACTORS: Dict[str, float] = {
+    "MyServer": 1.2,
+    "MyScanner": 1.3,
+    "MyPixler": 1.8,
+    "MyBoxer": 2.1,
+    "MyGlypher": 2.2,
+    "MyReader": 1.8,
+    "MyGrounder": 2.0,
+    "MyTrainer": 2.4,
+    "MyLexer": 1.5,
+    "MyResolver": 1.6,
+    "MyVersifier": 1.7,
+    "MyWriter": 1.4,
+}
+
 
 class ProjectWorkflowTracker:
     def __init__(self, workspace_root: Optional[str] = None):
         self.workspace_root = self._normalize_path(workspace_root)
+        self._handshake_rows = self._load_handshake_rows()
+        self._handshake_milestone_weights = self._build_handshake_weight_map()
+        self._milestone_catalog = self._build_milestone_catalog()
 
     def tracking_file_path(self, project_root: str) -> str:
         return os.path.join(project_root, "Model", "Project", "Data", "json", TRACKING_FILENAME)
@@ -124,16 +151,16 @@ class ProjectWorkflowTracker:
         state = self.ensure_tracking_state(normalized_root)
         tracked_milestones = state.get("milestones", {})
         rows = []
-        for milestone in OVERALL_MILESTONES:
-            tracked_value = tracked_milestones.get(milestone.key, {})
+        for milestone_key, milestone_label, default_weight in self._milestone_catalog:
+            tracked_value = tracked_milestones.get(milestone_key, {})
             rows.append(
                 {
-                    "key": milestone.key,
-                    "label": milestone.label,
-                    "weight": self._effective_weight(milestone, tracked_value),
+                    "key": milestone_key,
+                    "label": milestone_label,
+                    "weight": self._effective_weight(default_weight, tracked_value),
                     "complete": self._milestone_complete(
                         normalized_root,
-                        milestone.key,
+                        milestone_key,
                         tracked_milestones,
                     ),
                     "completed_at": tracked_value.get("completed_at") if isinstance(tracked_value, dict) else None,
@@ -156,19 +183,23 @@ class ProjectWorkflowTracker:
         state = self.ensure_tracking_state(normalized_root)
         milestones = state.setdefault("milestones", {})
 
-        for milestone in OVERALL_MILESTONES:
-            update = milestone_updates.get(milestone.key)
+        defaults = {key: (label, weight) for key, label, weight in self._milestone_catalog}
+        known_keys = set(defaults.keys()) | set(milestones.keys()) | set(milestone_updates.keys())
+
+        for milestone_key in sorted(known_keys):
+            update = milestone_updates.get(milestone_key)
             if not isinstance(update, dict):
                 continue
 
-            target = milestones.setdefault(milestone.key, {})
+            default_label, default_weight = defaults.get(milestone_key, (milestone_key, 1))
+            target = milestones.setdefault(milestone_key, {})
             previous_complete = bool(target.get("complete", False))
 
             if "weight" in update:
                 try:
                     target["weight"] = max(1, int(update["weight"]))
                 except (TypeError, ValueError):
-                    target["weight"] = milestone.weight
+                    target["weight"] = default_weight
 
             if "complete" in update:
                 complete = bool(update["complete"])
@@ -185,8 +216,8 @@ class ProjectWorkflowTracker:
             if "details" in update:
                 target["details"] = update.get("details")
 
-            target.setdefault("label", milestone.label)
-            target.setdefault("weight", milestone.weight)
+            target.setdefault("label", default_label)
+            target.setdefault("weight", default_weight)
 
         path = self.tracking_file_path(normalized_root)
         with open(path, "w", encoding="utf-8") as handle:
@@ -212,7 +243,11 @@ class ProjectWorkflowTracker:
             return {
                 "project_root": None,
                 "project_name": "none",
+                "project_percent": 0,
                 "overall_percent": 0,
+                "page_percent": 0,
+                "total_pages": 0,
+                "completed_pages": 0,
                 "overall_completed_count": 0,
                 "overall_total_count": len(OVERALL_MILESTONES),
                 "overall_next_label": OVERALL_MILESTONES[0].label if OVERALL_MILESTONES else "",
@@ -225,11 +260,25 @@ class ProjectWorkflowTracker:
         tracking_state = self.ensure_tracking_state(resolved_root)
         tracked_milestones = tracking_state.get("milestones", {})
 
+        all_milestone_states = [
+            {
+                "key": milestone_key,
+                "label": milestone_label,
+                "weight": self._effective_weight(default_weight, tracked_milestones.get(milestone_key, {})),
+                "complete": self._milestone_complete(
+                    resolved_root,
+                    milestone_key,
+                    tracked_milestones,
+                ),
+            }
+            for milestone_key, milestone_label, default_weight in self._milestone_catalog
+        ]
+
         milestone_states = [
             {
                 "key": milestone.key,
                 "label": milestone.label,
-                "weight": self._effective_weight(milestone, tracked_milestones.get(milestone.key, {})),
+                "weight": self._effective_weight(milestone.weight, tracked_milestones.get(milestone.key, {})),
                 "complete": self._milestone_complete(
                     resolved_root,
                     milestone.key,
@@ -243,6 +292,16 @@ class ProjectWorkflowTracker:
         completed_weight = sum(item["weight"] for item in milestone_states if item["complete"])
         overall_percent = int(round((completed_weight * 100) / total_weight))
 
+        handshake_milestone_states = [
+            item for item in all_milestone_states if item["key"] in self._handshake_milestone_weights
+        ]
+        if handshake_milestone_states:
+            handshake_total = sum(item["weight"] for item in handshake_milestone_states) or 1
+            handshake_complete = sum(item["weight"] for item in handshake_milestone_states if item["complete"])
+            project_percent = int(round((handshake_complete * 100) / handshake_total))
+        else:
+            project_percent = overall_percent
+
         completed_labels = [item["label"] for item in milestone_states if item["complete"]]
         next_overall = next((item for item in milestone_states if not item["complete"]), None)
 
@@ -251,11 +310,18 @@ class ProjectWorkflowTracker:
         next_module = next((item for item in module_states if not item["complete"]), None)
 
         project_context = self._load_project_context(resolved_root)
+        total_pages = self._context_total_pages(project_context)
+        page_percent = project_percent
+        completed_pages = int(round((total_pages * page_percent) / 100)) if total_pages > 0 else 0
 
         return {
             "project_root": resolved_root,
             "project_name": os.path.basename(resolved_root),
+            "project_percent": project_percent,
             "overall_percent": overall_percent,
+            "page_percent": page_percent,
+            "total_pages": total_pages,
+            "completed_pages": completed_pages,
             "overall_completed_count": len(completed_labels),
             "overall_total_count": len(milestone_states),
             "overall_next_label": next_overall["label"] if next_overall else "Complete",
@@ -371,6 +437,8 @@ class ProjectWorkflowTracker:
             "training_progress_plotted": self._training_progress_plotted,
         }
         detector = detectors.get(milestone_key)
+        if detector is None and milestone_key in self._handshake_milestone_weights:
+            return self._handshake_milestone_complete(project_root, milestone_key)
         return detector(project_root) if detector else False
 
     def _training_workspace_ready(self, project_root: str) -> bool:
@@ -415,11 +483,18 @@ class ProjectWorkflowTracker:
         if context:
             return self._normalize_project_context(context)
 
-        sqlite_path = os.path.join(project_root, "project_metadata.sqlite")
-        if os.path.isfile(sqlite_path):
+        sqlite_candidates = (
+            os.path.join(project_root, "Model", "Project", "Data", "sqlite", "project_metadata.sqlite"),
+            os.path.join(project_root, "Model", "Project", "Data", "SQLite", "project_metadata.sqlite"),
+            os.path.join(project_root, "project_metadata.sqlite"),
+        )
+        for sqlite_path in sqlite_candidates:
+            if not os.path.isfile(sqlite_path):
+                continue
             loaded = load_project_database_record(sqlite_path)
-            if isinstance(loaded, dict):
+            if isinstance(loaded, dict) and loaded:
                 context = loaded
+                break
 
         return self._normalize_project_context(context)
 
@@ -540,38 +615,43 @@ class ProjectWorkflowTracker:
                 return milestone.label
         return ""
 
-    def _effective_weight(self, milestone: WorkflowMilestone, tracked_value: object) -> int:
+    def _effective_weight(self, default_weight: int, tracked_value: object) -> int:
         if isinstance(tracked_value, dict):
             try:
-                return max(1, int(tracked_value.get("weight", milestone.weight)))
+                return max(1, int(tracked_value.get("weight", default_weight)))
             except (TypeError, ValueError):
-                return milestone.weight
-        return milestone.weight
+                return default_weight
+        return default_weight
 
     def _milestone_label(self, milestone_key: str) -> str:
         for milestone in OVERALL_MILESTONES:
             if milestone.key == milestone_key:
                 return milestone.label
+        for key, label, _weight in self._milestone_catalog:
+            if key == milestone_key:
+                return label
         return milestone_key
 
     def _milestone_weight(self, milestone_key: str) -> int:
         for milestone in OVERALL_MILESTONES:
             if milestone.key == milestone_key:
                 return milestone.weight
+        if milestone_key in self._handshake_milestone_weights:
+            return self._handshake_milestone_weights[milestone_key]
         return 1
 
     def _default_tracking_state(self) -> Dict[str, object]:
         return {
             "version": 1,
             "milestones": {
-                milestone.key: {
-                    "label": milestone.label,
-                    "weight": milestone.weight,
+                milestone_key: {
+                    "label": milestone_label,
+                    "weight": milestone_weight,
                     "complete": False,
                     "completed_at": None,
                     "updated_by": None,
                 }
-                for milestone in OVERALL_MILESTONES
+                for milestone_key, milestone_label, milestone_weight in self._milestone_catalog
             },
         }
 
@@ -585,22 +665,126 @@ class ProjectWorkflowTracker:
         if not isinstance(raw_milestones, dict):
             return state
 
-        for milestone in OVERALL_MILESTONES:
-            existing = raw_milestones.get(milestone.key, {})
+        for milestone_key, milestone_label, milestone_weight in self._milestone_catalog:
+            existing = raw_milestones.get(milestone_key, {})
             if not isinstance(existing, dict):
                 continue
-            target = state["milestones"][milestone.key]
-            target["label"] = existing.get("label", milestone.label)
+            target = state["milestones"][milestone_key]
+            target["label"] = existing.get("label", milestone_label)
             try:
-                target["weight"] = max(1, int(existing.get("weight", milestone.weight)))
+                target["weight"] = max(1, int(existing.get("weight", milestone_weight)))
             except (TypeError, ValueError):
-                target["weight"] = milestone.weight
+                target["weight"] = milestone_weight
             target["complete"] = bool(existing.get("complete", False))
             target["completed_at"] = existing.get("completed_at")
             target["updated_by"] = existing.get("updated_by")
             if "details" in existing:
                 target["details"] = existing.get("details")
         return state
+
+    def _build_milestone_catalog(self) -> List[tuple]:
+        catalog = [(m.key, m.label, m.weight) for m in OVERALL_MILESTONES]
+        for milestone_key in sorted(self._handshake_milestone_weights.keys()):
+            if any(existing_key == milestone_key for existing_key, _label, _weight in catalog):
+                continue
+            catalog.append((milestone_key, self._humanize_milestone_name(milestone_key), self._handshake_milestone_weights[milestone_key]))
+        return catalog
+
+    def _load_handshake_rows(self) -> List[Dict[str, str]]:
+        handshake_path = self._resolve_handshake_file_path()
+        if not handshake_path or not os.path.isfile(handshake_path):
+            return []
+
+        rows: List[Dict[str, str]] = []
+        with open(handshake_path, "r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle, delimiter=" ", skipinitialspace=True)
+            for raw_row in reader:
+                if not raw_row:
+                    continue
+                row = {str(key).strip(): str(value).strip() for key, value in raw_row.items() if key}
+                milestone_name = row.get("MilestoneName", "")
+                if not milestone_name:
+                    continue
+                rows.append(row)
+        return rows
+
+    def _resolve_handshake_file_path(self) -> Optional[str]:
+        candidates = []
+        if self.workspace_root:
+            candidates.append(os.path.join(self.workspace_root, HANDSHAKE_FILENAME))
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+        candidates.append(os.path.join(repo_root, HANDSHAKE_FILENAME))
+        candidates.append(os.path.join(os.getcwd(), HANDSHAKE_FILENAME))
+
+        for candidate in candidates:
+            if os.path.isfile(candidate):
+                return candidate
+        return None
+
+    def _build_handshake_weight_map(self) -> Dict[str, int]:
+        milestone_scores: Dict[str, float] = {}
+        for row in self._handshake_rows:
+            key = row.get("MilestoneName", "").strip()
+            if not key:
+                continue
+            in_module = row.get("InputModule", "")
+            out_module = row.get("OutputModule", "")
+            in_factor = MODULE_LABOR_FACTORS.get(in_module, 1.0)
+            out_factor = MODULE_LABOR_FACTORS.get(out_module, 1.0)
+            base_score = (in_factor + out_factor) / 2.0
+
+            ui_bonus = 0.15 if row.get("UI_Action", "").strip().upper() == "Y" else 0.0
+            manual_bonus = 0.15 if row.get("Override", "").strip().upper() == "N" else 0.0
+            milestone_scores[key] = milestone_scores.get(key, 0.0) + max(0.2, base_score + ui_bonus + manual_bonus)
+
+        if not milestone_scores:
+            return {}
+
+        total_score = sum(milestone_scores.values()) or 1.0
+        weights: Dict[str, int] = {}
+        for key, score in milestone_scores.items():
+            weights[key] = max(1, int(round((score * 100.0) / total_score)))
+        return weights
+
+    def _humanize_milestone_name(self, milestone_key: str) -> str:
+        return milestone_key.replace("_", " ").strip().title()
+
+    def _handshake_milestone_complete(self, project_root: str, milestone_key: str) -> bool:
+        matching_rows = [row for row in self._handshake_rows if row.get("MilestoneName") == milestone_key]
+        if not matching_rows:
+            return False
+        return any(self._handshake_output_exists(project_root, row.get("OutputPath", "")) for row in matching_rows)
+
+    def _handshake_output_exists(self, project_root: str, output_path: str) -> bool:
+        normalized = str(output_path or "").strip()
+        if not normalized:
+            return False
+        if normalized.startswith("~/") or normalized.startswith("/"):
+            return False
+        candidate = os.path.join(project_root, *normalized.split("/"))
+        if os.path.isfile(candidate):
+            return True
+        if os.path.isdir(candidate):
+            return self._directory_has_files(candidate)
+        return False
+
+    def _context_total_pages(self, project_context: Dict[str, object]) -> int:
+        try:
+            number_pages = int(project_context.get("NumberPages", 0) or 0)
+        except (TypeError, ValueError):
+            number_pages = 0
+        try:
+            number_columns = int(project_context.get("NumberColumns", 0) or 0)
+        except (TypeError, ValueError):
+            number_columns = 0
+
+        if number_pages <= 0 and number_columns <= 0:
+            return 0
+        if number_pages <= 0:
+            return max(0, number_columns)
+        if number_columns <= 0:
+            return max(0, number_pages)
+        return max(0, number_pages * number_columns)
 
     @staticmethod
     def _utc_now_iso() -> str:

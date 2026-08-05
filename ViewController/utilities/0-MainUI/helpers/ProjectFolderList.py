@@ -96,6 +96,7 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Images",
     "Model/Project/Images/Complete",
     "Model/Project/Data/json",
+    "Model/Project/Data/sqlite",
     "Model/Project/Data/esword",
     "Model/Project/Utilities",
     "Model/Project/Images/Complete/Greek",

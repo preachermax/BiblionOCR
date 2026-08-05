@@ -30,7 +30,6 @@ def main():
     from PyQt5 import QtWidgets
     from SessionManager import SessionManager
     from project_status_controller import ProjectStatusController
-    from ProjectTrackingDialog import ProjectTrackingDialog
 
     temp_dir = tempfile.mkdtemp(prefix="biblion_project_status_")
     project_root = os.path.join(temp_dir, "SmokeProject")
@@ -61,17 +60,17 @@ def main():
 
         assert controller.resolve_project_root() == os.path.normpath(project_root)
         assert controller.project_name_status_label.text() == "Project: SmokeProject"
-        assert controller.project_tracking_button.text() == "Milestones"
-
-        dialog = ProjectTrackingDialog(controller.workflow_tracker, project_root, "SmokeModule", window)
-        assert dialog.table.rowCount() > 0
-
-        row_widgets = dialog._row_widgets["source_acquired"]
-        row_widgets["weight"].setValue(25)
-        row_widgets["complete"].setChecked(True)
-
-        QtWidgets.QMessageBox.information = lambda *args, **kwargs: None
-        dialog.save_rows()
+        updates = {
+            "source_acquired": {
+                "weight": 25,
+                "complete": True,
+            }
+        }
+        controller.workflow_tracker.update_milestones(
+            project_root,
+            updates,
+            updated_by="SmokeModule:manual",
+        )
 
         tracking_path = controller.workflow_tracker.tracking_file_path(project_root)
         with open(tracking_path, "r", encoding="utf-8") as handle:

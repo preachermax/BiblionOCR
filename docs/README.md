@@ -149,6 +149,23 @@ When a document feels misplaced, move or rewrite it so the directory purpose rem
 
 ---
 
+## Current Runtime Administration Rules
+
+- MyServer is the sole runtime owner of project administration actions.
+- New project creation, project settings editing, and milestone override/weight editing are all centralized in MyServer.
+- Milestone override controls are presented on a dedicated `Milestone Settings` page in the Project Settings dialog.
+
+## Current Project Database Location
+
+For each created project, SQLite artifacts are stored in the project-local data path:
+
+- `Model/Project/Data/sqlite/project_metadata.sqlite`
+- `Model/Project/Data/sqlite/Project Settings.db`
+
+If no project has been created or opened yet, this folder may not exist in the workspace template tree.
+
+---
+
 *Documentation preserves understanding.*
 
 *Biblion is intended to preserve both software and the reasons it exists.*

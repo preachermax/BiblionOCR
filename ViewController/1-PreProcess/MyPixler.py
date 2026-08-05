@@ -71,7 +71,6 @@ from Adjust import crop_processor, get_processor, rotate_processor, threshold_pr
 from ImagePreviewDialog import ImagePreviewDialog
 from MorphologyDialog import MorphologyDialog
 from LocalFileDrop import LocalFileDropMixin
-from ProjectTrackingDialog import ProjectTrackingDialog
 
 
 # Dialog Imports
@@ -1094,14 +1093,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.project_overall_status_bar.setFixedWidth(140)
         self.project_overall_status_bar.setAlignment(Qt.AlignCenter)
 
-        self.project_tracking_button = qtw.QPushButton("Milestones")
-        self.project_tracking_button.setFixedHeight(24)
-        self.project_tracking_button.clicked.connect(self._open_project_tracking_dialog)
+        self.page_status_bar = qtw.QProgressBar()
+        self.page_status_bar.setRange(0, 100)
+        self.page_status_bar.setValue(0)
+        self.page_status_bar.setTextVisible(True)
+        self.page_status_bar.setFormat("Page 0%")
+        self.page_status_bar.setFixedWidth(130)
+        self.page_status_bar.setAlignment(Qt.AlignCenter)
 
         self.statusBar().addPermanentWidget(self.project_name_status_label)
         self.statusBar().addPermanentWidget(self.workflow_status_label)
         self.statusBar().addPermanentWidget(self.project_overall_status_bar)
-        self.statusBar().addPermanentWidget(self.project_tracking_button)
+        self.statusBar().addPermanentWidget(self.page_status_bar)
 
     def _shared_active_project_root(self):
         return self.shared_session_manager.get_active_project_root()
@@ -1159,15 +1162,26 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         completed_labels = snapshot.get("completed_labels", [])
         completed_text = ", ".join(completed_labels) if completed_labels else "None yet"
-        overall_percent = int(snapshot.get("overall_percent", 0))
+        project_percent = int(snapshot.get("project_percent", snapshot.get("overall_percent", 0)))
+        page_percent = int(snapshot.get("page_percent", project_percent))
+        completed_pages = int(snapshot.get("completed_pages", 0))
+        total_pages = int(snapshot.get("total_pages", 0))
         overall_next = snapshot.get("overall_next_label", "")
-        tooltip = f"Overall {overall_percent}%\nCompleted: {completed_text}\nNext: {overall_next}"
+        tooltip = (
+            f"Project {project_percent}%\n"
+            f"Page {page_percent}% ({completed_pages}/{total_pages})\n"
+            f"Completed: {completed_text}\n"
+            f"Next: {overall_next}"
+        )
 
         self.workflow_status_label.setText(self._format_module_workflow_status("MyPixler", snapshot))
         self.workflow_status_label.setToolTip(tooltip)
-        self.project_overall_status_bar.setValue(overall_percent)
-        self.project_overall_status_bar.setFormat(f"Project {overall_percent}%")
+        self.project_overall_status_bar.setValue(project_percent)
+        self.project_overall_status_bar.setFormat(f"Project {project_percent}%")
         self.project_overall_status_bar.setToolTip(tooltip)
+        self.page_status_bar.setValue(page_percent)
+        self.page_status_bar.setFormat(f"Page {page_percent}%")
+        self.page_status_bar.setToolTip(tooltip)
 
     def _record_project_milestone(self, milestone_key, candidate_path=None, details=None):
         project_root = self.workflow_tracker.resolve_project_root(
@@ -1194,31 +1208,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         )
         self._refresh_project_status(project_root)
         return project_root
-
-    def _open_project_tracking_dialog(self):
-        project_root = self.workflow_tracker.resolve_project_root(
-            self._shared_active_project_root(),
-            self.current_project_root,
-            getattr(self, "refimgpath", ""),
-            getattr(self, "imgpath", ""),
-            getattr(self, "refimgdir", ""),
-            getattr(self, "imagedir", ""),
-            getattr(self, "workflow", ""),
-            getattr(self, "session", ""),
-        )
-        if not project_root:
-            qtw.QMessageBox.information(
-                self,
-                "Project Milestones",
-                "Select or create a project in MyServer first so milestone state can be edited.",
-            )
-            return
-
-        self.current_project_root = project_root
-        self.workflow_tracker.ensure_tracking_state(project_root)
-        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, "MyPixler", self)
-        dialog.exec_()
-        self._refresh_project_status(project_root)
 
     def _init_subprocess_return_controls(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
@@ -1625,6 +1614,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 'self.firstpage': self.firstpage,
                 'self.lastpage': self.lastpage,
             })
+            ### MILESTONE - source_acquired-15% ###
             self._record_project_milestone(
                 "source_acquired",
                 workflow_folder,
@@ -1711,6 +1701,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     else:
                         shutil.copy2(source, destination)
             print("pdf pages for tif extraction complete")
+            ### MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
@@ -1802,11 +1793,13 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            ### MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
                 details={"source": "actiontiff_to_mono"},
             )
+            ### MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
@@ -1902,6 +1895,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            ### MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
@@ -2111,6 +2105,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            ### MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 tif_workflow_folder,
@@ -2294,6 +2289,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         shutil.copytree(source, destination, symlinks, ignore)
                     else:
                         shutil.copy2(source, destination)
+            ### MILESTONE - pages_prepared-20% ###
             self._record_project_milestone(
                 "pages_prepared",
                 workflow_greek_folder or workflow_latin_folder,
