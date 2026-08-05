@@ -13,6 +13,7 @@ from .project_database import (
     create_project_database,
     export_project_database_json,
 )
+from .project_tracking import ProjectWorkflowTracker
 
 
 class ProjectCreationEngine:
@@ -688,6 +689,7 @@ class ProjectCreationEngine:
 
         database_seed = {
             "ProjectName": self.context.get("project_name", ""),
+            "ProjectDatabase": self.context.get("ProjectDatabase") or self.context.get("project_database") or "",
             "ProjectType": self.context.get("ProjectType", "Scriptural"),
             "ScripturalSource": self.context.get("ScripturalSource", "both"),
             "NumberPages": self.context.get("NumberPages", 0),
@@ -696,17 +698,44 @@ class ProjectCreationEngine:
             "ColumnLanguage": self.context.get("ColumnLanguage", ""),
             "NumberLanguages": self.context.get("NumberLanguages", 0),
             "Languages": self.context.get("Languages", []),
+            "ProjectFont": self.context.get("ProjectFont") or self.context.get("project_font") or "",
             "ProvenancePath": self.context.get("source_provenance_path", ""),
             "Notes": self.context.get("user_intent_summary", ""),
         }
+        extra_project_db_fields = self.context.get("ProjectDatabaseFields")
+        if isinstance(extra_project_db_fields, dict):
+            database_seed.update(extra_project_db_fields)
 
-        create_project_database(project_metadata_db_path, database_seed)
+        normalized_db_seed = create_project_database(project_metadata_db_path, database_seed)
         export_project_database_json(project_metadata_db_path, project_metadata_json_path)
+
+        # Create the project deliverable database using the configured filename.
+        project_database_name = str(normalized_db_seed.get("ProjectDatabase") or "").strip() or "project.db"
+        if not project_database_name.lower().endswith(".db"):
+            project_database_name = f"{project_database_name}.db"
+        project_database_path = os.path.join(project_path, "Model", "Project", "Data", "SQLite", project_database_name)
+        os.makedirs(os.path.dirname(project_database_path), exist_ok=True)
+        with sqlite3.connect(project_database_path):
+            pass
+
+        self._append_generated_manifest_entry(
+            project_path,
+            f"Model/Project/Data/SQLite/{project_database_name}",
+        )
 
         # Keep the RIS settings sqlite file present from project creation onward.
         project_settings_db_path = os.path.join(sqlite_dir, "Project Settings.db")
         with sqlite3.connect(project_settings_db_path):
             pass
+
+        milestone_updates = self.context.get("MilestoneSettings")
+        if isinstance(milestone_updates, dict) and milestone_updates:
+            tracker = ProjectWorkflowTracker(workspace_root=os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+            tracker.update_milestones(
+                project_path,
+                milestone_updates,
+                updated_by="ProjectCreationWizard",
+            )
 
         self.emit(
             "project_databases_initialized",
@@ -714,8 +743,32 @@ class ProjectCreationEngine:
                 "sqlite_dir": sqlite_dir,
                 "project_metadata_db": project_metadata_db_path,
                 "project_settings_db": project_settings_db_path,
+                "project_database": project_database_path,
             },
         )
+
+    # -----------------------
+    def _append_generated_manifest_entry(self, project_path, manifest_entry):
+        manifest_path = os.path.join(project_path, "src", "manifests", "ProjectFolderList.txt")
+        if not os.path.exists(manifest_path):
+            return
+
+        normalized_entry = str(manifest_entry or "").replace("\\", "/").strip()
+        if not normalized_entry:
+            return
+
+        with open(manifest_path, "r", encoding="utf-8") as handle:
+            existing_entries = {
+                line.strip() for line in handle if line.strip()
+            }
+
+        if normalized_entry in existing_entries:
+            return
+
+        with open(manifest_path, "a", encoding="utf-8") as handle:
+            if existing_entries:
+                handle.write("\n")
+            handle.write(f"{normalized_entry}\n")
 
     # -----------------------
     def _copy_structure_manifest(self, project_path, folder_list_path, folder_count, file_count):

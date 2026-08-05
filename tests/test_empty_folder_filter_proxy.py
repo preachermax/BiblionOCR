@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +31,12 @@ def test_exclude_empty_dirs_filters_empty_directories(tmp_path):
     proxy.setExcludeEmptyDirs(True)
 
     source_root_index = model.index(str(root_dir))
+
+    # QFileSystemModel populates asynchronously; wait briefly for the directory listing.
+    deadline = QtCore.QDeadlineTimer(2000)
+    while model.rowCount(source_root_index) == 0 and not deadline.hasExpired():
+        app.processEvents(QtCore.QEventLoop.AllEvents, 50)
+
     proxy_root_index = proxy.mapFromSource(source_root_index)
 
     assert proxy.rowCount(proxy_root_index) == 1

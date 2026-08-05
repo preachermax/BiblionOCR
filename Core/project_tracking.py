@@ -50,6 +50,21 @@ MODULE_MILESTONES: Dict[str, Sequence[str]] = {
     ),
 }
 
+MODULE_SEQUENCE: Sequence[str] = (
+    "MyServer",
+    "MyScanner",
+    "MyPixler",
+    "MyBoxer",
+    "MyGlypher",
+    "MyReader",
+    "MyGrounder",
+    "MyTrainer",
+    "MyLexer",
+    "MyResolver",
+    "MyVersifier",
+    "MyWriter",
+)
+
 TRACKING_FILENAME = "ProjectTracking.json"
 HANDSHAKE_FILENAME = os.path.join(
     "Model",
@@ -85,6 +100,8 @@ class ProjectWorkflowTracker:
         self.workspace_root = self._normalize_path(workspace_root)
         self._handshake_rows = self._load_handshake_rows()
         self._handshake_milestone_weights = self._build_handshake_weight_map()
+        self._handshake_milestone_order = self._build_handshake_order_map()
+        self._handshake_milestone_modules = self._build_handshake_module_map()
         self._milestone_catalog = self._build_milestone_catalog()
 
     def tracking_file_path(self, project_root: str) -> str:
@@ -151,12 +168,15 @@ class ProjectWorkflowTracker:
         state = self.ensure_tracking_state(normalized_root)
         tracked_milestones = state.get("milestones", {})
         rows = []
-        for milestone_key, milestone_label, default_weight in self._milestone_catalog:
+        for sequence_index, (milestone_key, milestone_label, default_weight) in enumerate(self._milestone_catalog, start=1):
             tracked_value = tracked_milestones.get(milestone_key, {})
+            module_name = self._module_for_milestone(milestone_key)
             rows.append(
                 {
                     "key": milestone_key,
                     "label": milestone_label,
+                    "module": module_name,
+                    "sequence": sequence_index,
                     "weight": self._effective_weight(default_weight, tracked_value),
                     "complete": self._milestone_complete(
                         normalized_root,
@@ -684,11 +704,44 @@ class ProjectWorkflowTracker:
 
     def _build_milestone_catalog(self) -> List[tuple]:
         catalog = [(m.key, m.label, m.weight) for m in OVERALL_MILESTONES]
-        for milestone_key in sorted(self._handshake_milestone_weights.keys()):
+        ordered_handshake_keys = sorted(
+            self._handshake_milestone_weights.keys(),
+            key=lambda key: self._handshake_milestone_order.get(key, 10_000),
+        )
+        for milestone_key in ordered_handshake_keys:
             if any(existing_key == milestone_key for existing_key, _label, _weight in catalog):
                 continue
             catalog.append((milestone_key, self._humanize_milestone_name(milestone_key), self._handshake_milestone_weights[milestone_key]))
         return catalog
+
+    def _build_handshake_order_map(self) -> Dict[str, int]:
+        order_map: Dict[str, int] = {}
+        for index, row in enumerate(self._handshake_rows):
+            milestone_key = row.get("MilestoneName", "").strip()
+            if not milestone_key or milestone_key in order_map:
+                continue
+            order_map[milestone_key] = index
+        return order_map
+
+    def _build_handshake_module_map(self) -> Dict[str, str]:
+        module_map: Dict[str, str] = {}
+        for row in self._handshake_rows:
+            milestone_key = row.get("MilestoneName", "").strip()
+            if not milestone_key or milestone_key in module_map:
+                continue
+            output_module = row.get("OutputModule", "").strip()
+            input_module = row.get("InputModule", "").strip()
+            module_map[milestone_key] = output_module or input_module or "Workflow"
+        return module_map
+
+    def _module_for_milestone(self, milestone_key: str) -> str:
+        if milestone_key in self._handshake_milestone_modules:
+            return self._handshake_milestone_modules[milestone_key]
+
+        for module_name, milestone_keys in MODULE_MILESTONES.items():
+            if milestone_key in milestone_keys:
+                return module_name
+        return "Workflow"
 
     def _load_handshake_rows(self) -> List[Dict[str, str]]:
         handshake_path = self._resolve_handshake_file_path()

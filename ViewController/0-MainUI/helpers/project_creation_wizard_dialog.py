@@ -3,7 +3,11 @@ import json
 import os
 import re
 
+from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
+
+from Core.project_database import build_project_field_definitions
+from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 
 
 class ProjectCreationWizardDialog(qtw.QDialog):
@@ -16,14 +20,26 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.setModal(True)
         self.resize(640, 420)
         self._page_titles = [
-            "Step 1 of 3: RIS import",
-            "Step 2 of 3: Project details",
-            "Step 3 of 3: Project folders",
+            "Step 1 of 5: RIS import",
+            "Step 2 of 5: Project details",
+            "Step 3 of 5: Project settings",
+            "Step 4 of 5: Milestones",
+            "Step 5 of 5: Project folders",
         ]
         self.imported_provenance = {}
         self.folder_selection_pages = {}
         self.folder_selection_checkboxes = {}
         self.folder_selection_state = {"scriptural": set(), "general": set()}
+        self.workflow_tracker = ProjectWorkflowTracker(
+            workspace_root=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+        )
+        self._project_db_definitions = build_project_field_definitions()
+        self._project_db_definition_map = {
+            definition.key: definition for definition in self._project_db_definitions
+        }
+        self.project_db_table = None
+        self.milestones_table = None
+        self.handshake_table = None
         self._build_ui()
         self._update_page_state()
 
@@ -180,6 +196,86 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         details_layout.addStretch(1)
         self.page_stack.addWidget(details_page)
 
+        project_settings_page = qtw.QWidget()
+        project_settings_layout = qtw.QVBoxLayout(project_settings_page)
+        project_settings_layout.setSpacing(10)
+
+        project_settings_label = qtw.QLabel("Project settings")
+        project_settings_layout.addWidget(project_settings_label)
+
+        project_settings_help = qtw.QLabel(
+            "These values initialize project_metadata.sqlite. Recommended tools: DB Browser for SQLite and FontForge."
+        )
+        project_settings_help.setWordWrap(True)
+        project_settings_layout.addWidget(project_settings_help)
+
+        self.project_db_table = qtw.QTableWidget(0, 3, self)
+        self.project_db_table.setHorizontalHeaderLabels(["Field", "Value", "Notes"])
+        self.project_db_table.verticalHeader().setVisible(False)
+        self.project_db_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.project_db_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        self.project_db_table.setAlternatingRowColors(True)
+        self.project_db_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.project_db_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.Stretch)
+        self.project_db_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
+        project_settings_layout.addWidget(self.project_db_table, 1)
+
+        self.page_stack.addWidget(project_settings_page)
+        self._load_project_database_defaults()
+
+        milestones_page = qtw.QWidget()
+        milestones_layout = qtw.QVBoxLayout(milestones_page)
+        milestones_layout.setSpacing(10)
+
+        milestones_label = qtw.QLabel("Milestone and module handshake settings")
+        milestones_layout.addWidget(milestones_label)
+
+        milestones_help = qtw.QLabel(
+            "Milestones and handshakes are grouped by module and shown in sequential order."
+        )
+        milestones_help.setWordWrap(True)
+        milestones_layout.addWidget(milestones_help)
+
+        milestones_tabs = qtw.QTabWidget(self)
+
+        milestone_tab = qtw.QWidget()
+        milestone_tab_layout = qtw.QVBoxLayout(milestone_tab)
+        self.milestones_table = qtw.QTableWidget(0, 6, self)
+        self.milestones_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone Key", "Label", "Weight", "Complete"])
+        self.milestones_table.verticalHeader().setVisible(False)
+        self.milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.milestones_table.setAlternatingRowColors(True)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(3, qtw.QHeaderView.Stretch)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(4, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(5, qtw.QHeaderView.ResizeToContents)
+        milestone_tab_layout.addWidget(self.milestones_table)
+        milestones_tabs.addTab(milestone_tab, "Milestones")
+
+        handshake_tab = qtw.QWidget()
+        handshake_tab_layout = qtw.QVBoxLayout(handshake_tab)
+        self.handshake_table = qtw.QTableWidget(0, 6, self)
+        self.handshake_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone", "Language", "Input Path", "Output Path"])
+        self.handshake_table.verticalHeader().setVisible(False)
+        self.handshake_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.handshake_table.setAlternatingRowColors(True)
+        self.handshake_table.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(3, qtw.QHeaderView.ResizeToContents)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(4, qtw.QHeaderView.Stretch)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(5, qtw.QHeaderView.Stretch)
+        handshake_tab_layout.addWidget(self.handshake_table)
+        milestones_tabs.addTab(handshake_tab, "Module Handshakes")
+
+        milestones_layout.addWidget(milestones_tabs, 1)
+        self.page_stack.addWidget(milestones_page)
+        self._load_milestones_defaults()
+        self._load_handshake_rows()
+
         folder_selection_page = qtw.QWidget()
         folder_selection_layout = qtw.QVBoxLayout(folder_selection_page)
         folder_selection_layout.setSpacing(10)
@@ -283,6 +379,17 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         errors = self._required_field_errors()
         entered_name = self.project_name_edit.text().strip()
         sanitized_name = self._sanitize_project_name(entered_name)
+        if self.project_db_table is not None:
+            self._set_project_db_value("ProjectName", sanitized_name)
+            self._set_project_db_value("ProjectType", self.project_type_combo.currentText().strip())
+            self._set_project_db_value("ScripturalSource", self._normalized_scriptural_source_choice())
+            self._set_project_db_value("NumberPages", str(self.source_pages_spin.value()))
+            self._set_project_db_value("NumberColumns", str(self.columns_per_page_spin.value()))
+            self._set_project_db_value("ColumnName", ",".join(self._selected_column_languages()))
+            self._set_project_db_value("ColumnLanguage", ",".join(language.lower() for language in self._selected_column_languages()))
+            self._set_project_db_value("Languages", ",".join(language.lower() for language in self._selected_column_languages()))
+            self._set_project_db_value("NumberLanguages", str(len(self._selected_column_languages())))
+            self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
         self._refresh_review()
         self._apply_required_field_state(self.project_name_edit, self.project_name_label, not self.project_name_edit.text().strip())
         self._apply_required_field_state(self.project_purpose_edit, self.project_purpose_label, not self.project_purpose_edit.toPlainText().strip())
@@ -527,6 +634,215 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             ])
         )
         self._refresh_review()
+
+    def _module_rank(self, module_name):
+        module = str(module_name or "").strip()
+        if module in MODULE_SEQUENCE:
+            return MODULE_SEQUENCE.index(module)
+        return len(MODULE_SEQUENCE)
+
+    def _load_project_database_defaults(self):
+        if self.project_db_table is None:
+            return
+
+        self.project_db_table.setRowCount(0)
+        for definition in self._project_db_definitions:
+            row = self.project_db_table.rowCount()
+            self.project_db_table.insertRow(row)
+
+            key_item = qtw.QTableWidgetItem(definition.key)
+            key_item.setFlags(key_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.project_db_table.setItem(row, 0, key_item)
+
+            default_value = definition.default
+            if isinstance(default_value, list):
+                display_value = ",".join(str(part) for part in default_value)
+            else:
+                display_value = "" if default_value is None else str(default_value)
+            self.project_db_table.setItem(row, 1, qtw.QTableWidgetItem(display_value))
+
+            notes = definition.help_text or definition.label
+            notes_item = qtw.QTableWidgetItem(notes)
+            notes_item.setFlags(notes_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.project_db_table.setItem(row, 2, notes_item)
+
+        # Synchronize key defaults with wizard controls.
+        self._set_project_db_value("ProjectName", self._sanitize_project_name(self.project_name_edit.text().strip()))
+        self._set_project_db_value("ProjectType", self.project_type_combo.currentText().strip())
+        self._set_project_db_value("ScripturalSource", self._normalized_scriptural_source_choice())
+        self._set_project_db_value("NumberPages", str(self.source_pages_spin.value()))
+        self._set_project_db_value("NumberColumns", str(self.columns_per_page_spin.value()))
+        self._set_project_db_value("ColumnName", ",".join(self._selected_column_languages()))
+        self._set_project_db_value("ColumnLanguage", ",".join(language.lower() for language in self._selected_column_languages()))
+        self._set_project_db_value("Languages", ",".join(language.lower() for language in self._selected_column_languages()))
+        self._set_project_db_value("NumberLanguages", str(len(self._selected_column_languages())))
+        self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
+
+    def _load_milestones_defaults(self):
+        if self.milestones_table is None:
+            return
+
+        self.milestones_table.setRowCount(0)
+        rows = []
+        for index, (key, label, weight) in enumerate(getattr(self.workflow_tracker, "_milestone_catalog", []), start=1):
+            module_name = self.workflow_tracker._module_for_milestone(key) if hasattr(self.workflow_tracker, "_module_for_milestone") else "Workflow"
+            rows.append(
+                {
+                    "module": module_name,
+                    "sequence": index,
+                    "key": key,
+                    "label": label,
+                    "weight": max(1, int(weight)),
+                    "complete": False,
+                }
+            )
+
+        rows = sorted(rows, key=lambda row: (self._module_rank(row.get("module")), int(row.get("sequence", 10_000)), str(row.get("key", ""))))
+
+        for row_data in rows:
+            row = self.milestones_table.rowCount()
+            self.milestones_table.insertRow(row)
+
+            module_item = qtw.QTableWidgetItem(str(row_data.get("module", "Workflow")))
+            module_item.setFlags(module_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.milestones_table.setItem(row, 0, module_item)
+
+            sequence_item = qtw.QTableWidgetItem(str(row_data.get("sequence", row + 1)))
+            sequence_item.setFlags(sequence_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.milestones_table.setItem(row, 1, sequence_item)
+
+            key_item = qtw.QTableWidgetItem(str(row_data.get("key", "")))
+            key_item.setFlags(key_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.milestones_table.setItem(row, 2, key_item)
+
+            label_item = qtw.QTableWidgetItem(str(row_data.get("label", "")))
+            label_item.setFlags(label_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.milestones_table.setItem(row, 3, label_item)
+
+            self.milestones_table.setItem(row, 4, qtw.QTableWidgetItem(str(row_data.get("weight", 1))))
+
+            complete_checkbox = qtw.QCheckBox()
+            complete_checkbox.setChecked(bool(row_data.get("complete", False)))
+            complete_widget = qtw.QWidget()
+            complete_layout = qtw.QHBoxLayout(complete_widget)
+            complete_layout.setContentsMargins(0, 0, 0, 0)
+            complete_layout.setAlignment(qtc.Qt.AlignCenter)
+            complete_layout.addWidget(complete_checkbox)
+            self.milestones_table.setCellWidget(row, 5, complete_widget)
+
+    def _load_handshake_rows(self):
+        if self.handshake_table is None:
+            return
+
+        self.handshake_table.setRowCount(0)
+        rows = list(getattr(self.workflow_tracker, "_handshake_rows", []) or [])
+        for index, row_data in enumerate(rows):
+            row_data["_source_index"] = index
+
+        rows = sorted(
+            rows,
+            key=lambda row: (
+                self._module_rank(row.get("OutputModule") or row.get("InputModule") or "Workflow"),
+                int(row.get("_source_index", 10_000)),
+            ),
+        )
+
+        for sequence, row_data in enumerate(rows, start=1):
+            row = self.handshake_table.rowCount()
+            self.handshake_table.insertRow(row)
+
+            module_name = str(row_data.get("OutputModule") or row_data.get("InputModule") or "Workflow")
+            values = [
+                module_name,
+                str(sequence),
+                str(row_data.get("MilestoneName", "")),
+                str(row_data.get("Language", "")),
+                str(row_data.get("InputPath", "")),
+                str(row_data.get("OutputPath", "")),
+            ]
+            for column_index, value in enumerate(values):
+                item = qtw.QTableWidgetItem(value)
+                item.setFlags(item.flags() & ~qtc.Qt.ItemIsEditable)
+                self.handshake_table.setItem(row, column_index, item)
+
+    def _default_project_database_name(self):
+        project_name = self._sanitize_project_name(self.project_name_edit.text().strip()) or "project"
+        return f"{project_name}.db"
+
+    def _find_project_db_row(self, field_key):
+        if self.project_db_table is None:
+            return None
+        for row in range(self.project_db_table.rowCount()):
+            item = self.project_db_table.item(row, 0)
+            if item is not None and item.text().strip() == field_key:
+                return row
+        return None
+
+    def _set_project_db_value(self, field_key, value):
+        row = self._find_project_db_row(field_key)
+        if row is None:
+            return
+        item = self.project_db_table.item(row, 1)
+        if item is None:
+            item = qtw.QTableWidgetItem()
+            self.project_db_table.setItem(row, 1, item)
+        item.setText("" if value is None else str(value))
+
+    def _collect_project_db_values(self):
+        values = {}
+        if self.project_db_table is None:
+            return values
+        for row in range(self.project_db_table.rowCount()):
+            key_item = self.project_db_table.item(row, 0)
+            value_item = self.project_db_table.item(row, 1)
+            if key_item is None:
+                continue
+            key = key_item.text().strip()
+            if not key:
+                continue
+            raw_value = value_item.text().strip() if value_item is not None else ""
+            definition = self._project_db_definition_map.get(key)
+            if definition is None:
+                values[key] = raw_value
+                continue
+            if definition.field_type == "int":
+                try:
+                    values[key] = int(raw_value)
+                except ValueError:
+                    values[key] = definition.default if definition.default is not None else 0
+            elif definition.field_type == "multi_choice":
+                values[key] = [part.strip() for part in raw_value.split(",") if part.strip()]
+            else:
+                values[key] = raw_value
+        return values
+
+    def _collect_milestone_settings(self):
+        updates = {}
+        if self.milestones_table is None:
+            return updates
+        for row in range(self.milestones_table.rowCount()):
+            key_item = self.milestones_table.item(row, 2)
+            weight_item = self.milestones_table.item(row, 4)
+            complete_widget = self.milestones_table.cellWidget(row, 5)
+            if key_item is None:
+                continue
+            milestone_key = key_item.text().strip()
+            if not milestone_key:
+                continue
+            try:
+                milestone_weight = max(1, int((weight_item.text() if weight_item else "1").strip()))
+            except (TypeError, ValueError, AttributeError):
+                milestone_weight = 1
+            milestone_complete = False
+            if complete_widget is not None:
+                checkbox = complete_widget.findChild(qtw.QCheckBox)
+                if checkbox is not None:
+                    milestone_complete = checkbox.isChecked()
+            updates[milestone_key] = {
+                "weight": milestone_weight,
+                "complete": milestone_complete,
+            }
+        return updates
 
     def _browse_for_ris(self):
         path, _ = qtw.QFileDialog.getOpenFileName(
@@ -813,6 +1129,13 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         selected_languages = self._selected_column_languages()
         number_columns = max(1, int(self.columns_per_page_spin.value()))
         number_pages = max(1, int(self.source_pages_spin.value()))
+        project_db_values = self._collect_project_db_values()
+        milestone_settings = self._collect_milestone_settings()
+
+        project_database_name = str(project_db_values.get("ProjectDatabase") or self._default_project_database_name()).strip()
+        if not project_database_name.lower().endswith(".db"):
+            project_database_name = f"{project_database_name}.db"
+
         payload = {
             "project_name": sanitized_name,
             "project_purpose": self.project_purpose_edit.toPlainText().strip(),
@@ -829,6 +1152,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "NumberLanguages": len(selected_languages),
             "TotalColumnPages": number_pages * number_columns,
             "SelectedProjectFolders": self._selected_project_folders(),
+            "ProjectDatabase": project_database_name,
+            "ProjectFont": str(project_db_values.get("ProjectFont") or "").strip(),
+            "ProjectDatabaseFields": project_db_values,
+            "MilestoneSettings": milestone_settings,
         }
         creator = self.creator_edit.text().strip()
         if creator:

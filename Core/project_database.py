@@ -52,6 +52,13 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
     return [
         ProjectFieldDefinition("ProjectName", "Project Name", "text", default="", required=True),
         ProjectFieldDefinition(
+            "ProjectDatabase",
+            "Project Database",
+            "text",
+            default="",
+            help_text="Primary project SQLite database filename.",
+        ),
+        ProjectFieldDefinition(
             "ProjectType",
             "Project Type",
             "choice",
@@ -188,6 +195,8 @@ def normalize_project_database_values(
 
     if not incoming.get("ProjectName") and incoming.get("project_name"):
         incoming["ProjectName"] = incoming.get("project_name")
+    if incoming.get("project_database") and incoming.get("ProjectDatabase") in (None, ""):
+        incoming["ProjectDatabase"] = incoming.get("project_database")
     if incoming.get("CurrentPage") is not None and incoming.get("ProjectPageNumber") in (None, ""):
         incoming["ProjectPageNumber"] = incoming.get("CurrentPage")
     if incoming.get("CurrentBook") is not None and incoming.get("ProjectBook") in (None, ""):
@@ -278,6 +287,18 @@ def normalize_project_database_values(
 
     if not normalized.get("ProjectName") and incoming.get("project_name"):
         normalized["ProjectName"] = str(incoming["project_name"])
+
+    # Project database defaults to a per-project SQLite file.
+    project_name_for_db = str(normalized.get("ProjectName") or "").strip()
+    project_database = str(normalized.get("ProjectDatabase") or "").strip()
+    if not project_database:
+        if project_name_for_db:
+            project_database = f"{project_name_for_db}.db"
+        else:
+            project_database = "project.db"
+    if not project_database.lower().endswith(".db"):
+        project_database = f"{project_database}.db"
+    normalized["ProjectDatabase"] = project_database
 
     return normalized
 

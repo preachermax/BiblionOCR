@@ -33,9 +33,9 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
         self.assertEqual("Scriptural", normalized["ProjectType"])
         self.assertEqual(7, normalized["ProjectPageNumber"])
         self.assertEqual(100, normalized["ProjectPageProgress"])
-        self.assertEqual(3, normalized["NumberColumns"])
-        self.assertEqual("left,centercol,rightcol", normalized["ColumnName"])
-        self.assertEqual("grc,grc,grc", normalized["ColumnLanguage"])
+        self.assertEqual(4, normalized["NumberColumns"])
+        self.assertEqual("left,Greek,Hebrew,Latin", normalized["ColumnName"])
+        self.assertEqual("grc,grc,grc,grc", normalized["ColumnLanguage"])
         self.assertEqual("EB Garamond", normalized["ProjectFont"])
         self.assertEqual(7, normalized["CurrentPage"])
 
@@ -51,8 +51,8 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
             available_languages=("eng", "grc"),
         )
 
-        self.assertEqual("leftcol,rightcol", normalized["ColumnName"])
-        self.assertEqual("eng,eng", normalized["ColumnLanguage"])
+        self.assertEqual("English,Greek", normalized["ColumnName"])
+        self.assertEqual("english,greek", normalized["ColumnLanguage"])
 
     def test_column_fields_are_marked_required(self) -> None:
         definitions = {

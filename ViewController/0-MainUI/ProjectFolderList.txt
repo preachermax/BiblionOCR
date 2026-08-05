@@ -95,7 +95,6 @@ Model/Project/Data/json/Workflow.json
 Model/Project/Data/json/WriterSession.json
 Model/Project/Data/SQLite
 Model/Project/Data/sqlite
-Model/Project/Data/SQLite/FROMVS.db
 Model/Project/Data/sqlite/project_metadata.sqlite
 Model/Project/Data/SQLite/RMAC.db
 Model/Project/Data/SQLite/TRBible.db

@@ -31,6 +31,31 @@ ls -lh Model/Project/Data/esword
 
 ---
 
+## Execution Order Map
+
+### Finish-to-start sequence (required)
+
+Run these in order and do not skip ahead until each item passes.
+
+1. Stop Conditions Before Starting
+2. Phase 1 (all items)
+3. Phase 2 item 4 (`MyServer` ownership rules)
+4. Phase 2 item 5 (new project creation)
+5. Phase 2 item 6 (project settings workflow)
+6. Phase 3 item 7 (shared project status surface)
+7. Phase 3 item 8 (session persistence)
+8. Phase 3 item 9 (weighted progress integrity)
+
+### Arbitrary-order pool (run as capacity allows)
+
+These are independent validation passes once the finish-to-start sequence is green.
+
+- Phase 4 items 10 to 12 (scripture foundation and manifest integrity)
+- Phase 5 items 13 to 16 (workflow-specific functional passes)
+- Phase 6 items 17 to 18 (cross-platform and environment checks)
+
+---
+
 ## Phase 1: Fast Failure Scan
 
 Goal: catch import errors, missing files, and startup crashes before deeper workflow testing.
@@ -100,6 +125,7 @@ Goal: prove the project-administration refactor still behaves correctly.
 - Confirm the generated project contains:
   - `Model/Project/Data/sqlite/project_metadata.sqlite`
   - `Model/Project/Data/sqlite/Project Settings.db`
+  - `Model/Project/Data/SQLite/<ProjectName>.db` (default project deliverable DB, for example `Erasmus1516.db`)
 
 - Confirm project metadata fields are seeded correctly enough to open the project again.
 
@@ -107,8 +133,9 @@ Goal: prove the project-administration refactor still behaves correctly.
 
 - Open `Project Settings` from `MyServer`.
 - Verify stacked-page navigation works.
-- Verify `Milestone Settings` is its own page.
+- Verify `Project Database`, `RIS Settings`, `Milestone Settings`, and `Module Handshakes` pages are available.
 - Change one milestone-related field and confirm save/reload persistence.
+- Change one project-database field (for example `ProjectDatabase` or `ProjectFont`) and confirm save/reload persistence.
 
 ---
 

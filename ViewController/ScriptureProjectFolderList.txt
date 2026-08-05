@@ -5,7 +5,6 @@ Model/Project/Data
 Model/Project/Data/sqlite
 Model/Project/Data/sqlite/project_metadata.sqlite
 Model/Project/Data/SQLite
-Model/Project/Data/SQLite/FROMVS.db
 Model/Project/Data/SQLite/TRBible.db
 Model/Project/Data/SQLite/TRBibleWords.db
 Model/Project/Data/SQLite/TRiBible.db
