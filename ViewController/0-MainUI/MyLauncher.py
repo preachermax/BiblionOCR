@@ -213,7 +213,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             ],
             '1-PreProcess': [
                 {'module': 'MyPixler', 'label': 'Image cleanup and prep'},
-                {'module': 'MyBoxer', 'label': 'Page/line/word box workflows'},
+                {'module': 'MyBoxer', 'label': 'Page, line, and ground-truth pre-process boxing workflows'},
                 {'module': 'MyGlypher', 'label': 'Glyph and project font workflows'},
             ],
             '2-TrainTesseract': [
@@ -286,6 +286,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self._run_stage_macro(stage.get('key', ''), stage_plan)
 
     def _open_module_by_name(self, module_name):
+        if hasattr(self, 'session_manager'):
+            self.session_manager.set_active_workflow_module(module_name)
         dispatch = {
             'MyServer': self.OpenWithMyServer,
             'MyScanner': self.OpenWithMyScanner,
@@ -311,7 +313,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             title='Project Workflow Wizard',
             intro_text=(
                 'Run project workflow stages in ViewController numbered-folder order. '
-                'This macro-oriented view helps reduce operator flow errors while keeping manual processes available.'
+                'This macro-oriented view helps reduce operator flow errors while keeping manual processes available. '
+                'MyBoxer now owns the migrated line and ground-truth pre-process tasks that no longer run from MyServer.'
             ),
             stage_plan=stage_plan,
             run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
@@ -326,7 +329,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             title='Page Workflow Wizard',
             intro_text=(
                 'Run page-oriented stages in numbered ViewController order. '
-                'Use this for page-specific progression while preserving global project administration in MyServer.'
+                'Use this for page-specific progression while preserving global project administration in MyServer. '
+                'Line-splitting and box-preparation tasks are routed through MyBoxer in the pre-process stage.'
             ),
             stage_plan=stage_plan,
             run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),

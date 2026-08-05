@@ -1346,61 +1346,6 @@
     <property name="title">
      <string>Ground-Truth</string>
     </property>
-    <widget class="QMenu" name="menuGround_Truth">
-     <property name="title">
-      <string>Establish Truth</string>
-     </property>
-     <widget class="QMenu" name="menuGreekGT">
-      <property name="title">
-       <string>Greek</string>
-      </property>
-      <widget class="QMenu" name="menuGreek_Image_Lines">
-       <property name="title">
-        <string>Greek Image Lines</string>
-       </property>
-       <addaction name="actionAutoCrop_Greek_to_tif_Lines_tb"/>
-       <addaction name="actionRename_Greek_tif_Lines_tb"/>
-       <addaction name="actionMove_Greek_tif_Lines_tb"/>
-      </widget>
-      <widget class="QMenu" name="menuGreek_Text_Lines">
-       <property name="title">
-        <string>Greek Text Lines</string>
-       </property>
-       <addaction name="actionSplitGreek_text_lines_tb"/>
-       <addaction name="actionRenameGreek_text_lines_tb"/>
-      </widget>
-      <addaction name="menuGreek_Image_Lines"/>
-      <addaction name="menuGreek_Text_Lines"/>
-     </widget>
-     <widget class="QMenu" name="menuLatinGT">
-      <property name="title">
-       <string>Latin</string>
-      </property>
-      <widget class="QMenu" name="menuLatin_Image_Lines">
-       <property name="title">
-        <string>Latin Image Lines</string>
-       </property>
-       <addaction name="actionAutoCrop_Latin_To_tif_Lines_tb"/>
-       <addaction name="actionRename_Latin_tif_Lines_tb"/>
-       <addaction name="actionMove_Latin_tif_Lines_tb"/>
-      </widget>
-      <widget class="QMenu" name="menuLatin_Text_Lines">
-       <property name="title">
-        <string>Latin Text Lines</string>
-       </property>
-       <addaction name="actionSplit_Latin_Text_Lines_tb"/>
-       <addaction name="actionRename_Latin_Text_Lines_tb"/>
-      </widget>
-      <addaction name="menuLatin_Image_Lines"/>
-      <addaction name="menuLatin_Text_Lines"/>
-     </widget>
-     <addaction name="actionHebrew_2"/>
-     <addaction name="menuGreekGT"/>
-     <addaction name="menuLatinGT"/>
-     <addaction name="actionEnglish_3"/>
-    </widget>
-    <addaction name="separator"/>
-    <addaction name="menuGround_Truth"/>
     <addaction name="actionMyVersifier"/>
     <addaction name="actionMyResolver"/>
     <addaction name="actionMyGrounder"/>
@@ -1697,9 +1642,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAutoCrop_Greek_to_tif_Lines_tb"/>
-   <addaction name="actionRename_Greek_tif_Lines_tb"/>
-   <addaction name="actionMove_Greek_tif_Lines_tb"/>
   </widget>
   <widget class="QToolBar" name="LatinImageLinesToolBar">
    <property name="enabled">
@@ -1717,9 +1659,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAutoCrop_Latin_To_tif_Lines_tb"/>
-   <addaction name="actionRename_Latin_tif_Lines_tb"/>
-   <addaction name="actionMove_Latin_tif_Lines_tb"/>
   </widget>
   <widget class="QToolBar" name="FontForgeToolBar">
    <property name="windowTitle">
@@ -1749,8 +1688,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplitGreek_text_lines_tb"/>
-   <addaction name="actionRenameGreek_text_lines_tb"/>
    <addaction name="actionUpdate_Wordlist_tb"/>
   </widget>
   <widget class="QToolBar" name="LatinTextLinesToolBar">
@@ -1769,8 +1706,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSplit_Latin_Text_Lines_tb"/>
-   <addaction name="actionRename_Latin_Text_Lines_tb"/>
   </widget>
   <widget class="QToolBar" name="ModulesToolBar">
    <property name="windowTitle">
@@ -2206,66 +2141,6 @@
     <string>Upadting Greek wordlist...</string>
    </property>
   </action>
-  <action name="actionAutoCrop_Greek_to_tif_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-lines-greek.png</normaloff>:/Icons/Icons/split-lines-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Crop Greek To tif Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Auto cropping Greek tif lines....</string>
-   </property>
-  </action>
-  <action name="actionRename_Greek_tif_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/rename-lines-greek.png</normaloff>:/Icons/Icons/rename-lines-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename Greek tif Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Renaming Greek tif lines...</string>
-   </property>
-  </action>
-  <action name="actionMove_Greek_tif_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/move-lines-greek.png</normaloff>:/Icons/Icons/move-lines-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Move Greek tif Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Moving Greek tif lines...</string>
-   </property>
-  </action>
-  <action name="actionSplitGreek_text_lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-textlines-greek.png</normaloff>:/Icons/Icons/split-textlines-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Split Greek Pages To Text Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Splitting Greek pages to text lines...</string>
-   </property>
-  </action>
-  <action name="actionRenameGreek_text_lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/rename_textlines-greek.png</normaloff>:/Icons/Icons/rename_textlines-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename Greek Text Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Renaming Greek text lines...</string>
-   </property>
-  </action>
   <action name="actionImage_Lines_3">
    <property name="text">
     <string>Image Lines</string>
@@ -2279,102 +2154,6 @@
   <action name="actionUpdate_Wordlist_menu">
    <property name="text">
     <string>Update Latin Wordlist</string>
-   </property>
-  </action>
-  <action name="actionAutoCrop_Latin_To_tif_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-lines-latin.png</normaloff>:/Icons/Icons/split-lines-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Crop Latin To tif Lines</string>
-   </property>
-   <property name="iconText">
-    <string>Crop Latin To tif Lines</string>
-   </property>
-   <property name="toolTip">
-    <string>Crop Latin To tif Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Auto croping Latin tif lines...</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionRename_Latin_tif_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/rename-lines-latin.png</normaloff>:/Icons/Icons/rename-lines-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename Latin tif Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Renaming Latin tif lines...</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionMove_Latin_tif_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/move-lines-latin.png</normaloff>:/Icons/Icons/move-lines-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Move Latin tif Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Moving Latin tif lines...</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionSplit_Latin_Text_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-textlines-latin.png</normaloff>:/Icons/Icons/split-textlines-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Split Latin Pages To Text Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Splitting Latin pages to text lines...</string>
-   </property>
-   <property name="whatsThis">
-    <string/>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionRename_Latin_Text_Lines_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/rename-textlines-latin.png</normaloff>:/Icons/Icons/rename-textlines-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename Latin Text Lines</string>
-   </property>
-   <property name="statusTip">
-    <string>Renaming Latin text lines...</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
    </property>
   </action>
   <action name="actiondeskew_mono">

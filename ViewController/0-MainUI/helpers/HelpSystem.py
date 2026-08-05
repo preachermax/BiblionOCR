@@ -43,14 +43,16 @@ FEATURES:
 • Validate box data for training
 • Export box data in Tesseract format
 • Support for Greek and Latin text
+• Own the migrated line-image and line-text pre-process tasks formerly exposed in MyServer
 
 PRIMARY WORKFLOW:
 1. Load a TIFF image stack (File > Open)
 2. Navigate through pages using controls
-3. Draw boxes around characters (click and drag)
-4. Double-click box to edit character value
-5. Save boxes to file (File > Save)
-6. Use boxes for Tesseract training
+3. Run page, line, and box preprocessing tasks for Greek and Latin sources
+4. Draw boxes around characters (click and drag)
+5. Double-click box to edit character value
+6. Save boxes to file (File > Save)
+7. Use boxes for Tesseract training
 
 KEY SHORTCUTS:
 • Ctrl+O: Open image file
@@ -260,6 +262,7 @@ USES IN PIPELINE:
 • Inspect document quality
 • Validate image processing
 • Check page alignment
+• Hand off page images into MyBoxer for line and ground-truth preprocessing
 
 See also: MyBoxer, MyGrounder
 ''',
@@ -1228,7 +1231,7 @@ FEATURES:
     • Project creation and project-opening workflows
     • Shared scanner workflow integration
     • PDF/TIFF extraction and conversion dialogs
-    • Launch points into downstream modules such as MyPixler and MyScanner
+    • Launch points into downstream modules such as MyPixler, MyScanner, and MyBoxer
     • Session-backed path and workflow restore
     • Developer menu entry for Runtime Inspector / Developer Services
 
@@ -1244,6 +1247,7 @@ KEY FUNCTIONS:
     • Open project folders rooted under the user Projects directory
     • Launch and coordinate scanner acquisition workflows
     • Open images directly into MyPixler when editing is required
+    • Hand off line and ground-truth preprocessing into MyBoxer instead of running that slice locally
     • Persist session state rather than rewriting ad hoc local settings
 
 CONFIGURATION:
@@ -1256,12 +1260,13 @@ CONFIGURATION:
 USES IN PIPELINE:
     • Main runtime entry point
     • Project creation and routing surface
-    • Scan orchestration and preprocessing entry point
+    • Scan orchestration and high-level preprocessing entry point
     • Developer-mode hosting surface
 
     CURRENT NOTES:
     • Project creation logic is moving into the Core engine rather than staying in UI code.
     • MyServer and MyScanner share the same scanner workflow services.
+    • MyBoxer now owns the migrated Greek/Latin line preprocessing and box-preparation tasks.
     • The Runtime Inspector is available through the Developer menu when enabled.
     • Current repo policy and contribution guidance live in CONTRIBUTING.md and CONTENT_POLICY.md.
 
@@ -1291,7 +1296,8 @@ STARTING MYSERVER:
     MODULE ROUTING:
     1. Use MyPixler for image editing and review
     2. Use MyScanner for scanner-focused acquisition sessions
-    3. Use downstream OCR and text tools after acquisition/preprocessing is complete
+    3. Use MyBoxer for line-image, line-text, and box-oriented preprocessing tasks
+    4. Use downstream OCR and text tools after acquisition/preprocessing is complete
 
     DEVELOPER MODE:
     1. Open the Developer menu when available

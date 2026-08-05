@@ -19,6 +19,9 @@ ACTIVE_PROJECT_NAME_KEYS = (
     'self.active_project_name',
     'self.project_name',
 )
+ACTIVE_WORKFLOW_MODULE_KEYS = (
+    'self.active_workflow_module',
+)
 
 
 @dataclass(frozen=True)
@@ -188,6 +191,21 @@ class SessionManager:
             'project_root': normalized_root,
             'project_name': project_name,
         }
+
+    def get_active_workflow_module(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_WORKFLOW_MODULE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip()
+        return ''
+
+    def set_active_workflow_module(self, module_name: str, filename: str = 'Session.json') -> str:
+        normalized_name = str(module_name or '').strip()
+        if not normalized_name:
+            return ''
+        self.update(filename, {'self.active_workflow_module': normalized_name})
+        return normalized_name
 
     def update(self, filename: str, updates: Dict[str, Any]) -> None:
         path = self.session_path(filename)
