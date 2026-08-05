@@ -2,8 +2,8 @@
 
 ## Version 1.4 — ProjectFolderList Runtime Contract
 
-**Status:** Active implementation contract  
-**Scope:** MyServer, Core project engine, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation  
+**Status:** Active implementation contract
+**Scope:** MyServer, Core project engine, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation
 **Last updated:** 2026-07-04
 
 ---
@@ -68,6 +68,8 @@ Manifest curation rules for new-project generation:
 * Keep `Model/Project/Data/json` contents needed by runtime modules.
 * Keep `Model/Project/Data/esword` contents and placeholders; MyWriter is expected to generate and refresh that data later.
 * Keep minimal image workflow folders and the top-level `Model/Project/Training` scaffold.
+* Scripture projects also carry the repo-local `Model/Project/Training/Tesseract` subtree.
+* That subtree includes the workflow folders needed by the staged OCR pipeline (`MyBoxer`, `MyGlypher`, `MyGrounder`, `MyLexer`, `MyReader`, `MyResolver`, `MyVersifier`, and `MyWriter`).
 * Exclude heavy data trees such as `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, and deep training support payloads unless there is an explicit one-off regeneration case.
 
 Current workspace cleanup status:

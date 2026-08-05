@@ -525,6 +525,7 @@ These imports caused recent startup tracebacks because those names do not exist 
 * include current ViewController runtime files
 * include `Model/Project/Data` csv/json/SQLite folders and file contents
 * include minimal `Model/Project/Images` folder skeleton only
+* include the scripture-specific `Model/Project/Training/Tesseract` scaffold plus the workflow folders used by the OCR/training pipeline
 * exclude deep image trees and image files themselves
 
 * Deprecated references are excluded or redirected:
