@@ -4,6 +4,13 @@ Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui
 Model/Project/Data
 Model/Project/Data/sqlite
 Model/Project/Data/sqlite/project_metadata.sqlite
+Model/Project/Data/SQLite
+Model/Project/Data/SQLite/FROMVS.db
+Model/Project/Data/SQLite/TRBible.db
+Model/Project/Data/SQLite/TRBibleWords.db
+Model/Project/Data/SQLite/TRiBible.db
+Model/Project/Data/SQLite/TRiBibleWords.db
+Model/Project/Data/SQLite/RMAC.db
 Model/Project/Data/esword
 Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json

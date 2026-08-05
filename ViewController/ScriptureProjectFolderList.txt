@@ -4,6 +4,13 @@ Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui
 Model/Project/Data
 Model/Project/Data/sqlite
 Model/Project/Data/sqlite/project_metadata.sqlite
+Model/Project/Data/SQLite
+Model/Project/Data/SQLite/FROMVS.db
+Model/Project/Data/SQLite/TRBible.db
+Model/Project/Data/SQLite/TRBibleWords.db
+Model/Project/Data/SQLite/TRiBible.db
+Model/Project/Data/SQLite/TRiBibleWords.db
+Model/Project/Data/SQLite/RMAC.db
 Model/Project/Data/esword
 Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json
@@ -13,8 +20,6 @@ Model/Project/Data/json/BookChapterVerseTotals.json
 Model/Project/Data/json/BooksAbbrName.json
 Model/Project/Data/json/BooksAbbrNameNumIndex.json
 Model/Project/Data/json/BooksFolderList.json
-Model/Project/Data/json/BooksAbbrName.json
-Model/Project/Data/json/BooksAbbrNameNumIndex.json
 Model/Project/Data/json/EnglishProperNames.json
 Model/Project/Data/json/ProperNames.json
 Model/Project/Data/json/FromvsDiacritics.json

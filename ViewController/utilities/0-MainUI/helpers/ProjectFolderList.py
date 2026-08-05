@@ -5,7 +5,7 @@ Rebuild/update ProjectFolderList.txt for BiblionOCR.
 This script captures the cleanup rules used while curating ProjectFolderList.txt:
 - seed from the current ProjectFolderList.txt when it exists;
 - add folders referenced by Model/Project/Data/json/*Session.json;
-- include only project-safe `Model/Project/Data/json` and `Model/Project/Data/esword` contents needed at runtime;
+- include only project-safe `Model/Project/Data/json`, `Model/Project/Data/esword`, and `Model/Project/Data/SQLite` contents needed at runtime;
 - reduce Model/Project/Images file entries to folders only;
 - normalize project-absolute paths to project-relative paths;
 - reduce file paths to their containing folders;
@@ -97,6 +97,7 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Images/Complete",
     "Model/Project/Data/json",
     "Model/Project/Data/sqlite",
+    "Model/Project/Data/SQLite",
     "Model/Project/Data/esword",
     "Model/Project/Utilities",
     "Model/Project/Images/Complete/Greek",
@@ -476,11 +477,21 @@ class ProjectFolderListBuilder:
         data_roots = [
             self.project_root / "Model" / "Project" / "Data" / "json",
             self.project_root / "Model" / "Project" / "Data" / "esword",
+            self.project_root / "Model" / "Project" / "Data" / "sqlite",
+            self.project_root / "Model" / "Project" / "Data" / "SQLite",
         ]
         if not any(root.exists() for root in data_roots):
             return folders
 
-        folders.update({"Model/Project/Data", "Model/Project/Data/json", "Model/Project/Data/esword"})
+        folders.update(
+            {
+                "Model/Project/Data",
+                "Model/Project/Data/json",
+                "Model/Project/Data/esword",
+                "Model/Project/Data/sqlite",
+                "Model/Project/Data/SQLite",
+            }
+        )
 
         for data_root in data_roots:
             if not data_root.exists():
@@ -504,6 +515,8 @@ class ProjectFolderListBuilder:
         data_roots = [
             self.project_root / "Model" / "Project" / "Data" / "json",
             self.project_root / "Model" / "Project" / "Data" / "esword",
+            self.project_root / "Model" / "Project" / "Data" / "sqlite",
+            self.project_root / "Model" / "Project" / "Data" / "SQLite",
         ]
         if not any(root.exists() for root in data_roots):
             return files
@@ -854,6 +867,10 @@ class ProjectFolderListBuilder:
             or normalized.startswith("Model/Project/Data/json/")
             or normalized == "Model/Project/Data/esword"
             or normalized.startswith("Model/Project/Data/esword/")
+            or normalized == "Model/Project/Data/sqlite"
+            or normalized.startswith("Model/Project/Data/sqlite/")
+            or normalized == "Model/Project/Data/SQLite"
+            or normalized.startswith("Model/Project/Data/SQLite/")
         )
 
     @staticmethod
