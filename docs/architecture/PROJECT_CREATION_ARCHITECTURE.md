@@ -70,6 +70,7 @@ Manifest curation rules for new-project generation:
 * Keep minimal image workflow folders and the top-level `Model/Project/Training` scaffold.
 * Scripture projects also carry the repo-local `Model/Project/Training/Tesseract` subtree.
 * That subtree includes the workflow folders needed by the staged OCR pipeline (`MyBoxer`, `MyGlypher`, `MyGrounder`, `MyLexer`, `MyReader`, `MyResolver`, `MyVersifier`, and `MyWriter`).
+* Scripture manifests may use `Model/NT_BookFolders => <destination>` mappings so NT book-folder trees are installed into selected `Complete` and `Workflow` destinations by default while remaining individually selectable in the project wizard.
 * Exclude heavy data trees such as `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, and deep training support payloads unless there is an explicit one-off regeneration case.
 
 Current workspace cleanup status:

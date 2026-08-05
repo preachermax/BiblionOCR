@@ -87,13 +87,22 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             os.makedirs(project_root, exist_ok=True)
             engine._create_project_structure(project_root)
 
-            manifest_path = os.path.join(project_root, "src", "manifests", "ProjectFolderList.txt")
-            with open(manifest_path, "r", encoding="utf-8") as handle:
-                manifest_text = handle.read()
-
-            self.assertIn("Model/OT_BookFolders", manifest_text)
-            self.assertNotIn("Model/NT_BookFolders", manifest_text)
-            self.assertIn("Model/Project/Data/csv/BooksAbbrName.csv", manifest_text)
+            self.assertTrue(os.path.isdir(os.path.join(project_root, "Model", "OT_BookFolders")))
+            self.assertFalse(
+                os.path.isdir(
+                    os.path.join(
+                        project_root,
+                        "Model",
+                        "Project",
+                        "Text",
+                        "MyServer",
+                        "Workflow",
+                        "Greek",
+                        "txt_greek_pages",
+                        "book_40_Matthew",
+                    )
+                )
+            )
 
     def test_explicit_folder_selection_controls_scripture_manifest_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -102,8 +111,8 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             engine.context = {
                 "project_name": "scripture_project",
                 "ProjectType": "Scriptural",
-                "ScripturalSource": "both",
-                "SelectedProjectFolders": ["Model/NT_BookFolders"],
+                "ScripturalSource": "new_testament",
+                "SelectedProjectFolders": ["Model/Project/Text/MyServer/Workflow/Greek/txt_greek_pages"],
             }
             engine._resolve_folder_list_path = lambda: os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
 
@@ -111,12 +120,36 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             os.makedirs(project_root, exist_ok=True)
             engine._create_project_structure(project_root)
 
-            manifest_path = os.path.join(project_root, "src", "manifests", "ProjectFolderList.txt")
-            with open(manifest_path, "r", encoding="utf-8") as handle:
-                manifest_text = handle.read()
-
-            self.assertNotIn("Model/OT_BookFolders", manifest_text)
-            self.assertIn("Model/NT_BookFolders", manifest_text)
+            self.assertTrue(
+                os.path.isdir(
+                    os.path.join(
+                        project_root,
+                        "Model",
+                        "Project",
+                        "Text",
+                        "MyServer",
+                        "Workflow",
+                        "Greek",
+                        "txt_greek_pages",
+                        "book_40_Matthew",
+                    )
+                )
+            )
+            self.assertFalse(
+                os.path.isdir(
+                    os.path.join(
+                        project_root,
+                        "Model",
+                        "Project",
+                        "Text",
+                        "MyReader",
+                        "Workflow",
+                        "Greek",
+                        "txt_greek_wordlist",
+                        "book_40_Matthew",
+                    )
+                )
+            )
 
     def test_general_projects_exclude_scripture_only_modules(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
