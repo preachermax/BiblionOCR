@@ -48,6 +48,19 @@ Project administration is centralized in MyServer.
 - `Project Settings` is only available from MyServer.
 - Milestone override and weighted milestone editing are handled through the dedicated `Milestone Settings` page in the MyServer Project Settings dialog.
 
+## Workflow Wizard Foundation (Phase 1)
+
+Macro-like workflow wizard orchestration is now available as a first architectural layer.
+
+- MyLauncher now provides Project Workflow Wizard and Page Workflow Wizard entry points.
+- Wizard stage order is derived from numbered ViewController folders.
+- Existing manual module launch actions are preserved.
+- MyServer and MyScanner can now update columns-per-page and persist that update to project metadata.
+
+Architecture and procedure notes for this phase are documented in:
+
+- docs/development/WORKFLOW_WIZARD_PHASE1_2026-08-05.md
+
 ## Project Database Storage
 
 Project databases are created in each generated project root under:

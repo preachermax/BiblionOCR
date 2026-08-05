@@ -1477,6 +1477,7 @@
     <addaction name="actionMyExplorer"/>
     <addaction name="actionNewProject"/>
     <addaction name="actionOpen_Project"/>
+    <addaction name="actionSet_Columns_Per_Page"/>
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
@@ -2934,6 +2935,11 @@
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionSet_Columns_Per_Page">
+   <property name="text">
+    <string>Set Columns Per Page</string>
    </property>
   </action>
  </widget>

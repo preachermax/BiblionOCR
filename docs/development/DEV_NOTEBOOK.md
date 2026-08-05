@@ -30,6 +30,27 @@
 
 ---
 
+## Workflow Wizard Foundation (2026-08-05)
+
+### Phase 1 Scope
+
+* MyLauncher-first macro-style workflow wizard layer is now in place
+* stage order is now derived from numbered `ViewController` folders
+* workflow guidance is additive, not destructive: manual launch paths remain intact
+* `NumberColumns` update path is now exposed in MyServer and MyScanner and persisted to project metadata
+
+### New Runtime Components
+
+* `ViewController/0-MainUI/helpers/workflow_stack_wizard_dialog.py`
+* `ViewController/0-MainUI/helpers/project_column_settings.py`
+
+### Procedural Contract
+
+* this work is treated as a dedicated architecture milestone commit before broader module propagation
+* follow-up rollout to remaining modules should happen in separate commits to preserve testability and rollback clarity
+
+---
+
 ## Launcher Restore and Wrapper Notes (2026-08-02)
 
 * Linux launcher restore now targets icons under `ViewController/0-MainUI/helpers/Icons`

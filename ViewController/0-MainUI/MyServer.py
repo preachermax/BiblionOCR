@@ -112,6 +112,7 @@ from helpers.HelpSystem import add_help_menu
 from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
+from Core.project_database import load_project_database_record
 from Core.Scanner import NetworkScanner, ScanManager
 from helpers.scan_runtime import start_scan_workflow
 # EventBus is still defined below in this module during the Core migration.
@@ -220,6 +221,7 @@ from helpers.Training import Train as tr
 from helpers.TiffStackWorker import TiffStackWorker
 from helpers.LocalFileDrop import LocalFileDropMixin
 from helpers.ScanWorkflow import ScanWizardDialog as SharedScanWizardDialog
+from helpers.project_column_settings import update_project_columns
 # Dialog Imports
 from helpers.Dialogs.ExtractDialog import Ui_ExtractDialog
 from helpers.Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
@@ -414,6 +416,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         self.ui.actionPrefernces.triggered.connect(self.open_project_settings_dialog)
+        if hasattr(self.ui, "actionSet_Columns_Per_Page"):
+            self.ui.actionSet_Columns_Per_Page.triggered.connect(self.set_columns_per_page)
 
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
@@ -998,6 +1002,54 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             getattr(self, "txtdir", ""),
         )
         self._open_project_settings_dialog_for_root(project_root)
+
+    def set_columns_per_page(self):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+            getattr(self, "txtpath", ""),
+            getattr(self, "txtdir", ""),
+        )
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                "Set Columns Per Page",
+                "Open or create a project first.",
+            )
+            return
+
+        current_columns = 4
+        try:
+            metadata_path = os.path.join(
+                project_root,
+                "Model",
+                "Project",
+                "Data",
+                "sqlite",
+                "project_metadata.sqlite",
+            )
+            values = load_project_database_record(metadata_path)
+            current_columns = int(values.get("NumberColumns", 4) or 4)
+        except Exception:
+            current_columns = 4
+
+        new_value, accepted = qtw.QInputDialog.getInt(
+            self,
+            "Set Columns Per Page",
+            "Number of columns per source page:",
+            max(1, min(4, current_columns)),
+            1,
+            4,
+            1,
+        )
+        if not accepted:
+            return
+
+        update_project_columns(project_root, new_value)
+        self._refresh_project_status(project_root)
+        self.statusBar().showMessage(f"Project columns per page set to {new_value}", 5000)
 
     def collect_new_project_payload(self):
         dialog = ProjectCreationWizardDialog(self._projects_base_path(), self)

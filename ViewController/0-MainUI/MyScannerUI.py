@@ -968,6 +968,8 @@ class Ui_Scanner(object):
         self.actionScanImage = QtWidgets.QAction(Scanner)
         self.actionScanImage.setIcon(icon2)
         self.actionScanImage.setObjectName("actionScanImage")
+        self.actionSet_Columns_Per_Page = QtWidgets.QAction(Scanner)
+        self.actionSet_Columns_Per_Page.setObjectName("actionSet_Columns_Per_Page")
         self.menuSelect_Language.addAction(self.actionGreek_2)
         self.menuSelect_Language.addAction(self.actionHebrew_4)
         self.menuSelect_Language.addAction(self.actionLatin_2)
@@ -976,6 +978,7 @@ class Ui_Scanner(object):
         self.menuOCR.addAction(self.actionSelect_Image)
         self.menuOCR.addAction(self.actionCorrect_OCR_tb)
         self.menuFile.addAction(self.actionProject_Browser)
+        self.menuFile.addAction(self.actionSet_Columns_Per_Page)
         self.menuFile.addAction(self.actionImageScanner)
         self.menuFile.addAction(self.actionOpen_Image)
         self.menuFile.addAction(self.actionOpen_Text)
@@ -1295,6 +1298,7 @@ class Ui_Scanner(object):
         self.actionImageScanner.setText(_translate("Scanner", "Scan Image"))
         self.actionImageScanner_tb.setText(_translate("Scanner", "Scan Image"))
         self.actionScanImage.setText(_translate("Scanner", "Scan Image"))
+        self.actionSet_Columns_Per_Page.setText(_translate("Scanner", "Set Columns Per Page"))
 import UI_Icons
 
 

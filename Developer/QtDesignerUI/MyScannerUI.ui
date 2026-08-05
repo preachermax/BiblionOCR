@@ -1411,6 +1411,7 @@
      <string>File</string>
     </property>
     <addaction name="actionProject_Browser"/>
+    <addaction name="actionSet_Columns_Per_Page"/>
     <addaction name="actionImageScanner"/>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Text"/>
@@ -2589,6 +2590,11 @@
    </property>
    <property name="text">
     <string>Scan Image</string>
+   </property>
+  </action>
+  <action name="actionSet_Columns_Per_Page">
+   <property name="text">
+    <string>Set Columns Per Page</string>
    </property>
   </action>
  </widget>

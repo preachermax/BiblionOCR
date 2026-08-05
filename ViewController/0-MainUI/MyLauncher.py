@@ -7,6 +7,7 @@ import os
 import subprocess
 #import glob
 import json
+import re
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
@@ -57,6 +58,7 @@ _UI_MODULE = importlib.util.module_from_spec(_UI_SPEC)
 _UI_SPEC.loader.exec_module(_UI_MODULE)
 Ui_MainUI = _UI_MODULE.Ui_MainUI
 from helpers.LocalFileDrop import LocalFileDropMixin
+from helpers.workflow_stack_wizard_dialog import WorkflowStackWizardDialog
 from Developer.Publisher.launcher_registry import (
     LauncherIntegrationController,
     build_default_launcher_registry,
@@ -129,6 +131,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
+        if hasattr(self.ui, 'actionProject_Workflow_Wizard'):
+            self.ui.actionProject_Workflow_Wizard.triggered.connect(self.open_project_workflow_wizard)
+        if hasattr(self.ui, 'actionPage_Workflow_Wizard'):
+            self.ui.actionPage_Workflow_Wizard.triggered.connect(self.open_page_workflow_wizard)
 
         #self.ui.Gimpbutton.clicked.connect(self.actionGimpEdit)
         self.ui.MyReaderbutton.clicked.connect(self.OpenWithMyReader)
@@ -178,6 +184,150 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         self.show()
+
+    def _viewcontroller_stage_names(self):
+        stage_folders = []
+        for entry in os.listdir(viewcontroller_dir):
+            entry_path = os.path.join(viewcontroller_dir, entry)
+            if not os.path.isdir(entry_path):
+                continue
+            match = re.match(r'^(\d+)-', entry)
+            if not match:
+                continue
+            stage_folders.append((int(match.group(1)), entry))
+        stage_folders.sort(key=lambda item: item[0])
+        return [name for _idx, name in stage_folders]
+
+    def _workflow_stage_module_map(self):
+        return {
+            '0-MainUI': [
+                {'module': 'MyServer', 'label': 'Project setup and workflow governance'},
+                {'module': 'MyScanner', 'label': 'Source scanning and source acquisition'},
+                {'module': 'MyExplorer', 'label': 'Project structure review'},
+            ],
+            '1-PreProcess': [
+                {'module': 'MyPixler', 'label': 'Image cleanup and prep'},
+                {'module': 'MyBoxer', 'label': 'Page/line/word box workflows'},
+                {'module': 'MyGlypher', 'label': 'Glyph and project font workflows'},
+            ],
+            '2-TrainTesseract': [
+                {'module': 'MyReader', 'label': 'Read and review OCR content'},
+                {'module': 'MyGrounder', 'label': 'Ground truth preparation'},
+                {'module': 'MyTrainer', 'label': 'Training workflow execution'},
+            ],
+            '3-Process': [
+                {'module': 'MyLexer', 'label': 'Lexicon workflow pass'},
+                {'module': 'MyResolver', 'label': 'Variant resolution workflows'},
+                {'module': 'MyVersifier', 'label': 'Verse alignment workflows'},
+            ],
+            '4-PostProcess': [
+                {'module': 'MyWriter', 'label': 'Export and publication workflows'},
+            ],
+        }
+
+    def _build_stage_plan(self, mode='project'):
+        stage_map = self._workflow_stage_module_map()
+        ordered_stage_names = self._viewcontroller_stage_names()
+
+        if mode == 'project':
+            allowed_modules = {
+                'MyServer', 'MyScanner', 'MyExplorer',
+                'MyPixler', 'MyBoxer', 'MyGlypher',
+                'MyReader', 'MyGrounder', 'MyTrainer',
+                'MyLexer', 'MyResolver', 'MyVersifier', 'MyWriter',
+            }
+        else:
+            allowed_modules = {
+                'MyScanner',
+                'MyPixler', 'MyBoxer', 'MyGlypher',
+                'MyReader', 'MyGrounder', 'MyTrainer',
+                'MyLexer', 'MyResolver', 'MyVersifier', 'MyWriter',
+            }
+
+        stage_plan = []
+        for stage_name in ordered_stage_names:
+            steps = [
+                step for step in stage_map.get(stage_name, [])
+                if step.get('module') in allowed_modules
+            ]
+            if not steps:
+                continue
+            stage_plan.append(
+                {
+                    'key': stage_name,
+                    'title': stage_name,
+                    'description': (
+                        'Project-scoped workflow stage. Use this stage macro to launch relevant modules in order.'
+                        if mode == 'project'
+                        else 'Page-scoped workflow stage. Use this stage macro for page-level operations.'
+                    ),
+                    'steps': steps,
+                }
+            )
+        return stage_plan
+
+    def _run_stage_macro(self, stage_key, stage_plan):
+        target_stage = next((stage for stage in stage_plan if stage.get('key') == stage_key), None)
+        if target_stage is None:
+            return
+        for step in target_stage.get('steps', []):
+            module_name = step.get('module', '').strip()
+            if module_name:
+                self._open_module_by_name(module_name)
+
+    def _run_full_macro(self, stage_plan):
+        for stage in stage_plan:
+            self._run_stage_macro(stage.get('key', ''), stage_plan)
+
+    def _open_module_by_name(self, module_name):
+        dispatch = {
+            'MyServer': self.OpenWithMyServer,
+            'MyScanner': self.OpenWithMyScanner,
+            'MyExplorer': self.OpenWithMyExplorer,
+            'MyPixler': self.OpenWithMyPixler,
+            'MyBoxer': self.OpenWithMyBoxer,
+            'MyGlypher': self.OpenWithMyGlypher,
+            'MyReader': self.OpenWithMyReader,
+            'MyGrounder': self.OpenWithMyGrounder,
+            'MyTrainer': self.OpenWithMyTrainer,
+            'MyLexer': self.OpenWithMyLexer,
+            'MyResolver': self.OpenWithMyResolver,
+            'MyVersifier': self.OpenWithMyVersifier,
+            'MyWriter': self.OpenWithMyWriter,
+        }
+        callback = dispatch.get(module_name)
+        if callback is not None:
+            callback()
+
+    def open_project_workflow_wizard(self):
+        stage_plan = self._build_stage_plan(mode='project')
+        dialog = WorkflowStackWizardDialog(
+            title='Project Workflow Wizard',
+            intro_text=(
+                'Run project workflow stages in ViewController numbered-folder order. '
+                'This macro-oriented view helps reduce operator flow errors while keeping manual processes available.'
+            ),
+            stage_plan=stage_plan,
+            run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
+            run_all_callback=lambda: self._run_full_macro(stage_plan),
+            parent=self,
+        )
+        dialog.exec_()
+
+    def open_page_workflow_wizard(self):
+        stage_plan = self._build_stage_plan(mode='page')
+        dialog = WorkflowStackWizardDialog(
+            title='Page Workflow Wizard',
+            intro_text=(
+                'Run page-oriented stages in numbered ViewController order. '
+                'Use this for page-specific progression while preserving global project administration in MyServer.'
+            ),
+            stage_plan=stage_plan,
+            run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
+            run_all_callback=lambda: self._run_full_macro(stage_plan),
+            parent=self,
+        )
+        dialog.exec_()
 
     def get_session_settings(self):
         # get session settings from shared manager

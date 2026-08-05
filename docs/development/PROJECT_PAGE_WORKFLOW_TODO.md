@@ -14,15 +14,15 @@ Track each source page through the full project lifecycle, including per-page an
 
 ## Proposed New Project Data Fields
 
-- [ ] `ProjectType` (enum): `Secular` or `Scriptural`
-- [ ] `ProjectPageNumber` (int): current source page number
-- [ ] `ProjectPageProgress` (percentage): lifecycle completion for current page
+- [x] `ProjectType` (enum): `Secular` or `Scriptural`
+- [x] `ProjectPageNumber` (int): current source page number
+- [x] `ProjectPageProgress` (percentage): lifecycle completion for current page
 - [ ] `ProjectBook` (string, Scriptural only)
 - [ ] `ProjectVerse` (string/int, Scriptural only)
 - [ ] `ProjectWord` (string/int, Scriptural only)
-- [ ] `NumberColumns` (int, max `3`)
+- [x] `NumberColumns` (int, max `4`)
 - [ ] `ColumnName` (list/string mapping): default `left`, `center`, `right`, user-renamable
-- [ ] `CurrentLanguage` (enum/list): installed Tesseract language codes
+- [x] `CurrentLanguage` (enum/list): installed Tesseract language codes
 - [ ] `Notes` (text)
 
 ## Fields To Display In Every Module Status Bar
@@ -61,12 +61,12 @@ Track each source page through the full project lifecycle, including per-page an
 - [ ] Persist per-page state transitions and timestamps.
 - [ ] Bind page lifecycle updates to existing module actions.
 - [ ] Add helper APIs to get/set current page context across modules.
-- [ ] Add progress recalculation strategy for `ProjectPageProgress`.
+- [x] Add progress recalculation strategy for `ProjectPageProgress`.
 
 ## Phase 4: Status Bar Integration Across Modules
 
 - [ ] Inventory all modules that need page context status badges/labels.
-- [ ] Add a shared status payload contract for page fields.
+- [x] Add a shared status payload contract for page fields.
 - [ ] Implement status bar widgets for:
   - [ ] page number
   - [ ] page progress
@@ -97,12 +97,20 @@ Track each source page through the full project lifecycle, including per-page an
 
 ## Phase 7: Project Creation Wizard Updates
 
-- [ ] Extend project creation wizard fields for new schema values.
-- [ ] Add `ProjectType` decision point early in wizard.
-- [ ] Add initial page context defaults (`ProjectPageNumber`, `ProjectPageProgress`, etc.).
-- [ ] Add column configuration controls with sensible defaults.
-- [ ] Add language initialization from installed Tesseract language list.
+- [x] Extend project creation wizard fields for new schema values.
+- [x] Add `ProjectType` decision point early in wizard.
+- [x] Add initial page context defaults (`ProjectPageNumber`, `ProjectPageProgress`, etc.).
+- [x] Add column configuration controls with sensible defaults.
+- [x] Add language initialization from installed Tesseract language list.
 - [ ] Ensure wizard output drives type-specific folder initialization.
+
+## Phase 10: Workflow Wizard Rollout
+
+- [x] Implement MyLauncher-first macro-style workflow wizard architecture.
+- [x] Add Project Workflow Wizard and Page Workflow Wizard actions to MyLauncher Project menu.
+- [x] Preserve manual launch actions while introducing macro orchestration.
+- [x] Add initial NumberColumns update surfaces in MyServer and MyScanner.
+- [ ] Propagate equivalent wizard workflow entry points to remaining modules.
 
 ## Phase 8: Testing And Migration Coverage
 

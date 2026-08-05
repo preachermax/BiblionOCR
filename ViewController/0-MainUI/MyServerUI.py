@@ -1043,6 +1043,8 @@ class Ui_MainUI(object):
         self.actionImageScanner_tb.setObjectName("actionImageScanner_tb")
         self.actionOpen_Project = QtWidgets.QAction(MainUI)
         self.actionOpen_Project.setObjectName("actionOpen_Project")
+        self.actionSet_Columns_Per_Page = QtWidgets.QAction(MainUI)
+        self.actionSet_Columns_Per_Page.setObjectName("actionSet_Columns_Per_Page")
         self.menuGreek_Image_Lines.addAction(self.actionAutoCrop_Greek_to_tif_Lines_tb)
         self.menuGreek_Image_Lines.addAction(self.actionRename_Greek_tif_Lines_tb)
         self.menuGreek_Image_Lines.addAction(self.actionMove_Greek_tif_Lines_tb)
@@ -1095,6 +1097,7 @@ class Ui_MainUI(object):
         self.menuHelp.addAction(self.actionMyExplorer)
         self.menuHelp.addAction(self.actionNewProject)
         self.menuHelp.addAction(self.actionOpen_Project)
+        self.menuHelp.addAction(self.actionSet_Columns_Per_Page)
         self.menuGlyphs.addAction(self.actionLine_tif_to_bmp)
         self.menuGlyphs.addAction(self.actionMyGlypher)
         self.menuGlyphs.addAction(self.actionFontForge)
@@ -1516,6 +1519,7 @@ class Ui_MainUI(object):
         self.actionImageScanner.setText(_translate("MainUI", "ImageScanner"))
         self.actionImageScanner_tb.setText(_translate("MainUI", "ImageScanner"))
         self.actionOpen_Project.setText(_translate("MainUI", "Open Project"))
+        self.actionSet_Columns_Per_Page.setText(_translate("MainUI", "Set Columns Per Page"))
 import UI_Icons
 
 

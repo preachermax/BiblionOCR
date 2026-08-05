@@ -75,6 +75,8 @@ from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
 from project_status_controller import ProjectStatusController
 from print_menu_support import install_print_menu_support, image_target, document_target
+from project_column_settings import update_project_columns, project_metadata_db_path
+from Core.project_database import load_project_database_record
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -248,6 +250,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionProject_Browser.triggered.connect(self.OpenMyBrowser)
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
+        if hasattr(self.ui, 'actionSet_Columns_Per_Page'):
+            self.ui.actionSet_Columns_Per_Page.triggered.connect(self.set_columns_per_page)
         #self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         #self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
 
@@ -700,6 +704,40 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         request = dialog.get_request()
         self._persist_scan_request(request)
         return self._start_scan_workflow(request)
+
+    def set_columns_per_page(self):
+        project_root = self.project_status_controller.resolve_project_root()
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                'Set Columns Per Page',
+                'Select an active project first from Project Browser.',
+            )
+            return
+
+        current_columns = 4
+        try:
+            metadata_path = project_metadata_db_path(project_root)
+            values = load_project_database_record(metadata_path)
+            current_columns = int(values.get('NumberColumns', 4) or 4)
+        except Exception:
+            current_columns = 4
+
+        new_value, accepted = qtw.QInputDialog.getInt(
+            self,
+            'Set Columns Per Page',
+            'Number of columns per source page:',
+            max(1, min(4, current_columns)),
+            1,
+            4,
+            1,
+        )
+        if not accepted:
+            return
+
+        update_project_columns(project_root, new_value)
+        self.project_status_controller.refresh_status(project_root)
+        self.statusBar().showMessage(f'Project columns per page set to {new_value}', 5000)
 
     def _start_scan_workflow(self, request):
         return start_scan_workflow(
