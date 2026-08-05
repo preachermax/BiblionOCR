@@ -8,6 +8,27 @@ They assume the repository lives at `~/Projects/BiblionOCR`.
 If the terminal opens in your home directory, use `cd Projects/BiblionOCR`.
 If the repo is somewhere else on that machine, change the `cd` line accordingly.
 
+## Branch Policy For This Repo
+
+- Use `master` as the active branch for testing and debugging.
+- Keep `ubuntu_development` synchronized to the same commit as `master`.
+- Preserve one linear commit flow by creating commits on `master` and then updating `ubuntu_development` to the same commit.
+
+After you commit locally on `master`, use:
+
+```bash
+cd Projects/BiblionOCR
+git push origin master
+git push origin master:ubuntu_development
+```
+
+Optional local branch pointer sync:
+
+```bash
+cd Projects/BiblionOCR
+git branch -f ubuntu_development master
+```
+
 ## Recommended Safe Method
 
 This keeps local `master` aligned with remote `master` and avoids accidental merge commits.
@@ -52,14 +73,25 @@ Do not use it unless you are certain.
 
 The safest normal flow is:
 
-1. Update `master` on GitHub, whether that happened through a PR merge or a reviewed merge from `development`.
-2. On the Jetson, run:
+1. Commit and validate on local `master`.
+2. Push `master` and sync `ubuntu_development` to the same commit.
+3. On any machine that needs refresh, run:
 
 ```bash
 cd Projects/BiblionOCR
 git checkout master
 git fetch origin --prune
 git pull --ff-only origin master
+git checkout ubuntu_development
+git pull --ff-only origin ubuntu_development
+```
+
+- Confirm both branch heads match:
+
+```bash
+cd Projects/BiblionOCR
+git rev-parse master
+git rev-parse ubuntu_development
 ```
 
 ## Optional Cleanup After Update

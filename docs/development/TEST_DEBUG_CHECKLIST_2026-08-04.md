@@ -15,6 +15,13 @@ Purpose: provide a printable, high-signal checklist for the next large testing a
 - Confirm the active branch is `master`.
 - Confirm `git status --short` returns no output.
 - Confirm `git rev-parse --short HEAD` returns `730fba2` or a newer agreed baseline.
+- Confirm `ubuntu_development` is expected to match `master` for this test cycle:
+
+```bash
+git rev-parse master
+git rev-parse ubuntu_development
+```
+
 - Confirm Git LFS is available:
 
 ```bash
@@ -220,6 +227,21 @@ python3 Developer/utilities/scripture_data_parity.py --root . --write-json --for
 
 ```bash
 python3 ViewController/utilities/0-MainUI/helpers/ProjectFolderList.py
+```
+
+### 12b. Branch sync integrity
+
+- After test/debug commits on `master`, preserve the same commit flow by syncing `ubuntu_development` to `master`:
+
+```bash
+git push origin master
+git push origin master:ubuntu_development
+```
+
+- Verify both remote heads are the same commit:
+
+```bash
+git ls-remote --heads origin master ubuntu_development
 ```
 
 ---
