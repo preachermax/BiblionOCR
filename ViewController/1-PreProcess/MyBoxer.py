@@ -37,6 +37,7 @@ import os
 import re
 from pathlib import Path
 from HelpSystem import add_help_menu
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 
 #import glob
 import shutil
@@ -257,6 +258,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyBoxer')
         self.install_local_file_drop(
             [self, getattr(self.ui, 'BoxWidget', None)],
             image_handler=self.getImage,

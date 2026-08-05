@@ -126,6 +126,7 @@ ProjectStatusController = _load_module_from_path(
     "viewcontroller_helpers_project_status_controller_reader",
     os.path.join(_HELPERS_DIR, "project_status_controller.py"),
 ).ProjectStatusController
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -242,6 +243,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Reader()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyReader')
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,

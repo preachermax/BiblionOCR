@@ -8,6 +8,7 @@ import subprocess
 #import glob
 import json
 import re
+import argparse
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
@@ -103,7 +104,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, workflow_wizard_mode=None, **kwargs):
         super().__init__(*args, **kwargs)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
@@ -184,6 +185,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         self.show()
+        if workflow_wizard_mode in {'project', 'page'}:
+            qtc.QTimer.singleShot(
+                0,
+                self.open_project_workflow_wizard if workflow_wizard_mode == 'project' else self.open_page_workflow_wizard,
+            )
 
     def _viewcontroller_stage_names(self):
         stage_folders = []
@@ -687,7 +693,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 # Only run this code if I am actually running this script
 if __name__ == '__main__':
     install_qt_warning_filter()
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--workflow-wizard', choices=['project', 'page'])
+    known_args, _unknown = parser.parse_known_args(sys.argv[1:])
+
     app = qtw.QApplication(sys.argv)
-    w = MainWindow()
+    w = MainWindow(workflow_wizard_mode=known_args.workflow_wizard)
     w.show()
     app.exec()

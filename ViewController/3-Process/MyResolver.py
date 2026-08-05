@@ -31,6 +31,7 @@ import UI_Icons
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import update_tesseract_wordlist_for_variant
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 #import Qt5ResolveVariants as resolver
 
 app = QtWidgets.QApplication([])
@@ -44,6 +45,7 @@ if ui_path is None:
     raise FileNotFoundError("MyResolverUI.ui was not found in expected UI locations.")
 
 varui = uic.loadUi(ui_path)
+install_workflow_wizard_menu_actions(varui, "MyResolver")
 project_status_controller = ProjectStatusController(
     varui,
     "MyResolver",

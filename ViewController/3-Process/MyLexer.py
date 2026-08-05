@@ -54,6 +54,7 @@ from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 
 
 from queue import Queue
@@ -186,6 +187,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyLexer')
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
 

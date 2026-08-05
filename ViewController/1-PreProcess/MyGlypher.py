@@ -28,6 +28,7 @@ from pathlib import Path
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 
 #import glob
 import shutil
@@ -124,6 +125,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyGlypher')
         self.install_local_file_drop(
             [self, getattr(self.ui, 'GlypherWidget', None)],
             image_handler=self.getImage,

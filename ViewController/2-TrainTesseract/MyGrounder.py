@@ -165,6 +165,7 @@ ProjectStatusController = _load_module_from_path(
     "viewcontroller_helpers_project_status_controller_grounder",
     os.path.join(_HELPERS_DIR, "project_status_controller.py"),
 ).ProjectStatusController
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 
 #import PageVerseCrossReference as xref
 
@@ -252,6 +253,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Grounder()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyGrounder')
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'OCRTextEdit', None), getattr(self.ui, 'TextFileEdit', None)],
             image_handler=self.loadDropImageEvent,

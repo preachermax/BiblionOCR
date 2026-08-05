@@ -52,6 +52,7 @@ if project_root not in sys.path:
 
 from HelpSystem import add_help_menu
 from Core.project_tracking import ProjectWorkflowTracker
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 from SessionManager import SessionManager
 # PyQt5 imports
 from PyQt5 import uic
@@ -381,6 +382,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_Pixler()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyPixler')
 
         # Progress bar (safe)
         if not hasattr(self, "progress_bar"):

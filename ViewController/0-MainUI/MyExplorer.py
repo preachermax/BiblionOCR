@@ -15,6 +15,7 @@ if project_root not in sys.path:
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 from SessionManager import SessionManager
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 
 
 sanitize_current_process_and_reexec()
@@ -143,6 +144,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.start_dir = start_dir
         self.session_manager = SessionManager()
         self.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyExplorer')
         original_tree = self.treeView
         self.treeView = ExplorerTreeView(self.frame)
         self.gridLayout_2.replaceWidget(original_tree, self.treeView)

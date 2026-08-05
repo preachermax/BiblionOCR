@@ -46,6 +46,7 @@ from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 from LocalFileDrop import LocalFileDropMixin
 from print_menu_support import install_print_menu_support, document_target
+from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
 import ChrReference as chrref
 #import pytesseract
 
@@ -76,6 +77,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(self, 'MyVersifier')
         install_print_menu_support(
             self,
             {
