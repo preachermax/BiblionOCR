@@ -7,6 +7,8 @@ from PyQt5 import QtWidgets as qtw
 
 
 class ProjectCreationWizardDialog(qtw.QDialog):
+    DEFAULT_TESSERACT_LANGUAGES = ["English", "Greek", "Hebrew", "Latin"]
+
     def __init__(self, projects_base_path, parent=None):
         super().__init__(parent)
         self.projects_base_path = projects_base_path
@@ -119,6 +121,25 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         project_scope_row.addLayout(scripture_scope_column)
         details_layout.addLayout(project_scope_row)
 
+        page_model_group = qtw.QGroupBox("Source page model")
+        page_model_layout = qtw.QGridLayout(page_model_group)
+        page_model_layout.addWidget(qtw.QLabel("Source pages"), 0, 0)
+        self.source_pages_spin = qtw.QSpinBox()
+        self.source_pages_spin.setRange(1, 1000000)
+        self.source_pages_spin.setValue(1)
+        page_model_layout.addWidget(self.source_pages_spin, 0, 1)
+
+        page_model_layout.addWidget(qtw.QLabel("Columns per source page"), 1, 0)
+        self.columns_per_page_spin = qtw.QSpinBox()
+        self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
+        self.columns_per_page_spin.setValue(len(self.DEFAULT_TESSERACT_LANGUAGES))
+        page_model_layout.addWidget(self.columns_per_page_spin, 1, 1)
+
+        self.column_preview_label = qtw.QLabel("")
+        self.column_preview_label.setWordWrap(True)
+        page_model_layout.addWidget(self.column_preview_label, 2, 0, 1, 2)
+        details_layout.addWidget(page_model_group)
+
         self.user_intent_label = qtw.QLabel("User intent summary")
         self.user_intent_edit = qtw.QPlainTextEdit()
         self.user_intent_edit.setPlaceholderText("Describe the user intent for this project")
@@ -207,7 +228,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.creator_edit.textChanged.connect(self._update_validation_state)
         self.project_type_combo.currentIndexChanged.connect(self._update_project_scope_state)
         self.scriptural_source_combo.currentIndexChanged.connect(self._refresh_folder_selection_page)
+        self.source_pages_spin.valueChanged.connect(self._refresh_column_preview)
+        self.columns_per_page_spin.valueChanged.connect(self._refresh_column_preview)
+        self.project_type_combo.currentIndexChanged.connect(self._refresh_column_preview)
         self._update_project_scope_state()
+        self._refresh_column_preview()
 
     def _go_back(self):
         index = self.page_stack.currentIndex()
@@ -243,8 +268,15 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         project_type = self.project_type_combo.currentText().strip()
         scripture_enabled = project_type.lower() == "scriptural"
         self.scriptural_source_combo.setEnabled(scripture_enabled)
+        self.columns_per_page_spin.setEnabled(scripture_enabled)
+        if scripture_enabled:
+            self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
+        else:
+            self.columns_per_page_spin.setRange(1, 1)
+            self.columns_per_page_spin.setValue(1)
         self._refresh_review()
         self._refresh_folder_selection_page()
+        self._refresh_column_preview()
         self._update_validation_state()
 
     def _update_validation_state(self):
@@ -457,17 +489,44 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             name_line += f" -> {sanitized_name}"
         project_type = self.project_type_combo.currentText().strip() or "Scriptural"
         scripture_source = self.scriptural_source_combo.currentText().strip() or "both"
+        source_pages = int(self.source_pages_spin.value())
+        columns_per_page = int(self.columns_per_page_spin.value())
+        selected_languages = self._selected_column_languages()
+        total_column_pages = source_pages * max(1, columns_per_page)
         review_lines = [
             name_line,
             f"Purpose: {self.project_purpose_edit.toPlainText().strip() or 'Not set'}",
             f"Intent: {self.user_intent_edit.toPlainText().strip() or 'Not set'}",
             f"Project type: {project_type}",
             f"Scriptural source: {scripture_source}",
+            f"Source pages: {source_pages}",
+            f"Columns per source page: {columns_per_page}",
+            f"Column languages: {', '.join(selected_languages)}",
+            f"Total column pages: {total_column_pages}",
             f"Trigger: {self.creation_trigger_edit.text().strip() or 'MyServer_button'}",
             f"Source context: {self.source_context_edit.text().strip() or 'MyServer_UI'}",
             f"Creator: {creator}",
         ]
         self.review_label.setText("\n".join(review_lines))
+
+    def _selected_column_languages(self):
+        count = max(1, int(self.columns_per_page_spin.value()))
+        return self.DEFAULT_TESSERACT_LANGUAGES[:count]
+
+    def _refresh_column_preview(self):
+        selected_languages = self._selected_column_languages()
+        named_columns = [f"Column {index + 1}: {language}" for index, language in enumerate(selected_languages)]
+        source_pages = int(self.source_pages_spin.value())
+        columns_per_page = max(1, int(self.columns_per_page_spin.value()))
+        total_column_pages = source_pages * columns_per_page
+        self.column_preview_label.setText(
+            "\n".join([
+                "Columns are automatically named from the selected language list:",
+                *named_columns,
+                f"Total column pages = source pages ({source_pages}) x columns per page ({columns_per_page}) = {total_column_pages}",
+            ])
+        )
+        self._refresh_review()
 
     def _browse_for_ris(self):
         path, _ = qtw.QFileDialog.getOpenFileName(
@@ -751,6 +810,9 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         elif scriptural_source == "both":
             scriptural_source = "both"
 
+        selected_languages = self._selected_column_languages()
+        number_columns = max(1, int(self.columns_per_page_spin.value()))
+        number_pages = max(1, int(self.source_pages_spin.value()))
         payload = {
             "project_name": sanitized_name,
             "project_purpose": self.project_purpose_edit.toPlainText().strip(),
@@ -759,6 +821,13 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "user_intent_summary": self.user_intent_edit.toPlainText().strip(),
             "ProjectType": self.project_type_combo.currentText().strip(),
             "ScripturalSource": scriptural_source,
+            "NumberPages": number_pages,
+            "NumberColumns": number_columns,
+            "ColumnName": ",".join(selected_languages),
+            "ColumnLanguage": ",".join(language.lower() for language in selected_languages),
+            "Languages": [language.lower() for language in selected_languages],
+            "NumberLanguages": len(selected_languages),
+            "TotalColumnPages": number_pages * number_columns,
             "SelectedProjectFolders": self._selected_project_folders(),
         }
         creator = self.creator_edit.text().strip()

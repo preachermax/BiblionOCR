@@ -5,8 +5,14 @@ import shutil
 import hashlib
 import subprocess
 import tempfile
+import sqlite3
 
 from .state import ProjectState
+from .project_database import (
+    PROJECT_DATABASE_FILENAME,
+    create_project_database,
+    export_project_database_json,
+)
 
 
 class ProjectCreationEngine:
@@ -25,6 +31,7 @@ class ProjectCreationEngine:
         "output/corrected",
         "output/exports",
         "Model/Project/Data",
+        "Model/Project/Data/sqlite",
         "Model/Project/Images/MyServer/Source",
         "Model/Project/Images/MyServer/Workflow",
         "Model/Project/Images/MyServer/Complete",
@@ -189,6 +196,7 @@ class ProjectCreationEngine:
             json.dump(self.ris, f, indent=2)
 
         self._create_project_structure(tmp)
+        self._initialize_project_databases(tmp)
         self._write_git_support_files(tmp)
 
         os.rename(tmp, path)
@@ -662,6 +670,52 @@ class ProjectCreationEngine:
                 keep_path = os.path.join(root, ".gitkeep")
                 with open(keep_path, "w", encoding="utf-8"):
                     pass
+
+    # -----------------------
+    def _initialize_project_databases(self, project_path):
+        sqlite_dir = os.path.join(project_path, "Model", "Project", "Data", "sqlite")
+        os.makedirs(sqlite_dir, exist_ok=True)
+
+        project_metadata_db_path = os.path.join(sqlite_dir, PROJECT_DATABASE_FILENAME)
+        project_metadata_json_path = os.path.join(
+            project_path,
+            "Model",
+            "Project",
+            "Data",
+            "json",
+            "project_metadata.json",
+        )
+
+        database_seed = {
+            "ProjectName": self.context.get("project_name", ""),
+            "ProjectType": self.context.get("ProjectType", "Scriptural"),
+            "ScripturalSource": self.context.get("ScripturalSource", "both"),
+            "NumberPages": self.context.get("NumberPages", 0),
+            "NumberColumns": self.context.get("NumberColumns", 1),
+            "ColumnName": self.context.get("ColumnName", ""),
+            "ColumnLanguage": self.context.get("ColumnLanguage", ""),
+            "NumberLanguages": self.context.get("NumberLanguages", 0),
+            "Languages": self.context.get("Languages", []),
+            "ProvenancePath": self.context.get("source_provenance_path", ""),
+            "Notes": self.context.get("user_intent_summary", ""),
+        }
+
+        create_project_database(project_metadata_db_path, database_seed)
+        export_project_database_json(project_metadata_db_path, project_metadata_json_path)
+
+        # Keep the RIS settings sqlite file present from project creation onward.
+        project_settings_db_path = os.path.join(sqlite_dir, "Project Settings.db")
+        with sqlite3.connect(project_settings_db_path):
+            pass
+
+        self.emit(
+            "project_databases_initialized",
+            {
+                "sqlite_dir": sqlite_dir,
+                "project_metadata_db": project_metadata_db_path,
+                "project_settings_db": project_settings_db_path,
+            },
+        )
 
     # -----------------------
     def _copy_structure_manifest(self, project_path, folder_list_path, folder_count, file_count):

@@ -40,6 +40,23 @@ BiblionOCR is designed to make systems visible.
 
 MyExplorer and the shared file-picker now exclude empty folders by default. The checkbox can still be toggled off when you want to see the full directory tree.
 
+## Project Administration Ownership
+
+Project administration is centralized in MyServer.
+
+- `New Project` is only available from MyServer.
+- `Project Settings` is only available from MyServer.
+- Milestone override and weighted milestone editing are handled through the dedicated `Milestone Settings` page in the MyServer Project Settings dialog.
+
+## Project Database Storage
+
+Project databases are created in each generated project root under:
+
+- `Model/Project/Data/sqlite/project_metadata.sqlite`
+- `Model/Project/Data/sqlite/Project Settings.db`
+
+These database files are created when project creation code executes (for example, when a new project is created through MyServer).
+
 ## Developer Utility: Project Wizard Preview
 
 To preview and iterate on the Qt Designer-backed project creation wizard without launching MyServer:

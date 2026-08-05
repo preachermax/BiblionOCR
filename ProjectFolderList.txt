@@ -59,6 +59,8 @@ launchers/run-myversifier.sh
 launchers/run-mywriter.cmd
 launchers/run-mywriter.sh
 Model/Project/Data
+Model/Project/Data/sqlite
+Model/Project/Data/sqlite/project_metadata.sqlite
 Model/Project/Data/esword
 Model/Project/Data/esword/rmac.dctx
 Model/Project/Data/json

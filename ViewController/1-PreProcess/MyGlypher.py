@@ -1057,7 +1057,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def MoveLHSlider(self):
         self.ui.LHslider.setEnabled(True)
-        self.ui.LHslider.setValue(int(self.ui.LHlineEdit.text()))
+        text_value = self.ui.LHlineEdit.text().strip()
+        if not text_value:
+            text_value = self.ui.LHlineEdit.placeholderText().strip()
+
+        try:
+            slider_value = int(text_value)
+        except (TypeError, ValueError):
+            slider_value = self.ui.LHslider.value()
+
+        slider_value = max(self.ui.LHslider.minimum(), min(self.ui.LHslider.maximum(), slider_value))
+        self.ui.LHslider.setValue(slider_value)
 
     def SetLineSpacing(self):
 

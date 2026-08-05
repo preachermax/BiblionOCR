@@ -10,6 +10,7 @@ import time
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
+from Core.project_tracking import ProjectWorkflowTracker
 
 
 PROJECT_SETTINGS_DB_NAME = "Project Settings.db"
@@ -140,8 +141,10 @@ PROVENANCE_SEARCH_DIRS = (
 class ProjectSettingsStore:
     def __init__(self, project_root):
         self.project_root = os.path.abspath(project_root)
-        self.sqlite_dir = os.path.join(self.project_root, "Model", "Project", "Data", "SQLite")
+        self.sqlite_dir = os.path.join(self.project_root, "Model", "Project", "Data", "sqlite")
+        self.legacy_sqlite_dir = os.path.join(self.project_root, "Model", "Project", "Data", "SQLite")
         self.db_path = os.path.join(self.sqlite_dir, PROJECT_SETTINGS_DB_NAME)
+        self.legacy_db_path = os.path.join(self.legacy_sqlite_dir, PROJECT_SETTINGS_DB_NAME)
         self.ris_json_path = os.path.join(self.project_root, "project.ris.json")
         self.last_loaded_provenance_source = ""
 
@@ -379,10 +382,14 @@ class ProjectSettingsStore:
         return data if isinstance(data, dict) else {}
 
     def _load_ris_table(self):
-        if not os.path.exists(self.db_path):
+        candidate_db_path = self.db_path
+        if not os.path.exists(candidate_db_path) and os.path.exists(self.legacy_db_path):
+            candidate_db_path = self.legacy_db_path
+
+        if not os.path.exists(candidate_db_path):
             return {}
 
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(candidate_db_path)
         try:
             cursor = conn.execute(
                 "SELECT field_key, field_value FROM ris ORDER BY field_order ASC, field_key ASC"
@@ -655,6 +662,8 @@ class ProjectSettingsDialog(qtw.QDialog):
             field_key: description for field_key, _label, description in RIS_FIELD_SPECS
         }
         self._mainui_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        workspace_root = os.path.normpath(os.path.join(self._mainui_dir, os.pardir, os.pardir, os.pardir, os.pardir))
+        self.workflow_tracker = ProjectWorkflowTracker(workspace_root=workspace_root)
 
         self.setWindowTitle("Project Settings")
         self.setMinimumSize(920, 680)
@@ -662,8 +671,10 @@ class ProjectSettingsDialog(qtw.QDialog):
         self.setSizeGripEnabled(True)
         self._apply_workflow_font()
 
-        self.tabs = None
+        self.settings_nav_list = None
+        self.settings_page_stack = None
         self.ris_table = None
+        self.milestones_table = None
         self.status_label = None
 
         self._build_ui()
@@ -693,13 +704,25 @@ class ProjectSettingsDialog(qtw.QDialog):
         layout.setSpacing(10)
 
         intro_label = qtw.QLabel(
-            "Edit project settings and provenance. The RIS tab persists to the project-local SQLite store and project.ris.json."
+            "Edit project settings and provenance. Milestone settings are on their own page. "
+            "Changes persist to the project-local SQLite store and project.ris.json."
         )
         intro_label.setWordWrap(True)
         layout.addWidget(intro_label)
 
-        self.tabs = qtw.QTabWidget(self)
-        layout.addWidget(self.tabs, 1)
+        pages_layout = qtw.QHBoxLayout()
+        pages_layout.setSpacing(8)
+        layout.addLayout(pages_layout, 1)
+
+        self.settings_nav_list = qtw.QListWidget(self)
+        self.settings_nav_list.setFixedWidth(180)
+        self.settings_nav_list.addItems(["RIS Settings", "Milestone Settings"])
+        pages_layout.addWidget(self.settings_nav_list)
+
+        self.settings_page_stack = qtw.QStackedWidget(self)
+        pages_layout.addWidget(self.settings_page_stack, 1)
+
+        self.settings_nav_list.currentRowChanged.connect(self.settings_page_stack.setCurrentIndex)
 
         ris_tab = qtw.QWidget(self)
         ris_layout = qtw.QVBoxLayout(ris_tab)
@@ -739,7 +762,34 @@ class ProjectSettingsDialog(qtw.QDialog):
         self.status_label.setWordWrap(True)
         ris_layout.addWidget(self.status_label)
 
-        self.tabs.addTab(ris_tab, "RIS")
+        self.settings_page_stack.addWidget(ris_tab)
+
+        milestones_tab = qtw.QWidget(self)
+        milestones_layout = qtw.QVBoxLayout(milestones_tab)
+        milestones_layout.setContentsMargins(8, 8, 8, 8)
+        milestones_layout.setSpacing(8)
+
+        milestones_help = qtw.QLabel(
+            "Milestones are loaded from workflow tracking and module_handshakes.csv. "
+            "Adjust completion and weight to tune project/page progress calculations."
+        )
+        milestones_help.setWordWrap(True)
+        milestones_layout.addWidget(milestones_help)
+
+        self.milestones_table = qtw.QTableWidget(0, 4, self)
+        self.milestones_table.setHorizontalHeaderLabels(["Milestone Key", "Label", "Weight", "Complete"]) 
+        self.milestones_table.verticalHeader().setVisible(False)
+        self.milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.milestones_table.setAlternatingRowColors(True)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.Stretch)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(3, qtw.QHeaderView.ResizeToContents)
+        milestones_layout.addWidget(self.milestones_table, 1)
+
+        self.settings_page_stack.addWidget(milestones_tab)
+        self._load_milestones_table()
+        self.settings_nav_list.setCurrentRow(0)
 
         buttons = qtw.QDialogButtonBox(
             qtw.QDialogButtonBox.Save | qtw.QDialogButtonBox.Cancel,
@@ -755,6 +805,64 @@ class ProjectSettingsDialog(qtw.QDialog):
         for field_key, field_label, description in ordered_specs:
             display_value = self._format_value(values.get(field_key, ""))
             self._append_row(field_key, display_value, description, field_label)
+
+    def _load_milestones_table(self):
+        self.milestones_table.setRowCount(0)
+        rows = self.workflow_tracker.milestone_rows(self.project_root)
+        for row_data in rows:
+            row = self.milestones_table.rowCount()
+            self.milestones_table.insertRow(row)
+
+            key_item = qtw.QTableWidgetItem(str(row_data.get("key", "")))
+            key_item.setFlags(key_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.milestones_table.setItem(row, 0, key_item)
+
+            label_item = qtw.QTableWidgetItem(str(row_data.get("label", "")))
+            label_item.setFlags(label_item.flags() & ~qtc.Qt.ItemIsEditable)
+            self.milestones_table.setItem(row, 1, label_item)
+
+            weight_value = int(row_data.get("weight", 1))
+            weight_item = qtw.QTableWidgetItem(str(weight_value))
+            self.milestones_table.setItem(row, 2, weight_item)
+
+            complete_checkbox = qtw.QCheckBox()
+            complete_checkbox.setChecked(bool(row_data.get("complete", False)))
+            complete_widget = qtw.QWidget()
+            complete_layout = qtw.QHBoxLayout(complete_widget)
+            complete_layout.setContentsMargins(0, 0, 0, 0)
+            complete_layout.setAlignment(qtc.Qt.AlignCenter)
+            complete_layout.addWidget(complete_checkbox)
+            self.milestones_table.setCellWidget(row, 3, complete_widget)
+
+    def _collect_milestone_updates(self):
+        updates = {}
+        for row in range(self.milestones_table.rowCount()):
+            key_item = self.milestones_table.item(row, 0)
+            weight_item = self.milestones_table.item(row, 2)
+            complete_widget = self.milestones_table.cellWidget(row, 3)
+            if key_item is None:
+                continue
+
+            milestone_key = key_item.text().strip()
+            if not milestone_key:
+                continue
+
+            try:
+                milestone_weight = max(1, int((weight_item.text() if weight_item else "1").strip()))
+            except (TypeError, ValueError, AttributeError):
+                milestone_weight = 1
+
+            milestone_complete = False
+            if complete_widget is not None:
+                checkbox = complete_widget.findChild(qtw.QCheckBox)
+                if checkbox is not None:
+                    milestone_complete = checkbox.isChecked()
+
+            updates[milestone_key] = {
+                "weight": milestone_weight,
+                "complete": milestone_complete,
+            }
+        return updates
 
     def _append_row(self, field_key, field_value, description, field_label=None):
         row = self.ris_table.rowCount()
@@ -856,8 +964,9 @@ class ProjectSettingsDialog(qtw.QDialog):
                 tab_index = int(active_tab)
             except (TypeError, ValueError):
                 tab_index = 0
-            if 0 <= tab_index < self.tabs.count():
-                self.tabs.setCurrentIndex(tab_index)
+            if self.settings_page_stack is not None and 0 <= tab_index < self.settings_page_stack.count():
+                self.settings_page_stack.setCurrentIndex(tab_index)
+                self.settings_nav_list.setCurrentRow(tab_index)
 
         geometry_b64 = values.get(PROJECT_SETTINGS_GEOMETRY_KEY)
         if geometry_b64:
@@ -869,8 +978,9 @@ class ProjectSettingsDialog(qtw.QDialog):
 
     def _persist_session_state(self):
         geometry_b64 = base64.b64encode(bytes(self.saveGeometry())).decode("ascii")
+        active_page_index = self.settings_page_stack.currentIndex() if self.settings_page_stack is not None else 0
         self._update_session_values({
-            PROJECT_SETTINGS_TAB_KEY: self.tabs.currentIndex(),
+            PROJECT_SETTINGS_TAB_KEY: active_page_index,
             PROJECT_SETTINGS_GEOMETRY_KEY: geometry_b64,
         })
 
@@ -895,6 +1005,12 @@ class ProjectSettingsDialog(qtw.QDialog):
     def accept(self):
         try:
             saved_values = self.store.save_ris_values(self._collect_values())
+            milestone_updates = self._collect_milestone_updates()
+            self.workflow_tracker.update_milestones(
+                self.project_root,
+                milestone_updates,
+                updated_by="ProjectSettingsDialog",
+            )
         except Exception as exc:
             qtw.QMessageBox.warning(self, "Project Settings", "Failed to save project settings: {0}".format(exc))
             return

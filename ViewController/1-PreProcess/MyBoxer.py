@@ -264,7 +264,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         )
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyBoxer')
-        self.ui.ImageTab.currentChanged.connect(self.on_tabChanged)
         # Manual
         self.ui.actionManually_Crop_Page.triggered.connect(self.pagebox_make_split)
         self.ui.actionEdit_Greek_PageBox.triggered.connect(self.pagebox_edit_split)
@@ -378,6 +377,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.PageBoxTable.setCornerButtonEnabled(False)
         self.ui.PageBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
         self.ui.PageBoxTable.customContextMenuRequested.connect(self.openTableMenu)
+        self._configure_word_box_tab_layout()
 
         self.ui.reloadTextbutton.clicked.connect(self.BoxText2BoxTable)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
@@ -486,6 +486,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self.ui.ImageTab.currentChanged.connect(self.on_tabChanged)
         self.project_status_controller = ProjectStatusController(
             self,
             'MyBoxer',
@@ -576,6 +577,21 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
                 #time.sleep(0.05)
         #def setProgressVal(self, val):
             #self.ui.progressBar.setValue(val)
+
+    def _configure_word_box_tab_layout(self):
+        """Keep Word Box image editing in the left image panel tab stack."""
+        if self.ui.BoxTab.indexOf(self.ui.WordImage) != -1:
+            self.ui.BoxTab.removeTab(self.ui.BoxTab.indexOf(self.ui.WordImage))
+
+        existing_index = self.ui.ImageTab.indexOf(self.ui.WordImage)
+        if existing_index != -1:
+            self.ui.ImageTab.removeTab(existing_index)
+
+        self.ui.ImageTab.insertTab(0, self.ui.WordImage, "Word Box")
+
+        line_box_index = self.ui.ImageTab.indexOf(self.ui.LineBoxPage)
+        if line_box_index != -1:
+            self.ui.ImageTab.setTabText(line_box_index, "Line Box")
 
     @qtc.pyqtSlot(str)
     def append_text(self,text):
@@ -719,7 +735,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             self.imgopentitle = "Open Line Box Image"
             self.txtdir = self.txtgreeklinebox
             self.txtopentitle = "Open Line Box Text"
-        elif self.currenttabtext == "Word Box Text":
+        elif self.currenttabtext in ("Word Box", "Word Box Text", "Word Box Table", "Word Box Image"):
             self.currentBoxImage = self.ui.WordBoxImage
             self.currentBoxTable = self.ui.WordBoxTable
             self.currentTextTable = self.ui.WordBoxText
@@ -746,24 +762,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             self.imgopentitle = "Open Page Box Image"
             self.txtdir = self.txtpagesbox
             self.txtopentitle = "Open Page Box Text"
-        elif self.currenttabtext == "Word Box Table":
-            self.currentBoxImage = self.ui.WordBoxImage
-            self.currentBoxTable = self.ui.WordBoxTable
-            self.currentTextTable = self.ui.WordBoxText
-            self.imgdir = self.projecthome + "Model/Images/Complete/Greek/tif_greek_box"
-            print(f'TabChanged Image Dir: {self.imgdir}')
-            self.imgopentitle = "Open Word Box Image"
-            self.txtdir = self.projecthome + "Model/Project/Data/csv"
-            self.txtopentitle = "Open Word Box Text"
-        elif self.currenttabtext == "Word Box Image":
-            self.currentBoxImage = self.ui.WordBoxImage
-            self.currentBoxTable = self.ui.WordBoxTable
-            self.currentTextTable = self.ui.WordBoxText
-            self.imgdir = self.projecthome + "Model/Images/Complete/Greek/tif_greek_box"
-            print(f'TabChanged Image Dir: {self.imgdir}')
-            self.imgopentitle = "Open Word Box Image"
-            self.txtdir = self.projecthome + "Model/Project/Data/csv"
-            self.txtopentitle = "Open Word Box Text"
         elif self.currenttabtext == "Source Image":
             self.imgstrippath = self.imgpath.split("_")
             self.imgpath = self.imgstrippath[0] + ".tif"
@@ -803,7 +801,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             self.txtfilesplit = os.path.splitext(self.txtfilestr)
             self.txtfilename = self.txtfilesplit[0]
             self.txtfileext = self.txtfilesplit[1]
-        elif self.currenttabtext in ("Word Box Text", "Word Box Table", "Word Box Image"):
+        elif self.currenttabtext in ("Word Box", "Word Box Text", "Word Box Table", "Word Box Image"):
             self.path_of_imgwordbox = self.projecthome + "Model/Images/Complete/Greek/tif_greek_box/"
             self.path_of_txtwordbox = self.projecthome + "Model/Project/Data/csv/"
             self.boximgpath = self.path_of_imgwordbox + self.imgfilename.replace("_wordbox", "") + "_wordbox.tif"
@@ -1058,7 +1056,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.currentBoxImage = self.ui.WordBoxImage
         self.currentBoxTable = self.ui.WordBoxTable
         self.currentTextTable = self.ui.WordBoxText
-        self.currenttabtext = "Word Box Image"
+        self.currenttabtext = "Word Box"
         self.ui.ImageTab.setCurrentWidget(self.ui.WordImage)
         self.normImage()
         self.BoxText2BoxTable()
@@ -1331,7 +1329,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
                 self.ui.PageImage.setPixmap(self.scaled_pixmap)
             elif self.currenttabtext == "Page Box":
                 self.currentBoxImage.setPixmap(self.scaled_pixmap)
-            elif self.currenttabtext in ("Word Box Text", "Word Box Table", "Word Box Image"):
+            elif self.currenttabtext in ("Word Box", "Word Box Text", "Word Box Table", "Word Box Image"):
                 self.currentBoxImage.setPixmap(self.scaled_pixmap)
             elif self.currenttabtext == "Source Image":
                 self.ui.SourceImage.setPixmap(self.scaled_pixmap)

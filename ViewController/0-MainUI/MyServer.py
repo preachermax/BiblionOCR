@@ -210,7 +210,6 @@ boxer = _load_module_from_path(
 )
 import MyScanner as scanner
 import MyExplorer as explorer
-from helpers.ProjectTrackingDialog import ProjectTrackingDialog
 gtr = _load_module_from_path(
     "viewcontroller_2_traintesseract_mygrounder",
     os.path.join(training_dir, "MyGrounder.py"),
@@ -718,14 +717,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.project_overall_status_bar.setFixedWidth(140)
         self.project_overall_status_bar.setAlignment(Qt.AlignCenter)
 
-        self.project_tracking_button = qtw.QPushButton("Milestones")
-        self.project_tracking_button.setFixedHeight(24)
-        self.project_tracking_button.clicked.connect(self._open_project_tracking_dialog)
+        self.page_status_bar = qtw.QProgressBar()
+        self.page_status_bar.setRange(0, 100)
+        self.page_status_bar.setValue(0)
+        self.page_status_bar.setTextVisible(True)
+        self.page_status_bar.setFormat("Page 0%")
+        self.page_status_bar.setFixedWidth(130)
+        self.page_status_bar.setAlignment(Qt.AlignCenter)
 
         self.statusBar().addPermanentWidget(self.project_name_status_label)
         self.statusBar().addPermanentWidget(self.workflow_status_label)
         self.statusBar().addPermanentWidget(self.project_overall_status_bar)
-        self.statusBar().addPermanentWidget(self.project_tracking_button)
+        self.statusBar().addPermanentWidget(self.page_status_bar)
 
     def _format_module_workflow_status(self, module_name, snapshot):
         module_total = int(snapshot.get("module_total_count", 0))
@@ -775,15 +778,26 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         completed_labels = snapshot.get("completed_labels", [])
         completed_text = ", ".join(completed_labels) if completed_labels else "None yet"
-        overall_percent = int(snapshot.get("overall_percent", 0))
+        project_percent = int(snapshot.get("project_percent", snapshot.get("overall_percent", 0)))
+        page_percent = int(snapshot.get("page_percent", project_percent))
+        completed_pages = int(snapshot.get("completed_pages", 0))
+        total_pages = int(snapshot.get("total_pages", 0))
         overall_next = snapshot.get("overall_next_label", "")
-        tooltip = f"Overall {overall_percent}%\nCompleted: {completed_text}\nNext: {overall_next}"
+        tooltip = (
+            f"Project {project_percent}%\n"
+            f"Page {page_percent}% ({completed_pages}/{total_pages})\n"
+            f"Completed: {completed_text}\n"
+            f"Next: {overall_next}"
+        )
 
         self.workflow_status_label.setText(self._format_module_workflow_status("MyServer", snapshot))
         self.workflow_status_label.setToolTip(tooltip)
-        self.project_overall_status_bar.setValue(overall_percent)
-        self.project_overall_status_bar.setFormat(f"Project {overall_percent}%")
+        self.project_overall_status_bar.setValue(project_percent)
+        self.project_overall_status_bar.setFormat(f"Project {project_percent}%")
         self.project_overall_status_bar.setToolTip(tooltip)
+        self.page_status_bar.setValue(page_percent)
+        self.page_status_bar.setFormat(f"Page {page_percent}%")
+        self.page_status_bar.setToolTip(tooltip)
 
     def _record_project_milestone(self, milestone_key, candidate_path=None, details=None):
         project_root = self.workflow_tracker.resolve_project_root(
@@ -806,28 +820,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._refresh_project_status(project_root)
         return project_root
 
-    def _open_project_tracking_dialog(self):
-        project_root = self.workflow_tracker.resolve_project_root(
-            self._shared_active_project_root(),
-            self.current_project_root,
-            getattr(self, "imgpath", ""),
-            getattr(self, "imgdir", ""),
-            getattr(self, "txtpath", ""),
-            getattr(self, "txtdir", ""),
-        )
+    def _open_project_settings_dialog_for_root(self, project_root):
         if not project_root:
             qtw.QMessageBox.information(
                 self,
-                "Project Milestones",
-                "Open or create a project first so milestone state can be edited.",
+                "Project Settings",
+                "Open or create a project first so project settings can be edited.",
             )
-            return
+            return None
 
         self._set_current_project(project_root)
-        self.workflow_tracker.ensure_tracking_state(project_root)
-        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, "MyServer", self)
+        dialog = ProjectSettingsDialog(project_root, self.session_manager, self)
         dialog.exec_()
         self._refresh_project_status(project_root)
+        return project_root
 
     def on_new_project_clicked(self):
         payload = self.collect_new_project_payload()
@@ -871,6 +877,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._set_current_project(project_path)
         self.workflow_tracker.ensure_tracking_state(project_path)
+        ### MILESTONE - project_ready-10% ###
         self._record_project_milestone("project_ready", project_path)
         self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
@@ -922,12 +929,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             if self._pending_project_root:
                 self._set_current_project(self._pending_project_root)
                 self.workflow_tracker.ensure_tracking_state(self._pending_project_root)
+                ### MILESTONE - project_ready-10% ###
                 self._record_project_milestone(
                     "project_ready",
                     self._pending_project_root,
                     details={"source": "project_creation"},
                 )
                 self._refresh_project_status(self._pending_project_root)
+
+                # Project administration remains centralized in MyServer via Project Settings.
+                self._open_project_settings_dialog_for_root(self._pending_project_root)
             qtw.QMessageBox.information(
                 self,
                 self._project_success_title,
@@ -978,8 +989,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.progress_bar.setVisible(False)
 
     def open_project_settings_dialog(self):
-        dialog = ProjectSettingsDialog(project_root, self.session_manager, self)
-        dialog.exec_()
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+            getattr(self, "txtpath", ""),
+            getattr(self, "txtdir", ""),
+        )
+        self._open_project_settings_dialog_for_root(project_root)
 
     def collect_new_project_payload(self):
         dialog = ProjectCreationWizardDialog(self._projects_base_path(), self)
@@ -1075,6 +1093,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         self.showImage(result["path"])
+        ### MILESTONE - source_acquired-15% ###
         self._record_project_milestone(
             "source_acquired",
             result["path"],
@@ -2956,6 +2975,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
         })
+        ### MILESTONE - source_acquired-15% ###
         self._record_project_milestone(
             "source_acquired",
             self.imgpath,

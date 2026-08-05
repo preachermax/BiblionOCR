@@ -5,7 +5,6 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5.QtCore import Qt
 
 from Core.project_tracking import ProjectWorkflowTracker
-from ProjectTrackingDialog import ProjectTrackingDialog
 from SessionManager import SessionManager
 
 
@@ -90,15 +89,19 @@ class ProjectStatusController:
         self.project_overall_status_bar.setFixedWidth(140)
         self.project_overall_status_bar.setAlignment(Qt.AlignCenter)
 
-        self.project_tracking_button = qtw.QPushButton("Milestones")
-        self.project_tracking_button.setFixedHeight(24)
-        self.project_tracking_button.clicked.connect(self.open_tracking_dialog)
+        self.page_status_bar = qtw.QProgressBar()
+        self.page_status_bar.setRange(0, 100)
+        self.page_status_bar.setValue(0)
+        self.page_status_bar.setTextVisible(True)
+        self.page_status_bar.setFormat("Page 0%")
+        self.page_status_bar.setFixedWidth(130)
+        self.page_status_bar.setAlignment(Qt.AlignCenter)
 
         status_bar = self.window.statusBar()
         status_bar.addPermanentWidget(self.project_name_status_label)
         status_bar.addPermanentWidget(self.workflow_status_label)
         status_bar.addPermanentWidget(self.project_overall_status_bar)
-        status_bar.addPermanentWidget(self.project_tracking_button)
+        status_bar.addPermanentWidget(self.page_status_bar)
 
     def shared_active_project_root(self):
         return self.session_manager.get_active_project_root()
@@ -147,15 +150,26 @@ class ProjectStatusController:
 
         completed_labels = snapshot.get("completed_labels", [])
         completed_text = ", ".join(completed_labels) if completed_labels else "None yet"
-        overall_percent = int(snapshot.get("overall_percent", 0))
+        project_percent = int(snapshot.get("project_percent", snapshot.get("overall_percent", 0)))
+        page_percent = int(snapshot.get("page_percent", project_percent))
+        completed_pages = int(snapshot.get("completed_pages", 0))
+        total_pages = int(snapshot.get("total_pages", 0))
         overall_next = snapshot.get("overall_next_label", "")
-        tooltip = f"Overall {overall_percent}%\nCompleted: {completed_text}\nNext: {overall_next}"
+        tooltip = (
+            f"Project {project_percent}%\n"
+            f"Page {page_percent}% ({completed_pages}/{total_pages})\n"
+            f"Completed: {completed_text}\n"
+            f"Next: {overall_next}"
+        )
 
         self.workflow_status_label.setText(self._format_module_workflow_status(snapshot))
         self.workflow_status_label.setToolTip(tooltip)
-        self.project_overall_status_bar.setValue(overall_percent)
-        self.project_overall_status_bar.setFormat(f"Project {overall_percent}%")
+        self.project_overall_status_bar.setValue(project_percent)
+        self.project_overall_status_bar.setFormat(f"Project {project_percent}%")
         self.project_overall_status_bar.setToolTip(tooltip)
+        self.page_status_bar.setValue(page_percent)
+        self.page_status_bar.setFormat(f"Page {page_percent}%")
+        self.page_status_bar.setToolTip(tooltip)
 
     def _format_module_workflow_status(self, snapshot):
         module_total = int(snapshot.get("module_total_count", 0))
@@ -192,19 +206,3 @@ class ProjectStatusController:
         )
         self.refresh_status(project_root)
         return project_root
-
-    def open_tracking_dialog(self):
-        project_root = self.resolve_project_root()
-        if not project_root:
-            qtw.QMessageBox.information(
-                self.window,
-                "Project Milestones",
-                "Select or create a project in MyServer first so milestone state can be edited.",
-            )
-            return
-
-        self.window.current_project_root = project_root
-        self.workflow_tracker.ensure_tracking_state(project_root)
-        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, self.module_name, self.window)
-        dialog.exec_()
-        self.refresh_status(project_root)
