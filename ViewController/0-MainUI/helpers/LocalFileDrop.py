@@ -28,14 +28,31 @@ class EmptyFolderFilterProxyModel(qtc.QSortFilterProxyModel):
         if not self._exclude_empty_dirs:
             return super().filterAcceptsRow(source_row, source_parent)
 
-        source_index = self.sourceModel().index(source_row, 0, source_parent)
+        source_model = self.sourceModel()
+        source_index = source_model.index(source_row, 0, source_parent)
         if not source_index.isValid():
             return False
 
-        if not self.sourceModel().isDir(source_index):
+        if not source_model.isDir(source_index):
             return super().filterAcceptsRow(source_row, source_parent)
 
-        return self.sourceModel().hasChildren(source_index)
+        file_path = source_model.filePath(source_index)
+        if not file_path:
+            return False
+
+        return self._directory_has_visible_contents(file_path)
+
+    def _directory_has_visible_contents(self, directory_path):
+        try:
+            with os.scandir(directory_path) as entries:
+                for entry in entries:
+                    if entry.is_file():
+                        return True
+                    if entry.is_dir() and self._directory_has_visible_contents(entry.path):
+                        return True
+        except OSError:
+            return True
+        return False
 
 
 class FileDragTreeView(qtw.QTreeView):

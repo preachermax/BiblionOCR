@@ -22,6 +22,8 @@ OVERALL_MILESTONES: Sequence[WorkflowMilestone] = (
     WorkflowMilestone("lines_prepared", "Line images prepared", 15),
     WorkflowMilestone("ground_truth_started", "Ground truth started", 10),
     WorkflowMilestone("text_outputs_started", "Text outputs started", 10),
+    WorkflowMilestone("training_workspace_ready", "Training workspace prepared", 5),
+    WorkflowMilestone("training_progress_plotted", "Training progress plotted", 5),
 )
 
 
@@ -38,6 +40,12 @@ MODULE_MILESTONES: Dict[str, Sequence[str]] = {
         "pages_prepared",
         "lines_prepared",
         "ground_truth_started",
+    ),
+    "MyTrainer": (
+        "training_workspace_ready",
+        "ground_truth_started",
+        "text_outputs_started",
+        "training_progress_plotted",
     ),
 }
 
@@ -359,9 +367,27 @@ class ProjectWorkflowTracker:
             "lines_prepared": self._lines_prepared,
             "ground_truth_started": self._ground_truth_started,
             "text_outputs_started": self._text_outputs_started,
+            "training_workspace_ready": self._training_workspace_ready,
+            "training_progress_plotted": self._training_progress_plotted,
         }
         detector = detectors.get(milestone_key)
         return detector(project_root) if detector else False
+
+    def _training_workspace_ready(self, project_root: str) -> bool:
+        return os.path.isdir(os.path.join(project_root, "Model", "Project", "Training", "Tesseract"))
+
+    def _training_progress_plotted(self, project_root: str) -> bool:
+        plot_path = os.path.join(
+            project_root,
+            "Model",
+            "Project",
+            "Training",
+            "Tesseract",
+            "plots",
+            "feg",
+            "training_progress.png",
+        )
+        return os.path.isfile(plot_path)
 
     def _project_ready(self, project_root: str) -> bool:
         return os.path.isfile(

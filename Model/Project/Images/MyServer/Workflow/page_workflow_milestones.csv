@@ -1,0 +1,20 @@
+MilestoneNum MilestoneName Language Progress% Override OutputModule OutputPath
+1 extracted Greek 5.56% Y MyServer MyServer/Complete/Greek/extracted
+2 scanned Greek 5.56% Y MyScanner
+3 cleaned Greek 5.56% Y MyPixler
+4 autosplit Greek 5.88% Y MyBoxer
+5 pageboxed Greek 5.56% N MyBoxer
+6 lineboxed Greek 5.56% N MyBoxer
+7 wordboxed Greek 5.56% N MyBoxer
+8 glyphboxed Greek 5.56% N MyGlypher
+9 fonted Greek 5.56% Y MyGlypher
+10 proofread Greek 5.56% Y MyReader
+11 versified Greek 5.56% N MyVersifier
+12 resolved Greek 5.56% N MyResolver
+13 wordlisted Greek 5.56% Y MyLexer
+14 wordlisted Greek 5.56% Y MyReader
+15 wordlisted Greek 5.56% Y MyVersifier
+16 wordlisted Greek 5.56% Y MyWriter
+17 grounded Greek 5.56% N MyGrounder
+18 trained Greek 5.56% N MyTrainer
+19 published Greek 5.56% Y MyWriter

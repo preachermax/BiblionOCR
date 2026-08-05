@@ -32,6 +32,16 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
+        <widget class="QCheckBox" name="exclude_empty_checkbox">
+         <property name="text">
+          <string>Exclude empty folders</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QTreeView" name="treeView"/>
        </item>
       </layout>

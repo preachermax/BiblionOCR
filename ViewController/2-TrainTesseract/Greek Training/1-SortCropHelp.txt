@@ -1,0 +1,5 @@
+Prior to using SortCropLines(Lang).py, it is better to use GIMP to manually check that the spaces between the lines of the greek and latin blocks of text contain no noise.
+
+After using SortCropLines(Lang).py, the resulting tif line files will be located in the respective tif_lang_autosplit folder.  The line files should then be copied to the respective tif_lang_manual split folder for processing.
+
+Use GIMP to manually split each incorrect line file (some will have two lines, some three).  From that point, the correctly split line files can be renamed and moved to the associated tif4groundtruth folder for further auditing prior to finally renaming and moving the files to the tif2groundtruth folder.  From there, they are permanently staged for copying to the appropriate GroundTruth folder for training with Tesseract.
