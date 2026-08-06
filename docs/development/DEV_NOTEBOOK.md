@@ -20,6 +20,22 @@ Use this template for every pause, stop, or VS Code close event.
 * Next immediate action:
   * single next step
 
+### Session Handoff - 2026-08-06 23:59
+
+* Scope summary: finalized workflow wizard policy/runtime updates plus agent-owned checklist, PR governance, and cross-repo naming/policy documentation.
+* Touched files (`git status --short`):
+  * committed scope in commit `2d424eb` (33 files)
+  * remaining local runtime artifact: `ViewController/Model/Project/Data/json/Session.json`
+* Validation gates:
+  * problems/lint: pass on touched docs/templates/workflows
+  * compile: pass on touched Python runtime files via `python3 -m py_compile ...`
+  * smoke: pass (14/14) with `.venv/bin/python` and `QT_QPA_PLATFORM=offscreen`
+  * manual UI checks: pending explicit visual reconfirmation after reopen if runtime/UI edits continue
+* Unresolved blockers/risks:
+  * local `Session.json` remains intentionally uncommitted runtime noise
+* Next immediate action:
+  * on reopen, run recovery sequence from checklist section `K` before any new edits
+
 ## 📌 Project Overview
 
 * **MyServer**: Main runtime UI/controller for OCR workflow and project creation wiring
