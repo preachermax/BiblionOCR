@@ -177,8 +177,9 @@ Goal: verify the cross-module workflow state is consistent after centralization.
 
 ### 10. Workflow wizard launch integrity
 
-- Open `Project Workflow Wizard` from `MyLauncher`.
-- Open `Page Workflow Wizard` from `MyLauncher`.
+- Open `Project Workflow Wizard` from `MyServer`.
+- Open `Page Workflow Wizard` from `MyServer`.
+- Open `Page Workflow Wizard` from `MyLauncher` and verify module-scoped launch behavior.
 - Confirm stage order follows numbered `ViewController` folders:
   - `0-MainUI`
   - `1-PreProcess`
@@ -187,7 +188,7 @@ Goal: verify the cross-module workflow state is consistent after centralization.
   - `4-PostProcess`
 - Confirm `Run Full Macro` and stage-specific actions launch without traceback.
 - Confirm existing manual launch actions still work after using the wizards.
-- Open workflow wizard entry actions from these non-launcher windows and confirm they delegate correctly into `MyLauncher`:
+- Open workflow wizard entry actions from these non-launcher windows and confirm page-wizard delegation correctly routes into `MyLauncher` with module context:
   - `MyExplorer`
   - `MyPixler`
   - `MyBoxer`
@@ -199,6 +200,19 @@ Goal: verify the cross-module workflow state is consistent after centralization.
   - `MyResolver`
   - `MyVersifier`
   - `MyWriter`
+
+### 10b. MyLauncher click and context-menu integrity
+
+- Single left-click each module icon and confirm right-panel About/help updates for the selected module.
+- Double left-click each module icon and confirm module launch.
+- Right-click a module icon and confirm context menu includes:
+  - `Show <module> About`
+  - `Launch <module>`
+- Right-click empty left-panel space and confirm context menu targets currently selected module.
+- Right-click the right help panel and confirm:
+  - default text menu entries remain present
+  - selected-module About/Launch actions are appended
+- Confirm right help panel remains read-only.
 
 ### 11. Columns-per-page persistence
 

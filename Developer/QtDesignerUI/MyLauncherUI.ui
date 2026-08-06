@@ -66,6 +66,12 @@
       <bold>false</bold>
      </font>
     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
    </widget>
    <widget class="QWidget" name="LeftPanelwidget" native="true">
     <property name="geometry">
@@ -76,6 +82,9 @@
       <height>831</height>
      </rect>
     </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
     <widget class="QPushButton" name="MyScannerbutton">
      <property name="geometry">
       <rect>
@@ -86,7 +95,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyScanner OCR scans project source images and produces working text..</string>
+      <string>MyScanner acquires source images for the active project. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -117,7 +126,7 @@
       <string>My Scanner Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyScanner OCR scans project source images and produces working text..</string>
+      <string>MyScanner acquires source images for the active project. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -137,7 +146,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string extracomment="This is a comment">MyWriter prepares completed text for export to external applications.</string>
+      <string extracomment="This is a comment">MyWriter prepares reviewed text for export and publication. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -159,10 +168,10 @@
       <bool>false</bool>
      </property>
      <property name="tutorial.title" stdset="0">
-      <string>My Explorer Tutorial</string>
+      <string>My Writer Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>Navigates the project folder structure.</string>
+      <string>MyWriter prepares reviewed text for export and publication. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -182,7 +191,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyGlypher extracts glyphs from working images for the development of the project font used in the precise training of the OCR Engine.</string>
+      <string>MyGlypher extracts glyphs and supports project font development. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -207,7 +216,7 @@
       <string>My Glypher Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyGlypher extracts glyphs from working images for the development of the project font used in the precise training of the OCR Engine.</string>
+      <string>MyGlypher extracts glyphs and supports project font development. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -227,7 +236,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyGrounder ensures the integrity of the ground truth line files used by the OCR engine for training.</string>
+      <string>MyGrounder validates ground-truth line integrity for training data. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -252,7 +261,7 @@
       <string>My Grounder Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyGrounder ensures the integrity of the ground truth line files used by the OCR engine for training.</string>
+      <string>MyGrounder validates ground-truth line integrity for training data. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -272,7 +281,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyReader reads in current project images.</string>
+      <string>MyReader reviews project images and associated OCR text. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -300,7 +309,7 @@
       <string>My Reader</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyReader reads in current project images.</string>
+      <string>MyReader reviews project images and associated OCR text. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -320,7 +329,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyLexer consoladates the working text into a project lexicon.</string>
+      <string>MyLexer consolidates processed text into project lexicon outputs. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -345,7 +354,7 @@
       <string>My Lexer Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyLexer consoladates the working text into a project lexicon.</string>
+      <string>MyLexer consolidates processed text into project lexicon outputs. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -365,7 +374,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyResolver resolves variations between the versified text and a known reference text. </string>
+      <string>MyResolver resolves text variants against reference sources. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -390,7 +399,7 @@
       <string>My Resolver Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyResolver resolves variations between the versified text and a known reference text. </string>
+      <string>MyResolver resolves text variants against reference sources. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -410,7 +419,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyBoxer further segments the workflow images into box files used in training the OCR engine.</string>
+      <string>MyBoxer manages page, line, word, and character boxing workflows. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -435,7 +444,7 @@
       <string>My Boxer Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyBoxer further segments the workflow images into box files used in training the OCR engine.</string>
+      <string>MyBoxer manages page, line, word, and character boxing workflows. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -455,7 +464,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyPixler converts , segments ,cleans and prepares source images into workflow images.</string>
+      <string>MyPixler cleans and prepares source images for downstream workflows. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -480,7 +489,7 @@
       <string>My Pixler Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyPixler converts , segments ,cleans and prepares source images into workflow images.</string>
+      <string>MyPixler cleans and prepares source images for downstream workflows. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -500,7 +509,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyVersifier adds verses to unversed working text.</string>
+      <string>MyVersifier aligns and applies verse structure to working text. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -525,7 +534,7 @@
       <string>My Versifier Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyVersifier adds verses to unversed working text.</string>
+      <string>MyVersifier aligns and applies verse structure to working text. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -545,7 +554,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>MyTrainer tunes and retunes the OCR engine for precice recognition of the source images.</string>
+      <string>MyTrainer runs OCR training and model refinement workflows. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -570,7 +579,7 @@
       <string>My Trainer Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>MyTrainer tunes and retunes the OCR engine for precice recognition of the source images.</string>
+      <string>MyTrainer runs OCR training and model refinement workflows. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -599,7 +608,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>MyExplorer navigates the project folder structure.</string>
+      <string>MyExplorer navigates project folders and files. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -624,7 +633,7 @@
       <string>My Explorer Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>Navigates the project folder structure.</string>
+      <string>MyExplorer navigates project folders and files. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.image" stdset="0">
       <iconset resource="../UI_Icons.qrc">
@@ -647,7 +656,7 @@
       <enum>Qt::CustomContextMenu</enum>
      </property>
      <property name="toolTip">
-      <string>MyServer serves the project workflow and oversees progress.</string>
+      <string>MyServer manages project setup, settings, and workflow status. Single-click: show About. Double-click: launch module. Right-click: module actions.</string>
      </property>
      <property name="text">
       <string/>
@@ -672,7 +681,7 @@
       <string>My Server Tutorial</string>
      </property>
      <property name="tutorial.help" stdset="0">
-      <string>Serves the project workflow and oversees progress.</string>
+      <string>MyServer manages project setup, settings, and workflow status. Single-click this icon to preview module help in the right panel, double-click to launch, or right-click for module actions.</string>
      </property>
      <property name="tutorial.order" stdset="0">
       <number>1</number>

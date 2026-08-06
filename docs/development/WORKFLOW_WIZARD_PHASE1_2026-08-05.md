@@ -151,6 +151,18 @@ MyLauncher was also extended to accept direct CLI wizard startup:
 
 Validation for the rollout remained the same targeted runtime set and passed successfully.
 
+## Current Ownership Update (Post-Phase Refinement)
+
+The runtime policy has now been tightened to reduce operator ambiguity:
+
+- New Project wizard remains a MyServer responsibility.
+- Project Workflow Wizard is now scoped to MyServer menu actions.
+- Page Workflow Wizard remains available from module surfaces but is routed as module-scoped launches.
+- MyLauncher remains the central launch host and module-help dashboard, with click-aware behavior:
+  - single-click module icon: show About/help in right panel
+  - double-click module icon: launch module
+  - right-click module icon/left panel/right panel: module-aware context actions
+
 ## Next Rollout Target (After These Commits)
 
 - propagate wizard entry surfaces and contextual workflow guidance to remaining modules

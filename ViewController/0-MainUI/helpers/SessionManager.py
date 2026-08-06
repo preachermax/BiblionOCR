@@ -22,6 +22,12 @@ ACTIVE_PROJECT_NAME_KEYS = (
 ACTIVE_WORKFLOW_MODULE_KEYS = (
     'self.active_workflow_module',
 )
+ACTIVE_WORKFLOW_WIZARD_MODE_KEYS = (
+    'self.active_workflow_wizard_mode',
+)
+ACTIVE_WORKFLOW_WIZARD_MODULE_KEYS = (
+    'self.active_workflow_wizard_module',
+)
 
 
 @dataclass(frozen=True)
@@ -206,6 +212,49 @@ class SessionManager:
             return ''
         self.update(filename, {'self.active_workflow_module': normalized_name})
         return normalized_name
+
+    def get_active_workflow_wizard_mode(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_WORKFLOW_WIZARD_MODE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip().lower()
+        return ''
+
+    def get_active_workflow_wizard_module(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_WORKFLOW_WIZARD_MODULE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip()
+        return ''
+
+    def set_active_workflow_wizard_context(
+        self,
+        mode: str,
+        module_name: Optional[str] = None,
+        filename: str = 'Session.json',
+    ) -> Dict[str, str]:
+        normalized_mode = str(mode or '').strip().lower()
+        if normalized_mode not in {'project', 'page'}:
+            return {
+                'mode': '',
+                'module': '',
+            }
+
+        normalized_module = str(module_name or '').strip()
+        updates: Dict[str, Any] = {
+            'self.active_workflow_wizard_mode': normalized_mode,
+        }
+
+        if normalized_module:
+            updates['self.active_workflow_wizard_module'] = normalized_module
+
+        self.update(filename, updates)
+        return {
+            'mode': normalized_mode,
+            'module': normalized_module,
+        }
 
     def update(self, filename: str, updates: Dict[str, Any]) -> None:
         path = self.session_path(filename)

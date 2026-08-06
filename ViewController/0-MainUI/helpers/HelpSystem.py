@@ -1218,6 +1218,60 @@ PROJECT TEMPLATES:
 '''
     },
 
+    'MyLauncher': {
+        'title': 'Launcher Dashboard (MyLauncher)',
+        'icon': '🚀',
+        'description': '''Module Launcher and Workflow Entry Surface
+
+MyLauncher is the runtime dashboard for opening modules and viewing module help.
+It supports click-aware behavior for each module icon and context-aware launch actions.
+
+CURRENT INTERACTION MODEL:
+• Single left-click on a module icon shows module About/help in the right panel
+• Double left-click on a module icon launches that module
+• Right-click on a module icon opens module actions
+• Right panel is read-only and supports a context menu with module actions
+
+WIZARD OWNERSHIP RULES:
+• Project workflow wizard administration is anchored in MyServer
+• New Project wizard remains a MyServer responsibility
+• Page workflow wizards are module-scoped and can be launched from each module entry
+
+USES IN PIPELINE:
+• Fast operator routing between modules
+• Module help preview without launching modules
+• Page workflow wizard entry delegation into module-scoped sequences
+
+See also: MyServer, MyExplorer
+''',
+        'usage': '''LAUNCHER USAGE GUIDE
+
+MODULE ICON INTERACTIONS:
+1. Single left-click an icon to preview About/help text on the right panel
+2. Double left-click an icon to launch the selected module
+3. Right-click an icon to open module actions:
+   - Show <module> About
+   - Launch <module>
+
+LEFT PANEL CONTEXT MENU:
+1. Right-click the left panel background
+2. The menu targets the currently selected module
+3. Choose About or Launch action
+
+RIGHT PANEL CONTEXT MENU:
+1. Right-click inside the help panel
+2. Use default text menu entries as needed
+3. Use module actions appended to the menu:
+   - Show selected module About
+   - Launch selected module
+
+WORKFLOW ENTRY NOTES:
+1. Project workflow wizard remains in MyServer menu actions
+2. Page workflow wizard entry is available across module surfaces
+3. Page wizard launch delegates into module-scoped sequences
+'''
+    },
+
     'MyServer': {
         'title': 'OCR Processing Server (MyServer)',
         'icon': '🖥️',

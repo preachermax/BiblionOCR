@@ -53,8 +53,16 @@
 
 * follow-up module rollout is now complete in separate commit `4969da6`
 * `Core/workflow_wizard_actions.py` now provides shared runtime action injection for workflow wizard entry points
-* the remaining main runtime modules now expose workflow wizard entry actions without replacing their existing manual workflows
-* MyLauncher now supports direct CLI wizard startup for project and page modes
+* the remaining main runtime modules now expose page-workflow entry actions without replacing their existing manual workflows
+* project workflow wizard is now scoped to MyServer menu surfaces
+* MyLauncher now supports direct CLI wizard startup for project and page modes, including module-scoped page wizard launch routing
+
+### MyLauncher Interaction Model (Current)
+
+* single left-click on a module button now shows module About/help text in the right panel
+* double left-click on a module button launches the selected module
+* right-click on module buttons and the left panel opens module-aware context actions (About and Launch)
+* right panel is read-only and exposes default text actions plus selected-module About/Launch actions
 
 ---
 

@@ -136,23 +136,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, 'actionProject_Workflow_Wizard'):
             self.ui.actionProject_Workflow_Wizard.triggered.connect(self.open_project_workflow_wizard)
         if hasattr(self.ui, 'actionPage_Workflow_Wizard'):
-            self.ui.actionPage_Workflow_Wizard.triggered.connect(self.open_page_workflow_wizard)
-
-        #self.ui.Gimpbutton.clicked.connect(self.actionGimpEdit)
-        self.ui.MyReaderbutton.clicked.connect(self.OpenWithMyReader)
-        self.ui.MyScannerbutton.clicked.connect(self.OpenWithMyScanner)
-        self.ui.MyGlypherbutton.clicked.connect(self.OpenWithMyGlypher)
-        self.ui.MyBoxerbutton.clicked.connect(self.OpenWithMyBoxer)
-        self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
-        self.ui.MyVersifierbutton.clicked.connect(self.OpenWithMyVersifier)
-        self.ui.MyResolverbutton.clicked.connect(self.OpenWithMyResolver)
-        self.ui.MyLexerbutton.clicked.connect(self.OpenWithMyLexer)
-        self.ui.MyGrounderbutton.clicked.connect(self.OpenWithMyGrounder)
-        self.ui.MyTrainerbutton.clicked.connect(self.OpenWithMyTrainer)
-        self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
-        self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
-        if hasattr(self.ui, 'MyServerbutton'):
-            self.ui.MyServerbutton.clicked.connect(self.OpenWithMyServer)
+            self.ui.actionPage_Workflow_Wizard.triggered.connect(lambda: self.open_page_workflow_wizard())
 
         # UI and slots code ends here.
 
@@ -169,6 +153,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.OCRCursor = qtg.QTextCursor(self.ui.OCRDocument)
 
         self.ui.RightPanelwidget.setDocument(self.ui.OCRDocument)
+        self.ui.RightPanelwidget.setReadOnly(True)
+        self.ui.RightPanelwidget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+        self.ui.RightPanelwidget.customContextMenuRequested.connect(self._on_right_panel_context_menu_requested)
+        self.ui.LeftPanelwidget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+        self.ui.LeftPanelwidget.customContextMenuRequested.connect(self._on_left_panel_context_menu_requested)
 
         self.launcher_registry = build_default_launcher_registry()
         self.launch_controller = LauncherIntegrationController(
@@ -176,6 +165,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             launch_callback=self.run_child_module,
             help_panel_callback=self._swap_help_panel_text,
         )
+        self._module_buttons = {}
+        self._button_module_map = {}
+        self._pending_click_module = None
+        self._selected_module_id = None
+        self._module_click_timer = qtc.QTimer(self)
+        self._module_click_timer.setSingleShot(True)
+        self._module_click_timer.setInterval(250)
+        self._module_click_timer.timeout.connect(self._process_pending_single_click)
+        self._register_module_button_actions()
 
         # Restore Session settings
         self.get_session_settings()
@@ -196,6 +194,133 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                         requested_module=self._workflow_wizard_module
                     ),
                 )
+
+    def _register_module_button_actions(self):
+        module_specs = (
+            ("MyReader", "MyReaderbutton", self.OpenWithMyReader),
+            ("MyScanner", "MyScannerbutton", self.OpenWithMyScanner),
+            ("MyGlypher", "MyGlypherbutton", self.OpenWithMyGlypher),
+            ("MyBoxer", "MyBoxerbutton", self.OpenWithMyBoxer),
+            ("MyPixler", "MyPixlerbutton", self.OpenWithMyPixler),
+            ("MyVersifier", "MyVersifierbutton", self.OpenWithMyVersifier),
+            ("MyResolver", "MyResolverbutton", self.OpenWithMyResolver),
+            ("MyLexer", "MyLexerbutton", self.OpenWithMyLexer),
+            ("MyGrounder", "MyGrounderbutton", self.OpenWithMyGrounder),
+            ("MyTrainer", "MyTrainerbutton", self.OpenWithMyTrainer),
+            ("MyWriter", "MyWriterbutton", self.OpenWithMyWriter),
+            ("MyExplorer", "MyExplorerbutton", self.OpenWithMyExplorer),
+            ("MyServer", "MyServerbutton", self.OpenWithMyServer),
+        )
+
+        self._module_launch_actions = {}
+        for module_id, button_name, launch_callback in module_specs:
+            button = getattr(self.ui, button_name, None)
+            if button is None:
+                continue
+            self._module_buttons[module_id] = button
+            self._button_module_map[button] = module_id
+            self._module_launch_actions[module_id] = launch_callback
+            button.installEventFilter(self)
+            button.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+            button.customContextMenuRequested.connect(
+                lambda pos, b=button: self._on_module_button_context_menu_requested(b, pos)
+            )
+
+        if "MyServer" in self._module_buttons:
+            startup_module = (
+                (self._workflow_wizard_module or '').strip()
+                or self.session_manager.get_active_workflow_module('Session.json')
+                or self.session_manager.get_active_workflow_wizard_module('Session.json')
+                or 'MyServer'
+            )
+            if startup_module not in self._module_buttons:
+                startup_module = 'MyServer'
+            self._set_selected_module(startup_module)
+            self._show_module_help(startup_module)
+
+    def eventFilter(self, watched, event):
+        module_id = self._button_module_map.get(watched)
+        if module_id is not None:
+            if event.type() == qtc.QEvent.MouseButtonDblClick and event.button() == qtc.Qt.LeftButton:
+                self._module_click_timer.stop()
+                self._pending_click_module = None
+                self._set_selected_module(module_id)
+                self._launch_module_by_id(module_id)
+                return True
+
+            if event.type() == qtc.QEvent.MouseButtonRelease and event.button() == qtc.Qt.LeftButton:
+                self._pending_click_module = module_id
+                self._module_click_timer.start()
+                return True
+
+        return super().eventFilter(watched, event)
+
+    def _process_pending_single_click(self):
+        module_id = self._pending_click_module
+        self._pending_click_module = None
+        if module_id:
+            self._set_selected_module(module_id)
+            self._show_module_help(module_id)
+
+    def _set_selected_module(self, module_id):
+        self._selected_module_id = module_id
+        if hasattr(self, 'session_manager'):
+            self.session_manager.set_active_workflow_module(module_id, 'Session.json')
+
+    def _module_help_text(self, module_id):
+        if self.launcher_registry.resolve_script(module_id):
+            return self.launcher_registry.help_panel_text(module_id)
+
+        button = self._module_buttons.get(module_id)
+        title = module_id
+        help_text = "No help text is currently available for this module."
+        if button is not None:
+            title = str(button.property("tutorial.title") or module_id).strip() or module_id
+            help_text = str(button.property("tutorial.help") or button.toolTip() or help_text).strip() or help_text
+
+        return f"Launcher target: {module_id}\n\n{title}\n\n{help_text}"
+
+    def _show_module_help(self, module_id):
+        self._swap_help_panel_text(self._module_help_text(module_id))
+
+    def _launch_module_by_id(self, module_id):
+        launch_callback = self._module_launch_actions.get(module_id)
+        if launch_callback is None:
+            qtw.QMessageBox.warning(self, "Launcher", f"No launch action is configured for {module_id}.")
+            return
+        launch_callback()
+
+    def _build_module_context_menu(self, module_id):
+        menu = qtw.QMenu(self)
+        show_action = menu.addAction(f"Show {module_id} About")
+        launch_action = menu.addAction(f"Launch {module_id}")
+
+        show_action.triggered.connect(lambda: self._show_module_help(module_id))
+        launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        return menu
+
+    def _on_module_button_context_menu_requested(self, button, local_pos):
+        module_id = self._button_module_map.get(button)
+        if not module_id:
+            return
+        self._set_selected_module(module_id)
+        menu = self._build_module_context_menu(module_id)
+        menu.exec_(button.mapToGlobal(local_pos))
+
+    def _on_left_panel_context_menu_requested(self, local_pos):
+        module_id = self._selected_module_id or "MyServer"
+        menu = self._build_module_context_menu(module_id)
+        menu.exec_(self.ui.LeftPanelwidget.mapToGlobal(local_pos))
+
+    def _on_right_panel_context_menu_requested(self, local_pos):
+        menu = self.ui.RightPanelwidget.createStandardContextMenu()
+        module_id = self._selected_module_id or "MyServer"
+        menu.addSeparator()
+        show_action = menu.addAction(f"Show {module_id} About")
+        launch_action = menu.addAction(f"Launch {module_id}")
+        show_action.triggered.connect(lambda: self._show_module_help(module_id))
+        launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        menu.exec_(self.ui.RightPanelwidget.mapToGlobal(local_pos))
 
     def _viewcontroller_stage_names(self):
         stage_folders = []
@@ -318,6 +443,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             callback()
 
     def open_project_workflow_wizard(self):
+        if hasattr(self, 'session_manager'):
+            self.session_manager.set_active_workflow_wizard_context(
+                'project',
+                'MyServer',
+                'Session.json',
+            )
         stage_plan = self._build_stage_plan(mode='project')
         dialog = WorkflowStackWizardDialog(
             title='Project Workflow Wizard',
@@ -335,6 +466,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def open_page_workflow_wizard(self, requested_module=None):
         requested_module = (requested_module or '').strip()
+        if not requested_module:
+            requested_module = (
+                (self._selected_module_id or '').strip()
+                or self.session_manager.get_active_workflow_wizard_module('Session.json')
+                or self.session_manager.get_active_workflow_module('Session.json')
+                or 'MyServer'
+            )
+        if requested_module not in self._module_buttons:
+            requested_module = 'MyServer'
+
+        if hasattr(self, 'session_manager'):
+            self.session_manager.set_active_workflow_wizard_context(
+                'page',
+                requested_module,
+                'Session.json',
+            )
+
         stage_plan = self._build_stage_plan(mode='page', requested_module=requested_module)
         dialog_title = 'Page Workflow Wizard'
         if requested_module:
