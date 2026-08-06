@@ -29,7 +29,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.imported_provenance = {}
         self.folder_selection_pages = {}
         self.folder_selection_checkboxes = {}
-        self.folder_selection_state = {"scriptural": set(), "general": set()}
+        self.folder_selection_state = {"scriptural": set()}
         self.workflow_tracker = ProjectWorkflowTracker(
             workspace_root=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
         )
@@ -121,10 +121,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         project_scope_row = qtw.QHBoxLayout()
         project_scope_column = qtw.QVBoxLayout()
-        project_scope_column.addWidget(qtw.QLabel("Project type"))
+        project_scope_column.addWidget(qtw.QLabel("Project type (fixed)"))
         self.project_type_combo = qtw.QComboBox()
-        self.project_type_combo.addItems(["Scriptural", "Secular"])
+        self.project_type_combo.addItems(["Scriptural"])
         self.project_type_combo.setCurrentText("Scriptural")
+        self.project_type_combo.setEnabled(False)
         project_scope_column.addWidget(self.project_type_combo)
         project_scope_row.addLayout(project_scope_column)
 
@@ -293,7 +294,6 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         folder_selection_layout.addWidget(self.folder_selection_stack, 1)
 
         self._build_folder_selection_page("scriptural", "Scriptural project folders")
-        self._build_folder_selection_page("general", "General project folders")
 
         self.page_stack.addWidget(folder_selection_page)
 
@@ -361,15 +361,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         return errors
 
     def _update_project_scope_state(self):
-        project_type = self.project_type_combo.currentText().strip()
-        scripture_enabled = project_type.lower() == "scriptural"
-        self.scriptural_source_combo.setEnabled(scripture_enabled)
-        self.columns_per_page_spin.setEnabled(scripture_enabled)
-        if scripture_enabled:
-            self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
-        else:
-            self.columns_per_page_spin.setRange(1, 1)
-            self.columns_per_page_spin.setValue(1)
+        self.project_type_combo.setCurrentText("Scriptural")
+        self.scriptural_source_combo.setEnabled(True)
+        self.columns_per_page_spin.setEnabled(True)
+        self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
         self._refresh_review()
         self._refresh_folder_selection_page()
         self._refresh_column_preview()
@@ -455,10 +450,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.folder_selection_stack.addWidget(page)
 
     def _refresh_folder_selection_page(self):
-        project_type = self.project_type_combo.currentText().strip()
-        page_key = "scriptural" if project_type.lower() == "scriptural" else "general"
-        self.folder_selection_stack.setCurrentWidget(self.folder_selection_stack.widget(0 if page_key == "scriptural" else 1))
-        self._populate_folder_selection_page(page_key)
+        self.folder_selection_stack.setCurrentWidget(self.folder_selection_stack.widget(0))
+        self._populate_folder_selection_page("scriptural")
 
     def _populate_folder_selection_page(self, page_key):
         container = self.folder_selection_pages.get(page_key)
@@ -509,10 +502,9 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
     def _folder_selection_entries(self, page_key):
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-        if page_key == "scriptural":
-            template_path = os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
-        else:
-            template_path = os.path.join(repo_root, "ViewController", "GeneralProjectFolderList.txt")
+        if page_key != "scriptural":
+            return []
+        template_path = os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
 
         if not os.path.exists(template_path):
             return []
@@ -891,13 +883,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self.project_purpose_edit.setPlainText(str(payload.get("project_purpose", "")))
         if not self.user_intent_edit.toPlainText().strip():
             self.user_intent_edit.setPlainText(str(payload.get("user_intent_summary", "")))
-        project_type = payload.get("ProjectType") or payload.get("project_type") or payload.get("projectType")
-        if project_type:
-            project_type_text = str(project_type).strip()
-            if project_type_text.lower() in {"scriptural", "scripture"}:
-                self.project_type_combo.setCurrentText("Scriptural")
-            elif project_type_text.lower() in {"secular", "general"}:
-                self.project_type_combo.setCurrentText("Secular")
+        self.project_type_combo.setCurrentText("Scriptural")
         scriptural_source = payload.get("ScripturalSource") or payload.get("scriptural_source") or payload.get("scripturalSource")
         if scriptural_source:
             source_value = str(scriptural_source).strip().lower()
@@ -1165,9 +1151,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         return payload
 
     def _selected_project_folders(self):
-        project_type = self.project_type_combo.currentText().strip()
-        page_key = "scriptural" if project_type.lower() == "scriptural" else "general"
-        selection = self.folder_selection_state.get(page_key, set())
+        selection = self.folder_selection_state.get("scriptural", set())
         if not selection:
-            selection = set(self._folder_selection_entries(page_key))
+            selection = set(self._folder_selection_entries("scriptural"))
         return sorted(selection)

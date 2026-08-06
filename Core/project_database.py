@@ -64,7 +64,7 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "choice",
             default="Scriptural",
             required=True,
-            options=("Scriptural", "Secular"),
+            options=("Scriptural",),
         ),
         ProjectFieldDefinition(
             "SourceType",
@@ -79,7 +79,7 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "Reference Text Type",
             "choice",
             default="Scriptural",
-            options=("Scriptural", "Secular"),
+            options=("Scriptural",),
         ),
         ProjectFieldDefinition("ProvenancePath", "Provenance Path", "path", default=""),
         ProjectFieldDefinition("NumberPages", "Number of Pages", "int", default=0),
@@ -244,17 +244,13 @@ def normalize_project_database_values(
         base_language,
     )
 
-    if normalized.get("ProjectType") == "Secular":
-        normalized["ProjectBook"] = ""
-        normalized["ProjectVerse"] = ""
-        normalized["ProjectWord"] = ""
-        normalized["ScripturalSource"] = ""
-    else:
-        normalized["ScripturalSource"] = _coerce_choice(
-            normalized.get("ScripturalSource"),
-            ("old_testament", "new_testament", "both"),
-            "both",
-        )
+    normalized["ProjectType"] = "Scriptural"
+    normalized["RefTextType"] = "Scriptural"
+    normalized["ScripturalSource"] = _coerce_choice(
+        normalized.get("ScripturalSource"),
+        ("old_testament", "new_testament", "both"),
+        "both",
+    )
 
     # Keep legacy fields synchronized while phase 1 introduces page-centric naming.
     normalized["CurrentPage"] = normalized["ProjectPageNumber"]
@@ -448,8 +444,6 @@ def _normalize_project_type(value: Any) -> str:
     text = str(value or "").strip().lower()
     if text in {"scripture", "scriptural"}:
         return "Scriptural"
-    if text == "secular":
-        return "Secular"
     return "Scriptural"
 
 

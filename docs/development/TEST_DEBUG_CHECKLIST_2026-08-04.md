@@ -4,9 +4,9 @@ Date: 2026-08-04
 
 Baseline branch: `master`
 
-Baseline commit: `730fba2`
+Baseline commit: `6746b5d`
 
-Purpose: provide a printable, high-signal checklist for the next large testing and debugging effort after the scripture data foundation, LFS migration, project-governance cleanup, and branch resynchronization work.
+Purpose: provide a printable, high-signal checklist for the next large testing and debugging effort after the scripture data foundation, LFS migration, project-governance cleanup, workflow wizard rollout, and branch resynchronization work.
 
 ---
 
@@ -14,7 +14,7 @@ Purpose: provide a printable, high-signal checklist for the next large testing a
 
 - Confirm the active branch is `master`.
 - Confirm `git status --short` returns no output.
-- Confirm `git rev-parse --short HEAD` returns `730fba2` or a newer agreed baseline.
+- Confirm `git rev-parse --short HEAD` returns `6746b5d` or a newer agreed baseline.
 - Confirm `ubuntu_development` is expected to match `master` for this test cycle:
 
 ```bash
@@ -52,6 +52,8 @@ Run these in order and do not skip ahead until each item passes.
 6. Phase 3 item 7 (shared project status surface)
 7. Phase 3 item 8 (session persistence)
 8. Phase 3 item 9 (weighted progress integrity)
+9. Phase 3 item 10 (workflow wizard launch integrity)
+10. Phase 3 item 11 (columns-per-page persistence)
 
 ### Arbitrary-order pool (run as capacity allows)
 
@@ -124,6 +126,7 @@ Goal: prove the project-administration refactor still behaves correctly.
 - Verify `New Project` appears only in `MyServer`.
 - Verify `Project Settings` appears only in `MyServer`.
 - Verify non-server windows do not expose milestone override administration.
+- Verify project workflow administration remains anchored in `MyServer` even though workflow entry actions now exist across modules.
 
 ### 5. New project creation
 
@@ -143,6 +146,7 @@ Goal: prove the project-administration refactor still behaves correctly.
 - Verify `Project Database`, `RIS Settings`, `Milestone Settings`, and `Module Handshakes` pages are available.
 - Change one milestone-related field and confirm save/reload persistence.
 - Change one project-database field (for example `ProjectDatabase` or `ProjectFont`) and confirm save/reload persistence.
+- Change `NumberColumns` and confirm the saved value survives dialog close/reopen.
 
 ---
 
@@ -170,6 +174,39 @@ Goal: verify the cross-module workflow state is consistent after centralization.
   - numeric
   - bounded to valid percentages
   - stable across reopen
+
+### 10. Workflow wizard launch integrity
+
+- Open `Project Workflow Wizard` from `MyLauncher`.
+- Open `Page Workflow Wizard` from `MyLauncher`.
+- Confirm stage order follows numbered `ViewController` folders:
+  - `0-MainUI`
+  - `1-PreProcess`
+  - `2-TrainTesseract`
+  - `3-Process`
+  - `4-PostProcess`
+- Confirm `Run Full Macro` and stage-specific actions launch without traceback.
+- Confirm existing manual launch actions still work after using the wizards.
+- Open workflow wizard entry actions from these non-launcher windows and confirm they delegate correctly into `MyLauncher`:
+  - `MyExplorer`
+  - `MyPixler`
+  - `MyBoxer`
+  - `MyGlypher`
+  - `MyReader`
+  - `MyGrounder`
+  - `MyTrainer`
+  - `MyLexer`
+  - `MyResolver`
+  - `MyVersifier`
+  - `MyWriter`
+
+### 11. Columns-per-page persistence
+
+- Open a project in `MyServer` and use `Set Columns Per Page`.
+- Confirm the value is written into `project_metadata.sqlite`.
+- Open `MyScanner` against the same active project and confirm its `Set Columns Per Page` action updates the same persisted value.
+- Confirm `NumberPageBoxes` stays synchronized with `NumberColumns`.
+- Confirm project/page status surfaces continue to render normally after the update.
 
 ---
 
@@ -220,7 +257,6 @@ python3 Developer/utilities/scripture_data_parity.py --root . --write-json --for
 
 - Confirm canonical manifest coverage is still correct after any test-driven edits:
   - `ViewController/ScriptureProjectFolderList.txt`
-  - `ViewController/GeneralProjectFolderList.txt`
   - `ProjectFolderList.txt`
 
 - If paths move, regenerate:
@@ -256,6 +292,7 @@ Goal: test the highest-risk user-visible operations, not just startup.
 - Verify `Word Box` surfaces still load.
 - Verify line/word table interactions do not raise exceptions.
 - Verify load/save/export paths still function.
+- Verify workflow wizard entry actions are present and non-destructive.
 
 ### 14. MyPixler
 

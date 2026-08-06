@@ -83,7 +83,7 @@ Before Phase 1 implementation, the architecture plan for page-centric project wo
 This checkpoint defines:
 
 * new project database fields for page lifecycle context
-* Scriptural/Secular project structure strategy
+* scripture-only project structure strategy
 * per-column source page folder model
 * status-bar propagation requirements across modules
 * SessionManager tracked-field integration scope

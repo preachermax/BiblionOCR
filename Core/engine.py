@@ -376,20 +376,12 @@ class ProjectCreationEngine:
             candidates.append(self.folder_list_path)
 
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-        if self._is_scriptural_project():
-            candidates.extend([
-                os.path.join(os.getcwd(), "ViewController", "ScriptureProjectFolderList.txt"),
-                os.path.join(os.getcwd(), "ViewController", "0-MainUI", "helpers", "ScriptureProjectFolderList.txt"),
-                os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt"),
-                os.path.join(repo_root, "ViewController", "0-MainUI", "helpers", "ScriptureProjectFolderList.txt"),
-            ])
-        else:
-            candidates.extend([
-                os.path.join(os.getcwd(), "ViewController", "GeneralProjectFolderList.txt"),
-                os.path.join(os.getcwd(), "ViewController", "0-MainUI", "helpers", "GeneralProjectFolderList.txt"),
-                os.path.join(repo_root, "ViewController", "GeneralProjectFolderList.txt"),
-                os.path.join(repo_root, "ViewController", "0-MainUI", "helpers", "GeneralProjectFolderList.txt"),
-            ])
+        candidates.extend([
+            os.path.join(os.getcwd(), "ViewController", "ScriptureProjectFolderList.txt"),
+            os.path.join(os.getcwd(), "ViewController", "0-MainUI", "helpers", "ScriptureProjectFolderList.txt"),
+            os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt"),
+            os.path.join(repo_root, "ViewController", "0-MainUI", "helpers", "ScriptureProjectFolderList.txt"),
+        ])
 
         candidates.extend([
             os.path.join(os.getcwd(), "ProjectFolderList.txt"),
@@ -405,10 +397,8 @@ class ProjectCreationEngine:
 
     # -----------------------
     def _is_scriptural_project(self):
-        project_type = self.context.get("ProjectType") or self.context.get("project_type") or self.context.get("projectType")
-        if project_type is None:
-            return False
-        return str(project_type).strip().lower() in {"scriptural", "scripture"}
+        # OSS workflow now standardizes project creation as scripture-only.
+        return True
 
     def _normalize_scriptural_source(self):
         raw_source = self.context.get("ScripturalSource") or self.context.get("scriptural_source") or self.context.get("scripturalSource")

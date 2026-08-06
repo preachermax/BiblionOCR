@@ -7,14 +7,14 @@ Track each source page through the full project lifecycle, including per-page an
 ## Scope For This Initiative
 
 - Extend project metadata schema for page-centric workflow tracking.
-- Add Scriptural/Secular-specific structures for folders and workflow defaults.
+- Keep scripture-first structures for folders and workflow defaults.
 - Surface key page workflow fields in module status bars.
 - Integrate trackable fields with SessionManager.
 - Build a tabbed Project Settings dialog (Qt Designer editable `.ui`) for Paths, Milestones, Values, and Folders.
 
 ## Proposed New Project Data Fields
 
-- [x] `ProjectType` (enum): `Secular` or `Scriptural`
+- [x] `ProjectType` (enum): `Scriptural`
 - [x] `ProjectPageNumber` (int): current source page number
 - [x] `ProjectPageProgress` (percentage): lifecycle completion for current page
 - [ ] `ProjectBook` (string, Scriptural only)
@@ -44,16 +44,13 @@ Track each source page through the full project lifecycle, including per-page an
 - [ ] Define `ProjectPageProgress` representation (`0-100` int preferred).
 - [ ] Add migration/backfill behavior for older projects missing new fields.
 
-## Phase 2: Folder Structures (Scriptural vs Secular)
+## Phase 2: Folder Structures (Scripture Only)
 
 - [ ] Define canonical folder templates for `Scriptural` projects.
-- [ ] Define canonical folder templates for `Secular` projects.
 - [ ] Ensure per-column folders are created under `Model/Project/Images/Source`.
 - [ ] Add folder creation logic for column-aware pages.
 - [ ] Add optional include/exclude behavior for generated folder sets.
-- [ ] Decide whether to use:
-  - [ ] separate template tables/lists by project type, or
-  - [ ] one template with typed variants and toggles.
+- [ ] Keep a single canonical scripture template and simplify toggles accordingly.
 
 ## Phase 3: Workflow Lifecycle Tracking Per Page
 
@@ -88,7 +85,7 @@ Track each source page through the full project lifecycle, including per-page an
   - [ ] Milestones
   - [ ] Values
   - [ ] Folders
-- [ ] Add folder include/exclude checkboxes for Scriptural/Secular template generation.
+- [ ] Add folder include/exclude checkboxes for scripture template generation.
 - [ ] Ensure values tab supports conditional Scriptural fields.
 - [ ] Add language selector backed by installed Tesseract languages.
 - [ ] Create Qt Designer editable UI file:
@@ -98,11 +95,11 @@ Track each source page through the full project lifecycle, including per-page an
 ## Phase 7: Project Creation Wizard Updates
 
 - [x] Extend project creation wizard fields for new schema values.
-- [x] Add `ProjectType` decision point early in wizard.
+- [x] Keep `ProjectType` fixed as Scriptural in wizard.
 - [x] Add initial page context defaults (`ProjectPageNumber`, `ProjectPageProgress`, etc.).
 - [x] Add column configuration controls with sensible defaults.
 - [x] Add language initialization from installed Tesseract language list.
-- [ ] Ensure wizard output drives type-specific folder initialization.
+- [ ] Ensure wizard output drives scripture folder initialization.
 
 ## Phase 10: Workflow Wizard Rollout
 
@@ -115,7 +112,7 @@ Track each source page through the full project lifecycle, including per-page an
 ## Phase 8: Testing And Migration Coverage
 
 - [ ] Add unit tests for schema normalization and validation rules.
-- [ ] Add tests for Scriptural vs Secular folder generation.
+- [ ] Add tests for scripture folder generation.
 - [ ] Add tests for per-column folder creation under source images.
 - [ ] Add tests for status bar field propagation.
 - [ ] Add tests for SessionManager persistence/resume behavior.
@@ -135,11 +132,11 @@ Track each source page through the full project lifecycle, including per-page an
 - [ ] Confirm whether `ColumnName` is global-per-project or page-specific.
 - [ ] Confirm whether `CurrentLanguage` is global, per-page, or per-column.
 - [ ] Confirm whether page progress is milestone-count based or weighted by module stages.
-- [ ] Confirm whether Scriptural/Secular should use separate DB tables or a typed unified table.
+- [ ] Confirm any remaining schema simplifications now that project type is scripture-only.
 
 ## Immediate Next Execution Slice
 
 - [ ] Implement Phase 1 schema changes with defaults and migration.
-- [ ] Add Phase 2 typed folder template generator.
+- [ ] Add Phase 2 scripture folder template generator.
 - [ ] Add Phase 6 `ProjectSettingsDialogTabbed.ui` scaffold and basic wiring.
 - [ ] Add initial status bar field widgets in MyServer as the reference implementation.
