@@ -75,11 +75,12 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
 
         self.assertEqual("Linux Libertine", normalized["ProjectFont"])
 
-    def test_scriptural_only_fields_are_cleared_for_secular(self) -> None:
+    def test_project_type_is_forced_to_scriptural(self) -> None:
         normalized = normalize_project_database_values(
             {
-                "ProjectName": "Secular Demo",
-                "ProjectType": "Secular",
+                "ProjectName": "Coerced Demo",
+                "ProjectType": "UnsupportedType",
+                "RefTextType": "UnsupportedType",
                 "ProjectBook": "Genesis",
                 "ProjectVerse": "1:1",
                 "ProjectWord": "In",
@@ -87,10 +88,11 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
             available_languages=("eng",),
         )
 
-        self.assertEqual("Secular", normalized["ProjectType"])
-        self.assertEqual("", normalized["ProjectBook"])
-        self.assertEqual("", normalized["ProjectVerse"])
-        self.assertEqual("", normalized["ProjectWord"])
+        self.assertEqual("Scriptural", normalized["ProjectType"])
+        self.assertEqual("Scriptural", normalized["RefTextType"])
+        self.assertEqual("Genesis", normalized["ProjectBook"])
+        self.assertEqual("1:1", normalized["ProjectVerse"])
+        self.assertEqual("In", normalized["ProjectWord"])
 
     def test_current_language_defaults_from_selected_languages(self) -> None:
         normalized = normalize_project_database_values(
