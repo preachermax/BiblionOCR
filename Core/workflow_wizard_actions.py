@@ -48,7 +48,7 @@ def _find_menu_from_window(window) -> Optional[qtw.QMenu]:
     return menu_bar.addMenu("Project")
 
 
-def _open_launcher_wizard(window, mode: str) -> None:
+def _open_launcher_wizard(window, mode: str, requested_module: Optional[str] = None) -> None:
     launcher_path = _launcher_script_path()
     if not os.path.exists(launcher_path):
         qtw.QMessageBox.warning(
@@ -62,32 +62,46 @@ def _open_launcher_wizard(window, mode: str) -> None:
     if os.name == "nt":
         creationflags = getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
 
-    subprocess.Popen(
-        [sys.executable, launcher_path, "--workflow-wizard", mode],
-        creationflags=creationflags,
-    )
+    command = [sys.executable, launcher_path, "--workflow-wizard", mode]
+    if requested_module:
+        command.extend(["--workflow-module", requested_module])
+
+    subprocess.Popen(command, creationflags=creationflags)
 
 
-def install_workflow_wizard_menu_actions(window, module_name: str) -> None:
+def install_workflow_wizard_menu_actions(
+    window,
+    module_name: str,
+    *,
+    include_project_wizard: Optional[bool] = None,
+    include_page_wizard: bool = True,
+) -> None:
     menu = _find_menu_from_window(window)
     if menu is None:
         return
 
+    if include_project_wizard is None:
+        include_project_wizard = module_name == "MyServer"
+
     project_action_name = "actionProject_Workflow_Wizard"
     page_action_name = "actionPage_Workflow_Wizard"
 
-    if getattr(window, project_action_name, None) is None:
+    if include_project_wizard and getattr(window, project_action_name, None) is None:
         project_action = qtw.QAction("Project Workflow Wizard", window)
         project_action.setObjectName(project_action_name)
         project_action.setStatusTip(f"Open project workflow wizard from {module_name}")
-        project_action.triggered.connect(lambda: _open_launcher_wizard(window, "project"))
+        project_action.triggered.connect(
+            lambda: _open_launcher_wizard(window, "project", module_name)
+        )
         setattr(window, project_action_name, project_action)
         menu.addAction(project_action)
 
-    if getattr(window, page_action_name, None) is None:
+    if include_page_wizard and getattr(window, page_action_name, None) is None:
         page_action = qtw.QAction("Page Workflow Wizard", window)
         page_action.setObjectName(page_action_name)
         page_action.setStatusTip(f"Open page workflow wizard from {module_name}")
-        page_action.triggered.connect(lambda: _open_launcher_wizard(window, "page"))
+        page_action.triggered.connect(
+            lambda: _open_launcher_wizard(window, "page", module_name)
+        )
         setattr(window, page_action_name, page_action)
         menu.addAction(page_action)

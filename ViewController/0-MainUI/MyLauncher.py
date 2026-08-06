@@ -104,7 +104,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
 
-    def __init__(self, *args, workflow_wizard_mode=None, **kwargs):
+    def __init__(self, *args, workflow_wizard_mode=None, workflow_wizard_module=None, **kwargs):
         super().__init__(*args, **kwargs)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
@@ -113,6 +113,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
         self.session_manager = SessionManager()
+        self._workflow_wizard_module = workflow_wizard_module
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyServer')
         # extended slots code
@@ -186,10 +187,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.show()
         if workflow_wizard_mode in {'project', 'page'}:
-            qtc.QTimer.singleShot(
-                0,
-                self.open_project_workflow_wizard if workflow_wizard_mode == 'project' else self.open_page_workflow_wizard,
-            )
+            if workflow_wizard_mode == 'project':
+                qtc.QTimer.singleShot(0, self.open_project_workflow_wizard)
+            else:
+                qtc.QTimer.singleShot(
+                    0,
+                    lambda: self.open_page_workflow_wizard(
+                        requested_module=self._workflow_wizard_module
+                    ),
+                )
 
     def _viewcontroller_stage_names(self):
         stage_folders = []
@@ -231,7 +237,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             ],
         }
 
-    def _build_stage_plan(self, mode='project'):
+    def _build_stage_plan(self, mode='project', requested_module=None):
         stage_map = self._workflow_stage_module_map()
         ordered_stage_names = self._viewcontroller_stage_names()
 
@@ -244,11 +250,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             }
         else:
             allowed_modules = {
-                'MyScanner',
+                'MyServer', 'MyScanner', 'MyExplorer',
                 'MyPixler', 'MyBoxer', 'MyGlypher',
                 'MyReader', 'MyGrounder', 'MyTrainer',
                 'MyLexer', 'MyResolver', 'MyVersifier', 'MyWriter',
             }
+
+        requested_module = (requested_module or '').strip()
+        if mode == 'page' and requested_module:
+            allowed_modules = {requested_module}
 
         stage_plan = []
         for stage_name in ordered_stage_names:
@@ -323,13 +333,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
         dialog.exec_()
 
-    def open_page_workflow_wizard(self):
-        stage_plan = self._build_stage_plan(mode='page')
+    def open_page_workflow_wizard(self, requested_module=None):
+        requested_module = (requested_module or '').strip()
+        stage_plan = self._build_stage_plan(mode='page', requested_module=requested_module)
+        dialog_title = 'Page Workflow Wizard'
+        if requested_module:
+            dialog_title = f'{requested_module} Page Workflow Wizard'
         dialog = WorkflowStackWizardDialog(
-            title='Page Workflow Wizard',
+            title=dialog_title,
             intro_text=(
                 'Run page-oriented stages in numbered ViewController order. '
-                'Use this for page-specific progression while preserving global project administration in MyServer. '
+                'Use this for module-specific page progression while preserving global project administration in MyServer. '
                 'Line-splitting and box-preparation tasks are routed through MyBoxer in the pre-process stage.'
             ),
             stage_plan=stage_plan,
@@ -699,9 +713,13 @@ if __name__ == '__main__':
     install_qt_warning_filter()
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--workflow-wizard', choices=['project', 'page'])
+    parser.add_argument('--workflow-module')
     known_args, _unknown = parser.parse_known_args(sys.argv[1:])
 
     app = qtw.QApplication(sys.argv)
-    w = MainWindow(workflow_wizard_mode=known_args.workflow_wizard)
+    w = MainWindow(
+        workflow_wizard_mode=known_args.workflow_wizard,
+        workflow_wizard_module=known_args.workflow_module,
+    )
     w.show()
     app.exec()
