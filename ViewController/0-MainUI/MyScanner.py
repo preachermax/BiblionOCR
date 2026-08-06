@@ -77,6 +77,10 @@ from project_status_controller import ProjectStatusController
 from print_menu_support import install_print_menu_support, image_target, document_target
 from project_column_settings import update_project_columns, project_metadata_db_path
 from Core.project_database import load_project_database_record
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -207,6 +211,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Scanner()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyScanner',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyScanner')
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,

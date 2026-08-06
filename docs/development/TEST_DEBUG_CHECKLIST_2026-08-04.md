@@ -186,9 +186,9 @@ Goal: verify the cross-module workflow state is consistent after centralization.
   - `2-TrainTesseract`
   - `3-Process`
   - `4-PostProcess`
-- Confirm `Run Full Macro` and stage-specific actions launch without traceback.
+- Confirm `Run Full Wizard` and stage-specific wizard actions launch without traceback.
 - Confirm existing manual launch actions still work after using the wizards.
-- Open workflow wizard entry actions from these non-launcher windows and confirm page-wizard delegation correctly routes into `MyLauncher` with module context:
+- Open workflow wizard entry actions from these non-launcher windows and confirm module-owned page wizard execution with module context:
   - `MyExplorer`
   - `MyPixler`
   - `MyBoxer`

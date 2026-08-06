@@ -15,6 +15,13 @@ These two groups do not follow the same intake path.
 - Content creators should not be given broad write access to the main code repository unless they are also acting as maintainers.
 - Content submissions should be reviewed separately for provenance, copyright, redistribution rights, and publication suitability before they are merged into the public repo.
 
+## Cross-Repository Role Policy
+
+- `BiblionOCR-C++`: no developer-intake path; code changes are maintainer-governed.
+- `BiblionOCR-Qt6`: developer-intake path is enabled through pull requests and reviewed membership approvals.
+- `BiblionOCR`, `BiblionOCR-PyQt6`, and `BiblionOCR-C++`: content-creator intake is supported for approved content consumption/publication workflows.
+- Content-creator intake does not automatically grant broad code write access.
+
 ## Membership Intake Mechanism
 
 Repository membership is tracked through a GitHub-native approval path:
@@ -50,6 +57,37 @@ By submitting a pull request for original work, you represent that:
 - you intend the contribution to be distributed under the same license terms that apply to the files you changed
 
 For original BiblionOCR code, that normally means Apache-2.0 unless a different file- or directory-level notice applies.
+
+## Required Pre-PR Checklist Policy
+
+The full development checklist (including commit and resync operations) is an agent-owned operating routine.
+
+Developer contributors use a PR-only intake path and do not execute the full checklist routine.
+
+Required checklist:
+
+- [docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
+
+Policy requirements:
+
+- full checklist execution is required for agent-managed implementation work
+- commit and resync operations are agent-managed operations
+- developers are limited to pull request generation for proposed changes
+- UI lock-step checks are required whenever UI behavior/menu/actions changed
+- workflow wizard policy gates must be verified for affected modules
+
+Maintainer review may block or request changes when a PR does not demonstrate checklist completion.
+
+## PR Review Order And Exceptions
+
+For non-Dependabot pull requests, required order is:
+
+1. Agent review first.
+2. Repository owner/maintainer review and approval second.
+
+Dependabot exception:
+
+- Dependabot pull requests may be processed through Resync by the agent.
 
 ## Content Creator Contributions
 
@@ -102,6 +140,7 @@ Do not submit:
 - Security-sensitive changes should be reviewed before merge.
 - Content and publication assets should be reviewed for provenance and public redistribution rights.
 - Changes that affect licensing or policy should be reviewed carefully before merge.
+- Pull requests should include checklist evidence aligned with [docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md).
 
 ## Recommended GitHub Settings
 
@@ -109,6 +148,7 @@ The repository owner should use GitHub controls that match this policy:
 
 - branch protection on `master`
 - pull-request review before merge
+- required status check: `Enforce PR Checklist`
 - least-privilege team access
 - CODEOWNERS review for sensitive paths
 - MFA for accounts with write access

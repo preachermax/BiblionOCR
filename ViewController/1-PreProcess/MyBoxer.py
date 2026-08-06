@@ -37,7 +37,10 @@ import os
 import re
 from pathlib import Path
 from HelpSystem import add_help_menu
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 #import glob
 import shutil
@@ -263,6 +266,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             'MyBoxer',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyBoxer')
         )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'BoxWidget', None)],

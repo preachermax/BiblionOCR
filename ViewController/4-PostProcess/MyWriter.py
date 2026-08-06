@@ -25,7 +25,10 @@ sanitize_current_process_and_reexec()
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 from PyQt5 import QtPrintSupport
 #from PyQt5 import QPrintPreviewDialog, QPrintDialog
 from PyQt5 import QtWidgets as qtw
@@ -57,6 +60,9 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
             'MyWriter',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyWriter')
         )
         install_print_menu_support(
             self,

@@ -15,7 +15,10 @@ if project_root not in sys.path:
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 from SessionManager import SessionManager
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 
 sanitize_current_process_and_reexec()
@@ -149,6 +152,9 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             'MyExplorer',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyExplorer')
         )
         original_tree = self.treeView
         self.treeView = ExplorerTreeView(self.frame)

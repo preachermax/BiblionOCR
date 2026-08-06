@@ -2,6 +2,12 @@
 
 This document captures the practical development routine we have been using so changes stay consistent, testable, and easy to review.
 
+## 0) Execution Ownership
+
+1. Checklist execution is agent-owned.
+2. The user should not need to manually drive checklist steps.
+3. When manual validation is unavoidable (for example visual UI behavior), the agent requests only minimal confirmation and records outcomes in a handoff checkpoint.
+
 ## 1) Start-of-Task Preflight
 
 1. Confirm the exact requirement in one sentence.
@@ -66,12 +72,29 @@ Canonical policy:
 
 1. `MyServer`: Project Workflow Wizard + Page Workflow Wizard
 2. All other modules: Page Workflow Wizard only
+3. Prefer `menuProject` for workflow wizard actions when available.
+4. If in `menuProject`, do not duplicate in `menuFile`.
+5. Use `Wizard` wording, not `Macro`, for workflow run actions.
 
 Enforcement pattern:
 
 1. Shared enforcement in `Core/workflow_wizard_actions.py`.
 2. Explicit module call-site arguments to prevent policy drift.
 3. UI artifacts aligned to the same rule.
+4. Non-MyServer module UI artifacts do not define `Project Workflow Wizard` actions.
+
+Implementation note:
+
+- Page workflow handlers are module-local by default (module-specific stages and milestones).
+- Shared project workflow orchestration remains a MyServer-governed responsibility.
+
+## 6b) Test-First Commit Standard
+
+Before every commit:
+
+1. Run automated checks (`py_compile`, targeted diagnostics, and smoke checks).
+2. Run focused manual UI verification for changed behaviors.
+3. Only commit after both automated and manual gates pass.
 
 ## 7) Commit Routine
 
@@ -102,8 +125,9 @@ A change is done when all are true:
 2. UI source and generated artifacts are in lock-step.
 3. Touched files pass problem checks and `py_compile`.
 4. Critical runtime path is smoke-tested.
-5. Commit scope excludes unrelated artifacts.
-6. Branch sync status is confirmed.
+5. Manual UI behavior checks pass for changed interaction surfaces.
+6. Commit scope excludes unrelated artifacts.
+7. Branch sync status is confirmed.
 
 ## 10) Quick Failure Triage Checklist
 
@@ -114,6 +138,25 @@ If behavior is wrong after a change:
 3. Re-check `.ui` vs `UI.py` drift.
 4. Re-run focused compile and smoke tests.
 5. Inspect only deltas in edited files before broad changes.
+
+## 11) Session Handoff And Reopen Recovery
+
+Before pause/exit, the agent writes a restart-safe handoff in `docs/development/DEV_NOTEBOOK.md` containing:
+
+1. one-sentence scope
+2. touched-file list from `git status --short`
+3. validation gate status (problems, compile, smoke, manual UI)
+4. unresolved blockers/risks
+5. next immediate action
+
+After VS Code reopens, the agent must run this recovery sequence before making edits:
+
+1. read `docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md`
+2. read this playbook
+3. read latest `Session Handoff` entry in `docs/development/DEV_NOTEBOOK.md`
+4. run `git status --short`
+5. re-run fast validation context for touched files (problems + compile)
+6. publish footing summary and continue
 
 ---
 

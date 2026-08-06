@@ -52,7 +52,10 @@ if project_root not in sys.path:
 
 from HelpSystem import add_help_menu
 from Core.project_tracking import ProjectWorkflowTracker
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 from SessionManager import SessionManager
 # PyQt5 imports
 from PyQt5 import uic
@@ -387,6 +390,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             'MyPixler',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyPixler')
         )
 
         # Progress bar (safe)

@@ -54,7 +54,10 @@ from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 
 from queue import Queue
@@ -192,6 +195,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyLexer',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyLexer')
         )
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)

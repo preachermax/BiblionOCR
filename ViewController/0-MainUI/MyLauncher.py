@@ -411,16 +411,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     'key': stage_name,
                     'title': stage_name,
                     'description': (
-                        'Project-scoped workflow stage. Use this stage macro to launch relevant modules in order.'
+                        'Project-scoped workflow stage. Use this stage wizard to launch relevant modules in order.'
                         if mode == 'project'
-                        else 'Page-scoped workflow stage. Use this stage macro for page-level operations.'
+                        else 'Page-scoped workflow stage. Use this stage wizard for page-level operations.'
                     ),
                     'steps': steps,
                 }
             )
         return stage_plan
 
-    def _run_stage_macro(self, stage_key, stage_plan):
+    def _run_stage_wizard(self, stage_key, stage_plan):
         target_stage = next((stage for stage in stage_plan if stage.get('key') == stage_key), None)
         if target_stage is None:
             return
@@ -429,9 +429,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             if module_name:
                 self._open_module_by_name(module_name)
 
-    def _run_full_macro(self, stage_plan):
+    def _run_full_wizard(self, stage_plan):
         for stage in stage_plan:
-            self._run_stage_macro(stage.get('key', ''), stage_plan)
+            self._run_stage_wizard(stage.get('key', ''), stage_plan)
 
     def _open_module_by_name(self, module_name):
         if hasattr(self, 'session_manager'):
@@ -467,12 +467,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             title='Project Workflow Wizard',
             intro_text=(
                 'Run project workflow stages in ViewController numbered-folder order. '
-                'This macro-oriented view helps reduce operator flow errors while keeping manual processes available. '
+                'This wizard-oriented view helps reduce operator flow errors while keeping manual processes available. '
                 'MyBoxer now owns the migrated line and ground-truth pre-process tasks that no longer run from MyServer.'
             ),
             stage_plan=stage_plan,
-            run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
-            run_all_callback=lambda: self._run_full_macro(stage_plan),
+            run_stage_callback=lambda stage_key: self._run_stage_wizard(stage_key, stage_plan),
+            run_all_callback=lambda: self._run_full_wizard(stage_plan),
             parent=self,
         )
         dialog.exec_()
@@ -508,8 +508,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 'Line-splitting and box-preparation tasks are routed through MyBoxer in the pre-process stage.'
             ),
             stage_plan=stage_plan,
-            run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
-            run_all_callback=lambda: self._run_full_macro(stage_plan),
+            run_stage_callback=lambda stage_key: self._run_stage_wizard(stage_key, stage_plan),
+            run_all_callback=lambda: self._run_full_wizard(stage_plan),
             parent=self,
         )
         dialog.exec_()

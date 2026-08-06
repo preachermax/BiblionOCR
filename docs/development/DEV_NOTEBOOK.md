@@ -1,5 +1,25 @@
 # BiblionOCR Developer Notebook
 
+## Session Handoff Template (Required For Pause/Exit)
+
+Use this template for every pause, stop, or VS Code close event.
+
+### Session Handoff - YYYY-MM-DD HH:MM
+
+* Scope summary: one sentence describing current task focus.
+* Touched files (`git status --short`):
+  * file path 1
+  * file path 2
+* Validation gates:
+  * problems/lint: pass or fail with brief note
+  * compile: pass or fail with command used
+  * smoke: pass or fail with command used
+  * manual UI checks: pass or pending with note
+* Unresolved blockers/risks:
+  * item
+* Next immediate action:
+  * single next step
+
 ## 📌 Project Overview
 
 * **MyServer**: Main runtime UI/controller for OCR workflow and project creation wiring
@@ -34,7 +54,7 @@
 
 ### Phase 1 Scope
 
-* MyLauncher-first macro-style workflow wizard layer is now in place
+* MyLauncher-first wizard-style workflow layer is now in place
 * stage order is now derived from numbered `ViewController` folders
 * workflow guidance is additive, not destructive: manual launch paths remain intact
 * `NumberColumns` update path is now exposed in MyServer and MyScanner and persisted to project metadata
@@ -56,6 +76,13 @@
 * the remaining main runtime modules now expose page-workflow entry actions without replacing their existing manual workflows
 * project workflow wizard is now scoped to MyServer menu surfaces
 * MyLauncher now supports direct CLI wizard startup for project and page modes, including module-scoped page wizard launch routing
+* page workflow handlers are now bound explicitly on module windows as module-owned wizard actions
+
+### Test-First Commit Standard
+
+* commits are now gated by automated checks first (`py_compile`, diagnostics, smoke tests)
+* manual UI verification is required before commit on changed interaction surfaces
+* commit operations are treated as post-test milestones, not test breakpoints
 
 ### MyLauncher Interaction Model (Current)
 

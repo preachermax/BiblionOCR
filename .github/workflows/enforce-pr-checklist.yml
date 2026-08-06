@@ -1,0 +1,61 @@
+name: Enforce PR Checklist
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  enforce-pr-checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required PR checklist confirmations
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = (context.payload.pull_request?.body || "").replace(/\r\n/g, "\n");
+            const actor = String(context.payload.pull_request?.user?.login || context.actor || "");
+
+            if (actor.toLowerCase() === "dependabot[bot]") {
+              core.info("Dependabot PR detected: checklist enforcement bypassed by policy.");
+              return;
+            }
+
+            const owner = "preachermax";
+            const isAgentManaged = actor.toLowerCase() === owner.toLowerCase();
+
+            const required = isAgentManaged
+              ? [
+                  "I completed the development checklist before opening this PR.",
+                  "Automated checks required by the checklist were run for touched files.",
+                  "Manual UI checks were completed for changed interaction surfaces.",
+                  "UI lock-step was verified for all changed UI surfaces (`.ui` and generated `UI.py`).",
+                  "Workflow wizard policy gates were verified for affected modules.",
+                ]
+              : [
+                  "I am submitting a pull request only (no direct commit/resync operations on protected branches).",
+                  "I request agent review first, then repository owner/maintainer review and approval.",
+                ];
+
+            const missing = required.filter((label) => {
+              const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const checkedPattern = new RegExp(`-\\s*\\[(x|X)\\]\\s*${escaped}`);
+              return !checkedPattern.test(body);
+            });
+
+            if (missing.length > 0) {
+              core.setFailed(
+                [
+                  `Pull request is missing required confirmations for ${isAgentManaged ? "agent-managed" : "developer PR-only"} path.`,
+                  "Mark these items as checked in the PR body:",
+                  ...missing.map((m) => `- ${m}`),
+                  "Use the repository PR template and complete the checklist before requesting review.",
+                ].join("\n")
+              );
+              return;
+            }
+
+            core.info(`All required confirmations are present for ${isAgentManaged ? "agent-managed" : "developer PR-only"} path.`);

@@ -31,7 +31,10 @@ import UI_Icons
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import update_tesseract_wordlist_for_variant
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 #import Qt5ResolveVariants as resolver
 
 app = QtWidgets.QApplication([])
@@ -50,6 +53,9 @@ install_workflow_wizard_menu_actions(
     "MyResolver",
     include_project_wizard=False,
     include_page_wizard=True,
+)
+varui.open_page_workflow_wizard = (
+    lambda _requested_module=None: open_default_module_page_workflow_wizard(varui, "MyResolver")
 )
 project_status_controller = ProjectStatusController(
     varui,

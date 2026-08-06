@@ -46,7 +46,10 @@ from Dialogs.VariantRecorderDialog import Ui_RecorderDialog
 from SqliteHelper import *
 from LocalFileDrop import LocalFileDropMixin
 from print_menu_support import install_print_menu_support, document_target
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 import ChrReference as chrref
 #import pytesseract
 
@@ -82,6 +85,9 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyVersifier',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyVersifier')
         )
         install_print_menu_support(
             self,

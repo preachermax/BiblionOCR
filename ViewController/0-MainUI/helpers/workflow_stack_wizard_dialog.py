@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets as qtw
 
 
 class WorkflowStackWizardDialog(qtw.QDialog):
-    """Stacked, stage-oriented workflow wizard with macro launch controls."""
+    """Stacked, stage-oriented workflow wizard with wizard launch controls."""
 
     def __init__(
         self,
@@ -51,7 +51,7 @@ class WorkflowStackWizardDialog(qtw.QDialog):
         footer_layout = qtw.QHBoxLayout()
         footer_layout.addStretch(1)
 
-        self.run_all_button = qtw.QPushButton("Run Full Macro")
+        self.run_all_button = qtw.QPushButton("Run Full Wizard")
         self.run_all_button.clicked.connect(self._run_all)
         footer_layout.addWidget(self.run_all_button)
 
@@ -90,7 +90,7 @@ class WorkflowStackWizardDialog(qtw.QDialog):
                 step_list.addItem(f"{step.get('module', 'Module')}: {step.get('label', '')}")
             layout.addWidget(step_list, 1)
 
-            run_stage_button = qtw.QPushButton(f"Run {stage_title} Macro")
+            run_stage_button = qtw.QPushButton(f"Run {stage_title} Wizard")
             run_stage_button.clicked.connect(
                 lambda _checked=False, stage_key=stage.get("key", ""): self._run_stage(stage_key)
             )

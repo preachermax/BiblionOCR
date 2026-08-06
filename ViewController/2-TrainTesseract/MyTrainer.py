@@ -34,7 +34,10 @@ from SqliteHelper import *
 from ext import *
 from ext import reffind, versefind, versifiercount
 from project_status_controller import ProjectStatusController
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -117,6 +120,9 @@ class Ui_MainWindow(qtw.QMainWindow):
             'MyTrainer',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyTrainer')
         )
 
         self.projecthome = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))

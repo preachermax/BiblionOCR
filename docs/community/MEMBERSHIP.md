@@ -23,6 +23,14 @@ The membership mechanism uses these repository-controlled components:
 - `content_creator`: editorial, design, media, dataset, or publication-facing contributors
 - `maintainer`: trusted repository operators with elevated stewardship responsibility
 
+## Cross-Repository Role Matrix
+
+- `BiblionOCR-C++`: no developer-intake path; maintainer-governed code updates only.
+- `BiblionOCR-Qt6`: developer-intake path is allowed through reviewed membership and pull-request workflow.
+- `BiblionOCR`: content-creator intake is supported.
+- `BiblionOCR-PyQt6`: content-creator intake is supported.
+- `BiblionOCR-C++`: content-creator intake is supported for approved content consumption/publication workflows.
+
 ## Access Levels
 
 - `curated_intake`: content arrives through a reviewed intake path rather than broad repo write access

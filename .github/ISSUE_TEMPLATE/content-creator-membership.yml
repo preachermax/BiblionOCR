@@ -11,6 +11,7 @@ body:
         Use this form to request content-creator membership for BiblionOCR.
 
         Content-creator membership does not imply broad write access to the main repository. It is an approval path for curated intake, provenance review, and publication-rights screening.
+        Cross-repository scope: content-creator intake is used for BiblionOCR, BiblionOCR-PyQt6, and BiblionOCR-C++ content consumption/publication workflows.
   - type: input
     id: github_username
     attributes:

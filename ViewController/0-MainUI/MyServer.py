@@ -113,7 +113,10 @@ from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
 from Core.project_database import load_project_database_record
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 from Core.Scanner import NetworkScanner, ScanManager
 from helpers.scan_runtime import start_scan_workflow
 # EventBus is still defined below in this module during the Core migration.
@@ -358,6 +361,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyServer',
             include_project_wizard=True,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyServer')
         )
 
         # -------------------------
