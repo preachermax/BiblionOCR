@@ -243,7 +243,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Reader()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyReader')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyReader',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,

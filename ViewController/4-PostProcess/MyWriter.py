@@ -52,7 +52,12 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui = Ui_MyWriterUI()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyWriter')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyWriter',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         install_print_menu_support(
             self,
             {

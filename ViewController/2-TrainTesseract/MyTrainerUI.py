@@ -757,4 +757,14 @@ class Ui_Trainer(object):
         self.actionOpen_Reference_Text.setText(_translate("Trainer", "Open Reference Text"))
         self.action_Writer.setText(_translate("Trainer", "βϊϐλίον Writer"))
         self.actionWordcount.setText(_translate("Trainer", "Reference Word Count"))
-import UI_Icons_rc
+import UI_Icons
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Trainer = QtWidgets.QMainWindow()
+    ui = Ui_Trainer()
+    ui.setupUi(Trainer)
+    Trainer.show()
+    sys.exit(app.exec_())

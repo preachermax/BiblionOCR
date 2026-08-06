@@ -14,6 +14,7 @@ class EmptyFolderFilterProxyModel(qtc.QSortFilterProxyModel):
         super().__init__(parent)
         self._exclude_empty_dirs = True
         self.setDynamicSortFilter(True)
+        self._scan_limit = 5000
 
     def setExcludeEmptyDirs(self, enabled):
         if self._exclude_empty_dirs == enabled:
@@ -43,13 +44,31 @@ class EmptyFolderFilterProxyModel(qtc.QSortFilterProxyModel):
         return self._directory_has_visible_contents(file_path)
 
     def _directory_has_visible_contents(self, directory_path):
+        # Iterative traversal avoids recursion blowups and guards cyclic links.
+        pending = [directory_path]
+        seen_realpaths = set()
+        scanned_entries = 0
+
         try:
-            with os.scandir(directory_path) as entries:
-                for entry in entries:
-                    if entry.is_file():
-                        return True
-                    if entry.is_dir() and self._directory_has_visible_contents(entry.path):
-                        return True
+            while pending:
+                current_dir = pending.pop()
+                current_realpath = os.path.realpath(current_dir)
+                if current_realpath in seen_realpaths:
+                    continue
+                seen_realpaths.add(current_realpath)
+
+                with os.scandir(current_dir) as entries:
+                    for entry in entries:
+                        scanned_entries += 1
+                        if scanned_entries >= self._scan_limit:
+                            # Degrade to "visible" if traversal becomes too large.
+                            return True
+
+                        if entry.is_file(follow_symlinks=False):
+                            return True
+
+                        if entry.is_dir(follow_symlinks=False):
+                            pending.append(entry.path)
         except OSError:
             return True
         return False

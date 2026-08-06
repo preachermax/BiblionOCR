@@ -382,7 +382,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_Pixler()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyPixler')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyPixler',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
 
         # Progress bar (safe)
         if not hasattr(self, "progress_bar"):

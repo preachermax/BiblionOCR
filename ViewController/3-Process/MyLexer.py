@@ -187,7 +187,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyLexer')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyLexer',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
 

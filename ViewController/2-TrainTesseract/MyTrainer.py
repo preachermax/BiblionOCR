@@ -112,7 +112,12 @@ class Ui_MainWindow(qtw.QMainWindow):
         super().__init__(*args, **kwargs)
         self.ui = Ui_Trainer()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyTrainer')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyTrainer',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
 
         self.projecthome = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         self.project_root = Path(self.projecthome)

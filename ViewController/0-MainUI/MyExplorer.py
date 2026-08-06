@@ -144,7 +144,12 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.start_dir = start_dir
         self.session_manager = SessionManager()
         self.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyExplorer')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyExplorer',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         original_tree = self.treeView
         self.treeView = ExplorerTreeView(self.frame)
         self.gridLayout_2.replaceWidget(original_tree, self.treeView)
@@ -166,6 +171,25 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             'MyExplorer',
             session_manager=self.session_manager,
         )
+        QtCore.QTimer.singleShot(0, self._stabilize_window_visibility)
+
+    def _stabilize_window_visibility(self):
+        # Keep the window visible and focused even when many modules start together.
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+
+        screen = QtWidgets.QApplication.primaryScreen()
+        if screen is None:
+            return
+
+        available = screen.availableGeometry()
+        frame = self.frameGeometry()
+        new_left = max(available.left(), min(frame.left(), available.right() - frame.width() + 1))
+        new_top = max(available.top(), min(frame.top(), available.bottom() - frame.height() + 1))
+
+        if new_left != frame.left() or new_top != frame.top():
+            self.move(new_left, new_top)
 
     def _resolve_initial_directory(self):
         candidate = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else RUNTIME_PATHS.model_dir

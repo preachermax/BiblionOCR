@@ -1123,7 +1123,6 @@
      <string>Project</string>
     </property>
     <addaction name="actionOpen_Project"/>
-    <addaction name="actionProject_Workflow_Wizard"/>
     <addaction name="actionPage_Workflow_Wizard"/>
     <addaction name="actionMy_Launcher"/>
    </widget>
@@ -2188,11 +2187,6 @@
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project</string>
-   </property>
-  </action>
-  <action name="actionProject_Workflow_Wizard">
-   <property name="text">
-    <string>Project Workflow Wizard</string>
    </property>
   </action>
   <action name="actionPage_Workflow_Wizard">

@@ -1872,10 +1872,6 @@ class Ui_Boxer(object):
 import UI_Icons
 
 
-# Compatibility alias retained for legacy callers and tests.
-Ui_Glypher = Ui_Boxer
-
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

@@ -45,7 +45,12 @@ if ui_path is None:
     raise FileNotFoundError("MyResolverUI.ui was not found in expected UI locations.")
 
 varui = uic.loadUi(ui_path)
-install_workflow_wizard_menu_actions(varui, "MyResolver")
+install_workflow_wizard_menu_actions(
+    varui,
+    "MyResolver",
+    include_project_wizard=False,
+    include_page_wizard=True,
+)
 project_status_controller = ProjectStatusController(
     varui,
     "MyResolver",

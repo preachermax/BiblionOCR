@@ -50,6 +50,12 @@ from helpers.HelpSystem import add_help_menu
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
+
+QT_CONTEXT_MENU_POLICY = qtc.Qt.ContextMenuPolicy.CustomContextMenu
+QT_LEFT_BUTTON = qtc.Qt.MouseButton.LeftButton
+QEVENT_MOUSE_DBL_CLICK = qtc.QEvent.Type.MouseButtonDblClick
+QEVENT_MOUSE_RELEASE = qtc.QEvent.Type.MouseButtonRelease
+QFILE_READ_ONLY = qtc.QIODevice.OpenModeFlag.ReadOnly
 # Custom imports
 _UI_MODULE_PATH = os.path.join(script_dir, "MyLauncherUI.py")
 _UI_SPEC = importlib.util.spec_from_file_location("biblion_launcher_ui", _UI_MODULE_PATH)
@@ -129,12 +135,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMy_Grounder.triggered.connect(self.OpenWithMyGrounder)
         self.ui.actionMy_Trainer.triggered.connect(self.OpenWithMyTrainer)
         self.ui.actionMy_Writer.triggered.connect(self.OpenWithMyWriter)
-        self.ui.actionExplorer.triggered.connect(self.OpenWithMyExplorer)
+        if hasattr(self.ui, 'actionMy_Server'):
+            self.ui.actionMy_Server.triggered.connect(self.OpenWithMyServer)
+        if hasattr(self.ui, 'actionMy_Explorer'):
+            self.ui.actionMy_Explorer.triggered.connect(self.OpenWithMyExplorer)
+        if hasattr(self.ui, 'actionExplorer'):
+            self.ui.actionExplorer.triggered.connect(self.OpenWithMyExplorer)
 
         self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
-        if hasattr(self.ui, 'actionProject_Workflow_Wizard'):
-            self.ui.actionProject_Workflow_Wizard.triggered.connect(self.open_project_workflow_wizard)
         if hasattr(self.ui, 'actionPage_Workflow_Wizard'):
             self.ui.actionPage_Workflow_Wizard.triggered.connect(lambda: self.open_page_workflow_wizard())
 
@@ -154,9 +163,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.RightPanelwidget.setDocument(self.ui.OCRDocument)
         self.ui.RightPanelwidget.setReadOnly(True)
-        self.ui.RightPanelwidget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+        self.ui.RightPanelwidget.setContextMenuPolicy(QT_CONTEXT_MENU_POLICY)
         self.ui.RightPanelwidget.customContextMenuRequested.connect(self._on_right_panel_context_menu_requested)
-        self.ui.LeftPanelwidget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+        self.ui.LeftPanelwidget.setContextMenuPolicy(QT_CONTEXT_MENU_POLICY)
         self.ui.LeftPanelwidget.customContextMenuRequested.connect(self._on_left_panel_context_menu_requested)
 
         self.launcher_registry = build_default_launcher_registry()
@@ -221,7 +230,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self._button_module_map[button] = module_id
             self._module_launch_actions[module_id] = launch_callback
             button.installEventFilter(self)
-            button.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+            button.setContextMenuPolicy(QT_CONTEXT_MENU_POLICY)
             button.customContextMenuRequested.connect(
                 lambda pos, b=button: self._on_module_button_context_menu_requested(b, pos)
             )
@@ -238,17 +247,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self._set_selected_module(startup_module)
             self._show_module_help(startup_module)
 
-    def eventFilter(self, watched, event):
+    def eventFilter(self, watched, event):  # type: ignore[override]
         module_id = self._button_module_map.get(watched)
         if module_id is not None:
-            if event.type() == qtc.QEvent.MouseButtonDblClick and event.button() == qtc.Qt.LeftButton:
+            if event.type() == QEVENT_MOUSE_DBL_CLICK and event.button() == QT_LEFT_BUTTON:
                 self._module_click_timer.stop()
                 self._pending_click_module = None
                 self._set_selected_module(module_id)
                 self._launch_module_by_id(module_id)
                 return True
 
-            if event.type() == qtc.QEvent.MouseButtonRelease and event.button() == qtc.Qt.LeftButton:
+            if event.type() == QEVENT_MOUSE_RELEASE and event.button() == QT_LEFT_BUTTON:
                 self._pending_click_module = module_id
                 self._module_click_timer.start()
                 return True
@@ -295,8 +304,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         show_action = menu.addAction(f"Show {module_id} About")
         launch_action = menu.addAction(f"Launch {module_id}")
 
-        show_action.triggered.connect(lambda: self._show_module_help(module_id))
-        launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        if show_action is not None:
+            show_action.triggered.connect(lambda: self._show_module_help(module_id))
+        if launch_action is not None:
+            launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
         return menu
 
     def _on_module_button_context_menu_requested(self, button, local_pos):
@@ -318,8 +329,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         menu.addSeparator()
         show_action = menu.addAction(f"Show {module_id} About")
         launch_action = menu.addAction(f"Launch {module_id}")
-        show_action.triggered.connect(lambda: self._show_module_help(module_id))
-        launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        if show_action is not None:
+            show_action.triggered.connect(lambda: self._show_module_help(module_id))
+        if launch_action is not None:
+            launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
         menu.exec_(self.ui.RightPanelwidget.mapToGlobal(local_pos))
 
     def _viewcontroller_stage_names(self):
@@ -519,10 +532,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.tessdatadir = get_setting('tessdatadir', '')
         self.tesseract = get_setting('tesseract', '')
         self.tesstrain = get_setting('tesstrain', '')
-        self.font = get_setting('font', '')
-        self.fontsize = get_setting('fontsize', '20')
-        self.txtpath = get_setting('txtpath', '')
-        self.txtdir = get_setting('txtdir', '')
+        self.ui_font_family = str(get_setting('font', '') or '')
+        self.fontsize = str(get_setting('fontsize', '20') or '20')
+        self.txtpath = str(get_setting('txtpath', '') or '')
+        self.txtdir = str(get_setting('txtdir', '') or '')
 
     def get_workflow_settings(self):
 
@@ -631,7 +644,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
 
-            if file.open(qtc.QIODevice.ReadOnly):
+            if file.open(QFILE_READ_ONLY):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
@@ -669,10 +682,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         #txtdirpath = self.txtdir
         self.txtfileList = []
-        for t in os.listdir(self.txtdir):
-            tpath = os.path.join(self.txtdir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.txtfileList.append(tpath)
+        if self.txtdir and os.path.isdir(self.txtdir):
+            for t in os.listdir(self.txtdir):
+                tpath = os.path.join(self.txtdir, t)
+                if os.path.isfile(tpath) and t.endswith(('.txt')):
+                    self.txtfileList.append(tpath)
         self.sortTextFiles()
 
     def showText(self, txtfilename):
@@ -683,7 +697,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
 
-            if file.open(qtc.QIODevice.ReadOnly):
+            if file.open(QFILE_READ_ONLY):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
@@ -724,10 +738,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         f.close()
 
         self.txtfileList = []
-        for t in os.listdir(self.txtdir):
-            tpath = os.path.join(self.txtdir, t)
-            if os.path.isfile(tpath) and t.endswith(('.txt')):
-                self.txtfileList.append(tpath)
+        if self.txtdir and os.path.isdir(self.txtdir):
+            for t in os.listdir(self.txtdir):
+                tpath = os.path.join(self.txtdir, t)
+                if os.path.isfile(tpath) and t.endswith(('.txt')):
+                    self.txtfileList.append(tpath)
 
         self.sortTextFiles()
 
@@ -760,11 +775,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #else:
             #defaultdir = r"/home/jetson/Projects/Python/EstablishTruth/Greek_txt_pages/"
 
-        defaultdir = self.txtdir + r"/"
+        defaultdir = (self.txtdir or '')
         defaultfile = self.ui.TextLE.displayText()
 
         if defaultfile:
-            path = defaultdir + defaultfile
+            path = os.path.join(defaultdir, defaultfile) if defaultdir else defaultfile
             print(path)
             filename = defaultfile
         else:
@@ -780,11 +795,32 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         file.close()
 
     def run_child_module(self, filename):
-        module_path = RUNTIME_MODULE_PATHS.get(filename, os.path.join(script_dir, filename))
+        module_path = RUNTIME_MODULE_PATHS.get(filename)
+        if module_path is None and not filename.endswith('.py'):
+            module_path = RUNTIME_MODULE_PATHS.get(f'{filename}.py')
+        if module_path is None:
+            normalized_name = filename if filename.endswith('.py') else f'{filename}.py'
+            module_path = os.path.join(script_dir, normalized_name)
+
+        if not os.path.exists(module_path):
+            qtw.QMessageBox.warning(
+                self,
+                'Launch Failed',
+                f'Module script was not found:\n{module_path}',
+            )
+            return
+
         creationflags = 0
         if os.name == 'nt':
             creationflags = getattr(subprocess, 'CREATE_NEW_CONSOLE', 0)
-        subprocess.Popen([sys.executable, module_path], creationflags=creationflags)
+        try:
+            subprocess.Popen([sys.executable, module_path], creationflags=creationflags)
+        except OSError as exc:
+            qtw.QMessageBox.critical(
+                self,
+                'Launch Failed',
+                f'Unable to launch module script:\n{module_path}\n\n{exc}',
+            )
 
     def OpenWithMyReader(self):
         self.run_child_module('MyReader.py')
@@ -842,14 +878,30 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.on_font_update()
 
     def on_font_update(self):
-        # update font to selection and size
-        #font = qtg.QFont()
-        #font.setFamily(self.ui.fontComboBox.currentFont())
-        #print(self.ui.fontComboBox.currentFont())
-        font = qtg.QFont(self.ui.fontComboBox.currentFont())
-        font.setPointSize(self.ui.fontSizeBox.value())
-        #font = qtg.QFont(self.font)
-        #font.setPointSize(int(self.fontsize))
+        # Support both legacy UIs (with font controls) and current UIs (without them).
+        font = qtg.QFont(self.ui.RightPanelwidget.font())
+
+        font_combo = getattr(self.ui, 'fontComboBox', None)
+        if font_combo is not None:
+            font.setFamily(font_combo.currentFont().family())
+        elif getattr(self, 'ui_font_family', None):
+            font.setFamily(str(self.ui_font_family))
+
+        point_size = None
+        font_size_box = getattr(self.ui, 'fontSizeBox', None)
+        if font_size_box is not None:
+            point_size = int(font_size_box.value())
+        else:
+            fallback_fontsize = getattr(self, 'fontsize', None)
+            if fallback_fontsize is None:
+                fallback_fontsize = ''
+            try:
+                point_size = int(fallback_fontsize)
+            except (TypeError, ValueError):
+                point_size = None
+
+        if point_size and point_size > 0:
+            font.setPointSize(point_size)
 
         self.ui.RightPanelwidget.setFont(font)
 

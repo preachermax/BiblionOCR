@@ -258,7 +258,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Boxer()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyBoxer')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyBoxer',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'BoxWidget', None)],
             image_handler=self.getImage,

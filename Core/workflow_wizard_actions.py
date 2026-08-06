@@ -86,7 +86,26 @@ def install_workflow_wizard_menu_actions(
     project_action_name = "actionProject_Workflow_Wizard"
     page_action_name = "actionPage_Workflow_Wizard"
 
-    if include_project_wizard and getattr(window, project_action_name, None) is None:
+    existing_project_action = getattr(window, project_action_name, None)
+    if existing_project_action is None:
+        existing_project_action = getattr(getattr(window, "ui", None), project_action_name, None)
+
+    existing_page_action = getattr(window, page_action_name, None)
+    if existing_page_action is None:
+        existing_page_action = getattr(getattr(window, "ui", None), page_action_name, None)
+
+    if not include_project_wizard and isinstance(existing_project_action, qtw.QAction):
+        parent_menu = existing_project_action.parentWidget()
+        if isinstance(parent_menu, qtw.QMenu):
+            parent_menu.removeAction(existing_project_action)
+        else:
+            menu.removeAction(existing_project_action)
+        existing_project_action.setVisible(False)
+        existing_project_action.setEnabled(False)
+        if getattr(window, project_action_name, None) is not None:
+            setattr(window, project_action_name, None)
+
+    if include_project_wizard and not isinstance(existing_project_action, qtw.QAction):
         project_action = qtw.QAction("Project Workflow Wizard", window)
         project_action.setObjectName(project_action_name)
         project_action.setStatusTip(f"Open project workflow wizard from {module_name}")
@@ -95,8 +114,12 @@ def install_workflow_wizard_menu_actions(
         )
         setattr(window, project_action_name, project_action)
         menu.addAction(project_action)
+    elif include_project_wizard and isinstance(existing_project_action, qtw.QAction):
+        existing_project_action.setVisible(True)
+        existing_project_action.setEnabled(True)
+        setattr(window, project_action_name, existing_project_action)
 
-    if include_page_wizard and getattr(window, page_action_name, None) is None:
+    if include_page_wizard and not isinstance(existing_page_action, qtw.QAction):
         page_action = qtw.QAction("Page Workflow Wizard", window)
         page_action.setObjectName(page_action_name)
         page_action.setStatusTip(f"Open page workflow wizard from {module_name}")
@@ -105,3 +128,7 @@ def install_workflow_wizard_menu_actions(
         )
         setattr(window, page_action_name, page_action)
         menu.addAction(page_action)
+    elif include_page_wizard and isinstance(existing_page_action, qtw.QAction):
+        existing_page_action.setVisible(True)
+        existing_page_action.setEnabled(True)
+        setattr(window, page_action_name, existing_page_action)

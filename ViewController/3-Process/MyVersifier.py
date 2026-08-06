@@ -77,7 +77,12 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Versifier()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyVersifier')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyVersifier',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         install_print_menu_support(
             self,
             {

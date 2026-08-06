@@ -2629,4 +2629,14 @@ class Ui_Boxer(object):
         self.actionDeskewPage.setText(_translate("Boxer", "Deskew"))
         self.actionRotatePage.setText(_translate("Boxer", "Rotate"))
         self.actionPage_Image.setText(_translate("Boxer", "Page Image"))
-import UI_Icons_rc
+import UI_Icons
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Boxer = QtWidgets.QMainWindow()
+    ui = Ui_Boxer()
+    ui.setupUi(Boxer)
+    Boxer.show()
+    sys.exit(app.exec_())

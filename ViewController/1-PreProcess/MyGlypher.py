@@ -125,7 +125,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Glypher()
         self.ui.setupUi(self)
-        install_workflow_wizard_menu_actions(self, 'MyGlypher')
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyGlypher',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'GlypherWidget', None)],
             image_handler=self.getImage,
