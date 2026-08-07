@@ -1,7 +1,7 @@
 import os
 import subprocess
 import sys
-from typing import Optional
+from typing import Callable, Optional
 
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
@@ -121,7 +121,15 @@ class _DefaultContextMenuEventFilter(qtc.QObject):
         return menu
 
 
-def append_default_context_actions(menu: qtw.QMenu, widget: qtw.QWidget, *, is_text_widget: Optional[bool] = None) -> None:
+def append_default_context_actions(
+    menu: qtw.QMenu,
+    widget: qtw.QWidget,
+    *,
+    is_text_widget: Optional[bool] = None,
+    include_undo_redo: bool = False,
+    undo_callback: Optional[Callable[[], None]] = None,
+    redo_callback: Optional[Callable[[], None]] = None,
+) -> None:
     if is_text_widget is None:
         is_text_widget = isinstance(widget, (qtw.QLineEdit, qtw.QTextEdit, qtw.QPlainTextEdit, qtw.QTextBrowser))
 
@@ -131,18 +139,47 @@ def append_default_context_actions(menu: qtw.QMenu, widget: qtw.QWidget, *, is_t
         if key:
             action_map[key] = action
 
-    ordered_keys = ["help", "undo", "redo"]
+    has_help_text = bool((widget.toolTip() or "").strip() or (widget.whatsThis() or "").strip())
+
+    ordered_keys = []
+    if has_help_text:
+        ordered_keys.append("help")
+    if is_text_widget or include_undo_redo:
+        ordered_keys.extend(["undo", "redo"])
     if is_text_widget:
         ordered_keys.extend(["cut", "copy", "paste"])
 
     for key in ordered_keys:
         action = action_map.get(key)
         if action is None:
+            if key != "help":
+                method_name = {
+                    "undo": "undo",
+                    "redo": "redo",
+                    "cut": "cut",
+                    "copy": "copy",
+                    "paste": "paste",
+                }.get(key)
+                callback = None
+                if key == "undo" and undo_callback is not None:
+                    callback = undo_callback
+                elif key == "redo" and redo_callback is not None:
+                    callback = redo_callback
+
+                if callback is None and method_name and not callable(getattr(widget, method_name, None)):
+                    continue
+
             action = qtw.QAction(key.title(), menu)
             if key == "undo":
-                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "undo"))
+                if undo_callback is not None:
+                    action.triggered.connect(lambda _checked=False, cb=undo_callback: cb())
+                else:
+                    action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "undo"))
             elif key == "redo":
-                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "redo"))
+                if redo_callback is not None:
+                    action.triggered.connect(lambda _checked=False, cb=redo_callback: cb())
+                else:
+                    action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "redo"))
             elif key == "cut":
                 action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "cut"))
             elif key == "copy":

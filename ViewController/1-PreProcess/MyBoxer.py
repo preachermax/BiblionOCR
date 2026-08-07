@@ -383,6 +383,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.drawLineBoxImage)
+        self._install_image_context_menu_defaults()
 
         self.ui.LineBoxTable.setCornerButtonEnabled(False)
         self.ui.LineBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
@@ -5777,6 +5778,30 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             self.on_insertRowBelow()
         elif action == deleteRowAction:
             self.on_deleteRowSelection()
+
+    def _install_image_context_menu_defaults(self):
+        for widget_name in ("PageImage", "SourceImage", "Line", "Image"):
+            image_widget = getattr(self.ui, widget_name, None)
+            if image_widget is None:
+                continue
+            image_widget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+            image_widget.customContextMenuRequested.connect(
+                lambda pos, w=image_widget: self.openImagePanelMenu(w, pos)
+            )
+
+    def openImagePanelMenu(self, image_widget, position):
+        menu = QMenu(self)
+        reload_action = menu.addAction("Reload Image")
+        reload_action.triggered.connect(self.drawLineBoxImage)
+        append_default_context_actions(
+            menu,
+            image_widget,
+            is_text_widget=False,
+            include_undo_redo=True,
+            undo_callback=self.prevImage,
+            redo_callback=self.nextImage,
+        )
+        menu.exec_(image_widget.mapToGlobal(position))
 
     def setPrevLineBox(self):
         self.currentBoxTable.setSortingEnabled(False)
