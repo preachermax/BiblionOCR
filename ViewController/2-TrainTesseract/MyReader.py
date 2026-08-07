@@ -358,6 +358,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyReader',
@@ -577,6 +578,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.latinlinescleaned = get_setting('latinlinescleaned')
         self.latinlinesbox = get_setting('latinlinesbox')
 
+        if not str(self.font or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+
         self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
         self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
@@ -585,6 +589,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.setText(self.linespacing)
         self.ui.ZoomComboBox.setCurrentText(self.zoom)
         self.ui.Zoomslider.setValue(int(self.zoomslidervalue) if str(self.zoomslidervalue).isdigit() else self.ui.Zoomslider.value())
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyReader',
+            preferred_input_modules=('MyBoxer', 'MyGrounder', 'MyResolver'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+        for attribute_name in ('imgdir', 'txtdir'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def save_session_settings(self, **updates):
         self.session_manager.update('ReaderSession.json', updates)

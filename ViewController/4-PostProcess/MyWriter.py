@@ -125,6 +125,9 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         self.reftxtdir = get_setting('reftxtdir', '')
         self.reftxtfileList = get_setting('reftxtfileList', [])
 
+        if not str(self.font or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+
         if hasattr(self, 'ui'):
             if hasattr(self.ui, 'bookComboBox'):
                 self.ui.bookComboBox.setCurrentText(self.bookabbr)
@@ -134,6 +137,22 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
                 self.ui.fontSizeBox.setValue(int(self.fontsize))
             if hasattr(self, 'LHlineEdit'):
                 self.LHlineEdit.setText(self.linespacing)
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyWriter',
+            preferred_input_modules=('MyVersifier', 'MyResolver'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+        for attribute_name in ('txtdir', 'reftxtdir'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def save_session_settings(self, **updates):
         self.session_manager.update('Session.json', updates)
@@ -262,6 +281,7 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         # more or less 8 spaces
         self.ui.textEdit.setTabStopWidth(33)
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         if not hasattr(self, 'project_status_controller'):
             self.project_status_controller = ProjectStatusController(
                 self,

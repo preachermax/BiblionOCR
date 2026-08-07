@@ -67,6 +67,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path up one folder: {up_once}')
         #print(f'OS Path up two folders: {up_twice}')
@@ -186,7 +187,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.VersefontComboBox.currentFontChanged.connect(self.on_versefont_update)
         self.ui.VersefontSizeBox.valueChanged.connect(self.on_versefont_update)
         self.ui.VerseDocument = qtg.QTextDocument(self.ui.VerseText)
-        font = SessionManager().build_workflow_font(
+        font = self.session_manager.build_workflow_font(
             "FROMVS",
             20,
             os.path.dirname(os.path.realpath(__file__)),
@@ -224,7 +225,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.ReffontComboBox.currentFontChanged.connect(self.on_reffont_update)
         self.ui.ReffontSizeBox.valueChanged.connect(self.on_reffont_update)
         self.ui.ReferenceDocument = qtg.QTextDocument(self.ui.RefText)
-        font = SessionManager().build_workflow_font(
+        font = self.session_manager.build_workflow_font(
             "FROMVS",
             20,
             os.path.dirname(os.path.realpath(__file__)),
@@ -247,10 +248,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyVersifier',
-            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+            session_manager=self.session_manager,
         )
         #print(f'Reference File Path: {self.refpath}')
         #self.getRefText(self.refpath)
@@ -367,10 +369,10 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings
         self._startup_progress("loading session settings")
-        active_project = SessionManager().get_active_project('Session.json')
+        active_project = self.session_manager.get_active_project('Session.json')
         self.current_project_root = active_project.get('project_root', '')
         self.current_project_name = active_project.get('project_name', '')
-        session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('VersifierSession.json')
+        session = self.session_manager.values('VersifierSession.json')
         repo_root_name = os.path.basename(os.path.normpath(self.projecthome))
 
         def get_setting(name: str, default=None):
@@ -515,6 +517,27 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.ReflineComboBox.setCurrentText(self.refline)
             self.ui.VerseTextLE.setText(os.path.basename(self.versepath))
             self.ui.RefTextLE.setText(os.path.basename(self.refpath))
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyVersifier',
+            preferred_input_modules=('MyServer', 'MyResolver', 'MyGrounder'),
+            language_hint='greek',
+        )
+        if default_input:
+            os.makedirs(default_input, exist_ok=True)
+            for attribute_name in ('versedir', 'refdir'):
+                current_value = str(getattr(self, attribute_name, '') or '').strip()
+                if current_value and os.path.isdir(current_value):
+                    continue
+                setattr(self, attribute_name, default_input)
+
+        project_font = self.session_manager.get_active_project_font()
+        if project_font:
+            if not str(getattr(self, 'versefont', '') or '').strip():
+                self.versefont = project_font
+            if not str(getattr(self, 'reffont', '') or '').strip():
+                self.reffont = project_font
 
     def getstarted(self):
         self._startup_progress('starting initial text load')

@@ -237,6 +237,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path up one folder: {up_once}')
         #print(f'OS Path up two folders: {up_twice}')
@@ -351,10 +352,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyGrounder',
-            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+            session_manager=self.session_manager,
         )
         self.crossref = getattr(self, 'crossref', '') or ''
         self.jsondir = getattr(self, 'jsondir', '') or ''
@@ -429,11 +431,10 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # get session settings
         # Define json data
         print("loading session")
-        sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
-        active_project = sm.get_active_project('Session.json')
+        active_project = self.session_manager.get_active_project('Session.json')
         self.current_project_root = active_project.get('project_root', '')
         self.current_project_name = active_project.get('project_name', '')
-        data = list(sm.load('GrounderSession.json').values())
+        data = list(self.session_manager.load('GrounderSession.json').values())
 
         # Set json key values
         jsondir_key = r"self.jsondir"
@@ -617,6 +618,28 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.on_verse_font_update()
         except Exception:
             pass
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyGrounder',
+            preferred_input_modules=('MyBoxer', 'MyReader', 'MyResolver'),
+            language_hint='greek',
+        )
+        if default_input:
+            os.makedirs(default_input, exist_ok=True)
+            for attribute_name in ('imagedir', 'textdir', 'pagetextdir', 'versetextdir'):
+                current_value = str(getattr(self, attribute_name, '') or '').strip()
+                if current_value and os.path.isdir(current_value):
+                    continue
+                setattr(self, attribute_name, default_input)
+
+        if not str(getattr(self, 'font', '') or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+            try:
+                self.ui.fontComboBox.setCurrentText(self.font)
+                self.on_font_update()
+            except Exception:
+                pass
 
     def get_workflow_settings(self):
 
