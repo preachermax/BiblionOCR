@@ -1,6 +1,6 @@
 from PyQt5 import QtGui, QtWidgets, uic
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QThread, pyqtSignal 
+from PyQt5.QtCore import QThread, pyqtSignal
 import json
 import os
 import sqlite3
@@ -48,6 +48,7 @@ if ui_path is None:
     raise FileNotFoundError("MyResolverUI.ui was not found in expected UI locations.")
 
 varui = uic.loadUi(ui_path)
+session_manager = SessionManager()
 install_workflow_wizard_menu_actions(
     varui,
     "MyResolver",
@@ -60,19 +61,50 @@ varui.open_page_workflow_wizard = (
 project_status_controller = ProjectStatusController(
     varui,
     "MyResolver",
-    session_manager=SessionManager(),
+    session_manager=session_manager,
 )
+
+
+def _apply_resolver_defaults():
+    session_manager.set_active_workflow_module("MyResolver")
+
+    inbound_default_dir = session_manager.resolve_receiving_default_input(
+        "MyResolver",
+        preferred_input_modules=("MyTrainer", "MyLexer", "MyVersifier", "MyGrounder"),
+        language_hint="greek",
+    )
+    if inbound_default_dir:
+        os.makedirs(inbound_default_dir, exist_ok=True)
+        varui.inbound_default_dir = os.path.normpath(inbound_default_dir)
+        varui.setProperty("inboundDefaultDir", varui.inbound_default_dir)
+        session_manager.update(
+            "ResolverSession.json",
+            {
+                "self.inbound_default_dir": varui.inbound_default_dir,
+            },
+        )
+        if hasattr(varui, "statusbar"):
+            varui.statusbar.showMessage(f"Default input: {varui.inbound_default_dir}", 7000)
+
+    project_font = session_manager.get_active_project_font()
+    if project_font:
+        font_family = session_manager.register_application_font(project_font, script_dir)
+        resolver_font = QtGui.QFont(font_family)
+        varui.setFont(resolver_font)
+
+
+_apply_resolver_defaults()
 
 def main():
     print("working")
     loadTableView(0)
     loadVarWordsCombo()
     loadFormView()
-    
+
     varui.VarianceTable.itemSelectionChanged.connect(rowSelectionChanged)
     varui.NextButton.clicked.connect(next)
     varui.PreviousButton.clicked.connect(previous)
-    
+
     varui.PreservedCkBox.stateChanged.connect(VarCodeBuild)
     varui.CorrectedCkBox.stateChanged.connect(VarCodeBuild)
     varui.ErrorCkBox.stateChanged.connect(VarCodeBuild)
@@ -99,19 +131,19 @@ def loadTableView(rowid):
         print("MyResolver: FROMVS.db not available; variance table remains empty.")
         varui.VarianceTable.setRowCount(0)
         return
-    
+
     varui.VarianceTable.setRowCount(0)
-    
+
     if  varui.presRadButton.isChecked():
         variants = helper.select("SELECT ID,Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,Strong,RMAC,Lemma,ErrorCode,VarCode,Description,Preserved,Corrected,Error,Variance,Context,Inflection,Resolved FROM Variants WHERE Preserved = '1'")
     elif  varui.corrRadButton.isChecked():
-        variants = helper.select("SELECT ID,Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,Strong,RMAC,Lemma,ErrorCode,VarCode,Description,Preserved,Corrected,Error,Variance,Context,Inflection,Resolved FROM Variants WHERE Corrected = '1'")   
+        variants = helper.select("SELECT ID,Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,Strong,RMAC,Lemma,ErrorCode,VarCode,Description,Preserved,Corrected,Error,Variance,Context,Inflection,Resolved FROM Variants WHERE Corrected = '1'")
     elif varui.unresRadButton.isChecked():
         variants = helper.select("SELECT ID,Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,Strong,RMAC,Lemma,ErrorCode,VarCode,Description,Preserved,Corrected,Error,Variance,Context,Inflection,Resolved FROM Variants WHERE Strong IS NULL and VarWord IS NULL Order By Line")
         #variants = helper.select("SELECT ID,Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,Strong,RMAC,Lemma FROM Bible WHERE Strong IS NULL")
     else:
         variants = helper.select("SELECT ID,Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,Strong,RMAC,Lemma,ErrorCode,VarCode,Description,Preserved,Corrected,Error,Variance,Context,Inflection,Resolved FROM Variants")
-    
+
     for row_number,variant in enumerate(variants):
         varui.VarianceTable.insertRow(row_number)
         for column_number,data in enumerate(variant):
@@ -135,11 +167,11 @@ def loadVarWordsCombo():
 
     for varword in varwords:
         varui.VarWordSelCombo.addItem(varword[0])
-    
+
     selectVarWordsCombo()
 
 def selectVarWordsCombo():
-    
+
     selvarword = varui.VarWordSelCombo.currentText()
     if not selvarword:
         return
@@ -150,19 +182,19 @@ def selectVarWordsCombo():
     varwords = helper.select("SELECT DISTINCT NoDiaWord,Strong,RMAC,Lemma FROM Bible WHERE NoDiaWord =" + "'" + selvarword + "'")
     if not varwords:
         return
-    
+
     # This is only a partial solution.  It locks onto the first match only.
-    
+
     varfields = varwords[0]
 
     print(varfields[0])
-    
+
     #varword = varfields[0]
     varui.StrongsLE.setText(varfields[1])
     varui.RMACLE.setText(varfields[2])
     #varui.LemmaLE.setText(varfields[3])
     varui.LemmaLE.setText(varfields[3])
-    
+
 def resolved():
     conn_TR = sqlite3.connect(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "FROMVS.db"))
     print ("Opened the database successfully")
@@ -170,7 +202,7 @@ def resolved():
     cursor_TR = conn_TR.cursor()
 
     cursor_TR.execute("DELETE FROM Resolved")
-    
+
     cursor_TR.execute('''SELECT * FROM Variants WHERE VarWord IS NOT NULL AND Strong IS NOT NULL''')
 
     #vlines = cursor_TR.fetchone()
@@ -179,7 +211,7 @@ def resolved():
 
     #cursor_TR.execute("DELETE FROM Variants")
     #conn_TR.commit()
-    
+
     for vline in vlines:
         line = vline[1]
         book = vline[2]
@@ -207,7 +239,7 @@ def resolved():
         resolved = True
 
         #cursor_TR.execute("SELECT * FROM Resolved")
-        
+
         insert_parameters = """INSERT OR REPLACE INTO Resolved (Line,Book,Chapter,Verse,WordNum,Word,NoDiaWord,VarWord,
                                 Strong,RMAC,Lemma,VarianceForm,VarianceType,ImpactCode,ErrorCode,VarCode,Description,
                                 Preserved,Corrected,Error,Variance,Context,Inflection,Resolved)
@@ -219,13 +251,13 @@ def resolved():
         print(line,"\t",book,"\t",chapter,"\t",verse,"\t",wordnum,"\t",word,"\t",nodiaWord,"\t",varword,"\t",strong)
     conn_TR.close()
 
-def VarCodeBuild():  
+def VarCodeBuild():
     print("Preserve Toggled)")
     if varui.PreservedCkBox.isChecked():
         f1 = "P"
     else:
         f1 = ""
-    
+
     if varui.CorrectedCkBox.isChecked():
         f2 = "C"
     else:
@@ -240,7 +272,7 @@ def VarCodeBuild():
         f4 = "V"
     else:
         f4 = ""
-    
+
     if varui.ContextCkBox.isChecked():
         f5 = "C"
     else:
@@ -250,7 +282,7 @@ def VarCodeBuild():
         f6 = "I"
     else:
         f6 = ""
-    
+
     # get the length of string
     length = len(varui.ErrorCodeCombo.currentText())
     # Get last character of string i.e. char at index position len -1
@@ -259,7 +291,7 @@ def VarCodeBuild():
     else:
         errorcode = varui.ErrorCodeCombo.currentText()[length -1]
     print('Last character : ', errorcode)
-    
+
     varcode = f1+f2,"-",f3+f4,"-",f5+f6,"-",errorcode
     print(varcode)
 
@@ -271,11 +303,11 @@ def DescBuild():
 def next():
     varui.VarianceTable.selectRow(varui.VarianceTable.currentRow()+1)
     loadFormView()
-    
+
 def previous():
     varui.VarianceTable.selectRow(varui.VarianceTable.currentRow()-1)
     loadFormView()
-    
+
 def updateone():
     line = varui.LineLE.text()
     word = varui.WordLE.text()
@@ -287,19 +319,19 @@ def updateone():
     varcode = varui.VarianceCodeLE.text()
     errorcode = varui.ErrorCodeCombo.currentText()
     desc = varui.DescriptionTextEdit.toPlainText()
-    
+
     if varui.PreservedCkBox.isChecked():
         preserved = 1
         pckvar="P"
     else:
         preserved = 0
-        pckvar="" 
+        pckvar=""
     if varui.CorrectedCkBox.isChecked():
         Corrected = 1
         cckvar = "C"
     else:
         Corrected= 0
-        cckvar = "" 
+        cckvar = ""
     if varui.ErrorCkBox.isChecked():
         error = 1
         eckvar = "E"
@@ -310,14 +342,14 @@ def updateone():
         variance = 1
         vckvar = "V"
     else:
-        variance = 0 
+        variance = 0
         vckvar = ""
     if varui.ContextCkBox.isChecked():
         context = 1
         tckvar = "C"
     else:
         context = 0
-        tckvar = "" 
+        tckvar = ""
     if varui.InflectionCkBox.isChecked():
         inflection = 1
         ickvar = "I"
@@ -331,14 +363,14 @@ def updateone():
 
     if varword or varui.ResolvedCkBox.isChecked:
         resolved = 1
-    
+
     rownum = getSelectedRowId() +1
 
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "FROMVS.db"))
     # varwords = helper.select("SELECT * FROM Variants")
-    
+
     print(varword,"\t",strong,"\t",rmac,"\t",lemma,"\t",varcode,"\t",rownum)
-    
+
     query = """UPDATE Variants SET Word = ?, VarWord = ?,Strong = ?,RMAC = ?,Lemma = ?,VarCode = ?, ErrorCode = ?, Description = ?, VarianceForm = ?, VarianceType = ?, ImpactCode = ?, Preserved = ?, Corrected = ?, Error = ?, Variance = ?, Context = ?, Inflection = ?, Resolved = ?
                             WHERE Line = ? and WordNum = ?"""
     data = (word,varword,strong,rmac,lemma,varcode,errorcode,desc,varform,vartype,impactcode,preserved,Corrected,error,variance,context,inflection,resolved,line,wordnum)
@@ -360,19 +392,19 @@ def updatesim():
     varcode = varui.VarianceCodeLE.text()
     errorcode = varui.ErrorCodeCombo.currentText()
     desc = varui.DescriptionTextEdit.toPlainText()
-    
+
     if varui.PreservedCkBox.isChecked():
         preserved = 1
         pckvar="P"
     else:
         preserved = 0
-        pckvar="" 
+        pckvar=""
     if varui.CorrectedCkBox.isChecked():
         Corrected = 1
         cckvar = "C"
     else:
         Corrected= 0
-        cckvar = "" 
+        cckvar = ""
     if varui.ErrorCkBox.isChecked():
         error = 1
         eckvar = "E"
@@ -383,14 +415,14 @@ def updatesim():
         variance = 1
         vckvar = "V"
     else:
-        variance = 0 
+        variance = 0
         vckvar = ""
     if varui.ContextCkBox.isChecked():
         context = 1
         tckvar = "C"
     else:
         context = 0
-        tckvar = "" 
+        tckvar = ""
     if varui.InflectionCkBox.isChecked():
         inflection = 1
         ickvar = "I"
@@ -404,14 +436,14 @@ def updatesim():
 
     if varword or varui.ResolvedCkBox.isChecked:
         resolved = 1
-    
+
     rownum = getSelectedRowId() +1
 
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "FROMVS.db"))
     # varwords = helper.select("SELECT * FROM Variants")
-    
+
     print(varword,"\t",strong,"\t",rmac,"\t",lemma,"\t",varcode,"\t",rownum)
-    
+
     query = """UPDATE Variants SET VarWord = ?,Strong = ?,RMAC = ?,Lemma = ?,VarCode = ?, ErrorCode = ?, Description = ?, VarianceForm = ?, VarianceType = ?, ImpactCode = ?, Preserved = ?, Corrected = ?, Error = ?, Variance = ?, Context = ?, Inflection = ?, Resolved = ?
                             WHERE NoDiaWord = ?"""
     data = (varword,strong,rmac,lemma,varcode,errorcode,desc,varform,vartype,impactcode,preserved,Corrected,error,variance,context,inflection,resolved,nodiaword)
@@ -427,15 +459,15 @@ def updatebible():
     updateone()
     helper = SqliteHelper(os.path.join(project_root, "Model", "Project", "Data", "SQLite", "FROMVS.db"))
     #helper = SqliteHelper("c:/users/max/Projects/Python/SQLite/TRiBibleWords.db")
-   
+
     query = '''SELECT Line,WordNum,NoDiaWord,VarWord,Strong,RMAC,Lemma,VarCode FROM Variants WHERE Preserved = "1"'''
     variants = helper.select(query)
-    
-    
-    
+
+
+
     for variant in variants:
-        if variant[2]:    
-            
+        if variant[2]:
+
             line = variant[0]
             wordnum = variant[1]
             nodiaword = variant[2]
@@ -444,28 +476,28 @@ def updatebible():
             rmac = variant[5]
             lemma = variant[6]
             varcode = variant[7]
-       
+
 
             '''englishquery = "SELECT English FROM IntBibleWords WHERE Line = ? AND NoDiaWord = ?"
             engdata = (line,varword)
             english = helper.selectone(englishquery,engdata)
             if englishtup:
                 #try:
-                
+
                 for val in englishtup:
                     if len(val)>0:
                         english = val
                 #except:
                 else:
                     english = ""
-                
+
             english = ''.join(englishtup)
 
             if str(english) == "None":'''
             english = ""
-            
+
             print(line,"\t",varword,"\t",strong,"\t",rmac,"\t",lemma,"\t",english,"\t",varcode)
-            
+
             query = """UPDATE Bible SET VarWord = ?,Strong = ?,RMAC = ?,Lemma = ?,English = ?,VarCode = ?  WHERE Line = ? and NoDiaWord = ? and Strong IS NULL"""
             data = (varword,strong,rmac,lemma,english,varcode,line,nodiaword)
             helper.update(query,data)
@@ -474,7 +506,7 @@ def updatebible():
     #loadFormView()
 
 def loadFormView():
-    #loadVarWordsCombo()  
+    #loadVarWordsCombo()
     if varui.VarianceTable.rowCount() == 0:
         print("MyResolver: no variance rows available for form view initialization.")
         return
@@ -508,7 +540,7 @@ def loadFormView():
     varui.LemmaLE.setText(varui.VarianceTable.item(row_id,11).text())
     varui.ErrorCodeCombo.setCurrentText(varui.VarianceTable.item(row_id,12).text())
     varui.VarianceCodeLE.setText(varui.VarianceTable.item(row_id,13).text())
-    varui.DescriptionTextEdit.setPlainText(varui.VarianceTable.item(row_id,14).text()) 
+    varui.DescriptionTextEdit.setPlainText(varui.VarianceTable.item(row_id,14).text())
 
     if varui.VarianceTable.item(row_id,15).text() == "1" or varui.VarianceTable.item(row_id,13).text()[0] == "P":
         varui.PreservedCkBox.setChecked(True)
@@ -538,7 +570,7 @@ def loadFormView():
         varui.ResolvedCkBox.setChecked(True)
     else:
         varui.ResolvedCkBox.setChecked(False)
-    
+
 def rowSelectionChanged():
     loadFormView()
     #print(getSelectedBook())
@@ -549,7 +581,7 @@ def getSelectedRowId():
 
 def getSelectedBook():
     return varui.VarianceTable.item(getSelectedRowId(),2).text()
-      
+
 '''class MyThread(QThread):
     change_value = pyqtSignal(int)
 
