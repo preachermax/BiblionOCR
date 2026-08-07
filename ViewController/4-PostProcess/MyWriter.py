@@ -135,6 +135,10 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
                 self.ui.fontComboBox.setCurrentText(self.font)
             if hasattr(self.ui, 'fontSizeBox') and str(self.fontsize).isdigit():
                 self.ui.fontSizeBox.setValue(int(self.fontsize))
+            if hasattr(self, 'fontBox') and str(self.font or '').strip():
+                self.fontBox.setCurrentFont(qtg.QFont(self.font))
+            if hasattr(self, 'fontSize') and str(self.fontsize).isdigit():
+                self.fontSize.setValue(int(self.fontsize))
             if hasattr(self, 'LHlineEdit'):
                 self.LHlineEdit.setText(self.linespacing)
 

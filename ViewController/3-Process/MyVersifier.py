@@ -515,6 +515,14 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.RefchapterComboBox.setCurrentText(self.refchapter)
             self.ui.RefverseComboBox.setCurrentText(self.refverse)
             self.ui.ReflineComboBox.setCurrentText(self.refline)
+            if str(getattr(self, 'versefont', '') or '').strip():
+                self.ui.VersefontComboBox.setCurrentText(self.versefont)
+            if str(getattr(self, 'versefontsize', '') or '').strip().isdigit():
+                self.ui.VersefontSizeBox.setValue(int(self.versefontsize))
+            if str(getattr(self, 'reffont', '') or '').strip():
+                self.ui.ReffontComboBox.setCurrentText(self.reffont)
+            if str(getattr(self, 'reffontsize', '') or '').strip().isdigit():
+                self.ui.ReffontSizeBox.setValue(int(self.reffontsize))
             self.ui.VerseTextLE.setText(os.path.basename(self.versepath))
             self.ui.RefTextLE.setText(os.path.basename(self.refpath))
 
