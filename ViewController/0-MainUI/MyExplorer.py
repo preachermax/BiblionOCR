@@ -16,6 +16,7 @@ if project_root not in sys.path:
 from gui_runtime_env import sanitize_current_process_and_reexec
 from SessionManager import SessionManager
 from Core.workflow_wizard_actions import (
+    append_default_context_actions,
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
 )
@@ -286,6 +287,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         menu = QtWidgets.QMenu()
         open = menu.addAction("Open with operating system")
         open.triggered.connect(self.open_file)
+        append_default_context_actions(menu, self.treeView, is_text_widget=False)
         cursor = QtGui.QCursor()
         menu.exec_(cursor.pos())
 

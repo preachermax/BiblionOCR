@@ -26,6 +26,7 @@ from HelpSystem import add_help_menu
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from Core.workflow_wizard_actions import (
+    append_default_context_actions,
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
 )
@@ -428,6 +429,8 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
 
             menu.addAction(mergeAction)
             menu.addAction(splitAction)
+
+            append_default_context_actions(menu, self.ui.textEdit, is_text_widget=True)
 
             # Convert the widget coordinates into global coordinates
             pos = self.mapToGlobal(pos)

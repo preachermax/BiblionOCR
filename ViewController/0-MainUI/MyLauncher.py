@@ -44,6 +44,7 @@ sanitize_current_process_and_reexec()
 
 from helpers.SessionManager import SessionManager
 from helpers.project_status_controller import ProjectStatusController
+from Core.workflow_wizard_actions import append_default_context_actions
 #from subprocess import Popen, PIPE, CalledProcessError
 from helpers.HelpSystem import add_help_menu
 # PyQt5 imports
@@ -308,6 +309,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             show_action.triggered.connect(lambda: self._show_module_help(module_id))
         if launch_action is not None:
             launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        append_default_context_actions(menu, self, is_text_widget=False)
         return menu
 
     def _on_module_button_context_menu_requested(self, button, local_pos):
@@ -333,6 +335,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             show_action.triggered.connect(lambda: self._show_module_help(module_id))
         if launch_action is not None:
             launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        append_default_context_actions(menu, self.ui.RightPanelwidget, is_text_widget=True)
         menu.exec_(self.ui.RightPanelwidget.mapToGlobal(local_pos))
 
     def _viewcontroller_stage_names(self):

@@ -56,6 +56,7 @@ from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
 from Core.workflow_wizard_actions import (
+    append_default_context_actions,
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
 )
@@ -2854,6 +2855,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         iconD = qtg.QIcon()
         iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         deleteRowAction.setIcon(iconD)
+
+        append_default_context_actions(tableMenu, self.ui.BoxTable, is_text_widget=False)
 
         action = tableMenu.exec_(self.ui.BoxTable.mapToGlobal(position))
         if action == insertAboveAction:
