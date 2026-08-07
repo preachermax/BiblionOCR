@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 from typing import Callable, Optional
@@ -87,6 +88,24 @@ DEFAULT_MENU_SHORTCUTS = {
 }
 
 
+SAVE_ACTION_SHORTCUTS = {
+    "actionsave_image": qtg.QKeySequence("Ctrl+S"),
+    "actionsave_as_image": qtg.QKeySequence("Ctrl+Shift+S"),
+    "actionsave_text": qtg.QKeySequence("Ctrl+Alt+S"),
+    "actionsave_as_text": qtg.QKeySequence("Ctrl+Alt+Shift+S"),
+    "actionsave_line_image": qtg.QKeySequence("Ctrl+S"),
+    "actionsave_as_line_image": qtg.QKeySequence("Ctrl+Shift+S"),
+    "actionsave_line_text": qtg.QKeySequence("Ctrl+Alt+S"),
+    "actionsave_as_line_text": qtg.QKeySequence("Ctrl+Alt+Shift+S"),
+}
+
+
+SAVE_METHOD_NAME = re.compile(r"^(save($|[A-Z_])|Save)")
+SAVE_METHOD_EXCLUSIONS = {
+    "save_session_settings",
+}
+
+
 class _DefaultContextMenuEventFilter(qtc.QObject):
     """Attach consistent default context menus across module panels."""
 
@@ -119,6 +138,22 @@ class _DefaultContextMenuEventFilter(qtc.QObject):
 
         append_default_context_actions(menu, widget, is_text_widget=is_text_widget)
         return menu
+
+
+class _CloseConfirmationEventFilter(qtc.QObject):
+    def __init__(self, window):
+        super().__init__(window)
+        self._window = window
+
+    def eventFilter(self, obj, event):
+        if obj is not self._window:
+            return False
+        if event.type() != qtc.QEvent.Close:
+            return False
+        if not _confirm_close_operation(self._window, event):
+            event.ignore()
+            return True
+        return False
 
 
 def append_default_context_actions(
@@ -234,9 +269,113 @@ def _ensure_module_menu_shortcuts(window) -> None:
     for action in window.findChildren(qtw.QAction):
         canonical = _canonical_action_name(action.text())
         if not canonical:
+            object_name = (action.objectName() or "").replace("-", "_").lower()
+            object_name = object_name.replace("__", "_")
+            object_name = object_name.replace("_as_", "_as_")
+            object_name = object_name.replace("_as", "_as")
+            object_name = object_name.replace("save_as", "save_as")
+            object_name = object_name.replace("saveas", "save_as")
+            shortcut = SAVE_ACTION_SHORTCUTS.get(object_name)
+            if shortcut is not None and action.shortcut().isEmpty():
+                action.setShortcut(shortcut)
             continue
         if action.shortcut().isEmpty():
             action.setShortcut(DEFAULT_MENU_SHORTCUTS[canonical])
+
+
+def _confirm_save_operation(window, label: str) -> bool:
+    title = "Confirm Save"
+    prompt = f"Are you sure you want to {label}?"
+    answer = qtw.QMessageBox.question(
+        window,
+        title,
+        prompt,
+        qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+        qtw.QMessageBox.No,
+    )
+    return answer == qtw.QMessageBox.Yes
+
+
+def _install_save_confirmation_wrappers(window) -> None:
+    if window is None:
+        return
+    if getattr(window, "_workflow_save_confirmation_installed", False):
+        return
+
+    wrapped_names = set()
+    for name in dir(window):
+        if name in SAVE_METHOD_EXCLUSIONS:
+            continue
+        if not SAVE_METHOD_NAME.match(name):
+            continue
+        lowered = name.lower()
+        if "setting" in lowered or "session" in lowered:
+            continue
+
+        candidate = getattr(window, name, None)
+        if not callable(candidate):
+            continue
+        if getattr(candidate, "_workflow_save_wrapper", False):
+            continue
+
+        def _make_wrapper(method_name: str, method_callable):
+            def _wrapped(*args, **kwargs):
+                label = method_name.replace("_", " ")
+                if not _confirm_save_operation(window, label):
+                    return None
+                return method_callable(*args, **kwargs)
+
+            _wrapped._workflow_save_wrapper = True  # type: ignore[attr-defined]
+            return _wrapped
+
+        setattr(window, name, _make_wrapper(name, candidate))
+        wrapped_names.add(name)
+
+    setattr(window, "_workflow_wrapped_save_methods", wrapped_names)
+    setattr(window, "_workflow_save_confirmation_installed", True)
+
+
+def _confirm_close_operation(window, event) -> bool:
+    if hasattr(window, "changesSaved") and getattr(window, "changesSaved") is False and callable(getattr(window, "save", None)):
+        popup = qtw.QMessageBox(window)
+        popup.setIcon(qtw.QMessageBox.Warning)
+        popup.setText("The document has been modified")
+        popup.setInformativeText("Do you want to save your changes?")
+        popup.setStandardButtons(
+            qtw.QMessageBox.Save |
+            qtw.QMessageBox.Cancel |
+            qtw.QMessageBox.Discard
+        )
+        popup.setDefaultButton(qtw.QMessageBox.Save)
+        answer = popup.exec_()
+        if answer == qtw.QMessageBox.Save:
+            if _confirm_save_operation(window, "save your changes"):
+                window.save()
+                return True
+            return False
+        if answer == qtw.QMessageBox.Discard:
+            return True
+        return False
+
+    answer = qtw.QMessageBox.question(
+        window,
+        "Confirm Close",
+        "Are you sure you want to close this module?",
+        qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+        qtw.QMessageBox.No,
+    )
+    return answer == qtw.QMessageBox.Yes
+
+
+def _install_close_confirmation(window) -> None:
+    if window is None:
+        return
+    if getattr(window, "_workflow_close_confirmation_filter", None) is not None:
+        return
+
+    filter_obj = _CloseConfirmationEventFilter(window)
+    setattr(window, "_workflow_close_confirmation_filter", filter_obj)
+    window.installEventFilter(filter_obj)
 
 
 class ModulePageWorkflowWizardDialog(qtw.QDialog):
@@ -545,6 +684,9 @@ def install_workflow_wizard_menu_actions(
     include_page_wizard: bool = True,
 ) -> None:
     _install_default_context_menu_behavior(window)
+    _install_save_confirmation_wrappers(window)
+    if module_name != "MyWriter":
+        _install_close_confirmation(window)
     _ensure_module_menu_shortcuts(window)
 
     target_menu = _find_menu_from_window(window)
