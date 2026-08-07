@@ -12,14 +12,84 @@ from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 
 class ProjectCreationWizardDialog(qtw.QDialog):
     DEFAULT_TESSERACT_LANGUAGES = ["English", "Greek", "Hebrew", "Latin"]
-    RIS_EDITABLE_FIELDS = [
-        ("title", "Title"),
-        ("authors", "Authors (semicolon-separated)"),
-        ("publication_year", "Publication year"),
-        ("doi", "DOI"),
-        ("publisher", "Publisher"),
-        ("publication_place", "Publication place"),
-        ("source_identifier", "Source identifier"),
+    RIS_TAG_SPECS = [
+        ("TY", "Reference type"),
+        ("A1", "Primary author"),
+        ("A2", "Secondary author"),
+        ("A3", "Tertiary author"),
+        ("A4", "Subsidiary author"),
+        ("AB", "Abstract"),
+        ("AD", "Author address"),
+        ("AN", "Accession number"),
+        ("AU", "Author"),
+        ("AV", "Availability"),
+        ("BT", "Book title"),
+        ("C1", "Custom 1"),
+        ("C2", "Custom 2"),
+        ("C3", "Custom 3"),
+        ("C4", "Custom 4"),
+        ("C5", "Custom 5"),
+        ("C6", "Custom 6"),
+        ("C7", "Custom 7"),
+        ("C8", "Custom 8"),
+        ("CA", "Caption"),
+        ("CN", "Call number"),
+        ("CY", "Place published"),
+        ("DA", "Date"),
+        ("DB", "Database name"),
+        ("DO", "DOI"),
+        ("DP", "Database provider"),
+        ("ED", "Editor"),
+        ("EP", "End page"),
+        ("ET", "Edition"),
+        ("ID", "Reference ID"),
+        ("IS", "Issue number"),
+        ("J1", "Periodical name (user abbrev.)"),
+        ("J2", "Alternate title"),
+        ("JA", "Journal abbreviation"),
+        ("JF", "Journal/full publication title"),
+        ("JO", "Journal name"),
+        ("KW", "Keyword"),
+        ("L1", "File attachment 1"),
+        ("L2", "File attachment 2"),
+        ("L3", "Figure"),
+        ("L4", "Image"),
+        ("LA", "Language"),
+        ("LB", "Label"),
+        ("LK", "Website link"),
+        ("M1", "Number"),
+        ("M2", "Misc 2"),
+        ("M3", "Type of work"),
+        ("N1", "Notes"),
+        ("N2", "Abstract notes"),
+        ("NV", "Number of volumes"),
+        ("OP", "Original publication"),
+        ("PB", "Publisher"),
+        ("PP", "Publishing place"),
+        ("PY", "Publication year"),
+        ("RI", "Reviewed item"),
+        ("RN", "Research notes"),
+        ("RP", "Reprint edition"),
+        ("SE", "Section"),
+        ("SN", "ISBN/ISSN"),
+        ("SP", "Start page"),
+        ("ST", "Short title"),
+        ("T1", "Primary title"),
+        ("T2", "Secondary title"),
+        ("T3", "Tertiary title"),
+        ("TA", "Translated author"),
+        ("TI", "Title"),
+        ("TT", "Translated title"),
+        ("U1", "User field 1"),
+        ("U2", "User field 2"),
+        ("U3", "User field 3"),
+        ("U4", "User field 4"),
+        ("UR", "URL"),
+        ("VL", "Volume"),
+        ("VO", "Published standard number"),
+        ("Y1", "Primary date"),
+        ("Y2", "Access date"),
+        ("ER", "End of reference"),
     ]
 
     def __init__(self, projects_base_path, parent=None):
@@ -38,7 +108,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         ]
         self.imported_provenance = {}
         self._updating_ris_editor = False
-        self.ris_editor_inputs = {}
+        self._ris_tag_row_map = {}
         self.folder_selection_pages = {}
         self.folder_selection_checkboxes = {}
         self.folder_selection_state = {"scriptural": set()}
@@ -113,14 +183,26 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.status_label.setWordWrap(True)
         ris_layout.addWidget(self.status_label)
 
-        self.ris_editor_group = qtw.QGroupBox("Imported provenance fields")
-        ris_editor_layout = qtw.QFormLayout(self.ris_editor_group)
-        for key, label in self.RIS_EDITABLE_FIELDS:
-            line_edit = qtw.QLineEdit()
-            line_edit.setPlaceholderText(f"Optional {label.lower()}")
-            line_edit.textChanged.connect(self._sync_ris_editor_to_imported_provenance)
-            self.ris_editor_inputs[key] = line_edit
-            ris_editor_layout.addRow(label, line_edit)
+        self.ris_editor_group = qtw.QGroupBox("RIS metadata fields (full spec)")
+        ris_editor_layout = qtw.QVBoxLayout(self.ris_editor_group)
+        ris_editor_help = qtw.QLabel(
+            "Edit all RIS tags here. Use semicolons to separate multiple values for a tag."
+        )
+        ris_editor_help.setWordWrap(True)
+        ris_editor_layout.addWidget(ris_editor_help)
+
+        self.ris_editor_table = qtw.QTableWidget(0, 3, self)
+        self.ris_editor_table.setHorizontalHeaderLabels(["Tag", "Field", "Value(s)"])
+        self.ris_editor_table.verticalHeader().setVisible(False)
+        self.ris_editor_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.ris_editor_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        self.ris_editor_table.setAlternatingRowColors(True)
+        self.ris_editor_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.ris_editor_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+        self.ris_editor_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
+        self.ris_editor_table.itemChanged.connect(self._sync_ris_editor_to_imported_provenance)
+        ris_editor_layout.addWidget(self.ris_editor_table)
+        self._build_ris_spec_editor_rows()
         self.ris_editor_group.setVisible(False)
         ris_layout.addWidget(self.ris_editor_group)
 
@@ -895,8 +977,13 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.imported_provenance = {}
         self._updating_ris_editor = True
         try:
-            for line_edit in self.ris_editor_inputs.values():
-                line_edit.clear()
+            for row in range(self.ris_editor_table.rowCount()):
+                value_item = self.ris_editor_table.item(row, 2)
+                if value_item is None:
+                    value_item = qtw.QTableWidgetItem("")
+                    self.ris_editor_table.setItem(row, 2, value_item)
+                else:
+                    value_item.setText("")
         finally:
             self._updating_ris_editor = False
         self.ris_editor_group.setVisible(False)
@@ -940,29 +1027,139 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self._populate_ris_editor(payload)
         self._refresh_review()
 
+    def _build_ris_spec_editor_rows(self):
+        self.ris_editor_table.setRowCount(0)
+        self._ris_tag_row_map = {}
+        for row, (tag, label) in enumerate(self.RIS_TAG_SPECS):
+            self.ris_editor_table.insertRow(row)
+
+            tag_item = qtw.QTableWidgetItem(tag)
+            self.ris_editor_table.setItem(row, 0, tag_item)
+
+            label_item = qtw.QTableWidgetItem(label)
+            self.ris_editor_table.setItem(row, 1, label_item)
+
+            self.ris_editor_table.setItem(row, 2, qtw.QTableWidgetItem(""))
+            self._ris_tag_row_map[tag] = row
+
+    def _extract_ris_tags_from_payload(self, payload):
+        tags = payload.get("source_provenance_tags")
+        if isinstance(tags, dict):
+            extracted = {}
+            for key, value in tags.items():
+                tag = str(key).strip().upper()
+                if not tag:
+                    continue
+                if isinstance(value, list):
+                    extracted[tag] = [str(item).strip() for item in value if str(item).strip()]
+                else:
+                    text_value = str(value).strip()
+                    extracted[tag] = [text_value] if text_value else []
+            return extracted
+        return {}
+
     def _populate_ris_editor(self, payload):
+        tags = self._extract_ris_tags_from_payload(payload)
         self._updating_ris_editor = True
         try:
-            for key, _label in self.RIS_EDITABLE_FIELDS:
-                value = payload.get(key, "")
-                if isinstance(value, list):
-                    value = "; ".join(str(item).strip() for item in value if str(item).strip())
-                self.ris_editor_inputs[key].setText(str(value).strip() if value is not None else "")
+            for row in range(self.ris_editor_table.rowCount()):
+                value_item = self.ris_editor_table.item(row, 2)
+                if value_item is None:
+                    value_item = qtw.QTableWidgetItem("")
+                    self.ris_editor_table.setItem(row, 2, value_item)
+                else:
+                    value_item.setText("")
+
+            for tag, values in tags.items():
+                row = self._ris_tag_row_map.get(tag)
+                if row is None:
+                    continue
+                value_item = self.ris_editor_table.item(row, 2)
+                if value_item is None:
+                    value_item = qtw.QTableWidgetItem("")
+                    self.ris_editor_table.setItem(row, 2, value_item)
+                value_item.setText("; ".join(values))
         finally:
             self._updating_ris_editor = False
         self.ris_editor_group.setVisible(True)
         self._sync_ris_editor_to_imported_provenance()
 
-    def _sync_ris_editor_to_imported_provenance(self):
+    def _collect_ris_tags_from_editor(self):
+        tags = {}
+        for tag, row in self._ris_tag_row_map.items():
+            value_item = self.ris_editor_table.item(row, 2)
+            value_text = value_item.text().strip() if value_item is not None else ""
+            if not value_text:
+                continue
+            values = [part.strip() for part in value_text.split(";") if part.strip()]
+            if values:
+                tags[tag] = values
+        return tags
+
+    def _sync_derived_fields_from_ris_tags(self, tags):
+        def _first(*candidates):
+            for candidate in candidates:
+                values = tags.get(candidate)
+                if values:
+                    return values[0]
+            return ""
+
+        title = _first("T1", "TI", "T2")
+        if title:
+            self.imported_provenance["title"] = title
+        else:
+            self.imported_provenance.pop("title", None)
+
+        authors = tags.get("AU") or tags.get("A1") or []
+        if authors:
+            self.imported_provenance["authors"] = authors
+        else:
+            self.imported_provenance.pop("authors", None)
+
+        publication_year = _first("Y1", "PY")
+        if publication_year:
+            self.imported_provenance["publication_year"] = publication_year
+        else:
+            self.imported_provenance.pop("publication_year", None)
+
+        doi = _first("DO")
+        if doi:
+            self.imported_provenance["doi"] = doi
+        else:
+            self.imported_provenance.pop("doi", None)
+
+        publisher = _first("PB")
+        if publisher:
+            self.imported_provenance["publisher"] = publisher
+        else:
+            self.imported_provenance.pop("publisher", None)
+
+        publication_place = _first("CY", "PP")
+        if publication_place:
+            self.imported_provenance["publication_place"] = publication_place
+        else:
+            self.imported_provenance.pop("publication_place", None)
+
+        source_identifier = _first("ID")
+        if source_identifier:
+            self.imported_provenance["source_identifier"] = source_identifier
+        else:
+            self.imported_provenance.pop("source_identifier", None)
+
+    def _sync_ris_editor_to_imported_provenance(self, changed_item=None):
         if self._updating_ris_editor:
             return
+        if changed_item is not None and changed_item.column() != 2:
+            return
 
-        for key, _label in self.RIS_EDITABLE_FIELDS:
-            value = self.ris_editor_inputs[key].text().strip()
-            if value:
-                self.imported_provenance[key] = value
-            else:
-                self.imported_provenance.pop(key, None)
+        tags = self._collect_ris_tags_from_editor()
+        if tags:
+            self.imported_provenance["source_provenance_tags"] = tags
+            self.imported_provenance["source_provenance_format"] = "ris"
+        else:
+            self.imported_provenance.pop("source_provenance_tags", None)
+
+        self._sync_derived_fields_from_ris_tags(tags)
 
         self._refresh_review()
 
