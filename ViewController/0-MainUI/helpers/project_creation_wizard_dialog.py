@@ -2,8 +2,10 @@ import csv
 import json
 import os
 import re
+import subprocess
 
 from PyQt5 import QtCore as qtc
+from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
 from Core.project_database import build_project_field_definitions
@@ -11,7 +13,13 @@ from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 
 
 class ProjectCreationWizardDialog(qtw.QDialog):
-    DEFAULT_TESSERACT_LANGUAGES = ["English", "Greek", "Hebrew", "Latin"]
+    DEFAULT_TESSERACT_LANGUAGES = ["Greek", "Latin", "Hebrew", "English"]
+    LANGUAGE_NAME_TO_TESSERACT_CODE = {
+        "Greek": "ell",
+        "Latin": "lat",
+        "Hebrew": "heb",
+        "English": "eng",
+    }
     RIS_TAG_SPECS = [
         ("TY", "Reference type"),
         ("A1", "Primary author"),
@@ -111,6 +119,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.imported_provenance = {}
         self._updating_ris_editor = False
         self._ris_tag_row_map = {}
+        self._updating_column_rows = False
+        self._column_name_edits = []
+        self._column_language_combos = []
+        self.available_tesseract_languages = self._detect_installed_tesseract_languages()
         self.folder_selection_pages = {}
         self.folder_selection_checkboxes = {}
         self.folder_selection_state = {"scriptural": set()}
@@ -257,20 +269,53 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         page_model_group = qtw.QGroupBox("Source page model")
         page_model_layout = qtw.QGridLayout(page_model_group)
         page_model_layout.addWidget(qtw.QLabel("Source pages"), 0, 0)
-        self.source_pages_spin = qtw.QSpinBox()
-        self.source_pages_spin.setRange(1, 1000000)
-        self.source_pages_spin.setValue(1)
-        page_model_layout.addWidget(self.source_pages_spin, 0, 1)
+        self.source_pages_combo = qtw.QComboBox()
+        self.source_pages_combo.addItem("To Be Determined")
+        for page_number in range(1, 1001):
+            self.source_pages_combo.addItem(str(page_number))
+        page_model_layout.addWidget(self.source_pages_combo, 0, 1)
 
-        page_model_layout.addWidget(qtw.QLabel("Columns per source page"), 1, 0)
+        source_pages_note = qtw.QLabel(
+            "Source pages are determined by extract (MyServer) or multi-page scans (MyScanner)."
+        )
+        source_pages_note.setWordWrap(True)
+        page_model_layout.addWidget(source_pages_note, 1, 0, 1, 2)
+        self._configure_source_pages_dropdown()
+
+        page_model_layout.addWidget(qtw.QLabel("Columns per source page"), 2, 0)
         self.columns_per_page_spin = qtw.QSpinBox()
         self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
         self.columns_per_page_spin.setValue(len(self.DEFAULT_TESSERACT_LANGUAGES))
-        page_model_layout.addWidget(self.columns_per_page_spin, 1, 1)
+        page_model_layout.addWidget(self.columns_per_page_spin, 2, 1)
+
+        self.column_config_group = qtw.QGroupBox("Column language and name editor")
+        self.column_config_layout = qtw.QGridLayout(self.column_config_group)
+        self.column_config_layout.addWidget(qtw.QLabel("Column"), 0, 0)
+        self.column_config_layout.addWidget(qtw.QLabel("Column name"), 0, 1)
+        self.column_config_layout.addWidget(qtw.QLabel("Tesseract language"), 0, 2)
+
+        for index, default_language in enumerate(self.DEFAULT_TESSERACT_LANGUAGES):
+            row = index + 1
+            row_label = qtw.QLabel(f"{index + 1}")
+            self.column_config_layout.addWidget(row_label, row, 0)
+
+            name_edit = qtw.QLineEdit(default_language)
+            name_edit.textChanged.connect(self._on_column_configuration_changed)
+            self.column_config_layout.addWidget(name_edit, row, 1)
+            self._column_name_edits.append(name_edit)
+
+            language_combo = qtw.QComboBox()
+            language_combo.addItems(self.available_tesseract_languages)
+            language_combo.setCurrentText(default_language if default_language in self.available_tesseract_languages else self.available_tesseract_languages[0])
+            language_combo.currentIndexChanged.connect(self._on_column_configuration_changed)
+            self.column_config_layout.addWidget(language_combo, row, 2)
+            self._column_language_combos.append(language_combo)
+
+        page_model_layout.addWidget(self.column_config_group, 3, 0, 1, 2)
 
         self.column_preview_label = qtw.QLabel("")
         self.column_preview_label.setWordWrap(True)
-        page_model_layout.addWidget(self.column_preview_label, 2, 0, 1, 2)
+        page_model_layout.addWidget(self.column_preview_label, 4, 0, 1, 2)
         details_layout.addWidget(page_model_group)
 
         self.user_intent_label = qtw.QLabel("User intent summary")
@@ -440,11 +485,91 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.creator_edit.textChanged.connect(self._update_validation_state)
         self.project_type_combo.currentIndexChanged.connect(self._update_project_scope_state)
         self.scriptural_source_combo.currentIndexChanged.connect(self._refresh_folder_selection_page)
-        self.source_pages_spin.valueChanged.connect(self._refresh_column_preview)
+        self.source_pages_combo.currentIndexChanged.connect(self._refresh_column_preview)
         self.columns_per_page_spin.valueChanged.connect(self._refresh_column_preview)
         self.project_type_combo.currentIndexChanged.connect(self._refresh_column_preview)
         self._update_project_scope_state()
         self._refresh_column_preview()
+
+    def _configure_source_pages_dropdown(self):
+        model = self.source_pages_combo.model()
+        if isinstance(model, qtg.QStandardItemModel):
+            placeholder_item = model.item(0)
+            if placeholder_item is not None:
+                placeholder_item.setEnabled(False)
+        self.source_pages_combo.setCurrentText("1")
+
+    def _source_pages_value(self):
+        selected_text = self.source_pages_combo.currentText().strip()
+        if selected_text.isdigit():
+            return max(1, int(selected_text))
+        return 1
+
+    def _detect_installed_tesseract_languages(self):
+        codes = []
+        try:
+            output = subprocess.check_output(
+                ["tesseract", "--list-langs"],
+                stderr=subprocess.STDOUT,
+                text=True,
+                timeout=3,
+            )
+            for raw_line in output.splitlines():
+                candidate = raw_line.strip()
+                if not candidate or candidate.lower().startswith("list of available languages"):
+                    continue
+                if re.fullmatch(r"\d+", candidate):
+                    continue
+                codes.append(candidate)
+        except (OSError, subprocess.SubprocessError):
+            codes = []
+
+        code_to_name = {value: key for key, value in self.LANGUAGE_NAME_TO_TESSERACT_CODE.items()}
+        detected_names = []
+        for code in codes:
+            detected_names.append(code_to_name.get(code, code))
+
+        ordered = []
+        for default_name in self.DEFAULT_TESSERACT_LANGUAGES:
+            if default_name not in ordered:
+                ordered.append(default_name)
+        for detected in detected_names:
+            if detected not in ordered:
+                ordered.append(detected)
+
+        return ordered
+
+    def _on_column_configuration_changed(self, *_args):
+        if self._updating_column_rows:
+            return
+        self._refresh_column_preview()
+
+    def _selected_column_languages(self):
+        count = max(1, int(self.columns_per_page_spin.value()))
+        selected = []
+        for index in range(min(count, len(self._column_language_combos))):
+            selected.append(self._column_language_combos[index].currentText().strip())
+        return selected
+
+    def _selected_column_names(self):
+        count = max(1, int(self.columns_per_page_spin.value()))
+        selected_languages = self._selected_column_languages()
+        names = []
+        for index in range(min(count, len(self._column_name_edits))):
+            entered_name = self._column_name_edits[index].text().strip()
+            fallback_name = selected_languages[index] if index < len(selected_languages) else f"Column {index + 1}"
+            names.append(entered_name or fallback_name)
+        return names
+
+    def _selected_tesseract_language_codes(self):
+        codes = []
+        for language_name in self._selected_column_languages():
+            mapped_code = self.LANGUAGE_NAME_TO_TESSERACT_CODE.get(language_name)
+            if mapped_code:
+                codes.append(mapped_code)
+            else:
+                codes.append(language_name.lower())
+        return codes
 
     def _go_back(self):
         index = self.page_stack.currentIndex()
@@ -494,12 +619,12 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self._set_project_db_value("ProjectName", sanitized_name)
             self._set_project_db_value("ProjectType", self.project_type_combo.currentText().strip())
             self._set_project_db_value("ScripturalSource", self._normalized_scriptural_source_choice())
-            self._set_project_db_value("NumberPages", str(self.source_pages_spin.value()))
+            self._set_project_db_value("NumberPages", str(self._source_pages_value()))
             self._set_project_db_value("NumberColumns", str(self.columns_per_page_spin.value()))
-            self._set_project_db_value("ColumnName", ",".join(self._selected_column_languages()))
-            self._set_project_db_value("ColumnLanguage", ",".join(language.lower() for language in self._selected_column_languages()))
-            self._set_project_db_value("Languages", ",".join(language.lower() for language in self._selected_column_languages()))
-            self._set_project_db_value("NumberLanguages", str(len(self._selected_column_languages())))
+            self._set_project_db_value("ColumnName", ",".join(self._selected_column_names()))
+            self._set_project_db_value("ColumnLanguage", ",".join(self._selected_tesseract_language_codes()))
+            self._set_project_db_value("Languages", ",".join(self._selected_tesseract_language_codes()))
+            self._set_project_db_value("NumberLanguages", str(len(self._selected_tesseract_language_codes())))
             self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
         self._refresh_review()
         self._apply_required_field_state(self.project_name_edit, self.project_name_label, not self.project_name_edit.text().strip())
@@ -706,10 +831,15 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             name_line += f" -> {sanitized_name}"
         project_type = self.project_type_combo.currentText().strip() or "Scriptural"
         scripture_source = self.scriptural_source_combo.currentText().strip() or "both"
-        source_pages = int(self.source_pages_spin.value())
+        source_pages = self._source_pages_value()
         columns_per_page = int(self.columns_per_page_spin.value())
         selected_languages = self._selected_column_languages()
+        selected_names = self._selected_column_names()
         total_column_pages = source_pages * max(1, columns_per_page)
+        language_rows = []
+        for index, language in enumerate(selected_languages):
+            column_name = selected_names[index] if index < len(selected_names) else language
+            language_rows.append(f"{column_name} [{language}]")
         review_lines = [
             name_line,
             f"Purpose: {self.project_purpose_edit.toPlainText().strip() or 'Not set'}",
@@ -718,7 +848,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             f"Scriptural source: {scripture_source}",
             f"Source pages: {source_pages}",
             f"Columns per source page: {columns_per_page}",
-            f"Column languages: {', '.join(selected_languages)}",
+            f"Column language/name: {', '.join(language_rows)}",
             f"Total column pages: {total_column_pages}",
             f"Trigger: {self.creation_trigger_edit.text().strip() or 'MyServer_button'}",
             f"Source context: {self.source_context_edit.text().strip() or 'MyServer_UI'}",
@@ -726,19 +856,29 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         ]
         self.review_label.setText("\n".join(review_lines))
 
-    def _selected_column_languages(self):
-        count = max(1, int(self.columns_per_page_spin.value()))
-        return self.DEFAULT_TESSERACT_LANGUAGES[:count]
-
     def _refresh_column_preview(self):
+        count = max(1, int(self.columns_per_page_spin.value()))
+        self._updating_column_rows = True
+        try:
+            for index, name_edit in enumerate(self._column_name_edits):
+                active = index < count
+                name_edit.setEnabled(active)
+                self._column_language_combos[index].setEnabled(active)
+        finally:
+            self._updating_column_rows = False
+
         selected_languages = self._selected_column_languages()
-        named_columns = [f"Column {index + 1}: {language}" for index, language in enumerate(selected_languages)]
-        source_pages = int(self.source_pages_spin.value())
+        selected_names = self._selected_column_names()
+        named_columns = [
+            f"Column {index + 1}: {selected_names[index]} [{language}]"
+            for index, language in enumerate(selected_languages)
+        ]
+        source_pages = self._source_pages_value()
         columns_per_page = max(1, int(self.columns_per_page_spin.value()))
         total_column_pages = source_pages * columns_per_page
         self.column_preview_label.setText(
             "\n".join([
-                "Columns are automatically named from the selected language list:",
+                "Columns are named from the editable column name and language rows:",
                 *named_columns,
                 f"Total column pages = source pages ({source_pages}) x columns per page ({columns_per_page}) = {total_column_pages}",
             ])
@@ -780,12 +920,12 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self._set_project_db_value("ProjectName", self._sanitize_project_name(self.project_name_edit.text().strip()))
         self._set_project_db_value("ProjectType", self.project_type_combo.currentText().strip())
         self._set_project_db_value("ScripturalSource", self._normalized_scriptural_source_choice())
-        self._set_project_db_value("NumberPages", str(self.source_pages_spin.value()))
+        self._set_project_db_value("NumberPages", str(self._source_pages_value()))
         self._set_project_db_value("NumberColumns", str(self.columns_per_page_spin.value()))
-        self._set_project_db_value("ColumnName", ",".join(self._selected_column_languages()))
-        self._set_project_db_value("ColumnLanguage", ",".join(language.lower() for language in self._selected_column_languages()))
-        self._set_project_db_value("Languages", ",".join(language.lower() for language in self._selected_column_languages()))
-        self._set_project_db_value("NumberLanguages", str(len(self._selected_column_languages())))
+        self._set_project_db_value("ColumnName", ",".join(self._selected_column_names()))
+        self._set_project_db_value("ColumnLanguage", ",".join(self._selected_tesseract_language_codes()))
+        self._set_project_db_value("Languages", ",".join(self._selected_tesseract_language_codes()))
+        self._set_project_db_value("NumberLanguages", str(len(self._selected_tesseract_language_codes())))
         self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
 
     def _load_milestones_defaults(self):
@@ -1382,7 +1522,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         selected_languages = self._selected_column_languages()
         number_columns = max(1, int(self.columns_per_page_spin.value()))
-        number_pages = max(1, int(self.source_pages_spin.value()))
+        number_pages = self._source_pages_value()
         project_db_values = self._collect_project_db_values()
         milestone_settings = self._collect_milestone_settings()
 
@@ -1400,10 +1540,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "ScripturalSource": scriptural_source,
             "NumberPages": number_pages,
             "NumberColumns": number_columns,
-            "ColumnName": ",".join(selected_languages),
-            "ColumnLanguage": ",".join(language.lower() for language in selected_languages),
-            "Languages": [language.lower() for language in selected_languages],
-            "NumberLanguages": len(selected_languages),
+            "ColumnName": ",".join(self._selected_column_names()),
+            "ColumnLanguage": ",".join(self._selected_tesseract_language_codes()),
+            "Languages": self._selected_tesseract_language_codes(),
+            "NumberLanguages": len(self._selected_tesseract_language_codes()),
             "TotalColumnPages": number_pages * number_columns,
             "SelectedProjectFolders": self._selected_project_folders(),
             "ProjectDatabase": project_database_name,
