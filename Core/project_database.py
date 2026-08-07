@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import shutil
@@ -9,6 +10,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 PROJECT_DATABASE_FILENAME = "project_metadata.sqlite"
 PROJECT_DATABASE_EXPORT_FILENAME = "project_metadata.json"
+PROJECT_DATABASE_EXPORT_CSV_FILENAME = "project_metadata.csv"
 PROJECT_DATABASE_TABLE = "project_metadata"
 DEFAULT_SCRIPTURE_COLUMN_LANGUAGES = ["english", "greek", "hebrew", "latin"]
 
@@ -365,6 +367,8 @@ def create_project_database(
         )
         connection.commit()
 
+    sync_project_database_mirrors(database_path)
+
     return normalized
 
 
@@ -376,6 +380,37 @@ def export_project_database_json(
     export_path = export_path or os.path.splitext(database_path)[0] + ".json"
     with open(export_path, "w", encoding="utf-8") as handle:
         json.dump(record, handle, indent=2)
+    return record
+
+
+def export_project_database_csv(
+    database_path: str,
+    export_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    record = load_project_database_record(database_path)
+    export_path = export_path or os.path.splitext(database_path)[0] + ".csv"
+    with open(export_path, "w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["Field", "Value"])
+        for key in sorted(record.keys()):
+            value = record.get(key)
+            if isinstance(value, list):
+                serialized_value = json.dumps(value, ensure_ascii=False)
+            else:
+                serialized_value = "" if value is None else str(value)
+            writer.writerow([key, serialized_value])
+    return record
+
+
+def sync_project_database_mirrors(database_path: str) -> Dict[str, Any]:
+    """Keep SQLite project metadata mirrored to adjacent JSON and CSV exports."""
+    record = load_project_database_record(database_path)
+    base_dir = os.path.dirname(database_path)
+    json_path = os.path.join(base_dir, PROJECT_DATABASE_EXPORT_FILENAME)
+    csv_path = os.path.join(base_dir, PROJECT_DATABASE_EXPORT_CSV_FILENAME)
+
+    export_project_database_json(database_path, json_path)
+    export_project_database_csv(database_path, csv_path)
     return record
 
 

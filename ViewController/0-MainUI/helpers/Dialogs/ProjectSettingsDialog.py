@@ -1225,7 +1225,7 @@ class ProjectSettingsDialog(qtw.QDialog):
         timestamp_row = self._find_row("timestamp")
         if timestamp_row is not None:
             self.ris_table.item(timestamp_row, 1).setText(str(saved_values.get("timestamp", "")))
-        self.status_label.setText("Project settings saved to SQLite and project.ris.json.")
+        self.status_label.setText("Project settings saved to SQLite plus project metadata JSON/CSV mirrors and project.ris.json.")
         super().accept()
 
     def reject(self):

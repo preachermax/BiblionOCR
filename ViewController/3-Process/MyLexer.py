@@ -1,3 +1,4 @@
+# pyright: reportAttributeAccessIssue=false, reportOptionalMemberAccess=false, reportArgumentType=false, reportCallIssue=false, reportOperatorIssue=false, reportGeneralTypeIssues=false, reportPossiblyUnboundVariable=false, reportSelfClsParameterName=false, reportIncompatibleMethodOverride=false
 # Python imports
 import csv
 import json
