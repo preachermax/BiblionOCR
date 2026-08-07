@@ -38,6 +38,9 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
         self.assertEqual("grc,grc,grc,grc", normalized["ColumnLanguage"])
         self.assertEqual("EB Garamond", normalized["ProjectFont"])
         self.assertEqual(7, normalized["CurrentPage"])
+        self.assertEqual(7, normalized["CurrentProjectPage"])
+        self.assertEqual("", normalized["CurrentProjectMilestone"])
+        self.assertEqual("", normalized["CurrentPageMilestone"])
 
     def test_column_defaults_follow_column_count_rules(self) -> None:
         normalized = normalize_project_database_values(
@@ -133,6 +136,9 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
                     "ProjectType": "Scriptural",
                     "ProjectPageNumber": 4,
                     "ProjectPageProgress": 50,
+                    "CurrentProjectPage": 4,
+                    "CurrentProjectMilestone": "source_acquired",
+                    "CurrentPageMilestone": "source_acquired",
                     "NumberColumns": 2,
                     "ColumnName": "left,right",
                     "ColumnLanguage": "eng,lat",
@@ -155,10 +161,23 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
             self.assertEqual("Migrated", record["ProjectName"])
             self.assertEqual(4, record["ProjectPageNumber"])
             self.assertEqual(50, record["ProjectPageProgress"])
+            self.assertEqual(4, record["CurrentProjectPage"])
+            self.assertEqual("source_acquired", record["CurrentProjectMilestone"])
+            self.assertEqual("source_acquired", record["CurrentPageMilestone"])
             self.assertEqual(2, record["NumberColumns"])
             self.assertEqual("left,right", record["ColumnName"])
             self.assertEqual("eng,lat", record["ColumnLanguage"])
             self.assertEqual("Junicode", record["ProjectFont"])
+
+    def test_new_project_page_fields_are_present(self) -> None:
+        definitions = {
+            definition.key: definition
+            for definition in build_project_field_definitions(("eng", "grc"))
+        }
+
+        self.assertIn("CurrentProjectPage", definitions)
+        self.assertIn("CurrentProjectMilestone", definitions)
+        self.assertIn("CurrentPageMilestone", definitions)
 
 
 if __name__ == "__main__":

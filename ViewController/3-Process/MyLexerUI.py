@@ -1872,6 +1872,9 @@ class Ui_Boxer(object):
 import UI_Icons
 
 
+Ui_Glypher = Ui_Boxer
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

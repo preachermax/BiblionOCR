@@ -28,6 +28,15 @@ ACTIVE_WORKFLOW_WIZARD_MODE_KEYS = (
 ACTIVE_WORKFLOW_WIZARD_MODULE_KEYS = (
     'self.active_workflow_wizard_module',
 )
+ACTIVE_CURRENT_PROJECT_PAGE_KEYS = (
+    'self.current_project_page',
+)
+ACTIVE_CURRENT_PROJECT_MILESTONE_KEYS = (
+    'self.current_project_milestone',
+)
+ACTIVE_CURRENT_PAGE_MILESTONE_KEYS = (
+    'self.current_page_milestone',
+)
 
 
 @dataclass(frozen=True)
@@ -176,6 +185,9 @@ class SessionManager:
         return {
             'project_root': project_root,
             'project_name': project_name,
+            'current_project_page': str(values.get('self.current_project_page', '') or ''),
+            'current_project_milestone': str(values.get('self.current_project_milestone', '') or ''),
+            'current_page_milestone': str(values.get('self.current_page_milestone', '') or ''),
         }
 
     def get_active_project_root(self, filename: str = 'Session.json') -> str:
@@ -197,6 +209,57 @@ class SessionManager:
             'project_root': normalized_root,
             'project_name': project_name,
         }
+
+    @staticmethod
+    def _coerce_page_number(value: Any, default: int = 1) -> int:
+        try:
+            page_number = int(value)
+        except (TypeError, ValueError):
+            page_number = int(default or 1)
+        return max(1, page_number)
+
+    @staticmethod
+    def _normalize_milestone_text(value: Any) -> str:
+        return str(value or '').strip()
+
+    def get_active_project_page(self, filename: str = 'Session.json') -> int:
+        values = self.values(filename)
+        for key in ACTIVE_CURRENT_PROJECT_PAGE_KEYS:
+            value = values.get(key)
+            if value not in (None, ''):
+                return self._coerce_page_number(value, 1)
+        return 1
+
+    def set_active_project_page(self, page_number: Any, filename: str = 'Session.json') -> int:
+        normalized_page = self._coerce_page_number(page_number, 1)
+        self.update(filename, {'self.current_project_page': normalized_page})
+        return normalized_page
+
+    def get_active_project_milestone(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_CURRENT_PROJECT_MILESTONE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip()
+        return ''
+
+    def set_active_project_milestone(self, milestone: Any, filename: str = 'Session.json') -> str:
+        normalized_milestone = self._normalize_milestone_text(milestone)
+        self.update(filename, {'self.current_project_milestone': normalized_milestone})
+        return normalized_milestone
+
+    def get_active_page_milestone(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_CURRENT_PAGE_MILESTONE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip()
+        return ''
+
+    def set_active_page_milestone(self, milestone: Any, filename: str = 'Session.json') -> str:
+        normalized_milestone = self._normalize_milestone_text(milestone)
+        self.update(filename, {'self.current_page_milestone': normalized_milestone})
+        return normalized_milestone
 
     def get_active_workflow_module(self, filename: str = 'Session.json') -> str:
         values = self.values(filename)
@@ -301,6 +364,9 @@ class SessionManager:
             legacy_key_map = {
                 'path': 'self.imgpath',
                 'dir': 'self.imgdir',
+                'CurrentProjectPage': 'self.current_project_page',
+                'CurrentProjectMilestone': 'self.current_project_milestone',
+                'CurrentPageMilestone': 'self.current_page_milestone',
             }
             normalized_items = []
             for key, value in data.items():

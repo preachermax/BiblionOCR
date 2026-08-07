@@ -1,3 +1,5 @@
+# pyright: reportGeneralTypeIssues=false, reportOptionalMemberAccess=false, reportAssignmentType=false, reportArgumentType=false, reportAttributeAccessIssue=false, reportCallIssue=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportPossiblyUnboundVariable=false, reportIncompatibleMethodOverride=false, reportRedeclaration=false
+
 print("RUNNING:", __file__)
 # See dev_notebook.md for architecture + debugging notes
 #print(len(locals()))
@@ -315,6 +317,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.pending_pixler_source_path = ""
         self._pixler_return_poll_timer = None
         self.pixler_return_prompt_dialog = None
+        self.current_project_page = 1
+        self.current_project_milestone = ""
+        self.current_page_milestone = ""
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -738,6 +743,42 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return f"{module_name} {module_completed}/{module_total} | Complete"
         return f"{module_name} {module_completed}/{module_total} | Next: {next_label}"
 
+    def _page_number_from_path(self, path, fallback=None):
+        candidate = str(path or "").strip()
+        if not candidate:
+            return max(1, int(fallback or getattr(self, "current_project_page", 1) or 1))
+
+        stem = os.path.splitext(os.path.basename(candidate))[0]
+        for pattern in (
+            r"(?:^|[_\-\s])page[_\-\s]*(\d+)",
+            r"(?:^|[_\-\s])p(?:age)?[_\-\s]*(\d+)",
+            r"(\d+)$",
+        ):
+            match = re.search(pattern, stem, re.IGNORECASE)
+            if match:
+                return max(1, int(match.group(1)))
+
+        return max(1, int(fallback or getattr(self, "current_project_page", 1) or 1))
+
+    def _sync_project_page_state(self, page_path=None, project_milestone=None, page_milestone=None):
+        page_number = self._page_number_from_path(page_path)
+        self.current_project_page = page_number
+
+        payload = {
+            'self.current_project_page': page_number,
+        }
+
+        if project_milestone is not None:
+            self.current_project_milestone = str(project_milestone or '').strip()
+            payload['self.current_project_milestone'] = self.current_project_milestone
+
+        if page_milestone is not None:
+            self.current_page_milestone = str(page_milestone or '').strip()
+            payload['self.current_page_milestone'] = self.current_page_milestone
+
+        self.session_manager.update('Session.json', payload)
+        return page_number
+
     def _shared_active_project_root(self):
         return self.session_manager.get_active_project_root()
 
@@ -814,6 +855,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             module_name="MyServer",
             details=details,
         )
+        self._sync_project_page_state(project_root, project_milestone=milestone_key, page_milestone=milestone_key)
         self._refresh_project_status(project_root)
         return project_root
 
@@ -874,7 +916,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._set_current_project(project_path)
         self.workflow_tracker.ensure_tracking_state(project_path)
-        ### MILESTONE - project_ready-10% ###
+        ### PROJECT MILESTONE - project_ready-10% ###
         self._record_project_milestone("project_ready", project_path)
         self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
@@ -926,7 +968,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             if self._pending_project_root:
                 self._set_current_project(self._pending_project_root)
                 self.workflow_tracker.ensure_tracking_state(self._pending_project_root)
-                ### MILESTONE - project_ready-10% ###
+                ### PROJECT MILESTONE - project_ready-10% ###
                 self._record_project_milestone(
                     "project_ready",
                     self._pending_project_root,
@@ -1138,7 +1180,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         self.showImage(result["path"])
-        ### MILESTONE - source_acquired-15% ###
+        ### PAGE MILESTONE - source_acquired-15% ###
         self._record_project_milestone(
             "source_acquired",
             result["path"],
@@ -1272,6 +1314,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.qimage = get_setting('qimage', None)
         self.zoom = get_setting('zoom', '')
         self.zoomslidervalue = get_setting('zoomslidervalue', 0)
+        self.current_project_page = get_setting('current_project_page', 1)
+        self.current_project_milestone = get_setting('current_project_milestone', '')
+        self.current_page_milestone = get_setting('current_page_milestone', '')
         self.txtpath = get_setting('txtpath', '')
         self.txtdir = get_setting('txtdir', '')
         self.scannerManager.apply_request_state(
@@ -2786,7 +2831,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
         })
-        ### MILESTONE - source_acquired-15% ###
+        self._sync_project_page_state(self.imgpath)
+        ### PAGE MILESTONE - source_acquired-15% ###
         self._record_project_milestone(
             "source_acquired",
             self.imgpath,
@@ -3088,6 +3134,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.txtpath': self.txtpath if self.txtpath is not None else '',
             'self.txtdir': self.txtdir if self.txtdir is not None else '',
         })
+        self._sync_project_page_state(self.txtpath)
 
         # Ã¢Å“â€¦ Build file list (FIXED for Windows + CSV)
         self.txtfileList = []
@@ -3857,7 +3904,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyExplorer.py', self._projects_base_path())
 
     def OpenWithCalc(self):
-        lo_cmd = 'libreoffice --calc ' + self.txtpath
+        lo_cmd = f"libreoffice --calc {self.txtpath or ''}"
         print(lo_cmd)
         os.system(lo_cmd)
 

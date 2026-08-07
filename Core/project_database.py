@@ -177,6 +177,19 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             help_text="Select one or more installed Tesseract languages.",
         ),
         ProjectFieldDefinition("CurrentPage", "Current Page", "int", default=1),
+        ProjectFieldDefinition("CurrentProjectPage", "Current Project Page", "int", default=1),
+        ProjectFieldDefinition(
+            "CurrentProjectMilestone",
+            "Current Project Milestone",
+            "text",
+            default="",
+        ),
+        ProjectFieldDefinition(
+            "CurrentPageMilestone",
+            "Current Page Milestone",
+            "text",
+            default="",
+        ),
         ProjectFieldDefinition("CurrentColumn", "Current Column", "int", default=1),
         ProjectFieldDefinition("CurrentLine", "Current Line", "int", default=1),
         ProjectFieldDefinition("CurrentBook", "Current Book", "int", default=1),
@@ -199,6 +212,15 @@ def normalize_project_database_values(
         incoming["ProjectDatabase"] = incoming.get("project_database")
     if incoming.get("CurrentPage") is not None and incoming.get("ProjectPageNumber") in (None, ""):
         incoming["ProjectPageNumber"] = incoming.get("CurrentPage")
+    if incoming.get("CurrentProjectPage") is None:
+        if incoming.get("CurrentPage") not in (None, ""):
+            incoming["CurrentProjectPage"] = incoming.get("CurrentPage")
+        elif incoming.get("ProjectPageNumber") not in (None, ""):
+            incoming["CurrentProjectPage"] = incoming.get("ProjectPageNumber")
+    if incoming.get("CurrentProjectMilestone") in (None, "") and incoming.get("CurrentPageMilestone") not in (None, ""):
+        incoming["CurrentProjectMilestone"] = incoming.get("CurrentPageMilestone")
+    if incoming.get("CurrentPageMilestone") in (None, "") and incoming.get("CurrentProjectMilestone") not in (None, ""):
+        incoming["CurrentPageMilestone"] = incoming.get("CurrentProjectMilestone")
     if incoming.get("CurrentBook") is not None and incoming.get("ProjectBook") in (None, ""):
         incoming["ProjectBook"] = incoming.get("CurrentBook")
     if incoming.get("CurrentVerse") is not None and incoming.get("ProjectVerse") in (None, ""):
@@ -254,6 +276,9 @@ def normalize_project_database_values(
 
     # Keep legacy fields synchronized while phase 1 introduces page-centric naming.
     normalized["CurrentPage"] = normalized["ProjectPageNumber"]
+    normalized["CurrentProjectPage"] = max(1, _coerce_int(normalized.get("CurrentProjectPage"), normalized["ProjectPageNumber"]))
+    normalized["CurrentPage"] = normalized["CurrentProjectPage"]
+    normalized["ProjectPageNumber"] = normalized["CurrentProjectPage"]
     normalized["CurrentBook"] = _coerce_int(normalized.get("ProjectBook"), normalized.get("CurrentBook", 1))
     normalized["CurrentVerse"] = _coerce_int(normalized.get("ProjectVerse"), normalized.get("CurrentVerse", 1))
     normalized["CurrentWord"] = _coerce_int(normalized.get("ProjectWord"), normalized.get("CurrentWord", 1))
@@ -262,6 +287,10 @@ def normalize_project_database_values(
         1,
         normalized["NumberColumns"],
     )
+    normalized["CurrentProjectMilestone"] = str(normalized.get("CurrentProjectMilestone") or "").strip()
+    normalized["CurrentPageMilestone"] = str(normalized.get("CurrentPageMilestone") or normalized["CurrentProjectMilestone"] or "").strip()
+    if not normalized["CurrentProjectMilestone"]:
+        normalized["CurrentProjectMilestone"] = normalized["CurrentPageMilestone"]
 
     current_language_was_blank = str(incoming.get("CurrentLanguage", "")).strip() == ""
     if current_language_was_blank or not normalized.get("CurrentLanguage"):

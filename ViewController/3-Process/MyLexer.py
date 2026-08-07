@@ -62,7 +62,7 @@ from Core.workflow_wizard_actions import (
 
 from queue import Queue
 from ext import mainfind
-from MyLexerUI import Ui_Boxer
+from MyLexerUI import Ui_Glypher
 from LocalFileDrop import LocalFileDropMixin
 from Training import Train as tr
 #from ProjectBrowserUI import Ui_Explorer
@@ -188,7 +188,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         super().__init__(*args, **kwargs)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
-        self.ui = Ui_Boxer()
+        self.ui = Ui_Glypher()
         self.ui.setupUi(self)
         install_workflow_wizard_menu_actions(
             self,

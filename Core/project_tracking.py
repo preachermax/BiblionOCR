@@ -520,6 +520,19 @@ class ProjectWorkflowTracker:
 
     def _normalize_project_context(self, context: Dict[str, object]) -> Dict[str, object]:
         normalized = dict(context or {})
+        if normalized.get("CurrentProjectPage") not in (None, ""):
+            normalized["CurrentPage"] = normalized.get("CurrentProjectPage")
+            normalized["ProjectPageNumber"] = normalized.get("CurrentProjectPage")
+        elif normalized.get("CurrentPage") not in (None, ""):
+            normalized["CurrentProjectPage"] = normalized.get("CurrentPage")
+        elif normalized.get("ProjectPageNumber") not in (None, ""):
+            normalized["CurrentProjectPage"] = normalized.get("ProjectPageNumber")
+
+        if normalized.get("CurrentProjectMilestone") not in (None, ""):
+            normalized["CurrentPageMilestone"] = normalized.get("CurrentProjectMilestone")
+        elif normalized.get("CurrentPageMilestone") not in (None, ""):
+            normalized["CurrentProjectMilestone"] = normalized.get("CurrentPageMilestone")
+
         if isinstance(normalized.get("ColumnName"), str):
             column_names = [part.strip() for part in normalized["ColumnName"].split(",") if part.strip()]
             if column_names:
