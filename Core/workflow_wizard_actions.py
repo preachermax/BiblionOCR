@@ -4,6 +4,7 @@ import sys
 from typing import Optional
 
 from PyQt5 import QtCore as qtc
+from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
 
@@ -74,6 +75,125 @@ MODULE_PAGE_WORKFLOW_MILESTONES = {
         "Export page output",
     ],
 }
+
+
+DEFAULT_MENU_SHORTCUTS = {
+    "undo": qtg.QKeySequence.Undo,
+    "redo": qtg.QKeySequence.Redo,
+    "cut": qtg.QKeySequence.Cut,
+    "copy": qtg.QKeySequence.Copy,
+    "paste": qtg.QKeySequence.Paste,
+    "help": qtg.QKeySequence.HelpContents,
+}
+
+
+class _DefaultContextMenuEventFilter(qtc.QObject):
+    """Attach consistent default context menus across module panels."""
+
+    def eventFilter(self, obj, event):
+        if event.type() != qtc.QEvent.ContextMenu:
+            return False
+        if not isinstance(obj, qtw.QWidget):
+            return False
+
+        menu = self._build_context_menu(obj)
+        if menu is None:
+            return False
+
+        menu.exec_(event.globalPos())
+        return True
+
+    def _build_context_menu(self, widget: qtw.QWidget) -> Optional[qtw.QMenu]:
+        menu = None
+        is_text_widget = isinstance(widget, (qtw.QLineEdit, qtw.QTextEdit, qtw.QPlainTextEdit, qtw.QTextBrowser))
+
+        if is_text_widget and hasattr(widget, "createStandardContextMenu"):
+            menu = widget.createStandardContextMenu()
+        else:
+            menu = qtw.QMenu(widget)
+
+        if menu is None:
+            return None
+
+        self._ensure_default_actions(widget, menu, is_text_widget)
+        return menu
+
+    def _ensure_default_actions(self, widget: qtw.QWidget, menu: qtw.QMenu, is_text_widget: bool) -> None:
+        action_map = {}
+        for action in menu.actions():
+            key = _canonical_action_name(action.text())
+            if key:
+                action_map[key] = action
+
+        for key, shortcut in DEFAULT_MENU_SHORTCUTS.items():
+            action = action_map.get(key)
+            if action is None:
+                action = qtw.QAction(key.title(), menu)
+                menu.addAction(action)
+
+            if action.shortcut().isEmpty():
+                action.setShortcut(shortcut)
+
+            if key in {"cut", "copy", "paste"} and not is_text_widget:
+                action.setEnabled(False)
+
+            if key == "undo":
+                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "undo"))
+            elif key == "redo":
+                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "redo"))
+            elif key == "cut":
+                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "cut"))
+            elif key == "copy":
+                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "copy"))
+            elif key == "paste":
+                action.triggered.connect(lambda _checked=False, w=widget: _invoke_widget_method(w, "paste"))
+            elif key == "help":
+                action.triggered.connect(lambda _checked=False, w=widget: _show_widget_help(w))
+
+
+def _canonical_action_name(raw_text: str) -> str:
+    text = (raw_text or "").replace("&", "").strip().lower()
+    if text in {"undo", "redo", "cut", "copy", "paste", "help"}:
+        return text
+    return ""
+
+
+def _invoke_widget_method(widget: qtw.QWidget, method_name: str) -> None:
+    method = getattr(widget, method_name, None)
+    if callable(method):
+        method()
+
+
+def _show_widget_help(widget: qtw.QWidget) -> None:
+    help_text = widget.toolTip() or widget.whatsThis() or "No panel-specific help text is available."
+    qtw.QMessageBox.information(widget, "Help", help_text)
+
+
+def _install_default_context_menu_behavior(window) -> None:
+    if window is None:
+        return
+
+    if getattr(window, "_default_context_menu_filter", None) is None:
+        filter_obj = _DefaultContextMenuEventFilter(window)
+        setattr(window, "_default_context_menu_filter", filter_obj)
+    else:
+        filter_obj = getattr(window, "_default_context_menu_filter")
+
+    window.installEventFilter(filter_obj)
+    for child in window.findChildren(qtw.QWidget):
+        child.installEventFilter(filter_obj)
+
+
+def _ensure_module_menu_shortcuts(window) -> None:
+    if window is None:
+        return
+
+    for action in window.findChildren(qtw.QAction):
+        canonical = _canonical_action_name(action.text())
+        if not canonical:
+            continue
+        if action.shortcut().isEmpty():
+            action.setShortcut(DEFAULT_MENU_SHORTCUTS[canonical])
 
 
 class ModulePageWorkflowWizardDialog(qtw.QDialog):
@@ -381,6 +501,9 @@ def install_workflow_wizard_menu_actions(
     include_project_wizard: Optional[bool] = None,
     include_page_wizard: bool = True,
 ) -> None:
+    _install_default_context_menu_behavior(window)
+    _ensure_module_menu_shortcuts(window)
+
     target_menu = _find_menu_from_window(window)
     if target_menu is None:
         return
