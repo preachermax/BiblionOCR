@@ -499,6 +499,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.ui.ImageTab.currentChanged.connect(self.on_tabChanged)
         self.project_status_controller = ProjectStatusController(
             self,
@@ -702,6 +703,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.latinpagesbox = get_setting('latinpagesbox', '')
         self.latinlinesbox = get_setting('latinlinesbox', '')
         self.latinlinesautosplit = get_setting('latinlinesautosplit', '')
+        if not self.font:
+            self.font = self.session_manager.get_active_project_font() or self.font
 
         self.ui.fontComboBox.setCurrentText(self.font)
         self.ui.fontSizeBox.setValue(int(self.fontsize) if str(self.fontsize).isdigit() else self.ui.fontSizeBox.value())
@@ -709,6 +712,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
         self.ui.LHlineEdit.setText(self.linespacing)
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyBoxer',
+            preferred_input_modules=('MyServer', 'MyPixler'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+
+        for attribute_name in ('imgdir', 'pages', 'greekpages'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def save_session_settings(self, **updates):
         self.session_manager.update('BoxerSession.json', updates)

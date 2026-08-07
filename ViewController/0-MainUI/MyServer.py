@@ -531,6 +531,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Session Restore
         # -------------------------
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.OpenChrReference()
 
         print('current book:', self.bookabbr)
@@ -1280,7 +1281,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
-        session = SessionManager().values('Session.json')
+        session = self.session_manager.values('Session.json')
 
         def get_setting(name: str, default=None):
             if default is None:
@@ -1336,6 +1337,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         self._apply_session_ui_state()
+
+    def _apply_closed_loop_defaults(self):
+        inbound_image_dir = self.session_manager.resolve_receiving_default_input(
+            'MyServer',
+            preferred_input_modules=('MyPixler', 'MyScanner', 'MyBoxer'),
+            language_hint='greek',
+        )
+        if inbound_image_dir:
+            os.makedirs(inbound_image_dir, exist_ok=True)
+            if not str(getattr(self, 'imgdir', '') or '').strip() or not os.path.isdir(str(self.imgdir)):
+                self.imgdir = inbound_image_dir
+
+        if not str(getattr(self, 'font', '') or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+        if self.font and hasattr(self, 'ui') and hasattr(self.ui, 'fontComboBox'):
+            self.ui.fontComboBox.setCurrentText(self.font)
 
     def _apply_session_ui_state(self):
         if not hasattr(self, 'ui'):
