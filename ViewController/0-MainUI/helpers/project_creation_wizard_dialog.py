@@ -12,6 +12,15 @@ from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 
 class ProjectCreationWizardDialog(qtw.QDialog):
     DEFAULT_TESSERACT_LANGUAGES = ["English", "Greek", "Hebrew", "Latin"]
+    RIS_EDITABLE_FIELDS = [
+        ("title", "Title"),
+        ("authors", "Authors (semicolon-separated)"),
+        ("publication_year", "Publication year"),
+        ("doi", "DOI"),
+        ("publisher", "Publisher"),
+        ("publication_place", "Publication place"),
+        ("source_identifier", "Source identifier"),
+    ]
 
     def __init__(self, projects_base_path, parent=None):
         super().__init__(parent)
@@ -28,6 +37,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "Step 5 of 5: Project folders",
         ]
         self.imported_provenance = {}
+        self._updating_ris_editor = False
+        self.ris_editor_inputs = {}
         self.folder_selection_pages = {}
         self.folder_selection_checkboxes = {}
         self.folder_selection_state = {"scriptural": set()}
@@ -101,6 +112,17 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.status_label = qtw.QLabel("")
         self.status_label.setWordWrap(True)
         ris_layout.addWidget(self.status_label)
+
+        self.ris_editor_group = qtw.QGroupBox("Imported provenance fields")
+        ris_editor_layout = qtw.QFormLayout(self.ris_editor_group)
+        for key, label in self.RIS_EDITABLE_FIELDS:
+            line_edit = qtw.QLineEdit()
+            line_edit.setPlaceholderText(f"Optional {label.lower()}")
+            line_edit.textChanged.connect(self._sync_ris_editor_to_imported_provenance)
+            self.ris_editor_inputs[key] = line_edit
+            ris_editor_layout.addRow(label, line_edit)
+        self.ris_editor_group.setVisible(False)
+        ris_layout.addWidget(self.ris_editor_group)
 
         ris_layout.addStretch(1)
         self.page_stack.addWidget(self._make_scroll_page(ris_page))
@@ -864,13 +886,20 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         self.ris_path_edit.setText(path)
         self._apply_ris_payload(payload)
-        self.status_label.setText("Provenance loaded. You can adjust any field before creating the project.")
-        self.page_stack.setCurrentIndex(1)
+        self.status_label.setText("Provenance loaded. Edit fields below or continue to project details.")
+        self.page_stack.setCurrentIndex(0)
         self._update_page_state()
 
     def _clear_ris(self):
         self.ris_path_edit.clear()
         self.imported_provenance = {}
+        self._updating_ris_editor = True
+        try:
+            for line_edit in self.ris_editor_inputs.values():
+                line_edit.clear()
+        finally:
+            self._updating_ris_editor = False
+        self.ris_editor_group.setVisible(False)
         self.status_label.setText("Imported provenance cleared. Continue with manual entry.")
 
     def _apply_ris_payload(self, payload):
@@ -907,6 +936,34 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.source_context_edit.setText(str(payload.get("source_context", "MyServer_UI")))
         if payload.get("creator") and not self.creator_edit.text().strip():
             self.creator_edit.setText(str(payload.get("creator", "")))
+
+        self._populate_ris_editor(payload)
+        self._refresh_review()
+
+    def _populate_ris_editor(self, payload):
+        self._updating_ris_editor = True
+        try:
+            for key, _label in self.RIS_EDITABLE_FIELDS:
+                value = payload.get(key, "")
+                if isinstance(value, list):
+                    value = "; ".join(str(item).strip() for item in value if str(item).strip())
+                self.ris_editor_inputs[key].setText(str(value).strip() if value is not None else "")
+        finally:
+            self._updating_ris_editor = False
+        self.ris_editor_group.setVisible(True)
+        self._sync_ris_editor_to_imported_provenance()
+
+    def _sync_ris_editor_to_imported_provenance(self):
+        if self._updating_ris_editor:
+            return
+
+        for key, _label in self.RIS_EDITABLE_FIELDS:
+            value = self.ris_editor_inputs[key].text().strip()
+            if value:
+                self.imported_provenance[key] = value
+            else:
+                self.imported_provenance.pop(key, None)
+
         self._refresh_review()
 
     def _load_provenance_file(self, path):
