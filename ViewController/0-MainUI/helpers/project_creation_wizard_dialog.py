@@ -215,7 +215,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         project_settings_layout.addWidget(project_settings_label)
 
         project_settings_help = qtw.QLabel(
-            "These values initialize project_metadata.sqlite. Recommended tools: DB Browser for SQLite and FontForge."
+            "These values initialize project_metadata.sqlite. Recommended tools: DB Browser for SQLite."
         )
         project_settings_help.setWordWrap(True)
         project_settings_layout.addWidget(project_settings_help)

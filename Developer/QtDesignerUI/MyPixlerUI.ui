@@ -1408,19 +1408,19 @@
     <string>Extracting and trace bitmap glyphs with GlyphTracer...</string>
    </property>
   </action>
-  <action name="actionFontForge">
+  <action name="actionProjectFont">
    <property name="icon">
     <iconset>
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>FontForge</string>
+    <string>Project Font</string>
    </property>
    <property name="toolTip">
-    <string>Edit current GlyphTracer sfd file in FontForge</string>
+    <string>Manage current project font assets</string>
    </property>
    <property name="statusTip">
-    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+    <string>Managing current project font assets...</string>
    </property>
   </action>
   <action name="actionPreferences">
@@ -1813,10 +1813,10 @@
   <action name="actionFont_Forge">
    <property name="icon">
     <iconset>
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>Font Forge</string>
+    <string>Project Font</string>
    </property>
   </action>
   <action name="actionRotateRefImg_180_deg_CW">
