@@ -117,6 +117,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path rootdir: {self.mod_rootdir}')
         print(f'OS Path realpath: {self.mod_realpath}')
@@ -214,7 +215,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Show the Main user interface
         self.ui.BoxDocument = qtg.QTextDocument(self.ui.GlyphBoxText)
-        font = SessionManager().build_workflow_font(
+        font = self.session_manager.build_workflow_font(
             "FROMVS [MAXR]",
             20,
             os.path.dirname(os.path.realpath(__file__)),
@@ -308,10 +309,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyGlypher',
-            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+            session_manager=self.session_manager,
         )
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
@@ -340,7 +342,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         active_project = SessionManager().get_active_project('Session.json')
         self.current_project_root = active_project.get('project_root', '')
         self.current_project_name = active_project.get('project_name', '')
-        session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('GlypherSession.json')
+        session = self.session_manager.values('GlypherSession.json')
 
         def get_setting(name: str, default=None):
             if default is None:
@@ -422,6 +424,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.greeklinesbox = get_setting('greeklinesbox', '')
         self.latinpages = get_setting('latinpages', '')
         self.latinlinesbox = get_setting('latinlinesbox', '')
+        if not self.font:
+            self.font = self.session_manager.get_active_project_font() or self.font
 
         def _join_project_path(value: str) -> str:
             if not value:
@@ -474,6 +478,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.ZoomComboBox.setCurrentText(self.zoom)
             if str(self.zoomslidervalue).isdigit():
                 self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyGlypher',
+            preferred_input_modules=('MyBoxer', 'MyServer'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+
+        for attribute_name in ('imgdir', 'sourceimgdir', 'glyphboxgreekimgdir', 'greekpages'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def get_workflow_settings(self):
 

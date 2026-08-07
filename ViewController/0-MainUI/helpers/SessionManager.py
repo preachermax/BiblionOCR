@@ -1,5 +1,6 @@
 import os
 import json
+import csv
 import platform
 import sqlite3
 import sys
@@ -514,3 +515,163 @@ class SessionManager:
                 continue
 
         return ""
+
+    def _module_handshakes_path(self, project_root: str) -> str:
+        candidates = (
+            os.path.join(project_root, "Model", "Project", "Data", "csv", "module_handshakes.csv"),
+            os.path.join(project_root, "Model", "Project", "Images", "MyServer", "Workflow", "module_handshakes.csv"),
+        )
+        for path in candidates:
+            if os.path.exists(path):
+                return path
+        return ""
+
+    def _read_module_handshake_rows(self, project_root: str) -> List[Dict[str, str]]:
+        csv_path = self._module_handshakes_path(project_root)
+        if not csv_path:
+            return []
+
+        rows: List[Dict[str, str]] = []
+        try:
+            with open(csv_path, "r", encoding="utf-8", newline="") as handle:
+                first_line = handle.readline().strip()
+                handle.seek(0)
+
+                if "," in first_line:
+                    reader = csv.DictReader(handle)
+                    for row in reader:
+                        if isinstance(row, dict):
+                            rows.append({str(k): str(v or "") for k, v in row.items() if k})
+                    return rows
+
+                for index, raw_line in enumerate(handle):
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    if index == 0 and line.lower().startswith("milestonename "):
+                        continue
+
+                    parts = line.split()
+                    if len(parts) < 8:
+                        continue
+
+                    rows.append(
+                        {
+                            "MilestoneName": parts[0],
+                            "UI_Action": parts[1],
+                            "Override": parts[2],
+                            "Language": parts[3],
+                            "InputPath": parts[4],
+                            "InputModule": parts[5],
+                            "OutputModule": parts[6],
+                            "OutputPath": parts[7],
+                        }
+                    )
+        except OSError:
+            return []
+
+        return rows
+
+    @staticmethod
+    def _to_absolute_project_path(project_root: str, path_value: str) -> str:
+        normalized = str(path_value or "").strip()
+        if not normalized:
+            return ""
+        if os.path.isabs(normalized):
+            return os.path.normpath(normalized)
+        return os.path.normpath(os.path.join(project_root, normalized.lstrip("/\\")))
+
+    @staticmethod
+    def _workflow_to_complete_path(path_value: str) -> str:
+        normalized = str(path_value or "").strip()
+        if not normalized:
+            return ""
+
+        replacements = (
+            ("/Workflow/", "/Complete/"),
+            ("\\Workflow\\", "\\Complete\\"),
+            ("/workflow/", "/complete/"),
+            ("\\workflow\\", "\\complete\\"),
+        )
+        for old, new in replacements:
+            if old in normalized:
+                return normalized.replace(old, new)
+        return normalized
+
+    def resolve_receiving_default_input(
+        self,
+        receiving_module: str,
+        preferred_input_modules: Optional[Iterable[str]] = None,
+        language_hint: str = "greek",
+        *,
+        prefer_complete: bool = True,
+        filename: str = "Session.json",
+    ) -> str:
+        module_name = str(receiving_module or "").strip().lower()
+        if not module_name:
+            return ""
+
+        project_root = self.get_active_project_root(filename)
+        if not project_root:
+            project_root = os.path.normpath(os.path.join(self.base_dir, "..", "..", "..", ".."))
+
+        rows = self._read_module_handshake_rows(project_root)
+        if not rows:
+            return ""
+
+        candidates = [
+            row for row in rows if str(row.get("OutputModule", "")).strip().lower() == module_name
+        ]
+        if not candidates:
+            return ""
+
+        normalized_language = str(language_hint or "").strip().lower()
+        if normalized_language:
+            language_filtered = [
+                row for row in candidates if str(row.get("Language", "")).strip().lower() == normalized_language
+            ]
+            if language_filtered:
+                candidates = language_filtered
+
+        prioritized: List[Dict[str, str]] = []
+        used_ids = set()
+        preferred_modules = [str(item).strip().lower() for item in (preferred_input_modules or ()) if str(item).strip()]
+        if preferred_modules:
+            for preferred in preferred_modules:
+                for row in candidates:
+                    if str(row.get("InputModule", "")).strip().lower() != preferred:
+                        continue
+                    row_key = id(row)
+                    if row_key in used_ids:
+                        continue
+                    prioritized.append(row)
+                    used_ids.add(row_key)
+
+        for row in candidates:
+            row_key = id(row)
+            if row_key in used_ids:
+                continue
+            prioritized.append(row)
+            used_ids.add(row_key)
+
+        fallback_path = ""
+        for row in prioritized:
+            input_path = str(row.get("InputPath", "")).strip()
+            if not input_path:
+                continue
+
+            path_candidates = []
+            if prefer_complete:
+                path_candidates.append(self._workflow_to_complete_path(input_path))
+            path_candidates.append(input_path)
+
+            for candidate_path in path_candidates:
+                absolute_candidate = self._to_absolute_project_path(project_root, candidate_path)
+                if not absolute_candidate:
+                    continue
+                if not fallback_path:
+                    fallback_path = absolute_candidate
+                if os.path.isdir(absolute_candidate):
+                    return absolute_candidate
+
+        return fallback_path

@@ -131,6 +131,13 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.workspace.ensure_directories()
         self.installation = discover_tesseract_installation()
         self.session_manager = SessionManager(os.path.join(self.projecthome, "Model", "Project", "Data", "json"))
+        self.inbound_default_source = self.session_manager.resolve_receiving_default_input(
+            "MyTrainer",
+            preferred_input_modules=("MyGlypher", "MyReader", "MyLexer", "MyVersifier"),
+            language_hint="greek",
+        )
+        if self.inbound_default_source:
+            os.makedirs(self.inbound_default_source, exist_ok=True)
         self.training_process = qtc.QProcess(self)
         self.training_process.setProcessChannelMode(qtc.QProcess.MergedChannels)
         self.training_process.readyReadStandardOutput.connect(self._consume_training_output)
@@ -217,6 +224,8 @@ class Ui_MainWindow(qtw.QMainWindow):
             environment["TESSERACT_BIN"] = self.installation.binary_path
             if self.installation.tessdata_dir:
                 environment["TESSDATA_PREFIX"] = self.installation.tessdata_dir
+        if self.inbound_default_source:
+            environment["BIBLION_TRAINING_INPUT_SOURCE"] = self.inbound_default_source
         return environment
 
     def _training_script_path(self) -> Path:
@@ -224,6 +233,8 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def _training_summary_text(self) -> str:
         lines = [self._training_installation_summary()]
+        if self.inbound_default_source:
+            lines.append(f"Inbound source default: {self.inbound_default_source}")
         lines.append(f"Ground truth: {self.workspace.ground_truth_root}")
         lines.append(f"Wordlists: {self.workspace.wordlist_root}")
         lines.append(f"Configs: {self.workspace.config_root}")
