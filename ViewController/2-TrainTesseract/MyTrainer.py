@@ -33,6 +33,7 @@ from SessionManager import SessionManager
 from SqliteHelper import *
 from ext import *
 from ext import reffind, versefind, versifiercount
+import ChrReference as chrref
 from project_status_controller import ProjectStatusController
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
@@ -133,7 +134,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.session_manager = SessionManager(os.path.join(self.projecthome, "Model", "Project", "Data", "json"))
         self.inbound_default_source = self.session_manager.resolve_receiving_default_input(
             "MyTrainer",
-            preferred_input_modules=("MyGlypher", "MyReader", "MyLexer", "MyVersifier"),
+            preferred_input_modules=("MyGlypher", "MyReader", "MyResolver", "MyVersifier"),
             language_hint="greek",
         )
         if self.inbound_default_source:
@@ -146,17 +147,11 @@ class Ui_MainWindow(qtw.QMainWindow):
 
         self._setup_training_pages()
 
-        chr_ref_candidates = (
-            os.path.join(self.projecthome, "ViewController", "3-ConductOCR", "FROMVS ChrReference.txt"),
-            os.path.join(self.projecthome, "ViewController", "Application", "3-ConductOCR", "FROMVS ChrReference.txt"),
-        )
-        chr_ref_path = next((path for path in chr_ref_candidates if os.path.exists(path)), "")
-        if chr_ref_path:
-            with open(chr_ref_path, encoding="utf-8") as handle:
-                chr_ref_text = handle.read()
-            self.ui.ChrRefplainTextEdit.setPlainText(chr_ref_text)
-
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
+        self._apply_project_font_defaults()
+        self.save_session_settings()
+        self.OpenChrReference()
         self.project_status_controller = ProjectStatusController(
             self,
             "MyTrainer",
@@ -185,6 +180,10 @@ class Ui_MainWindow(qtw.QMainWindow):
         self._update_page_title()
         installation_summary = self._training_installation_summary()
         self.ui.trainingSummaryLabel.setText(installation_summary)
+
+    def OpenChrReference(self) -> None:
+        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain.show()
 
     def _update_page_title(self) -> None:
         if self.ui.page_stack.currentIndex() == 0:
@@ -245,13 +244,41 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def get_session_settings(self):
         print("loading session")
-        active_project = SessionManager().get_active_project("Session.json")
+        active_project = self.session_manager.get_active_project("Session.json")
         self.current_project_root = active_project.get("project_root", "")
         self.current_project_name = active_project.get("project_name", "")
-        session = self.session_manager.values("VersifierSession.json")
+        session = self.session_manager.values("Session.json")
         for setting, value in session.items():
             if setting.startswith("self."):
                 setattr(self, setting[5:], value)
+
+    def _apply_closed_loop_defaults(self) -> None:
+        if not self.inbound_default_source:
+            self.inbound_default_source = self.session_manager.resolve_receiving_default_input(
+                "MyTrainer",
+                preferred_input_modules=("MyGlypher", "MyReader", "MyResolver", "MyVersifier"),
+                language_hint="greek",
+            )
+        if self.inbound_default_source:
+            os.makedirs(self.inbound_default_source, exist_ok=True)
+
+    def _apply_project_font_defaults(self) -> None:
+        point_size = 8
+        raw_size = str(getattr(self, "fontsize", "") or "").strip()
+        if raw_size.isdigit():
+            point_size = int(raw_size)
+
+        workflow_font = self.session_manager.build_workflow_font(
+            "FROMVS [MAXR]",
+            point_size,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
+        for widget_name in ("RefText", "VerseText", "OutputText"):
+            widget = getattr(self.ui, widget_name, None)
+            if widget is not None:
+                widget.setFont(workflow_font)
+        self.font = workflow_font.family()
+        self.fontsize = str(workflow_font.pointSize())
 
     def get_workflow_settings(self):
         workflow_path = os.path.join(self.projecthome, "Model", "SQLite", "json", "Workflow.json")
@@ -260,8 +287,16 @@ class Ui_MainWindow(qtw.QMainWindow):
         for sequence in data:
             print(sequence["Sequence"], sequence["DialogUi"], sequence["DefaultSource"])
 
-    def save_session_settings(self):
-        print("Saving Trainer session settings")
+    def save_session_settings(self, **updates):
+        payload = {
+            "self.font": str(getattr(self, "font", "") or ""),
+            "self.fontsize": str(getattr(self, "fontsize", "") or ""),
+            "self.inbound_default_source": str(getattr(self, "inbound_default_source", "") or ""),
+            "self.current_project_root": str(getattr(self, "current_project_root", "") or ""),
+            "self.current_project_name": str(getattr(self, "current_project_name", "") or ""),
+        }
+        payload.update(updates)
+        self.session_manager.update("Session.json", payload)
 
     def refresh_training_progress(self):
         self.workspace.ensure_directories()

@@ -2138,8 +2138,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         pil_im = Image.fromarray(img)
 
         draw = ImageDraw.Draw(pil_im)
-        # use a truetype font
-        font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8)
+        # Resolve the project font from the active runtime tree (legacy path fallback included).
+        font_path = self.session_manager.resolve_font_path(
+            "FROMVS [MAXR]",
+            os.path.dirname(os.path.realpath(__file__)),
+        ) or os.path.join(self.projecthome, "ViewController", "0-MainUI", "fonts", "FROMVS.ttf")
+        font = ImageFont.truetype(font_path, 8)
         #font = ImageFont.truetype("FROMVS.ttf", 20)
 
         # Draw the text

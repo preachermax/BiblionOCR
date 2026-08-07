@@ -336,7 +336,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
 
-
     def get_session_settings(self):
         print("loading session")
         active_project = SessionManager().get_active_project('Session.json')

@@ -13,6 +13,7 @@ PROJECT_DATABASE_EXPORT_FILENAME = "project_metadata.json"
 PROJECT_DATABASE_EXPORT_CSV_FILENAME = "project_metadata.csv"
 PROJECT_DATABASE_TABLE = "project_metadata"
 DEFAULT_SCRIPTURE_COLUMN_LANGUAGES = ["english", "greek", "hebrew", "latin"]
+DEFAULT_PROJECT_FONT = "FROMVS.ttf"
 
 
 @dataclass(frozen=True)
@@ -158,7 +159,7 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "ProjectFont",
             "Project Font",
             "text",
-            default="",
+            default=DEFAULT_PROJECT_FONT,
             help_text="Primary project font family used during transcription and rendering.",
         ),
         ProjectFieldDefinition("Notes", "Notes", "text", default=""),
@@ -231,6 +232,8 @@ def normalize_project_database_values(
         incoming["ProjectWord"] = incoming.get("CurrentWord")
     if incoming.get("project_font") and incoming.get("ProjectFont") in (None, ""):
         incoming["ProjectFont"] = incoming.get("project_font")
+    if incoming.get("ProjectFont") in (None, ""):
+        incoming["ProjectFont"] = DEFAULT_PROJECT_FONT
 
     normalized: Dict[str, Any] = {}
 
@@ -326,6 +329,9 @@ def normalize_project_database_values(
     if not project_database.lower().endswith(".db"):
         project_database = f"{project_database}.db"
     normalized["ProjectDatabase"] = project_database
+
+    if not str(normalized.get("ProjectFont") or "").strip():
+        normalized["ProjectFont"] = DEFAULT_PROJECT_FONT
 
     return normalized
 

@@ -3,6 +3,8 @@ import json
 import csv
 import platform
 import sqlite3
+import shutil
+import subprocess
 import sys
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union
@@ -94,6 +96,8 @@ def build_runtime_paths(
 
 
 class SessionManager:
+    DEFAULT_PROJECT_FONT = 'FROMVS.ttf'
+
     @staticmethod
     def runtime_paths_for(
         module_file: Optional[str] = None,
@@ -464,6 +468,58 @@ class SessionManager:
 
         return font_name
 
+    @staticmethod
+    def _is_user_font_dir(path: str) -> bool:
+        normalized = os.path.normpath(path)
+        home_dir = os.path.normpath(os.path.expanduser('~'))
+        return normalized.startswith(home_dir)
+
+    def install_font_file(self, font_file_path: str, *, prefer_user_scope: bool = True) -> str:
+        source_path = os.path.normpath(str(font_file_path or '').strip())
+        if not source_path or not os.path.isfile(source_path):
+            return ''
+
+        install_dirs = self.default_font_install_dirs()
+        if prefer_user_scope:
+            install_dirs = sorted(install_dirs, key=lambda path: 0 if self._is_user_font_dir(path) else 1)
+
+        for font_dir in install_dirs:
+            try:
+                os.makedirs(font_dir, exist_ok=True)
+                destination = os.path.normpath(os.path.join(font_dir, os.path.basename(source_path)))
+                if os.path.exists(destination):
+                    return destination
+                shutil.copy2(source_path, destination)
+                self._refresh_font_cache_for_dir(font_dir)
+                return destination
+            except OSError:
+                continue
+
+        return ''
+
+    def ensure_project_font_installed(
+        self,
+        font_name: str,
+        module_dir: Optional[str] = None,
+        *,
+        prefer_user_scope: bool = True,
+    ) -> str:
+        font_path = self.resolve_font_path(font_name, module_dir)
+        if not font_path:
+            return ''
+        return self.install_font_file(font_path, prefer_user_scope=prefer_user_scope)
+
+    @staticmethod
+    def _refresh_font_cache_for_dir(font_dir: str) -> None:
+        if platform.system().lower() != 'linux':
+            return
+        if not shutil.which('fc-cache'):
+            return
+        try:
+            subprocess.run(['fc-cache', '-f', font_dir], check=False, capture_output=True, text=True)
+        except OSError:
+            return
+
     def build_workflow_font(self, font_name: str, point_size: int = 20, module_dir: Optional[str] = None) -> qtg.QFont:
         preferred_font = self.get_active_project_font() or str(font_name or "").strip()
         if not preferred_font:
@@ -477,7 +533,7 @@ class SessionManager:
     def get_active_project_font(self, filename: str = 'Session.json') -> str:
         active_root = self.get_active_project_root(filename)
         if not active_root:
-            return ""
+            return self.DEFAULT_PROJECT_FONT
 
         sqlite_candidates = (
             os.path.join(active_root, "Model", "Project", "Data", "sqlite", "project_metadata.sqlite"),
@@ -514,7 +570,7 @@ class SessionManager:
             except (OSError, ValueError, TypeError):
                 continue
 
-        return ""
+        return self.DEFAULT_PROJECT_FONT
 
     def _module_handshakes_path(self, project_root: str) -> str:
         candidates = (
