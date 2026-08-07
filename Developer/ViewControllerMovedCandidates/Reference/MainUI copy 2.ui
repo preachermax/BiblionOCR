@@ -600,7 +600,7 @@
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
-     <string>FontForge</string>
+     <string>Project Font</string>
     </property>
     <widget class="QMenu" name="menuIndex_Images">
      <property name="title">
@@ -610,7 +610,7 @@
     </widget>
     <addaction name="menuIndex_Images"/>
     <addaction name="actionExtract_Glyphs"/>
-    <addaction name="actionFontForge"/>
+    <addaction name="actionProjectFont"/>
    </widget>
    <widget class="QMenu" name="menuGround_Truth_2">
     <property name="title">
@@ -1258,9 +1258,9 @@
     <string>Line tif to bmp</string>
    </property>
   </action>
-  <action name="actionFontForge">
+  <action name="actionProjectFont">
    <property name="text">
-    <string>FontForge</string>
+    <string>Project Font</string>
    </property>
   </action>
   <action name="actionPrefernces">

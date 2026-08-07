@@ -98,14 +98,13 @@ Optional but useful:
 
 ```bash
 sudo apt install -y \
-  fontforge \
   gimp \
   libreoffice \
   simple-scan
 ```
 
 Notes:
-- `fontforge` and `gimp` are the two optional third-party open-source desktop tools currently expected by this repo's setup guidance
+- `gimp` is an optional third-party open-source desktop tool currently expected by this repo's setup guidance
 - `sane-airscan` is useful for AirScan / eSCL network-capable devices
 - on Jetson USB-only testing, disabling `airscan` requires moving its file out of `/etc/sane.d/dll.d/`; renaming it to `airscan.disabled` inside that directory does not disable it
 
@@ -116,7 +115,6 @@ sudo apt install -y \
   python3-sane \
   python3-scapy \
   python3-zeroconf \
-  python3-fontforge \
   python3-enchant \
   python3-reportlab \
   enchant-2
@@ -125,7 +123,6 @@ sudo apt install -y \
 Why these matter:
 - `python3-sane`: Python bindings for scanner access
 - `python3-scapy` and `python3-zeroconf`: network scanner discovery and related tooling
-- `python3-fontforge`: font-editing automation used by glyph/font workflows
 - `python3-enchant` and `enchant-2`: spelling/dictionary bindings used by text tooling
 - `python3-reportlab`: PDF/report generation support used by auxiliary workflows
 
@@ -186,7 +183,6 @@ Useful post-install import probe:
 ```bash
 python3 - <<'PY'
 import enchant
-import fontforge
 import reportlab
 import sane
 import scapy

@@ -53,7 +53,6 @@ OCR_PACKAGES=(
   libsane1
   sane-airscan
   imagemagick
-  fontforge
   gimp
   enchant-2
 )
@@ -69,7 +68,6 @@ PRINT_PACKAGES=(
 
 PYTHON_RUNTIME_PACKAGES=(
   python3-sane
-  python3-fontforge
   python3-opencv
   python3-numpy
   python3-pandas
@@ -236,7 +234,6 @@ modules = [
     "PyQt5",
     "cv2",
     "enchant",
-    "fontforge",
     "imutils",
     "numpy",
     "pandas",
