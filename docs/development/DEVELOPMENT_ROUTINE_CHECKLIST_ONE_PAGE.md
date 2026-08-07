@@ -25,6 +25,9 @@ git status --short
 1. Keep edits narrow and task-specific.
 2. Apply policy in shared control points first.
 3. Avoid unrelated refactors while fixing a scoped issue.
+4. Preserve line endings/whitespace style to avoid accidental large-file rewrites.
+5. If whitespace normalization is required, isolate it to a dedicated commit and state why.
+6. If the user excludes a module/file from scope, do not include it in default/handoff priority lists.
 
 ## C) UI Lock-Step Rule
 
@@ -120,6 +123,7 @@ python3 -m py_compile <file1.py> <file2.py> ...
 3. Use narrow commit message describing behavior change.
 4. Re-check staged scope before commit.
 5. Do not commit until automated and manual test gates pass.
+6. Compare line-change volume to intended behavior change; if disproportionate, investigate before committing.
 
 ## J) Sync and Post-Check
 
