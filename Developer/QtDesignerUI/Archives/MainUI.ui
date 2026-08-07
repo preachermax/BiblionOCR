@@ -960,7 +960,7 @@
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
-     <string>FontForge</string>
+     <string>Project Font</string>
     </property>
     <widget class="QMenu" name="menuIndex_Images">
      <property name="title">
@@ -970,7 +970,7 @@
     </widget>
     <addaction name="menuIndex_Images"/>
     <addaction name="actionExtract_Glyphs"/>
-    <addaction name="actionFontForge"/>
+    <addaction name="actionProjectFont"/>
    </widget>
    <widget class="QMenu" name="menuGround_Truth_2">
     <property name="title">
@@ -1063,7 +1063,7 @@
    <addaction name="separator"/>
    <addaction name="actionLine_tif_to_bmp"/>
    <addaction name="actionExtract_Glyphs"/>
-   <addaction name="actionFontForge"/>
+   <addaction name="actionProjectFont"/>
    <addaction name="actionLibreOffice_Calc"/>
    <addaction name="actionLibreOffice_Writer"/>
    <addaction name="separator"/>
@@ -1701,13 +1701,13 @@
     <string>Line tif to bmp</string>
    </property>
   </action>
-  <action name="actionFontForge">
+  <action name="actionProjectFont">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>FontForge</string>
+    <string>Project Font</string>
    </property>
   </action>
   <action name="actionPrefernces">
