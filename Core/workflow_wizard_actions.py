@@ -91,11 +91,21 @@ class ModulePageWorkflowWizardDialog(qtw.QDialog):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(860, 520)
+        self.setSizeGripEnabled(True)
         self.stage_plan = stage_plan
         self.run_stage_callback = run_stage_callback
         self.run_all_callback = run_all_callback
         self._build_ui(intro_text)
         self._populate_stage_pages()
+
+    def _make_scroll_page(self, content_widget: qtw.QWidget) -> qtw.QScrollArea:
+        scroll = qtw.QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(qtw.QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(qtc.Qt.ScrollBarAsNeeded)
+        scroll.setVerticalScrollBarPolicy(qtc.Qt.ScrollBarAsNeeded)
+        scroll.setWidget(content_widget)
+        return scroll
 
     def _build_ui(self, intro_text: str) -> None:
         root_layout = qtw.QVBoxLayout(self)
@@ -166,7 +176,7 @@ class ModulePageWorkflowWizardDialog(qtw.QDialog):
             )
             layout.addWidget(run_stage_button)
 
-            self.stage_stack.addWidget(page)
+            self.stage_stack.addWidget(self._make_scroll_page(page))
 
         if self.stage_nav.count() > 0:
             self.stage_nav.setCurrentRow(0)

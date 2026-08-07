@@ -19,6 +19,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.setWindowTitle("New Project")
         self.setModal(True)
         self.resize(640, 420)
+        self.setSizeGripEnabled(True)
         self._page_titles = [
             "Step 1 of 5: RIS import",
             "Step 2 of 5: Project details",
@@ -42,6 +43,15 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.handshake_table = None
         self._build_ui()
         self._update_page_state()
+
+    def _make_scroll_page(self, content_widget):
+        scroll = qtw.QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(qtw.QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(qtc.Qt.ScrollBarAsNeeded)
+        scroll.setVerticalScrollBarPolicy(qtc.Qt.ScrollBarAsNeeded)
+        scroll.setWidget(content_widget)
+        return scroll
 
     def _build_ui(self):
         layout = qtw.QVBoxLayout(self)
@@ -93,7 +103,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         ris_layout.addWidget(self.status_label)
 
         ris_layout.addStretch(1)
-        self.page_stack.addWidget(ris_page)
+        self.page_stack.addWidget(self._make_scroll_page(ris_page))
 
         details_page = qtw.QWidget()
         details_layout = qtw.QVBoxLayout(details_page)
@@ -195,7 +205,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         details_layout.addWidget(self.details_status_label)
 
         details_layout.addStretch(1)
-        self.page_stack.addWidget(details_page)
+        self.page_stack.addWidget(self._make_scroll_page(details_page))
 
         project_settings_page = qtw.QWidget()
         project_settings_layout = qtw.QVBoxLayout(project_settings_page)
@@ -221,7 +231,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.project_db_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
         project_settings_layout.addWidget(self.project_db_table, 1)
 
-        self.page_stack.addWidget(project_settings_page)
+        self.page_stack.addWidget(self._make_scroll_page(project_settings_page))
         self._load_project_database_defaults()
 
         milestones_page = qtw.QWidget()
@@ -273,7 +283,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         milestones_tabs.addTab(handshake_tab, "Module Handshakes")
 
         milestones_layout.addWidget(milestones_tabs, 1)
-        self.page_stack.addWidget(milestones_page)
+        self.page_stack.addWidget(self._make_scroll_page(milestones_page))
         self._load_milestones_defaults()
         self._load_handshake_rows()
 
@@ -295,7 +305,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         self._build_folder_selection_page("scriptural", "Scriptural project folders")
 
-        self.page_stack.addWidget(folder_selection_page)
+        self.page_stack.addWidget(self._make_scroll_page(folder_selection_page))
 
         button_row = qtw.QHBoxLayout()
         self.back_button = qtw.QPushButton("Back")

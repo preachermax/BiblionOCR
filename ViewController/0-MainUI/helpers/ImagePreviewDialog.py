@@ -277,6 +277,27 @@ class ImagePreviewDialog(qtw.QDialog):
         self.controls_layout.addWidget(slider)
         self.params[name] = default
 
+    def add_choice(self, name, options, default):
+        label = qtw.QLabel("{}:".format(name))
+        combo = qtw.QComboBox()
+        combo.addItems([str(option) for option in options])
+
+        default_text = str(default)
+        if default_text and default_text in [combo.itemText(i) for i in range(combo.count())]:
+            combo.setCurrentText(default_text)
+        elif combo.count() > 0:
+            combo.setCurrentIndex(0)
+
+        def on_change(value):
+            self.params[name] = value
+            self._schedule_preview_update()
+
+        combo.currentTextChanged.connect(on_change)
+        self.controls_layout.addWidget(label)
+        self.controls_layout.addWidget(combo)
+        if combo.currentText():
+            self.params[name] = combo.currentText()
+
     def eventFilter(self, obj, event):
         handle_name = None
         for name, handle in self._crop_handles.items():

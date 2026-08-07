@@ -1,6 +1,7 @@
 import os
 import json
 import platform
+import sqlite3
 import sys
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union
@@ -463,7 +464,53 @@ class SessionManager:
         return font_name
 
     def build_workflow_font(self, font_name: str, point_size: int = 20, module_dir: Optional[str] = None) -> qtg.QFont:
-        font_family = self.register_application_font(font_name, module_dir)
+        preferred_font = self.get_active_project_font() or str(font_name or "").strip()
+        if not preferred_font:
+            preferred_font = "FROMVS [MAXR]"
+
+        font_family = self.register_application_font(preferred_font, module_dir)
         font = qtg.QFont(font_family)
         font.setPointSize(point_size)
         return font
+
+    def get_active_project_font(self, filename: str = 'Session.json') -> str:
+        active_root = self.get_active_project_root(filename)
+        if not active_root:
+            return ""
+
+        sqlite_candidates = (
+            os.path.join(active_root, "Model", "Project", "Data", "sqlite", "project_metadata.sqlite"),
+            os.path.join(active_root, "Model", "Project", "Data", "SQLite", "project_metadata.sqlite"),
+            os.path.join(active_root, "project_metadata.sqlite"),
+        )
+
+        for sqlite_path in sqlite_candidates:
+            if not os.path.exists(sqlite_path):
+                continue
+            try:
+                with sqlite3.connect(sqlite_path) as conn:
+                    cursor = conn.execute("SELECT ProjectFont FROM project_metadata LIMIT 1")
+                    row = cursor.fetchone()
+                    if row and row[0]:
+                        return str(row[0]).strip()
+            except sqlite3.Error:
+                continue
+
+        json_candidates = (
+            os.path.join(active_root, "Model", "Project", "Data", "json", "project_metadata.json"),
+            os.path.join(active_root, "project_metadata.json"),
+        )
+        for json_path in json_candidates:
+            if not os.path.exists(json_path):
+                continue
+            try:
+                with open(json_path, "r", encoding="utf-8") as handle:
+                    payload = json.load(handle)
+                if isinstance(payload, dict):
+                    value = payload.get("ProjectFont")
+                    if value:
+                        return str(value).strip()
+            except (OSError, ValueError, TypeError):
+                continue
+
+        return ""

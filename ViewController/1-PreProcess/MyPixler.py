@@ -337,7 +337,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         }
         self.fill_background_color = qtg.QColor("white")
         self.fill_foreground_color = qtg.QColor("black")
-        self.eraser_tip_size = 24
+        self.eraser_tip_diameter = 24
+        self.eraser_tip_shape = "circle"
+        self._last_crop_origin = qtc.QPoint(0, 0)
         self.rubberBand = None
         self.return_to_server_button = None
         self.crop_prompt_dialog = None
@@ -1193,10 +1195,14 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         return page_number
 
     def _move_workflow_entries(self, workflow_dir, complete_dir):
-        if not workflow_dir or not complete_dir or not os.path.isdir(workflow_dir):
+        if not workflow_dir or not complete_dir:
             return
 
+        os.makedirs(workflow_dir, exist_ok=True)
         os.makedirs(complete_dir, exist_ok=True)
+
+        self._convert_workflow_png_to_indexed_tiff(workflow_dir)
+
         for item in os.listdir(workflow_dir):
             source = os.path.join(workflow_dir, item)
             destination = os.path.join(complete_dir, item)
@@ -1206,6 +1212,27 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 else:
                     os.remove(destination)
             shutil.move(source, destination)
+
+    def _convert_workflow_png_to_indexed_tiff(self, workflow_dir):
+        if not os.path.isdir(workflow_dir):
+            return
+
+        for item in os.listdir(workflow_dir):
+            source = os.path.join(workflow_dir, item)
+            if not os.path.isfile(source):
+                continue
+            stem, ext = os.path.splitext(item)
+            if ext.lower() != ".png":
+                continue
+
+            target = os.path.join(workflow_dir, stem + ".tif")
+            try:
+                with pilimg.open(source) as img:
+                    indexed = img.convert("L").convert("P", palette=pilimg.ADAPTIVE, colors=256)
+                    indexed.save(target, "TIFF", dpi=(300, 300), compression="tiff_lzw")
+                os.remove(source)
+            except Exception as exc:
+                print(f"[PIXLER] Could not convert intermediary PNG to TIFF: {source} ({exc})")
 
     def _refresh_project_status(self, candidate_path=None):
         snapshot = self.workflow_tracker.snapshot(
@@ -3614,16 +3641,41 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         buffer.open(qtc.QBuffer.ReadWrite)
         qimage.save(buffer, "PNG")
         PILimage = pilimg.open(io.BytesIO(buffer.data()))
+
+        # Workflow handoffs standardize on 300-DPI indexed TIFF outputs.
         dpi_x = 300
         dpi_y = 300
-        if qimage.dotsPerMeterX() > 0:
-            dpi_x = qimage.dotsPerMeterX() * 0.0254
-        if qimage.dotsPerMeterY() > 0:
-            dpi_y = qimage.dotsPerMeterY() * 0.0254
         print("Generating: " + outfile)
         if self._source_prefers_bilevel_output():
             PILimage = PILimage.convert("1")
+        else:
+            PILimage = PILimage.convert("L").convert("P", palette=pilimg.ADAPTIVE, colors=256)
         PILimage.save(outfile, "TIFF", dpi=(dpi_x, dpi_y), compression="tiff_lzw")
+
+    def _normalize_return_geometry(self, qimage):
+        if qimage is None or qimage.isNull():
+            return qtg.QImage()
+
+        if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
+            return qimage
+
+        source = self.refimgqimage
+        if qimage.width() == source.width() and qimage.height() == source.height():
+            return qimage
+
+        canvas = qtg.QImage(source)
+        painter = qtg.QPainter(canvas)
+        fill_color = self._coerce_fill_color(None, source)
+        painter.fillRect(canvas.rect(), fill_color)
+
+        origin = getattr(self, "_last_crop_origin", qtc.QPoint(0, 0)) or qtc.QPoint(0, 0)
+        draw_x = max(0, min(int(origin.x()), max(0, canvas.width() - qimage.width())))
+        draw_y = max(0, min(int(origin.y()), max(0, canvas.height() - qimage.height())))
+        painter.drawImage(draw_x, draw_y, qimage)
+        painter.end()
+
+        self._copy_qimage_resolution(source, canvas)
+        return canvas
 
     def returnCropToMyServer(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
@@ -3638,6 +3690,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print("[CROP] No crop result available to return")
             return
 
+        payload = self._normalize_return_geometry(payload)
         self._save_qimage_as_tiff(payload, self.subprocess_return_path)
         print(f"[CROP] Returned cropped result to MyServer: {self.subprocess_return_path}")
 
@@ -3710,10 +3763,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_drawing_active = False
 
     def clip(self):
-        print("[CLIP] Opening inverse-selection preview")
+        print("[CUT] Opening cut preview")
         return self._launch_preview_tool(
             self.clip_processor,
-            title="Clip Preview",
+            title="Cut Preview",
             params={"background_color": self._background_fill_color_name(self.refimgqimage)},
             enable_crop=True,
         )
@@ -3728,7 +3781,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.refimgqimage,
             self.erase_processor,
             {
-                "brush_radius": int(self.eraser_tip_size),
+                "tip_diameter_px": int(self.eraser_tip_diameter),
+                "tip_shape": str(self.eraser_tip_shape or "circle"),
                 "background_color": self._background_fill_color_name(self.refimgqimage),
                 "erase_points": [],
             },
@@ -3738,14 +3792,30 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             preview_max_dimension=1600,
         )
         dialog.setWindowTitle("Erase Preview")
-        dialog.add_slider("brush_radius", 1, 200, int(self.eraser_tip_size))
+        max_tip = self._max_eraser_tip_diameter()
+        dialog.add_slider("tip_diameter_px", 1, max_tip, min(int(self.eraser_tip_diameter), max_tip))
+        dialog.add_choice("tip_shape", ["circle", "square", "diamond"], str(self.eraser_tip_shape or "circle"))
 
         if dialog.exec_() != qtw.QDialog.Accepted:
             print("[ERASE] Cancelled")
             return False
 
-        self.eraser_tip_size = int(dialog.params.get("brush_radius", self.eraser_tip_size))
+        self.eraser_tip_diameter = max(1, int(dialog.params.get("tip_diameter_px", self.eraser_tip_diameter)))
+        self.eraser_tip_shape = str(dialog.params.get("tip_shape", self.eraser_tip_shape or "circle")).strip().lower() or "circle"
         return self._apply_preview_result(dialog.get_result())
+
+    def _max_eraser_tip_diameter(self):
+        if hasattr(self, "ui") and hasattr(self.ui, "LHlineEdit"):
+            raw = str(self.ui.LHlineEdit.text() or "").strip()
+            if raw.isdigit():
+                return max(1, min(1024, int(raw)))
+
+        source = getattr(self, "refimgqimage", None)
+        if source is not None and not source.isNull():
+            estimated = max(1, int(source.height() / 35))
+            return max(1, min(1024, estimated))
+
+        return 128
 
     def crop_processor(self, qimage, params):
         if not params:
@@ -3755,6 +3825,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         y = params.get("y", 0)
         w = params.get("w", qimage.width())
         h = params.get("h", qimage.height())
+
+        self._last_crop_origin = qtc.QPoint(int(x), int(y))
 
         # safety clamp
         x = max(0, x)
@@ -3792,7 +3864,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             return qimage
 
         erase_points = params.get("erase_points", [])
-        radius = max(1, int(params.get("brush_radius", self.eraser_tip_size)))
+        tip_diameter = max(1, int(params.get("tip_diameter_px", params.get("brush_radius", self.eraser_tip_diameter))))
+        radius = max(1, int(round(tip_diameter / 2.0)))
+        tip_shape = str(params.get("tip_shape", self.eraser_tip_shape or "circle")).strip().lower() or "circle"
         if not erase_points:
             return qimage
 
@@ -3804,7 +3878,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         for point in erase_points:
             x = int(point.get("x", 0))
             y = int(point.get("y", 0))
-            painter.drawEllipse(qtc.QPoint(x, y), radius, radius)
+            if tip_shape == "square":
+                painter.drawRect(qtc.QRect(x - radius, y - radius, radius * 2, radius * 2))
+            elif tip_shape == "diamond":
+                diamond = qtg.QPolygon([
+                    qtc.QPoint(x, y - radius),
+                    qtc.QPoint(x + radius, y),
+                    qtc.QPoint(x, y + radius),
+                    qtc.QPoint(x - radius, y),
+                ])
+                painter.drawPolygon(diamond)
+            else:
+                painter.drawEllipse(qtc.QPoint(x, y), radius, radius)
         painter.end()
         self._copy_qimage_resolution(qimage, result)
         return result
