@@ -91,6 +91,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         ("Y2", "Access date"),
         ("ER", "End of reference"),
     ]
+    PAGE_HORIZONTAL_SCROLL_POLICY = qtc.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+    PAGE_VERTICAL_SCROLL_POLICY = qtc.Qt.ScrollBarPolicy.ScrollBarAsNeeded
 
     def __init__(self, projects_base_path, parent=None):
         super().__init__(parent)
@@ -129,8 +131,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         scroll = qtw.QScrollArea(self)
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(qtw.QFrame.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(qtc.Qt.ScrollBarAsNeeded)
-        scroll.setVerticalScrollBarPolicy(qtc.Qt.ScrollBarAsNeeded)
+        scroll.setHorizontalScrollBarPolicy(self.PAGE_HORIZONTAL_SCROLL_POLICY)
+        scroll.setVerticalScrollBarPolicy(self.PAGE_VERTICAL_SCROLL_POLICY)
         scroll.setWidget(content_widget)
         return scroll
 
@@ -552,6 +554,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         scroll_area = qtw.QScrollArea()
         scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(self.PAGE_HORIZONTAL_SCROLL_POLICY)
+        scroll_area.setVerticalScrollBarPolicy(self.PAGE_VERTICAL_SCROLL_POLICY)
         scroll_content = qtw.QWidget()
         scroll_layout = qtw.QVBoxLayout(scroll_content)
         scroll_layout.setContentsMargins(0, 0, 0, 0)
