@@ -289,6 +289,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.ReloadImage)
         self._install_image_context_menu_defaults()
+        self._install_image_panel_shortcuts()
         self.ui.BoxTable.customContextMenuRequested.connect(self.openTableMenu)
         self.ui.reloadTextbutton.clicked.connect(self.ReloadText)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
@@ -2887,14 +2888,41 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             #
 
     def _install_image_context_menu_defaults(self):
+        self._image_context_widgets = []
         for widget_name in ("Image", "Line"):
             image_widget = getattr(self.ui, widget_name, None)
             if image_widget is None:
                 continue
+            image_widget.setFocusPolicy(qtc.Qt.ClickFocus)
             image_widget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
             image_widget.customContextMenuRequested.connect(
                 lambda pos, w=image_widget: self.openImagePanelMenu(w, pos)
             )
+            self._image_context_widgets.append(image_widget)
+
+    def _install_image_panel_shortcuts(self):
+        self._image_undo_shortcut = qtw.QShortcut(qtg.QKeySequence.Undo, self)
+        self._image_redo_shortcut = qtw.QShortcut(qtg.QKeySequence.Redo, self)
+        self._image_undo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_redo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_undo_shortcut.activated.connect(self._on_image_panel_undo_shortcut)
+        self._image_redo_shortcut.activated.connect(self._on_image_panel_redo_shortcut)
+
+    def _focused_image_widget(self):
+        focus_widget = qtw.QApplication.focusWidget()
+        if focus_widget in getattr(self, "_image_context_widgets", []):
+            return focus_widget
+        return None
+
+    def _on_image_panel_undo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.prevImage()
+
+    def _on_image_panel_redo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.nextImage()
 
     def openImagePanelMenu(self, image_widget, position):
         menu = QMenu(self)
