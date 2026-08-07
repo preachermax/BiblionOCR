@@ -70,7 +70,7 @@ def _apply_resolver_defaults():
 
     inbound_default_dir = session_manager.resolve_receiving_default_input(
         "MyResolver",
-        preferred_input_modules=("MyTrainer", "MyLexer", "MyVersifier", "MyGrounder"),
+        preferred_input_modules=("MyTrainer", "MyVersifier", "MyGrounder"),
         language_hint="greek",
     )
     if inbound_default_dir:
