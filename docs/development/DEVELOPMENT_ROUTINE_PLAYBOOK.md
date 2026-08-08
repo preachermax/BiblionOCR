@@ -119,8 +119,9 @@ Before every commit:
 
 1. Stage only the intended change set.
 2. Exclude runtime/session noise unless requested.
-3. Use clear, scoped commit messages.
-4. Sync target branches after successful local validation.
+3. Treat `ViewController/Model/Project/Data/json/Session.json` as runtime-local state by default: do not commit and do not reset it without explicit maintainer approval.
+4. Use clear, scoped commit messages.
+5. Sync target branches after successful local validation.
 
 Recommended pre-commit check:
 

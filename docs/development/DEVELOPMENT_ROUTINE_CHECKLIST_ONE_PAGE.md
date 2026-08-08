@@ -133,10 +133,11 @@ python3 -m py_compile <file1.py> <file2.py> ...
 
 1. Stage only intended files.
 2. Exclude session/runtime noise unless explicitly requested.
-3. Use narrow commit message describing behavior change.
-4. Re-check staged scope before commit.
-5. Do not commit until automated and manual test gates pass.
-6. Compare line-change volume to intended behavior change; if disproportionate, investigate before committing.
+3. Treat `ViewController/Model/Project/Data/json/Session.json` as runtime-local state by default: do not commit and do not reset it without explicit maintainer approval.
+4. Use narrow commit message describing behavior change.
+5. Re-check staged scope before commit.
+6. Do not commit until automated and manual test gates pass.
+7. Compare line-change volume to intended behavior change; if disproportionate, investigate before committing.
 
 ## J) Sync and Post-Check
 
@@ -216,3 +217,4 @@ Run this lane when the active change set is architecture normalization and docum
    - architecture governance docs,
    - spec/policy documentation.
 9. Confirm runtime/session artifacts remain uncommitted unless explicitly requested.
+10. If Session.json is modified, report it explicitly in handoff as local runtime drift.
