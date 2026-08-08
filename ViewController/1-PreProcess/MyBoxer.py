@@ -336,7 +336,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.actionDraw_Selected_LineBox_tb.triggered.connect(self.getRbLineBox)
         #self.ui.actionEdit_Latin_LineBox_Pair.triggered.connect(self.linebox_edit_split)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
         #self.ui.action_Grounder.triggered.connect(self.OpenWithMyGrounder)
 
@@ -346,8 +346,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.actionMake_Word_Box_Files.triggered.connect(self.loadwordboximage)
         self.ui.actionOpen_Word_Box_Image.triggered.connect(self.loadwordboximage)
         self.ui.actionOpen_Word_Box_File.triggered.connect(self.loadwordboximage)
-        self.ui.actionSave_Word_Box_Image.triggered.connect(self.saveWordBoxImage)
-        self.ui.actionSave_AS_Word_Box_Image.triggered.connect(self.saveWordBoxImage)
+        self.ui.actionSave_Word_Box_Image.triggered.connect(self.save_image_with_myexplorer)
+        self.ui.actionSave_AS_Word_Box_Image.triggered.connect(self.save_image_as_with_myexplorer)
         self.ui.actionSave_Word_Box_File.triggered.connect(self.WordBoxTable2csv)
         self.ui.actionSave_As_Word_Box_File.triggered.connect(self.WordBoxTable2csv)
 
@@ -375,9 +375,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
 
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)

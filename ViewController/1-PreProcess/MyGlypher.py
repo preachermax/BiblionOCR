@@ -157,7 +157,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionStandardUI.triggered.connect(self.standardUI)
         self.ui.action_Explorer.triggered.connect(self.OpenProjectExplorer)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
 
         self.ui.actionOpen_Greek_Page_Image.triggered.connect(self.loadImage)
@@ -191,9 +191,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
 
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)

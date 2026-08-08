@@ -105,6 +105,235 @@ SAVE_METHOD_EXCLUSIONS = {
     "save_session_settings",
 }
 
+_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif", ".webp"}
+_TEXT_EXTENSIONS = {".txt", ".nt", ".md", ".json", ".csv", ".tsv", ".xml", ".html", ".htm", ".ris"}
+
+_IMAGE_HANDLER_CANDIDATES = (
+    "showImage",
+    "getImage",
+    "loadDropImageEvent",
+    "loadImagePath",
+    "loadImageFromPath",
+)
+
+_TEXT_HANDLER_CANDIDATES = (
+    "showText",
+    "getText",
+    "getRefText",
+    "getVerseText",
+    "loadDropTextEvent",
+    "loadTextPath",
+    "loadTextFromPath",
+)
+
+_MYEXPLORER_ALIAS_CANDIDATES = {
+    "open_image_with_myexplorer": ("loadImage", "loadRefImg", "getImage"),
+    "open_text_with_myexplorer": ("loadText", "getText"),
+    "save_image_with_myexplorer": ("SaveImage", "saveWordBoxImage", "SaveImgFileDialog"),
+    "save_image_as_with_myexplorer": ("SaveImageAs", "SaveImgFileDialog", "saveWordBoxImage"),
+    "save_text_with_myexplorer": ("SaveCorrectedTextFileDialog", "SaveVerseTextDialog", "SavePageTextDialog", "save"),
+    "save_text_as_with_myexplorer": ("SaveAsCorrectedTextFileDialog", "SaveAsVerseTextDialog", "SaveAsPageTextDialog", "saveastextDialog"),
+}
+
+_MYEXPLORER_ICON_TARGET_PATTERNS = (
+    "openimage",
+    "opentext",
+    "saveimage",
+    "savetext",
+    "open_line_image",
+    "open_line_text",
+    "save_line_image",
+    "save_line_text",
+    "open_word_box",
+    "save_word_box",
+    "openreffimg",
+)
+
+
+_ORIGINAL_GET_OPEN_FILE_NAME = qtw.QFileDialog.getOpenFileName
+_ORIGINAL_GET_SAVE_FILE_NAME = qtw.QFileDialog.getSaveFileName
+_ORIGINAL_GET_EXISTING_DIRECTORY = qtw.QFileDialog.getExistingDirectory
+
+
+def _project_root_from_core() -> str:
+    core_dir = os.path.abspath(os.path.dirname(__file__))
+    return os.path.abspath(os.path.join(core_dir, ".."))
+
+
+def _coerce_start_directory(path_hint: str) -> str:
+    if not path_hint:
+        return _project_root_from_core()
+    candidate = os.path.abspath(path_hint)
+    if os.path.isfile(candidate):
+        candidate = os.path.dirname(candidate)
+    if os.path.isdir(candidate):
+        return candidate
+    parent = os.path.dirname(candidate)
+    if os.path.isdir(parent):
+        return parent
+    return _project_root_from_core()
+
+
+class _ExplorerPickerDialog(qtw.QDialog):
+    def __init__(self, parent, caption: str, start_dir: str, mode: str, suggested_name: str = ""):
+        super().__init__(parent)
+        self._mode = mode
+        self._selected_path = ""
+        self.setWindowTitle(caption or "Select Path")
+        self.resize(860, 560)
+
+        root = _project_root_from_core()
+        initial_dir = _coerce_start_directory(start_dir)
+
+        layout = qtw.QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
+
+        self._model = qtw.QFileSystemModel(self)
+        self._model.setRootPath(root)
+        self._model.setReadOnly(False)
+
+        self._tree = qtw.QTreeView(self)
+        self._tree.setModel(self._model)
+        self._tree.setRootIndex(self._model.index(root))
+        self._tree.setSortingEnabled(True)
+        self._tree.sortByColumn(0, qtc.Qt.AscendingOrder)
+        self._tree.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        self._tree.doubleClicked.connect(self._on_double_click)
+        layout.addWidget(self._tree, 1)
+
+        form = qtw.QHBoxLayout()
+        form.addWidget(qtw.QLabel("Selected:"))
+        self._path_display = qtw.QLineEdit(self)
+        self._path_display.setReadOnly(True)
+        form.addWidget(self._path_display, 1)
+        layout.addLayout(form)
+
+        self._name_edit = qtw.QLineEdit(self)
+        if mode == "save_file":
+            self._name_edit.setPlaceholderText("File name")
+            if suggested_name:
+                self._name_edit.setText(suggested_name)
+            layout.addWidget(self._name_edit)
+
+        button_row = qtw.QHBoxLayout()
+        button_row.addStretch(1)
+        self._select_button = qtw.QPushButton("Select", self)
+        self._cancel_button = qtw.QPushButton("Cancel", self)
+        button_row.addWidget(self._select_button)
+        button_row.addWidget(self._cancel_button)
+        layout.addLayout(button_row)
+
+        self._select_button.clicked.connect(self._accept_selection)
+        self._cancel_button.clicked.connect(self.reject)
+        self._tree.selectionModel().currentChanged.connect(self._on_selection_changed)
+
+        initial_index = self._model.index(initial_dir)
+        if initial_index.isValid():
+            self._tree.setCurrentIndex(initial_index)
+            self._tree.scrollTo(initial_index, qtw.QAbstractItemView.PositionAtCenter)
+        self._on_selection_changed(self._tree.currentIndex(), qtc.QModelIndex())
+
+    def selected_path(self) -> str:
+        return self._selected_path
+
+    def _on_selection_changed(self, current, _previous) -> None:
+        if not current.isValid():
+            self._path_display.clear()
+            return
+        self._path_display.setText(self._model.filePath(current))
+
+    def _on_double_click(self, index) -> None:
+        if self._mode != "open_file":
+            return
+        if not index.isValid():
+            return
+        path = self._model.filePath(index)
+        if os.path.isfile(path):
+            self._selected_path = path
+            self.accept()
+
+    def _accept_selection(self) -> None:
+        index = self._tree.currentIndex()
+        if not index.isValid():
+            qtw.QMessageBox.information(self, "Select Path", "Please select a location.")
+            return
+
+        selected = self._model.filePath(index)
+        if self._mode == "directory":
+            if os.path.isfile(selected):
+                selected = os.path.dirname(selected)
+            if not os.path.isdir(selected):
+                qtw.QMessageBox.information(self, "Select Folder", "Please select a folder.")
+                return
+            self._selected_path = selected
+            self.accept()
+            return
+
+        if self._mode == "open_file":
+            if not os.path.isfile(selected):
+                qtw.QMessageBox.information(self, "Open File", "Please select a file.")
+                return
+            self._selected_path = selected
+            self.accept()
+            return
+
+        if self._mode == "save_file":
+            filename = self._name_edit.text().strip() if hasattr(self, "_name_edit") else ""
+            if not filename and os.path.isfile(selected):
+                filename = os.path.basename(selected)
+                selected = os.path.dirname(selected)
+            if not filename:
+                qtw.QMessageBox.information(self, "Save File", "Please enter a file name.")
+                return
+            if os.path.isfile(selected):
+                selected = os.path.dirname(selected)
+            if not os.path.isdir(selected):
+                qtw.QMessageBox.information(self, "Save File", "Please select a valid destination folder.")
+                return
+            self._selected_path = os.path.join(selected, filename)
+            self.accept()
+
+
+def _explorer_get_open_file_name(parent=None, caption="", directory="", _filter="", *args, **kwargs):
+    dialog = _ExplorerPickerDialog(parent, caption or "Open File", directory, "open_file")
+    if dialog.exec_() == qtw.QDialog.Accepted:
+        return dialog.selected_path(), ""
+    return "", ""
+
+
+def _explorer_get_save_file_name(parent=None, caption="", directory="", _filter="", *args, **kwargs):
+    suggested_name = ""
+    if directory:
+        suggested_name = os.path.basename(directory) if os.path.basename(directory) else ""
+    dialog = _ExplorerPickerDialog(parent, caption or "Save File", directory, "save_file", suggested_name)
+    if dialog.exec_() == qtw.QDialog.Accepted:
+        return dialog.selected_path(), ""
+    return "", ""
+
+
+def _explorer_get_existing_directory(parent=None, caption="", directory="", *args, **kwargs):
+    dialog = _ExplorerPickerDialog(parent, caption or "Select Folder", directory, "directory")
+    if dialog.exec_() == qtw.QDialog.Accepted:
+        return dialog.selected_path()
+    return ""
+
+
+def _install_explorer_backed_file_dialogs(window) -> None:
+    if window is None:
+        return
+    if getattr(window, "_workflow_explorer_file_dialogs_installed", False):
+        return
+
+    qtw.QFileDialog.getOpenFileName = staticmethod(_explorer_get_open_file_name)
+    qtw.QFileDialog.getSaveFileName = staticmethod(_explorer_get_save_file_name)
+    qtw.QFileDialog.getExistingDirectory = staticmethod(_explorer_get_existing_directory)
+    setattr(window, "_workflow_explorer_file_dialogs_installed", True)
+
+
+def install_explorer_file_dialogs(window) -> None:
+    _install_explorer_backed_file_dialogs(window)
+
 
 class _DefaultContextMenuEventFilter(qtc.QObject):
     """Attach consistent default context menus across module panels."""
@@ -153,6 +382,29 @@ class _CloseConfirmationEventFilter(qtc.QObject):
         if not _confirm_close_operation(self._window, event):
             event.ignore()
             return True
+        return False
+
+
+class _PanelFileDropEventFilter(qtc.QObject):
+    def __init__(self, window, target_widgets):
+        super().__init__(window)
+        self._window = window
+        self._targets = set(target_widgets)
+
+    def eventFilter(self, watched, event):
+        if watched not in self._targets:
+            return False
+        if event.type() in (qtc.QEvent.DragEnter, qtc.QEvent.DragMove):
+            if _mime_has_local_urls(event.mimeData()):
+                event.acceptProposedAction()
+                return True
+        if event.type() == qtc.QEvent.Drop:
+            file_path = _first_local_drop_path(event.mimeData())
+            if not file_path:
+                return False
+            if _dispatch_panel_drop_file(self._window, file_path):
+                event.acceptProposedAction()
+                return True
         return False
 
 
@@ -376,6 +628,185 @@ def _install_close_confirmation(window) -> None:
     filter_obj = _CloseConfirmationEventFilter(window)
     setattr(window, "_workflow_close_confirmation_filter", filter_obj)
     window.installEventFilter(filter_obj)
+
+
+def _mime_has_local_urls(mime_data) -> bool:
+    if not mime_data.hasUrls():
+        return False
+    return any(url.isLocalFile() for url in mime_data.urls())
+
+
+def _first_local_drop_path(mime_data) -> str:
+    for url in mime_data.urls():
+        if url.isLocalFile():
+            return url.toLocalFile()
+    return ""
+
+
+def _is_image_file(path: str) -> bool:
+    return os.path.splitext(path)[1].lower() in _IMAGE_EXTENSIONS
+
+
+def _is_text_file(path: str) -> bool:
+    return os.path.splitext(path)[1].lower() in _TEXT_EXTENSIONS
+
+
+def _invoke_handler_with_path(window, handler_name: str, file_path: str) -> bool:
+    handler = getattr(window, handler_name, None)
+    if not callable(handler):
+        return False
+    try:
+        handler(file_path)
+        return True
+    except TypeError:
+        # Keep compatibility with methods that only support no-arg mode.
+        return False
+
+
+def _dispatch_panel_drop_file(window, file_path: str) -> bool:
+    if _is_image_file(file_path):
+        for handler_name in _IMAGE_HANDLER_CANDIDATES:
+            if _invoke_handler_with_path(window, handler_name, file_path):
+                return True
+    if _is_text_file(file_path):
+        for handler_name in _TEXT_HANDLER_CANDIDATES:
+            if _invoke_handler_with_path(window, handler_name, file_path):
+                return True
+    return False
+
+
+def _iter_candidate_drop_widgets(window):
+    ui = getattr(window, "ui", None)
+    if ui is None:
+        return
+
+    for attr_name in dir(ui):
+        widget = getattr(ui, attr_name, None)
+        if not isinstance(widget, qtw.QWidget):
+            continue
+        if isinstance(widget, (qtw.QPushButton, qtw.QToolButton, qtw.QComboBox, qtw.QSpinBox, qtw.QSlider, qtw.QCheckBox, qtw.QRadioButton, qtw.QProgressBar, qtw.QMenuBar, qtw.QToolBar, qtw.QStatusBar, qtw.QTableWidget, qtw.QTreeView, qtw.QListView)):
+            continue
+        lowered_name = attr_name.lower()
+        if "image" in lowered_name or "text" in lowered_name or "ocr" in lowered_name or "verse" in lowered_name or "ref" in lowered_name:
+            yield widget
+
+
+def _install_panel_file_drop_behavior(window) -> None:
+    if window is None:
+        return
+    if getattr(window, "_workflow_panel_drop_filter", None) is not None:
+        return
+
+    targets = []
+    for widget in _iter_candidate_drop_widgets(window):
+        widget.setAcceptDrops(True)
+        if hasattr(widget, "viewport") and callable(getattr(widget, "viewport", None)):
+            viewport = widget.viewport()
+            if viewport is not None:
+                viewport.setAcceptDrops(True)
+                targets.append(viewport)
+        targets.append(widget)
+
+    if not targets:
+        return
+
+    filter_obj = _PanelFileDropEventFilter(window, targets)
+    setattr(window, "_workflow_panel_drop_filter", filter_obj)
+    for target in targets:
+        target.installEventFilter(filter_obj)
+
+
+def install_panel_file_drops(window) -> None:
+    _install_panel_file_drop_behavior(window)
+
+
+def _install_myexplorer_method_aliases(window) -> None:
+    if window is None:
+        return
+    if getattr(window, "_workflow_myexplorer_aliases_installed", False):
+        return
+
+    for alias_name, candidates in _MYEXPLORER_ALIAS_CANDIDATES.items():
+        if callable(getattr(window, alias_name, None)):
+            continue
+        for candidate_name in candidates:
+            target = getattr(window, candidate_name, None)
+            if not callable(target):
+                continue
+
+            def _make_alias(method):
+                return lambda *args, **kwargs: method(*args, **kwargs)
+
+            setattr(window, alias_name, _make_alias(target))
+            break
+
+    setattr(window, "_workflow_myexplorer_aliases_installed", True)
+
+
+def install_myexplorer_method_aliases(window) -> None:
+    _install_myexplorer_method_aliases(window)
+
+
+def _resolve_myexplorer_icon(window):
+    ui = getattr(window, "ui", None)
+    candidates = []
+    if ui is not None:
+        candidates.extend([
+            getattr(ui, "MyExplorerbutton", None),
+            getattr(ui, "actionProject_Browser", None),
+            getattr(ui, "actionExplorer", None),
+            getattr(ui, "actionMy_Explorer", None),
+            getattr(ui, "actionProject_Explorer", None),
+        ])
+    candidates.extend([
+        getattr(window, "actionProject_Browser", None),
+        getattr(window, "actionExplorer", None),
+        getattr(window, "actionMy_Explorer", None),
+        getattr(window, "actionProject_Explorer", None),
+    ])
+
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        icon = candidate.icon() if hasattr(candidate, "icon") else qtg.QIcon()
+        if icon is not None and not icon.isNull():
+            return icon
+    return qtg.QIcon()
+
+
+def _install_myexplorer_icon_lockstep(window) -> None:
+    if window is None:
+        return
+    if getattr(window, "_workflow_myexplorer_icon_lockstep_installed", False):
+        return
+
+    icon = _resolve_myexplorer_icon(window)
+    if icon.isNull():
+        return
+
+    ui = getattr(window, "ui", None)
+    owners = [window]
+    if ui is not None:
+        owners.append(ui)
+
+    for owner in owners:
+        for attr_name in dir(owner):
+            lowered = attr_name.lower()
+            if not any(token in lowered for token in _MYEXPLORER_ICON_TARGET_PATTERNS):
+                continue
+            target = getattr(owner, attr_name, None)
+            if target is None or not hasattr(target, "setIcon"):
+                continue
+            try:
+                target.setIcon(icon)
+            except Exception:
+                pass
+
+    setattr(window, "_workflow_myexplorer_icon_lockstep_installed", True)
+
+
+def install_myexplorer_icon_lockstep(window) -> None:
+    _install_myexplorer_icon_lockstep(window)
 
 
 class ModulePageWorkflowWizardDialog(qtw.QDialog):
@@ -684,6 +1115,10 @@ def install_workflow_wizard_menu_actions(
     include_page_wizard: bool = True,
 ) -> None:
     _install_default_context_menu_behavior(window)
+    _install_explorer_backed_file_dialogs(window)
+    _install_myexplorer_method_aliases(window)
+    _install_myexplorer_icon_lockstep(window)
+    _install_panel_file_drop_behavior(window)
     _install_save_confirmation_wrappers(window)
     if module_name != "MyWriter":
         _install_close_confirmation(window)

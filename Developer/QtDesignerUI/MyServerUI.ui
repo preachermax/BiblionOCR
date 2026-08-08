@@ -214,7 +214,7 @@
     </property>
     <property name="icon">
      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="SaveAsOCRCorrTextbutton">
@@ -1303,35 +1303,6 @@
       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="MyExplorerbutton">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>FROMVS [MAXR]</family>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Open current image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -2284,7 +2255,7 @@
   <action name="actionOpen_Text">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Open Text</string>

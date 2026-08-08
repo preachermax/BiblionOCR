@@ -39,6 +39,12 @@ If UI behavior/menu/actions changed:
 4. Keep generated UI modules free of local path bootstraps or ad hoc import fixes.
 5. If generated UI code needs a shared compatibility shim, put it in a shared repository-level module such as `UI_Icons.py` instead of editing the generated file.
 6. If a generated UI export name changes, update the `.ui` class name and the runtime caller together; keep temporary compatibility aliases only until regeneration lands.
+7. Treat `Developer/QtDesignerUI/*.ui` as the only editable source of truth for UI text, tooltips, and action labels.
+8. Do not hand-edit generated `ViewController/**/*UI.py` text/tooltips; if a generated file was edited, mirror the same change in `.ui` and immediately regenerate.
+9. Regenerate only the touched UI pairs first (targeted reflow), then expand to full UI regeneration only if needed.
+10. Use the generated-file header (`# Form implementation generated from reading ui file ...`) to map each touched `UI.py` file back to the exact source `.ui` file before reflow.
+11. Run drift probes after regeneration for stale phrases (for example old Open/Save labels or pre-MyExplorer tooltip forms), then fix in `.ui` and regenerate again.
+12. For paired controls (for example image vs text buttons), verify semantic mapping after bulk replacements so tooltips are not swapped.
 
 ## D) Workflow Wizard Policy Gate
 
@@ -77,36 +83,22 @@ Must be true before commit:
 
 ## G) Validation Sequence
 
-1. Repair all issues cited in the Problems window for touched files.
-2. Problems check on touched files.
-3. Compile check touched Python files:
+1. Run a full-workspace Problems scan first and record the total count.
+1. Classify Problems into two buckets: pre-existing baseline (outside current scope), and introduced/regressed by the current change set.
+1. Repair all introduced/regressed Problems before any clean-status claim.
+1. Re-run full-workspace Problems scan and report both counts: total remaining Problems, and remaining in-scope Problems (must be zero).
+1. Problems check on touched files.
+1. Compile check touched Python files:
 
 ```bash
 python3 -m py_compile <file1.py> <file2.py> ...
 ```
 
 1. Run targeted runtime smoke tests for changed launch paths.
-2. Run focused manual UI verification for changed menus/buttons/wizard actions.
-3. Run a smoketest of every launcher in `launchers/` on the active platform.
-4. Confirm the canonical launch paths open cleanly without a traceback:
-   - `MyLauncher`
-   - `MyServer`
-   - `MyBoxer`
-   - `MyGlypher`
-   - `MyPixler`
-   - `MyReader`
-   - `MyGrounder`
-   - `MyTrainer`
-   - `MyLexer`
-   - `MyResolver`
-   - `MyVersifier`
-   - `MyWriter`
-5. Minimum pass condition:
-   - window starts
-   - no immediate traceback
-   - no missing UI file error
-   - no missing shared helper import
-   - no crash on empty/default session state
+1. Run focused manual UI verification for changed menus/buttons/wizard actions.
+1. Run a smoketest of every launcher in `launchers/` on the active platform.
+1. Confirm the canonical launch paths open cleanly without a traceback for `MyLauncher`, `MyServer`, `MyBoxer`, `MyGlypher`, `MyPixler`, `MyReader`, `MyGrounder`, `MyTrainer`, `MyLexer`, `MyResolver`, `MyVersifier`, and `MyWriter`.
+1. Minimum pass condition: window starts, no immediate traceback, no missing UI file error, no missing shared helper import, and no crash on empty/default session state.
 
 ## H) Launcher Reliability Gate
 
@@ -142,8 +134,12 @@ Record a restart-safe checkpoint before closing VS Code or pausing work.
    - compile
    - smoke tests
    - manual UI checks
-4. Save unresolved risks/blockers.
-5. Save next immediate action.
+4. For Problems specifically, record:
+   - full-workspace total count
+   - in-scope count
+   - exact unresolved file list (if any)
+5. Save unresolved risks/blockers.
+6. Save next immediate action.
 
 Checkpoint location:
 
@@ -166,9 +162,11 @@ Before any edits, the agent must regain footing in this exact order:
 
 1. Requirement implemented exactly.
 2. UI.ui and UI.py in lock-step.
-3. Touched files pass problems + compile checks.
-4. Key runtime path smoke-tested.
-5. Manual UI checks pass for changed interactions.
-6. Commit excludes unrelated artifacts.
-7. Branch sync confirmed.
-8. Launcher smoketest passes for all canonical launchers.
+3. Full-workspace Problems scan completed and reported.
+4. In-scope Problems count is zero.
+5. Touched files pass problems + compile checks.
+6. Key runtime path smoke-tested.
+7. Manual UI checks pass for changed interactions.
+8. Commit excludes unrelated artifacts.
+9. Branch sync confirmed.
+10. Launcher smoketest passes for all canonical launchers.

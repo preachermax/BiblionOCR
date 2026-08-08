@@ -379,7 +379,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, "actionOpen_Project"):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
 
-        self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
 
         if hasattr(self.ui, "actionPrint_Ref_Image"):
             self.ui.actionPrint_Ref_Image.triggered.connect(
@@ -425,7 +425,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui.imageScannerbutton.clicked.connect(self.actionScanNetwork)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
 
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
@@ -467,9 +467,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         # Text Editing
         # -------------------------
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         # -------------------------
         # External Modules
@@ -489,7 +489,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
 
         # Button Modules
-        self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
         self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
 

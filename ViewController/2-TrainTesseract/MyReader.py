@@ -263,7 +263,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyReader')
-        self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
         self.ui.actionVerse_Correction.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
@@ -288,7 +288,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
 
         #self.ui.OpenImageFilebutton.clicked.connect(self.OpenImageFileDialog)
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         #self.ui.Gimpbutton.clicked.connect(self.actionGimpEdit)
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
@@ -317,9 +317,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
         #self.ui.EditCorrectedTextbutton.clicked.connect(self.OpenTextFileDialog)
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         self.ui.Calcbutton.clicked.connect(self.OpenWithCalc)
         self.ui.Writerbutton.clicked.connect(self.OpenWithWriter)

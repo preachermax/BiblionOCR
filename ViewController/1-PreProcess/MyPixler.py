@@ -991,8 +991,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         # File menu Signals(Slots)
         self.ui.actionOpen_Reference_Image.triggered.connect(self.loadRefImg)
-        self.ui.actionSave_Image.triggered.connect(self.SaveImage)
-        self.ui.actionSave_As_Image.triggered.connect(self.SaveImageAs)
+        self.ui.actionSave_Image.triggered.connect(self.save_image_with_myexplorer)
+        self.ui.actionSave_As_Image.triggered.connect(self.save_image_as_with_myexplorer)
         self.ui.actionOverwrite_Reference_Image.triggered.connect(self.OverwriteRefImg)
         self.ui.actionImport_Current_Image.triggered.connect(self.importRefImg)
         self.ui.actionLanguage_Morphology.triggered.connect(self.openMorphologyDialog)
@@ -1015,7 +1015,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         # Ref Image
         # -------------------------
-        self.ui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
+        self.ui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
         self.ui.Deskewbutton.clicked.connect(self.deskewRefImg)
         self.ui.OverwriteRefImgbutton.clicked.connect(self.OverwriteRefImg)
@@ -1048,8 +1048,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.Imagezoomslider.sliderReleased.connect(self.disable_Imagezoomslider)
 
         self.ui.ExportRefImgFilebutton.clicked.connect(self.ExportImage)
-        self.ui.SaveImagebutton.clicked.connect(self.SaveImage)
-        self.ui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
+        self.ui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
+        self.ui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
 
         # -------------------------
         # UI defaults
@@ -1342,7 +1342,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     #     # Ref Image
 
-    #     self.ui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
+    #     self.ui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
     #     self.ui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
     #     self.ui.Deskewbutton.clicked.connect(self.deskewRefImg)
 
@@ -1380,8 +1380,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     #     self.ui.Imagezoomslider.sliderReleased.connect(self.disable_Imagezoomslider)
 
     #     self.ui.ExportRefImgFilebutton.clicked.connect(self.ExportImage)
-    #     self.ui.SaveImagebutton.clicked.connect(self.SaveImage)
-    #     self.ui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
+    #     self.ui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
+    #     self.ui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
 
     #     self.ui.RefImgzoomslider.hide()
     #     self.ui.Imagezoomslider.hide()

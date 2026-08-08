@@ -255,7 +255,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 f'MyScanner loaded with reduced OCR functionality. Missing packages: {missing}.',
             )
 
-        self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
         self.ui.actionPixler_Image_Editor.triggered.connect(self.OpenWithMyPixler)
         self.ui.actionVersifier.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionBoxer.triggered.connect(self.OpenWithMyBoxer)
@@ -269,7 +269,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
 
         #self.ui.OpenImageFilebutton.clicked.connect(self.OpenImageFileDialog)
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.actionScanImage.triggered.connect(self.actionScanImage)
         self._connect_scan_ui_aliases()
         self.ui.actionEdit_Image_tb.triggered.connect(self.actionGimpEdit)
@@ -300,9 +300,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
         #self.ui.EditCorrectedTextbutton.clicked.connect(self.OpenTextFileDialog)
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         self.ui.Writerbutton.clicked.connect(self.OpenWithWriter)
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)

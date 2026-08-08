@@ -44,7 +44,13 @@ sanitize_current_process_and_reexec()
 
 from helpers.SessionManager import SessionManager
 from helpers.project_status_controller import ProjectStatusController
-from Core.workflow_wizard_actions import append_default_context_actions
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_explorer_file_dialogs,
+    install_myexplorer_icon_lockstep,
+    install_myexplorer_method_aliases,
+    install_panel_file_drops,
+)
 #from subprocess import Popen, PIPE, CalledProcessError
 from helpers.HelpSystem import add_help_menu
 # PyQt5 imports
@@ -113,10 +119,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, *args, workflow_wizard_mode=None, workflow_wizard_module=None, **kwargs):
         super().__init__(*args, **kwargs)
+        install_explorer_file_dialogs(self)
+        install_myexplorer_method_aliases(self)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        install_myexplorer_icon_lockstep(self)
+        install_panel_file_drops(self)
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
         self.session_manager = SessionManager()
@@ -584,12 +594,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.pixlerui.setupUi(self.PixlerWindow)
         self.PixlerWindow.show()
 
-        self.pixlerui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
+        self.pixlerui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
         self.pixlerui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
         self.pixlerui.OverwriteRefImgbutton.clicked.connect(self.OverwriteRefImg)
         self.pixlerui.ExportImageFilebutton.clicked.connect(self.ExportImage)
-        self.pixlerui.SaveImagebutton.clicked.connect(self.SaveImage)
-        self.pixlerui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
+        self.pixlerui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
+        self.pixlerui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
         #self.pixlerui.OpenImageFilebutton.clicked.connect(self.OpenPixlerFileDialog)
         #self.pixlerui.PixlerButton.clicked.connect(self.PixlerTif(self.pixlerui.Image))
         #self.pixlerui.SavePixlerpedImgAsbutton.clicked.connect(self.DestLatinDialog)

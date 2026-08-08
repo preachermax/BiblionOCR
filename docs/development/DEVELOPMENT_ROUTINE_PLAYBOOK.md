@@ -49,15 +49,23 @@ Core rule:
 
 Run lightweight validation first, then smoke test behavior.
 
-1. Static/problem checks on touched files.
-2. `py_compile` on touched Python files.
-3. Focused runtime smoke checks for changed launch paths.
+1. Full-workspace Problems scan and total-count capture.
+2. Baseline-versus-change triage of Problems.
+3. Static/problem checks on touched files.
+4. `py_compile` on touched Python files.
+5. Focused runtime smoke checks for changed launch paths.
 
 Example compile check:
 
 ```bash
 python3 -m py_compile <edited_file_1.py> <edited_file_2.py>
 ```
+
+Required Problems policy:
+
+1. Never claim "clean" from touched-file checks alone.
+2. A clean claim requires both: in-scope Problems count is zero, and full-workspace Problems totals are explicitly reported.
+3. If full-workspace Problems remain outside scope, publish the unresolved file list in the handoff.
 
 ## 5) Launcher and Module Launch Standards
 
@@ -124,10 +132,11 @@ A change is done when all are true:
 1. Requirement is implemented exactly.
 2. UI source and generated artifacts are in lock-step.
 3. Touched files pass problem checks and `py_compile`.
-4. Critical runtime path is smoke-tested.
-5. Manual UI behavior checks pass for changed interaction surfaces.
-6. Commit scope excludes unrelated artifacts.
-7. Branch sync status is confirmed.
+4. In-scope Problems count is zero and full-workspace totals are reported.
+5. Critical runtime path is smoke-tested.
+6. Manual UI behavior checks pass for changed interaction surfaces.
+7. Commit scope excludes unrelated artifacts.
+8. Branch sync status is confirmed.
 
 ## 10) Quick Failure Triage Checklist
 
@@ -145,9 +154,10 @@ Before pause/exit, the agent writes a restart-safe handoff in `docs/development/
 
 1. one-sentence scope
 2. touched-file list from `git status --short`
-3. validation gate status (problems, compile, smoke, manual UI)
-4. unresolved blockers/risks
-5. next immediate action
+3. validation gate status (full-workspace problems, in-scope problems, compile, smoke, manual UI)
+4. unresolved Problems list (if any)
+5. unresolved blockers/risks
+6. next immediate action
 
 After VS Code reopens, the agent must run this recovery sequence before making edits:
 

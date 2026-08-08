@@ -293,22 +293,22 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Line Image controls
         #self.ui.StageButton.clicked.connect(self.Stage_Greek_tiff_Lines)
         self.ui.actionStage_Ground_Truth.triggered.connect(self.Stage_Greek_tiff_Lines)
-        self.ui.ImageButton.clicked.connect(self.loadImage)
+        self.ui.ImageButton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.PrevImgButton.clicked.connect(self.prevImage)
         self.ui.NextImgButton.clicked.connect(self.nextImage)
-        self.ui.SaveImgAsButton.clicked.connect(self.SaveImgFileDialog)
+        self.ui.SaveImgAsButton.clicked.connect(self.save_image_as_with_myexplorer)
         self.ui.DiscardImageButton.clicked.connect(self.discardImage)
         #self.ui.RenumberImagesButton.clicked.connect(self.Renumber_Greek_tiff_Lines)
         self.ui.actionRenumber_Images.triggered.connect(self.Renumber_Greek_tiff_Lines)
 
         # Line text controls
-        self.ui.TextButton.clicked.connect(self.loadText)
+        self.ui.TextButton.clicked.connect(self.open_text_with_myexplorer)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
         self.ui.PrevTxtButton.clicked.connect(self.prevText)
         self.ui.NextTxtButton.clicked.connect(self.nextText)
-        self.ui.SaveButton.clicked.connect(self.SaveCorrectedTextFileDialog)
-        self.ui.SaveAsButton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
+        self.ui.SaveButton.clicked.connect(self.save_text_with_myexplorer)
+        self.ui.SaveAsButton.clicked.connect(self.save_text_as_with_myexplorer)
         self.ui.DiscardTextButton.clicked.connect(self.discardText)
         #self.ui.RenumberTextButton.clicked.connect(self.Renumber_Greek_text_Lines)
         self.ui.actionRenumber_Text.triggered.connect(self.Renumber_Greek_text_Lines)
@@ -330,7 +330,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.PagefontComboBox.currentFontChanged.connect(self.on_page_font_update)
         self.ui.PagefontSizeBox.valueChanged.connect(self.on_page_font_update)
         self.ui.PageAutoSeekcheckBox.stateChanged.connect(self.pageAutoSeek)
-        self.ui.SavePageTextButton.clicked.connect(self.SavePageTextDialog)
+        self.ui.SavePageTextButton.clicked.connect(self.save_text_with_myexplorer)
 
 
         # Verse
@@ -343,7 +343,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.VerseAutoSeekcheckBox.stateChanged.connect(self.verseAutoSeek)
         self.ui.VersefontComboBox.currentFontChanged.connect(self.on_verse_font_update)
         self.ui.VersefontSizeBox.valueChanged.connect(self.on_verse_font_update)
-        self.ui.SaveVerseTextButton.clicked.connect(self.SaveVerseTextDialog)
+        self.ui.SaveVerseTextButton.clicked.connect(self.save_text_with_myexplorer)
 
         # Final
         #self.ui.ReviewCompletecheckBox.stateChanged.connect(self.updateXRef)
