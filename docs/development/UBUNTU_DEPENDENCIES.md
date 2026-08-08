@@ -3,6 +3,7 @@
 Use this on a fresh Ubuntu machine when you want the practical package set for BiblionOCR development, OCR work, and scanner support.
 
 Assumptions:
+
 - target distro: Ubuntu 24
 - target repo path: `~/Projects/BiblionOCR`
 - package manager: `apt`
@@ -37,6 +38,7 @@ sudo apt install -y \
 ```
 
 What these are for:
+
 - `git`: clone, fetch, reset, branch work
 - `ripgrep`: fast repo searching
 - `build-essential`, `pkg-config`, `cmake`: native build support
@@ -104,6 +106,7 @@ sudo apt install -y \
 ```
 
 Notes:
+
 - `gimp` is an optional third-party open-source desktop tool currently expected by this repo's setup guidance
 - `sane-airscan` is useful for AirScan / eSCL network-capable devices
 - on Jetson USB-only testing, disabling `airscan` requires moving its file out of `/etc/sane.d/dll.d/`; renaming it to `airscan.disabled` inside that directory does not disable it
@@ -121,6 +124,7 @@ sudo apt install -y \
 ```
 
 Why these matter:
+
 - `python3-sane`: Python bindings for scanner access
 - `python3-scapy` and `python3-zeroconf`: network scanner discovery and related tooling
 - `python3-enchant` and `enchant-2`: spelling/dictionary bindings used by text tooling
@@ -170,6 +174,7 @@ bash docs/development/UbuntuDependencies.sh
 ```
 
 What the script does, in order:
+
 - updates and upgrades the Ubuntu package set
 - installs the core Ubuntu, Python, Qt, OCR, and scanner packages used by this repo
 - installs the Ubuntu Python bindings required by the current scanner/network/font/text support stack

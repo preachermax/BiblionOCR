@@ -10,14 +10,12 @@ to a Unicode code point. It then converts the images to vector form
 and writes them to a font editor compatible data format. The font can then
 be finalized with a desktop font editor.
 
-
 ## Dependencies
 
 Glyphtracer requires PyQt5 and Potrace, which is an image vectorizer.
 
 It has been only tested on Linux. It might work on OSX or Windows.
 It might not.
-
 
 ## Usage tips
 

@@ -76,6 +76,22 @@ Policy requirements:
 - UI lock-step checks are required whenever UI behavior/menu/actions changed
 - workflow wizard policy gates must be verified for affected modules
 
+## Module-Scoped Change-Set Workflow (Recommended)
+
+For runtime/UI refactors that can regress behavior across modules, contributors should follow a module-scoped change-set workflow.
+
+Workflow reference:
+
+- [docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md](docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md)
+
+Recommended operating pattern:
+
+1. Work one module per change set unless maintainers explicitly request grouped rollout.
+2. Keep Qt Designer lock-step: edit `Developer/QtDesignerUI/*.ui` source first, then regenerate paired `ViewController/**/*UI.py`.
+3. Preserve existing custom context-menu defaults unless the change request explicitly says otherwise.
+4. Run full-workspace Problems checks before clean claims, and report both full-workspace and in-scope counts.
+5. Keep intentionally deferred modules out of scope until maintainers explicitly re-open them.
+
 Maintainer review may block or request changes when a PR does not demonstrate checklist completion.
 
 ## PR Review Order And Exceptions

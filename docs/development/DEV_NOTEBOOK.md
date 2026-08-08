@@ -20,6 +20,27 @@ Use this template for every pause, stop, or VS Code close event.
 * Next immediate action:
   * single next step
 
+## Collaboration Protocol Snapshot (2026-08-07)
+
+1. User will run an extensive manual audit in module order.
+2. Default execution mode is one module per change set.
+3. Global rollout is opt-in and only done when explicitly requested.
+4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
+5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
+
+## Reusable Prompt Workflow (Developer Use)
+
+Use the module-scoped prompt workflow to reduce prompt-writing overhead while preserving validation discipline:
+
+* [docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md](docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md)
+
+Quick use pattern:
+
+1. Choose one module from the prompt queue.
+2. Apply strict header plus module task plus lean footer.
+3. Keep deferred modules out of scope until explicitly re-opened.
+4. Report full-workspace Problems count and in-scope Problems count before completion claims.
+
 ### Session Handoff - 2026-08-06 23:59
 
 * Scope summary: finalized workflow wizard policy/runtime updates plus agent-owned checklist, PR governance, and cross-repo naming/policy documentation.

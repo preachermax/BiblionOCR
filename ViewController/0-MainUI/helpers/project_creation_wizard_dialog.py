@@ -101,6 +101,18 @@ class ProjectCreationWizardDialog(qtw.QDialog):
     ]
     PAGE_HORIZONTAL_SCROLL_POLICY = qtc.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
     PAGE_VERTICAL_SCROLL_POLICY = qtc.Qt.ScrollBarPolicy.ScrollBarAsNeeded
+    _QT_ITEM_FLAG_CLASS = getattr(qtc.Qt, "ItemFlag", None)
+    _QT_ALIGNMENT_FLAG_CLASS = getattr(qtc.Qt, "AlignmentFlag", None)
+    ITEM_IS_EDITABLE_FLAG = (
+        _QT_ITEM_FLAG_CLASS.ItemIsEditable
+        if _QT_ITEM_FLAG_CLASS is not None
+        else getattr(qtc.Qt, "ItemIsEditable")
+    )
+    ALIGN_CENTER_FLAG = (
+        _QT_ALIGNMENT_FLAG_CLASS.AlignCenter
+        if _QT_ALIGNMENT_FLAG_CLASS is not None
+        else getattr(qtc.Qt, "AlignCenter")
+    )
 
     def __init__(self, projects_base_path, parent=None):
         super().__init__(parent)
@@ -206,16 +218,21 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         ris_editor_layout.addWidget(ris_editor_help)
 
         self.ris_editor_table = qtw.QTableWidget(0, 3, self)
-        self.ris_editor_table.setHorizontalHeaderLabels(["Tag", "Field", "Value(s)"])
-        self.ris_editor_table.verticalHeader().setVisible(False)
-        self.ris_editor_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        self.ris_editor_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
-        self.ris_editor_table.setAlternatingRowColors(True)
-        self.ris_editor_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-        self.ris_editor_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
-        self.ris_editor_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
-        self.ris_editor_table.itemChanged.connect(self._sync_ris_editor_to_imported_provenance)
-        ris_editor_layout.addWidget(self.ris_editor_table)
+        ris_table = self.ris_editor_table
+        ris_table.setHorizontalHeaderLabels(["Tag", "Field", "Value(s)"])
+        ris_vertical_header = ris_table.verticalHeader()
+        if ris_vertical_header is not None:
+            ris_vertical_header.setVisible(False)
+        ris_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        ris_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        ris_table.setAlternatingRowColors(True)
+        ris_horizontal_header = ris_table.horizontalHeader()
+        if ris_horizontal_header is not None:
+            ris_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+            ris_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+            ris_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.Stretch)
+        ris_table.itemChanged.connect(self._sync_ris_editor_to_imported_provenance)
+        ris_editor_layout.addWidget(ris_table)
         self._build_ris_spec_editor_rows()
         self.ris_editor_group.setVisible(False)
         ris_layout.addWidget(self.ris_editor_group)
@@ -372,15 +389,20 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         project_settings_layout.addWidget(project_settings_help)
 
         self.project_db_table = qtw.QTableWidget(0, 3, self)
-        self.project_db_table.setHorizontalHeaderLabels(["Field", "Value", "Notes"])
-        self.project_db_table.verticalHeader().setVisible(False)
-        self.project_db_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        self.project_db_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
-        self.project_db_table.setAlternatingRowColors(True)
-        self.project_db_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-        self.project_db_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.Stretch)
-        self.project_db_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
-        project_settings_layout.addWidget(self.project_db_table, 1)
+        project_db_table = self.project_db_table
+        project_db_table.setHorizontalHeaderLabels(["Field", "Value", "Notes"])
+        project_db_vertical_header = project_db_table.verticalHeader()
+        if project_db_vertical_header is not None:
+            project_db_vertical_header.setVisible(False)
+        project_db_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        project_db_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        project_db_table.setAlternatingRowColors(True)
+        project_db_horizontal_header = project_db_table.horizontalHeader()
+        if project_db_horizontal_header is not None:
+            project_db_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+            project_db_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.Stretch)
+            project_db_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.Stretch)
+        project_settings_layout.addWidget(project_db_table, 1)
 
         self.page_stack.addWidget(self._make_scroll_page(project_settings_page))
         self._load_project_database_defaults()
@@ -403,34 +425,44 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         milestone_tab = qtw.QWidget()
         milestone_tab_layout = qtw.QVBoxLayout(milestone_tab)
         self.milestones_table = qtw.QTableWidget(0, 6, self)
-        self.milestones_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone Key", "Label", "Weight", "Complete"])
-        self.milestones_table.verticalHeader().setVisible(False)
-        self.milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        self.milestones_table.setAlternatingRowColors(True)
-        self.milestones_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-        self.milestones_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
-        self.milestones_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
-        self.milestones_table.horizontalHeader().setSectionResizeMode(3, qtw.QHeaderView.Stretch)
-        self.milestones_table.horizontalHeader().setSectionResizeMode(4, qtw.QHeaderView.ResizeToContents)
-        self.milestones_table.horizontalHeader().setSectionResizeMode(5, qtw.QHeaderView.ResizeToContents)
-        milestone_tab_layout.addWidget(self.milestones_table)
+        milestones_table = self.milestones_table
+        milestones_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone Key", "Label", "Weight", "Complete"])
+        milestones_vertical_header = milestones_table.verticalHeader()
+        if milestones_vertical_header is not None:
+            milestones_vertical_header.setVisible(False)
+        milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        milestones_table.setAlternatingRowColors(True)
+        milestones_horizontal_header = milestones_table.horizontalHeader()
+        if milestones_horizontal_header is not None:
+            milestones_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+            milestones_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+            milestones_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
+            milestones_horizontal_header.setSectionResizeMode(3, qtw.QHeaderView.Stretch)
+            milestones_horizontal_header.setSectionResizeMode(4, qtw.QHeaderView.ResizeToContents)
+            milestones_horizontal_header.setSectionResizeMode(5, qtw.QHeaderView.ResizeToContents)
+        milestone_tab_layout.addWidget(milestones_table)
         milestones_tabs.addTab(milestone_tab, "Milestones")
 
         handshake_tab = qtw.QWidget()
         handshake_tab_layout = qtw.QVBoxLayout(handshake_tab)
         self.handshake_table = qtw.QTableWidget(0, 6, self)
-        self.handshake_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone", "Language", "Input Path", "Output Path"])
-        self.handshake_table.verticalHeader().setVisible(False)
-        self.handshake_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        self.handshake_table.setAlternatingRowColors(True)
-        self.handshake_table.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
-        self.handshake_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-        self.handshake_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
-        self.handshake_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
-        self.handshake_table.horizontalHeader().setSectionResizeMode(3, qtw.QHeaderView.ResizeToContents)
-        self.handshake_table.horizontalHeader().setSectionResizeMode(4, qtw.QHeaderView.Stretch)
-        self.handshake_table.horizontalHeader().setSectionResizeMode(5, qtw.QHeaderView.Stretch)
-        handshake_tab_layout.addWidget(self.handshake_table)
+        handshake_table = self.handshake_table
+        handshake_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone", "Language", "Input Path", "Output Path"])
+        handshake_vertical_header = handshake_table.verticalHeader()
+        if handshake_vertical_header is not None:
+            handshake_vertical_header.setVisible(False)
+        handshake_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        handshake_table.setAlternatingRowColors(True)
+        handshake_table.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
+        handshake_horizontal_header = handshake_table.horizontalHeader()
+        if handshake_horizontal_header is not None:
+            handshake_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+            handshake_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+            handshake_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
+            handshake_horizontal_header.setSectionResizeMode(3, qtw.QHeaderView.ResizeToContents)
+            handshake_horizontal_header.setSectionResizeMode(4, qtw.QHeaderView.Stretch)
+            handshake_horizontal_header.setSectionResizeMode(5, qtw.QHeaderView.Stretch)
+        handshake_tab_layout.addWidget(handshake_table)
         milestones_tabs.addTab(handshake_tab, "Module Handshakes")
 
         milestones_layout.addWidget(milestones_tabs, 1)
@@ -892,29 +924,30 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         return len(MODULE_SEQUENCE)
 
     def _load_project_database_defaults(self):
-        if self.project_db_table is None:
+        table = self.project_db_table
+        if table is None:
             return
 
-        self.project_db_table.setRowCount(0)
+        table.setRowCount(0)
         for definition in self._project_db_definitions:
-            row = self.project_db_table.rowCount()
-            self.project_db_table.insertRow(row)
+            row = table.rowCount()
+            table.insertRow(row)
 
             key_item = qtw.QTableWidgetItem(definition.key)
-            key_item.setFlags(key_item.flags() & ~qtc.Qt.ItemIsEditable)
-            self.project_db_table.setItem(row, 0, key_item)
+            key_item.setFlags(key_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 0, key_item)
 
             default_value = definition.default
             if isinstance(default_value, list):
                 display_value = ",".join(str(part) for part in default_value)
             else:
                 display_value = "" if default_value is None else str(default_value)
-            self.project_db_table.setItem(row, 1, qtw.QTableWidgetItem(display_value))
+            table.setItem(row, 1, qtw.QTableWidgetItem(display_value))
 
             notes = definition.help_text or definition.label
             notes_item = qtw.QTableWidgetItem(notes)
-            notes_item.setFlags(notes_item.flags() & ~qtc.Qt.ItemIsEditable)
-            self.project_db_table.setItem(row, 2, notes_item)
+            notes_item.setFlags(notes_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 2, notes_item)
 
         # Synchronize key defaults with wizard controls.
         self._set_project_db_value("ProjectName", self._sanitize_project_name(self.project_name_edit.text().strip()))
@@ -929,10 +962,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
 
     def _load_milestones_defaults(self):
-        if self.milestones_table is None:
+        table = self.milestones_table
+        if table is None:
             return
 
-        self.milestones_table.setRowCount(0)
+        table.setRowCount(0)
         rows = []
         for index, (key, label, weight) in enumerate(getattr(self.workflow_tracker, "_milestone_catalog", []), start=1):
             module_name = self.workflow_tracker._module_for_milestone(key) if hasattr(self.workflow_tracker, "_module_for_milestone") else "Workflow"
@@ -950,41 +984,42 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         rows = sorted(rows, key=lambda row: (self._module_rank(row.get("module")), int(row.get("sequence", 10_000)), str(row.get("key", ""))))
 
         for row_data in rows:
-            row = self.milestones_table.rowCount()
-            self.milestones_table.insertRow(row)
+            row = table.rowCount()
+            table.insertRow(row)
 
             module_item = qtw.QTableWidgetItem(str(row_data.get("module", "Workflow")))
-            module_item.setFlags(module_item.flags() & ~qtc.Qt.ItemIsEditable)
-            self.milestones_table.setItem(row, 0, module_item)
+            module_item.setFlags(module_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 0, module_item)
 
             sequence_item = qtw.QTableWidgetItem(str(row_data.get("sequence", row + 1)))
-            sequence_item.setFlags(sequence_item.flags() & ~qtc.Qt.ItemIsEditable)
-            self.milestones_table.setItem(row, 1, sequence_item)
+            sequence_item.setFlags(sequence_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 1, sequence_item)
 
             key_item = qtw.QTableWidgetItem(str(row_data.get("key", "")))
-            key_item.setFlags(key_item.flags() & ~qtc.Qt.ItemIsEditable)
-            self.milestones_table.setItem(row, 2, key_item)
+            key_item.setFlags(key_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 2, key_item)
 
             label_item = qtw.QTableWidgetItem(str(row_data.get("label", "")))
-            label_item.setFlags(label_item.flags() & ~qtc.Qt.ItemIsEditable)
-            self.milestones_table.setItem(row, 3, label_item)
+            label_item.setFlags(label_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 3, label_item)
 
-            self.milestones_table.setItem(row, 4, qtw.QTableWidgetItem(str(row_data.get("weight", 1))))
+            table.setItem(row, 4, qtw.QTableWidgetItem(str(row_data.get("weight", 1))))
 
             complete_checkbox = qtw.QCheckBox()
             complete_checkbox.setChecked(bool(row_data.get("complete", False)))
             complete_widget = qtw.QWidget()
             complete_layout = qtw.QHBoxLayout(complete_widget)
             complete_layout.setContentsMargins(0, 0, 0, 0)
-            complete_layout.setAlignment(qtc.Qt.AlignCenter)
+            complete_layout.setAlignment(self.ALIGN_CENTER_FLAG)
             complete_layout.addWidget(complete_checkbox)
-            self.milestones_table.setCellWidget(row, 5, complete_widget)
+            table.setCellWidget(row, 5, complete_widget)
 
     def _load_handshake_rows(self):
-        if self.handshake_table is None:
+        table = self.handshake_table
+        if table is None:
             return
 
-        self.handshake_table.setRowCount(0)
+        table.setRowCount(0)
         rows = list(getattr(self.workflow_tracker, "_handshake_rows", []) or [])
         for index, row_data in enumerate(rows):
             row_data["_source_index"] = index
@@ -998,8 +1033,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         )
 
         for sequence, row_data in enumerate(rows, start=1):
-            row = self.handshake_table.rowCount()
-            self.handshake_table.insertRow(row)
+            row = table.rowCount()
+            table.insertRow(row)
 
             module_name = str(row_data.get("OutputModule") or row_data.get("InputModule") or "Workflow")
             values = [
@@ -1012,39 +1047,44 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             ]
             for column_index, value in enumerate(values):
                 item = qtw.QTableWidgetItem(value)
-                item.setFlags(item.flags() & ~qtc.Qt.ItemIsEditable)
-                self.handshake_table.setItem(row, column_index, item)
+                item.setFlags(item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+                table.setItem(row, column_index, item)
 
     def _default_project_database_name(self):
         project_name = self._sanitize_project_name(self.project_name_edit.text().strip()) or "project"
         return f"{project_name}.db"
 
     def _find_project_db_row(self, field_key):
-        if self.project_db_table is None:
+        table = self.project_db_table
+        if table is None:
             return None
-        for row in range(self.project_db_table.rowCount()):
-            item = self.project_db_table.item(row, 0)
+        for row in range(table.rowCount()):
+            item = table.item(row, 0)
             if item is not None and item.text().strip() == field_key:
                 return row
         return None
 
     def _set_project_db_value(self, field_key, value):
+        table = self.project_db_table
+        if table is None:
+            return
         row = self._find_project_db_row(field_key)
         if row is None:
             return
-        item = self.project_db_table.item(row, 1)
+        item = table.item(row, 1)
         if item is None:
             item = qtw.QTableWidgetItem()
-            self.project_db_table.setItem(row, 1, item)
+            table.setItem(row, 1, item)
         item.setText("" if value is None else str(value))
 
     def _collect_project_db_values(self):
         values = {}
-        if self.project_db_table is None:
+        table = self.project_db_table
+        if table is None:
             return values
-        for row in range(self.project_db_table.rowCount()):
-            key_item = self.project_db_table.item(row, 0)
-            value_item = self.project_db_table.item(row, 1)
+        for row in range(table.rowCount()):
+            key_item = table.item(row, 0)
+            value_item = table.item(row, 1)
             if key_item is None:
                 continue
             key = key_item.text().strip()
