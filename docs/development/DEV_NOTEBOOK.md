@@ -1321,8 +1321,49 @@ Next immediate action:
 
 ---
 
+## Session Handoff (2026-08-08) - Compute Documentation Reflow
+
+Scope summary:
+
+* Reflowed Compute Engine documentation into a lint-clean strategy/contract split and consolidated the Jetson architecture narrative into the architecture docs lane.
+
+Touched-file list from git status --short:
+
+* M docs/development/COMPUTE_ENGINE_ARCHITECTURE.md
+* ?? docs/development/COMPUTE_ENGINE_ROADMAP.md
+* ?? docs/architecture/BiblionOCR_Intelligent_Compute_and_Jetson_Architecture.md
+* M ViewController/Model/Project/Data/json/Session.json (local runtime drift, out of scope)
+
+Validation status by gate:
+
+* problems/lint:
+  * in-scope files: clean (0)
+  * full workspace: clean (0)
+* compile:
+  * not required this cycle (docs-only change set; no Python runtime edits)
+* smoke tests:
+  * not required this cycle (no runtime behavior change)
+* manual UI checks:
+  * not required this cycle (no UI interaction change)
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Unresolved risks/blockers:
+
+* Session.json remains modified as runtime-local state and should remain uncommitted unless explicitly requested.
+
+Next immediate action:
+
+* Commit and resync the three compute documentation files as a docs-only batch.
+
+---
+
 ## 📅 Last Updated
 
-2026-08-07
+2026-08-08
 
 ---
