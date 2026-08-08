@@ -2,7 +2,6 @@ import os
 import json
 import time
 import shutil
-import hashlib
 import subprocess
 import tempfile
 import sqlite3
@@ -14,6 +13,9 @@ from .project_database import (
     export_project_database_json,
 )
 from .project_tracking import ProjectWorkflowTracker
+from .event_bus import normalize_event
+from .ris import capture_provenance as capture_ris_provenance
+from .ris import finalize_ris
 
 
 class ProjectCreationEngine:
@@ -95,13 +97,13 @@ class ProjectCreationEngine:
 
     # -----------------------
     def emit(self, name, meta=None):
-        event = {
+        event = normalize_event({
             "event": name,
             "timestamp": time.time(),
             "state": self.state.value,
             "project_name": self.context.get("project_name"),
             "metadata": meta or {}
-        }
+        })
 
         self.event_bus.emit(event)
         return event
@@ -152,20 +154,7 @@ class ProjectCreationEngine:
     def capture_provenance(self):
         self.state = ProjectState.PROVENANCE
 
-        required = [
-            "project_name",
-            "project_purpose",
-            "creation_trigger",
-            "source_context",
-            "user_intent_summary"
-        ]
-
-        for r in required:
-            if r not in self.context:
-                raise ValueError(f"Missing {r}")
-
-        self.ris = self.context.copy()
-        self.ris["_locked"] = True
+        self.ris = capture_ris_provenance(self.context)
 
         self.emit("provenance_captured")
 
@@ -173,12 +162,7 @@ class ProjectCreationEngine:
     def generate_ris(self):
         self.state = ProjectState.RIS
 
-        self.ris["ris_version"] = "1.1"
-        self.ris["timestamp"] = time.time()
-
-        self.ris["_hash"] = hashlib.sha256(
-            json.dumps(self.ris, sort_keys=True).encode()
-        ).hexdigest()
+        self.ris = finalize_ris(self.ris)
 
         self.emit("ris_generated")
 
