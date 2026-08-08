@@ -2,6 +2,8 @@
 
 Use this as a fast, repeatable execution checklist for daily development work.
 
+For architecture-normalization passes, run sections A through M plus the dedicated change-set lane in section N.
+
 Execution ownership policy:
 
 1. The coding agent executes this checklist end-to-end.
@@ -15,6 +17,17 @@ Current collaboration protocol (2026-08-07):
 3. UI behavior changes must stay in lock-step across `UI.ui`, generated `UI.py`, and runtime wiring for the scoped module(s).
 4. Every cycle reports full-workspace Problems totals and in-scope Problems totals separately.
 5. Commits and sync are performed only when the user explicitly requests commit/sync for that cycle.
+
+Current architecture-normalization protocol (2026-08-07):
+
+1. Resolve normalization tasks in ledger order and close each task only with evidence.
+2. Update source-of-truth docs in lock-step with code reality:
+   - architecture truth table,
+   - normalization task ledger,
+   - PROJECT_SPEC contract text.
+3. Keep unresolved contradictions explicit in a transitional exceptions register with owner and exit criteria.
+4. Group commits by intent (core runtime, architecture docs, spec/policy docs).
+5. Leave runtime-local state artifacts out of commit unless explicitly requested.
 
 ## A) Preflight (Before Editing)
 
@@ -178,3 +191,28 @@ Before any edits, the agent must regain footing in this exact order:
 8. Commit excludes unrelated artifacts.
 9. Branch sync confirmed.
 10. Launcher smoketest passes for all canonical launchers.
+
+## N) Change-Set Reflow Lane (Architecture Normalization)
+
+Run this lane when the active change set is architecture normalization and documentation reconciliation.
+
+1. Confirm active task IDs and status in `docs/architecture/ARCHITECTURE_NORMALIZATION_TASKS_2026-08-07.md`.
+2. Verify architectural claims against runtime evidence before editing docs.
+3. Update `docs/architecture/ARCHITECTURAL_TRUTH_TABLE_2026-08-07.md` for any status change.
+4. Reconcile `docs/development/PROJECT_SPEC.md` naming/contracts to runtime truth when contradictions are found.
+5. Record or update accepted transitional exceptions in `docs/architecture/BiblionOCR_Architectural_Evidence_Review.md`.
+6. Add closure records for completed task IDs with:
+   - files changed,
+   - acceptance checks run,
+   - full-workspace and in-scope Problems counts,
+   - residual risk.
+7. Validate with:
+   - problems checks for touched files,
+   - full-workspace Problems scan,
+   - `python3 -m py_compile` on touched runtime files,
+   - bounded startup smoke for changed entrypoints.
+8. Commit in grouped batches:
+   - core runtime changes,
+   - architecture governance docs,
+   - spec/policy documentation.
+9. Confirm runtime/session artifacts remain uncommitted unless explicitly requested.

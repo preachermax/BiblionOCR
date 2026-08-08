@@ -1280,8 +1280,49 @@ With the public introduction complete, development focus returns to core applica
 
 ---
 
+## Session Handoff (2026-08-07) - Process Smoke Test
+
+Scope summary:
+
+* Executed the architecture-normalization checklist lane as an end-to-end smoke test after checklist reflow.
+
+Touched-file list from git status --short:
+
+* M ViewController/Model/Project/Data/json/Session.json
+* M docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md
+
+Validation status by gate:
+
+* problems/lint:
+  * in-scope files: clean (0)
+  * full workspace: clean (0)
+* compile:
+  * python3 -m py_compile Core/engine.py Core/event_bus.py Core/event_store.py Core/ris.py ViewController/0-MainUI/MyServer.py
+  * result: pass
+* smoke tests:
+  * QT_QPA_PLATFORM=offscreen timeout 12s .venv/bin/python ViewController/0-MainUI/MyServer.py
+  * result: pass (bounded startup)
+* manual UI checks:
+  * not required for this smoke-test cycle (documentation/process-only delta)
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Unresolved risks/blockers:
+
+* Session.json remains as runtime-local state drift and should stay out of commit unless explicitly requested.
+
+Next immediate action:
+
+* Commit docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md as a focused checklist-reflow docs commit if maintainer approves.
+
+---
+
 ## 📅 Last Updated
 
-2026-07-20
+2026-08-07
 
 ---
