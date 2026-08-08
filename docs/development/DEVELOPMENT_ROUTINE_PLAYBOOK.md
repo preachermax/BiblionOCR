@@ -8,6 +8,17 @@ This document captures the practical development routine we have been using so c
 2. The user should not need to manually drive checklist steps.
 3. When manual validation is unavoidable (for example visual UI behavior), the agent requests only minimal confirmation and records outcomes in a handoff checkpoint.
 
+## 0b) User-Guided Audit Mode (Current)
+
+1. Work is organized module-by-module in the prescribed order provided by the user.
+2. Each change set should be confined to one module unless the user explicitly requests a global change.
+3. When global impact is requested, apply changes consistently across all specified modules and re-run lock-step UI regeneration.
+4. Per-cycle reporting must include:
+   - full-workspace Problems total
+   - in-scope Problems total
+   - unresolved out-of-scope file list
+5. Do not perform commit or sync unless explicitly requested for the current cycle.
+
 ## 1) Start-of-Task Preflight
 
 1. Confirm the exact requirement in one sentence.

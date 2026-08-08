@@ -8,6 +8,14 @@ Execution ownership policy:
 2. The user is not responsible for performing checklist steps manually.
 3. If manual verification is required (for example visual UI checks), the agent requests only the minimum confirmation needed and records the result in the handoff checkpoint.
 
+Current collaboration protocol (2026-08-07):
+
+1. Default scope is one module per change set.
+2. Cross-module or global rollout occurs only when explicitly requested by the user.
+3. UI behavior changes must stay in lock-step across `UI.ui`, generated `UI.py`, and runtime wiring for the scoped module(s).
+4. Every cycle reports full-workspace Problems totals and in-scope Problems totals separately.
+5. Commits and sync are performed only when the user explicitly requests commit/sync for that cycle.
+
 ## A) Preflight (Before Editing)
 
 1. Confirm requirement scope in one sentence.

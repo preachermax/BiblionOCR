@@ -92,6 +92,23 @@ Recommended operating pattern:
 4. Run full-workspace Problems checks before clean claims, and report both full-workspace and in-scope counts.
 5. Keep intentionally deferred modules out of scope until maintainers explicitly re-open them.
 
+## Local Planning Docs (Do Not Commit)
+
+Personal planning material that is useful to an individual maintainer but not intended as shared developer documentation should stay out of git.
+
+Use these ignored locations for local-only planning assets:
+
+1. `docs/development/local/`
+2. `Developer/local/`
+
+Examples of local-only material:
+
+1. personal prompt packs and prompt experiments
+2. private release-planning notes or legal-hygiene drafts
+3. maintainer-only scratch checklists and working memos that are not ready for shared developer use
+
+If a document benefits other developers, move it out of the local folders and commit it through normal review.
+
 Maintainer review may block or request changes when a PR does not demonstrate checklist completion.
 
 ## PR Review Order And Exceptions
