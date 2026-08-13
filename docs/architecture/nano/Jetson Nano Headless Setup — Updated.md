@@ -3,7 +3,9 @@
 ## Current Status
 
 - Nano boots successfully.
+- Hostname verified: `nano`
 - Ethernet connection verified: `192.168.2.5`
+- Host discovery alias verified: `nano.local`
 - SSH from Ubuntu 24 verified successfully.
 - CUDA 10.2.300 verified.
 - CUDA samples are installed.
