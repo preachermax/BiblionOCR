@@ -1,0 +1,328 @@
+max-richey@max-richey-HP-Compaq-6200-Pro-MT-PC:~$ hostnamectl
+uname -a
+lsblk
+free -h
+lscpu
+nproc
+df -h
+ Static hostname: max-richey-HP-Compaq-6200-Pro-MT-PC
+       Icon name: computer-desktop
+         Chassis: desktop 🖥️
+      Machine ID: 93a71afdb3c04875ac87899a839dfcb4
+         Boot ID: a5b83d3c09d6445eade12a004ac1743a
+Operating System: Ubuntu 24.04.2 LTS                 
+          Kernel: Linux 7.0.0-28-generic
+    Architecture: x86-64
+ Hardware Vendor: Hewlett-Packard
+  Hardware Model: HP Compaq 6200 Pro MT PC
+Firmware Version: J01 v02.15
+   Firmware Date: Thu 2011-11-10
+    Firmware Age: 14y 9month 2d                      
+Linux max-richey-HP-Compaq-6200-Pro-MT-PC 7.0.0-28-generic #28~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Wed Jul  1 15:50:57 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0    7:0    0 528.2M  1 loop /snap/audacity/1226
+loop1    7:1    0     4K  1 loop /snap/bare/5
+loop2    7:2    0  13.5M  1 loop /snap/canonical-livepatch/406
+loop3    7:3    0 188.2M  1 loop /snap/chromium/3499
+loop4    7:4    0 257.7M  1 loop /snap/firefox/8754
+loop5    7:5    0 193.4M  1 loop /snap/chromium/3507
+loop6    7:6    0 470.4M  1 loop /snap/code/254
+loop7    7:7    0  63.8M  1 loop /snap/core20/2866
+loop8    7:8    0  73.9M  1 loop /snap/core22/1748
+loop9    7:9    0    74M  1 loop /snap/core22/2411
+loop10   7:10   0  66.8M  1 loop /snap/core24/1643
+loop11   7:11   0  49.1M  1 loop /snap/cups/1229
+loop12   7:12   0  47.9M  1 loop /snap/cups/1238
+loop13   7:13   0  75.5M  1 loop /snap/ffmpeg-2404/139
+loop14   7:14   0  75.5M  1 loop /snap/ffmpeg-2404/149
+loop16   7:16   0 257.7M  1 loop /snap/firefox/8736
+loop17   7:17   0  11.1M  1 loop /snap/firmware-updater/167
+loop18   7:18   0  16.5M  1 loop /snap/firmware-updater/226
+loop19   7:19   0   516M  1 loop /snap/gnome-42-2204/202
+loop20   7:20   0 531.5M  1 loop /snap/gnome-42-2204/263
+loop21   7:21   0 614.5M  1 loop /snap/gnome-46-2404/164
+loop22   7:22   0  91.7M  1 loop /snap/gtk-common-themes/1535
+loop23   7:23   0  94.2M  1 loop /snap/kdenlive/144
+loop24   7:24   0   1.5G  1 loop /snap/kf6-core24/58
+loop25   7:25   0   1.6G  1 loop /snap/kf6-core24/64
+loop26   7:26   0   4.3M  1 loop /snap/lxqt-support-core24/16
+loop27   7:27   0   402M  1 loop /snap/mesa-2404/1839
+loop28   7:28   0   8.9M  1 loop /snap/notepad-plus-plus/444
+loop29   7:29   0  88.6M  1 loop /snap/plexmediaserver/528
+loop30   7:30   0  88.6M  1 loop /snap/plexmediaserver/532
+loop31   7:31   0  78.6M  1 loop /snap/powershell/378
+loop32   7:32   0  78.6M  1 loop /snap/powershell/389
+loop33   7:33   0  15.7M  1 loop /snap/snap-store/1367
+loop34   7:34   0  11.8M  1 loop /snap/snap-store/1390
+loop35   7:35   0  50.1M  1 loop /snap/snapd/27591
+loop36   7:36   0   568K  1 loop /snap/snapd-desktop-integration/253
+loop37   7:37   0   828K  1 loop /snap/snapd-desktop-integration/391
+loop38   7:38   0  64.7M  1 loop /snap/sublime-text/219
+loop39   7:39   0  50.1M  1 loop /snap/snapd/27710
+loop40   7:40   0 103.8M  1 loop /snap/ubuntu-image/1140
+loop41   7:41   0 406.7M  1 loop /snap/wine-platform/154
+loop42   7:42   0 178.9M  1 loop /snap/wine-platform-runtime-core24/23
+loop43   7:43   0 523.6M  1 loop /snap/code/256
+sda      8:0    0 931.5G  0 disk 
+├─sda1   8:1    0   499M  0 part 
+├─sda2   8:2    0 921.6G  0 part /media/max-richey/Windows
+├─sda3   8:3    0   100M  0 part 
+└─sda4   8:4    0   9.3G  0 part 
+sdb      8:16   0   1.8T  0 disk 
+├─sdb1   8:17   0     1G  0 part /boot/efi
+└─sdb2   8:18   0   1.8T  0 part /
+sdc      8:32   1    16M  1 disk /media/max-richey/L4T-README
+sdd      8:48   0  31.9T  0 disk 
+├─sdd1   8:49   0    16M  0 part 
+└─sdd2   8:50   0  31.9T  0 part /media/max-richey/SSD
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       4.4Gi       1.6Gi       456Mi        10Gi        11Gi
+Swap:          4.0Gi        49Mi       4.0Gi
+Architecture:                x86_64
+  CPU op-mode(s):            32-bit, 64-bit
+  Address sizes:             36 bits physical, 48 bits virtual
+  Byte Order:                Little Endian
+CPU(s):                      4
+  On-line CPU(s) list:       0-3
+Vendor ID:                   GenuineIntel
+  Model name:                Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    CPU family:              6
+    Model:                   42
+    Thread(s) per core:      1
+    Core(s) per socket:      4
+    Socket(s):               1
+    Stepping:                7
+    CPU(s) scaling MHz:      94%
+    CPU max MHz:             3400.0000
+    CPU min MHz:             1600.0000
+    BogoMIPS:                6186.24
+    Flags:                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pg
+                             e mca cmov pat pse36 clflush dts acpi mmx fxsr sse 
+                             sse2 ht tm pbe syscall nx rdtscp lm constant_tsc ar
+                             ch_perfmon pebs bts rep_good nopl xtopology nonstop
+                             _tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor 
+                             ds_cpl smx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1
+                              sse4_2 x2apic popcnt tsc_deadline_timer aes xsave 
+                             avx lahf_lm epb pti ssbd ibrs ibpb stibp xsaveopt d
+                             therm ida arat pln pts md_clear flush_l1d
+Caches (sum of all):         
+  L1d:                       128 KiB (4 instances)
+  L1i:                       128 KiB (4 instances)
+  L2:                        1 MiB (4 instances)
+  L3:                        6 MiB (1 instance)
+NUMA:                        
+  NUMA node(s):              1
+  NUMA node0 CPU(s):         0-3
+Vulnerabilities:             
+  Gather data sampling:      Not affected
+  Ghostwrite:                Not affected
+  Indirect target selection: Not affected
+  Itlb multihit:             KVM: Mitigation: VMX unsupported
+  L1tf:                      Mitigation; PTE Inversion
+  Mds:                       Mitigation; Clear CPU buffers; SMT disabled
+  Meltdown:                  Mitigation; PTI
+  Mmio stale data:           Not affected
+  Old microcode:             Not affected
+  Reg file data sampling:    Not affected
+  Retbleed:                  Not affected
+  Spec rstack overflow:      Not affected
+  Spec store bypass:         Mitigation; Speculative Store Bypass disabled via p
+                             rctl
+  Spectre v1:                Mitigation; usercopy/swapgs barriers and __user poi
+                             nter sanitization
+  Spectre v2:                Mitigation; Retpolines; IBPB conditional; IBRS_FW; 
+                             STIBP disabled; RSB filling; PBRSB-eIBRS Not affect
+                             ed; BHI Not affected
+  Srbds:                     Not affected
+  Tsa:                       Not affected
+  Tsx async abort:           Not affected
+  Vmscape:                   Mitigation; IBPB before exit to userspace
+4
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           1.6G  6.7M  1.6G   1% /run
+/dev/sdb2       1.8T  483G  1.3T  28% /
+tmpfs           7.8G  186M  7.6G   3% /dev/shm
+tmpfs           5.0M   12K  5.0M   1% /run/lock
+efivarfs         64K   16K   44K  26% /sys/firmware/efi/efivars
+/dev/sdb1       1.1G  6.2M  1.1G   1% /boot/efi
+tmpfs           1.6G  160K  1.6G   1% /run/user/1000
+/dev/sdd2        32T  3.8T   29T  12% /media/max-richey/SSD
+/dev/sda2       922G  680G  243G  74% /media/max-richey/Windows
+/dev/sdc         16M   66K   16M   1% /media/max-richey/L4T-README
+max-richey@max-richey-HP-Compaq-6200-Pro-MT-PC:~$ sudo nvpmodel -q
+tegrastats --interval 1000 --count 5
+[sudo] password for max-richey: 
+sudo: nvpmodel: command not found
+tegrastats: command not found
+max-richey@max-richey-HP-Compaq-6200-Pro-MT-PC:~$ ssh max-richey@192.168.2.5
+max-richey@192.168.2.5's password: 
+Permission denied, please try again.
+max-richey@192.168.2.5's password: 
+Permission denied, please try again.
+max-richey@192.168.2.5's password: 
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 4.9.253-tegra aarch64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+337 updates can be applied immediately.
+283 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+Last login: Tue Aug 11 17:49:35 2026 from 192.168.2.10
+max-richey@nano:~$ hostnamectl
+   Static hostname: nano
+         Icon name: computer
+        Machine ID: a3d9197b765643568af09eb2bd3e5ce7
+           Boot ID: 45d5dc75d0844fd1890601bcbff35098
+  Operating System: Ubuntu 18.04.6 LTS
+            Kernel: Linux 4.9.253-tegra
+      Architecture: arm64
+max-richey@nano:~$ uname -a
+Linux nano 4.9.253-tegra #1 SMP PREEMPT Sat Feb 19 08:59:22 PST 2022 aarch64 aarch64 aarch64 GNU/Linux
+max-richey@nano:~$ lsblk
+NAME         MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0          7:0    0    16M  1 loop 
+mtdblock0     31:0    0     4M  0 disk 
+mmcblk0      179:0    0 119.1G  0 disk 
+├─mmcblk0p1  179:1    0 119.1G  0 part /
+├─mmcblk0p2  179:2    0   128K  0 part 
+├─mmcblk0p3  179:3    0   448K  0 part 
+├─mmcblk0p4  179:4    0   576K  0 part 
+├─mmcblk0p5  179:5    0    64K  0 part 
+├─mmcblk0p6  179:6    0   192K  0 part 
+├─mmcblk0p7  179:7    0   384K  0 part 
+├─mmcblk0p8  179:8    0    64K  0 part 
+├─mmcblk0p9  179:9    0   448K  0 part 
+├─mmcblk0p10 179:10   0   448K  0 part 
+├─mmcblk0p11 179:11   0   768K  0 part 
+├─mmcblk0p12 179:12   0    64K  0 part 
+├─mmcblk0p13 179:13   0   192K  0 part 
+└─mmcblk0p14 179:14   0   128K  0 part 
+zram0        252:0    0 495.5M  0 disk [SWAP]
+zram1        252:1    0 495.5M  0 disk [SWAP]
+zram2        252:2    0 495.5M  0 disk [SWAP]
+zram3        252:3    0 495.5M  0 disk [SWAP]
+max-richey@nano:~$ free -h
+              total        used        free      shared  buff/cache   available
+Mem:           3.9G        474M        2.6G         20M        853M        3.2G
+Swap:          1.9G          0B        1.9G
+max-richey@nano:~$ lscpu
+Architecture:        aarch64
+Byte Order:          Little Endian
+CPU(s):              4
+On-line CPU(s) list: 0-3
+Thread(s) per core:  1
+Core(s) per socket:  4
+Socket(s):           1
+Vendor ID:           ARM
+Model:               1
+Model name:          Cortex-A57
+Stepping:            r1p1
+CPU max MHz:         1479.0000
+CPU min MHz:         102.0000
+BogoMIPS:            38.40
+L1d cache:           32K
+L1i cache:           48K
+L2 cache:            2048K
+Flags:               fp asimd evtstrm aes pmull sha1 sha2 crc32
+max-richey@nano:~$ nproc
+4
+max-richey@nano:~$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/mmcblk0p1  118G   12G  101G  11% /
+none            1.8G     0  1.8G   0% /dev
+tmpfs           2.0G  4.0K  2.0G   1% /dev/shm
+tmpfs           2.0G   21M  2.0G   2% /run
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
+tmpfs           397M   12K  397M   1% /run/user/120
+tmpfs           397M     0  397M   0% /run/user/1000
+max-richey@nano:~$ sudo nvpmodel -q
+[sudo] password for max-richey: 
+Sorry, try again.
+[sudo] password for max-richey: 
+NVPM WARN: fan mode is not set!
+NV Power Mode: MAXN
+0
+max-richey@nano:~$ sudo tegrastats --interval 1000 --count 5
+Unknown command: --count. Please try again or see --help
+max-richey@nano:~$ sudo tegrastats --help
+Usage: tegrastats [-option]
+Options:
+    --help                  : print this help screen
+    --interval <millisec>   : sample the information in <milliseconds>
+    --logfile  <filename>   : dump the output of tegrastats to <filename>
+    --load_cfg <filename>   : load the information from <filename>
+    --save_cfg <filename>   : save the information to <filename>
+    --start                 : run tegrastats as a daemon process in the background
+    --stop                  : stop any running instances of tegrastats
+    --verbose               : print verbose message
+max-richey@nano:~$ sudo tegrastats --interval 1000
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [3%@102,0%@102,0%@102,0%@102] EMC_FREQ 0%@1600 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35.5C PMIC@50C GPU@36C AO@43C thermal@36C POM_5V_IN 1502/1502 POM_5V_GPU 0/0 POM_5V_CPU 125/125
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [1%@102,0%@204,0%@204,1%@204] EMC_FREQ 0%@1600 GR3D_FREQ 0%@76 APE 25 PLL@32.5C CPU@35.5C PMIC@50C GPU@36.5C AO@43.5C thermal@36C POM_5V_IN 1502/1502 POM_5V_GPU 0/0 POM_5V_CPU 125/125
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [2%@102,0%@102,0%@102,0%@102] EMC_FREQ 0%@1600 GR3D_FREQ 0%@76 APE 25 PLL@32.5C CPU@35C PMIC@50C GPU@36.5C AO@43C thermal@35.75C POM_5V_IN 1460/1488 POM_5V_GPU 0/0 POM_5V_CPU 83/111
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [2%@102,0%@102,0%@204,1%@204] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@36C PMIC@50C GPU@36C AO@43C thermal@36C POM_5V_IN 964/1357 POM_5V_GPU 0/0 POM_5V_CPU 125/114
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [2%@102,0%@102,0%@102,0%@102] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35.5C PMIC@50C GPU@36C AO@43C thermal@36C POM_5V_IN 922/1270 POM_5V_GPU 0/0 POM_5V_CPU 125/116
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [2%@102,2%@102,0%@102,0%@102] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35.5C PMIC@50C GPU@36C AO@43C thermal@35.75C POM_5V_IN 922/1212 POM_5V_GPU 0/0 POM_5V_CPU 125/118
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [2%@102,0%@102,0%@102,0%@102] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35.5C PMIC@50C GPU@36.5C AO@43C thermal@36C POM_5V_IN 922/1170 POM_5V_GPU 0/0 POM_5V_CPU 125/119
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [1%@102,0%@204,0%@204,0%@204] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35.5C PMIC@50C GPU@36C AO@43C thermal@35.75C POM_5V_IN 922/1139 POM_5V_GPU 0/0 POM_5V_CPU 125/119
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [4%@102,0%@102,0%@102,0%@102] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35C PMIC@50C GPU@36C AO@43C thermal@36C POM_5V_IN 922/1115 POM_5V_GPU 0/0 POM_5V_CPU 125/120
+RAM 533/3964MB (lfb 643x4MB) SWAP 0/1982MB (cached 0MB) IRAM 0/252kB(lfb 252kB) CPU [2%@102,1%@204,0%@204,0%@204] EMC_FREQ 0%@204 GR3D_FREQ 0%@76 APE 25 PLL@32C CPU@35.5C PMIC@50C GPU@36C AO@43C thermal@36C POM_5V_IN 922/1096 POM_5V_GPU 0/0 POM_5V_CPU 125/120
+^C
+
+
+
+max-richey@nano:~$ cat /etc/nv_tegra_release
+# R32 (release), REVISION: 7.1, GCID: 29818004, BOARD: t210ref, EABI: aarch64, DATE: Sat Feb 19 17:05:08 UTC 2022
+max-richey@nano:~$ ls -ld /usr/local/cuda*
+lrwxrwxrwx  1 root root   22 Feb 22  2022 /usr/local/cuda -> /etc/alternatives/cuda
+lrwxrwxrwx  1 root root   25 Feb 22  2022 /usr/local/cuda-10 -> /etc/alternatives/cuda-10
+drwxr-xr-x 12 root root 4096 Feb 22  2022 /usr/local/cuda-10.2
+max-richey@nano:~$ which nvcc
+max-richey@nano:~$ ls -l /usr/local/cuda/bin/nvcc
+-rwxr-xr-x 1 root root 200800 Mar  1  2021 /usr/local/cuda/bin/nvcc
+max-richey@nano:~$ readlink -f /usr/local/cuda
+/usr/local/cuda-10.2
+max-richey@nano:~$ echo "$PATH"
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+max-richey@nano:~$ 
+max-richey@nano:~$ export PATH=/usr/local/cuda/bin:$PATH
+max-richey@nano:~$ which nvcc
+/usr/local/cuda/bin/nvcc
+max-richey@nano:~$ nvcc --version
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2021 NVIDIA Corporation
+Built on Sun_Feb_28_22:34:44_PST_2021
+Cuda compilation tools, release 10.2, V10.2.300
+Build cuda_10.2_r440.TC440_70.29663091_0
+max-richey@nano:~$ 
+max-richey@nano:~$ echo $PATH
+/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+max-richey@nano:~$ ls -l /usr/local/cuda
+lrwxrwxrwx 1 root root 22 Feb 22  2022 /usr/local/cuda -> /etc/alternatives/cuda
+max-richey@nano:~$ ls -l /usr/local/cuda/bin/nvcc
+-rwxr-xr-x 1 root root 200800 Mar  1  2021 /usr/local/cuda/bin/nvcc
+max-richey@nano:~$ nvidia-smi
+-bash: nvidia-smi: command not found
+max-richey@nano:~$ 
+max-richey@nano:~$ ls -l /usr/local/cuda/samples
+total 100
+drwxr-xr-x 42 root root  4096 Feb 22  2022 0_Simple
+drwxr-xr-x  7 root root  4096 Feb 22  2022 1_Utilities
+drwxr-xr-x 12 root root  4096 Feb 22  2022 2_Graphics
+drwxr-xr-x 24 root root  4096 Feb 22  2022 3_Imaging
+drwxr-xr-x  7 root root  4096 Feb 22  2022 4_Finance
+drwxr-xr-x  9 root root  4096 Feb 22  2022 5_Simulations
+drwxr-xr-x 30 root root  4096 Feb 22  2022 6_Advanced
+drwxr-xr-x 33 root root  4096 Feb 22  2022 7_CUDALibraries
+drwxr-xr-x  6 root root  4096 Feb 22  2022 common
+-rw-r--r--  1 root root 60543 Mar  1  2021 EULA.txt
+-rw-r--r--  1 root root  2606 Mar  1  2021 Makefile
+max-richey@nano:~$ hostname -I
+192.168.2.5 192.168.55.1 172.17.0.1 

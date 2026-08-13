@@ -1331,7 +1331,7 @@ Touched-file list from git status --short:
 
 * M docs/development/COMPUTE_ENGINE_ARCHITECTURE.md
 * ?? docs/development/COMPUTE_ENGINE_ROADMAP.md
-* ?? docs/architecture/BiblionOCR_Intelligent_Compute_and_Jetson_Architecture.md
+* ?? docs/architecture/nano/BiblionOCR_Intelligent_Compute_and_Jetson_Architecture.md
 * M ViewController/Model/Project/Data/json/Session.json (local runtime drift, out of scope)
 
 Validation status by gate:
