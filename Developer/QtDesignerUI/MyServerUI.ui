@@ -1310,7 +1310,7 @@
      <x>0</x>
      <y>0</y>
      <width>1319</width>
-      <height>32</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTraining">
@@ -1320,7 +1320,6 @@
     <addaction name="actionMyVersifier"/>
     <addaction name="actionMyResolver"/>
     <addaction name="actionMyGrounder"/>
-    <addaction name="actionStage_Ground_Truth"/>
    </widget>
    <widget class="QMenu" name="menuOCR">
     <property name="title">
@@ -1336,8 +1335,6 @@
      <addaction name="actionEnglish_2"/>
     </widget>
     <addaction name="menuSelect_Language"/>
-    <addaction name="actionOCR_Preprocess"/>
-    <addaction name="actionSelect_Image"/>
     <addaction name="actionCorrect_OCR_tb"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -1360,12 +1357,15 @@
     <addaction name="actionSave_As_Image"/>
     <addaction name="actionSave_Text"/>
     <addaction name="actionSave_As_Text"/>
+    <addaction name="separator"/>
+    <addaction name="actionDevelopment_Backup"/>
+    <addaction name="actionDevelopment_Restore"/>
+    <addaction name="actionProduction_Backup_Restore"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionPrefernces"/>
     <addaction name="actionMyPixler"/>
     <addaction name="actionMyWriter"/>
     <addaction name="actionFind_and_Replace"/>
@@ -1381,8 +1381,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionOnline"/>
-    <addaction name="actionProjectFont"/>
     <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
    </widget>
@@ -1394,6 +1392,7 @@
     <addaction name="actionNewProject"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="actionSet_Columns_Per_Page"/>
+    <addaction name="actionPrefernces"/>
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
@@ -2262,11 +2261,19 @@
    </property>
   </action>
   <action name="actionSave_Image">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+   </property>
    <property name="text">
     <string>Save Image</string>
    </property>
   </action>
   <action name="actionSave_As_Image">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+   </property>
    <property name="text">
     <string>Save As Image</string>
    </property>
@@ -2548,7 +2555,7 @@
   </action>
   <action name="actionFont_Forge">
    <property name="icon">
-    <iconset>
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
      <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
@@ -2685,6 +2692,33 @@
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionDevelopment_Backup">
+   <property name="text">
+    <string>Development Backup...</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a development backup snapshot.</string>
+   </property>
+  </action>
+  <action name="actionDevelopment_Restore">
+   <property name="text">
+    <string>Development Restore...</string>
+   </property>
+   <property name="toolTip">
+    <string>Restore a development backup snapshot to a staged folder.</string>
+   </property>
+  </action>
+  <action name="actionProduction_Backup_Restore">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Production Backup/Restore (Coming Soon)</string>
+   </property>
+   <property name="toolTip">
+    <string>Reserved for production backup and restore process wiring.</string>
    </property>
   </action>
   <action name="actionSet_Columns_Per_Page">

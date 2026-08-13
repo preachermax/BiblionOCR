@@ -21,6 +21,7 @@ import json
 import csv
 import time
 import hashlib
+from datetime import datetime, timezone
 from enum import Enum
 
 
@@ -419,6 +420,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
+        self._install_backup_restore_actions()
 
         # -------------------------
         # Buttons / Navigation
@@ -3075,6 +3077,53 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
 
+    def _choose_directory_with_myexplorer(self, title, start_dir=''):
+        """Use MyExplorer as the default directory picker for workflow dialogs."""
+        start_path = self._dialog_start_directory(start_dir)
+        output_file = os.path.join(
+            tempfile.gettempdir(),
+            f"biblion_myexplorer_select_{int(time.time() * 1000)}.txt",
+        )
+        module_path = os.path.join(script_dir, "MyExplorer.py")
+
+        cmd = [
+            sys.executable,
+            module_path,
+            "--select-dir",
+            "--start-dir",
+            start_path,
+            "--output-file",
+            output_file,
+            "--title",
+            title,
+        ]
+
+        try:
+            subprocess.run(cmd, check=False)
+        except OSError as exc:
+            qtw.QMessageBox.warning(
+                self,
+                "MyExplorer Picker",
+                f"Could not start MyExplorer picker:\n{exc}\n\nFalling back to system folder dialog.",
+            )
+            return self._choose_directory(title, start_dir)
+
+        selected_path = ""
+        if os.path.isfile(output_file):
+            try:
+                with open(output_file, "r", encoding="utf-8") as handle:
+                    selected_path = handle.read().strip()
+            except OSError:
+                selected_path = ""
+
+        try:
+            if os.path.exists(output_file):
+                os.remove(output_file)
+        except OSError:
+            pass
+
+        return selected_path
+
     def _choose_file(self, title, name_filter='All Files (*.*)', start_dir=''):
         return qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget,
@@ -3082,6 +3131,266 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self._dialog_start_directory(start_dir),
             name_filter,
         )[0]
+
+    def _install_backup_restore_actions(self):
+        """Install development backup/restore menu actions into File menu."""
+        if hasattr(self.ui, "actionDevelopment_Backup"):
+            self.ui.actionDevelopment_Backup.triggered.connect(self.open_development_backup_dialog)
+        if hasattr(self.ui, "actionDevelopment_Restore"):
+            self.ui.actionDevelopment_Restore.triggered.connect(self.open_development_restore_dialog)
+        if hasattr(self.ui, "actionProduction_Backup_Restore"):
+            self.ui.actionProduction_Backup_Restore.setEnabled(False)
+
+        # Backward-compatible fallback for older UI artifacts.
+        if not hasattr(self.ui, "actionDevelopment_Backup") and hasattr(self.ui, "menuFile"):
+            self.actionDevelopmentBackup = QAction("Development Backup...", self)
+            self.actionDevelopmentRestore = QAction("Development Restore...", self)
+            self.actionProductionBackupRestore = QAction("Production Backup/Restore (Coming Soon)", self)
+            self.actionProductionBackupRestore.setEnabled(False)
+
+            self.actionDevelopmentBackup.triggered.connect(self.open_development_backup_dialog)
+            self.actionDevelopmentRestore.triggered.connect(self.open_development_restore_dialog)
+
+            self.ui.menuFile.addSeparator()
+            self.ui.menuFile.addAction(self.actionDevelopmentBackup)
+            self.ui.menuFile.addAction(self.actionDevelopmentRestore)
+            self.ui.menuFile.addAction(self.actionProductionBackupRestore)
+
+    def _default_backup_source_dir(self):
+        """Return the default development backup source directory."""
+        return os.path.abspath(project_root)
+
+    def _default_external_backup_root(self):
+        """Resolve best-effort mounted external root; prefer large mounts (for 32TB SSD)."""
+        user = os.environ.get("USER", "")
+        candidates = []
+
+        for base in (
+            os.path.join("/media", user),
+            os.path.join("/run", "media", user),
+            "/mnt",
+        ):
+            if os.path.isdir(base):
+                for name in os.listdir(base):
+                    path = os.path.join(base, name)
+                    if os.path.ismount(path):
+                        candidates.append(path)
+
+        best_path = ""
+        best_size = -1
+        for candidate in candidates:
+            try:
+                total = shutil.disk_usage(candidate).total
+            except OSError:
+                continue
+            if total > best_size:
+                best_size = total
+                best_path = candidate
+
+        if best_path:
+            return best_path
+
+        return qtc.QDir.homePath()
+
+    def _development_backup_root(self, destination_root):
+        return os.path.join(destination_root, "BiblionOCR_Backups", "Development")
+
+    def _build_copy_ignore(self):
+        """Return ignore function for volatile dev artifacts that should not be backed up."""
+        ignored = {
+            ".venv",
+            "__pycache__",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".coverage",
+        }
+
+        def _ignore(_current_dir, names):
+            return {name for name in names if name in ignored}
+
+        return _ignore
+
+    def _copy_tree_with_feedback(self, source_dir, destination_dir):
+        """Copy tree and present a simple wait cursor/status experience for long operations."""
+        qtw.QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.statusBar().showMessage(f"Copying: {source_dir} -> {destination_dir}")
+        qtw.QApplication.processEvents()
+        try:
+            shutil.copytree(
+                source_dir,
+                destination_dir,
+                dirs_exist_ok=False,
+                ignore=self._build_copy_ignore(),
+            )
+        finally:
+            self.statusBar().clearMessage()
+            qtw.QApplication.restoreOverrideCursor()
+
+    def _write_backup_manifest(self, snapshot_dir, source_dir, payload_dir):
+        manifest_path = os.path.join(snapshot_dir, "backup_manifest.json")
+        manifest = {
+            "process": "development",
+            "module": "MyServer",
+            "created_utc": datetime.now(timezone.utc).isoformat(),
+            "source_dir": os.path.abspath(source_dir),
+            "payload_dir": os.path.abspath(payload_dir),
+            "host_platform": platform.platform(),
+            "python": sys.version,
+        }
+
+        with open(manifest_path, "w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2)
+
+    def open_development_backup_dialog(self):
+        """Run the development backup workflow with manual step-by-step dialogs."""
+        source_default = self._default_backup_source_dir()
+        destination_default = self._default_external_backup_root()
+
+        source_dir = self._choose_directory_with_myexplorer(
+            "Development Backup: Select source folder",
+            source_default,
+        )
+        if not source_dir:
+            return
+
+        destination_root = self._choose_directory_with_myexplorer(
+            "Development Backup: Select destination root (mounted SSD)",
+            destination_default,
+        )
+        if not destination_root:
+            return
+
+        if not os.path.isdir(source_dir):
+            qtw.QMessageBox.warning(self, "Development Backup", f"Source folder not found:\n{source_dir}")
+            return
+        if not os.path.isdir(destination_root):
+            qtw.QMessageBox.warning(self, "Development Backup", f"Destination root not found:\n{destination_root}")
+            return
+
+        backup_root = self._development_backup_root(destination_root)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        snapshot_dir = os.path.join(backup_root, f"dev_backup_{timestamp}")
+        payload_dir = os.path.join(snapshot_dir, os.path.basename(os.path.abspath(source_dir)))
+
+        confirmation = qtw.QMessageBox.question(
+            self,
+            "Confirm Development Backup",
+            (
+                "Create development backup with these settings?\n\n"
+                f"Source:\n{source_dir}\n\n"
+                f"Destination Root:\n{destination_root}\n\n"
+                f"Snapshot Folder:\n{snapshot_dir}"
+            ),
+            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+            qtw.QMessageBox.Yes,
+        )
+        if confirmation != qtw.QMessageBox.Yes:
+            return
+
+        try:
+            os.makedirs(snapshot_dir, exist_ok=False)
+            self._copy_tree_with_feedback(source_dir, payload_dir)
+            self._write_backup_manifest(snapshot_dir, source_dir, payload_dir)
+        except Exception as exc:
+            qtw.QMessageBox.critical(
+                self,
+                "Development Backup Failed",
+                f"Backup failed with error:\n{exc}",
+            )
+            return
+
+        qtw.QMessageBox.information(
+            self,
+            "Development Backup Complete",
+            f"Backup created successfully:\n{snapshot_dir}",
+        )
+
+    def _find_restore_payload_dir(self, backup_snapshot_dir):
+        """Resolve payload directory inside a backup snapshot (expects BiblionOCR folder payload)."""
+        preferred = os.path.join(backup_snapshot_dir, "BiblionOCR")
+        if os.path.isdir(preferred):
+            return preferred
+
+        for child in os.listdir(backup_snapshot_dir):
+            child_path = os.path.join(backup_snapshot_dir, child)
+            if os.path.isdir(child_path) and child.lower().startswith("biblion"):
+                return child_path
+
+        return ""
+
+    def open_development_restore_dialog(self):
+        """Run the development restore workflow as a safe staged restore (non-destructive)."""
+        backup_start = self._development_backup_root(self._default_external_backup_root())
+        backup_snapshot_dir = self._choose_directory_with_myexplorer(
+            "Development Restore: Select backup snapshot folder",
+            backup_start,
+        )
+        if not backup_snapshot_dir:
+            return
+
+        if not os.path.isdir(backup_snapshot_dir):
+            qtw.QMessageBox.warning(
+                self,
+                "Development Restore",
+                f"Backup snapshot folder not found:\n{backup_snapshot_dir}",
+            )
+            return
+
+        payload_dir = self._find_restore_payload_dir(backup_snapshot_dir)
+        if not payload_dir:
+            qtw.QMessageBox.warning(
+                self,
+                "Development Restore",
+                "Selected backup does not contain a recognizable BiblionOCR payload folder.",
+            )
+            return
+
+        restore_parent_default = os.path.dirname(self._default_backup_source_dir())
+        restore_parent = self._choose_directory_with_myexplorer(
+            "Development Restore: Select restore parent folder",
+            restore_parent_default,
+        )
+        if not restore_parent:
+            return
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        restore_target = os.path.join(restore_parent, f"BiblionOCR_dev_restore_{timestamp}")
+
+        confirmation = qtw.QMessageBox.question(
+            self,
+            "Confirm Development Restore",
+            (
+                "Restore will create a new restored folder (non-destructive).\n\n"
+                f"Backup Snapshot:\n{backup_snapshot_dir}\n\n"
+                f"Payload:\n{payload_dir}\n\n"
+                f"Restore Target:\n{restore_target}"
+            ),
+            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+            qtw.QMessageBox.Yes,
+        )
+        if confirmation != qtw.QMessageBox.Yes:
+            return
+
+        try:
+            self._copy_tree_with_feedback(payload_dir, restore_target)
+        except Exception as exc:
+            qtw.QMessageBox.critical(
+                self,
+                "Development Restore Failed",
+                f"Restore failed with error:\n{exc}",
+            )
+            return
+
+        qtw.QMessageBox.information(
+            self,
+            "Development Restore Complete",
+            (
+                "Restore completed to a new folder:\n"
+                f"{restore_target}\n\n"
+                "Review and validate it before manual cutover."
+            ),
+        )
 
     def loadText(self):
         self.open_non_modal_text_picker(
