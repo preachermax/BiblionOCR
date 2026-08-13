@@ -1,6 +1,7 @@
 # BiblionOCR: Intelligent Compute, CUDA, and Headless Jetson Architecture
-## Session Summary and Nano Migration Plan
-### 8 August 2026
+
+Session Summary and Nano Migration Plan
+8 August 2026
 
 ## 1. Strategic Direction
 
@@ -57,7 +58,7 @@ The Nano should evolve from being a remotely controlled desktop into a **network
 
 ---
 
-# 3. The Important Architectural Shift
+## 3. The Important Architectural Shift
 
 The Nano should not need TeamViewer.
 
@@ -87,7 +88,7 @@ A desktop environment is unnecessary for this role.
 
 ---
 
-# 4. Compute Engine Evolution
+## 4. Compute Engine Evolution
 
 The existing Compute Engine architecture is the correct foundation.
 
@@ -143,7 +144,7 @@ The five principal concerns are:
 
 ---
 
-# 5. Resource Knowledge Base
+## 5. Resource Knowledge Base
 
 The Compute Engine should maintain a **small operational knowledge base**.
 
@@ -184,7 +185,7 @@ The key principle is that the database should describe **BiblionOCR-relevant cap
 
 ---
 
-# 6. Capability States
+## 6. Capability States
 
 Unknown hardware should never be treated as capable merely because it looks promising.
 
@@ -202,14 +203,14 @@ BiblionOCR should discover what it can verify and conservatively decline what it
 
 ---
 
-# 7. Task-Oriented Capability Knowledge
+## 7. Task-Oriented Capability Knowledge
 
 Capability should be evaluated against workloads.
 
 For example:
 
 | Capability | Jetson Nano | Desktop GPU | CPU |
-|---|---:|---:|---:|
+| --- | ---: | ---: | ---: |
 | Image preprocessing | Yes | Yes | Yes |
 | OCR preprocessing | Yes | Yes | Yes |
 | ML inference | Yes | Yes | Yes |
@@ -228,7 +229,7 @@ The important idea is:
 
 ---
 
-# 8. Decisive ML Process Flow
+## 8. Decisive ML Process Flow
 
 As NVIDIA GPUs become more common, Compute Engine needs to be decisive without becoming reckless.
 
@@ -279,7 +280,7 @@ A core architectural principle should be:
 
 ---
 
-# 9. Where CUDA Actually Matters
+## 9. Where CUDA Actually Matters
 
 CUDA should not be forced into tasks where it offers little benefit.
 
@@ -302,7 +303,7 @@ The Compute Engine should make CUDA available as a capability rather than assumi
 
 ---
 
-# 10. Intelligent Workflow
+## 10. Intelligent Workflow
 
 The existing Workflow architecture can eventually become adaptive.
 
@@ -363,7 +364,7 @@ rather than merely:
 
 ---
 
-# 11. Learning From Scholarly Corrections
+## 11. Learning From Scholarly Corrections
 
 A potentially powerful future loop is:
 
@@ -397,7 +398,7 @@ The human correction must remain authoritative evidence.
 
 ---
 
-# 12. Project Knowledge State
+## 12. Project Knowledge State
 
 An adaptive project could eventually maintain a knowledge state resembling:
 
@@ -428,7 +429,7 @@ It is an **adaptive scholarly workflow**.
 
 ---
 
-# 13. Provenance Must Extend Into ML Decisions
+## 13. Provenance Must Extend Into ML Decisions
 
 An automated decision should record more than the resulting setting.
 
@@ -457,29 +458,20 @@ decision:
     parameters: ...
 ```
 
-The scholarly artifact should eventually contain not only:
+The scholarly artifact should eventually contain not only "What happened?" but also:
 
-> What happened?
-
-but:
-
-> Why did it happen?
-
-> Which model made the recommendation?
-
-> What evidence was considered?
-
-> What compute resource was used?
-
-> What model/version/parameters were involved?
-
-> Did the scholar accept the result?
+- Why did it happen?
+- Which model made the recommendation?
+- What evidence was considered?
+- What compute resource was used?
+- What model/version/parameters were involved?
+- Did the scholar accept the result?
 
 This is where AI/ML becomes particularly compatible with the humanities.
 
 ---
 
-# 14. Credibility and "Preeminence"
+## 14. Credibility and "Preeminence"
 
 The goal should not be to establish credibility by using fashionable AI terminology.
 
@@ -501,7 +493,7 @@ It is **auditable computational scholarship**.
 
 ---
 
-# 15. BiblionOCR Should Not Become a General Distributed Computing Framework
+## 15. BiblionOCR Should Not Become a General Distributed Computing Framework
 
 Avoid prematurely turning Compute Engine into:
 
@@ -524,7 +516,7 @@ That is enough.
 
 ---
 
-# 16. Networked Jetson Architecture
+## 16. Networked Jetson Architecture
 
 The eventual headless Nano can expose a small service layer:
 
@@ -580,7 +572,7 @@ Status:
 
 ---
 
-# 17. The TeamViewer Insight
+## 17. The TeamViewer Insight
 
 Abandoning TeamViewer was therefore not merely a convenience decision.
 
@@ -603,7 +595,7 @@ This is genuinely a "two birds with one stone" opportunity.
 
 ---
 
-# 18. Headless Jetson Nano Migration
+## 18. Headless Jetson Nano Migration
 
 ## Objective
 
@@ -639,7 +631,7 @@ For this hardware, an older NVIDIA-supported JetPack/L4T release may actually be
 
 ---
 
-# 19. Recommended Migration Strategy
+## 19. Recommended Migration Strategy
 
 Use:
 
@@ -654,7 +646,7 @@ Then install BiblionOCR's compute service.
 
 ---
 
-# 20. Preserve the Existing Nano First
+## 20. Preserve the Existing Nano First
 
 Before replacing the SSD image:
 
@@ -699,7 +691,7 @@ Also record:
 
 ---
 
-# 21. Back Up Anything Worth Keeping
+## 21. Back Up Anything Worth Keeping
 
 Before writing a new image, preserve:
 
@@ -719,7 +711,7 @@ Do not rely solely on a file copy if the existing installation contains anything
 
 ---
 
-# 22. Determine the Exact JetPack/L4T Baseline
+## 22. Determine the Exact JetPack/L4T Baseline
 
 On the existing Nano, investigate:
 
@@ -750,7 +742,7 @@ For Jetson hardware, the NVIDIA-supported software stack is the primary constrai
 
 ---
 
-# 23. Image Acquisition
+## 23. Image Acquisition
 
 Prefer an image from NVIDIA's official Jetson developer resources rather than an arbitrary third-party image.
 
@@ -770,7 +762,7 @@ not:
 
 ---
 
-# 24. Windows Image-Burning Workflow
+## 24. Windows Image-Burning Workflow
 
 A practical Windows procedure is:
 
@@ -790,7 +782,7 @@ Do not proceed until the target SSD/storage device is unambiguously identified.
 
 ---
 
-# 25. First Headless Boot
+## 25. First Headless Boot
 
 After installing the new image:
 
@@ -821,7 +813,7 @@ Jetson:
 
 ---
 
-# 26. Headless Does Not Mean "Barely Functional"
+## 26. Headless Does Not Mean "Barely Functional"
 
 Keep enough of the NVIDIA stack to support:
 
@@ -839,7 +831,7 @@ A conservative minimalism is preferable to aggressive stripping.
 
 ---
 
-# 27. BiblionOCR Agent Should Come Later
+## 27. BiblionOCR Agent Should Come Later
 
 Once the Jetson is stable:
 
@@ -874,7 +866,7 @@ Then we can add:
 
 ---
 
-# 28. Initial Compute Agent Protocol
+## 28. Initial Compute Agent Protocol
 
 A minimal first registration could eventually resemble:
 
@@ -903,7 +895,7 @@ The actual implementation should emerge from the Compute Engine architecture rat
 
 ---
 
-# 29. Fallback and Bailout Are First-Class Features
+## 29. Fallback and Bailout Are First-Class Features
 
 A workload should never silently disappear because the preferred resource is unavailable.
 
@@ -942,7 +934,7 @@ That last state is especially important for computational humanities.
 
 ---
 
-# 30. Governing Principle
+## 30. Governing Principle
 
 The emerging architectural principle is:
 
@@ -967,7 +959,7 @@ But it should remain conservative about:
 
 ---
 
-# 31. Immediate Next Steps
+## 31. Immediate Next Steps
 
 Do not implement all of this at once.
 
@@ -1056,7 +1048,7 @@ improved recommendation
 
 ---
 
-# 32. Final Architectural Picture
+## 32. Final Architectural Picture
 
 The direction now looks like this:
 
