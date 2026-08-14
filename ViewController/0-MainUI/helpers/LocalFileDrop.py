@@ -322,7 +322,9 @@ class LocalFileDropMixin:
         self._ensure_file_drop_state()
         self._register_file_drop_target(target, image_handler=image_handler, text_handler=text_handler)
 
-    def eventFilter(self, watched, event):
+    def eventFilter(self, a0, a1):
+        watched = a0
+        event = a1
         if self.FILE_DROP_DEBUG:
             if event.type() in (qtc.QEvent.DragEnter, qtc.QEvent.DragMove, qtc.QEvent.Drop):
                 self._debug_file_drop_event(watched, event, "global-event")
