@@ -76,101 +76,108 @@ class CharacterReference(qtw.QMainWindow):
         self.ui.chrSelectedFontSize.valueChanged.connect(self.on_chrfont_update)
         #self.ui.OCRlangComboBox.currentTextChanged.connect(self.on_language_select)
 
-    def _resolve_unicode_ranges_json_path(self):
-        # Prefer primary project data, then fallback to known mirrored/backup trees.
-        candidate_paths = [
+    def _unicode_ranges_json_candidates(self):
+        return [
             os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json'),
+            os.path.join(self.mod_abspath, 'Model', 'Data', 'json', 'ProjectUnicodeRanges.json'),
             os.path.join(self.mod_abspath, 'ViewController', 'Model', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json'),
             os.path.join(self.mod_abspath, 'Model', 'Backup Copies', 'Project', 'Data', 'json', 'ProjectUnicodeRanges.json'),
         ]
+
+    def _unicode_ranges_csv_candidates(self):
+        return [
+            os.path.join(self.mod_abspath, 'Model', 'Project', 'Data', 'csv', 'ProjectUnicodeRanges.csv'),
+            os.path.join(self.mod_abspath, 'Model', 'Data', 'csv', 'ProjectUnicodeRanges.csv'),
+        ]
+
+    def _resolve_unicode_ranges_json_path(self):
+        # Prefer primary project data, then fallback to known mirrored/backup trees.
+        candidate_paths = self._unicode_ranges_json_candidates()
         for candidate in candidate_paths:
             if os.path.isfile(candidate):
                 return candidate
+
+        for csv_candidate in self._unicode_ranges_csv_candidates():
+            if os.path.isfile(csv_candidate):
+                return None
+
         raise FileNotFoundError(
             'ProjectUnicodeRanges.json not found in expected locations: '
-            + ', '.join(candidate_paths)
+            + ', '.join(candidate_paths + self._unicode_ranges_csv_candidates())
         )
+
+    def _load_unicode_ranges(self):
+        json_path = self._resolve_unicode_ranges_json_path()
+        if json_path:
+            with open(json_path, encoding='utf-8') as handle:
+                return json.load(handle)
+
+        for csv_candidate in self._unicode_ranges_csv_candidates():
+            if os.path.isfile(csv_candidate):
+                with open(csv_candidate, encoding='utf-8-sig', newline='') as handle:
+                    return list(csv.DictReader(handle))
+
+        raise FileNotFoundError('ProjectUnicodeRanges source data could not be loaded.')
     
     #def on_language_select(self):
     
 
 
     def initUCodeRangeCombo(self):
-        # Opening JSON file
-        json_path = self._resolve_unicode_ranges_json_path()
-        with open(json_path) as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)
-            # Iterating through the json
-            for category in data:
-                #print(category['category'])
-                #lang = self.ui.OCRlangComboBox.currentText()
-                self.ui.uCodeRangeComboBox.addItem(category['category'])
-
-        # Closing file
-        f.close()
+        data = self._load_unicode_ranges()
+        for category in data:
+            self.ui.uCodeRangeComboBox.addItem(category['category'])
         self.on_combo_select()
 
     def on_combo_select(self):
         self.ucoderange = self.ui.uCodeRangeComboBox.currentText()
         # self.ui.uCodeRangeComboBox.setEditText(self.ucoderange)
-        # Reopening JSON file
-        json_path = self._resolve_unicode_ranges_json_path()
-        with open(json_path) as f:
-            # returns JSON object as
-            # a dictionary
-            data = json.load(f)
+        data = self._load_unicode_ranges()
 
-            # Iterating through the json
-            # list
-            for category in data:
-                #print(category['category'])
-                if category['category'] == self.ucoderange:
-                    decrange = category['range'].split(",")
-                    hexrange = category['hexrange'].split(",")
-                    print(f'Hex Range from json: {hexrange} Range: {decrange}')
-                    self.hs = hexrange[0].replace('[','')
-                    self.he = hexrange[1].replace(']','')
-                    self.ds = decrange[0].replace('[','')
-                    self.de = decrange[1].replace(']','')
-                    print(
-                        f'Hex Range Start: {self.hs} End: {self.he}, Dec Range Start: {self.ds} End: {self.de}')
-                    start = int(self.ds)
-                    end = int(self.de)
-                    # Initialize start and end comboboxes
-                    # self.rowcount = 0
-                    self.ui.uCodeStartRangeComboBox.clear()
-                    self.ui.uCodeEndRangeComboBox.clear()
-                    for startcode in range(start, end+1):
-                        endcode = end
-                        if self.ui.hexRadioButton.isChecked():
-                            if startcode % 16 == 0:
-                                rowendcode = hex(int(startcode) + 15)
-                                rowstartcode = hex(int(startcode))
-                                startcode = hex(int(startcode))
-                                endcode = hex(int(endcode))
-                                self.ui.uCodeStartRangeComboBox.addItem(rowstartcode)
-                                self.ui.uCodeEndRangeComboBox.addItem(rowendcode)
-                                # self.rowcount += 1
-                        else:
-                            if startcode % 10 == 0:
-                                rowendcode =  int(startcode) + 9
-                                rowstartcode = int(startcode)
-                                startcode = int(startcode)
-                                endcode = int(endcode)
-                                self.ui.uCodeStartRangeComboBox.addItem(str(rowstartcode))
-                                self.ui.uCodeEndRangeComboBox.addItem(str(rowendcode))
-                                # self.rowcount += 1
-                    endcount = self.ui.uCodeStartRangeComboBox.count()-1
-                    self.ui.uCodeStartRangeComboBox.setCurrentIndex(0)
-                    self.ui.uCodeEndRangeComboBox.setCurrentIndex(endcount)
-                    starttext = self.ui.uCodeStartRangeComboBox.currentText()
-                    endtext = self.ui.uCodeEndRangeComboBox.currentText()
-                    self.showChrRefTable(start, end)
-
-        # Closing file
-        f.close()
+        for category in data:
+            if category['category'] == self.ucoderange:
+                decrange = category['range'].split(",")
+                hexrange = category['hexrange'].split(",")
+                print(f'Hex Range from json: {hexrange} Range: {decrange}')
+                self.hs = hexrange[0].replace('[','')
+                self.he = hexrange[1].replace(']','')
+                self.ds = decrange[0].replace('[','')
+                self.de = decrange[1].replace(']','')
+                print(
+                    f'Hex Range Start: {self.hs} End: {self.he}, Dec Range Start: {self.ds} End: {self.de}')
+                start = int(self.ds)
+                end = int(self.de)
+                # Initialize start and end comboboxes
+                # self.rowcount = 0
+                self.ui.uCodeStartRangeComboBox.clear()
+                self.ui.uCodeEndRangeComboBox.clear()
+                for startcode in range(start, end+1):
+                    endcode = end
+                    if self.ui.hexRadioButton.isChecked():
+                        if startcode % 16 == 0:
+                            rowendcode = hex(int(startcode) + 15)
+                            rowstartcode = hex(int(startcode))
+                            startcode = hex(int(startcode))
+                            endcode = hex(int(endcode))
+                            self.ui.uCodeStartRangeComboBox.addItem(rowstartcode)
+                            self.ui.uCodeEndRangeComboBox.addItem(rowendcode)
+                            # self.rowcount += 1
+                    else:
+                        if startcode % 10 == 0:
+                            rowendcode =  int(startcode) + 9
+                            rowstartcode = int(startcode)
+                            startcode = int(startcode)
+                            endcode = int(endcode)
+                            self.ui.uCodeStartRangeComboBox.addItem(str(rowstartcode))
+                            self.ui.uCodeEndRangeComboBox.addItem(str(rowendcode))
+                            # self.rowcount += 1
+                endcount = self.ui.uCodeStartRangeComboBox.count()-1
+                self.ui.uCodeStartRangeComboBox.setCurrentIndex(0)
+                self.ui.uCodeEndRangeComboBox.setCurrentIndex(endcount)
+                starttext = self.ui.uCodeStartRangeComboBox.currentText()
+                endtext = self.ui.uCodeEndRangeComboBox.currentText()
+                self.showChrRefTable(start, end)
+                break
 
     def on_range_select(self):
         start = self.ui.uCodeStartRangeComboBox.currentText()
