@@ -12,6 +12,13 @@ permissions:
 jobs:
   branch-sync-visibility:
     runs-on: ubuntu-latest
+    env:
+      WARN_WINDOWS_BEHIND_MASTER: "15"
+      WARN_UBUNTU_BEHIND_MASTER: "60"
+      WARN_CROSS_BRANCH_UNIQUE: "120"
+      FAIL_WINDOWS_BEHIND_MASTER: "40"
+      FAIL_UBUNTU_BEHIND_MASTER: "150"
+      FAIL_CROSS_BRANCH_UNIQUE: "260"
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -95,6 +102,97 @@ jobs:
           name: branch-sync-status
           path: docs/development/BRANCH_SYNC_STATUS.md
 
+      - name: Evaluate realistic sync policy limits
+        id: policy
+        env:
+          WIN_BEHIND: ${{ steps.metrics.outputs.win_behind }}
+          UBU_BEHIND: ${{ steps.metrics.outputs.ubu_behind }}
+          WIN_ONLY: ${{ steps.metrics.outputs.win_only }}
+          UBU_ONLY: ${{ steps.metrics.outputs.ubu_only }}
+        run: |
+          python - <<'PY'
+          import os
+
+          win_behind = int(os.environ["WIN_BEHIND"])
+          ubu_behind = int(os.environ["UBU_BEHIND"])
+          win_only = int(os.environ["WIN_ONLY"])
+          ubu_only = int(os.environ["UBU_ONLY"])
+          cross_unique = max(win_only, ubu_only)
+
+          warn_win_behind = int(os.environ["WARN_WINDOWS_BEHIND_MASTER"])
+          warn_ubu_behind = int(os.environ["WARN_UBUNTU_BEHIND_MASTER"])
+          warn_cross = int(os.environ["WARN_CROSS_BRANCH_UNIQUE"])
+
+          fail_win_behind = int(os.environ["FAIL_WINDOWS_BEHIND_MASTER"])
+          fail_ubu_behind = int(os.environ["FAIL_UBUNTU_BEHIND_MASTER"])
+          fail_cross = int(os.environ["FAIL_CROSS_BRANCH_UNIQUE"])
+
+          notes = []
+          state = "ok"
+
+          if win_behind >= warn_win_behind:
+            notes.append(
+              f"windows-development behind master is {win_behind} (warn >= {warn_win_behind})"
+            )
+            state = "warn"
+          if ubu_behind >= warn_ubu_behind:
+            notes.append(
+              f"ubuntu_development behind master is {ubu_behind} (warn >= {warn_ubu_behind})"
+            )
+            state = "warn"
+          if cross_unique >= warn_cross:
+            notes.append(
+              f"cross-branch unique commit count is {cross_unique} (warn >= {warn_cross})"
+            )
+            state = "warn"
+
+          critical = False
+          if win_behind >= fail_win_behind:
+            notes.append(
+              f"windows-development behind master is {win_behind} (fail >= {fail_win_behind})"
+            )
+            critical = True
+          if ubu_behind >= fail_ubu_behind:
+            notes.append(
+              f"ubuntu_development behind master is {ubu_behind} (fail >= {fail_ubu_behind})"
+            )
+            critical = True
+          if cross_unique >= fail_cross:
+            notes.append(
+              f"cross-branch unique commit count is {cross_unique} (fail >= {fail_cross})"
+            )
+            critical = True
+
+          if critical:
+            state = "critical"
+
+          summary_lines = [
+            "## Branch Sync Policy Evaluation",
+            "",
+            f"- State: {state}",
+            f"- warn windows behind master: {warn_win_behind}",
+            f"- warn ubuntu behind master: {warn_ubu_behind}",
+            f"- warn cross-branch unique: {warn_cross}",
+            f"- fail windows behind master: {fail_win_behind}",
+            f"- fail ubuntu behind master: {fail_ubu_behind}",
+            f"- fail cross-branch unique: {fail_cross}",
+          ]
+
+          if notes:
+            summary_lines.append("")
+            summary_lines.append("### Notes")
+            for item in notes:
+              summary_lines.append(f"- {item}")
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
+            fh.write("\n".join(summary_lines) + "\n")
+
+          notes_text = " | ".join(notes) if notes else "within policy limits"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+            fh.write(f"state={state}\n")
+            fh.write(f"notes={notes_text}\n")
+          PY
+
       - name: Upsert PR comment with sync metrics
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -112,6 +210,8 @@ jobs:
               "",
               `- Commits only in origin/windows-development: ${{ steps.metrics.outputs.win_only }}`,
               `- Commits only in origin/ubuntu_development: ${{ steps.metrics.outputs.ubu_only }}`,
+              `- Policy state: ${{ steps.policy.outputs.state }}`,
+              `- Policy notes: ${{ steps.policy.outputs.notes }}`,
               "",
               "Full markdown report is attached to this workflow run as artifact `branch-sync-status`.",
             ].join("\n");
@@ -147,3 +247,10 @@ jobs:
               });
               core.info(`Created new branch sync comment: ${created.data.id}`);
             }
+
+      - name: Enforce hard sync limits
+        if: steps.policy.outputs.state == 'critical'
+        run: |
+          echo "Branch sync policy reached critical state."
+          echo "${{ steps.policy.outputs.notes }}"
+          exit 1

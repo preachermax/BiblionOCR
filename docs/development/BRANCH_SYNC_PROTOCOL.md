@@ -41,3 +41,19 @@ Windows task entry:
 - `Ahead of master > 0`: branch has pending work not yet in source of truth.
 - `Behind master > 0`: branch must be refreshed before risky refactors.
 - Both branches unique at the same time: perform a reconciliation review before release-critical tasks.
+
+## Realistic Policy Limits
+
+The CI policy is intentionally soft-first so normal platform-specific iteration is not blocked.
+
+- Warning threshold, windows behind master: 15 commits
+- Warning threshold, ubuntu behind master: 60 commits
+- Warning threshold, cross-branch unique commits: 120 commits
+- Critical threshold, windows behind master: 40 commits
+- Critical threshold, ubuntu behind master: 150 commits
+- Critical threshold, cross-branch unique commits: 260 commits
+
+Behavior:
+
+- Warning state: workflow stays green and posts visibility notes in PR comments.
+- Critical state: workflow fails and requires explicit reconciliation before merge.
