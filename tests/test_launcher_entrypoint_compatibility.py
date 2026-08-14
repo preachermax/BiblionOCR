@@ -22,11 +22,11 @@ class LauncherEntrypointCompatibilityTests(unittest.TestCase):
         module = _load_module("launcher_ui_test_module", ui_path)
         self.assertTrue(hasattr(module, "Ui_MainUI"))
 
-    def test_lexer_ui_exposes_glypher_class(self):
+    def test_lexer_ui_exposes_boxer_class(self):
         ui_path = os.path.join(REPO_ROOT, "ViewController", "3-Process", "MyLexerUI.py")
         self.assertTrue(os.path.exists(ui_path), "Lexer UI module should exist")
         module = _load_module("lexer_ui_test_module", ui_path)
-        self.assertTrue(hasattr(module, "Ui_Glypher"))
+        self.assertTrue(hasattr(module, "Ui_Boxer"))
 
     def test_reader_helper_shim_exists(self):
         helper_path = os.path.join(REPO_ROOT, "ViewController", "0-MainUI", "helpers", "QtCropImage.py")
