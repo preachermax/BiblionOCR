@@ -23,6 +23,7 @@ Required confirmations (agent path):
 - [ ] Manual UI checks were completed for changed interaction surfaces.
 - [ ] UI lock-step was verified for all changed UI surfaces (`.ui` and generated `UI.py`).
 - [ ] Workflow wizard policy gates were verified for affected modules.
+- [ ] Shared cross-platform tooling policy is satisfied (no shared-tool changes, or manifest/validator checks were updated and passed).
 
 ## Developer PR-Only Path
 
@@ -32,6 +33,7 @@ Required confirmations (developer path):
 
 - [ ] I am submitting a pull request only (no direct commit/resync operations on protected branches).
 - [ ] I request agent review first, then repository owner/maintainer review and approval.
+- [ ] Shared cross-platform tooling policy is satisfied (no shared-tool changes, or manifest/validator checks were updated and passed).
 
 ## Validation Evidence
 

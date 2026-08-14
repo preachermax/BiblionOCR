@@ -111,6 +111,23 @@ If a document benefits other developers, move it out of the local folders and co
 
 Maintainer review may block or request changes when a PR does not demonstrate checklist completion.
 
+## Shared Cross-Platform Tooling Policy
+
+If a development script is required by either Windows or Ubuntu development workflows, it must be treated as shared tooling and remain portable across branches.
+
+Shared tooling requirements:
+
+1. Place shared scripts in tracked repo paths (current standard: `Developer/utilities/`).
+2. Register the script in `Developer/utilities/shared_tools_manifest.json`.
+3. Keep shared tools out of ignored local-only paths.
+4. Ensure `Developer/utilities/verify_shared_dev_tools.py` passes.
+
+Local-only scripts may exist in ignored paths such as `Developer/local/`, but those scripts must not be prerequisites for branch sync, validation, CI, or routine development on either platform.
+
+Policy reference:
+
+- [docs/development/SHARED_DEV_TOOLS_POLICY.md](docs/development/SHARED_DEV_TOOLS_POLICY.md)
+
 ## PR Review Order And Exceptions
 
 For non-Dependabot pull requests, required order is:
@@ -182,6 +199,8 @@ The repository owner should use GitHub controls that match this policy:
 - branch protection on `master`
 - pull-request review before merge
 - required status check: `Enforce PR Checklist`
+- required status check: `Branch Sync Visibility`
+- required status check: `Validate Shared Dev Tools`
 - least-privilege team access
 - CODEOWNERS review for sensitive paths
 - MFA for accounts with write access
