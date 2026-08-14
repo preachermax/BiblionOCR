@@ -41,6 +41,44 @@ Quick use pattern:
 3. Keep deferred modules out of scope until explicitly re-opened.
 4. Report full-workspace Problems count and in-scope Problems count before completion claims.
 
+### Session Handoff - 2026-08-14 00:15
+
+* Scope summary: finalized checklist documentation evidence for the Windows bootstrap change set and prepared branch resync verification.
+* Touched files (`git status --short`):
+  * committed runtime fix: `ViewController/0-MainUI/helpers/ChrReference.py` (`5f9c761`)
+  * local docs checkpoint: `docs/development/DEV_NOTEBOOK.md`
+  * local runtime artifact (uncommitted by policy): `ViewController/Model/Project/Data/json/Session.json`
+* Validation gates:
+  * problems/lint: full-workspace Problems `2` baseline in `MyServer.py`; in-scope Problems `0`
+  * compile: pass for touched runtime file (`ChrReference.py`)
+  * smoke: pass for MyServer startup path and CharacterReference data load
+  * manual UI checks: Windows shortcut icon refresh and icon-path correction completed on existing `My*.lnk` Desktop shortcuts
+* Compatibility impact review:
+  * no API contract changes introduced outside CharacterReference data-source loading
+  * fallback behavior is additive and preserves existing JSON-first behavior
+  * no session-schema change committed
+* Sync posture:
+  * `windows-development` is rebased on current `origin/master` and has no behind count
+  * branch remains ahead until `origin/master` receives the committed branch deltas via merge/resync workflow
+* Next immediate action:
+  * commit this docs checkpoint and continue module-scoped compatibility passes
+
+### Session Handoff - 2026-08-13 23:59
+
+* Scope summary: completed Windows branch bootstrap by committing CharacterReference unicode range fallback and validating checklist gates through push/resync on `windows-development`.
+* Touched files (`git status --short`):
+  * committed: `ViewController/0-MainUI/helpers/ChrReference.py`
+  * remaining local runtime artifact (intentionally uncommitted): `ViewController/Model/Project/Data/json/Session.json`
+* Validation gates:
+  * problems/lint: full-workspace Problems `2` (baseline in `ViewController/0-MainUI/MyServer.py`), in-scope Problems `0`
+  * compile: pass via `python.exe -m py_compile ViewController/0-MainUI/helpers/ChrReference.py`
+  * smoke: pass for changed launch path via MyServer startup; CharacterReference loaded and rendered without traceback
+  * manual UI checks: pending visual confirmation by maintainer on Windows desktop icon refresh behavior
+* Unresolved blockers/risks:
+  * `ViewController/Model/Project/Data/json/Session.json` drift remains local runtime state and is not committed by policy
+* Next immediate action:
+  * continue module-scoped Windows compatibility passes, keeping runtime-local session artifacts out of commit scope
+
 ### Session Handoff - 2026-08-06 23:59
 
 * Scope summary: finalized workflow wizard policy/runtime updates plus agent-owned checklist, PR governance, and cross-repo naming/policy documentation.
