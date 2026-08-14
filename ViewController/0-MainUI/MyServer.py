@@ -1255,17 +1255,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     @qtc.pyqtSlot(str)
     def on_zoom_combobox(self, text=None):
         if text is None:
+            if not hasattr(self, "ui") or not hasattr(self.ui, "ZoomComboBox"):
+                return
             text = self.ui.ZoomComboBox.currentText()
 
         print("[ZOOM HANDLER HIT] ComboBox")
 
         try:
-            value = int(text.replace("%", ""))
-        except:
+            value = int(str(text).replace("%", "").strip())
+        except (TypeError, ValueError):
             print("[ZOOM ERROR] Invalid text:", text)
             return
 
-        self.ui.Zoomslider.setValue(value)  # drives everything
+        if hasattr(self.ui, "Zoomslider"):
+            self.ui.Zoomslider.setValue(value)  # drives everything
+
+        self.on_zoom(str(text))
 
     # def on_zoom_combobox(self, text):
     #     print("[ZOOM HANDLER HIT] ComboBox")
@@ -2844,7 +2849,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         file.close()
 
-        self.on_zoom_combobox()
+        combo = getattr(self.ui, "ZoomComboBox", None)
+        if combo is not None:
+            self.on_zoom(combo.currentText())
         self.session_manager.update('Session.json', {
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
@@ -3007,7 +3014,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     #     file.close()
 
-        self.on_zoom_combobox()
+        combo = getattr(self.ui, "ZoomComboBox", None)
+        if combo is not None:
+            self.on_zoom(combo.currentText())
 
     def sortImgFiles(self):
         import re
@@ -3952,12 +3961,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.ZoomComboBox.show()
 
     def on_zoom(self, text):
-        try:
-            value = int(text.replace('%', '').strip())
-        except:
+        if text is None:
             return
 
-        self.ui.Zoomslider.setValue(value)
+        try:
+            value = int(str(text).replace('%', '').strip())
+        except (TypeError, ValueError):
+            return
+
+        if hasattr(self.ui, "Zoomslider"):
+            self.ui.Zoomslider.setValue(value)
 
     def on_zoomslider(self, value):
         print("[ZOOM HANDLER HIT]")  # confirm it fires

@@ -13,5 +13,10 @@
         "Setting": "self.fontsize",
         "CurrentValue": 20,
         "DefaultValue": 20
+    },
+    {
+        "Setting": "self.active_workflow_module",
+        "CurrentValue": "MyServer",
+        "DefaultValue": "MyServer"
     }
 ]
