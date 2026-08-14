@@ -259,23 +259,23 @@ If the SSH test succeeds, future `fetch`, `pull`, and `push` commands can use th
 ssh-keygen -t ed25519 -C "jetson@nano"
 ```
 
-2. Show the public key:
+1. Show the public key:
 
 ```bash
 cat ~/.ssh/id_ed25519.pub
 ```
 
-3. In a browser, sign in to GitHub.
-4. Open Settings -> SSH and GPG keys -> New SSH key.
-5. Paste the public key and save it.
-6. This is correct even for a private repository. GitHub needs your public key so it can verify the matching private key on the Jetson. The public key does not make the repository public, and the private key stays only on the Jetson.
-7. Back on the Jetson, test GitHub SSH access:
+1. In a browser, sign in to GitHub.
+1. Open Settings -> SSH and GPG keys -> New SSH key.
+1. Paste the public key and save it.
+1. This is correct even for a private repository. GitHub needs your public key so it can verify the matching private key on the Jetson. The public key does not make the repository public, and the private key stays only on the Jetson.
+1. Back on the Jetson, test GitHub SSH access:
 
 ```bash
 ssh -T git@github.com
 ```
 
-8. If that succeeds, switch this repo to SSH and retry Git:
+1. If that succeeds, switch this repo to SSH and retry Git:
 
 ```bash
 cd Projects/BiblionOCR
@@ -285,12 +285,48 @@ git fetch origin --prune
 
 SSH is usually the better long-term Jetson setup because it avoids repeated HTTPS token prompts.
 
-#### What "Public SSH Key" Means Here
+### What "Public SSH Key" Means Here
 
 - `~/.ssh/id_ed25519.pub` is the public key file. This is the one you copy into GitHub.
 - `~/.ssh/id_ed25519` is the private key file. Do not upload this file anywhere.
 - GitHub stores the public key and uses it to verify that your Jetson holds the matching private key.
 - A public key on GitHub is normal for both public and private repositories.
+
+## Ubuntu Post-Merge Verification For Shared Tooling
+
+Use this after the PR is merged to `master` to confirm Ubuntu has the same shared development tooling and sync governance changes.
+
+```bash
+cd Projects/BiblionOCR
+git checkout master
+git fetch origin --prune
+git pull --ff-only origin master
+git checkout ubuntu_development
+git pull --ff-only origin ubuntu_development
+```
+
+Verify required shared tooling files exist and are tracked:
+
+```bash
+cd Projects/BiblionOCR
+git ls-files Developer/utilities/branch_sync_report.py
+git ls-files Developer/utilities/verify_shared_dev_tools.py
+git ls-files Developer/utilities/shared_tools_manifest.json
+```
+
+Run policy and sync checks on Ubuntu:
+
+```bash
+cd Projects/BiblionOCR
+python3 Developer/utilities/verify_shared_dev_tools.py --repo .
+python3 Developer/utilities/branch_sync_report.py --repo .
+```
+
+Expected outcomes:
+
+- shared-tool validator reports the required tool count and exits with success
+- branch sync report writes `docs/development/BRANCH_SYNC_STATUS.md`
+- `master` and `ubuntu_development` remain fast-forward clean with no local divergence surprises
 
 ## If `pull --ff-only` Fails
 
