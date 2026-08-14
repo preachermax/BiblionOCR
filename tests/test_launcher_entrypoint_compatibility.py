@@ -1,18 +1,41 @@
 import importlib.util
 import os
+import sys
 import unittest
+from contextlib import contextmanager
 
 from PyQt5 import QtWidgets
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
 
+@contextmanager
+def _temporary_sys_path(*paths):
+    added_paths = []
+    for path in paths:
+        if path and path not in sys.path:
+            sys.path.insert(0, path)
+            added_paths.append(path)
+
+    try:
+        yield
+    finally:
+        for path in reversed(added_paths):
+            if path in sys.path:
+                sys.path.remove(path)
+
+
 def _load_module(module_name, file_path):
-    spec = importlib.util.spec_from_file_location(module_name, file_path)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    module_dir = os.path.dirname(file_path)
+    shared_helpers_dir = os.path.join(REPO_ROOT, "ViewController", "0-MainUI", "helpers")
+    local_helpers_dir = os.path.join(module_dir, "helpers")
+
+    with _temporary_sys_path(module_dir, local_helpers_dir, shared_helpers_dir):
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+        return module
 
 
 class LauncherEntrypointCompatibilityTests(unittest.TestCase):
