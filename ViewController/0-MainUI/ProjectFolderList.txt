@@ -4,7 +4,7 @@ Core/MyServer.py => ViewController/0-MainUI/MyServer.py
 Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py
 Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui
 Developer/QtDesignerUI
-Developer/update_UI_Resources.txt
+Developer/QtDesignerUI/update_UI_Resources.txt
 Developer/ViewController/SeparatedDevFiles/0-MainUI/AIcommitWorkflow.md
 Developer/ViewController/SeparatedDevFiles/0-MainUI/cmap2csv2 json.py
 Developer/ViewController/SeparatedDevFiles/0-MainUI/Co-pilot diff text on FROMVS in Windows.txt
@@ -50,8 +50,6 @@ launchers/run-myscanner.cmd
 launchers/run-myscanner.sh
 launchers/run-myserver.cmd
 launchers/run-myserver.sh
-launchers/run-mysliders.cmd
-launchers/run-mysliders.sh
 launchers/run-mytrainer.cmd
 launchers/run-mytrainer.sh
 launchers/run-myversifier.cmd

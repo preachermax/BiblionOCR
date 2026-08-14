@@ -33,7 +33,6 @@ Standard Windows wrappers now exist in `launchers/` for these canonical runnable
 - `run-myresolver.cmd`
 - `run-myscanner.cmd`
 - `run-myserver.cmd`
-- `run-mysliders.cmd`
 - `run-mytrainer.cmd`
 - `run-myversifier.cmd`
 - `run-mywriter.cmd`

@@ -1,5 +1,103 @@
 # BiblionOCR Developer Notebook
 
+## Session Handoff Template (Required For Pause/Exit)
+
+Use this template for every pause, stop, or VS Code close event.
+
+### Session Handoff - YYYY-MM-DD HH:MM
+
+* Scope summary: one sentence describing current task focus.
+* Touched files (`git status --short`):
+  * file path 1
+  * file path 2
+* Validation gates:
+  * problems/lint: pass or fail with brief note
+  * compile: pass or fail with command used
+  * smoke: pass or fail with command used
+  * manual UI checks: pass or pending with note
+* Unresolved blockers/risks:
+  * item
+* Next immediate action:
+  * single next step
+
+## Collaboration Protocol Snapshot (2026-08-07)
+
+1. User will run an extensive manual audit in module order.
+2. Default execution mode is one module per change set.
+3. Global rollout is opt-in and only done when explicitly requested.
+4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
+5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
+
+## Reusable Prompt Workflow (Developer Use)
+
+Use the module-scoped prompt workflow to reduce prompt-writing overhead while preserving validation discipline:
+
+* [docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md](docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md)
+
+Quick use pattern:
+
+1. Choose one module from the prompt queue.
+2. Apply strict header plus module task plus lean footer.
+3. Keep deferred modules out of scope until explicitly re-opened.
+4. Report full-workspace Problems count and in-scope Problems count before completion claims.
+
+### Session Handoff - 2026-08-14 13:54
+
+* Scope summary: reviewed and reconciled the origin/master Windows-development change set by removing `MySliders` from the runnable launcher surface, correcting new architecture-doc contradictions, and validating launcher startup paths.
+* Touched files (`git status --short`):
+  * `D Developer/ViewController/SeparatedDevFiles/0-MainUI/update_UI_Resources.sh`
+  * `D Developer/ViewController/SeparatedDevFiles/0-MainUI/update_UI_Resources.txt`
+  * `M Developer/ViewController/SeparatedDevFiles/MOVED_FILE_MANIFEST.md`
+  * `D Developer/update_UI_Resources.sh`
+  * `D Developer/update_UI_Resources.txt`
+  * `M ProjectFolderList.txt`
+  * `M ViewController/0-MainUI/ProjectFolderList.txt`
+  * `M ViewController/0-MainUI/helpers/ProjectFolderList.txt`
+  * `M ViewController/0-MainUI/helpers/ScriptureProjectFolderList.txt`
+  * `M ViewController/GeneralProjectFolderList.txt`
+  * `M ViewController/Model/Project/Data/json/Session.json`
+  * `M ViewController/ScriptureProjectFolderList.txt`
+  * `M ViewController/utilities/0-MainUI/helpers/ProjectFolderList.py`
+  * `M docs/architecture/BIBLION ECOSYSTEM ARCHITECTURE.md`
+  * `M docs/architecture/nano/BiblionOCR_Jetson_Nano_Journey_and_Compute_Baseline.md`
+  * `M docs/development/DEV_NOTEBOOK.md`
+  * `M docs/development/WINDOWS_PERSISTENT_LAUNCHERS.md`
+  * `M launchers/restore_desktop_launchers.py`
+  * `D launchers/run-mysliders.cmd`
+  * `D launchers/run-mysliders.sh`
+  * `M tests/test_launcher_entrypoint_compatibility.py`
+  * `?? Developer/QtDesignerUI/update_UI_Resources.sh`
+  * `?? Developer/QtDesignerUI/update_UI_Resources.txt`
+  * `?? docs/development/WINDOWS10_REPO_BACKUP_AND_RECLEAN.md`
+  * `?? docs/development/WINDOWS10_WINDOWS_DEVELOPMENT_BRANCH_SETUP.md`
+* Validation gates:
+  * problems/lint: pass; full-workspace Problems total `0`, in-scope Problems total `0` via `get_errors`.
+  * compile: pass via `python3 -m py_compile launchers/restore_desktop_launchers.py tests/test_launcher_entrypoint_compatibility.py`.
+  * smoke: pass via `QT_QPA_PLATFORM=offscreen timeout 30s pytest tests/test_launcher_entrypoint_compatibility.py -q` and full `launchers/run-my*.sh` timeout-based startup smoke (`14/14` passing after removal of `run-mysliders.sh`).
+  * manual UI checks: not required for this cycle; no `.ui` source, generated `UI.py`, menus, buttons, or wizard interactions changed.
+* Unresolved blockers/risks:
+  * the worktree still contains unrelated local changes outside this cycle and they should remain out of commit scope unless explicitly requested.
+  * `ViewController/Model/Project/Data/json/Session.json` remains runtime-local drift and should stay uncommitted by default.
+  * architecture-normalization tracker files were not updated in this cycle because no architecture status/task state changed; this pass corrected internal doc consistency and launcher inventory only.
+* Next immediate action:
+  * stage only the intended launcher/doc/test files if you want this cycle committed, leaving unrelated local artifacts out of scope.
+
+### Session Handoff - 2026-08-06 23:59
+
+* Scope summary: finalized workflow wizard policy/runtime updates plus agent-owned checklist, PR governance, and cross-repo naming/policy documentation.
+* Touched files (`git status --short`):
+  * committed scope in commit `2d424eb` (33 files)
+  * remaining local runtime artifact: `ViewController/Model/Project/Data/json/Session.json`
+* Validation gates:
+  * problems/lint: pass on touched docs/templates/workflows
+  * compile: pass on touched Python runtime files via `python3 -m py_compile ...`
+  * smoke: pass (14/14) with `.venv/bin/python` and `QT_QPA_PLATFORM=offscreen`
+  * manual UI checks: pending explicit visual reconfirmation after reopen if runtime/UI edits continue
+* Unresolved blockers/risks:
+  * local `Session.json` remains intentionally uncommitted runtime noise
+* Next immediate action:
+  * on reopen, run recovery sequence from checklist section `K` before any new edits
+
 ## 📌 Project Overview
 
 * **MyServer**: Main runtime UI/controller for OCR workflow and project creation wiring
@@ -1221,3 +1319,59 @@ With the public introduction complete, development focus returns to core applica
 2026-07-20
 
 ---
+
+## Session Handoff (2026-08-13) - MyExplorer-Driven Development Backup/Restore
+
+Scope summary:
+
+* Implemented MyServer development backup/restore governance with MyExplorer as the default folder selector and added MyExplorer File-menu trash/restore actions.
+
+Touched-file list from git status --short (in-scope):
+
+* M Developer/QtDesignerUI/MyExplorerUI.ui
+* M Developer/QtDesignerUI/MyServerUI.ui
+* M ViewController/0-MainUI/MyExplorer.py
+* M ViewController/0-MainUI/MyExplorerUI.py
+* M ViewController/0-MainUI/MyServer.py
+* M ViewController/0-MainUI/MyServerUI.py
+
+Validation status by gate:
+
+* problems/lint:
+  * in-scope files: clean (0)
+  * full workspace: clean (0)
+* compile:
+  * python3 -m py_compile ViewController/0-MainUI/MyServer.py ViewController/0-MainUI/MyExplorer.py ViewController/0-MainUI/MyServerUI.py ViewController/0-MainUI/MyExplorerUI.py
+  * result: pass
+* smoke tests:
+  * QT_QPA_PLATFORM=offscreen timeout 12s .venv/bin/python ViewController/0-MainUI/MyServer.py
+  * QT_QPA_PLATFORM=offscreen timeout 12s .venv/bin/python ViewController/0-MainUI/MyExplorer.py --select-dir --start-dir "$PWD" --output-file /tmp/biblion_picker_test.txt --title "Picker Smoke"
+  * result: pass (bounded startup; no immediate traceback)
+* manual UI checks:
+  * Verified generated UI action presence for MyServer and MyExplorer via offscreen runtime object checks.
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Commit/sync:
+
+* commit: 39f351c
+* title: feat(myserver,myexplorer): add explorer-driven backup restore dialogs
+* push: origin/master synced (39f351c)
+
+Unresolved risks/blockers:
+
+* Windows recycle-bin restore path is not yet implemented in MyExplorer runtime; currently Linux/macOS have concrete trash-location handling.
+* Unrelated working-tree drift remains out of scope (ProjectFolderList and runtime-local Session.json changes).
+
+Next immediate action:
+
+* Start module-by-module standardization of workflow folder-picking dialogs to MyExplorer after maintainer approval of module order.
+
+Windows transition runbooks (2026-08-13):
+
+* docs/development/WINDOWS10_REPO_BACKUP_AND_RECLEAN.md
+* docs/development/WINDOWS10_WINDOWS_DEVELOPMENT_BRANCH_SETUP.md

@@ -28,8 +28,6 @@ launchers/run-myscanner.cmd
 launchers/run-myscanner.sh
 launchers/run-myserver.cmd
 launchers/run-myserver.sh
-launchers/run-mysliders.cmd
-launchers/run-mysliders.sh
 launchers/run-mytrainer.cmd
 launchers/run-mytrainer.sh
 launchers/run-myversifier.cmd
@@ -315,7 +313,7 @@ ViewController/0-MainUI/helpers/UI_Icons_rc.py
 ViewController/0-MainUI/helpers/UI_Images
 Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.py
 Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.txt
-Developer/update_UI_Resources.txt
+Developer/QtDesignerUI/update_UI_Resources.txt
 ViewController/0-MainUI/helpers/web
 ViewController/0-MainUI/helpers/worker.py
 ViewController/1-PreProcess
