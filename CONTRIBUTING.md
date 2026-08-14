@@ -127,6 +127,7 @@ Local-only scripts may exist in ignored paths such as `Developer/local/`, but th
 Policy reference:
 
 - [docs/development/SHARED_DEV_TOOLS_POLICY.md](docs/development/SHARED_DEV_TOOLS_POLICY.md)
+- [docs/development/SHARED_TOOL_PROMOTION_CHECKLIST.md](docs/development/SHARED_TOOL_PROMOTION_CHECKLIST.md)
 
 ## PR Review Order And Exceptions
 

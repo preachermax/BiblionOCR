@@ -27,6 +27,12 @@ This policy is enforced by:
 
 The CI check fails if a required shared tool is missing, untracked, or ignored.
 
+## Promotion Path
+
+When a script transitions from local-only or experimental status into required shared workflow, use:
+
+- `docs/development/SHARED_TOOL_PROMOTION_CHECKLIST.md`
+
 ## Practical Branch Guidance
 
 - Shared tooling becomes available on Ubuntu once merged to `master` and pulled there.
