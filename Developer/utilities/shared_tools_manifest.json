@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "owner": "BiblionOCR",
+  "policy": {
+    "shared_tools_must_be_tracked": true,
+    "shared_tools_must_not_be_ignored": true,
+    "target_branches": [
+      "master",
+      "windows-development",
+      "ubuntu_development"
+    ]
+  },
+  "tools": [
+    {
+      "path": "Developer/utilities/branch_sync_report.py",
+      "description": "Cross-branch divergence report for master/windows/ubuntu coordination",
+      "platforms": ["windows", "ubuntu"]
+    },
+    {
+      "path": "Developer/utilities/scripture_data_parity.py",
+      "description": "Scripture dataset parity and manifest checks",
+      "platforms": ["windows", "ubuntu"]
+    }
+  ]
+}

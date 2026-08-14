@@ -1,0 +1,32 @@
+name: Validate Shared Dev Tools
+
+on:
+  push:
+    paths:
+      - Developer/utilities/**
+      - .gitignore
+      - .github/workflows/validate-shared-dev-tools.yml
+  pull_request:
+    paths:
+      - Developer/utilities/**
+      - .gitignore
+      - .github/workflows/validate-shared-dev-tools.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate-shared-dev-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate shared tool manifest policy
+        run: |
+          python Developer/utilities/verify_shared_dev_tools.py --repo .
