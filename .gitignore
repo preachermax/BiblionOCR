@@ -37,6 +37,7 @@ Core/Scanner/TWAINDSM.dll
 /Developer/local/
 /docs/development/system/
 /docs/development/local/
+/docs/development/BRANCH_SYNC_STATUS.md
 
 # Public-release asset exclusions
 Developer/assets/Licensed images/*

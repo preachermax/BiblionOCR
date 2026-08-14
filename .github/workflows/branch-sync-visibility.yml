@@ -1,0 +1,149 @@
+name: Branch Sync Visibility
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  branch-sync-visibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate branch sync report
+        run: |
+          python Developer/utilities/branch_sync_report.py \
+            --repo . \
+            --remote origin \
+            --master master \
+            --windows windows-development \
+            --ubuntu ubuntu_development \
+            --out docs/development/BRANCH_SYNC_STATUS.md
+
+      - name: Summarize report metrics
+        id: metrics
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          text = Path("docs/development/BRANCH_SYNC_STATUS.md").read_text(encoding="utf-8")
+
+          def parse_row(branch):
+              # Example row:
+              # | `origin/windows-development` | 3 | 0 |
+              pattern = rf"\|\s*`{re.escape(branch)}`\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|"
+              m = re.search(pattern, text)
+              if not m:
+                  raise SystemExit(f"Could not parse metrics row for {branch}")
+              return int(m.group(1)), int(m.group(2))
+
+          win_ahead, win_behind = parse_row("origin/windows-development")
+          ubu_ahead, ubu_behind = parse_row("origin/ubuntu_development")
+
+          win_only = re.search(
+              r"Commits only in `origin/windows-development` .*: \*\*(\d+)\*\*",
+              text,
+          )
+          ubu_only = re.search(
+              r"Commits only in `origin/ubuntu_development` .*: \*\*(\d+)\*\*",
+              text,
+          )
+          if not win_only or not ubu_only:
+              raise SystemExit("Could not parse cross-branch metrics")
+
+          lines = [
+              "## Branch Sync Metrics",
+              "",
+              "| Branch | Ahead Of Master | Behind Master |",
+              "| --- | ---: | ---: |",
+              f"| origin/windows-development | {win_ahead} | {win_behind} |",
+              f"| origin/ubuntu_development | {ubu_ahead} | {ubu_behind} |",
+              "",
+              f"- Commits only in origin/windows-development: {win_only.group(1)}",
+              f"- Commits only in origin/ubuntu_development: {ubu_only.group(1)}",
+          ]
+
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+              fh.write(f"win_ahead={win_ahead}\n")
+              fh.write(f"win_behind={win_behind}\n")
+              fh.write(f"ubu_ahead={ubu_ahead}\n")
+              fh.write(f"ubu_behind={ubu_behind}\n")
+              fh.write(f"win_only={win_only.group(1)}\n")
+              fh.write(f"ubu_only={ubu_only.group(1)}\n")
+          PY
+
+      - name: Upload sync report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: branch-sync-status
+          path: docs/development/BRANCH_SYNC_STATUS.md
+
+      - name: Upsert PR comment with sync metrics
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = "<!-- branch-sync-report -->";
+            const body = [
+              marker,
+              "### Branch Sync Visibility",
+              "",
+              "| Branch | Ahead Of Master | Behind Master |",
+              "| --- | ---: | ---: |",
+              `| origin/windows-development | ${{ steps.metrics.outputs.win_ahead }} | ${{ steps.metrics.outputs.win_behind }} |`,
+              `| origin/ubuntu_development | ${{ steps.metrics.outputs.ubu_ahead }} | ${{ steps.metrics.outputs.ubu_behind }} |`,
+              "",
+              `- Commits only in origin/windows-development: ${{ steps.metrics.outputs.win_only }}`,
+              `- Commits only in origin/ubuntu_development: ${{ steps.metrics.outputs.ubu_only }}`,
+              "",
+              "Full markdown report is attached to this workflow run as artifact `branch-sync-status`.",
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existing = comments.find(
+              (c) => c.user?.type === "Bot" && c.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated existing branch sync comment: ${existing.id}`);
+            } else {
+              const created = await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+              core.info(`Created new branch sync comment: ${created.data.id}`);
+            }
