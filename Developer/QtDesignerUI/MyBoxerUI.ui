@@ -47,7 +47,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -88,7 +88,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -116,7 +116,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -144,7 +144,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -1047,7 +1047,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -3776,7 +3776,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
   </action>
@@ -3801,7 +3801,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
    <property name="visible">
@@ -3824,7 +3824,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
   </action>
@@ -3841,7 +3841,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
    <property name="visible">
@@ -4301,7 +4301,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
    <property name="visible">
@@ -4327,7 +4327,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
    <property name="visible">

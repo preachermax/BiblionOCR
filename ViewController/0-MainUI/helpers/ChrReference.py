@@ -49,6 +49,11 @@ class CharacterReference(qtw.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Ensure Qt destroys the helper window when it closes and tie it to owner lifetime.
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+        parent = self.parentWidget()
+        if parent is not None:
+            parent.destroyed.connect(self.close)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_CharRef()

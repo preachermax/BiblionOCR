@@ -1202,7 +1202,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         writer.MainWindow.show()'''
 
     def OpenChrReference(self):
-        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
 
     def on_font_update(self):

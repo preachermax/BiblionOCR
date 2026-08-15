@@ -182,7 +182,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.trainingSummaryLabel.setText(installation_summary)
 
     def OpenChrReference(self) -> None:
-        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
 
     def _update_page_title(self) -> None:

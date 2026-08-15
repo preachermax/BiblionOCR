@@ -15,7 +15,7 @@
   </property>
   <property name="font">
    <font>
-    <family>FROMVS [MAXR]</family>
+    <family>FROMVS</family>
    </font>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>20</pointsize>
      </font>
     </property>

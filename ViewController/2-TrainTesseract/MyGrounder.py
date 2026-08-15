@@ -706,7 +706,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def OpenChrReference(self):
 
-        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
 
 

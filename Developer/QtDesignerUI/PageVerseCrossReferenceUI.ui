@@ -201,7 +201,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>10</pointsize>
      </font>
     </property>
@@ -245,7 +245,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -308,7 +308,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -340,7 +340,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -362,7 +362,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -384,7 +384,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -406,7 +406,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -428,7 +428,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -450,7 +450,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -533,7 +533,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -619,7 +619,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>
@@ -641,7 +641,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>10</pointsize>
      </font>
     </property>
@@ -660,7 +660,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>7</pointsize>
      </font>
     </property>

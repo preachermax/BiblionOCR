@@ -16,7 +16,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 881)
         font = QtGui.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         MainWindow.setFont(font)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionResolver.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
         self.WordLE = QtWidgets.QLineEdit(self.centralwidget)
         self.WordLE.setGeometry(QtCore.QRect(50, 90, 200, 25))
         font = QtGui.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         font.setPointSize(12)
         self.WordLE.setFont(font)
         self.WordLE.setReadOnly(False)
@@ -136,7 +136,7 @@ class Ui_MainWindow(object):
         self.NoDiaWordLE = QtWidgets.QLineEdit(self.centralwidget)
         self.NoDiaWordLE.setGeometry(QtCore.QRect(290, 90, 200, 25))
         font = QtGui.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         font.setPointSize(12)
         self.NoDiaWordLE.setFont(font)
         self.NoDiaWordLE.setReadOnly(True)
@@ -203,7 +203,7 @@ class Ui_MainWindow(object):
         self.PreviousButton = QtWidgets.QPushButton(self.centralwidget)
         self.PreviousButton.setGeometry(QtCore.QRect(50, 200, 89, 25))
         font = QtGui.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         font.setPointSize(8)
         self.PreviousButton.setFont(font)
         icon3 = QtGui.QIcon()
@@ -478,14 +478,4 @@ class Ui_MainWindow(object):
         self.presRadButton.setText(_translate("MainWindow", "Show Preserved"))
         self.unresRadButton.setText(_translate("MainWindow", "Show Unresolved"))
         self.corrRadButton.setText(_translate("MainWindow", "Show Corrected"))
-import UI_Icons
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+import UI_Icons_rc

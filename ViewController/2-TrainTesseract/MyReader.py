@@ -750,7 +750,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         os.system(gimp_cmd)
 
     def OpenChrReference(self):
-        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
 
     def actionCorrect_OCR(self):

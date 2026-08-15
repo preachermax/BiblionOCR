@@ -12,6 +12,9 @@ import sys
 
 
 _SANITIZED_MARKER = "BIBLION_GUI_ENV_SANITIZED"
+_QT_FONT_POLICY_INSTALLED = False
+_FONT_DISABLE_ENV = "BIBLION_DISABLE_DEFAULT_QT_FONT"
+_FONT_OVERRIDE_ENV = "BIBLION_DEFAULT_QT_FONT"
 
 
 def sanitize_current_process_and_reexec() -> None:
@@ -91,3 +94,74 @@ def sanitize_current_process_and_reexec() -> None:
         os.execve(sys.executable, [sys.executable] + sys.argv, env)
 
     os.environ[_SANITIZED_MARKER] = "1"
+    install_default_qt_font_policy()
+
+
+def install_default_qt_font_policy() -> None:
+    """Install a shared Qt application-font policy for canonical GUI entrypoints."""
+
+    global _QT_FONT_POLICY_INSTALLED
+    if _QT_FONT_POLICY_INSTALLED:
+        return
+
+    try:
+        from PyQt5 import QtGui as qtg
+        from PyQt5 import QtWidgets as qtw
+    except Exception:
+        return
+
+    original_init = qtw.QApplication.__init__
+
+    def patched_init(app_self, *args, **kwargs):
+        original_init(app_self, *args, **kwargs)
+        _apply_default_qt_font(app_self, qtg, qtw)
+
+    qtw.QApplication.__init__ = patched_init
+    _QT_FONT_POLICY_INSTALLED = True
+
+    existing_app = qtw.QApplication.instance()
+    if existing_app is not None:
+        _apply_default_qt_font(existing_app, qtg, qtw)
+
+
+def _apply_default_qt_font(app, qtg, qtw) -> None:
+    """Apply the default project font to a QApplication when available."""
+
+    font = _resolve_default_qt_font(qtg)
+    if font is None:
+        return
+
+    app.setFont(font)
+    qtw.QToolTip.setFont(qtg.QFont(font))
+
+
+def _resolve_default_qt_font(qtg):
+    """Resolve the configured default Qt font, preferring the bundled FROMVS.ttf."""
+
+    requested_family = os.environ.get(_FONT_OVERRIDE_ENV, "").strip()
+    if os.environ.get(_FONT_DISABLE_ENV, "").strip() == "1":
+        return None
+
+    if requested_family.lower() in {"default", "system", "unset"}:
+        return None
+
+    font_db = qtg.QFontDatabase()
+    available_families = set(font_db.families())
+
+    if requested_family:
+        if requested_family not in available_families:
+            return None
+        return qtg.QFont(requested_family)
+
+    bundled_font_path = os.path.join(os.path.dirname(__file__), "fonts", "FROMVS.ttf")
+    if os.path.isfile(bundled_font_path):
+        font_id = qtg.QFontDatabase.addApplicationFont(bundled_font_path)
+        if font_id != -1:
+            loaded_families = qtg.QFontDatabase.applicationFontFamilies(font_id)
+            if loaded_families:
+                return qtg.QFont(loaded_families[0])
+
+    if "FROMVS" in available_families:
+        return qtg.QFont("FROMVS")
+
+    return None

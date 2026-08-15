@@ -18,7 +18,7 @@
   </property>
   <property name="font">
    <font>
-    <family>FROMVS [MAXR]</family>
+    <family>FROMVS</family>
     <pointsize>11</pointsize>
     <weight>50</weight>
     <italic>false</italic>
@@ -149,7 +149,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -211,7 +211,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -240,7 +240,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -269,7 +269,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -304,7 +304,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -406,7 +406,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -558,7 +558,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -643,7 +643,7 @@
      </property>
      <property name="font">
       <font>
-       <family>FROMVS [MAXR]</family>
+       <family>FROMVS</family>
        <pointsize>8</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -668,7 +668,7 @@
      </property>
      <property name="font">
       <font>
-       <family>FROMVS [MAXR]</family>
+       <family>FROMVS</family>
        <pointsize>8</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -750,7 +750,7 @@
      </property>
      <property name="font">
       <font>
-       <family>FROMVS [MAXR]</family>
+       <family>FROMVS</family>
        <pointsize>8</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -827,7 +827,7 @@
      </property>
      <property name="font">
       <font>
-       <family>FROMVS [MAXR]</family>
+       <family>FROMVS</family>
        <pointsize>10</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -1000,7 +1000,7 @@
      </property>
      <property name="font">
       <font>
-       <family>FROMVS [MAXR]</family>
+       <family>FROMVS</family>
        <pointsize>8</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -1022,7 +1022,7 @@
      </property>
      <property name="font">
       <font>
-       <family>FROMVS [MAXR]</family>
+       <family>FROMVS</family>
        <pointsize>8</pointsize>
        <weight>50</weight>
        <italic>false</italic>
@@ -1098,7 +1098,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>11</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -1160,7 +1160,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -1263,7 +1263,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>8</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -1355,7 +1355,7 @@
     </property>
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>9</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -1400,7 +1400,7 @@
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>11</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -1439,7 +1439,7 @@
    <widget class="QMenu" name="menuTools">
     <property name="font">
      <font>
-      <family>FROMVS [MAXR]</family>
+      <family>FROMVS</family>
       <pointsize>11</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -2543,7 +2543,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS [MAXR]</family>
+     <family>FROMVS</family>
     </font>
    </property>
   </action>

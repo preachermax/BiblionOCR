@@ -17,7 +17,7 @@ class Ui_MyWriterUI(object):
         MyWriterUI.setWindowModality(QtCore.Qt.ApplicationModal)
         MyWriterUI.resize(901, 900)
         font = QtGui.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         MyWriterUI.setFont(font)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionWriter.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -27,7 +27,7 @@ class Ui_MyWriterUI(object):
         self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
         self.textEdit.setGeometry(QtCore.QRect(10, 0, 881, 741))
         font = QtGui.QFont()
-        font.setFamily("FROMVS [MAXR]")
+        font.setFamily("FROMVS")
         font.setPointSize(20)
         self.textEdit.setFont(font)
         self.textEdit.setObjectName("textEdit")
@@ -373,14 +373,4 @@ class Ui_MyWriterUI(object):
         self.actionLineSpacing.setText(_translate("MyWriterUI", "LineSpacing"))
         self.actionImport.setText(_translate("MyWriterUI", "Import"))
         self.actionExport.setText(_translate("MyWriterUI", "Export"))
-import UI_Icons
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MyWriterUI = QtWidgets.QMainWindow()
-    ui = Ui_MyWriterUI()
-    ui.setupUi(MyWriterUI)
-    MyWriterUI.show()
-    sys.exit(app.exec_())
+import UI_Icons_rc

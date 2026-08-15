@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QSize
 import os
+import html
 
 # ============================================================================
 # PROGRAM DOCUMENTATION DATABASE
@@ -1563,13 +1564,27 @@ def add_help_menu(window, program_name):
 
 def show_about(parent=None, program_name='MyBoxer'):
     """Show about dialog with program information."""
-    help_data = PROGRAM_HELP.get(program_name, {})
-    title = help_data.get('title', program_name)
+    title, _description, _known_program = _resolve_help_metadata(program_name)
     
-    about_text = f"""
+    about_text = get_about_page_html(program_name)
+    
+    from PyQt5.QtWidgets import QMessageBox
+    QMessageBox.about(parent, f'About {title}', about_text)
+
+
+def get_about_page_html(program_name='MyBoxer'):
+    """Return the standard HelpSystem About page HTML for a module."""
+    title, description, known_program = _resolve_help_metadata(program_name)
+
+    summary_html = _build_module_summary_bullets_html(title, description, known_program)
+
+    return f"""
 <h2>{title}</h2>
 <p>Part of the BiblionOCR Project</p>
 <p>A comprehensive OCR system for document digitization and text extraction.</p>
+
+<h3>Module Summary:</h3>
+{summary_html}
 
 <h3>Project Information:</h3>
 <ul>
@@ -1579,11 +1594,10 @@ def show_about(parent=None, program_name='MyBoxer'):
 <li>Architecture: See docs/architecture/PROJECT_ARCHITECTURE.md</li>
 </ul>
 
-<h3>Current Reference Surface:</h3>
+<h3>Project References:</h3>
 <ul>
+<li>Project readme: README.md</li>
 <li>Documentation root: docs/README.md</li>
-<li>Developer notebook: docs/development/DEV_NOTEBOOK.md</li>
-<li>Quick reference: docs/development/QUICK_REFERENCE.md</li>
 <li>Contribution policy: CONTRIBUTING.md</li>
 <li>Content rights policy: CONTENT_POLICY.md</li>
 </ul>
@@ -1599,11 +1613,97 @@ def show_about(parent=None, program_name='MyBoxer'):
 <h3>Getting Help:</h3>
 <p>Press F1 in any program for detailed help.
 See docs/architecture/PROJECT_ARCHITECTURE.md for system overview.
-See docs/development/QUICK_REFERENCE.md for quick lookup.</p>
+See docs/README.md for end-user and project documentation.</p>
 """
-    
-    from PyQt5.QtWidgets import QMessageBox
-    QMessageBox.about(parent, f'About {title}', about_text)
+
+
+def get_launcher_about_preview_text(program_name='MyBoxer'):
+    """Return MyLauncher right-pane preview HTML with left-justified bullet wrapping."""
+    title, description, known_program = _resolve_help_metadata(program_name)
+
+    summary_html = _build_module_summary_bullets_html(title, description, known_program)
+    getting_help_html = """
+<h3>Getting Help:</h3>
+<ul style="margin: 0 0 0 1.2em; padding: 0; list-style-position: outside;">
+  <li style="margin: 0 0 0.35em 0;">Press F1 in any program for detailed help.</li>
+  <li style="margin: 0 0 0.35em 0;">Project documentation: docs/README.md</li>
+  <li style="margin: 0;">Architecture overview: docs/architecture/PROJECT_ARCHITECTURE.md</li>
+</ul>
+"""
+
+    return f"<h3>Module Summary:</h3>{summary_html}{getting_help_html}"
+
+
+def _build_module_summary_bullets_html(title, description, known_program):
+    """Build bullet-summary HTML with proper hanging indentation for wrapped lines."""
+    lines = [line.strip() for line in str(description).splitlines()]
+    lines = [line for line in lines if line]
+
+    first_sentence = "No summary available."
+    for line in lines:
+        normalized = line.replace('\u2022', '').strip()
+        if normalized and not normalized.endswith(':'):
+            first_sentence = normalized
+            break
+
+    feature_items = []
+    in_features = False
+    for line in lines:
+        upper = line.upper()
+        if upper == 'FEATURES:':
+            in_features = True
+            continue
+        if in_features:
+            if line.endswith(':') and not line.startswith('\u2022'):
+                break
+            if line.startswith('\u2022'):
+                feature_items.append(line.lstrip('\u2022').strip())
+
+    if not known_program:
+        feature_items = [
+            'Dedicated PROGRAM_HELP entry not found.',
+            'Using standardized fallback summary for this module.',
+        ]
+
+    capability_items = feature_items or ['No capabilities listed.']
+    capability_html = ''.join(
+        f'<li style="margin: 0 0 0.25em 0;">{html.escape(item)}</li>'
+        for item in capability_items
+    )
+
+    return f"""
+<ul style="margin: 0 0 0 1.2em; padding: 0; list-style-position: outside;">
+  <li style="margin: 0 0 0.35em 0;"><b>Module:</b> {html.escape(title)}</li>
+  <li style="margin: 0 0 0.35em 0;"><b>Purpose:</b> {html.escape(first_sentence)}</li>
+  <li style="margin: 0;"><b>Capabilities:</b>
+    <ul style="margin: 0.25em 0 0 1.2em; padding: 0; list-style-position: outside;">
+      {capability_html}
+    </ul>
+  </li>
+</ul>
+"""
+
+
+def _resolve_help_metadata(program_name):
+    """Resolve help metadata with a tolerant fallback for unknown modules."""
+    normalized_name = (program_name or '').strip()
+    help_data = PROGRAM_HELP.get(normalized_name)
+
+    if help_data is None and normalized_name:
+        lower_name = normalized_name.lower()
+        for known_name, known_data in PROGRAM_HELP.items():
+            if known_name.lower() == lower_name:
+                help_data = known_data
+                normalized_name = known_name
+                break
+
+    if help_data is None:
+        safe_title = normalized_name or 'Unknown Module'
+        return safe_title, 'No description available.', False
+
+    title = str(help_data.get('title', normalized_name) or normalized_name)
+    description = str(help_data.get('description', 'No description available.') or 'No description available.')
+    return title, description, True
 
 
 def get_program_list():

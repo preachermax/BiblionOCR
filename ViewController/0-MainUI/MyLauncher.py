@@ -52,7 +52,7 @@ from Core.workflow_wizard_actions import (
     install_panel_file_drops,
 )
 #from subprocess import Popen, PIPE, CalledProcessError
-from helpers.HelpSystem import add_help_menu
+from helpers.HelpSystem import add_help_menu, get_launcher_about_preview_text
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
@@ -288,8 +288,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.session_manager.set_active_workflow_module(module_id, 'Session.json')
 
     def _module_help_text(self, module_id):
-        if self.launcher_registry.resolve_script(module_id):
-            return self.launcher_registry.help_panel_text(module_id)
+        if module_id:
+            return get_launcher_about_preview_text(module_id)
 
         button = self._module_buttons.get(module_id)
         title = module_id
@@ -887,7 +887,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def _swap_help_panel_text(self, text):
         self.ui.RightPanelwidget.clear()
-        self.ui.RightPanelwidget.setPlainText(text)
+        normalized_text = text if isinstance(text, str) else str(text)
+        if normalized_text.lstrip().startswith('<'):
+            self.ui.RightPanelwidget.setHtml(normalized_text)
+        else:
+            self.ui.RightPanelwidget.setPlainText(normalized_text)
         self.on_font_update()
 
     def on_font_update(self):

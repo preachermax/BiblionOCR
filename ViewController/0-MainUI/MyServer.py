@@ -1403,7 +1403,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         f.close()
 
     def OpenChrReference(self):
-        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
 
     def initBookCombo(self):

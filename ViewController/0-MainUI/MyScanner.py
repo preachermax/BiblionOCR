@@ -846,7 +846,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         qtw.QMessageBox.warning(self, 'GIMP not found', 'GIMP is not installed or not on PATH.')
 
     def OpenChrReference(self):
-        self.chrrefmain = chrref.CharacterReference()
+        self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
 
     def actionCorrect_OCR(self):
