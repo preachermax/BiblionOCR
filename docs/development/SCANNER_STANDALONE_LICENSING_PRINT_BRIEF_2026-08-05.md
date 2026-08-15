@@ -79,6 +79,32 @@ Action:
 
 Proceed with separate Scanner development if your goal is licensing flexibility, but gate release on dependency-license clearance (especially Qt/PyQt) and documented provenance compliance.
 
+## Migration Recommendation: Qt6 C++ for BiblionOCR-C++
+
+Short answer: use Qt6 C++ as the commercial Windows/Linux binary implementation track.
+
+Why Qt6 C++ is the fit:
+
+1. It preserves the closest continuity with the existing Qt Designer `.ui` workflow.
+2. It supports direct control of native performance and packaging for desktop binaries.
+3. It keeps UI lockstep practical: `.ui` source plus generated/runtime UI bindings.
+4. It supports long-term maintainability for a multi-module desktop suite.
+5. SQLite, OCR orchestration, and module workflow wiring map cleanly to C++ service boundaries.
+
+Practical migration shape:
+
+1. Use private intermediary repo `BiblionOCR-PyQt6` for commercial migration orchestration.
+2. Run the intermediary OSS bridge: Qt5 Python -> Qt6 Python with standardized Windows/Linux Python installs.
+3. Treat this bridge as a risk-reduction accelerator, not a hard gate for C++ binary pre-release.
+4. Port shared core logic first (project/session/workflow state) into shared C++ services.
+5. Introduce a compatibility bridge so existing Python modules can still run during transition.
+6. Port module UIs in release order (Scanner -> Pixler -> Trainer -> Writer -> Reader).
+7. Keep a license and provenance ledger per migrated component before each binary release.
+
+Implementation reference:
+
+1. See docs/development/BIBLIONOCR_CPP_QT6_MIGRATION_PLAN_2026-08-06.md for phased engineering and release gates.
+
 ## Finding an OSS Attorney Near Florence, AL (35630)
 
 Primary referral channels:

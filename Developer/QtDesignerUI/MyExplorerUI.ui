@@ -58,8 +58,58 @@
      <height>22</height>
     </rect>
    </property>
+    <widget class="QMenu" name="menuFile">
+     <property name="title">
+      <string>File</string>
+     </property>
+     <addaction name="actionSelect_Folder"/>
+     <addaction name="separator"/>
+     <addaction name="actionOpen_Trash"/>
+     <addaction name="actionRestore_From_Trash"/>
+     <addaction name="actionRestore_From_Backup"/>
+     <addaction name="separator"/>
+     <addaction name="actionExit"/>
+    </widget>
+    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+    <action name="actionSelect_Folder">
+    <property name="text">
+     <string>Select Current Folder</string>
+    </property>
+    <property name="toolTip">
+     <string>Use the current folder selection and return it to the calling workflow.</string>
+    </property>
+    </action>
+    <action name="actionOpen_Trash">
+    <property name="text">
+     <string>Open System Trash</string>
+    </property>
+    <property name="toolTip">
+     <string>Open the operating system trash location.</string>
+    </property>
+    </action>
+    <action name="actionRestore_From_Trash">
+    <property name="text">
+     <string>Restore From Trash...</string>
+    </property>
+    <property name="toolTip">
+     <string>Restore a trashed item to its original folder or the current folder.</string>
+    </property>
+    </action>
+    <action name="actionRestore_From_Backup">
+    <property name="text">
+     <string>Restore From Backup...</string>
+    </property>
+    <property name="toolTip">
+     <string>Copy a selected backup file or folder into the currently selected folder.</string>
+    </property>
+    </action>
+    <action name="actionExit">
+    <property name="text">
+     <string>Exit</string>
+    </property>
+    </action>
  </widget>
  <resources>
   <include location="../UI_Icons.qrc"/>

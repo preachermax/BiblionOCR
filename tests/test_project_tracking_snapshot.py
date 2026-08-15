@@ -23,6 +23,9 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
                 json.dump(
                     {
                         "ProjectPageNumber": 12,
+                        "CurrentProjectPage": 12,
+                        "CurrentProjectMilestone": "source_acquired",
+                        "CurrentPageMilestone": "source_acquired",
                         "ProjectPageProgress": 65,
                         "ColumnName": "left,center,right",
                         "CurrentColumn": 2,
@@ -38,6 +41,9 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
             context = snapshot.get("project_context", {})
 
             self.assertEqual(12, context.get("ProjectPageNumber"))
+            self.assertEqual(12, context.get("CurrentProjectPage"))
+            self.assertEqual("source_acquired", context.get("CurrentProjectMilestone"))
+            self.assertEqual("source_acquired", context.get("CurrentPageMilestone"))
             self.assertEqual(65, context.get("ProjectPageProgress"))
             self.assertEqual("left,center,right", context.get("ColumnName"))
             self.assertEqual(2, context.get("CurrentColumn"))
@@ -55,6 +61,9 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
                 {
                     "ProjectName": "SQLiteProject",
                     "ProjectPageNumber": 3,
+                    "CurrentProjectPage": 3,
+                    "CurrentProjectMilestone": "pages_prepared",
+                    "CurrentPageMilestone": "pages_prepared",
                     "ProjectPageProgress": 40,
                     "NumberColumns": 2,
                     "ColumnName": "left,right",
@@ -71,6 +80,9 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
             context = snapshot.get("project_context", {})
 
             self.assertEqual(3, context.get("ProjectPageNumber"))
+            self.assertEqual(3, context.get("CurrentProjectPage"))
+            self.assertEqual("pages_prepared", context.get("CurrentProjectMilestone"))
+            self.assertEqual("pages_prepared", context.get("CurrentPageMilestone"))
             self.assertEqual(40, context.get("ProjectPageProgress"))
             self.assertEqual("left,right", context.get("ColumnName"))
             self.assertEqual(2, context.get("CurrentColumn"))

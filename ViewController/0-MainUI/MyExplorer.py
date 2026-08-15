@@ -1,7 +1,9 @@
 import os
 import shlex
 import shutil
+import subprocess
 import sys
+from urllib.parse import unquote
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
@@ -15,7 +17,11 @@ if project_root not in sys.path:
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 from SessionManager import SessionManager
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 
 sanitize_current_process_and_reexec()
@@ -139,16 +145,23 @@ class ExplorerTreeView(QtWidgets.QTreeView):
         return candidate
 
 class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
-    def __init__(self, start_dir=None, maya=False):
+    def __init__(self, start_dir=None, maya=False, select_mode=False, selection_output_path="", window_title=""):
         super(MyFileBrowser, self).__init__()
         self.start_dir = start_dir
+        self.select_mode = bool(select_mode)
+        self.selection_output_path = str(selection_output_path or "")
         self.session_manager = SessionManager()
         self.setupUi(self)
+        if window_title:
+            self.setWindowTitle(window_title)
         install_workflow_wizard_menu_actions(
             self,
             'MyExplorer',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyExplorer')
         )
         original_tree = self.treeView
         self.treeView = ExplorerTreeView(self.frame)
@@ -164,6 +177,19 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView.setAcceptDrops(True)
         self.treeView.customContextMenuRequested.connect(self.context_menu)
         self.exclude_empty_checkbox.toggled.connect(self._toggle_empty_folder_filter)
+        self.treeView.doubleClicked.connect(self._on_tree_double_clicked)
+
+        if hasattr(self, "actionSelect_Folder"):
+            self.actionSelect_Folder.triggered.connect(self.select_current_folder)
+            self.actionSelect_Folder.setEnabled(self.select_mode)
+        if hasattr(self, "actionOpen_Trash"):
+            self.actionOpen_Trash.triggered.connect(self.open_system_trash)
+        if hasattr(self, "actionRestore_From_Trash"):
+            self.actionRestore_From_Trash.triggered.connect(self.restore_from_trash)
+        if hasattr(self, "actionRestore_From_Backup"):
+            self.actionRestore_From_Backup.triggered.connect(self.restore_from_backup)
+        if hasattr(self, "actionExit"):
+            self.actionExit.triggered.connect(self.close)
 
         self.populate()
         self.project_status_controller = ProjectStatusController(
@@ -276,10 +302,197 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
     def _toggle_empty_folder_filter(self, enabled):
         self.proxy_model.setExcludeEmptyDirs(enabled)
 
+    def _current_path(self):
+        index = self.treeView.currentIndex()
+        if not index.isValid():
+            return ""
+        if hasattr(self.proxy_model, "mapToSource"):
+            source_index = self.proxy_model.mapToSource(index)
+            return self.model.filePath(source_index)
+        return self.model.filePath(index)
+
+    def _current_directory(self):
+        path = self._current_path()
+        if not path:
+            return ""
+        if os.path.isdir(path):
+            return path
+        return os.path.dirname(path)
+
+    def _on_tree_double_clicked(self, _index):
+        if self.select_mode:
+            self.select_current_folder()
+
+    def _write_selection_output(self, selected_path):
+        if not self.selection_output_path:
+            return
+        try:
+            with open(self.selection_output_path, "w", encoding="utf-8") as handle:
+                handle.write(selected_path)
+        except OSError as exc:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "MyExplorer",
+                f"Could not persist selection output:\n{exc}",
+            )
+
+    def select_current_folder(self):
+        selected_dir = self._current_directory()
+        if not selected_dir:
+            QtWidgets.QMessageBox.information(self, "Select Folder", "Select a folder first.")
+            return
+
+        self._write_selection_output(selected_dir)
+        if self.select_mode:
+            self.close()
+
+    def open_system_trash(self):
+        if sys.platform.startswith("win"):
+            subprocess.Popen(["explorer.exe", "shell:RecycleBinFolder"])
+            return
+
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", os.path.expanduser("~/.Trash")])
+            return
+
+        trash_dir = os.path.expanduser("~/.local/share/Trash/files")
+        if not os.path.isdir(trash_dir):
+            QtWidgets.QMessageBox.information(self, "System Trash", "Trash folder was not found on this system.")
+            return
+        subprocess.Popen(["xdg-open", trash_dir])
+
+    def _trash_paths(self):
+        trash_files = os.path.expanduser("~/.local/share/Trash/files")
+        trash_info = os.path.expanduser("~/.local/share/Trash/info")
+        return trash_files, trash_info
+
+    def _trash_original_path(self, info_path):
+        if not os.path.isfile(info_path):
+            return ""
+
+        try:
+            with open(info_path, "r", encoding="utf-8") as handle:
+                for line in handle:
+                    if line.startswith("Path="):
+                        return unquote(line.strip().split("=", 1)[1])
+        except OSError:
+            return ""
+        return ""
+
+    def restore_from_trash(self):
+        if sys.platform.startswith("win"):
+            QtWidgets.QMessageBox.information(
+                self,
+                "Restore From Trash",
+                "Windows recycle-bin restore is not implemented in MyExplorer yet.",
+            )
+            return
+
+        trash_files, trash_info = self._trash_paths()
+        if not os.path.isdir(trash_files):
+            QtWidgets.QMessageBox.information(self, "Restore From Trash", "No trash folder is available.")
+            return
+
+        items = sorted([name for name in os.listdir(trash_files) if name not in (".", "..")])
+        if not items:
+            QtWidgets.QMessageBox.information(self, "Restore From Trash", "Trash is empty.")
+            return
+
+        selected_item, ok = QtWidgets.QInputDialog.getItem(
+            self,
+            "Restore From Trash",
+            "Select trashed item:",
+            items,
+            0,
+            False,
+        )
+        if not ok or not selected_item:
+            return
+
+        trashed_path = os.path.join(trash_files, selected_item)
+        info_path = os.path.join(trash_info, f"{selected_item}.trashinfo")
+        original_path = self._trash_original_path(info_path)
+
+        default_target = self._current_directory() or RUNTIME_PATHS.project_root
+        if original_path:
+            original_parent = os.path.dirname(original_path)
+            if original_parent and os.path.isdir(original_parent):
+                default_target = original_parent
+
+        restore_dir = QtWidgets.QFileDialog.getExistingDirectory(
+            self,
+            "Restore From Trash: Select destination folder",
+            default_target,
+        )
+        if not restore_dir:
+            return
+
+        destination = ExplorerTreeView._unique_destination_path(restore_dir, os.path.basename(trashed_path))
+        try:
+            shutil.move(trashed_path, destination)
+            if os.path.isfile(info_path):
+                os.remove(info_path)
+        except OSError as exc:
+            QtWidgets.QMessageBox.critical(self, "Restore From Trash", f"Restore failed:\n{exc}")
+            return
+
+        QtWidgets.QMessageBox.information(self, "Restore From Trash", f"Item restored to:\n{destination}")
+
+    def restore_from_backup(self):
+        destination_dir = self._current_directory() or RUNTIME_PATHS.project_root
+        source_type, ok = QtWidgets.QInputDialog.getItem(
+            self,
+            "Restore From Backup",
+            "Select backup source type:",
+            ["File", "Folder"],
+            0,
+            False,
+        )
+        if not ok or not source_type:
+            return
+
+        source_path = ""
+        if source_type == "File":
+            source_path = QtWidgets.QFileDialog.getOpenFileName(
+                self,
+                "Restore From Backup: Select source file",
+                destination_dir,
+                "All Files (*.*)",
+            )[0]
+        else:
+            source_path = QtWidgets.QFileDialog.getExistingDirectory(
+                self,
+                "Restore From Backup: Select source folder",
+                destination_dir,
+            )
+
+        if not source_path:
+            return
+        if not os.path.exists(source_path):
+            QtWidgets.QMessageBox.warning(self, "Restore From Backup", "Selected source does not exist.")
+            return
+
+        destination_path = ExplorerTreeView._unique_destination_path(
+            destination_dir,
+            os.path.basename(source_path),
+        )
+
+        try:
+            if os.path.isdir(source_path):
+                shutil.copytree(source_path, destination_path)
+            else:
+                shutil.copy2(source_path, destination_path)
+        except OSError as exc:
+            QtWidgets.QMessageBox.critical(self, "Restore From Backup", f"Restore failed:\n{exc}")
+            return
+
+        QtWidgets.QMessageBox.information(self, "Restore From Backup", f"Copied to:\n{destination_path}")
+
     def context_menu(self):
         menu = QtWidgets.QMenu()
         open = menu.addAction("Open with operating system")
         open.triggered.connect(self.open_file)
+        append_default_context_actions(menu, self.treeView, is_text_widget=False)
         cursor = QtGui.QCursor()
         menu.exec_(cursor.pos())
 
@@ -302,7 +515,36 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
-    start_dir = sys.argv[1] if len(sys.argv) > 1 else None
-    fb = MyFileBrowser(start_dir=start_dir)
+
+    start_dir = None
+    select_dir_mode = False
+    output_file = ""
+    window_title = ""
+
+    argv = list(sys.argv[1:])
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+        if arg == "--select-dir":
+            select_dir_mode = True
+        elif arg == "--start-dir" and i + 1 < len(argv):
+            i += 1
+            start_dir = argv[i]
+        elif arg == "--output-file" and i + 1 < len(argv):
+            i += 1
+            output_file = argv[i]
+        elif arg == "--title" and i + 1 < len(argv):
+            i += 1
+            window_title = argv[i]
+        elif not arg.startswith("--") and start_dir is None:
+            start_dir = arg
+        i += 1
+
+    fb = MyFileBrowser(
+        start_dir=start_dir,
+        select_mode=select_dir_mode,
+        selection_output_path=output_file,
+        window_title=window_title,
+    )
     fb.show()
     app.exec_()

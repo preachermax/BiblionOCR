@@ -45,6 +45,28 @@ Do not ship first proprietary binaries until this is confirmed.
 2. Build Scanner as a cleanly separated product track.
 3. Publish a clear policy on what is free/community vs paid/support.
 
+## Language Recommendation For BiblionOCR-C++ (Commercial Track)
+
+Use Qt6 C++ for the commercial Windows/Linux binary track.
+
+Reasons:
+
+1. Best continuity with the existing Qt Designer `.ui` workflow.
+2. Strong native desktop packaging posture across Windows and Linux.
+3. Maintains UI lockstep discipline between `.ui` sources and generated/runtime bindings.
+4. Good fit for a long-lived, performance-sensitive, multi-module desktop suite.
+
+Required intermediary step:
+
+1. Use private intermediary repo `BiblionOCR-PyQt6` for commercial bridge execution.
+2. Convert OSS baseline from Qt5 Python to Qt6 Python.
+3. Standardize associated Python installations on Windows/Linux for that bridge.
+4. Qt6 Python/PyQt6 pre-release is useful but not required before pre-releasing commercial Qt6 C++ binaries.
+
+Implementation reference:
+
+1. See docs/development/BIBLIONOCR_CPP_QT6_MIGRATION_PLAN_2026-08-06.md for phased migration and commercial release gates.
+
 ## Finding an OSS Attorney Near Florence, AL (35630)
 
 1. Start with Alabama State Bar referral links:

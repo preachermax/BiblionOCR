@@ -716,7 +716,8 @@ class ProjectSettingsDialog(qtw.QDialog):
 
         intro_label = qtw.QLabel(
             "Edit project settings and provenance. Milestone and module handshake settings are on dedicated pages. "
-            "Changes persist to project-local SQLite stores and project.ris.json. Recommended tools: DB Browser for SQLite and FontForge."
+            "Changes persist to project-local SQLite stores and project.ris.json. Recommended tool: DB Browser for SQLite. "
+            "Project font installation is handled automatically when ProjectFont is saved."
         )
         intro_label.setWordWrap(True)
         layout.addWidget(intro_label)
@@ -1207,6 +1208,13 @@ class ProjectSettingsDialog(qtw.QDialog):
         try:
             project_db_values = self._collect_project_database_values()
             create_project_database(self._project_metadata_db_path(), project_db_values)
+            installed_font_path = ""
+            project_font_name = str(project_db_values.get("ProjectFont", "") or "").strip()
+            if project_font_name:
+                installed_font_path = self.session_manager.ensure_project_font_installed(
+                    project_font_name,
+                    module_dir=self._mainui_dir,
+                )
             saved_values = self.store.save_ris_values(self._collect_values())
             milestone_updates = self._collect_milestone_updates()
             self.workflow_tracker.update_milestones(
@@ -1225,7 +1233,15 @@ class ProjectSettingsDialog(qtw.QDialog):
         timestamp_row = self._find_row("timestamp")
         if timestamp_row is not None:
             self.ris_table.item(timestamp_row, 1).setText(str(saved_values.get("timestamp", "")))
-        self.status_label.setText("Project settings saved to SQLite and project.ris.json.")
+        if installed_font_path:
+            self.status_label.setText(
+                "Project settings saved to SQLite plus project metadata JSON/CSV mirrors and project.ris.json. "
+                f"Project font installed at: {installed_font_path}"
+            )
+        else:
+            self.status_label.setText(
+                "Project settings saved to SQLite plus project metadata JSON/CSV mirrors and project.ris.json."
+            )
         super().accept()
 
     def reject(self):

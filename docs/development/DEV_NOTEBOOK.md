@@ -202,7 +202,7 @@ Quick use pattern:
 
 ### Phase 1 Scope
 
-* MyLauncher-first macro-style workflow wizard layer is now in place
+* MyLauncher-first wizard-style workflow layer is now in place
 * stage order is now derived from numbered `ViewController` folders
 * workflow guidance is additive, not destructive: manual launch paths remain intact
 * `NumberColumns` update path is now exposed in MyServer and MyScanner and persisted to project metadata
@@ -224,6 +224,13 @@ Quick use pattern:
 * the remaining main runtime modules now expose page-workflow entry actions without replacing their existing manual workflows
 * project workflow wizard is now scoped to MyServer menu surfaces
 * MyLauncher now supports direct CLI wizard startup for project and page modes, including module-scoped page wizard launch routing
+* page workflow handlers are now bound explicitly on module windows as module-owned wizard actions
+
+### Test-First Commit Standard
+
+* commits are now gated by automated checks first (`py_compile`, diagnostics, smoke tests)
+* manual UI verification is required before commit on changed interaction surfaces
+* commit operations are treated as post-test milestones, not test breakpoints
 
 ### MyLauncher Interaction Model (Current)
 
@@ -1384,9 +1391,91 @@ With the public introduction complete, development focus returns to core applica
 
 ---
 
+## Session Handoff (2026-08-07) - Process Smoke Test
+
+Scope summary:
+
+* Executed the architecture-normalization checklist lane as an end-to-end smoke test after checklist reflow.
+
+Touched-file list from git status --short:
+
+* M ViewController/Model/Project/Data/json/Session.json
+* M docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md
+
+Validation status by gate:
+
+* problems/lint:
+  * in-scope files: clean (0)
+  * full workspace: clean (0)
+* compile:
+  * python3 -m py_compile Core/engine.py Core/event_bus.py Core/event_store.py Core/ris.py ViewController/0-MainUI/MyServer.py
+  * result: pass
+* smoke tests:
+  * QT_QPA_PLATFORM=offscreen timeout 12s .venv/bin/python ViewController/0-MainUI/MyServer.py
+  * result: pass (bounded startup)
+* manual UI checks:
+  * not required for this smoke-test cycle (documentation/process-only delta)
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Unresolved risks/blockers:
+
+* Session.json remains as runtime-local state drift and should stay out of commit unless explicitly requested.
+
+Next immediate action:
+
+* Commit docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md as a focused checklist-reflow docs commit if maintainer approves.
+
+---
+
+## Session Handoff (2026-08-08) - Compute Documentation Reflow
+
+Scope summary:
+
+* Reflowed Compute Engine documentation into a lint-clean strategy/contract split and consolidated the Jetson architecture narrative into the architecture docs lane.
+
+Touched-file list from git status --short:
+
+* M docs/development/COMPUTE_ENGINE_ARCHITECTURE.md
+* ?? docs/development/COMPUTE_ENGINE_ROADMAP.md
+* ?? docs/architecture/nano/BiblionOCR_Intelligent_Compute_and_Jetson_Architecture.md
+* M ViewController/Model/Project/Data/json/Session.json (local runtime drift, out of scope)
+
+Validation status by gate:
+
+* problems/lint:
+  * in-scope files: clean (0)
+  * full workspace: clean (0)
+* compile:
+  * not required this cycle (docs-only change set; no Python runtime edits)
+* smoke tests:
+  * not required this cycle (no runtime behavior change)
+* manual UI checks:
+  * not required this cycle (no UI interaction change)
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Unresolved risks/blockers:
+
+* Session.json remains modified as runtime-local state and should remain uncommitted unless explicitly requested.
+
+Next immediate action:
+
+* Commit and resync the three compute documentation files as a docs-only batch.
+
+---
+
 ## 📅 Last Updated
 
-2026-07-20
+2026-08-08
 
 ---
 

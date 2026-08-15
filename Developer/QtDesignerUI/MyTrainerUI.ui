@@ -343,62 +343,6 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockChrRef">
-   <property name="minimumSize">
-    <size>
-     <width>400</width>
-     <height>619</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>200</width>
-     <height>200</height>
-    </size>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Character Reference</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockChrRefContents">
-    <property name="minimumSize">
-     <size>
-      <width>400</width>
-      <height>600</height>
-     </size>
-    </property>
-    <widget class="QPlainTextEdit" name="ChrRefplainTextEdit">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>380</width>
-       <height>671</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>360</width>
-       <height>500</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>FROMVS</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="documentTitle">
-      <string>Character Reference</string>
-     </property>
-    </widget>
-   </widget>
-  </widget>
   <widget class="QToolBar" name="ModulesToolBar">
    <property name="windowTitle">
     <string>Versify Text Tool Bar</string>
@@ -1115,21 +1059,6 @@
     <string>Converting current tif image to bmp...</string>
    </property>
   </action>
-  <action name="actionFontForge">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
-   </property>
-   <property name="text">
-    <string>FontForge</string>
-   </property>
-   <property name="toolTip">
-    <string>Edit current GlyphTracer sfd file in FontForge</string>
-   </property>
-   <property name="statusTip">
-    <string>Editing current GlyphTracer sfd file in FontForge...</string>
-   </property>
-  </action>
   <action name="actionPreferences">
    <property name="text">
     <string>Preferences</string>
@@ -1138,7 +1067,7 @@
   <action name="actionOpen_Text">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Open Text</string>
@@ -1352,7 +1281,7 @@
   <action name="actionOpen_Reference_Text">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Open Reference Text</string>

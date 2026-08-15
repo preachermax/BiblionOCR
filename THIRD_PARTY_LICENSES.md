@@ -12,9 +12,9 @@ Known examples surfaced during the public-repo audit:
 
 Excluded from the intended public-tracked repo surface:
 
-- `ViewController/0-MainUI/pyTesseractTrainer-1.03.py` is GPL-licensed upstream tooling and should stay local or be redistributed separately with its GPL terms.
-- `ViewController/0-MainUI/glyphtracer-master/` is vendored GPL upstream tooling and should stay local or be redistributed separately with its GPL terms.
-- `ViewController/0-MainUI/potrace-main/` is vendored GPL upstream tooling and should stay local or be redistributed separately with its GPL terms.
+- `Developer/ViewController/SeparatedDevFiles/0-MainUI/pyTesseractTrainer-1.03.py` is GPL-licensed upstream tooling and should stay local or be redistributed separately with its GPL terms.
+- `Developer/ViewController/SeparatedDevFiles/0-MainUI/glyphtracer-master/` is vendored GPL upstream tooling and should stay local or be redistributed separately with its GPL terms.
+- `Developer/ViewController/SeparatedDevFiles/0-MainUI/potrace-main/` is vendored GPL upstream tooling and should stay local or be redistributed separately with its GPL terms.
 
 Public release guidance:
 
@@ -23,3 +23,9 @@ Public release guidance:
 - Keep GPL vendored tools out of the public-tracked surface unless you explicitly want to publish them under their original GPL terms.
 - Remove or relocate separately licensed assets if you do not want to publish them.
 - The stock-media workflow under [Developer/assets](Developer/assets) should be treated separately from software licensing because media redistribution terms are not the same as code licensing.
+- For commercial Windows/Linux binary planning, treat Qt/PyQt dependency licensing as a separate release gate even when your own code is Apache-2.0.
+
+See also:
+
+- [docs/development/SCANNER_STANDALONE_LICENSING_ONE_PAGE_2026-08-05.md](docs/development/SCANNER_STANDALONE_LICENSING_ONE_PAGE_2026-08-05.md)
+- [docs/development/SCANNER_STANDALONE_LICENSING_PRINT_BRIEF_2026-08-05.md](docs/development/SCANNER_STANDALONE_LICENSING_PRINT_BRIEF_2026-08-05.md)

@@ -73,7 +73,7 @@
     </property>
     <property name="icon">
      <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="SaveImgAsButton">
@@ -1997,7 +1997,7 @@
   <action name="actionOpen_Line_Text">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Open Line Text</string>

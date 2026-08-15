@@ -4,6 +4,8 @@ from PyQt5 import QtCore
 import os
 import sys
 
+from Core.workflow_wizard_actions import append_default_context_actions
+
 import ProjectBrowserUI
 
 
@@ -31,6 +33,7 @@ class MyFileBrowser(ProjectBrowserUI.Ui_MainWindow, QtWidgets.QMainWindow):
         menu = QtWidgets.QMenu()
         open = menu.addAction("Open with operating system")
         open.triggered.connect(self.open_file)
+        append_default_context_actions(menu, self.treeView, is_text_widget=False)
 
         '''if self.maya:
             open_file = menu.addAction("Open file")

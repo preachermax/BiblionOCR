@@ -2,7 +2,7 @@
 
 ## Summary
 
-This phase introduces the first production implementation of macro-like workflow orchestration driven by ViewController numbered stage folders.
+This phase introduces the first production implementation of wizard-style workflow orchestration driven by ViewController numbered stage folders.
 
 The implementation is intentionally narrow:
 
@@ -18,7 +18,7 @@ No broad module-by-module workflow takeover is included in this phase.
 This change moves workflow execution from only ad hoc operator navigation to a dual-mode model:
 
 - manual mode: existing direct module launches remain unchanged
-- guided macro mode: stage-scoped and full-sequence launch macros are now available through dedicated workflow wizards
+- guided wizard mode: stage-scoped and full-sequence workflow runs are available through dedicated workflow wizards
 
 This creates a stable contract for future workflow governance while avoiding immediate regressions in current production behavior.
 
@@ -29,8 +29,8 @@ This creates a stable contract for future workflow governance while avoiding imm
 - Added: ViewController/0-MainUI/helpers/workflow_stack_wizard_dialog.py
 - Responsibility:
   - stacked stage navigation UI
-  - stage-level macro trigger
-  - full workflow macro trigger
+  - stage-level wizard trigger
+  - full workflow wizard trigger
 
 ### 2. MyLauncher Workflow Orchestration
 
@@ -39,7 +39,7 @@ This creates a stable contract for future workflow governance while avoiding imm
   - derive ordered stages from ViewController numbered folders (0-MainUI, 1-PreProcess, 2-TrainTesseract, 3-Process, 4-PostProcess)
   - map stages to module launch steps
   - expose project workflow wizard and page workflow wizard entry points
-  - run stage-only or full macro launch sequence
+  - run stage-only or full wizard launch sequence
 
 ### 3. UI Action Surface (Code + Designer)
 
@@ -67,7 +67,7 @@ New action entries:
 The procedural split for this phase is:
 
 - Project workflow administration remains anchored in MyServer.
-- Page-oriented macro entry is provided from MyLauncher.
+- Page-oriented wizard entry is provided from module surfaces and remains launcher-compatible.
 - Scanner receives a fallback menu entry for columns-per-page updates where a Project menu is not present.
 
 ## Shared Metadata Update Contract
@@ -125,10 +125,10 @@ The shared runtime entry helper added in this step is:
 
 - `Core/workflow_wizard_actions.py`
 
-This follow-up phase propagated workflow wizard entry actions to the remaining main runtime modules while preserving the same menu policy:
+This follow-up phase propagated workflow wizard entry actions to the remaining main runtime modules while preserving menu policy:
 
 - Project menu when available
-- File menu fallback when Project is not present
+- File menu fallback only when Project is not present
 
 Modules covered by the rollout:
 
@@ -157,7 +157,7 @@ The runtime policy has now been tightened to reduce operator ambiguity:
 
 - New Project wizard remains a MyServer responsibility.
 - Project Workflow Wizard is now scoped to MyServer menu actions.
-- Page Workflow Wizard remains available from module surfaces but is routed as module-scoped launches.
+- Page Workflow Wizard remains available from module surfaces as module-owned page workflow handlers.
 - MyLauncher remains the central launch host and module-help dashboard, with click-aware behavior:
   - single-click module icon: show About/help in right panel
   - double-click module icon: launch module
@@ -165,6 +165,6 @@ The runtime policy has now been tightened to reduce operator ambiguity:
 
 ## Next Rollout Target (After These Commits)
 
-- propagate wizard entry surfaces and contextual workflow guidance to remaining modules
+- keep module page-wizard handlers aligned with module milestones
 - keep menu policy: Project menu when available, otherwise File menu fallback
 - maintain compatibility with existing launchers and session behavior

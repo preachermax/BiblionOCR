@@ -126,7 +126,10 @@ ProjectStatusController = _load_module_from_path(
     "viewcontroller_helpers_project_status_controller_reader",
     os.path.join(_HELPERS_DIR, "project_status_controller.py"),
 ).ProjectStatusController
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 #import Qt5GroundTruthReview as gtr
 #import Qt5VersifyText as versify
 #import MyWriter as writer
@@ -249,6 +252,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             include_project_wizard=False,
             include_page_wizard=True,
         )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyReader')
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,
@@ -257,7 +263,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.session_manager = SessionManager()
         #Implement Co-pilot Help system
         add_help_menu(self, 'MyReader')
-        self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
         self.ui.actionVerse_Correction.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionAutoCrop_Greek_to_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.OpenWithMyScanner)
@@ -282,7 +288,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
 
         #self.ui.OpenImageFilebutton.clicked.connect(self.OpenImageFileDialog)
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         #self.ui.Gimpbutton.clicked.connect(self.actionGimpEdit)
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
@@ -311,9 +317,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
         #self.ui.EditCorrectedTextbutton.clicked.connect(self.OpenTextFileDialog)
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         self.ui.Calcbutton.clicked.connect(self.OpenWithCalc)
         self.ui.Writerbutton.clicked.connect(self.OpenWithWriter)
@@ -352,6 +358,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyReader',
@@ -571,6 +578,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.latinlinescleaned = get_setting('latinlinescleaned')
         self.latinlinesbox = get_setting('latinlinesbox')
 
+        if not str(self.font or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+
         self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
         self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
@@ -579,6 +589,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.setText(self.linespacing)
         self.ui.ZoomComboBox.setCurrentText(self.zoom)
         self.ui.Zoomslider.setValue(int(self.zoomslidervalue) if str(self.zoomslidervalue).isdigit() else self.ui.Zoomslider.value())
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyReader',
+            preferred_input_modules=('MyBoxer', 'MyGrounder', 'MyResolver'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+        for attribute_name in ('imgdir', 'txtdir'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def save_session_settings(self, **updates):
         self.session_manager.update('ReaderSession.json', updates)

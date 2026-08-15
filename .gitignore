@@ -33,6 +33,10 @@ Model/Project/Data/json/Session.json
 ViewController/0-MainUI/__pycache__/
 ViewController/0-MainUI/MyScannerWin.py
 Core/Scanner/TWAINDSM.dll
+/Developer/chat/
+/Developer/local/
+/docs/development/system/
+/docs/development/local/
 
 # Public-release asset exclusions
 Developer/assets/Licensed images/*

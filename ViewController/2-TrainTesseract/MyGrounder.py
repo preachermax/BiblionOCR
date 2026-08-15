@@ -165,7 +165,10 @@ ProjectStatusController = _load_module_from_path(
     "viewcontroller_helpers_project_status_controller_grounder",
     os.path.join(_HELPERS_DIR, "project_status_controller.py"),
 ).ProjectStatusController
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 #import PageVerseCrossReference as xref
 
@@ -234,6 +237,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path up one folder: {up_once}')
         #print(f'OS Path up two folders: {up_twice}')
@@ -258,6 +262,9 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyGrounder',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyGrounder')
         )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'OCRTextEdit', None), getattr(self.ui, 'TextFileEdit', None)],
@@ -286,22 +293,22 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Line Image controls
         #self.ui.StageButton.clicked.connect(self.Stage_Greek_tiff_Lines)
         self.ui.actionStage_Ground_Truth.triggered.connect(self.Stage_Greek_tiff_Lines)
-        self.ui.ImageButton.clicked.connect(self.loadImage)
+        self.ui.ImageButton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.PrevImgButton.clicked.connect(self.prevImage)
         self.ui.NextImgButton.clicked.connect(self.nextImage)
-        self.ui.SaveImgAsButton.clicked.connect(self.SaveImgFileDialog)
+        self.ui.SaveImgAsButton.clicked.connect(self.save_image_as_with_myexplorer)
         self.ui.DiscardImageButton.clicked.connect(self.discardImage)
         #self.ui.RenumberImagesButton.clicked.connect(self.Renumber_Greek_tiff_Lines)
         self.ui.actionRenumber_Images.triggered.connect(self.Renumber_Greek_tiff_Lines)
 
         # Line text controls
-        self.ui.TextButton.clicked.connect(self.loadText)
+        self.ui.TextButton.clicked.connect(self.open_text_with_myexplorer)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
         self.ui.PrevTxtButton.clicked.connect(self.prevText)
         self.ui.NextTxtButton.clicked.connect(self.nextText)
-        self.ui.SaveButton.clicked.connect(self.SaveCorrectedTextFileDialog)
-        self.ui.SaveAsButton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
+        self.ui.SaveButton.clicked.connect(self.save_text_with_myexplorer)
+        self.ui.SaveAsButton.clicked.connect(self.save_text_as_with_myexplorer)
         self.ui.DiscardTextButton.clicked.connect(self.discardText)
         #self.ui.RenumberTextButton.clicked.connect(self.Renumber_Greek_text_Lines)
         self.ui.actionRenumber_Text.triggered.connect(self.Renumber_Greek_text_Lines)
@@ -323,7 +330,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.PagefontComboBox.currentFontChanged.connect(self.on_page_font_update)
         self.ui.PagefontSizeBox.valueChanged.connect(self.on_page_font_update)
         self.ui.PageAutoSeekcheckBox.stateChanged.connect(self.pageAutoSeek)
-        self.ui.SavePageTextButton.clicked.connect(self.SavePageTextDialog)
+        self.ui.SavePageTextButton.clicked.connect(self.save_text_with_myexplorer)
 
 
         # Verse
@@ -336,7 +343,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.VerseAutoSeekcheckBox.stateChanged.connect(self.verseAutoSeek)
         self.ui.VersefontComboBox.currentFontChanged.connect(self.on_verse_font_update)
         self.ui.VersefontSizeBox.valueChanged.connect(self.on_verse_font_update)
-        self.ui.SaveVerseTextButton.clicked.connect(self.SaveVerseTextDialog)
+        self.ui.SaveVerseTextButton.clicked.connect(self.save_text_with_myexplorer)
 
         # Final
         #self.ui.ReviewCompletecheckBox.stateChanged.connect(self.updateXRef)
@@ -345,10 +352,11 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore Session settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyGrounder',
-            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+            session_manager=self.session_manager,
         )
         self.crossref = getattr(self, 'crossref', '') or ''
         self.jsondir = getattr(self, 'jsondir', '') or ''
@@ -423,11 +431,10 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # get session settings
         # Define json data
         print("loading session")
-        sm = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
-        active_project = sm.get_active_project('Session.json')
+        active_project = self.session_manager.get_active_project('Session.json')
         self.current_project_root = active_project.get('project_root', '')
         self.current_project_name = active_project.get('project_name', '')
-        data = list(sm.load('GrounderSession.json').values())
+        data = list(self.session_manager.load('GrounderSession.json').values())
 
         # Set json key values
         jsondir_key = r"self.jsondir"
@@ -594,23 +601,46 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
 
         print(f'Absolute Path to Project Directory: {self.projecthome}')
+        project_font = self.session_manager.get_active_project_font() or 'FROMVS'
         if not hasattr(self, 'font') or not self.font:
-            self.font = 'FROMVS'
+            self.font = project_font
             try:
                 self.ui.fontComboBox.setCurrentText(self.font)
             except Exception:
                 pass
             self.on_font_update()
         try:
-            self.ui.PagefontComboBox.setCurrentText('FROMVS')
+            self.ui.PagefontComboBox.setCurrentText(project_font)
             self.on_page_font_update()
         except Exception:
             pass
         try:
-            self.ui.VersefontComboBox.setCurrentText('FROMVS')
+            self.ui.VersefontComboBox.setCurrentText(project_font)
             self.on_verse_font_update()
         except Exception:
             pass
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyGrounder',
+            preferred_input_modules=('MyBoxer', 'MyReader', 'MyResolver'),
+            language_hint='greek',
+        )
+        if default_input:
+            os.makedirs(default_input, exist_ok=True)
+            for attribute_name in ('imagedir', 'textdir', 'pagetextdir', 'versetextdir'):
+                current_value = str(getattr(self, attribute_name, '') or '').strip()
+                if current_value and os.path.isdir(current_value):
+                    continue
+                setattr(self, attribute_name, default_input)
+
+        if not str(getattr(self, 'font', '') or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+            try:
+                self.ui.fontComboBox.setCurrentText(self.font)
+                self.on_font_update()
+            except Exception:
+                pass
 
     def get_workflow_settings(self):
 

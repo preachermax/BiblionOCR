@@ -44,6 +44,13 @@ sanitize_current_process_and_reexec()
 
 from helpers.SessionManager import SessionManager
 from helpers.project_status_controller import ProjectStatusController
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_explorer_file_dialogs,
+    install_myexplorer_icon_lockstep,
+    install_myexplorer_method_aliases,
+    install_panel_file_drops,
+)
 #from subprocess import Popen, PIPE, CalledProcessError
 from helpers.HelpSystem import add_help_menu
 # PyQt5 imports
@@ -112,10 +119,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def __init__(self, *args, workflow_wizard_mode=None, workflow_wizard_module=None, **kwargs):
         super().__init__(*args, **kwargs)
+        install_explorer_file_dialogs(self)
+        install_myexplorer_method_aliases(self)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        install_myexplorer_icon_lockstep(self)
+        install_panel_file_drops(self)
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
         self.session_manager = SessionManager()
@@ -308,6 +319,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             show_action.triggered.connect(lambda: self._show_module_help(module_id))
         if launch_action is not None:
             launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        append_default_context_actions(menu, self, is_text_widget=False)
         return menu
 
     def _on_module_button_context_menu_requested(self, button, local_pos):
@@ -333,6 +345,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             show_action.triggered.connect(lambda: self._show_module_help(module_id))
         if launch_action is not None:
             launch_action.triggered.connect(lambda: self._launch_module_by_id(module_id))
+        append_default_context_actions(menu, self.ui.RightPanelwidget, is_text_widget=True)
         menu.exec_(self.ui.RightPanelwidget.mapToGlobal(local_pos))
 
     def _viewcontroller_stage_names(self):
@@ -411,16 +424,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     'key': stage_name,
                     'title': stage_name,
                     'description': (
-                        'Project-scoped workflow stage. Use this stage macro to launch relevant modules in order.'
+                        'Project-scoped workflow stage. Use this stage wizard to launch relevant modules in order.'
                         if mode == 'project'
-                        else 'Page-scoped workflow stage. Use this stage macro for page-level operations.'
+                        else 'Page-scoped workflow stage. Use this stage wizard for page-level operations.'
                     ),
                     'steps': steps,
                 }
             )
         return stage_plan
 
-    def _run_stage_macro(self, stage_key, stage_plan):
+    def _run_stage_wizard(self, stage_key, stage_plan):
         target_stage = next((stage for stage in stage_plan if stage.get('key') == stage_key), None)
         if target_stage is None:
             return
@@ -429,9 +442,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             if module_name:
                 self._open_module_by_name(module_name)
 
-    def _run_full_macro(self, stage_plan):
+    def _run_full_wizard(self, stage_plan):
         for stage in stage_plan:
-            self._run_stage_macro(stage.get('key', ''), stage_plan)
+            self._run_stage_wizard(stage.get('key', ''), stage_plan)
 
     def _open_module_by_name(self, module_name):
         if hasattr(self, 'session_manager'):
@@ -467,12 +480,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             title='Project Workflow Wizard',
             intro_text=(
                 'Run project workflow stages in ViewController numbered-folder order. '
-                'This macro-oriented view helps reduce operator flow errors while keeping manual processes available. '
+                'This wizard-oriented view helps reduce operator flow errors while keeping manual processes available. '
                 'MyBoxer now owns the migrated line and ground-truth pre-process tasks that no longer run from MyServer.'
             ),
             stage_plan=stage_plan,
-            run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
-            run_all_callback=lambda: self._run_full_macro(stage_plan),
+            run_stage_callback=lambda stage_key: self._run_stage_wizard(stage_key, stage_plan),
+            run_all_callback=lambda: self._run_full_wizard(stage_plan),
             parent=self,
         )
         dialog.exec_()
@@ -508,8 +521,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 'Line-splitting and box-preparation tasks are routed through MyBoxer in the pre-process stage.'
             ),
             stage_plan=stage_plan,
-            run_stage_callback=lambda stage_key: self._run_stage_macro(stage_key, stage_plan),
-            run_all_callback=lambda: self._run_full_macro(stage_plan),
+            run_stage_callback=lambda stage_key: self._run_stage_wizard(stage_key, stage_plan),
+            run_all_callback=lambda: self._run_full_wizard(stage_plan),
             parent=self,
         )
         dialog.exec_()
@@ -581,12 +594,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.pixlerui.setupUi(self.PixlerWindow)
         self.PixlerWindow.show()
 
-        self.pixlerui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
+        self.pixlerui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
         self.pixlerui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
         self.pixlerui.OverwriteRefImgbutton.clicked.connect(self.OverwriteRefImg)
         self.pixlerui.ExportImageFilebutton.clicked.connect(self.ExportImage)
-        self.pixlerui.SaveImagebutton.clicked.connect(self.SaveImage)
-        self.pixlerui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
+        self.pixlerui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
+        self.pixlerui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
         #self.pixlerui.OpenImageFilebutton.clicked.connect(self.OpenPixlerFileDialog)
         #self.pixlerui.PixlerButton.clicked.connect(self.PixlerTif(self.pixlerui.Image))
         #self.pixlerui.SavePixlerpedImgAsbutton.clicked.connect(self.DestLatinDialog)

@@ -25,7 +25,11 @@ sanitize_current_process_and_reexec()
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 from PyQt5 import QtPrintSupport
 #from PyQt5 import QPrintPreviewDialog, QPrintDialog
 from PyQt5 import QtWidgets as qtw
@@ -57,6 +61,9 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
             'MyWriter',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyWriter')
         )
         install_print_menu_support(
             self,
@@ -119,6 +126,9 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         self.reftxtdir = get_setting('reftxtdir', '')
         self.reftxtfileList = get_setting('reftxtfileList', [])
 
+        if not str(self.font or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+
         if hasattr(self, 'ui'):
             if hasattr(self.ui, 'bookComboBox'):
                 self.ui.bookComboBox.setCurrentText(self.bookabbr)
@@ -126,8 +136,28 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
                 self.ui.fontComboBox.setCurrentText(self.font)
             if hasattr(self.ui, 'fontSizeBox') and str(self.fontsize).isdigit():
                 self.ui.fontSizeBox.setValue(int(self.fontsize))
+            if hasattr(self, 'fontBox') and str(self.font or '').strip():
+                self.fontBox.setCurrentFont(qtg.QFont(self.font))
+            if hasattr(self, 'fontSize') and str(self.fontsize).isdigit():
+                self.fontSize.setValue(int(self.fontsize))
             if hasattr(self, 'LHlineEdit'):
                 self.LHlineEdit.setText(self.linespacing)
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyWriter',
+            preferred_input_modules=('MyVersifier', 'MyResolver'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+        for attribute_name in ('txtdir', 'reftxtdir'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def save_session_settings(self, **updates):
         self.session_manager.update('Session.json', updates)
@@ -256,6 +286,7 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         # more or less 8 spaces
         self.ui.textEdit.setTabStopWidth(33)
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         if not hasattr(self, 'project_status_controller'):
             self.project_status_controller = ProjectStatusController(
                 self,
@@ -398,6 +429,8 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
 
             menu.addAction(mergeAction)
             menu.addAction(splitAction)
+
+            append_default_context_actions(menu, self.ui.textEdit, is_text_widget=True)
 
             # Convert the widget coordinates into global coordinates
             pos = self.mapToGlobal(pos)

@@ -54,7 +54,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>Open current image</string>
+      <string>Open current image</string>
     </property>
     <property name="text">
      <string/>
@@ -102,7 +102,7 @@
     </property>
     <property name="icon">
      <iconset resource="../UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="SaveAsBoxCorrTextbutton">
@@ -3681,7 +3681,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>Open current image</string>
+      <string>Open current image</string>
     </property>
     <property name="text">
      <string/>
@@ -3709,7 +3709,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>Open current image</string>
+       <string>Open current text</string>
     </property>
     <property name="text">
      <string/>
@@ -4321,7 +4321,6 @@
      <addaction name="menuProject_Font"/>
      <addaction name="menuGenerate_Project_Font"/>
      <addaction name="actionInstall_Project_Font"/>
-     <addaction name="actionEdit_Font_with_Font_Forge"/>
      <addaction name="menuGlyphRef_Font"/>
      <addaction name="menuCharRef_Font"/>
     </widget>
@@ -5164,21 +5163,6 @@
     <string>Converting current tif image to bmp...</string>
    </property>
   </action>
-  <action name="actionFontForge">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/fontforgenew.png</normaloff>:/Icons/Icons/fontforgenew.png</iconset>
-   </property>
-   <property name="text">
-    <string>FontForge</string>
-   </property>
-   <property name="toolTip">
-    <string>Edit current GlyphTracer sfd file in FontForge</string>
-   </property>
-   <property name="statusTip">
-    <string>Editing current GlyphTracer sfd file in FontForge...</string>
-   </property>
-  </action>
   <action name="actionPreferences">
    <property name="text">
     <string>Preferences</string>
@@ -5434,15 +5418,6 @@
    </property>
    <property name="text">
     <string>Libre Office Calc</string>
-   </property>
-  </action>
-  <action name="actionFont_Forge">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
-   </property>
-   <property name="text">
-    <string>Font Forge</string>
    </property>
   </action>
   <action name="actionDeveloper">
@@ -6312,15 +6287,6 @@
   <action name="actionGenerate_Project_SFD">
    <property name="text">
     <string>Build Project SFD</string>
-   </property>
-  </action>
-  <action name="actionEdit_Font_with_Font_Forge">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/fontforgenew.png</normaloff>:/Icons/Icons/fontforgenew.png</iconset>
-   </property>
-   <property name="text">
-    <string>Edit Font with Font Forge</string>
    </property>
   </action>
   <action name="actionEdit_Glyph_Names">

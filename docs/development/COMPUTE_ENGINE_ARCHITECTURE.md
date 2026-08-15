@@ -1,394 +1,158 @@
-# COMPUTE_ENGINE_ARCHITECTURE.md
+# BiblionOCR Compute Engine Architecture Contract
 
-# BiblionOCR Compute Engine Architecture
+Status: Implementation contract
+Revision: 0.2
+Scope: Runtime-facing architecture contract for compute discovery, profiling, status, and provider abstraction.
 
-**Status:** Planning
-**Revision:** 0.1
-**Project:** BiblionOCR
+## 1. Purpose
 
----
+Define what the current Compute Engine must guarantee to callers and where future extensions should attach.
 
-# Purpose
+This contract intentionally separates:
 
-The Compute Engine is responsible for discovering, profiling, monitoring, and utilizing all available computational resources available to BiblionOCR.
+- current implemented behavior
+- emerging implementation direction
+- planned capabilities
 
-The objective is not merely to detect CUDA devices, but to provide a unified abstraction layer through which every hardware accelerator may be discovered and leveraged by the application.
+## 2. Current Runtime Surface
 
-This architecture intentionally extends beyond the current implementation of Tesseract OCR and is designed to support future AI, OCR, and image-processing workloads.
+### 2.1 ComputeEngine API
 
----
+Current public orchestration lives in Core/compute_engine.py and provides:
 
-# Design Philosophy
+- provider registration/unregistration
+- provider discovery/bootstrap
+- availability filtering
+- normalized profile aggregation
+- normalized status aggregation
 
-The Compute Engine treats all computational resources as discoverable services.
+### 2.2 Provider Registry
 
-Hardware should never be hard-coded into application logic.
+Current provider lifecycle management in Core/compute_registry.py provides:
 
-Instead, every subsystem should request computational capabilities from the Compute Engine rather than interacting directly with individual hardware APIs.
+- in-memory provider set
+- idempotent registration
+- safe unregistration
+- one-time bootstrap discovery
 
----
+### 2.3 Provider Contract
 
-# Architectural Goals
+Core/compute_provider.py defines the provider interface:
 
-The Compute Engine shall:
+- available() -> bool
+- profile() -> Mapping[str, Any]
+- status() -> Mapping[str, Any]
 
-* Discover available hardware.
-* Profile system capabilities.
-* Monitor computational resources.
-* Allocate workloads.
-* Provide a unified interface to software modules.
-* Support future expansion without architectural redesign.
+Providers own platform-specific logic.
 
----
+### 2.4 Profile Schema Layer
 
-# Responsibilities
+Core/compute_profile.py currently defines schema dataclasses.
 
-The Compute Engine is responsible for:
+Important constraint:
 
-## Hardware Discovery
+- schema definitions exist
+- runtime aggregation is not yet fully wired to dataclass serialization
 
-* CPU
-* Memory
-* Storage
-* GPU(s)
-* CUDA devices
-* OpenCL devices
-* External accelerators
-* Future AI hardware
+## 3. Normalized Output Contract
 
----
+ComputeEngine returns stable top-level sections for profile and status payloads.
 
-## Capability Discovery
+Required sections:
 
-Determine available software support including:
+- cpu
+- memory
+- storage
+- gpus
+- cuda
+- providers
 
-* CUDA Runtime
-* cuDNN
-* TensorRT
-* OpenCV CUDA
-* OpenCL
-* ONNX Runtime
-* Future inference engines
+Design intent:
 
----
+- callers consume stable top-level keys
+- provider-native detail remains available through provider payload sections
 
-## Resource Monitoring
+## 4. Architectural Constraints
 
-Monitor:
+1. ComputeEngine must not embed hardware-specific heuristics.
+2. Provider implementations must encapsulate platform logic.
+3. Callers should request capability through ComputeEngine, not direct hardware APIs.
+4. CPU-only execution must remain valid baseline behavior.
+5. CUDA support is additive capability, not mandatory dependency.
 
-* CPU utilization
-* GPU utilization
-* Memory usage
-* VRAM
-* Storage capacity
-* Temperature
-* Power status (where supported)
+## 5. Capability Model Direction
 
----
+Capability semantics should become workload-oriented and explicit.
 
-## Workload Scheduling
+Target capability states:
 
-Provide intelligent workload assignment for:
+- KNOWN_GOOD
+- KNOWN_UNSUITABLE
+- UNKNOWN
 
-* OCR preprocessing
-* Image enhancement
-* Dataset generation
-* AI inference
-* Model training
-* Benchmarking
+Unknown implies conservative fallback.
 
----
+## 6. Workload Planning Direction
 
-# Proposed Directory Structure
+Workload planner is not yet first-class in runtime, but architecture requires:
 
-```
-Developer/
-    hardware/
-        detector.py
-        cpu.py
-        gpu.py
-        cuda.py
-        opencl.py
-        memory.py
-        storage.py
-        benchmark.py
+- workload requirement declaration
+- capability matching
+- resource preference order
+- fallback and degradation paths
+- explicit human bailout state
 
-Core/
-    compute_engine.py
-```
+## 7. Jetson and Remote Node Direction
 
----
+Remote node model (including Jetson Nano) should be treated as provider/resource integration, not remote desktop automation.
 
-# Hardware Discovery
+Target remote-node primitives:
 
-The Compute Engine should identify:
+- registration
+- heartbeat
+- capability report
+- workload reception
+- result and failure reporting
 
-* CPU manufacturer
-* CPU model
-* Core count
-* Thread count
+## 8. Non-Goals
 
-Memory:
+Compute Engine is not intended to become:
 
-* Installed RAM
-* Available RAM
+- cluster orchestrator
+- cloud provisioning platform
+- generalized distributed-training framework
+- universal hardware encyclopedia
 
-Storage:
+## 9. Integration Expectations
 
-* Capacity
-* Available space
-* Device type
+Compute-aware module code should:
 
-GPU(s):
+1. request capability from ComputeEngine
+2. avoid direct accelerator coupling where shared provider abstraction exists
+3. preserve deterministic fallback behavior when acceleration unavailable
 
-* Vendor
-* Model
-* Driver version
-* Compute capability
-* VRAM
+## 10. Versioned Adoption Path
 
----
+### Near term
 
-# Capability Discovery
+- stabilize provider discovery and normalized output
+- validate provider payload consistency
+- expose status/profile surfaces to diagnostics tooling
 
-Hardware alone is insufficient.
+### Mid term
 
-The Compute Engine should determine software capabilities.
+- introduce minimal resource registry semantics
+- add workload requirement descriptions
+- formalize fallback/degradation state transitions
 
-Examples include:
+### Later
 
-* CUDA installed
-* CUDA version
-* cuDNN installed
-* TensorRT installed
-* OpenCV CUDA support
-* OpenCL support
-* ONNX Runtime
-* Additional AI frameworks
+- add remote node provider support
+- add bounded Jetson compute-agent integration
+- add first measurable CUDA-backed workload path
 
----
+## 11. Relationship to Roadmap
 
-# Hardware Profile
+Strategy and sequencing live in docs/development/COMPUTE_ENGINE_ROADMAP.md.
 
-The Compute Engine shall generate a hardware profile similar to:
-
-```json
-{
-    "cpu": {
-        "model": "...",
-        "cores": 8
-    },
-
-    "memory": {
-        "installed_gb": 32
-    },
-
-    "cuda": {
-        "available": true,
-        "version": "12.x"
-    },
-
-    "gpus": [
-        {
-            "vendor": "NVIDIA",
-            "model": "Jetson Nano",
-            "cuda": true
-        }
-    ]
-}
-```
-
-This profile becomes the authoritative hardware description for the current runtime.
-
-Current implementation note:
-
-* `Core/compute_profile.py` now defines schema-only dataclasses for the normalized profile shape: `CPUProfile`, `MemoryProfile`, `StorageProfile`, `OSProfile`, `PythonProfile`, `GPUProfile`, `CUDAProfile`, `ProviderProfileEntry`, and `HardwareProfile`
-* the refinement pass keeps storage and memory capacities in bytes, names CPU topology fields as `physical_cores` and `logical_cores`, and reserves `HardwareProfile.raw` for provider-native diagnostic payloads
-* this file intentionally contains no discovery, registration, monitoring, or aggregation logic
-* provider implementations and `ComputeEngine` output are not yet wired to these dataclasses; they remain a type-definition layer only
-
----
-
-# Tesseract Training
-
-Current versions of Tesseract perform LSTM training primarily on the CPU.
-
-Consequently, CUDA should not be expected to directly accelerate the Tesseract training engine.
-
-Instead, the Compute Engine should accelerate the stages surrounding OCR training.
-
-These include:
-
-* Image preprocessing
-* Adaptive thresholding
-* Denoising
-* Morphological operations
-* Deskewing
-* Segmentation
-* Dataset preparation
-
-Improved preprocessing increases training quality while leveraging available GPU resources.
-
----
-
-# Processing Pipeline
-
-```
-Images
-
-↓
-
-Compute Engine
-
-↓
-
-GPU-Accelerated Preprocessing
-
-↓
-
-OCR Dataset Builder
-
-↓
-
-Tesseract Training
-
-↓
-
-Validation
-
-↓
-
-Model Packaging
-```
-
----
-
-# GPU Discovery Strategy
-
-The Compute Engine should support multiple accelerator providers.
-
-Initial targets include:
-
-* NVIDIA CUDA
-* OpenCL
-* Intel oneAPI
-* AMD ROCm
-* Apple Metal (future)
-* Software fallback
-
-Each provider should expose a common interface describing:
-
-* Availability
-* Supported features
-* Performance characteristics
-
----
-
-# Jetson Support
-
-Jetson-specific discovery should include:
-
-* JetPack version
-* CUDA Runtime
-* TensorRT
-* OpenCV CUDA
-* GPU characteristics
-* tegrastats monitoring
-
-Where available:
-
-* nvidia-smi
-
----
-
-# External GPU Support
-
-The architecture shall support multiple simultaneous accelerators including:
-
-* Internal GPU
-* External GPU
-* Thunderbolt GPU
-* PCIe GPU
-* USB AI accelerators
-* Future hardware
-
-Multiple accelerators should appear as independent compute resources managed by the Compute Engine.
-
----
-
-# Developer Services Integration
-
-Future versions of Developer Services should expose a Compute Dashboard displaying:
-
-* CPU utilization
-* GPU utilization
-* Memory
-* VRAM
-* Active workloads
-* CUDA status
-* OpenCL status
-* Benchmark results
-* Training queue
-
-This dashboard should become part of the observable runtime architecture.
-
----
-
-# Proposed Development Milestones
-
-## v1.9
-
-* Hardware discovery
-* JSON hardware profile
-* CPU
-* Memory
-* Storage
-
----
-
-## v2.0
-
-* GPU discovery
-* CUDA discovery
-* Capability graph
-* Developer Services integration
-
----
-
-## v2.1
-
-* CUDA-accelerated preprocessing
-* Benchmark framework
-* Performance profiling
-
----
-
-## v2.2
-
-* OCR dataset builder
-* Training manager
-* Model packaging
-* Validation pipeline
-
----
-
-## v2.3
-
-* Multi-GPU scheduling
-* Remote compute support
-* Distributed training
-* Future AI accelerators
-
----
-
-# Long-Term Vision
-
-The Compute Engine shall become the centralized computational subsystem of BiblionOCR.
-
-Rather than serving only Tesseract OCR, it will provide a unified architecture through which current and future OCR engines, AI models, image-processing pipelines, benchmarking tools, and hardware accelerators may operate.
-
-The Compute Engine is intended to remain hardware-agnostic, extensible, and observable, ensuring that BiblionOCR can evolve alongside emerging computational technologies without requiring fundamental architectural redesign.
-
----
-
-*"Making systems visible extends beyond software—it includes the computational resources that bring those systems to life."*
+This file is the implementation contract that keeps runtime behavior constrained while the roadmap evolves.

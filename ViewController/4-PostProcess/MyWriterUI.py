@@ -78,7 +78,7 @@ class Ui_MyWriterUI(object):
         self.actionNew.setObjectName("actionNew")
         self.actionOpenFile = QtWidgets.QAction(MyWriterUI)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/Icons/Icons/folder-open-document-text.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(":/Icons/Icons/BiblionExplorer.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionOpenFile.setIcon(icon2)
         self.actionOpenFile.setObjectName("actionOpenFile")
         self.actionSave = QtWidgets.QAction(MyWriterUI)

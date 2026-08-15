@@ -37,7 +37,11 @@ import os
 import re
 from pathlib import Path
 from HelpSystem import add_help_menu
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 #import glob
 import shutil
@@ -264,6 +268,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             include_project_wizard=False,
             include_page_wizard=True,
         )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyBoxer')
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'BoxWidget', None)],
             image_handler=self.getImage,
@@ -329,7 +336,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.actionDraw_Selected_LineBox_tb.triggered.connect(self.getRbLineBox)
         #self.ui.actionEdit_Latin_LineBox_Pair.triggered.connect(self.linebox_edit_split)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
         #self.ui.action_Grounder.triggered.connect(self.OpenWithMyGrounder)
 
@@ -339,8 +346,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.actionMake_Word_Box_Files.triggered.connect(self.loadwordboximage)
         self.ui.actionOpen_Word_Box_Image.triggered.connect(self.loadwordboximage)
         self.ui.actionOpen_Word_Box_File.triggered.connect(self.loadwordboximage)
-        self.ui.actionSave_Word_Box_Image.triggered.connect(self.saveWordBoxImage)
-        self.ui.actionSave_AS_Word_Box_Image.triggered.connect(self.saveWordBoxImage)
+        self.ui.actionSave_Word_Box_Image.triggered.connect(self.save_image_with_myexplorer)
+        self.ui.actionSave_AS_Word_Box_Image.triggered.connect(self.save_image_as_with_myexplorer)
         self.ui.actionSave_Word_Box_File.triggered.connect(self.WordBoxTable2csv)
         self.ui.actionSave_As_Word_Box_File.triggered.connect(self.WordBoxTable2csv)
 
@@ -368,14 +375,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
 
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.drawLineBoxImage)
+        self._install_image_context_menu_defaults()
+        self._install_image_panel_shortcuts()
 
         self.ui.LineBoxTable.setCornerButtonEnabled(False)
         self.ui.LineBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
@@ -493,6 +502,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.ui.ImageTab.currentChanged.connect(self.on_tabChanged)
         self.project_status_controller = ProjectStatusController(
             self,
@@ -696,6 +706,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.latinpagesbox = get_setting('latinpagesbox', '')
         self.latinlinesbox = get_setting('latinlinesbox', '')
         self.latinlinesautosplit = get_setting('latinlinesautosplit', '')
+        if not self.font:
+            self.font = self.session_manager.get_active_project_font() or self.font
 
         self.ui.fontComboBox.setCurrentText(self.font)
         self.ui.fontSizeBox.setValue(int(self.fontsize) if str(self.fontsize).isdigit() else self.ui.fontSizeBox.value())
@@ -703,6 +715,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
         self.ui.LHlineEdit.setText(self.linespacing)
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyBoxer',
+            preferred_input_modules=('MyServer', 'MyPixler'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+
+        for attribute_name in ('imgdir', 'pages', 'greekpages'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def save_session_settings(self, **updates):
         self.session_manager.update('BoxerSession.json', updates)
@@ -5737,6 +5766,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         deleteRowAction.setIcon(iconD)
 
+        append_default_context_actions(tableMenu, self.currentBoxTable, is_text_widget=False)
+
         action = tableMenu.exec_(self.currentBoxTable.mapToGlobal(position))
         if action == undoAction:
             qtw.QUndoStack.undo()
@@ -5748,6 +5779,57 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             self.on_insertRowBelow()
         elif action == deleteRowAction:
             self.on_deleteRowSelection()
+
+    def _install_image_context_menu_defaults(self):
+        self._image_context_widgets = []
+        for widget_name in ("PageImage", "SourceImage", "Line", "Image"):
+            image_widget = getattr(self.ui, widget_name, None)
+            if image_widget is None:
+                continue
+            image_widget.setFocusPolicy(qtc.Qt.ClickFocus)
+            image_widget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+            image_widget.customContextMenuRequested.connect(
+                lambda pos, w=image_widget: self.openImagePanelMenu(w, pos)
+            )
+            self._image_context_widgets.append(image_widget)
+
+    def _install_image_panel_shortcuts(self):
+        self._image_undo_shortcut = qtw.QShortcut(qtg.QKeySequence.Undo, self)
+        self._image_redo_shortcut = qtw.QShortcut(qtg.QKeySequence.Redo, self)
+        self._image_undo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_redo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_undo_shortcut.activated.connect(self._on_image_panel_undo_shortcut)
+        self._image_redo_shortcut.activated.connect(self._on_image_panel_redo_shortcut)
+
+    def _focused_image_widget(self):
+        focus_widget = qtw.QApplication.focusWidget()
+        if focus_widget in getattr(self, "_image_context_widgets", []):
+            return focus_widget
+        return None
+
+    def _on_image_panel_undo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.prevImage()
+
+    def _on_image_panel_redo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.nextImage()
+
+    def openImagePanelMenu(self, image_widget, position):
+        menu = QMenu(self)
+        reload_action = menu.addAction("Reload Image")
+        reload_action.triggered.connect(self.drawLineBoxImage)
+        append_default_context_actions(
+            menu,
+            image_widget,
+            is_text_widget=False,
+            include_undo_redo=True,
+            undo_callback=self.prevImage,
+            redo_callback=self.nextImage,
+        )
+        menu.exec_(image_widget.mapToGlobal(position))
 
     def setPrevLineBox(self):
         self.currentBoxTable.setSortingEnabled(False)

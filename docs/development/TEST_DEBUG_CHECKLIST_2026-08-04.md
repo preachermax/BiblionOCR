@@ -69,6 +69,15 @@ These are independent validation passes once the finish-to-start sequence is gre
 
 Goal: catch import errors, missing files, and startup crashes before deeper workflow testing.
 
+### 0. Workspace Problems baseline and delta triage
+
+- Capture full-workspace Problems first and record the total count.
+- Split the list into:
+  - baseline Problems outside this test scope
+  - introduced/regressed Problems in this scope
+- Do not report "clean" unless introduced/regressed Problems are zero.
+- Keep the unresolved baseline file list in the test handoff notes.
+
 ### 1. Python syntax and import sanity
 
 - Run targeted compile checks for recently touched code:
@@ -186,9 +195,9 @@ Goal: verify the cross-module workflow state is consistent after centralization.
   - `2-TrainTesseract`
   - `3-Process`
   - `4-PostProcess`
-- Confirm `Run Full Macro` and stage-specific actions launch without traceback.
+- Confirm `Run Full Wizard` and stage-specific wizard actions launch without traceback.
 - Confirm existing manual launch actions still work after using the wizards.
-- Open workflow wizard entry actions from these non-launcher windows and confirm page-wizard delegation correctly routes into `MyLauncher` with module context:
+- Open workflow wizard entry actions from these non-launcher windows and confirm module-owned page wizard execution with module context:
   - `MyExplorer`
   - `MyPixler`
   - `MyBoxer`

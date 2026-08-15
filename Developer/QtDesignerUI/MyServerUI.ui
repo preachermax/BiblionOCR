@@ -214,7 +214,7 @@
     </property>
     <property name="icon">
      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="SaveAsOCRCorrTextbutton">
@@ -1303,35 +1303,6 @@
       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="MyExplorerbutton">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>0</y>
-      <width>21</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>FROMVS [MAXR]</family>
-      <pointsize>8</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Open current image</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1339,7 +1310,7 @@
      <x>0</x>
      <y>0</y>
      <width>1319</width>
-      <height>32</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTraining">
@@ -1349,7 +1320,6 @@
     <addaction name="actionMyVersifier"/>
     <addaction name="actionMyResolver"/>
     <addaction name="actionMyGrounder"/>
-    <addaction name="actionStage_Ground_Truth"/>
    </widget>
    <widget class="QMenu" name="menuOCR">
     <property name="title">
@@ -1365,8 +1335,6 @@
      <addaction name="actionEnglish_2"/>
     </widget>
     <addaction name="menuSelect_Language"/>
-    <addaction name="actionOCR_Preprocess"/>
-    <addaction name="actionSelect_Image"/>
     <addaction name="actionCorrect_OCR_tb"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -1389,12 +1357,15 @@
     <addaction name="actionSave_As_Image"/>
     <addaction name="actionSave_Text"/>
     <addaction name="actionSave_As_Text"/>
+    <addaction name="separator"/>
+    <addaction name="actionDevelopment_Backup"/>
+    <addaction name="actionDevelopment_Restore"/>
+    <addaction name="actionProduction_Backup_Restore"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionPrefernces"/>
     <addaction name="actionMyPixler"/>
     <addaction name="actionMyWriter"/>
     <addaction name="actionFind_and_Replace"/>
@@ -1410,8 +1381,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionOnline"/>
-    <addaction name="actionFontForge"/>
     <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
    </widget>
@@ -1423,6 +1392,7 @@
     <addaction name="actionNewProject"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="actionSet_Columns_Per_Page"/>
+    <addaction name="actionPrefernces"/>
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
@@ -1430,7 +1400,7 @@
     </property>
     <addaction name="actionLine_tif_to_bmp"/>
     <addaction name="actionMyGlypher"/>
-    <addaction name="actionFontForge"/>
+    <addaction name="actionProjectFont"/>
     <addaction name="actionInstall_Font"/>
    </widget>
    <widget class="QMenu" name="menuGround_Truth_2">
@@ -1660,12 +1630,12 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QToolBar" name="FontForgeToolBar">
+  <widget class="QToolBar" name="ProjectFontToolBar">
    <property name="windowTitle">
-    <string>FontForge Tool Bar</string>
+    <string>Project Font Tool Bar</string>
    </property>
    <property name="toolTip">
-    <string>FontForge Tool Bar</string>
+    <string>Project Font Tool Bar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -2261,19 +2231,19 @@
     <string>Converting current tif image to bmp...</string>
    </property>
   </action>
-  <action name="actionFontForge">
+  <action name="actionProjectFont">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/fontforgenew.png</normaloff>:/Icons/Icons/fontforgenew.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>FontForge</string>
+    <string>Project Font</string>
    </property>
    <property name="toolTip">
-    <string>Edit current GlyphTracer sfd file in FontForge</string>
+    <string>Manage current project font assets</string>
    </property>
    <property name="statusTip">
-    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+    <string>Managing current project font assets...</string>
    </property>
   </action>
   <action name="actionPrefernces">
@@ -2284,18 +2254,26 @@
   <action name="actionOpen_Text">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Open Text</string>
    </property>
   </action>
   <action name="actionSave_Image">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk.png</normaloff>:/Icons/Icons/disk.png</iconset>
+   </property>
    <property name="text">
     <string>Save Image</string>
    </property>
   </action>
   <action name="actionSave_As_Image">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/disk-rename.png</normaloff>:/Icons/Icons/disk-rename.png</iconset>
+   </property>
    <property name="text">
     <string>Save As Image</string>
    </property>
@@ -2577,11 +2555,11 @@
   </action>
   <action name="actionFont_Forge">
    <property name="icon">
-    <iconset>
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>Font Forge</string>
+    <string>Project Font</string>
    </property>
   </action>
   <action name="actionDeveloper">
@@ -2714,6 +2692,33 @@
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionDevelopment_Backup">
+   <property name="text">
+    <string>Development Backup...</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a development backup snapshot.</string>
+   </property>
+  </action>
+  <action name="actionDevelopment_Restore">
+   <property name="text">
+    <string>Development Restore...</string>
+   </property>
+   <property name="toolTip">
+    <string>Restore a development backup snapshot to a staged folder.</string>
+   </property>
+  </action>
+  <action name="actionProduction_Backup_Restore">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Production Backup/Restore (Coming Soon)</string>
+   </property>
+   <property name="toolTip">
+    <string>Reserved for production backup and restore process wiring.</string>
    </property>
   </action>
   <action name="actionSet_Columns_Per_Page">

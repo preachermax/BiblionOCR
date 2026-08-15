@@ -28,7 +28,11 @@ from pathlib import Path
 from HelpSystem import add_help_menu
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 #import glob
 import shutil
@@ -114,6 +118,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.mod_abspath = os.path.abspath(self.mod_realpath)
         self.mod_relpath = os.path.relpath(self.mod_abspath)
         self.projecthome = self.mod_abspath + os.sep
+        self.session_manager = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json'))
         print(f'OS Path dirname: {self.mod_dirname}')
         print(f'OS Path rootdir: {self.mod_rootdir}')
         print(f'OS Path realpath: {self.mod_realpath}')
@@ -130,6 +135,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyGlypher',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyGlypher')
         )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'GlypherWidget', None)],
@@ -149,7 +157,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionStandardUI.triggered.connect(self.standardUI)
         self.ui.action_Explorer.triggered.connect(self.OpenProjectExplorer)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
 
         self.ui.actionOpen_Greek_Page_Image.triggered.connect(self.loadImage)
@@ -183,14 +191,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
 
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.drawGlyphBoxImage)
+        self._install_image_context_menu_defaults()
+        self._install_image_panel_shortcuts()
 
         self.ui.GlyphBoxTable.setCornerButtonEnabled(False)
         self.ui.GlyphBoxTable.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
@@ -208,7 +218,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Show the Main user interface
         self.ui.BoxDocument = qtg.QTextDocument(self.ui.GlyphBoxText)
-        font = SessionManager().build_workflow_font(
+        font = self.session_manager.build_workflow_font(
             "FROMVS [MAXR]",
             20,
             os.path.dirname(os.path.realpath(__file__)),
@@ -302,10 +312,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Restore BoxerSession settings
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.project_status_controller = ProjectStatusController(
             self,
             'MyGlypher',
-            session_manager=SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')),
+            session_manager=self.session_manager,
         )
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
@@ -328,13 +339,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.bookComboBox.setCurrentText(self.bookabbr)
         print('current book:',self.bookabbr)
 
-
     def get_session_settings(self):
         print("loading session")
         active_project = SessionManager().get_active_project('Session.json')
         self.current_project_root = active_project.get('project_root', '')
         self.current_project_name = active_project.get('project_name', '')
-        session = SessionManager(os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')).values('GlypherSession.json')
+        session = self.session_manager.values('GlypherSession.json')
 
         def get_setting(name: str, default=None):
             if default is None:
@@ -416,6 +426,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.greeklinesbox = get_setting('greeklinesbox', '')
         self.latinpages = get_setting('latinpages', '')
         self.latinlinesbox = get_setting('latinlinesbox', '')
+        if not self.font:
+            self.font = self.session_manager.get_active_project_font() or self.font
 
         def _join_project_path(value: str) -> str:
             if not value:
@@ -468,6 +480,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.ZoomComboBox.setCurrentText(self.zoom)
             if str(self.zoomslidervalue).isdigit():
                 self.ui.Zoomslider.setValue(int(self.zoomslidervalue))
+
+    def _apply_closed_loop_defaults(self):
+        default_input = self.session_manager.resolve_receiving_default_input(
+            'MyGlypher',
+            preferred_input_modules=('MyBoxer', 'MyServer'),
+            language_hint='greek',
+        )
+        if not default_input:
+            return
+
+        os.makedirs(default_input, exist_ok=True)
+
+        for attribute_name in ('imgdir', 'sourceimgdir', 'glyphboxgreekimgdir', 'greekpages'):
+            current_value = str(getattr(self, attribute_name, '') or '').strip()
+            if current_value and os.path.isdir(current_value):
+                continue
+            setattr(self, attribute_name, default_input)
 
     def get_workflow_settings(self):
 
@@ -1854,6 +1883,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         deleteRowAction.setIcon(iconD)
 
+        append_default_context_actions(tableMenu, self.ui.GlyphBoxTable, is_text_widget=False)
+
         action = tableMenu.exec_(self.ui.GlyphBoxTable.mapToGlobal(position))
         if action == undoAction:
             qtw.QUndoStack.undo()
@@ -1865,6 +1896,57 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.on_insertRowBelow()
         elif action == deleteRowAction:
             self.on_deleteRowSelection()
+
+    def _install_image_context_menu_defaults(self):
+        self._image_context_widgets = []
+        for widget_name in ("Image", "Line", "GlyphBox", "GlyphMap"):
+            image_widget = getattr(self.ui, widget_name, None)
+            if image_widget is None:
+                continue
+            image_widget.setFocusPolicy(qtc.Qt.ClickFocus)
+            image_widget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+            image_widget.customContextMenuRequested.connect(
+                lambda pos, w=image_widget: self.openImagePanelMenu(w, pos)
+            )
+            self._image_context_widgets.append(image_widget)
+
+    def _install_image_panel_shortcuts(self):
+        self._image_undo_shortcut = qtw.QShortcut(qtg.QKeySequence.Undo, self)
+        self._image_redo_shortcut = qtw.QShortcut(qtg.QKeySequence.Redo, self)
+        self._image_undo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_redo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_undo_shortcut.activated.connect(self._on_image_panel_undo_shortcut)
+        self._image_redo_shortcut.activated.connect(self._on_image_panel_redo_shortcut)
+
+    def _focused_image_widget(self):
+        focus_widget = qtw.QApplication.focusWidget()
+        if focus_widget in getattr(self, "_image_context_widgets", []):
+            return focus_widget
+        return None
+
+    def _on_image_panel_undo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.prevImage()
+
+    def _on_image_panel_redo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.nextImage()
+
+    def openImagePanelMenu(self, image_widget, position):
+        menu = QMenu(self)
+        reload_action = menu.addAction("Reload Image")
+        reload_action.triggered.connect(self.drawGlyphBoxImage)
+        append_default_context_actions(
+            menu,
+            image_widget,
+            is_text_widget=False,
+            include_undo_redo=True,
+            undo_callback=self.prevImage,
+            redo_callback=self.nextImage,
+        )
+        menu.exec_(image_widget.mapToGlobal(position))
 
     # Drawing Methods
 

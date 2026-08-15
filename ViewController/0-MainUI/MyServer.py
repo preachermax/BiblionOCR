@@ -1,3 +1,5 @@
+# pyright: reportGeneralTypeIssues=false, reportOptionalMemberAccess=false, reportAssignmentType=false, reportArgumentType=false, reportAttributeAccessIssue=false, reportCallIssue=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportPossiblyUnboundVariable=false, reportIncompatibleMethodOverride=false, reportRedeclaration=false
+
 print("RUNNING:", __file__)
 # See dev_notebook.md for architecture + debugging notes
 #print(len(locals()))
@@ -19,6 +21,7 @@ import json
 import csv
 import time
 import hashlib
+from datetime import datetime, timezone
 from enum import Enum
 
 
@@ -113,11 +116,14 @@ from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
 from Core.project_database import load_project_database_record
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 from Core.Scanner import NetworkScanner, ScanManager
 from helpers.scan_runtime import start_scan_workflow
-# EventBus is still defined below in this module during the Core migration.
-# ProjectCreationEngine remains below as a temporary fallback, but runtime wiring now uses CoreProjectCreationEngine.
+# Event bus and project creation engine are provided by Core modules.
+from Core.event_bus import EventBus
 # Do not import MainWindow from MainUI.py; that file only contains the generated Ui_MainUI class.
 
 # PyQt5 imports
@@ -312,6 +318,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.pending_pixler_source_path = ""
         self._pixler_return_poll_timer = None
         self.pixler_return_prompt_dialog = None
+        self.current_project_page = 1
+        self.current_project_milestone = ""
+        self.current_page_milestone = ""
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -359,6 +368,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             include_project_wizard=True,
             include_page_wizard=True,
         )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyServer')
+        )
 
         # -------------------------
         # Actions / Signals
@@ -368,7 +380,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, "actionOpen_Project"):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
 
-        self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
 
         if hasattr(self.ui, "actionPrint_Ref_Image"):
             self.ui.actionPrint_Ref_Image.triggered.connect(
@@ -408,13 +420,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
         self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
+        self._install_backup_restore_actions()
 
         # -------------------------
         # Buttons / Navigation
         # -------------------------
         self.ui.imageScannerbutton.clicked.connect(self.actionScanNetwork)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.FindReplacebutton.clicked.connect(mainfind.Find(self).show)
 
         self.ui.BothLoadButton.clicked.connect(self.bothLoad)
@@ -456,9 +469,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         # Text Editing
         # -------------------------
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         # -------------------------
         # External Modules
@@ -478,7 +491,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
 
         # Button Modules
-        self.ui.MyExplorerbutton.clicked.connect(self.OpenWithMyExplorer)
         self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
 
@@ -520,6 +532,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Session Restore
         # -------------------------
         self.get_session_settings()
+        self._apply_closed_loop_defaults()
         self.OpenChrReference()
 
         print('current book:', self.bookabbr)
@@ -732,6 +745,42 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return f"{module_name} {module_completed}/{module_total} | Complete"
         return f"{module_name} {module_completed}/{module_total} | Next: {next_label}"
 
+    def _page_number_from_path(self, path, fallback=None):
+        candidate = str(path or "").strip()
+        if not candidate:
+            return max(1, int(fallback or getattr(self, "current_project_page", 1) or 1))
+
+        stem = os.path.splitext(os.path.basename(candidate))[0]
+        for pattern in (
+            r"(?:^|[_\-\s])page[_\-\s]*(\d+)",
+            r"(?:^|[_\-\s])p(?:age)?[_\-\s]*(\d+)",
+            r"(\d+)$",
+        ):
+            match = re.search(pattern, stem, re.IGNORECASE)
+            if match:
+                return max(1, int(match.group(1)))
+
+        return max(1, int(fallback or getattr(self, "current_project_page", 1) or 1))
+
+    def _sync_project_page_state(self, page_path=None, project_milestone=None, page_milestone=None):
+        page_number = self._page_number_from_path(page_path)
+        self.current_project_page = page_number
+
+        payload = {
+            'self.current_project_page': page_number,
+        }
+
+        if project_milestone is not None:
+            self.current_project_milestone = str(project_milestone or '').strip()
+            payload['self.current_project_milestone'] = self.current_project_milestone
+
+        if page_milestone is not None:
+            self.current_page_milestone = str(page_milestone or '').strip()
+            payload['self.current_page_milestone'] = self.current_page_milestone
+
+        self.session_manager.update('Session.json', payload)
+        return page_number
+
     def _shared_active_project_root(self):
         return self.session_manager.get_active_project_root()
 
@@ -808,6 +857,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             module_name="MyServer",
             details=details,
         )
+        self._sync_project_page_state(project_root, project_milestone=milestone_key, page_milestone=milestone_key)
         self._refresh_project_status(project_root)
         return project_root
 
@@ -868,7 +918,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._set_current_project(project_path)
         self.workflow_tracker.ensure_tracking_state(project_path)
-        ### MILESTONE - project_ready-10% ###
+        ### PROJECT MILESTONE - project_ready-10% ###
         self._record_project_milestone("project_ready", project_path)
         self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
@@ -920,7 +970,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             if self._pending_project_root:
                 self._set_current_project(self._pending_project_root)
                 self.workflow_tracker.ensure_tracking_state(self._pending_project_root)
-                ### MILESTONE - project_ready-10% ###
+                ### PROJECT MILESTONE - project_ready-10% ###
                 self._record_project_milestone(
                     "project_ready",
                     self._pending_project_root,
@@ -1132,7 +1182,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         self.showImage(result["path"])
-        ### MILESTONE - source_acquired-15% ###
+        ### PAGE MILESTONE - source_acquired-15% ###
         self._record_project_milestone(
             "source_acquired",
             result["path"],
@@ -1232,7 +1282,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def get_session_settings(self):
         # get session settings from shared manager
         print("loading session")
-        session = SessionManager().values('Session.json')
+        session = self.session_manager.values('Session.json')
 
         def get_setting(name: str, default=None):
             if default is None:
@@ -1266,6 +1316,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.qimage = get_setting('qimage', None)
         self.zoom = get_setting('zoom', '')
         self.zoomslidervalue = get_setting('zoomslidervalue', 0)
+        self.current_project_page = get_setting('current_project_page', 1)
+        self.current_project_milestone = get_setting('current_project_milestone', '')
+        self.current_page_milestone = get_setting('current_page_milestone', '')
         self.txtpath = get_setting('txtpath', '')
         self.txtdir = get_setting('txtdir', '')
         self.scannerManager.apply_request_state(
@@ -1285,6 +1338,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         self._apply_session_ui_state()
+
+    def _apply_closed_loop_defaults(self):
+        inbound_image_dir = self.session_manager.resolve_receiving_default_input(
+            'MyServer',
+            preferred_input_modules=('MyPixler', 'MyScanner', 'MyBoxer'),
+            language_hint='greek',
+        )
+        if inbound_image_dir:
+            os.makedirs(inbound_image_dir, exist_ok=True)
+            if not str(getattr(self, 'imgdir', '') or '').strip() or not os.path.isdir(str(self.imgdir)):
+                self.imgdir = inbound_image_dir
+
+        if not str(getattr(self, 'font', '') or '').strip():
+            self.font = self.session_manager.get_active_project_font() or self.font
+        if self.font and hasattr(self, 'ui') and hasattr(self.ui, 'fontComboBox'):
+            self.ui.fontComboBox.setCurrentText(self.font)
 
     def _apply_session_ui_state(self):
         if not hasattr(self, 'ui'):
@@ -2780,7 +2849,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath if self.imgpath is not None else '',
             'self.imgdir': self.imgdir if self.imgdir is not None else '',
         })
-        ### MILESTONE - source_acquired-15% ###
+        self._sync_project_page_state(self.imgpath)
+        ### PAGE MILESTONE - source_acquired-15% ###
         self._record_project_milestone(
             "source_acquired",
             self.imgpath,
@@ -3007,6 +3077,53 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
 
+    def _choose_directory_with_myexplorer(self, title, start_dir=''):
+        """Use MyExplorer as the default directory picker for workflow dialogs."""
+        start_path = self._dialog_start_directory(start_dir)
+        output_file = os.path.join(
+            tempfile.gettempdir(),
+            f"biblion_myexplorer_select_{int(time.time() * 1000)}.txt",
+        )
+        module_path = os.path.join(script_dir, "MyExplorer.py")
+
+        cmd = [
+            sys.executable,
+            module_path,
+            "--select-dir",
+            "--start-dir",
+            start_path,
+            "--output-file",
+            output_file,
+            "--title",
+            title,
+        ]
+
+        try:
+            subprocess.run(cmd, check=False)
+        except OSError as exc:
+            qtw.QMessageBox.warning(
+                self,
+                "MyExplorer Picker",
+                f"Could not start MyExplorer picker:\n{exc}\n\nFalling back to system folder dialog.",
+            )
+            return self._choose_directory(title, start_dir)
+
+        selected_path = ""
+        if os.path.isfile(output_file):
+            try:
+                with open(output_file, "r", encoding="utf-8") as handle:
+                    selected_path = handle.read().strip()
+            except OSError:
+                selected_path = ""
+
+        try:
+            if os.path.exists(output_file):
+                os.remove(output_file)
+        except OSError:
+            pass
+
+        return selected_path
+
     def _choose_file(self, title, name_filter='All Files (*.*)', start_dir=''):
         return qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget,
@@ -3014,6 +3131,266 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self._dialog_start_directory(start_dir),
             name_filter,
         )[0]
+
+    def _install_backup_restore_actions(self):
+        """Install development backup/restore menu actions into File menu."""
+        if hasattr(self.ui, "actionDevelopment_Backup"):
+            self.ui.actionDevelopment_Backup.triggered.connect(self.open_development_backup_dialog)
+        if hasattr(self.ui, "actionDevelopment_Restore"):
+            self.ui.actionDevelopment_Restore.triggered.connect(self.open_development_restore_dialog)
+        if hasattr(self.ui, "actionProduction_Backup_Restore"):
+            self.ui.actionProduction_Backup_Restore.setEnabled(False)
+
+        # Backward-compatible fallback for older UI artifacts.
+        if not hasattr(self.ui, "actionDevelopment_Backup") and hasattr(self.ui, "menuFile"):
+            self.actionDevelopmentBackup = QAction("Development Backup...", self)
+            self.actionDevelopmentRestore = QAction("Development Restore...", self)
+            self.actionProductionBackupRestore = QAction("Production Backup/Restore (Coming Soon)", self)
+            self.actionProductionBackupRestore.setEnabled(False)
+
+            self.actionDevelopmentBackup.triggered.connect(self.open_development_backup_dialog)
+            self.actionDevelopmentRestore.triggered.connect(self.open_development_restore_dialog)
+
+            self.ui.menuFile.addSeparator()
+            self.ui.menuFile.addAction(self.actionDevelopmentBackup)
+            self.ui.menuFile.addAction(self.actionDevelopmentRestore)
+            self.ui.menuFile.addAction(self.actionProductionBackupRestore)
+
+    def _default_backup_source_dir(self):
+        """Return the default development backup source directory."""
+        return os.path.abspath(project_root)
+
+    def _default_external_backup_root(self):
+        """Resolve best-effort mounted external root; prefer large mounts (for 32TB SSD)."""
+        user = os.environ.get("USER", "")
+        candidates = []
+
+        for base in (
+            os.path.join("/media", user),
+            os.path.join("/run", "media", user),
+            "/mnt",
+        ):
+            if os.path.isdir(base):
+                for name in os.listdir(base):
+                    path = os.path.join(base, name)
+                    if os.path.ismount(path):
+                        candidates.append(path)
+
+        best_path = ""
+        best_size = -1
+        for candidate in candidates:
+            try:
+                total = shutil.disk_usage(candidate).total
+            except OSError:
+                continue
+            if total > best_size:
+                best_size = total
+                best_path = candidate
+
+        if best_path:
+            return best_path
+
+        return qtc.QDir.homePath()
+
+    def _development_backup_root(self, destination_root):
+        return os.path.join(destination_root, "BiblionOCR_Backups", "Development")
+
+    def _build_copy_ignore(self):
+        """Return ignore function for volatile dev artifacts that should not be backed up."""
+        ignored = {
+            ".venv",
+            "__pycache__",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".coverage",
+        }
+
+        def _ignore(_current_dir, names):
+            return {name for name in names if name in ignored}
+
+        return _ignore
+
+    def _copy_tree_with_feedback(self, source_dir, destination_dir):
+        """Copy tree and present a simple wait cursor/status experience for long operations."""
+        qtw.QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.statusBar().showMessage(f"Copying: {source_dir} -> {destination_dir}")
+        qtw.QApplication.processEvents()
+        try:
+            shutil.copytree(
+                source_dir,
+                destination_dir,
+                dirs_exist_ok=False,
+                ignore=self._build_copy_ignore(),
+            )
+        finally:
+            self.statusBar().clearMessage()
+            qtw.QApplication.restoreOverrideCursor()
+
+    def _write_backup_manifest(self, snapshot_dir, source_dir, payload_dir):
+        manifest_path = os.path.join(snapshot_dir, "backup_manifest.json")
+        manifest = {
+            "process": "development",
+            "module": "MyServer",
+            "created_utc": datetime.now(timezone.utc).isoformat(),
+            "source_dir": os.path.abspath(source_dir),
+            "payload_dir": os.path.abspath(payload_dir),
+            "host_platform": platform.platform(),
+            "python": sys.version,
+        }
+
+        with open(manifest_path, "w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2)
+
+    def open_development_backup_dialog(self):
+        """Run the development backup workflow with manual step-by-step dialogs."""
+        source_default = self._default_backup_source_dir()
+        destination_default = self._default_external_backup_root()
+
+        source_dir = self._choose_directory_with_myexplorer(
+            "Development Backup: Select source folder",
+            source_default,
+        )
+        if not source_dir:
+            return
+
+        destination_root = self._choose_directory_with_myexplorer(
+            "Development Backup: Select destination root (mounted SSD)",
+            destination_default,
+        )
+        if not destination_root:
+            return
+
+        if not os.path.isdir(source_dir):
+            qtw.QMessageBox.warning(self, "Development Backup", f"Source folder not found:\n{source_dir}")
+            return
+        if not os.path.isdir(destination_root):
+            qtw.QMessageBox.warning(self, "Development Backup", f"Destination root not found:\n{destination_root}")
+            return
+
+        backup_root = self._development_backup_root(destination_root)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        snapshot_dir = os.path.join(backup_root, f"dev_backup_{timestamp}")
+        payload_dir = os.path.join(snapshot_dir, os.path.basename(os.path.abspath(source_dir)))
+
+        confirmation = qtw.QMessageBox.question(
+            self,
+            "Confirm Development Backup",
+            (
+                "Create development backup with these settings?\n\n"
+                f"Source:\n{source_dir}\n\n"
+                f"Destination Root:\n{destination_root}\n\n"
+                f"Snapshot Folder:\n{snapshot_dir}"
+            ),
+            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+            qtw.QMessageBox.Yes,
+        )
+        if confirmation != qtw.QMessageBox.Yes:
+            return
+
+        try:
+            os.makedirs(snapshot_dir, exist_ok=False)
+            self._copy_tree_with_feedback(source_dir, payload_dir)
+            self._write_backup_manifest(snapshot_dir, source_dir, payload_dir)
+        except Exception as exc:
+            qtw.QMessageBox.critical(
+                self,
+                "Development Backup Failed",
+                f"Backup failed with error:\n{exc}",
+            )
+            return
+
+        qtw.QMessageBox.information(
+            self,
+            "Development Backup Complete",
+            f"Backup created successfully:\n{snapshot_dir}",
+        )
+
+    def _find_restore_payload_dir(self, backup_snapshot_dir):
+        """Resolve payload directory inside a backup snapshot (expects BiblionOCR folder payload)."""
+        preferred = os.path.join(backup_snapshot_dir, "BiblionOCR")
+        if os.path.isdir(preferred):
+            return preferred
+
+        for child in os.listdir(backup_snapshot_dir):
+            child_path = os.path.join(backup_snapshot_dir, child)
+            if os.path.isdir(child_path) and child.lower().startswith("biblion"):
+                return child_path
+
+        return ""
+
+    def open_development_restore_dialog(self):
+        """Run the development restore workflow as a safe staged restore (non-destructive)."""
+        backup_start = self._development_backup_root(self._default_external_backup_root())
+        backup_snapshot_dir = self._choose_directory_with_myexplorer(
+            "Development Restore: Select backup snapshot folder",
+            backup_start,
+        )
+        if not backup_snapshot_dir:
+            return
+
+        if not os.path.isdir(backup_snapshot_dir):
+            qtw.QMessageBox.warning(
+                self,
+                "Development Restore",
+                f"Backup snapshot folder not found:\n{backup_snapshot_dir}",
+            )
+            return
+
+        payload_dir = self._find_restore_payload_dir(backup_snapshot_dir)
+        if not payload_dir:
+            qtw.QMessageBox.warning(
+                self,
+                "Development Restore",
+                "Selected backup does not contain a recognizable BiblionOCR payload folder.",
+            )
+            return
+
+        restore_parent_default = os.path.dirname(self._default_backup_source_dir())
+        restore_parent = self._choose_directory_with_myexplorer(
+            "Development Restore: Select restore parent folder",
+            restore_parent_default,
+        )
+        if not restore_parent:
+            return
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        restore_target = os.path.join(restore_parent, f"BiblionOCR_dev_restore_{timestamp}")
+
+        confirmation = qtw.QMessageBox.question(
+            self,
+            "Confirm Development Restore",
+            (
+                "Restore will create a new restored folder (non-destructive).\n\n"
+                f"Backup Snapshot:\n{backup_snapshot_dir}\n\n"
+                f"Payload:\n{payload_dir}\n\n"
+                f"Restore Target:\n{restore_target}"
+            ),
+            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+            qtw.QMessageBox.Yes,
+        )
+        if confirmation != qtw.QMessageBox.Yes:
+            return
+
+        try:
+            self._copy_tree_with_feedback(payload_dir, restore_target)
+        except Exception as exc:
+            qtw.QMessageBox.critical(
+                self,
+                "Development Restore Failed",
+                f"Restore failed with error:\n{exc}",
+            )
+            return
+
+        qtw.QMessageBox.information(
+            self,
+            "Development Restore Complete",
+            (
+                "Restore completed to a new folder:\n"
+                f"{restore_target}\n\n"
+                "Review and validate it before manual cutover."
+            ),
+        )
 
     def loadText(self):
         self.open_non_modal_text_picker(
@@ -3082,6 +3459,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.txtpath': self.txtpath if self.txtpath is not None else '',
             'self.txtdir': self.txtdir if self.txtdir is not None else '',
         })
+        self._sync_project_page_state(self.txtpath)
 
         # Ã¢Å“â€¦ Build file list (FIXED for Windows + CSV)
         self.txtfileList = []
@@ -3851,7 +4229,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyExplorer.py', self._projects_base_path())
 
     def OpenWithCalc(self):
-        lo_cmd = 'libreoffice --calc ' + self.txtpath
+        lo_cmd = f"libreoffice --calc {self.txtpath or ''}"
         print(lo_cmd)
         os.system(lo_cmd)
 
@@ -3870,377 +4248,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def on_lang_select(self):
         pass
-
-# ================================
-# PROJECT CREATION STATE MACHINE
-# MyServer.py - Core Implementation
-# ================================
-
-# -------------------------------
-# STATE DEFINITIONS
-# -------------------------------
-
-class ProjectState(Enum):
-    INIT = "INIT"
-    VALIDATE_INPUT = "VALIDATE_INPUT"
-    PROVENANCE_REQUIRED = "PROVENANCE_REQUIRED"
-    PROVENANCE_CAPTURED = "PROVENANCE_CAPTURED"
-    RIS_GENERATION = "RIS_GENERATION"
-    FILESYSTEM_WRITE = "FILESYSTEM_WRITE"
-    REGISTRATION = "REGISTRATION"
-    COMPLETE = "COMPLETE"
-    FAILED = "FAILED"
-
-# -------------------------------
-# CORE ENGINE
-# -------------------------------
-
-class ProjectCreationEngine:
-    def __init__(self, base_path=None, event_bus=None):
-        self.base_path = base_path or os.path.join(os.path.expanduser("~"), "Projects")
-        self.state = ProjectState.INIT
-        self.context = {}
-        self.ris = None
-        self.events = []
-
-        # NEW: shared event bus (or create default one)
-        self.event_bus = event_bus if event_bus else EventBus()
-
-    # ---------------------------
-    # EVENT EMITTER
-    # ---------------------------
-
-    def emit_event(self, event_name, metadata=None):
-        event = {
-            "event": event_name,
-            "timestamp": time.time(),
-            "state": self.state.value,
-            "project_name": self.context.get("project_name"),
-            "metadata": metadata or {}
-        }
-
-        # store locally (for replay/debug)
-        self.events.append(event)
-
-        # console debug
-        print(f"[EVENT] {event_name}")
-
-        # NEW: broadcast globally
-        if self.event_bus:
-            self.event_bus.emit(event)
-
-        return event
-
-    # ---------------------------
-    # STATE TRANSITION CORE
-    # ---------------------------
-
-    def transition(self, next_state):
-        self.state = next_state
-        self.emit_event(f"state_{next_state.value.lower()}")
-
-    # ---------------------------
-    # ENTRY POINT
-    # ---------------------------
-
-    def create_project(self, payload):
-        try:
-            self.context = payload
-            self.transition(ProjectState.INIT)
-
-            self.validate_input()
-            self.capture_provenance()
-            self.generate_ris()
-            self.write_filesystem()
-            self.register_project()
-
-            self.transition(ProjectState.COMPLETE)
-            self.emit_event("project_created")
-
-            return {
-                "status": "success",
-                "project": self.context.get("project_name")
-            }
-
-        except Exception as e:
-            self.rollback()
-            self.state = ProjectState.FAILED
-            self.emit_event("project_failed", {"error": str(e)})
-            return {"status": "failed", "error": str(e)}
-
-    # ---------------------------
-    # VALIDATION
-    # ---------------------------
-
-    def validate_input(self):
-        self.transition(ProjectState.VALIDATE_INPUT)
-
-        name = self.context.get("project_name")
-
-        if not name or not isinstance(name, str):
-            raise ValueError("Invalid project name")
-
-        project_path = os.path.join(self.base_path, name)
-
-        if os.path.exists(project_path):
-            raise ValueError("Project already exists")
-
-        self.emit_event("validation_passed")
-
-    # ---------------------------
-    # PROVENANCE CAPTURE
-    # ---------------------------
-
-    def capture_provenance(self):
-        self.transition(ProjectState.PROVENANCE_REQUIRED)
-
-        required_fields = [
-            "project_name",
-            "project_purpose",
-            "creation_trigger",
-            "source_context",
-            "user_intent_summary"
-        ]
-
-        for field in required_fields:
-            if field not in self.context:
-                raise ValueError(f"Missing RIS field: {field}")
-
-        self.ris = self.context.copy()
-
-        self.transition(ProjectState.PROVENANCE_CAPTURED)
-
-        # lock step (immutability simulation)
-        self.ris["_locked"] = True
-        self.ris["_hash"] = self._hash_ris(self.ris)
-
-        self.emit_event("provenance_captured")
-
-    # ---------------------------
-    # RIS GENERATION
-    # ---------------------------
-
-    def generate_ris(self):
-        self.transition(ProjectState.RIS_GENERATION)
-
-        self.ris.update({
-            "ris_version": "1.1",
-            "timestamp_created": time.time(),
-            "creator": "Max",
-            "environment": {
-                "platform": "MyPixler",
-                "server": "MyServer"
-            }
-        })
-
-        self.emit_event("ris_generated")
-
-    # ---------------------------
-    # FILESYSTEM WRITE (ATOMIC)
-    # ---------------------------
-
-    def write_filesystem(self):
-        self.transition(ProjectState.FILESYSTEM_WRITE)
-
-        project_name = self.context["project_name"]
-        final_path = os.path.join(self.base_path, project_name)
-        temp_path = final_path + "_tmp"
-
-        os.makedirs(self.base_path, exist_ok=True)
-
-        # clean temp
-        if os.path.exists(temp_path):
-            shutil.rmtree(temp_path)
-
-        os.makedirs(temp_path)
-
-                # write RIS
-        with open(os.path.join(temp_path, "project.ris.json"), "w") as f:
-            json.dump(self.ris, f, indent=2)
-
-        # create structure
-        os.makedirs(os.path.join(temp_path, "src"))
-        os.makedirs(os.path.join(temp_path, "assets"))
-        os.makedirs(os.path.join(temp_path, "logs"))
-        os.makedirs(os.path.join(temp_path, "output"))
-        self._write_git_support_files(temp_path)
-
-        # atomic commit
-        if os.path.exists(final_path):
-            raise ValueError("Final path collision")
-
-        os.rename(temp_path, final_path)
-        self._initialize_git_repository(final_path)
-
-        self.emit_event("filesystem_written")
-
-    # ---------------------------
-    # GIT REPOSITORY INITIALIZATION
-    # ---------------------------
-
-    def _write_git_support_files(self, project_path):
-        readme_path = os.path.join(project_path, "README.md")
-        gitignore_path = os.path.join(project_path, ".gitignore")
-
-        with open(readme_path, "w", encoding="utf-8") as f:
-            f.write(f"# {self.context['project_name']}\n\n")
-            f.write("Local BiblionOCR project repository.\n")
-
-        with open(gitignore_path, "w", encoding="utf-8") as f:
-            f.write("__pycache__/\n")
-            f.write("*.pyc\n")
-            f.write("*.tmp\n")
-            f.write("*.log\n")
-            f.write(".DS_Store\n")
-            f.write("Thumbs.db\n")
-
-    def _initialize_git_repository(self, project_path):
-        git_executable = shutil.which("git")
-        if not git_executable:
-            raise RuntimeError("Git executable not found; cannot initialize local repository.")
-
-        result = subprocess.run(
-            [git_executable, "init"],
-            cwd=project_path,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"Git repository initialization failed: {result.stderr.strip()}")
-
-        branch_result = subprocess.run(
-            [git_executable, "symbolic-ref", "HEAD", "refs/heads/main"],
-            cwd=project_path,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if branch_result.returncode != 0:
-            raise RuntimeError(f"Git default branch setup failed: {branch_result.stderr.strip()}")
-
-        self.emit_event("git_repository_initialized", {"path": project_path})
-
-    # ---------------------------
-    # REGISTRATION
-    # ---------------------------
-
-    def register_project(self):
-        self.transition(ProjectState.REGISTRATION)
-
-        registry_path = os.path.join(self.base_path, "_registry.json")
-
-        registry = []
-
-        if os.path.exists(registry_path):
-            with open(registry_path, "r") as f:
-                registry = json.load(f)
-            if isinstance(registry, dict):
-                registry = [registry]
-            elif not isinstance(registry, list):
-                registry = []
-
-        registry = [item for item in registry if item.get("project_name") != self.context["project_name"]]
-        registry.append({"project_name": self.context["project_name"],"timestamp": time.time(),"path": os.path.join(self.base_path, self.context["project_name"]),"git_repository": True})
-        with open(registry_path, "w") as f:
-            json.dump(registry, f, indent=2)
-
-        self.emit_event("project_registered")
-
-    # ---------------------------
-    # ROLLBACK
-    # ---------------------------
-
-    def rollback(self):
-        project_name = self.context.get("project_name")
-        if not project_name:
-            return
-
-        path = os.path.join(self.base_path, project_name)
-        tmp_path = path + "_tmp"
-
-        for p in [path, tmp_path]:
-            if os.path.exists(p):
-                shutil.rmtree(p)
-
-        self.emit_event("rollback_complete")
-
-    # ---------------------------
-    # HASH FUNCTION
-    # ---------------------------
-
-    def _hash_ris(self, ris):
-        raw = json.dumps(ris, sort_keys=True).encode()
-        return hashlib.sha256(raw).hexdigest()
-
-# ================================
-# 0-MainUI - RIS Dialog Controller
-# ================================
-
-class RISDialogController:
-
-    def __init__(self, engine):
-        self.engine = engine
-
-    def launch_dialog(self):
-        """
-        UI must BLOCK until RIS payload is complete
-        """
-
-        self.engine.emit_event("provenance_required")
-
-        ris_payload = self.collect_user_input()
-
-        self.engine.context.update(ris_payload)
-
-        return ris_payload
-
-    def collect_user_input(self):
-        """
-        Replace with real UI bindings.
-        This is the contract layer.
-        """
-
-        return {
-            "project_name": input("Project Name: "),
-            "project_purpose": input("Purpose: "),
-            "creation_trigger": "manual",
-            "source_context": "0-MainUI",
-            "user_intent_summary": input("Intent Summary: ")
-        }
-# ================================
-# EVENT BUS
-# ================================
-
-class EventBus:
-
-    def __init__(self):
-        self.listeners = {}
-
-    def subscribe(self, event_name, callback):
-        if event_name not in self.listeners:
-            self.listeners[event_name] = []
-        self.listeners[event_name].append(callback)
-
-    def unsubscribe(self, event_name, callback):
-        callbacks = self.listeners.get(event_name)
-        if not callbacks:
-            return
-
-        self.listeners[event_name] = [cb for cb in callbacks if cb != callback]
-        if not self.listeners[event_name]:
-            del self.listeners[event_name]
-
-    def emit(self, event):
-        name = event["event"]
-
-        if name in self.listeners:
-            for cb in list(self.listeners[name]):
-                cb(event)
-
-        if "*" in self.listeners:
-            for cb in list(self.listeners["*"]):
-                cb(event)
 
 # ================================
 # PROJECT REPLAY ENGINE

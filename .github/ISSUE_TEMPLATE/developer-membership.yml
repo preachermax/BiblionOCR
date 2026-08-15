@@ -11,6 +11,7 @@ body:
         Use this form to request developer membership for BiblionOCR.
 
         Developer membership is for contributors who will work through pull requests on code, tests, build automation, architecture, or engineering documentation.
+        Cross-repository scope: developer intake is allowed for BiblionOCR and BiblionOCR-Qt6. Developer intake is not used for BiblionOCR-C++.
   - type: input
     id: github_username
     attributes:
@@ -58,6 +59,8 @@ body:
         - label: I will use a GitHub account protected by MFA.
           required: true
         - label: I will contribute through pull requests and accept maintainer review on protected areas.
+          required: true
+        - label: I will use docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md before opening pull requests.
           required: true
         - label: I have read CONTRIBUTING.md and understand the repository review model.
           required: true

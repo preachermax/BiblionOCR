@@ -69,8 +69,6 @@ sudo apt install -y \
 
 echo "Installing optional desktop tools..."
 sudo apt install -y \
-  fontforge \
-  python3-fontforge \
   python3-enchant \
   python3-reportlab \
   enchant-2 \

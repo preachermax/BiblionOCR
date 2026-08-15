@@ -103,11 +103,11 @@ Track each source page through the full project lifecycle, including per-page an
 
 ## Phase 10: Workflow Wizard Rollout
 
-- [x] Implement MyLauncher-first macro-style workflow wizard architecture.
+- [x] Implement MyLauncher-first wizard-style workflow architecture.
 - [x] Add Project Workflow Wizard and Page Workflow Wizard actions to MyLauncher Project menu.
-- [x] Preserve manual launch actions while introducing macro orchestration.
+- [x] Preserve manual launch actions while introducing wizard orchestration.
 - [x] Add initial NumberColumns update surfaces in MyServer and MyScanner.
-- [x] Propagate equivalent wizard workflow entry points to remaining modules.
+- [x] Propagate wizard workflow entry points to remaining modules.
 
 ## Phase 8: Testing And Migration Coverage
 

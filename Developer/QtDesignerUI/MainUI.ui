@@ -1557,7 +1557,7 @@
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
-     <string>FontForge</string>
+     <string>Project Font</string>
     </property>
     <widget class="QMenu" name="menuIndex_Images">
      <property name="title">
@@ -1567,7 +1567,7 @@
     </widget>
     <addaction name="menuIndex_Images"/>
     <addaction name="actionExtract_Glyphs"/>
-    <addaction name="actionFontForge"/>
+    <addaction name="actionProjectFont"/>
     <addaction name="actionInstall_Font"/>
    </widget>
    <widget class="QMenu" name="menuGround_Truth_2">
@@ -1732,12 +1732,12 @@
    <addaction name="actionEdit_Image_tb"/>
    <addaction name="actionCorrect_OCR_tb"/>
   </widget>
-  <widget class="QToolBar" name="FontForgeToolBar">
+  <widget class="QToolBar" name="ProjectFontToolBar">
    <property name="windowTitle">
-    <string>FontForge Tool Bar</string>
+    <string>Project Font Tool Bar</string>
    </property>
    <property name="toolTip">
-    <string>FontForge Tool Bar</string>
+    <string>Project Font Tool Bar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -1747,7 +1747,7 @@
    </attribute>
    <addaction name="actionLine_tif_to_bmp"/>
    <addaction name="actionExtract_Glyphs"/>
-   <addaction name="actionFontForge"/>
+   <addaction name="actionProjectFont"/>
   </widget>
   <widget class="QToolBar" name="GreekTextLinesToolBar">
    <property name="windowTitle">
@@ -2611,19 +2611,19 @@
     <string>Converting current tif image to bmp...</string>
    </property>
   </action>
-  <action name="actionFontForge">
+  <action name="actionProjectFont">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>FontForge</string>
+    <string>Project Font</string>
    </property>
    <property name="toolTip">
-    <string>Edit current GlyphTracer sfd file in FontForge</string>
+    <string>Manage current project font assets</string>
    </property>
    <property name="statusTip">
-    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+    <string>Managing current project font assets...</string>
    </property>
   </action>
   <action name="actionPrefernces">
@@ -2928,10 +2928,10 @@
   <action name="actionFont_Forge">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>Font Forge</string>
+    <string>Project Font</string>
    </property>
   </action>
   <action name="actionDeveloper">

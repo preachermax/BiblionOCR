@@ -1837,19 +1837,19 @@
     <string>Converting current tif image to bmp...</string>
    </property>
   </action>
-  <action name="actionFontForge">
+  <action name="actionProjectFont">
    <property name="icon">
     <iconset>
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>FontForge</string>
+    <string>Project Font</string>
    </property>
    <property name="toolTip">
-    <string>Edit current GlyphTracer sfd file in FontForge</string>
+    <string>Manage current project font assets</string>
    </property>
    <property name="statusTip">
-    <string>Editing current GlyphTracer sfd file in FontForge...</string>
+    <string>Managing current project font assets...</string>
    </property>
   </action>
   <action name="actionPrefernces">
@@ -1860,7 +1860,7 @@
   <action name="actionOpen_Text">
    <property name="icon">
     <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-document-text.png</normaloff>:/Icons/Icons/folder-open-document-text.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
    </property>
    <property name="text">
     <string>Open Text</string>
@@ -2154,10 +2154,10 @@
   <action name="actionFont_Forge">
    <property name="icon">
     <iconset>
-     <normaloff>:/Icons/Icons/FontForge.png</normaloff>:/Icons/Icons/FontForge.png</iconset>
+     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
    </property>
    <property name="text">
-    <string>Font Forge</string>
+    <string>Project Font</string>
    </property>
   </action>
   <action name="actionDeveloper">

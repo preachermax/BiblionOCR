@@ -1,6 +1,10 @@
 import os
 import json
+import csv
 import platform
+import sqlite3
+import shutil
+import subprocess
 import sys
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union
@@ -27,6 +31,15 @@ ACTIVE_WORKFLOW_WIZARD_MODE_KEYS = (
 )
 ACTIVE_WORKFLOW_WIZARD_MODULE_KEYS = (
     'self.active_workflow_wizard_module',
+)
+ACTIVE_CURRENT_PROJECT_PAGE_KEYS = (
+    'self.current_project_page',
+)
+ACTIVE_CURRENT_PROJECT_MILESTONE_KEYS = (
+    'self.current_project_milestone',
+)
+ACTIVE_CURRENT_PAGE_MILESTONE_KEYS = (
+    'self.current_page_milestone',
 )
 
 
@@ -83,6 +96,8 @@ def build_runtime_paths(
 
 
 class SessionManager:
+    DEFAULT_PROJECT_FONT = 'FROMVS.ttf'
+
     @staticmethod
     def runtime_paths_for(
         module_file: Optional[str] = None,
@@ -176,6 +191,9 @@ class SessionManager:
         return {
             'project_root': project_root,
             'project_name': project_name,
+            'current_project_page': str(values.get('self.current_project_page', '') or ''),
+            'current_project_milestone': str(values.get('self.current_project_milestone', '') or ''),
+            'current_page_milestone': str(values.get('self.current_page_milestone', '') or ''),
         }
 
     def get_active_project_root(self, filename: str = 'Session.json') -> str:
@@ -197,6 +215,57 @@ class SessionManager:
             'project_root': normalized_root,
             'project_name': project_name,
         }
+
+    @staticmethod
+    def _coerce_page_number(value: Any, default: int = 1) -> int:
+        try:
+            page_number = int(value)
+        except (TypeError, ValueError):
+            page_number = int(default or 1)
+        return max(1, page_number)
+
+    @staticmethod
+    def _normalize_milestone_text(value: Any) -> str:
+        return str(value or '').strip()
+
+    def get_active_project_page(self, filename: str = 'Session.json') -> int:
+        values = self.values(filename)
+        for key in ACTIVE_CURRENT_PROJECT_PAGE_KEYS:
+            value = values.get(key)
+            if value not in (None, ''):
+                return self._coerce_page_number(value, 1)
+        return 1
+
+    def set_active_project_page(self, page_number: Any, filename: str = 'Session.json') -> int:
+        normalized_page = self._coerce_page_number(page_number, 1)
+        self.update(filename, {'self.current_project_page': normalized_page})
+        return normalized_page
+
+    def get_active_project_milestone(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_CURRENT_PROJECT_MILESTONE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip()
+        return ''
+
+    def set_active_project_milestone(self, milestone: Any, filename: str = 'Session.json') -> str:
+        normalized_milestone = self._normalize_milestone_text(milestone)
+        self.update(filename, {'self.current_project_milestone': normalized_milestone})
+        return normalized_milestone
+
+    def get_active_page_milestone(self, filename: str = 'Session.json') -> str:
+        values = self.values(filename)
+        for key in ACTIVE_CURRENT_PAGE_MILESTONE_KEYS:
+            value = values.get(key)
+            if value:
+                return str(value).strip()
+        return ''
+
+    def set_active_page_milestone(self, milestone: Any, filename: str = 'Session.json') -> str:
+        normalized_milestone = self._normalize_milestone_text(milestone)
+        self.update(filename, {'self.current_page_milestone': normalized_milestone})
+        return normalized_milestone
 
     def get_active_workflow_module(self, filename: str = 'Session.json') -> str:
         values = self.values(filename)
@@ -301,6 +370,9 @@ class SessionManager:
             legacy_key_map = {
                 'path': 'self.imgpath',
                 'dir': 'self.imgdir',
+                'CurrentProjectPage': 'self.current_project_page',
+                'CurrentProjectMilestone': 'self.current_project_milestone',
+                'CurrentPageMilestone': 'self.current_page_milestone',
             }
             normalized_items = []
             for key, value in data.items():
@@ -396,8 +468,266 @@ class SessionManager:
 
         return font_name
 
+    @staticmethod
+    def _is_user_font_dir(path: str) -> bool:
+        normalized = os.path.normpath(path)
+        home_dir = os.path.normpath(os.path.expanduser('~'))
+        return normalized.startswith(home_dir)
+
+    def install_font_file(self, font_file_path: str, *, prefer_user_scope: bool = True) -> str:
+        source_path = os.path.normpath(str(font_file_path or '').strip())
+        if not source_path or not os.path.isfile(source_path):
+            return ''
+
+        install_dirs = self.default_font_install_dirs()
+        if prefer_user_scope:
+            install_dirs = sorted(install_dirs, key=lambda path: 0 if self._is_user_font_dir(path) else 1)
+
+        for font_dir in install_dirs:
+            try:
+                os.makedirs(font_dir, exist_ok=True)
+                destination = os.path.normpath(os.path.join(font_dir, os.path.basename(source_path)))
+                if os.path.exists(destination):
+                    return destination
+                shutil.copy2(source_path, destination)
+                self._refresh_font_cache_for_dir(font_dir)
+                return destination
+            except OSError:
+                continue
+
+        return ''
+
+    def ensure_project_font_installed(
+        self,
+        font_name: str,
+        module_dir: Optional[str] = None,
+        *,
+        prefer_user_scope: bool = True,
+    ) -> str:
+        font_path = self.resolve_font_path(font_name, module_dir)
+        if not font_path:
+            return ''
+        return self.install_font_file(font_path, prefer_user_scope=prefer_user_scope)
+
+    @staticmethod
+    def _refresh_font_cache_for_dir(font_dir: str) -> None:
+        if platform.system().lower() != 'linux':
+            return
+        if not shutil.which('fc-cache'):
+            return
+        try:
+            subprocess.run(['fc-cache', '-f', font_dir], check=False, capture_output=True, text=True)
+        except OSError:
+            return
+
     def build_workflow_font(self, font_name: str, point_size: int = 20, module_dir: Optional[str] = None) -> qtg.QFont:
-        font_family = self.register_application_font(font_name, module_dir)
+        preferred_font = self.get_active_project_font() or str(font_name or "").strip()
+        if not preferred_font:
+            preferred_font = "FROMVS [MAXR]"
+
+        font_family = self.register_application_font(preferred_font, module_dir)
         font = qtg.QFont(font_family)
         font.setPointSize(point_size)
         return font
+
+    def get_active_project_font(self, filename: str = 'Session.json') -> str:
+        active_root = self.get_active_project_root(filename)
+        if not active_root:
+            return self.DEFAULT_PROJECT_FONT
+
+        sqlite_candidates = (
+            os.path.join(active_root, "Model", "Project", "Data", "sqlite", "project_metadata.sqlite"),
+            os.path.join(active_root, "Model", "Project", "Data", "SQLite", "project_metadata.sqlite"),
+            os.path.join(active_root, "project_metadata.sqlite"),
+        )
+
+        for sqlite_path in sqlite_candidates:
+            if not os.path.exists(sqlite_path):
+                continue
+            try:
+                with sqlite3.connect(sqlite_path) as conn:
+                    cursor = conn.execute("SELECT ProjectFont FROM project_metadata LIMIT 1")
+                    row = cursor.fetchone()
+                    if row and row[0]:
+                        return str(row[0]).strip()
+            except sqlite3.Error:
+                continue
+
+        json_candidates = (
+            os.path.join(active_root, "Model", "Project", "Data", "json", "project_metadata.json"),
+            os.path.join(active_root, "project_metadata.json"),
+        )
+        for json_path in json_candidates:
+            if not os.path.exists(json_path):
+                continue
+            try:
+                with open(json_path, "r", encoding="utf-8") as handle:
+                    payload = json.load(handle)
+                if isinstance(payload, dict):
+                    value = payload.get("ProjectFont")
+                    if value:
+                        return str(value).strip()
+            except (OSError, ValueError, TypeError):
+                continue
+
+        return self.DEFAULT_PROJECT_FONT
+
+    def _module_handshakes_path(self, project_root: str) -> str:
+        candidates = (
+            os.path.join(project_root, "Model", "Project", "Data", "csv", "module_handshakes.csv"),
+            os.path.join(project_root, "Model", "Project", "Images", "MyServer", "Workflow", "module_handshakes.csv"),
+        )
+        for path in candidates:
+            if os.path.exists(path):
+                return path
+        return ""
+
+    def _read_module_handshake_rows(self, project_root: str) -> List[Dict[str, str]]:
+        csv_path = self._module_handshakes_path(project_root)
+        if not csv_path:
+            return []
+
+        rows: List[Dict[str, str]] = []
+        try:
+            with open(csv_path, "r", encoding="utf-8", newline="") as handle:
+                first_line = handle.readline().strip()
+                handle.seek(0)
+
+                if "," in first_line:
+                    reader = csv.DictReader(handle)
+                    for row in reader:
+                        if isinstance(row, dict):
+                            rows.append({str(k): str(v or "") for k, v in row.items() if k})
+                    return rows
+
+                for index, raw_line in enumerate(handle):
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    if index == 0 and line.lower().startswith("milestonename "):
+                        continue
+
+                    parts = line.split()
+                    if len(parts) < 8:
+                        continue
+
+                    rows.append(
+                        {
+                            "MilestoneName": parts[0],
+                            "UI_Action": parts[1],
+                            "Override": parts[2],
+                            "Language": parts[3],
+                            "InputPath": parts[4],
+                            "InputModule": parts[5],
+                            "OutputModule": parts[6],
+                            "OutputPath": parts[7],
+                        }
+                    )
+        except OSError:
+            return []
+
+        return rows
+
+    @staticmethod
+    def _to_absolute_project_path(project_root: str, path_value: str) -> str:
+        normalized = str(path_value or "").strip()
+        if not normalized:
+            return ""
+        if os.path.isabs(normalized):
+            return os.path.normpath(normalized)
+        return os.path.normpath(os.path.join(project_root, normalized.lstrip("/\\")))
+
+    @staticmethod
+    def _workflow_to_complete_path(path_value: str) -> str:
+        normalized = str(path_value or "").strip()
+        if not normalized:
+            return ""
+
+        replacements = (
+            ("/Workflow/", "/Complete/"),
+            ("\\Workflow\\", "\\Complete\\"),
+            ("/workflow/", "/complete/"),
+            ("\\workflow\\", "\\complete\\"),
+        )
+        for old, new in replacements:
+            if old in normalized:
+                return normalized.replace(old, new)
+        return normalized
+
+    def resolve_receiving_default_input(
+        self,
+        receiving_module: str,
+        preferred_input_modules: Optional[Iterable[str]] = None,
+        language_hint: str = "greek",
+        *,
+        prefer_complete: bool = True,
+        filename: str = "Session.json",
+    ) -> str:
+        module_name = str(receiving_module or "").strip().lower()
+        if not module_name:
+            return ""
+
+        project_root = self.get_active_project_root(filename)
+        if not project_root:
+            project_root = os.path.normpath(os.path.join(self.base_dir, "..", "..", "..", ".."))
+
+        rows = self._read_module_handshake_rows(project_root)
+        if not rows:
+            return ""
+
+        candidates = [
+            row for row in rows if str(row.get("OutputModule", "")).strip().lower() == module_name
+        ]
+        if not candidates:
+            return ""
+
+        normalized_language = str(language_hint or "").strip().lower()
+        if normalized_language:
+            language_filtered = [
+                row for row in candidates if str(row.get("Language", "")).strip().lower() == normalized_language
+            ]
+            if language_filtered:
+                candidates = language_filtered
+
+        prioritized: List[Dict[str, str]] = []
+        used_ids = set()
+        preferred_modules = [str(item).strip().lower() for item in (preferred_input_modules or ()) if str(item).strip()]
+        if preferred_modules:
+            for preferred in preferred_modules:
+                for row in candidates:
+                    if str(row.get("InputModule", "")).strip().lower() != preferred:
+                        continue
+                    row_key = id(row)
+                    if row_key in used_ids:
+                        continue
+                    prioritized.append(row)
+                    used_ids.add(row_key)
+
+        for row in candidates:
+            row_key = id(row)
+            if row_key in used_ids:
+                continue
+            prioritized.append(row)
+            used_ids.add(row_key)
+
+        fallback_path = ""
+        for row in prioritized:
+            input_path = str(row.get("InputPath", "")).strip()
+            if not input_path:
+                continue
+
+            path_candidates = []
+            if prefer_complete:
+                path_candidates.append(self._workflow_to_complete_path(input_path))
+            path_candidates.append(input_path)
+
+            for candidate_path in path_candidates:
+                absolute_candidate = self._to_absolute_project_path(project_root, candidate_path)
+                if not absolute_candidate:
+                    continue
+                if not fallback_path:
+                    fallback_path = absolute_candidate
+                if os.path.isdir(absolute_candidate):
+                    return absolute_candidate
+
+        return fallback_path

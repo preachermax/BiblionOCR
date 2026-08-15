@@ -7,9 +7,8 @@
 Glyphtracer takes an image that contains pictures of several letters.
 It recognizes all them and lets the user tag each letter
 to a Unicode code point. It then converts the images to vector form
-and writes them to a FontForge's data format. The font can then
-be finalized with FontForge.
-
+and writes them to a font editor compatible data format. The font can then
+be finalized with a desktop font editor.
 
 ## Dependencies
 
@@ -17,7 +16,6 @@ Glyphtracer requires PyQt5 and Potrace, which is an image vectorizer.
 
 It has been only tested on Linux. It might work on OSX or Windows.
 It might not.
-
 
 ## Usage tips
 

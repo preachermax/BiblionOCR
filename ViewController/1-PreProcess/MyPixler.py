@@ -52,7 +52,10 @@ if project_root not in sys.path:
 
 from HelpSystem import add_help_menu
 from Core.project_tracking import ProjectWorkflowTracker
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 from SessionManager import SessionManager
 # PyQt5 imports
 from PyQt5 import uic
@@ -334,7 +337,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         }
         self.fill_background_color = qtg.QColor("white")
         self.fill_foreground_color = qtg.QColor("black")
-        self.eraser_tip_size = 24
+        self.eraser_tip_diameter = 24
+        self.eraser_tip_shape = "circle"
+        self._last_crop_origin = qtc.QPoint(0, 0)
         self.rubberBand = None
         self.return_to_server_button = None
         self.crop_prompt_dialog = None
@@ -342,6 +347,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_drawing_active = False
         self.shared_session_manager = SessionManager()
         self.current_project_root = self.shared_session_manager.get_active_project_root() or None
+        self.current_project_page = 1
+        self.current_project_milestone = ""
+        self.current_page_milestone = ""
         self._active_project_sync_timer = None
 
         # -------------------------
@@ -387,6 +395,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             'MyPixler',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyPixler')
         )
 
         # Progress bar (safe)
@@ -891,6 +902,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.imagefileList = get_setting('imagefileList', [])
         self.imagezoom = get_setting('imagezoom', '')
         self.imagezoomslidervalue = get_setting('imagezoomslidervalue', 0)
+        self.current_project_page = get_setting('current_project_page', 1)
+        self.current_project_milestone = get_setting('current_project_milestone', '')
+        self.current_page_milestone = get_setting('current_page_milestone', '')
 
         # Bulk paths (safe now)
         self.bmpsourcedir = abs_project_path('bmpsourcedir')
@@ -977,8 +991,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         # File menu Signals(Slots)
         self.ui.actionOpen_Reference_Image.triggered.connect(self.loadRefImg)
-        self.ui.actionSave_Image.triggered.connect(self.SaveImage)
-        self.ui.actionSave_As_Image.triggered.connect(self.SaveImageAs)
+        self.ui.actionSave_Image.triggered.connect(self.save_image_with_myexplorer)
+        self.ui.actionSave_As_Image.triggered.connect(self.save_image_as_with_myexplorer)
         self.ui.actionOverwrite_Reference_Image.triggered.connect(self.OverwriteRefImg)
         self.ui.actionImport_Current_Image.triggered.connect(self.importRefImg)
         self.ui.actionLanguage_Morphology.triggered.connect(self.openMorphologyDialog)
@@ -1001,7 +1015,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         # Ref Image
         # -------------------------
-        self.ui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
+        self.ui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
         self.ui.Deskewbutton.clicked.connect(self.deskewRefImg)
         self.ui.OverwriteRefImgbutton.clicked.connect(self.OverwriteRefImg)
@@ -1034,8 +1048,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.Imagezoomslider.sliderReleased.connect(self.disable_Imagezoomslider)
 
         self.ui.ExportRefImgFilebutton.clicked.connect(self.ExportImage)
-        self.ui.SaveImagebutton.clicked.connect(self.SaveImage)
-        self.ui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
+        self.ui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
+        self.ui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
 
         # -------------------------
         # UI defaults
@@ -1142,6 +1156,84 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             return f"{module_name} {module_completed}/{module_total} | Complete"
         return f"{module_name} {module_completed}/{module_total} | Next: {next_label}"
 
+    def _page_number_from_path(self, path, fallback=None):
+        candidate = str(path or "").strip()
+        if not candidate:
+            return max(1, int(fallback or getattr(self, "current_project_page", 1) or 1))
+
+        stem = os.path.splitext(os.path.basename(candidate))[0]
+        for pattern in (
+            r"(?:^|[_\-\s])page[_\-\s]*(\d+)",
+            r"(?:^|[_\-\s])p(?:age)?[_\-\s]*(\d+)",
+            r"(\d+)$",
+        ):
+            match = re.search(pattern, stem, re.IGNORECASE)
+            if match:
+                return max(1, int(match.group(1)))
+
+        return max(1, int(fallback or getattr(self, "current_project_page", 1) or 1))
+
+    def _sync_project_page_state(self, page_path=None, project_milestone=None, page_milestone=None):
+        page_number = self._page_number_from_path(page_path)
+        self.current_project_page = page_number
+
+        payload = {
+            'self.current_project_page': page_number,
+        }
+
+        if project_milestone is not None:
+            self.current_project_milestone = str(project_milestone or '').strip()
+            payload['self.current_project_milestone'] = self.current_project_milestone
+
+        if page_milestone is not None:
+            self.current_page_milestone = str(page_milestone or '').strip()
+            payload['self.current_page_milestone'] = self.current_page_milestone
+
+        base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
+        SessionManager(base).update('Session.json', payload)
+        SessionManager(base).update('PixlerSession.json', payload)
+        return page_number
+
+    def _move_workflow_entries(self, workflow_dir, complete_dir):
+        if not workflow_dir or not complete_dir:
+            return
+
+        os.makedirs(workflow_dir, exist_ok=True)
+        os.makedirs(complete_dir, exist_ok=True)
+
+        self._convert_workflow_png_to_indexed_tiff(workflow_dir)
+
+        for item in os.listdir(workflow_dir):
+            source = os.path.join(workflow_dir, item)
+            destination = os.path.join(complete_dir, item)
+            if os.path.exists(destination):
+                if os.path.isdir(destination) and not os.path.islink(destination):
+                    shutil.rmtree(destination)
+                else:
+                    os.remove(destination)
+            shutil.move(source, destination)
+
+    def _convert_workflow_png_to_indexed_tiff(self, workflow_dir):
+        if not os.path.isdir(workflow_dir):
+            return
+
+        for item in os.listdir(workflow_dir):
+            source = os.path.join(workflow_dir, item)
+            if not os.path.isfile(source):
+                continue
+            stem, ext = os.path.splitext(item)
+            if ext.lower() != ".png":
+                continue
+
+            target = os.path.join(workflow_dir, stem + ".tif")
+            try:
+                with pilimg.open(source) as img:
+                    indexed = img.convert("L").convert("P", palette=pilimg.ADAPTIVE, colors=256)
+                    indexed.save(target, "TIFF", dpi=(300, 300), compression="tiff_lzw")
+                os.remove(source)
+            except Exception as exc:
+                print(f"[PIXLER] Could not convert intermediary PNG to TIFF: {source} ({exc})")
+
     def _refresh_project_status(self, candidate_path=None):
         snapshot = self.workflow_tracker.snapshot(
             "MyPixler",
@@ -1213,6 +1305,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             module_name="MyPixler",
             details=details,
         )
+        self._sync_project_page_state(project_root, project_milestone=milestone_key, page_milestone=milestone_key)
         self._refresh_project_status(project_root)
         return project_root
 
@@ -1249,7 +1342,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     #     # Ref Image
 
-    #     self.ui.OpenRefImgbutton.clicked.connect(self.loadRefImg)
+    #     self.ui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
     #     self.ui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
     #     self.ui.Deskewbutton.clicked.connect(self.deskewRefImg)
 
@@ -1287,8 +1380,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     #     self.ui.Imagezoomslider.sliderReleased.connect(self.disable_Imagezoomslider)
 
     #     self.ui.ExportRefImgFilebutton.clicked.connect(self.ExportImage)
-    #     self.ui.SaveImagebutton.clicked.connect(self.SaveImage)
-    #     self.ui.SaveAsImagebutton.clicked.connect(self.SaveImageAs)
+    #     self.ui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
+    #     self.ui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
 
     #     self.ui.RefImgzoomslider.hide()
     #     self.ui.Imagezoomslider.hide()
@@ -1524,6 +1617,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             'self.imagepath': os.path.normpath(self.imagepath),
             'self.imagedir': os.path.normpath(self.imagedir),
         })
+        self._sync_project_page_state(self.imagepath)
 
         self.imagefileList = []
         for i in os.listdir(self.imagedir):
@@ -1598,15 +1692,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
             # Extract to default Complete folder
             if complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_folder, complete_folder)
             print("pdf page extraction complete")
 
             base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
@@ -1621,7 +1707,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 'self.firstpage': self.firstpage,
                 'self.lastpage': self.lastpage,
             })
-            ### MILESTONE - source_acquired-15% ###
+            ### PAGE MILESTONE - source_acquired-15% ###
             self._record_project_milestone(
                 "source_acquired",
                 workflow_folder,
@@ -1698,17 +1784,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             pp.pdf4tif(source_file_path, workflow_folder)
             # Extract to default Complete folder
             if complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_folder, complete_folder)
             print("pdf pages for tif extraction complete")
-            ### MILESTONE - source_converted-20% ###
+            ### PAGE MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
@@ -1788,25 +1866,16 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print(source_folder, workflow_folder)
             #pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
             pp.pdf2tif(self.pdf2tif_ui.SourceLineEdit.text(), self.pdf2tif_ui.DestinationLineEdit.text(), self.pdf2tif_ui.StartPageLineEdit.text())
-            # Copy Workflow folder to default Complete folder
+            # Move Workflow folder into Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            ### MILESTONE - source_converted-20% ###
+                self._move_workflow_entries(workflow_folder, complete_folder)
+            ### PAGE MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
                 details={"source": "actiontiff_to_mono"},
             )
-            ### MILESTONE - source_converted-20% ###
+            ### PAGE MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
@@ -1890,19 +1959,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2tiffidx(self.tif2mono_ui.SourceLineEdit.text(), self.tif2mono_ui.DestinationLineEdit.text())
-            # Copy Workflow folder to default Complete folder
+            # Move Workflow folder into Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            ### MILESTONE - source_converted-20% ###
+                self._move_workflow_entries(workflow_folder, complete_folder)
+            ### PAGE MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 workflow_folder,
@@ -1987,18 +2047,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
-            # Copy Workflow folder to default Complete folder
+            # Move Workflow folder into Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_folder, complete_folder)
         def reject():
             pass
 
@@ -2091,28 +2142,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folders
             print(source_folder, png_workflow_folder, tif_workflow_folder)
             pp.deskewfiles(self.deskew_mono_ui.SourceLineEdit.text(), self.deskew_mono_ui.DestPngLineEdit.text(),self.deskew_mono_ui.DestTifLineEdit.text())
-            # Copy Workflow folder to default Complete folders
+            # Move Workflow folders into Complete folders
             if tif_complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(tif_workflow_folder):
-                    source = os.path.join(tif_workflow_folder, item)
-                    destination = os.path.join(tif_complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(tif_workflow_folder, tif_complete_folder)
             if png_complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(png_workflow_folder):
-                    source = os.path.join(png_workflow_folder, item)
-                    destination = os.path.join(png_complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            ### MILESTONE - source_converted-20% ###
+                self._move_workflow_entries(png_workflow_folder, png_complete_folder)
+            ### PAGE MILESTONE - source_converted-20% ###
             self._record_project_milestone(
                 "source_converted",
                 tif_workflow_folder,
@@ -2232,95 +2267,23 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         print('Failed to delete %s. Reason: %s' % (file_path, e))
             pp.croplangs(self.crop_languages_ui.SourceLineEdit.text(), self.crop_languages_ui.BoxFolderLineEdit.text(),self.crop_languages_ui.DestGreekLineEdit.text(),self.crop_languages_ui.DestLatinLineEdit.text(),self.crop_languages_ui.ElimFolderLineEdit.text())
             print("completed creating cropped language tif files")
-            # copy workflow images to complete images
+            # move workflow images to complete images
             if workflow_box_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_box_folder):
-                    source = os.path.join(workflow_box_folder, item)
-                    destination = os.path.join(complete_box_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_box_folder, complete_box_folder)
             if workflow_elim_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_elim_folder):
-                    source = os.path.join(workflow_elim_folder, item)
-                    destination = os.path.join(complete_elim_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_elim_folder, complete_elim_folder)
 
             if workflow_greek_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_greek_folder):
-                    source = os.path.join(workflow_greek_folder, item)
-                    destination = os.path.join(complete_greek_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-
-            '''if workflow_dup_greek_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_greek_folder):
-                    source = os.path.join(workflow_greek_folder, item)
-                    destination = os.path.join(workflow_dup_greek_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-                    # enable section below to remove files from workflow_greek_folder
-                    file_path = os.path.join(workflow_greek_folder, filename)
-                    print('File Name:'+filename, 'File Path:'+file_path)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))'''
+                self._move_workflow_entries(workflow_greek_folder, complete_greek_folder)
 
             if workflow_latin_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_latin_folder):
-                    source = os.path.join(workflow_latin_folder, item)
-                    destination = os.path.join(complete_latin_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            ### MILESTONE - pages_prepared-20% ###
+                self._move_workflow_entries(workflow_latin_folder, complete_latin_folder)
+            ### PAGE MILESTONE - pages_prepared-20% ###
             self._record_project_milestone(
                 "pages_prepared",
                 workflow_greek_folder or workflow_latin_folder,
                 details={"source": "actionCrop_Languages"},
             )
-            '''if workflow_dup_latin_folder:
-                #symlinks=False
-                #ignore=None
-                for item in os.listdir(workflow_latin_folder):
-                    source = os.path.join(workflow_latin_folder, item)
-                    destination = os.path.join(workflow_dup_latin_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-                    file_path = os.path.join(workflow_latin_folder, filename)
-                    print('File Name:'+filename, 'File Path:'+file_path)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))'''
 
         def reject():
             pass
@@ -2414,18 +2377,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2pngidx(self.greekmono2png_ui.SourceLineEdit.text(), self.greekmono2png_ui.DestinationLineEdit.text())
-            # Copy Workflow folder to default Complete folder
+            # Move Workflow folder into Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_folder, complete_folder)
         def reject():
             pass
 
@@ -2516,27 +2470,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folders
             print(source_folder, png_workflow_folder, tif_workflow_folder)
             pp.deskewfiles(self.deskew_greekmono_ui.SourceLineEdit.text(), self.deskew_greekmono_ui.DestPngLineEdit.text(),self.deskew_greekmono_ui.DestTifLineEdit.text())
-            # Copy Workflow folder to default Complete folders
+            # Move Workflow folders into Complete folders
             if tif_complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(tif_workflow_folder):
-                    source = os.path.join(tif_workflow_folder, item)
-                    destination = os.path.join(tif_complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(tif_workflow_folder, tif_complete_folder)
             if png_complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(png_workflow_folder):
-                    source = os.path.join(png_workflow_folder, item)
-                    destination = os.path.join(png_complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(png_workflow_folder, png_complete_folder)
         def reject():
             pass
 
@@ -2644,18 +2582,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print(source_folder, workflow_folder)
             pp.resizepngs(self.greekresizepng_ui.SourceLineEdit.text(), self.greekresizepng_ui.DestinationLineEdit.text())
 
-            # Copy Workflow folder to default Complete folder
+            # Move Workflow folder into Complete folder
             if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+                self._move_workflow_entries(workflow_folder, complete_folder)
         def reject():
             pass
 
@@ -3712,16 +3641,41 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         buffer.open(qtc.QBuffer.ReadWrite)
         qimage.save(buffer, "PNG")
         PILimage = pilimg.open(io.BytesIO(buffer.data()))
+
+        # Workflow handoffs standardize on 300-DPI indexed TIFF outputs.
         dpi_x = 300
         dpi_y = 300
-        if qimage.dotsPerMeterX() > 0:
-            dpi_x = qimage.dotsPerMeterX() * 0.0254
-        if qimage.dotsPerMeterY() > 0:
-            dpi_y = qimage.dotsPerMeterY() * 0.0254
         print("Generating: " + outfile)
         if self._source_prefers_bilevel_output():
             PILimage = PILimage.convert("1")
+        else:
+            PILimage = PILimage.convert("L").convert("P", palette=pilimg.ADAPTIVE, colors=256)
         PILimage.save(outfile, "TIFF", dpi=(dpi_x, dpi_y), compression="tiff_lzw")
+
+    def _normalize_return_geometry(self, qimage):
+        if qimage is None or qimage.isNull():
+            return qtg.QImage()
+
+        if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
+            return qimage
+
+        source = self.refimgqimage
+        if qimage.width() == source.width() and qimage.height() == source.height():
+            return qimage
+
+        canvas = qtg.QImage(source)
+        painter = qtg.QPainter(canvas)
+        fill_color = self._coerce_fill_color(None, source)
+        painter.fillRect(canvas.rect(), fill_color)
+
+        origin = getattr(self, "_last_crop_origin", qtc.QPoint(0, 0)) or qtc.QPoint(0, 0)
+        draw_x = max(0, min(int(origin.x()), max(0, canvas.width() - qimage.width())))
+        draw_y = max(0, min(int(origin.y()), max(0, canvas.height() - qimage.height())))
+        painter.drawImage(draw_x, draw_y, qimage)
+        painter.end()
+
+        self._copy_qimage_resolution(source, canvas)
+        return canvas
 
     def returnCropToMyServer(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
@@ -3736,6 +3690,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print("[CROP] No crop result available to return")
             return
 
+        payload = self._normalize_return_geometry(payload)
         self._save_qimage_as_tiff(payload, self.subprocess_return_path)
         print(f"[CROP] Returned cropped result to MyServer: {self.subprocess_return_path}")
 
@@ -3808,10 +3763,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_drawing_active = False
 
     def clip(self):
-        print("[CLIP] Opening inverse-selection preview")
+        print("[CUT] Opening cut preview")
         return self._launch_preview_tool(
             self.clip_processor,
-            title="Clip Preview",
+            title="Cut Preview",
             params={"background_color": self._background_fill_color_name(self.refimgqimage)},
             enable_crop=True,
         )
@@ -3826,7 +3781,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.refimgqimage,
             self.erase_processor,
             {
-                "brush_radius": int(self.eraser_tip_size),
+                "tip_diameter_px": int(self.eraser_tip_diameter),
+                "tip_shape": str(self.eraser_tip_shape or "circle"),
                 "background_color": self._background_fill_color_name(self.refimgqimage),
                 "erase_points": [],
             },
@@ -3836,14 +3792,30 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             preview_max_dimension=1600,
         )
         dialog.setWindowTitle("Erase Preview")
-        dialog.add_slider("brush_radius", 1, 200, int(self.eraser_tip_size))
+        max_tip = self._max_eraser_tip_diameter()
+        dialog.add_slider("tip_diameter_px", 1, max_tip, min(int(self.eraser_tip_diameter), max_tip))
+        dialog.add_choice("tip_shape", ["circle", "square", "diamond"], str(self.eraser_tip_shape or "circle"))
 
         if dialog.exec_() != qtw.QDialog.Accepted:
             print("[ERASE] Cancelled")
             return False
 
-        self.eraser_tip_size = int(dialog.params.get("brush_radius", self.eraser_tip_size))
+        self.eraser_tip_diameter = max(1, int(dialog.params.get("tip_diameter_px", self.eraser_tip_diameter)))
+        self.eraser_tip_shape = str(dialog.params.get("tip_shape", self.eraser_tip_shape or "circle")).strip().lower() or "circle"
         return self._apply_preview_result(dialog.get_result())
+
+    def _max_eraser_tip_diameter(self):
+        if hasattr(self, "ui") and hasattr(self.ui, "LHlineEdit"):
+            raw = str(self.ui.LHlineEdit.text() or "").strip()
+            if raw.isdigit():
+                return max(1, min(1024, int(raw)))
+
+        source = getattr(self, "refimgqimage", None)
+        if source is not None and not source.isNull():
+            estimated = max(1, int(source.height() / 35))
+            return max(1, min(1024, estimated))
+
+        return 128
 
     def crop_processor(self, qimage, params):
         if not params:
@@ -3853,6 +3825,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         y = params.get("y", 0)
         w = params.get("w", qimage.width())
         h = params.get("h", qimage.height())
+
+        self._last_crop_origin = qtc.QPoint(int(x), int(y))
 
         # safety clamp
         x = max(0, x)
@@ -3890,7 +3864,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             return qimage
 
         erase_points = params.get("erase_points", [])
-        radius = max(1, int(params.get("brush_radius", self.eraser_tip_size)))
+        tip_diameter = max(1, int(params.get("tip_diameter_px", params.get("brush_radius", self.eraser_tip_diameter))))
+        radius = max(1, int(round(tip_diameter / 2.0)))
+        tip_shape = str(params.get("tip_shape", self.eraser_tip_shape or "circle")).strip().lower() or "circle"
         if not erase_points:
             return qimage
 
@@ -3902,7 +3878,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         for point in erase_points:
             x = int(point.get("x", 0))
             y = int(point.get("y", 0))
-            painter.drawEllipse(qtc.QPoint(x, y), radius, radius)
+            if tip_shape == "square":
+                painter.drawRect(qtc.QRect(x - radius, y - radius, radius * 2, radius * 2))
+            elif tip_shape == "diamond":
+                diamond = qtg.QPolygon([
+                    qtc.QPoint(x, y - radius),
+                    qtc.QPoint(x + radius, y),
+                    qtc.QPoint(x, y + radius),
+                    qtc.QPoint(x - radius, y),
+                ])
+                painter.drawPolygon(diamond)
+            else:
+                painter.drawEllipse(qtc.QPoint(x, y), radius, radius)
         painter.end()
         self._copy_qimage_resolution(qimage, result)
         return result

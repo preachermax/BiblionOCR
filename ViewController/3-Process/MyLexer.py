@@ -1,3 +1,4 @@
+# pyright: reportAttributeAccessIssue=false, reportOptionalMemberAccess=false, reportArgumentType=false, reportCallIssue=false, reportOperatorIssue=false, reportGeneralTypeIssues=false, reportPossiblyUnboundVariable=false, reportSelfClsParameterName=false, reportIncompatibleMethodOverride=false
 # Python imports
 import csv
 import json
@@ -6,7 +7,6 @@ import re
 import subprocess
 from pathlib import Path
 import sys
-from typing import Any
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
@@ -55,7 +55,11 @@ from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
-from Core.workflow_wizard_actions import install_workflow_wizard_menu_actions
+from Core.workflow_wizard_actions import (
+    append_default_context_actions,
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 
 from queue import Queue
@@ -77,26 +81,6 @@ from Dialogs.tif_latin_lines_moveDialog import Ui_tiflatinmovelinesDialog
 from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from Dialogs.split_greek_text_linesDialog import Ui_splitgreektextlinesDialog
 from Dialogs.rename_greek_text_linesDialog import Ui_renamegreektextlinesDialog
-
-QT_ALIGN_CENTER = Qt.AlignmentFlag.AlignCenter
-QT_KEEP_ASPECT_RATIO = Qt.AspectRatioMode.KeepAspectRatio
-QT_SMOOTH_TRANSFORMATION = Qt.TransformationMode.SmoothTransformation
-QT_ITEM_IS_EDITABLE = Qt.ItemFlag.ItemIsEditable
-QT_NON_MODAL = Qt.WindowModality.NonModal
-QT_LEFT_BUTTON = Qt.MouseButton.LeftButton
-QIO_READ_ONLY = qtc.QIODevice.OpenModeFlag.ReadOnly
-TIFF_CAPTURE_TYPE = getattr(tiffcapture, "TiffCapture", object)
-QICON_NORMAL = qtg.QIcon.Mode.Normal
-QICON_OFF = qtg.QIcon.State.Off
-
-tr: Any = tr
-
-
-def _scaled_size(size: QSize, scale: float) -> QSize:
-    return QSize(
-        max(1, int(size.width() * scale)),
-        max(1, int(size.height() * scale)),
-    )
 
 # The new Stream Object which replaces the default stream associated with sys.stdout
 # This object just puts data in a queue!
@@ -206,14 +190,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         super().__init__(*args, **kwargs)
         # pre-compiled QtDesigner Ui_MainUI and extended slots code starts here:
         # load the pre-compiled QtDesigner Ui_MainUI user interface
-        self.ui: Any = Ui_Boxer()
+        self.ui = Ui_Boxer()
         self.ui.setupUi(self)
-        self.rubberBand: Any = None
         install_workflow_wizard_menu_actions(
             self,
             'MyLexer',
             include_project_wizard=False,
             include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyLexer')
         )
         if hasattr(self.ui, 'actionExit'):
             self.ui.actionExit.triggered.connect(self.close)
@@ -261,7 +247,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionDraw_Selected_LineBox_tb.triggered.connect(self.getRbLineBox)
         #self.ui.actionEdit_Latin_LineBox_Pair.triggered.connect(self.linebox_edit_split)
 
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         if hasattr(self.ui, 'MyPixlerbutton'):
             self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
@@ -292,9 +278,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
 
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveBoxCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
         if hasattr(self.ui, 'actionUpdate_Wordlist_tb'):
             self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
 
@@ -302,6 +288,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.textButton.clicked.connect(self.editText)
         #self.ui.tableButton.clicked.connect(self.editTable)
         self.ui.reloadImagebutton.clicked.connect(self.ReloadImage)
+        self._install_image_context_menu_defaults()
+        self._install_image_panel_shortcuts()
         self.ui.BoxTable.customContextMenuRequested.connect(self.openTableMenu)
         self.ui.reloadTextbutton.clicked.connect(self.ReloadText)
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
@@ -343,7 +331,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         font.setFamily("FROMVS [MAXR]")
         font.setPointSize(11)
         self.statusBoxType.setFont(font)
-        self.statusBoxType.setAlignment(QT_ALIGN_CENTER)
+        self.statusBoxType.setAlignment(qtc.Qt.AlignCenter)
         self.statusBoxType.setText('None')
         # statusBoxModeLabel and statusBoxMode
         self.statusBoxModeLabel = qtw.QLabel()
@@ -355,7 +343,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         font.setFamily("FROMVS")
         font.setPointSize(11)
         self.statusBoxMode.setFont(font)
-        self.statusBoxMode.setAlignment(QT_ALIGN_CENTER)
+        self.statusBoxMode.setAlignment(qtc.Qt.AlignCenter)
         self.statusBoxMode.setText('None')
         # statusDrawingModeLabel and statusDrawingMode
         self.statusDrawingModeLabel = qtw.QLabel()
@@ -367,7 +355,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         font.setFamily("FROMVS")
         font.setPointSize(11)
         self.statusDrawingMode.setFont(font)
-        self.statusDrawingMode.setAlignment(QT_ALIGN_CENTER)
+        self.statusDrawingMode.setAlignment(qtc.Qt.AlignCenter)
         self.statusDrawingMode.setText('None')
         # statusSelectionModeLabel and statusSelectionMode
         self.statusSelectionModeLabel = qtw.QLabel()
@@ -379,7 +367,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         font.setFamily("FROMVS")
         font.setPointSize(11)
         self.statusSelectionMode.setFont(font)
-        self.statusSelectionMode.setAlignment(QT_ALIGN_CENTER)
+        self.statusSelectionMode.setAlignment(qtc.Qt.AlignCenter)
         self.statusSelectionMode.setText('None')
         # statusSpacerLabel
         self.statusSpacerLabel = qtw.QLabel()
@@ -422,9 +410,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'MyLexer',
             session_manager=SessionManager(),
         )
-
-    def eventFilter(self, a0, a1):
-        return super().eventFilter(a0, a1)
         #self.ui.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey;border-radius:8px;padding:1px}"
                                        #"QProgressBar::chunk {background:blue}")
         self.ui.progressBar.setStyleSheet("QProgressBar::chunk {background:blue}")
@@ -771,7 +756,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("cropping and sorting Greek tiff lines")
         #usage: tr.sortcroplines(source, splitdir, linebox)
         self.crop_greeklinesDialog = qtw.QDialog()
-        self.crop_greeklines_ui: Any = Ui_crop_greek_linesDialog()
+        self.crop_greeklines_ui = Ui_crop_greek_linesDialog()
         self.crop_greeklines_ui.setupUi(self.crop_greeklinesDialog)
         self.crop_greeklinesDialog.show()
         #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
@@ -881,7 +866,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("renaming Greek tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
         self.tifgreekrenamelinesDialog = qtw.QDialog()
-        self.greekrenamelines_ui: Any = Ui_tifgreekrenamelinesDialog()
+        self.greekrenamelines_ui = Ui_tifgreekrenamelinesDialog()
         self.greekrenamelines_ui.setupUi(self.tifgreekrenamelinesDialog)
         self.tifgreekrenamelinesDialog.show()
 
@@ -900,7 +885,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-            source_file_path = ""
             for filename in os.listdir(source_folder):
                 print(source_folder,filename)
                 source_file_path = os.path.join(source_folder, filename)
@@ -976,7 +960,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("moving Greek tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
         self.greekmovelinesDialog = qtw.QDialog()
-        self.greekmovelines_ui: Any = Ui_tifgreekmovelinesDialog()
+        self.greekmovelines_ui = Ui_tifgreekmovelinesDialog()
         self.greekmovelines_ui.setupUi(self.greekmovelinesDialog)
         self.greekmovelinesDialog.show()
 
@@ -997,31 +981,27 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("cropping and sorting Latin tiff lines")
         #usage: tr.sortcroplines(source, splitdir, linebox)
         self.crop_latinlinesDialog = qtw.QDialog()
-        self.crop_latinlines_ui: Any = Ui_crop_latin_linesDialog()
+        self.crop_latinlines_ui = Ui_crop_latin_linesDialog()
         self.crop_latinlines_ui.setupUi(self.crop_latinlinesDialog)
         self.crop_latinlinesDialog.show()
 
         self.crop_latinlines_ui.SourceButton.clicked.connect(self.CroplatinLinesDialog)
-        self.crop_latinlines_ui.LatinBoxFolderButton.clicked.connect(self.LatinLineBoxFolderDialog)
-        self.crop_latinlines_ui.DestLatinButton.clicked.connect(self.DestLatinLinesDialog)
+        self.crop_latinlines_ui.BoxFolderButton.clicked.connect(self.LineBoxFolderDialog)
+        self.crop_latinlines_ui.DestlatinButton.clicked.connect(self.DestlatinLinesDialog)
 
         rsp = self.crop_latinlinesDialog.exec_()
 
         if self.crop_latinlinesDialog.Accepted:
-            tr.sortcroplines(
-                self.crop_latinlines_ui.SourceLineEdit.text(),
-                self.crop_latinlines_ui.LatinBoxFolderLineEdit.text(),
-                self.crop_latinlines_ui.DestLatinLineEdit.text(),
-            )
+            tr.sortcroplines(self.crop_latinlines_ui.SourceLineEdit.text(),self.crop_latinlines_ui.BoxFolderLineEdit.text(),self.crop_latinlines_ui.DestlatinLineEdit.text())
             print("completed creating cropped Latin tif lines")
         #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_40_Matthew/","/home/jetson/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_40_Matthew/")
-        # Legacy hard-coded local workflow example intentionally left disabled.
+        tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_autosplit/latin_book_41_Mark/","/home/jetson/Projects/Python/Images/Latin/tif_latin_linebox/latin_book_41_Mark/")
 
     def actionRename_Latin_tiff_Lines(self):
         print("renaming Latin tiff lines for ground truth")
         # usage: tr.renameimages(source, destination)
         self.latinrenamelinesDialog = qtw.QDialog()
-        self.latinrenamelines_ui: Any = Ui_tiflatinrenamelinesDialog()
+        self.latinrenamelines_ui = Ui_tiflatinrenamelinesDialog()
         self.latinrenamelines_ui.setupUi(self.latinrenamelinesDialog)
         self.latinrenamelinesDialog.show()
 
@@ -1042,7 +1022,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("moving Latin tif lines for ground truth")
         # usage: tr.renameimages(source, destination)
         self.latinmovelinesDialog = qtw.QDialog()
-        self.latinmovelines_ui: Any = Ui_tiflatinmovelinesDialog()
+        self.latinmovelines_ui = Ui_tiflatinmovelinesDialog()
         self.latinmovelines_ui.setupUi(self.latinmovelinesDialog)
         self.latinmovelinesDialog.show()
 
@@ -1059,7 +1039,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("splitting Greek textlines for ground truth review")
         #usage: tr.sortcroplines(source, splitdir, linebox)
         self.split_greek_text_linesDialog = qtw.QDialog()
-        self.split_greeklines_ui: Any = Ui_splitgreektextlinesDialog()
+        self.split_greeklines_ui = Ui_splitgreektextlinesDialog()
         self.split_greeklines_ui.setupUi(self.split_greek_text_linesDialog)
         self.split_greek_text_linesDialog.show()
         #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
@@ -1165,7 +1145,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         print("renaming Greek textlines for ground truth review")
         #usage: tr.sortcroplines(source, splitdir, linebox)
         self.rename_greek_text_linesDialog = qtw.QDialog()
-        self.rename_greeklines_ui: Any = Ui_renamegreektextlinesDialog()
+        self.rename_greeklines_ui = Ui_renamegreektextlinesDialog()
         self.rename_greeklines_ui.setupUi(self.rename_greek_text_linesDialog)
         self.rename_greek_text_linesDialog.show()
         #tr.sortcroplines(r"/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_autosplit/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_linebox/greek_book_40_Matthew/")
@@ -1455,7 +1435,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             Raises a RuntimeError if the input tiffCaptureHandle has type other than TiffCapture.
             :type tiffCaptureHandle: TiffCapture
             """
-            if not isinstance(tiffCaptureHandle, TIFF_CAPTURE_TYPE):
+            if type(tiffCaptureHandle) is not tiffcapture.TiffCapture:
                 raise RuntimeError("MultiPageTIFFViewerQt.setImageStack: Argument must be a TiffCapture object.")
             self._tiffCaptureHandle = tiffCaptureHandle
             self.showFrame(0)
@@ -1480,7 +1460,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if self._tiffCaptureHandle is not None:
             # !!! tiffcapture has length=0 for a single page TIFF.
             # If our handle is valid, we'll assume we have at least one image.
-            return max(1, int(getattr(self._tiffCaptureHandle, "length", 0) or 0))
+            return max([1, self._tiffCaptureHandle.length])
         return 0
 
     def getFrame(self, i=None):
@@ -1544,15 +1524,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
             self.origpixmap = qtg.QPixmap.fromImage(self.qimage)
             # Convert self.qimage to pixmap
-            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(
-                self.ui.Image.size(),
-                QT_KEEP_ASPECT_RATIO,
-            )
+            self.pixmap = qtg.QPixmap.fromImage(self.qimage).scaled(self.ui.Image.size(),
+                qtc.Qt.KeepAspectRatio)
         else:
-            self.pixmap = qtg.QPixmap(self.imgpath).scaled(
-                self.ui.Image.size(),
-                QT_KEEP_ASPECT_RATIO,
-            )
+            self.pixmap = qtg.QPixmap(self.imgpath).scaled(self.ui.Image.size(),
+                qtc.Qt.KeepAspectRatio)
 
         if self.pixmap.isNull():
             return
@@ -1674,10 +1650,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             if seltext == "Contents":
                 print("Resizing to Contents")
                 #self.DisableZoomSlider()
-                if self.origpixmap is None:
-                    return
-                self.origsize = self.origpixmap.size()
-                self.scale = float(self.ui.ImagescrollArea.height() / self.origpixmap.height())
+                if self.qimage:
+                    self.origsize = self.origpixmap.size()
+                self.scale = float((self.ui.ImagescrollArea.height())/self.origpixmap.height())
                 #self.ui.ImagescrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
                 #self.ui.ImagescrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
                 #scale_width = float(self.scaled_pixmap.width()/self.origpixmap.width())
@@ -1701,13 +1676,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
             print(f'Final scale: {self.scale*100}' + ' %')
 
-            if self.origpixmap is None:
-                return
-            self.scaled_pixmap = self.origpixmap.scaled(
-                _scaled_size(self.origpixmap.size(), self.scale),
-                QT_KEEP_ASPECT_RATIO,
-                transformMode=QT_SMOOTH_TRANSFORMATION,
-            )
+            self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origpixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.scaled_pixmap)
             print('Resizing contents')
             self.ui.ImagescrollAreaWidgetContents.resize(self.scale * self.ui.ImagescrollAreaWidgetContents.size())
@@ -1719,16 +1688,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def resize_image(self):
         if self.qimage:
-            if self.origpixmap is None:
-                return
             self.origsize = self.origpixmap.size()
-            self.origheight = self.origpixmap.height()
-            self.origwidth = self.origpixmap.width()
-            self.scaled_pixmap = self.origpixmap.scaled(
-                _scaled_size(self.origsize, self.scale),
-                QT_KEEP_ASPECT_RATIO,
-                transformMode=QT_SMOOTH_TRANSFORMATION,
-            )
+            self.origheight = self.origpixmap.height
+            self.origwidth = self.origpixmap.width
+            self.scaled_pixmap = self.origpixmap.scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
             self.ui.Image.setPixmap(self.scaled_pixmap)
 
     def resize_lineimage(self):
@@ -1738,11 +1701,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.get_LineImg()
         #if self.qlineimage():
         print('Placing Line label...')
-        self.scaled_linepixmap = self.origlinepixmap.scaled(
-            _scaled_size(self.origlinepixmap.size(), self.scale),
-            QT_KEEP_ASPECT_RATIO,
-            transformMode=QT_SMOOTH_TRANSFORMATION,
-        )
+        self.scaled_linepixmap = self.origlinepixmap.scaled(self.scale * self.origlinepixmap.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
 
         #self.ui.Line.resize(self.ui.Line.width(),self.ui.Image.height())
         #self.ui.Line.setGeometry(int(self.img_xoffset) + self.ui.Image.width() + 1,0,self.ui.Line.width(),self.ui.Image.height())
@@ -1759,7 +1718,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select tif pages source folder"))
 
         if self.directory:
-            self.crop_latinlines_ui.SourceLineEdit.setText(self.directory+r'/')
+            self.crop_greeklines_ui.SourceLineEdit.setText(self.directory+r'/')
 
     def GreekLineBoxFolderDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select linebox destination folder"))
@@ -1783,13 +1742,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select linebox destination folder"))
 
         if self.directory:
-            self.crop_latinlines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
+            self.crop_greeklines_ui.LatinBoxFolderLineEdit.setText(self.directory+r'/')
 
     def DestLatinLinesDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Latin lines destination folder"))
+        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select Greek lines destination folder"))
 
         if self.directory:
-            self.crop_latinlines_ui.DestLatinLineEdit.setText(self.directory+r'/')
+            self.crop_greeklines_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
     def GreekRenameLinesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.BoxWidget, "Select rename tif Greek lines source folder"))
@@ -1869,7 +1828,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.txtdir = os.path.dirname(self.txtpath)
             self.ui.TextLE.setText(filename)
 
-            if file.open(QIO_READ_ONLY):
+            if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
@@ -1932,7 +1891,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             file = qtc.QFile(self.txtpath)
             filename = os.path.basename(self.txtpath)
             self.ui.TextLE.setText(filename)
-            if file.open(QIO_READ_ONLY):
+            if file.open(qtc.QIODevice.ReadOnly):
                 stream = qtc.QTextStream(file)
                 text = stream.readAll()
                 info = qtc.QFileInfo(self.txtpath)
@@ -1971,14 +1930,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     pagenum = int(pagestr)
                     print(self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt")
                 else:
-                    print(str(self.imgpath) + " does not exist")
-                    return
+                    print(self.imgpath + " does not exist")
 
                 self.trytxtpath = self.txtdir +r"/"+ versionref + "_Page_" + pagestr + r".txt"
                 if self.trytxtpath:
                     print("opening " + self.trytxtpath)
                     self.txtpath = self.trytxtpath
-                    self.showText(self.txtpath)
+                    self.showText()
                     #self.ReloadText()
                 else:
                     print(self.trytxtpath + " does not exist")
@@ -2001,8 +1959,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     pagenum = int(pagestr)
                     print(self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif")
                 else:
-                    print(str(self.txtpath) + " does not exist")
-                    return
+                    print(self.txtpath + " does not exist")
 
                 self.tryimgpath = self.imgdir +r"/"+ versionref + "_Page_" + pagestr + r".tif"
                 if self.tryimgpath:
@@ -2017,7 +1974,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             pass
 
         self.ImageTextPairDialog = qtw.QDialog()
-        self.ImageTextPairDialog_ui: Any = Ui_ImageTextPairDialog()
+        self.ImageTextPairDialog_ui = Ui_ImageTextPairDialog()
         self.ImageTextPairDialog_ui.setupUi(self.ImageTextPairDialog)
         self.ImageTextPairDialog.show()
 
@@ -2184,8 +2141,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         pil_im = Image.fromarray(img)
 
         draw = ImageDraw.Draw(pil_im)
-        # use a truetype font
-        font = ImageFont.truetype("ViewController/Application/0-MainUI/fonts/FROMVS.ttf", 8)
+        # Resolve the project font from the active runtime tree (legacy path fallback included).
+        font_path = self.session_manager.resolve_font_path(
+            "FROMVS [MAXR]",
+            os.path.dirname(os.path.realpath(__file__)),
+        ) or os.path.join(self.projecthome, "ViewController", "0-MainUI", "fonts", "FROMVS.ttf")
+        font = ImageFont.truetype(font_path, 8)
         #font = ImageFont.truetype("FROMVS.ttf", 20)
 
         # Draw the text
@@ -2213,6 +2174,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             with open(charboxcsvpath, mode='a') as file_:
                 file_.write(f"{char}\t{x}\t{y}\t{w}\t{h}")
                 file_.write("\n")  # Next line.
+        file_.close()
         with open(charboxcsvpath, mode='r') as file_:
             self.ui.BoxText.clear()
             self.ui.BoxText.insertPlainText(file_.read())
@@ -2256,7 +2218,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # #['level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text']
         lines = []
         wordboxes = pytesseract.image_to_data(img,lang="feg")
-        pil_im = Image.fromarray(img)
         #self.ui.BoxText.insertPlainText(wordboxes)
         for a,b in enumerate(wordboxes.splitlines()):
             print(b)
@@ -2277,6 +2238,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     with open(wordboxcsvpath, mode='a') as file_:
                         file_.write(f"{imglinenum}\t{imgwordnum}\t{imgword}\t{x}\t{y}\t{w}\t{h}")
                         file_.write("\n")  # Next line.
+        file_.close()
         with open(wordboxcsvpath, mode='r') as file_:
             self.ui.BoxText.clear()
             self.ui.BoxText.insertPlainText(file_.read())
@@ -2303,6 +2265,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             wordboxes = file_.read()
             self.ui.BoxText.insertPlainText(wordboxes)
             self.ui.TextLE.setText(f"{filename}_wordbox.csv")
+        file_.close()
+
         boxfile = open(wordboxcsvpath)
         with boxfile:
             csv_f = csv.reader(boxfile, delimiter = "\t")
@@ -2313,7 +2277,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     print(f"linenum: {row[0]} wordnum: {row[1]}")
                 linecount =+ 1
 
-    @staticmethod
     def sortcroplines(source, linebox, splitdir):
             dest_of_autosplit = splitdir
             dest_of_linebox = linebox
@@ -2331,7 +2294,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     PIL_BWimage.save(tif_outfile, "TIFF", dpi=(300,300))
 
             def removeworkflow(source):
-                    os.remove(source)
+                    shutil.remove(source)
 
             for image in list_of_images:
 
@@ -2478,7 +2441,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             #self.getPrevLineBox()
             #for column in range(colcount):
             if col == 0:
-                self.tableitem.setFlags(self.tableitem.flags() | QT_ITEM_IS_EDITABLE)
+                self.tableitem.setFlags(qtc.Qt.ItemIsEditable)
             elif col == 1:
                 self.currx = int(self.cellvalue)
             elif col == 2:
@@ -2654,7 +2617,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                             insertAButton.setEnabled(True)
                             insertAButton.show()
                             insertAIcon = qtg.QIcon()
-                            insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), QICON_NORMAL, QICON_OFF)
+                            insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             insertAButton.setIcon(insertAIcon)
                             insertAButton.setIconSize(QSize(12,12))
                             self.ui.BoxTable.setCellWidget(row,col,insertAButton)
@@ -2665,7 +2628,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                             insertBButton.setEnabled(True)
                             insertBButton.show()
                             insertBIcon = qtg.QIcon()
-                            insertBIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), QICON_NORMAL, QICON_OFF)
+                            insertBIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             insertBButton.setIcon(insertBIcon)
                             insertBButton.setIconSize(QSize(12,12))
                             self.ui.BoxTable.setCellWidget(row,col,insertBButton)
@@ -2675,7 +2638,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                             deleteButton.setEnabled(True)
                             deleteButton.show()
                             deleteIcon = qtg.QIcon()
-                            deleteIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/deleterow.png"), QICON_NORMAL, QICON_OFF)
+                            deleteIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/deleterow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             deleteButton.setIcon(deleteIcon)
                             deleteButton.setIconSize(QSize(12,12))
                             self.ui.BoxTable.setCellWidget(row,col,deleteButton)
@@ -2684,7 +2647,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                             rDrawButton.setEnabled(True)
                             rDrawButton.show()
                             rDrawIcon = qtg.QIcon()
-                            rDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/rubberband.png"), QICON_NORMAL, QICON_OFF)
+                            rDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/rubberband.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             rDrawButton.setIcon(rDrawIcon)
                             rDrawButton.setIconSize(QSize(12,12))
                             self.ui.BoxTable.setCellWidget(row,col,rDrawButton)
@@ -2693,7 +2656,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                             sDrawButton.setEnabled(True)
                             sDrawButton.show()
                             sDrawIcon = qtg.QIcon()
-                            sDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/spinbox4.png"), QICON_NORMAL, QICON_OFF)
+                            sDrawIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/spinbox4.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             sDrawButton.setIcon(sDrawIcon)
                             sDrawButton.setIconSize(QSize(16,16))
                             self.ui.BoxTable.setCellWidget(row,col,sDrawButton)
@@ -2703,7 +2666,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                             acceptButton.show()
                             acceptButton = qtw.QPushButton(self.ui.BoxTable)
                             acceptIcon = qtg.QIcon()
-                            acceptIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/Valid.png"), QICON_NORMAL, QICON_OFF)
+                            acceptIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/Valid.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                             acceptButton.setIcon(acceptIcon)
                             acceptButton.setIconSize(QSize(12,12))
                             self.ui.BoxTable.setCellWidget(row,col,acceptButton)
@@ -2732,7 +2695,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             for column, value in enumerate(boxes):
                 if column == 0:
                     tableitem = qtw.QTableWidgetItem()
-                    tableitem.setFlags(tableitem.flags() | QT_ITEM_IS_EDITABLE)
+                    tableitem.setFlags(qtc.Qt.ItemIsEditable)
                     newItem = qtw.QTableWidgetItem(value)
                     self.ui.BoxTable.setItem(row, column, newItem)
                 elif column >= 1 and column <= 4:
@@ -2755,7 +2718,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     print('adding column 5 insert button')
                     insertAButton = qtw.QPushButton(self.ui.BoxTable) #changed parent from None to self.ui.BoxTable - could also be just self
                     insertAIcon = qtg.QIcon()
-                    insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), QICON_NORMAL, QICON_OFF)
+                    insertAIcon.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
                     insertAButton.setIcon(insertAIcon)
                     self.ui.BoxTable.setCellWidget(row,column,insertAButton)
                     self.inslocation = "above"
@@ -2880,20 +2843,22 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def openTableMenu(self, position):
         tableMenu = QMenu()
-        insertAboveAction: Any = tableMenu.addAction("Insert Row Above")
+        insertAboveAction = tableMenu.addAction("Insert Row Above")
         iconA = qtg.QIcon()
-        iconA.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), QICON_NORMAL, QICON_OFF)
+        iconA.addPixmap(qtg.QPixmap(":/Icons/Icons/insertabove.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         insertAboveAction.setIcon(iconA)
 
-        insertBelowAction: Any = tableMenu.addAction("Insert Row Below")
+        insertBelowAction = tableMenu.addAction("Insert Row Below")
         iconB = qtg.QIcon()
-        iconB.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), QICON_NORMAL, QICON_OFF)
+        iconB.addPixmap(qtg.QPixmap(":/Icons/Icons/insertbelow.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         insertBelowAction.setIcon(iconB)
 
-        deleteRowAction: Any = tableMenu.addAction("Delete Current Row")
+        deleteRowAction = tableMenu.addAction("Delete Current Row")
         iconD = qtg.QIcon()
-        iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), QICON_NORMAL, QICON_OFF)
+        iconD.addPixmap(qtg.QPixmap(":/Icons/Icons/cross.png"), qtg.QIcon.Normal, qtg.QIcon.Off)
         deleteRowAction.setIcon(iconD)
+
+        append_default_context_actions(tableMenu, self.ui.BoxTable, is_text_widget=False)
 
         action = tableMenu.exec_(self.ui.BoxTable.mapToGlobal(position))
         if action == insertAboveAction:
@@ -2921,6 +2886,57 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.BoxTable2csv()
             #
             #
+
+    def _install_image_context_menu_defaults(self):
+        self._image_context_widgets = []
+        for widget_name in ("Image", "Line"):
+            image_widget = getattr(self.ui, widget_name, None)
+            if image_widget is None:
+                continue
+            image_widget.setFocusPolicy(qtc.Qt.ClickFocus)
+            image_widget.setContextMenuPolicy(qtc.Qt.CustomContextMenu)
+            image_widget.customContextMenuRequested.connect(
+                lambda pos, w=image_widget: self.openImagePanelMenu(w, pos)
+            )
+            self._image_context_widgets.append(image_widget)
+
+    def _install_image_panel_shortcuts(self):
+        self._image_undo_shortcut = qtw.QShortcut(qtg.QKeySequence.Undo, self)
+        self._image_redo_shortcut = qtw.QShortcut(qtg.QKeySequence.Redo, self)
+        self._image_undo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_redo_shortcut.setContext(qtc.Qt.WindowShortcut)
+        self._image_undo_shortcut.activated.connect(self._on_image_panel_undo_shortcut)
+        self._image_redo_shortcut.activated.connect(self._on_image_panel_redo_shortcut)
+
+    def _focused_image_widget(self):
+        focus_widget = qtw.QApplication.focusWidget()
+        if focus_widget in getattr(self, "_image_context_widgets", []):
+            return focus_widget
+        return None
+
+    def _on_image_panel_undo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.prevImage()
+
+    def _on_image_panel_redo_shortcut(self):
+        if self._focused_image_widget() is None:
+            return
+        self.nextImage()
+
+    def openImagePanelMenu(self, image_widget, position):
+        menu = QMenu(self)
+        reload_action = menu.addAction("Reload Image")
+        reload_action.triggered.connect(self.ReloadImage)
+        append_default_context_actions(
+            menu,
+            image_widget,
+            is_text_widget=False,
+            include_undo_redo=True,
+            undo_callback=self.prevImage,
+            redo_callback=self.nextImage,
+        )
+        menu.exec_(image_widget.mapToGlobal(position))
 
     def setBoxPaths(self):
 
@@ -3308,7 +3324,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             DrawImg_yu = DrawImg_ys / self.scale
             DrawImg_wu = DrawImg_ws / self.scale
             DrawImg_hu = DrawImg_hs / self.scale
-            DrawImg_uqrect = QRect(int(DrawImg_xu), int(DrawImg_yu), int(DrawImg_wu), int(DrawImg_hu))
+            DrawImg_uqrect = QRect(DrawImg_xu,DrawImg_yu,DrawImg_wu,DrawImg_hu)
             print("Offset Upscaled QRect = " + str(DrawImg_uqrect))
 
             # Set LineBox values
@@ -3335,7 +3351,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def completeSbLineBox(self):
         popup = qtw.QMessageBox(self)
-        popup.setWindowModality(QT_NON_MODAL)
+        popup.setWindowModality(Qt.NonModal)
         popup.setIcon(qtw.QMessageBox.Information)
         popup.setWindowTitle("Edit Line Box")
         popup.setText("Press OK to keep the edited Line Box")
@@ -3374,11 +3390,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         pil_img = Image.fromarray(self.norm)
         qimage = ImageQt.ImageQt(pil_img)
         #self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.ui.Image.size(), qtc.Qt.KeepAspectRatio)
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(
-            _scaled_size(self.origsize, self.scale),
-            QT_KEEP_ASPECT_RATIO,
-            transformMode=QT_SMOOTH_TRANSFORMATION,
-        )
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
         #self.on_zoom()
         #self.saveLineBoxImage()
@@ -3395,11 +3407,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.prevh = h
         pil_img = Image.fromarray(self.norm)
         qimage = ImageQt.ImageQt(pil_img)
-        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(
-            _scaled_size(self.origsize, self.scale),
-            QT_KEEP_ASPECT_RATIO,
-            transformMode=QT_SMOOTH_TRANSFORMATION,
-        )
+        self.pixmap = qtg.QPixmap.fromImage(qimage).scaled(self.scale * self.origsize, qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation)
         self.ui.Image.setPixmap(self.pixmap)
         #self.ui.actionDraw_Table_LineBox_tb.triggered.connect(self.putSbLineBox)
 
@@ -3588,8 +3596,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.progressBar.reset()
 
     # Mouse Controllers
-    def mousePressEvent(self, a0):
-        event: Any = a0
+    def mousePressEvent(self, event):
         if self.statusBoxMode.text() == "Edit" and self.statusDrawingMode.text() == "Mouse":
             self.run_event = False
             self.event_x = event.pos().x()
@@ -3597,7 +3604,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.start_pos = QPoint(self.event_x, self.event_y)
             print(f'Mouse clicked as start position: {self.start_pos}')
             # Limit scope of rubberband starting position
-            x_min = x_max = y_min = y_max = 0
             if self.ui.ImageLe.displayText() != "":
                 self.run_event = True
                 x_min = int(self.img_xoffset) - 1
@@ -3612,7 +3618,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 self.run_event = False
                 print('You cannot draw without a loaded image')
 
-            if event.button() == QT_LEFT_BUTTON and self.run_event == True:
+            if event.button() == Qt.LeftButton and self.run_event == True:
                 if self.event_x >= x_min and self.event_x <= x_max and self.event_y >= y_min and self.event_y <= y_max:
                     self.rubberBand = ResizableRubberBand(self)
                     self.run_event = True
@@ -3624,8 +3630,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         else:
             print("You can only draw in 'Edit' mode")
 
-    def mouseMoveEvent(self, a0):
-        event: Any = a0
+    def mouseMoveEvent(self, event):
         if self.statusBoxMode.text() == "Edit" and self.run_event:
             self.end_pos = event.pos()
             self.rubberBand.setGeometry(QRect(self.start_pos, self.end_pos).normalized())
@@ -3657,12 +3662,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     h_rb_item.setText(str(self.h_rb))
                     self.ui.BoxTable.setItem(self.row_current,column,h_rb_item)'''
 
-    def mouseReleaseEvent(self, a0):
-        event: Any = a0
+    def mouseReleaseEvent(self, event):
         if self.statusBoxMode.text() == "Edit":
             if not self.run_event:
                 self.run_event = False
-            if self.run_event and event.button() == QT_LEFT_BUTTON:
+            if self.run_event and event.button() == Qt.LeftButton:
                 geo = self.rubberBand.geometry()
                 self.x_rb = self.rubberBand.x()
                 self.y_rb = self.rubberBand.y()
@@ -3678,7 +3682,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
                 self.currentQRect = self.rubberBand.geometry()
 
-    @staticmethod
     def renameimages(source, destination):
             def sorted_alphanumeric(data):
                     convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -3709,10 +3712,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     linestr = namesplit[3]
                     #print(versionref,pagenum,linestr)
                     print(f"namesplit: {namesplit} versionref: {versionref} pagestr: {pagestr} pagenum: {pagenum} linestr: {linestr}")
-                    match = re.match('.*?([0-9]+)$', linestr)
-                    if match is None:
-                        continue
-                    linenum = int(match.group(1))
+                    linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
                     #print("Last digits of "+filename+" are "+last_digits)
                     if pagenum > newpagenum:
                             newlinenum = 1
@@ -3722,7 +3722,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     newlinenum += 1
                     print("linenum: " + str(linenum) + "  newlinenum: " + str(newlinenum))
 
-    @staticmethod
     def moveimages(source, destination):
             def sorted_alphanumeric(data):
                     convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -3766,10 +3765,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     linestr = namesplit[3]
                     #print(versionref,pagenum,linestr)
 
-                    match = re.match('.*?([0-9]+)$', linestr)
-                    if match is None:
-                        continue
-                    linenum = int(match.group(1))
+                    linenum = int(re.match('.*?([0-9]+)$', linestr).group(1))
                     #print("Last digits of "+filename+" are "+last_digits)
 
                     if pagenum > newpagenum:
@@ -3813,7 +3809,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                                 print("Line {}: {}".format(cnt, line))
                                 outF.close()
 
-    @staticmethod
     def text2groundtruth(source, destination):
             def sorted_alphanumeric(data):
                     convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -3876,28 +3871,20 @@ class ResizableRubberBand(QWidget):
     def __init__(self, parent = None):
         super(ResizableRubberBand, self).__init__(parent)
 
-        self.setWindowFlags(Qt.WindowType.SubWindow)
-        self.layout_: Any = QHBoxLayout(self)
-        self.layout_.setContentsMargins(0, 0, 0, 0)
+        self.setWindowFlags(Qt.SubWindow)
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         self.grip1 = QSizeGrip(self)
         self.grip2 = QSizeGrip(self)
-        self.layout_.addWidget(
-            self.grip1,
-            0,
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop,
-        )
-        self.layout_.addWidget(
-            self.grip2,
-            0,
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom,
-        )
+        self.layout.addWidget(self.grip1, 0, Qt.AlignLeft | Qt.AlignTop)
+        self.layout.addWidget(self.grip2, 0, Qt.AlignRight | Qt.AlignBottom)
         self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
         self.rubberband.move(0, 0)
         self.rubberband.show()
         self.show()
 
-    def resizeEvent(self, a0):
+    def resizeEvent(self, event):
         self.rubberband.resize(self.size())
 
 # Only run this code if I am actually running this script

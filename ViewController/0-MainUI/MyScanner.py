@@ -77,6 +77,10 @@ from project_status_controller import ProjectStatusController
 from print_menu_support import install_print_menu_support, image_target, document_target
 from project_column_settings import update_project_columns, project_metadata_db_path
 from Core.project_database import load_project_database_record
+from Core.workflow_wizard_actions import (
+    install_workflow_wizard_menu_actions,
+    open_default_module_page_workflow_wizard,
+)
 
 import MyVersifier as versifier
 import MyWriter as writer
@@ -207,6 +211,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # load the pre-compiled QtDesigner Ui_MainUI user interface
         self.ui = Ui_Scanner()
         self.ui.setupUi(self)
+        install_workflow_wizard_menu_actions(
+            self,
+            'MyScanner',
+            include_project_wizard=False,
+            include_page_wizard=True,
+        )
+        self.open_page_workflow_wizard = (
+            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyScanner')
+        )
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None), getattr(self.ui, 'Image', None), getattr(self.ui, 'OCRText', None)],
             image_handler=self.showImage,
@@ -242,7 +255,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 f'MyScanner loaded with reduced OCR functionality. Missing packages: {missing}.',
             )
 
-        self.ui.actionOpen_Image.triggered.connect(self.loadImage)
+        self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
         self.ui.actionPixler_Image_Editor.triggered.connect(self.OpenWithMyPixler)
         self.ui.actionVersifier.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionBoxer.triggered.connect(self.OpenWithMyBoxer)
@@ -256,7 +269,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
 
         #self.ui.OpenImageFilebutton.clicked.connect(self.OpenImageFileDialog)
-        self.ui.OpenImageFilebutton.clicked.connect(self.loadImage)
+        self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         self.ui.actionScanImage.triggered.connect(self.actionScanImage)
         self._connect_scan_ui_aliases()
         self.ui.actionEdit_Image_tb.triggered.connect(self.actionGimpEdit)
@@ -287,9 +300,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.LHlineEdit.textChanged.connect(self.MoveLHSlider)
         self.ui.LHslider.hide()
         #self.ui.EditCorrectedTextbutton.clicked.connect(self.OpenTextFileDialog)
-        self.ui.EditCorrectedTextbutton.clicked.connect(self.loadText)
-        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.SaveAsCorrectedTextFileDialog)
-        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.SaveCorrectedTextFileDialog)
+        self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
+        self.ui.SaveAsOCRCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
+        self.ui.SaveOCRCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
 
         self.ui.Writerbutton.clicked.connect(self.OpenWithWriter)
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)

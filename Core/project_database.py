@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import shutil
@@ -9,8 +10,10 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 PROJECT_DATABASE_FILENAME = "project_metadata.sqlite"
 PROJECT_DATABASE_EXPORT_FILENAME = "project_metadata.json"
+PROJECT_DATABASE_EXPORT_CSV_FILENAME = "project_metadata.csv"
 PROJECT_DATABASE_TABLE = "project_metadata"
 DEFAULT_SCRIPTURE_COLUMN_LANGUAGES = ["english", "greek", "hebrew", "latin"]
+DEFAULT_PROJECT_FONT = "FROMVS.ttf"
 
 
 @dataclass(frozen=True)
@@ -156,7 +159,7 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "ProjectFont",
             "Project Font",
             "text",
-            default="",
+            default=DEFAULT_PROJECT_FONT,
             help_text="Primary project font family used during transcription and rendering.",
         ),
         ProjectFieldDefinition("Notes", "Notes", "text", default=""),
@@ -177,6 +180,19 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             help_text="Select one or more installed Tesseract languages.",
         ),
         ProjectFieldDefinition("CurrentPage", "Current Page", "int", default=1),
+        ProjectFieldDefinition("CurrentProjectPage", "Current Project Page", "int", default=1),
+        ProjectFieldDefinition(
+            "CurrentProjectMilestone",
+            "Current Project Milestone",
+            "text",
+            default="",
+        ),
+        ProjectFieldDefinition(
+            "CurrentPageMilestone",
+            "Current Page Milestone",
+            "text",
+            default="",
+        ),
         ProjectFieldDefinition("CurrentColumn", "Current Column", "int", default=1),
         ProjectFieldDefinition("CurrentLine", "Current Line", "int", default=1),
         ProjectFieldDefinition("CurrentBook", "Current Book", "int", default=1),
@@ -199,6 +215,15 @@ def normalize_project_database_values(
         incoming["ProjectDatabase"] = incoming.get("project_database")
     if incoming.get("CurrentPage") is not None and incoming.get("ProjectPageNumber") in (None, ""):
         incoming["ProjectPageNumber"] = incoming.get("CurrentPage")
+    if incoming.get("CurrentProjectPage") is None:
+        if incoming.get("CurrentPage") not in (None, ""):
+            incoming["CurrentProjectPage"] = incoming.get("CurrentPage")
+        elif incoming.get("ProjectPageNumber") not in (None, ""):
+            incoming["CurrentProjectPage"] = incoming.get("ProjectPageNumber")
+    if incoming.get("CurrentProjectMilestone") in (None, "") and incoming.get("CurrentPageMilestone") not in (None, ""):
+        incoming["CurrentProjectMilestone"] = incoming.get("CurrentPageMilestone")
+    if incoming.get("CurrentPageMilestone") in (None, "") and incoming.get("CurrentProjectMilestone") not in (None, ""):
+        incoming["CurrentPageMilestone"] = incoming.get("CurrentProjectMilestone")
     if incoming.get("CurrentBook") is not None and incoming.get("ProjectBook") in (None, ""):
         incoming["ProjectBook"] = incoming.get("CurrentBook")
     if incoming.get("CurrentVerse") is not None and incoming.get("ProjectVerse") in (None, ""):
@@ -207,6 +232,8 @@ def normalize_project_database_values(
         incoming["ProjectWord"] = incoming.get("CurrentWord")
     if incoming.get("project_font") and incoming.get("ProjectFont") in (None, ""):
         incoming["ProjectFont"] = incoming.get("project_font")
+    if incoming.get("ProjectFont") in (None, ""):
+        incoming["ProjectFont"] = DEFAULT_PROJECT_FONT
 
     normalized: Dict[str, Any] = {}
 
@@ -254,6 +281,9 @@ def normalize_project_database_values(
 
     # Keep legacy fields synchronized while phase 1 introduces page-centric naming.
     normalized["CurrentPage"] = normalized["ProjectPageNumber"]
+    normalized["CurrentProjectPage"] = max(1, _coerce_int(normalized.get("CurrentProjectPage"), normalized["ProjectPageNumber"]))
+    normalized["CurrentPage"] = normalized["CurrentProjectPage"]
+    normalized["ProjectPageNumber"] = normalized["CurrentProjectPage"]
     normalized["CurrentBook"] = _coerce_int(normalized.get("ProjectBook"), normalized.get("CurrentBook", 1))
     normalized["CurrentVerse"] = _coerce_int(normalized.get("ProjectVerse"), normalized.get("CurrentVerse", 1))
     normalized["CurrentWord"] = _coerce_int(normalized.get("ProjectWord"), normalized.get("CurrentWord", 1))
@@ -262,6 +292,10 @@ def normalize_project_database_values(
         1,
         normalized["NumberColumns"],
     )
+    normalized["CurrentProjectMilestone"] = str(normalized.get("CurrentProjectMilestone") or "").strip()
+    normalized["CurrentPageMilestone"] = str(normalized.get("CurrentPageMilestone") or normalized["CurrentProjectMilestone"] or "").strip()
+    if not normalized["CurrentProjectMilestone"]:
+        normalized["CurrentProjectMilestone"] = normalized["CurrentPageMilestone"]
 
     current_language_was_blank = str(incoming.get("CurrentLanguage", "")).strip() == ""
     if current_language_was_blank or not normalized.get("CurrentLanguage"):
@@ -295,6 +329,9 @@ def normalize_project_database_values(
     if not project_database.lower().endswith(".db"):
         project_database = f"{project_database}.db"
     normalized["ProjectDatabase"] = project_database
+
+    if not str(normalized.get("ProjectFont") or "").strip():
+        normalized["ProjectFont"] = DEFAULT_PROJECT_FONT
 
     return normalized
 
@@ -336,6 +373,8 @@ def create_project_database(
         )
         connection.commit()
 
+    sync_project_database_mirrors(database_path)
+
     return normalized
 
 
@@ -347,6 +386,37 @@ def export_project_database_json(
     export_path = export_path or os.path.splitext(database_path)[0] + ".json"
     with open(export_path, "w", encoding="utf-8") as handle:
         json.dump(record, handle, indent=2)
+    return record
+
+
+def export_project_database_csv(
+    database_path: str,
+    export_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    record = load_project_database_record(database_path)
+    export_path = export_path or os.path.splitext(database_path)[0] + ".csv"
+    with open(export_path, "w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["Field", "Value"])
+        for key in sorted(record.keys()):
+            value = record.get(key)
+            if isinstance(value, list):
+                serialized_value = json.dumps(value, ensure_ascii=False)
+            else:
+                serialized_value = "" if value is None else str(value)
+            writer.writerow([key, serialized_value])
+    return record
+
+
+def sync_project_database_mirrors(database_path: str) -> Dict[str, Any]:
+    """Keep SQLite project metadata mirrored to adjacent JSON and CSV exports."""
+    record = load_project_database_record(database_path)
+    base_dir = os.path.dirname(database_path)
+    json_path = os.path.join(base_dir, PROJECT_DATABASE_EXPORT_FILENAME)
+    csv_path = os.path.join(base_dir, PROJECT_DATABASE_EXPORT_CSV_FILENAME)
+
+    export_project_database_json(database_path, json_path)
+    export_project_database_csv(database_path, csv_path)
     return record
 
 
