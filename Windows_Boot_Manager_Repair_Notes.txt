@@ -5,6 +5,10 @@ Purpose
 -------
 Printable recovery sheet for the Ubuntu boot failure. Keep the current Ubuntu 24 system untouched unless the Windows-side evidence clearly shows a loader repair is needed.
 
+Recovery media status
+---------------------
+The bootable Ubuntu installer has been written to the 128 GB USB drive (`/dev/sdd`, Cruzer Glide). Do not use the 32 TB SSD (`/dev/sdc`) for this repair path.
+
 Observed error
 --------------
 Windows Boot Manager reports:

@@ -1,0 +1,265 @@
+Windows Boot Manager Repair Notes
+=================================
+
+Purpose:
+This file is meant to be copied to the Windows hard drive before rebooting into Windows, so the current state and repair steps are preserved and can be shared back for comparison with the Ubuntu-side repair work.
+
+This is the full procedure to follow in Windows. It is intentionally self-contained so it can be copied onto the Windows drive and used as a step-by-step recovery document.
+
+Recovery media status:
+The bootable Ubuntu installer has been written to the 128 GB USB drive (`/dev/sdd`, Cruzer Glide). Do not use the 32 TB SSD (`/dev/sdc`) for this repair path.
+
+Background:
+The reported failure is:
+
+  File: \EFI\ubuntu\shimx64.efi
+  Status: 0xc000007b
+  Info: The application or operating system couldn't be loaded because a required file is missing or contains errors.
+
+This means the firmware or Windows Boot Manager reached the normal Ubuntu shim path,
+but the EFI application was not loadable. Possible causes include a corrupt or
+incomplete shim file, EFI-partition or filesystem damage, an architecture mismatch,
+or Secure Boot validation failure. A stale BCD or firmware entry remains possible,
+but must be verified rather than assumed.
+
+What to capture before rebooting into Windows:
+1. Note the exact error text shown by the firmware/Windows Boot Manager.
+2. Note whether the Ubuntu boot option is selected from firmware or from the Windows Boot Manager menu.
+3. Note whether the system is using Secure Boot.
+4. Record the exact file names present on the EFI partition under the Ubuntu folder,
+  especially whether \EFI\ubuntu\shimx64.efi exists and is readable.
+
+What the status code suggests:
+- If shimx64.efi is absent, the entry points to the wrong file or the EFI partition is not the one being inspected.
+- If shimx64.efi exists, 0xc000007b points more strongly to an invalid or corrupt EFI image, filesystem or partition damage, an architecture mismatch, or Secure Boot validation.
+- A stale BCD or firmware entry matters only if bcdedit shows a different path or partition from the one containing the Ubuntu files.
+
+Evidence now supplied from Windows:
+- Native firmware entry {9cd5158b-83e9-11f1-9e10-806e6f6e6963} points to
+  partition=\Device\HarddiskVolume5 and \EFI\ubuntu\shimx64.efi.
+- The Windows Boot Manager menu entry {55ccaa1e-9852-11f1-9e20-000272c9bf70}
+  also points to that file, but is incorrectly classified as a Windows Boot Loader.
+- Therefore the failing selection is the Windows BCD chainload entry, not evidence
+  that the native Ubuntu firmware entry is missing. Remove the malformed BCD entry
+  and boot the existing native Ubuntu firmware entry, or recreate the BCD entry as a
+  BOOTAPP if Ubuntu must remain inside the Windows menu.
+
+Windows-side investigation commands (run from an elevated Windows Command Prompt):
+
+  bcdedit /enum firmware
+  bcdedit /enum all
+
+If needed, inspect the EFI partition:
+
+  diskpart
+  list vol
+  exit
+
+Then map the EFI partition letter (for example, E: or S:) and inspect:
+
+  dir E:\EFI\ubuntu
+  dir E:\EFI\Microsoft\Boot
+
+You are looking for an Ubuntu entry pointing to:
+
+  \EFI\ubuntu\shimx64.efi
+
+Recommended repair procedure in Windows:
+
+Step 1 - Confirm the current EFI partition letter:
+
+  diskpart
+  list vol
+  exit
+
+Then inspect the Ubuntu folder:
+
+  dir E:\EFI\ubuntu
+
+If the folder is not on E:, replace E: with the correct partition letter.
+
+Step 2 - View the Windows Boot Manager and firmware entries:
+
+  bcdedit /enum firmware
+  bcdedit /enum all
+
+Look for an Ubuntu entry with the path:
+
+  \EFI\ubuntu\shimx64.efi
+
+If the path is stale or points to a missing file, continue.
+
+Step 3 - Remove an invalid or duplicate Ubuntu entry from BCD:
+
+Only run the delete command if the inspection above shows that the entry is stale,
+duplicated, or points to a different path or partition. Do not delete a matching entry
+merely because shimx64.efi returns 0xc000007b.
+
+For the evidence currently supplied, the malformed entry is confirmed. Remove this
+specific Windows Boot Manager menu entry:
+
+  bcdedit /delete {55ccaa1e-9852-11f1-9e20-000272c9bf70} /cleanup
+
+Then reboot and select the existing firmware entry named ubuntu, whose identifier is:
+
+  {9cd5158b-83e9-11f1-9e10-806e6f6e6963}
+
+Do not delete the native firmware entry.
+
+  bcdedit /delete {<ubuntu-entry-id>} /cleanup
+
+If the entry is in the firmware store instead of the normal BCD store, identify the firmware entry and remove it:
+
+  bcdedit /enum firmware
+  bcdedit /delete {<firmware-entry-id>}
+
+Notes:
+- The entry ID is the curly-braced value shown by bcdedit, such as {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}.
+- If the command says the entry is in use or cannot be deleted, try removing it from the firmware view as shown above.
+
+Step 4 - Prefer restoring Ubuntu's native UEFI entry:
+
+The Ubuntu loader is a Linux EFI application, not a Windows OS loader. Do not create
+it with `bcdedit /application osloader` as the first repair; that can leave Windows
+Boot Manager trying to handle the EFI image as the wrong application type.
+
+From Ubuntu, with the EFI System Partition mounted at /boot/efi, repair the signed
+Ubuntu loader and recreate its firmware entry:
+
+  findmnt /boot/efi
+  test -f /boot/efi/EFI/ubuntu/shimx64.efi
+  sudo apt-get install --reinstall shim-signed grub-efi-amd64-signed
+  sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ubuntu --recheck
+  sudo update-grub
+  sudo efibootmgr -v
+
+Confirm that an Ubuntu firmware entry points to:
+
+  \EFI\ubuntu\shimx64.efi
+
+Then select Ubuntu directly from the firmware boot menu. This avoids Windows Boot
+Manager having to interpret and chainload the Linux EFI application.
+
+Step 5 - If the Windows Boot Manager menu must launch Ubuntu:
+
+  bcdedit /create /d "Ubuntu" /application BOOTAPP
+
+This returns a new identifier, for example:
+
+  {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+
+Use that identifier in the next commands:
+
+  bcdedit /set {<new-id>} path \EFI\ubuntu\shimx64.efi
+  bcdedit /set {<new-id>} device partition=E:
+  bcdedit /set {<new-id>} locale en-us
+  bcdedit /set {<new-id>} bootmenupolicy legacy
+  bcdedit /displayorder {<new-id>} /addlast
+
+If Secure Boot is enabled and the shim file exists, use the shim path:
+
+  \EFI\ubuntu\shimx64.efi
+
+If the file is missing or Secure Boot is disabled and only grubx64.efi exists, use:
+
+  bcdedit /set {<new-id>} path \EFI\ubuntu\grubx64.efi
+
+Step 6 - Verify the repair:
+
+  bcdedit /enum firmware
+  bcdedit /enum all
+
+Confirm that the Ubuntu entry now points to the correct file and is listed in the proper order.
+
+Step 7 - Reboot and test:
+
+- Reboot to the boot menu.
+- Select Ubuntu.
+- Confirm that the system loads the Ubuntu bootloader instead of returning 0xc000007b.
+
+Step 8 - If it still fails:
+
+  dir E:\EFI\ubuntu
+  bcdedit /enum all
+
+Compare the BCD path to the actual files in the EFI folder. If the file names differ, update the BCD path to match exactly what is actually present.
+
+Important notes:
+- The Windows Boot Manager can keep a stale firmware entry even after Ubuntu is repaired.
+- If the EFI partition is not mounted correctly or the Ubuntu folder is missing, the Boot Manager cannot load the reported path.
+- If shimx64.efi exists and the BCD/firmware path matches it, rebuilding the entry alone is unlikely to fix 0xc000007b. Compare the file with the Ubuntu-side EFI files and repair or reinstall the Ubuntu shim.
+- If Secure Boot is enabled, verify that shimx64.efi is a properly signed x64 shim; do not substitute an unsigned grubx64.efi as a workaround.
+
+Copy/paste repair block for an elevated Windows Command Prompt:
+
+  diskpart
+  list vol
+  exit
+
+  dir E:\EFI\ubuntu
+  bcdedit /enum firmware
+  bcdedit /enum all
+
+Only if those results show an invalid or duplicate entry:
+
+  bcdedit /delete {<ubuntu-entry-id>} /cleanup
+  bcdedit /delete {<firmware-entry-id>}
+
+  bcdedit /create /d "Ubuntu" /application BOOTAPP
+
+  bcdedit /set {<new-id>} path \EFI\ubuntu\shimx64.efi
+  bcdedit /set {<new-id>} device partition=E:
+  bcdedit /set {<new-id>} locale en-us
+  bcdedit /set {<new-id>} bootmenupolicy legacy
+  bcdedit /displayorder {<new-id>} /addlast
+
+  bcdedit /enum firmware
+  bcdedit /enum all
+
+If the shim file is not present, use:
+
+  bcdedit /set {<new-id>} path \EFI\ubuntu\grubx64.efi
+
+Minimal evidence list to share back:
+- Output of: bcdedit /enum firmware
+- Output of: bcdedit /enum all
+- Output of: dir E:\EFI\ubuntu
+- Screenshot or text of the exact error message
+- Whether the Ubuntu folder contains shimx64.efi or only grubx64.efi
+
+Verified Windows repair state (2026-08-15):
+- Disk 0 is the 1 TB Windows disk. Its EFI System Partition is HarddiskVolume3.
+- Disk 1 is the 2 TB Ubuntu disk. Partition 1 is a 1.05 GB EFI System Partition;
+  partition 2 is the 1.86 TB Linux filesystem partition.
+- The Ubuntu EFI partition was mounted temporarily as U:. Its volume serial number is
+  C85C-2E21, and it contains EFI\ubuntu and EFI\BOOT.
+- EFI\ubuntu contains grubx64.efi, shimx64.efi, mmx64.efi, BOOTX64.CSV, and grub.cfg.
+- The native firmware entry named ubuntu remains present as
+  {9cd5158b-83e9-11f1-9e10-806e6f6e6963} and points to
+  HarddiskVolume5\EFI\ubuntu\shimx64.efi.
+- A new Windows Boot Application entry named Ubuntu was created as
+  {55ccaa1f-9852-11f1-9e20-000272c9bf70}. It points to
+  partition=U: and \EFI\ubuntu\shimx64.efi.
+- Windows Boot Manager displayorder now contains Windows 10 followed by the new Ubuntu
+  BOOTAPP entry. The menu is enabled with a 10-second timeout.
+- The configuration was verified with bcdedit before reboot; the end-to-end Ubuntu
+  boot test remains pending.
+
+Windows access to the Ubuntu filesystem:
+- Windows identifies Disk 1 partition 2 with Linux filesystem GPT type
+  {0fc63daf-8483-4772-8e79-3d69d8477de4}; Windows has no native ext4 driver.
+- WSL2 cannot run because firmware virtualization is unavailable on this system.
+- The selected direct-access option is Linux File Systems for Windows by Paragon
+  Software. The vendor supports read/write access to Ext2, Ext3, and Ext4 on Windows
+  10. Install only the current package obtained from Paragon's official website.
+- Disable automatic write mounting initially. Inspect the Ubuntu partition read-only,
+  then enable write access only after confirming the expected folders and a clean
+  filesystem state.
+- Never access the ext4 partition from Windows while native Ubuntu is running,
+  suspended, or hibernated. Unmount it cleanly in Paragon before rebooting to Ubuntu.
+- Ext2Fsd is not an acceptable alternative for this modern ext4 filesystem.
+
+Temporary EFI mount cleanup after boot testing:
+
+  mountvol U: /D
+  mountvol S: /D
