@@ -226,6 +226,23 @@ Quick use pattern:
 * Next immediate action:
   * on reopen, run recovery sequence from checklist section `K` before any new edits
 
+### Session Handoff - 2026-08-14 18:45
+
+* Scope summary: validated the branch-sync and final compliance pass against the development checklist, removed the stray startup guard text that failed the clean-state gate, and completed the local merge/commit chain.
+* Touched files (`git status --short`):
+  * `ViewController/0-MainUI/MyServer.py`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; workspace-level `get_errors` returned `No errors found` after the startup guard fix.
+  * compile: pass via `python -m py_compile ViewController/0-MainUI/MyServer.py`, `Developer/utilities/branch_sync_report.py`, `ViewController/0-MainUI/helpers/LocalFileDrop.py`, and `ViewController/3-Process/MyLexer.py`.
+  * smoke: pass for the changed runtime path with the startup script guarded cleanly under Python compile validation; no syntax/runtime import errors on the touched path.
+  * manual UI checks: not required for this cycle; no UI behavior changes were introduced, and the fix was limited to a stray preamble line that broke Python parsing.
+* Unresolved blockers/risks:
+  * local Git state is clean after commit; the remote `origin/windows-development` remains behind this local branch by 6 commits until push.
+  * upstream `origin/master` has already been merged into this branch; no further master drift is present.
+* Next immediate action:
+  * push `windows_development` to `origin/windows-development` if the branch should be published from this workstation.
+
 ## 📌 Project Overview
 
 * **MyServer**: Main runtime UI/controller for OCR workflow and project creation wiring
