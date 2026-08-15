@@ -6,7 +6,7 @@
     "shared_tools_must_not_be_ignored": true,
     "target_branches": [
       "master",
-      "windows-development",
+      "windows_development",
       "ubuntu_development"
     ]
   },

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a branch sync report for master, windows-development, and ubuntu_development.
+"""Generate a branch sync report for master, windows_development, and ubuntu_development.
 
 This script is intentionally Git-only and platform-neutral so it can run from
 both Windows and Ubuntu checkouts.
@@ -159,7 +159,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", default=".", help="Path to repository root")
     parser.add_argument("--remote", default="origin", help="Git remote name")
     parser.add_argument("--master", default="master", help="Canonical source branch")
-    parser.add_argument("--windows", default="windows-development", help="Windows dev branch")
+    parser.add_argument("--windows", default="windows_development", help="Windows dev branch")
     parser.add_argument("--ubuntu", default="ubuntu_development", help="Ubuntu dev branch")
     parser.add_argument(
         "--out",

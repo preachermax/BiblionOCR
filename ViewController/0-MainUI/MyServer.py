@@ -1,4 +1,4 @@
-# pyright: reportGeneralTypeIssues=false, reportOptionalMemberAccess=false, reportAssignmentType=false, reportArgumentType=false, reportAttributeAccessIssue=false, reportCallIssue=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportPossiblyUnboundVariable=false, reportIncompatibleMethodOverride=false, reportRedeclaration=false
+Check the current git status, fetch and resync with origin-master.# pyright: reportGeneralTypeIssues=false, reportOptionalMemberAccess=false, reportAssignmentType=false, reportArgumentType=false, reportAttributeAccessIssue=false, reportCallIssue=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportPossiblyUnboundVariable=false, reportIncompatibleMethodOverride=false, reportRedeclaration=false
 
 print("RUNNING:", __file__)
 # See dev_notebook.md for architecture + debugging notes

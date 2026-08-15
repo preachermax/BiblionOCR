@@ -36,7 +36,7 @@ jobs:
             --repo . \
             --remote origin \
             --master master \
-            --windows windows-development \
+            --windows windows_development \
             --ubuntu ubuntu_development \
             --out docs/development/BRANCH_SYNC_STATUS.md
 
@@ -52,18 +52,18 @@ jobs:
 
           def parse_row(branch):
               # Example row:
-              # | `origin/windows-development` | 3 | 0 |
+              # | `origin/windows_development` | 3 | 0 |
               pattern = rf"\|\s*`{re.escape(branch)}`\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|"
               m = re.search(pattern, text)
               if not m:
                   raise SystemExit(f"Could not parse metrics row for {branch}")
               return int(m.group(1)), int(m.group(2))
 
-          win_ahead, win_behind = parse_row("origin/windows-development")
+          win_ahead, win_behind = parse_row("origin/windows_development")
           ubu_ahead, ubu_behind = parse_row("origin/ubuntu_development")
 
           win_only = re.search(
-              r"Commits only in `origin/windows-development` .*: \*\*(\d+)\*\*",
+              r"Commits only in `origin/windows_development` .*: \*\*(\d+)\*\*",
               text,
           )
           ubu_only = re.search(
@@ -78,10 +78,10 @@ jobs:
               "",
               "| Branch | Ahead Of Master | Behind Master |",
               "| --- | ---: | ---: |",
-              f"| origin/windows-development | {win_ahead} | {win_behind} |",
+              f"| origin/windows_development | {win_ahead} | {win_behind} |",
               f"| origin/ubuntu_development | {ubu_ahead} | {ubu_behind} |",
               "",
-              f"- Commits only in origin/windows-development: {win_only.group(1)}",
+              f"- Commits only in origin/windows_development: {win_only.group(1)}",
               f"- Commits only in origin/ubuntu_development: {ubu_only.group(1)}",
           ]
 
@@ -132,7 +132,7 @@ jobs:
 
           if win_behind >= warn_win_behind:
             notes.append(
-              f"windows-development behind master is {win_behind} (warn >= {warn_win_behind})"
+              f"windows_development behind master is {win_behind} (warn >= {warn_win_behind})"
             )
             state = "warn"
           if ubu_behind >= warn_ubu_behind:
@@ -149,7 +149,7 @@ jobs:
           critical = False
           if win_behind >= fail_win_behind:
             notes.append(
-              f"windows-development behind master is {win_behind} (fail >= {fail_win_behind})"
+              f"windows_development behind master is {win_behind} (fail >= {fail_win_behind})"
             )
             critical = True
           if ubu_behind >= fail_ubu_behind:
@@ -205,10 +205,10 @@ jobs:
               "",
               "| Branch | Ahead Of Master | Behind Master |",
               "| --- | ---: | ---: |",
-              `| origin/windows-development | ${{ steps.metrics.outputs.win_ahead }} | ${{ steps.metrics.outputs.win_behind }} |`,
+              `| origin/windows_development | ${{ steps.metrics.outputs.win_ahead }} | ${{ steps.metrics.outputs.win_behind }} |`,
               `| origin/ubuntu_development | ${{ steps.metrics.outputs.ubu_ahead }} | ${{ steps.metrics.outputs.ubu_behind }} |`,
               "",
-              `- Commits only in origin/windows-development: ${{ steps.metrics.outputs.win_only }}`,
+              `- Commits only in origin/windows_development: ${{ steps.metrics.outputs.win_only }}`,
               `- Commits only in origin/ubuntu_development: ${{ steps.metrics.outputs.ubu_only }}`,
               `- Policy state: ${{ steps.policy.outputs.state }}`,
               `- Policy notes: ${{ steps.policy.outputs.notes }}`,
