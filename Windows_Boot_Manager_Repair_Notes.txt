@@ -1,0 +1,98 @@
+Windows Boot Manager Repair Notes
+=================================
+
+Purpose
+-------
+Printable recovery sheet for the Ubuntu boot failure. Keep the current Ubuntu 24 system untouched unless the Windows-side evidence clearly shows a loader repair is needed.
+
+Observed error
+--------------
+Windows Boot Manager reports:
+
+  File: \EFI\shimx64.efi
+  Status: 0xc000007b
+  Info: The application or operating system couldn't be loaded because a required file is missing or contains errors.
+
+Interpretation
+--------------
+Windows is finding an EFI loader path and then rejecting the file as invalid, missing, or incompatible. A normal Ubuntu Secure Boot chain usually points to \EFI\ubuntu\shimx64.efi.
+
+Safety rule
+-----------
+Do not repartition, reinstall Ubuntu, or overwrite data partitions. Do not compromise the existing Ubuntu 24 system. The steps below are read-only until a repair path is clearly justified.
+
+Step 1: Collect Windows evidence
+--------------------------------
+Open an elevated Command Prompt and record:
+
+  bcdedit /enum firmware
+  bcdedit /enum all
+
+Then identify the EFI System Partition:
+
+  diskpart
+  list vol
+  exit
+
+Confirm the EFI partition letter, then inspect the files that actually exist:
+
+  dir E:\EFI
+  dir E:\EFI\ubuntu
+  dir E:\EFI\Microsoft\Boot
+
+Replace E: with the real EFI partition letter.
+
+Step 2: Check for the mismatch
+------------------------------
+Look for any of the following:
+
+  - An Ubuntu entry that points to \EFI\shimx64.efi instead of \EFI\ubuntu\shimx64.efi.
+  - A missing shimx64.efi file.
+  - A grubx64.efi file without a matching shimx64.efi file.
+  - A firmware or BCD entry that still references an old Ubuntu path.
+
+Step 3: Decide what the Windows evidence means
+----------------------------------------------
+If the EFI folder shows the expected Ubuntu files and Windows still throws 0xc000007b, the likely problem is a broken or mismatched bootloader chain, not the Ubuntu install itself.
+
+Safe recovery path
+------------------
+Use this only if Windows-side inspection confirms the file exists but is invalid, or if the EFI path is wrong:
+
+  1. Boot an Ubuntu live USB.
+  2. Mount the installed Ubuntu system.
+  3. Chroot into the installed system.
+  4. Reinstall the signed boot packages:
+
+     sudo apt update
+     sudo apt install --reinstall shim-signed grub-efi-amd64-signed
+
+  5. Rebuild the bootloader configuration:
+
+     sudo grub-install
+     sudo update-grub
+
+  6. Reboot and test the Ubuntu entry again.
+
+What to keep in the printout
+----------------------------
+  - Exact Windows Boot Manager error text.
+  - Whether the boot option came from firmware or Windows Boot Manager.
+  - EFI partition letter.
+  - Output of bcdedit /enum firmware.
+  - Output of bcdedit /enum all.
+  - Output of dir E:\EFI\ubuntu.
+  - Whether shimx64.efi exists.
+  - Whether grubx64.efi exists.
+  - Whether Secure Boot is enabled.
+
+Short notes
+-----------
+  - The common Ubuntu EFI loader is shimx64.efi, not shim64.efi.
+  - The boot entry should normally live under \EFI\ubuntu\, not directly at the EFI root.
+  - Windows may keep stale firmware entries even after Ubuntu is repaired.
+  - A read-only Windows check is the right first pass when the goal is to avoid disturbing the Ubuntu install.
+
+Bottom line
+-----------
+Do not try to fix this by changing Ubuntu itself from Windows. First verify the EFI files and the boot entry from Windows. If the loader is still rejected with 0xc000007b, the next safe repair is a live USB bootloader reinstall, which preserves the current Ubuntu 24 installation.
