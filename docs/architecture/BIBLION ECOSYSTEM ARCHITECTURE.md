@@ -1,4 +1,5 @@
 # BIBLION ECOSYSTEM ARCHITECTURE
+
 ## Applications, APIs, Extensions, OSS/Commercial Boundaries, and Portal
 
 **Status:** Conceptual Architecture  
@@ -6,7 +7,7 @@
 
 ---
 
-# 1. Vision
+## 1. Vision
 
 Biblion should evolve from an OCR application into an **extensible digital-humanities ecosystem**.
 
@@ -47,7 +48,7 @@ The guiding principle is:
 
 ---
 
-# 2. The Extensibility Model
+## 2. The Extensibility Model
 
 Biblion should have three levels of extensibility.
 
@@ -116,16 +117,16 @@ This makes the Portal itself an extensible platform rather than merely a launche
 
 ---
 
-# 3. Application Portfolio
+## 3. Application Portfolio
 
 The Biblion applications have different responsibilities and different OSS/commercial opportunities.
 
 | Application | Primary Role | OSS | Commercial | Extension Potential |
-|---|---|:---:|:---:|:---:|
+| --- | --- | :---: | :---: | :---: |
 | **MyScanner** | Image acquisition | Yes | **Yes** | Scanner/device APIs |
 | **MyPixler** | Image processing | Yes | Possible | GIMP, scripts |
 | **MyGlypher** | Glyph/font work | Yes | Possible | FontForge, scripts |
-| **MyOCR** | OCR processing | Yes | Yes | OCR engines/processors |
+| **OCR Processing Layer** | OCR processing capability across the suite, not a current standalone repo module | Yes | Yes | OCR engines/processors |
 | **MyTrainer** | OCR training | Yes | **Yes** | Training engines/data |
 | **MyGrounder** | OCR ground-truth creation | Yes | **Yes** | Training workflows |
 | **MyReader** | Reading/study | **Yes** | Possible | Module importers |
@@ -141,7 +142,7 @@ The exact licensing and commercial boundaries remain subject to future business 
 
 ---
 
-# 4. MyScanner — Commercial Entry Point
+## 4. MyScanner — Commercial Entry Point
 
 MyScanner is currently the planned **first commercial Biblion release**.
 
@@ -171,7 +172,7 @@ Third-party developers can build scanner extensions against the supported API.
 
 ---
 
-# 5. MyPixler
+## 5. MyPixler
 
 MyPixler provides Biblion-specific image preparation and processing.
 
@@ -199,7 +200,7 @@ MyPixler can also expose Python processing APIs for automation.
 
 ---
 
-# 6. MyGlypher
+## 6. MyGlypher
 
 MyGlypher handles glyph extraction, preparation, and font-oriented workflows.
 
@@ -227,7 +228,7 @@ FontForge therefore becomes a specialized external capability participating in a
 
 ---
 
-# 7. OCR Training Ecosystem
+## 7. OCR Training Ecosystem
 
 OCR training is a particularly important example of the Biblion OSS/commercial model.
 
@@ -325,7 +326,7 @@ This pattern can become a model for other Biblion commercial products.
 
 ---
 
-# 8. MyLexer
+## 8. MyLexer
 
 MyLexer analyzes lexical and linguistic structure.
 
@@ -353,7 +354,7 @@ Commercial components could provide:
 
 ---
 
-# 9. MyVersifier
+## 9. MyVersifier
 
 MyVersifier is currently envisioned as **OSS-only**.
 
@@ -371,7 +372,7 @@ Keeping MyVersifier open reinforces Biblion's role as a research platform.
 
 ---
 
-# 10. MyResolver
+## 10. MyResolver
 
 MyResolver is also envisioned as **OSS-only**.
 
@@ -390,7 +391,7 @@ MyResolver can provide an open research foundation upon which other Biblion appl
 
 ---
 
-# 11. MyReader
+## 11. MyReader
 
 MyReader is envisioned as an **OSS Bible/text reader with OCR-aware capabilities**.
 
@@ -415,7 +416,7 @@ External modules are converted into the Biblion content model.
 
 ---
 
-# 12. MyWriter
+## 12. MyWriter
 
 MyWriter is the complementary authoring and publishing application.
 
@@ -454,7 +455,7 @@ External Module
 
 ---
 
-# 13. Canonical Biblion Content Model
+## 13. Canonical Biblion Content Model
 
 External formats should never become the internal architecture of Biblion.
 
@@ -478,7 +479,7 @@ This allows additional formats to be added without contaminating the core archit
 
 ---
 
-# 14. MyServer
+## 14. MyServer
 
 MyServer remains the **project and workflow workhorse** of the Biblion Portal.
 
@@ -502,7 +503,7 @@ MyServer should be the authoritative owner of project creation and project lifec
 
 ---
 
-# 15. MyLauncher
+## 15. MyLauncher
 
 MyLauncher is the primary **presentation and public interface** to the Biblion ecosystem.
 
@@ -527,7 +528,7 @@ Together they form the primary Biblion Portal interface.
 
 ---
 
-# 16. Presentation Layer
+## 16. Presentation Layer
 
 The emerging architecture suggests that the presentation layer deserves independent architectural treatment.
 
@@ -564,7 +565,7 @@ The important principle is that **the Portal should eventually present the capab
 
 ---
 
-# 17. Future Institutional Infrastructure
+## 17. Future Institutional Infrastructure
 
 A longer-term opportunity is to allow Biblion to interface with resources already owned by libraries, universities, archives, and other institutions.
 
@@ -605,7 +606,7 @@ No implementation or business commitment is implied.
 
 ---
 
-# 18. The Full Digital-Humanities Workflow
+## 18. The Full Digital-Humanities Workflow
 
 The ecosystem can ultimately support a complete workflow:
 
@@ -623,7 +624,7 @@ The ecosystem can ultimately support a complete workflow:
                           MyPixler
                               │
                               ▼
-                           MyOCR
+                      OCR Processing
                               │
                      ┌────────┴────────┐
                      ▼                 ▼
@@ -654,7 +655,7 @@ External applications can participate at appropriate points through extensions.
 
 ---
 
-# 19. OSS/Commercial Composition
+## 19. OSS/Commercial Composition
 
 Biblion should not assume that every application needs the same business model.
 
@@ -718,7 +719,7 @@ while preserving useful OSS components.
 
 ---
 
-# 20. Intellectual Property and Interoperability
+## 20. Intellectual Property and Interoperability
 
 Compatibility with external formats must be distinguished from redistribution of external content.
 
@@ -734,7 +735,7 @@ Biblion extensions should provide interoperability without assuming ownership of
 
 ---
 
-# 21. Commercial Strategy
+## 21. Commercial Strategy
 
 The initial commercial target remains:
 
@@ -759,7 +760,7 @@ The commercial strategy should emerge from the value of **workflow integration**
 
 ---
 
-# 22. Architectural Philosophy
+## 22. Architectural Philosophy
 
 The central philosophy is:
 
@@ -791,7 +792,7 @@ External applications, developers, institutions, and researchers become particip
 
 ---
 
-# 23. Long-Term Vision
+## 23. Long-Term Vision
 
 The result is no longer adequately described as an OCR application.
 
@@ -854,7 +855,7 @@ The architecture remains conceptual until individual API contracts, canonical da
 
 ---
 
-# 24. Immediate Architectural Implication
+## 24. Immediate Architectural Implication
 
 The current development strategy should therefore continue to separate:
 

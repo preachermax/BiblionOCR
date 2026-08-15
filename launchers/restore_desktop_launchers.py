@@ -28,7 +28,6 @@ CANONICAL_MODULES: List[Tuple[str, str, str]] = [
     ("MyReader", "Biblion Reader", "BiblionReader2.png"),
     ("MyResolver", "Biblion Resolver", "BiblionResolver2.png"),
     ("MyScanner", "Biblion Scanner", "BiblionScanner1.png"),
-    ("MySliders", "Biblion Sliders", "BiblionOCR.png"),
     ("MyTrainer", "Biblion Trainer", "BiblionTrainer1.png"),
     ("MyVersifier", "Biblion Versifier", "BiblionVersifier2.png"),
     ("MyWriter", "Biblion Writer", "BiblionWriter1.png"),

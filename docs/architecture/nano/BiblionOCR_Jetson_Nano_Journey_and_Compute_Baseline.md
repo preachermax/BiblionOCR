@@ -167,14 +167,14 @@ with:
 192.168.2.5/24
 ```
 
-The Ubuntu 24 host can ping it:
+The Ubuntu 24 host can reach the Nano over the USB gadget interface as:
 
 ```text
 PING nano.local (192.168.55.1)
 0% packet loss
 ```
 
-and can SSH directly to:
+For the normal Ethernet operating model, SSH should target the LAN address directly:
 
 ```bash
 ssh max-richey@192.168.2.5
@@ -223,7 +223,7 @@ USB/serial capability should still be retained for maintenance and recovery.
 
 ---
 
-# 7. Current Nano Hardware Baseline
+## 7. Current Nano Hardware Baseline
 
 All commands in this section were run **on the Nano**, not the Ubuntu 24 host.
 
@@ -304,7 +304,7 @@ This is a very healthy amount of free space for development.
 
 ---
 
-# 8. Power Mode
+## 8. Power Mode
 
 The following was run on the Nano:
 
@@ -334,7 +334,7 @@ No power-mode changes have been made.
 
 ---
 
-# 9. tegrastats Baseline
+## 9. tegrastats Baseline
 
 The Nano's older `tegrastats` implementation does not support:
 
@@ -441,7 +441,7 @@ This is a good baseline for future Compute Engine profiling.
 
 ---
 
-# 10. Compute Engine Significance
+## 10. Compute Engine Significance
 
 The BiblionOCR Compute Engine is intended to:
 
@@ -474,19 +474,19 @@ The Compute Engine should eventually discover these properties programmatically 
 
 ---
 
-# 11. Architectural Principle
+## 11. Architectural Principle
 
 The Compute Engine should distinguish:
 
-**Known capability**
+### Known capability
 
 from
 
-**currently available resource**
+### Currently available resource
 
 and from
 
-**unknown capability**.
+### Unknown capability
 
 For example:
 
@@ -529,7 +529,7 @@ rather than simply reporting "Jetson Nano."
 
 ---
 
-# 12. What We Are NOT Doing Yet
+## 12. What We Are NOT Doing Yet
 
 Do not:
 
@@ -547,7 +547,7 @@ The current phase is **discovery and documentation**.
 
 ---
 
-# 13. Immediate Next Step
+## 13. Immediate Next Step
 
 The next three commands should be run on the Nano:
 
@@ -570,21 +570,21 @@ After that, we can inspect the CUDA/runtime stack before making any changes.
 
 ---
 
-# 14. Lessons From the Nano Journey
+## 14. Lessons From the Nano Journey
 
-### Lesson 1 — Preserve the known-good image.
+### Lesson 1 — Preserve the known-good image
 
 The original Nano SD card and its image backup are more valuable than repeated attempts to repair questionable cards.
 
-### Lesson 2 — Verify before modifying.
+### Lesson 2 — Verify before modifying
 
 The failed card experiments demonstrated why block-level verification matters.
 
-### Lesson 3 — Use the platform's intended tooling when practical.
+### Lesson 3 — Use the platform's intended tooling when practical
 
 The successful headless setup followed NVIDIA's established Jetson procedure rather than continuing to fight an image-writing path that was producing unexplained byte differences.
 
-### Lesson 4 — Separate host from target.
+### Lesson 4 — Separate host from target
 
 Ubuntu 24 is the **development/control host**.
 
@@ -599,13 +599,13 @@ tegrastats
 
 belong on the Nano.
 
-### Lesson 5 — USB networking is useful but special.
+### Lesson 5 — USB networking is useful but special
 
 The USB connection provides valuable recovery/serial/network functionality, but it also creates a NetworkManager-managed Ethernet device on Ubuntu 24.
 
 Ethernet is the normal operational network path.
 
-### Lesson 6 — Patience is a technical strategy.
+### Lesson 6 — Patience is a technical strategy
 
 When hardware behavior becomes ambiguous, stop changing things.
 
@@ -613,7 +613,7 @@ Preserve the known-good state, document it, and continue from a controlled basel
 
 ---
 
-# 15. Current State
+## 15. Current State
 
 **Nano:** WORKING  
 **Headless setup:** COMPLETE  
