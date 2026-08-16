@@ -9,6 +9,8 @@ Purpose: Reduce prompt-writing overhead while preserving safety, module boundari
 - MyLexer is intentionally deferred as a required placeholder and must remain untouched until user audit reaches it.
 - Preserve existing custom context-menu defaults.
 - Keep UI lock-step: edit Designer source first, then regenerate paired UI.py.
+- Treat inferred workflow sequence (menu + toolbar order) as provisional baseline only.
+- Re-establish and edit exact step order per module during each prompt-pack pass.
 - Remove redundant MyExplorer controls rather than hiding them, and do not change wording unless requested.
 - Do not claim clean unless full workspace Problems scan is clean.
 - Report both counts every cycle:
@@ -30,17 +32,21 @@ Rules:
    - edit Developer/QtDesignerUI/[MODULE_UI].ui as source of truth,
    - regenerate paired ViewController/.../[MODULE_UI].py with pyuic5,
    - avoid manual drift in generated UI.py.
-5. Remove redundant MyExplorer controls if found; do not just hide/disable them.
-6. Before completion, run full workspace Problems scan and report:
+5. Treat inferred workflow sequence (menu + toolbar order) as a default starting point only.
+6. Re-establish exact step ordering from real module behavior and edit as needed.
+7. Remove redundant MyExplorer controls if found; do not just hide/disable them.
+8. Before completion, run full workspace Problems scan and report:
    - full workspace count,
    - in-scope count.
-7. If either count is non-zero, continue fixing until both are zero or report blocker with exact file and reason.
-8. Never revert unrelated existing changes.
+9. If either count is non-zero, continue fixing until both are zero or report blocker with exact file and reason.
+10. Never revert unrelated existing changes.
+11. Follow the DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md for each change set and pause before committing.
 
 Output format required:
 
 - Files changed.
 - Behavior changed.
+- Workflow sequence delta from inferred baseline (what was re-ordered and why).
 - Validation commands run.
 - Problems totals (full + in-scope).
 - Residual risks (if any).
@@ -74,6 +80,8 @@ Expected completion response shape:
 ## Module Prompt Queue (Copy/Paste)
 
 ### 1) MyServer
+
+Status: Part 1 completed and accepted on 2026-08-16. Part 2 is reserved for follow-up debugging.
 
 Apply the strict header above.
 

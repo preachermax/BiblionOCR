@@ -17,6 +17,9 @@ SCRIPT_DIR_TARGET="${BIBLION_TRAINING_SCRIPT_DIR:-${TRAINING_ROOT}/scripts}"
 TESSTRAIN_DIR="${BIBLION_TRAINING_TESSSTRAIN_DIR:-${TRAINING_ROOT}/tesstrain}"
 TESSERACT_BIN="${TESSERACT_BIN:-$(command -v tesseract || true)}"
 TESSDATA_DIR="${TESSDATA_PREFIX:-${BIBLION_TESSDATA_DIR:-/usr/share/tesseract-ocr/5/tessdata}}"
+PROJECT_FONT="${BIBLION_PROJECT_FONT:-FROMVS.ttf}"
+LANGUAGE_MODEL="${BIBLION_TRAINING_LANGUAGE_MODEL:-}"
+TRAINING_FONTS_DIR="${BIBLION_TRAINING_FONTS_DIR:-}"
 
 mkdir -p \
   "${TRAINING_ROOT}" \
@@ -33,6 +36,9 @@ printf 'Training workspace: %s\n' "${TRAINING_ROOT}"
 printf 'Language code: %s\n' "${LANGUAGE_CODE}"
 printf 'Tesseract binary: %s\n' "${TESSERACT_BIN:-not found}"
 printf 'Tessdata directory: %s\n' "${TESSDATA_DIR}"
+printf 'Tesseract project font: %s\n' "${PROJECT_FONT}"
+printf 'Selected language model: %s\n' "${LANGUAGE_MODEL:-workspace/default}"
+printf 'Training fonts directory: %s\n' "${TRAINING_FONTS_DIR:-workspace/default}"
 printf 'Ground truth directory: %s\n' "${GROUND_TRUTH_DIR}"
 printf 'Wordlist directory: %s\n' "${WORDLIST_DIR}"
 printf 'Config directory: %s\n' "${CONFIG_DIR}"
@@ -42,6 +48,16 @@ printf 'Model directory: %s\n' "${MODEL_DIR}"
 
 if [[ -z "${TESSERACT_BIN}" ]]; then
   printf 'Tesseract was not found on PATH. Install tesseract-ocr 5.0+ before training.\n' >&2
+  exit 2
+fi
+
+if [[ -n "${LANGUAGE_MODEL}" && ! -f "${LANGUAGE_MODEL}" ]]; then
+  printf 'Selected language model does not exist: %s\n' "${LANGUAGE_MODEL}" >&2
+  exit 2
+fi
+
+if [[ -n "${TRAINING_FONTS_DIR}" && ! -d "${TRAINING_FONTS_DIR}" ]]; then
+  printf 'Selected training fonts directory does not exist: %s\n' "${TRAINING_FONTS_DIR}" >&2
   exit 2
 fi
 

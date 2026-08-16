@@ -540,12 +540,12 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     continue
                 setattr(self, attribute_name, default_input)
 
-        project_font = self.session_manager.get_active_project_font()
-        if project_font:
+        ui_font = self.session_manager.get_active_ui_font()
+        if ui_font:
             if not str(getattr(self, 'versefont', '') or '').strip():
-                self.versefont = project_font
+                self.versefont = ui_font
             if not str(getattr(self, 'reffont', '') or '').strip():
-                self.reffont = project_font
+                self.reffont = ui_font
 
     def getstarted(self):
         self._startup_progress('starting initial text load')

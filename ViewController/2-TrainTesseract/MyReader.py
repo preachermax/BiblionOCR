@@ -280,7 +280,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionRename_Latin_Text_Lines_tb.triggered.connect(self.OpenWithMyScanner)
 
         self.ui.actionReview_Ground_Truth_tb.triggered.connect(self.OpenWithMyGrounder)
-        self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.OpenWithMyTrainer)
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
@@ -579,7 +578,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.latinlinesbox = get_setting('latinlinesbox')
 
         if not str(self.font or '').strip():
-            self.font = self.session_manager.get_active_project_font() or self.font
+            self.font = self.session_manager.get_active_ui_font() or self.font
 
         self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
         self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
@@ -1513,13 +1512,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         writer.ui = writer.Ui_MyWriterUI()
         writer.ui.setupUi(writer.MainWindow)
         writer.MainWindow.show()'''
-
-    def actionUpdate_Wordlist(self):
-        target_text = self.ui.OCRText.toPlainText()
-        output_path = os.path.join(self.session_manager.get_active_project('Session.json').get('project_root', ''), 'tesseract_wordlist.txt') if self.session_manager else None
-        if output_path and not output_path.startswith('/'):
-            output_path = os.path.join(os.getcwd(), output_path)
-        update_tesseract_wordlist_from_text(target_text, project_root=os.getcwd(), output_path=output_path)
 
     def wordCount(self):
         show_word_count_dialog(self, self.ui.OCRText)

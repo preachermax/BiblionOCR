@@ -6,6 +6,8 @@ import tempfile
 import unittest
 
 from Core.project_database import (
+    DEFAULT_PROJECT_FONT,
+    DEFAULT_UI_FONT,
     PROJECT_DATABASE_TABLE,
     build_project_field_definitions,
     create_project_database,
@@ -33,9 +35,9 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
         self.assertEqual("Scriptural", normalized["ProjectType"])
         self.assertEqual(7, normalized["ProjectPageNumber"])
         self.assertEqual(100, normalized["ProjectPageProgress"])
-        self.assertEqual(4, normalized["NumberColumns"])
-        self.assertEqual("left,Greek,Hebrew,Latin", normalized["ColumnName"])
-        self.assertEqual("grc,grc,grc,grc", normalized["ColumnLanguage"])
+        self.assertEqual(3, normalized["NumberColumns"])
+        self.assertEqual("left,Greek,Hebrew", normalized["ColumnName"])
+        self.assertEqual("grc,grc,grc", normalized["ColumnLanguage"])
         self.assertEqual("EB Garamond", normalized["ProjectFont"])
         self.assertEqual(7, normalized["CurrentPage"])
         self.assertEqual(7, normalized["CurrentProjectPage"])
@@ -77,6 +79,24 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
         )
 
         self.assertEqual("Linux Libertine", normalized["ProjectFont"])
+        self.assertEqual("Linux Libertine", normalized["UIFont"])
+
+    def test_ui_and_project_fonts_default_to_bundled_fromvs(self) -> None:
+        normalized = normalize_project_database_values({}, available_languages=("eng",))
+
+        self.assertEqual("FROMVS.ttf", DEFAULT_UI_FONT)
+        self.assertEqual("FROMVS.ttf", DEFAULT_PROJECT_FONT)
+        self.assertEqual(DEFAULT_UI_FONT, normalized["UIFont"])
+        self.assertEqual(DEFAULT_PROJECT_FONT, normalized["ProjectFont"])
+
+    def test_ui_and_tesseract_project_fonts_are_independent(self) -> None:
+        normalized = normalize_project_database_values(
+            {"UIFont": "FROMVS.ttf", "ProjectFont": "GrowingProjectFont.ttf"},
+            available_languages=("eng",),
+        )
+
+        self.assertEqual("FROMVS.ttf", normalized["UIFont"])
+        self.assertEqual("GrowingProjectFont.ttf", normalized["ProjectFont"])
 
     def test_project_type_is_forced_to_scriptural(self) -> None:
         normalized = normalize_project_database_values(
@@ -175,9 +195,23 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
             for definition in build_project_field_definitions(("eng", "grc"))
         }
 
+        self.assertEqual("Total Source Document Pages", definitions["NumberPages"].label)
+        self.assertTrue(definitions["NumberPages"].required)
+        self.assertEqual(1, definitions["NumberPages"].default)
+        self.assertIn("TotalProjectPages", definitions)
         self.assertIn("CurrentProjectPage", definitions)
         self.assertIn("CurrentProjectMilestone", definitions)
         self.assertIn("CurrentPageMilestone", definitions)
+
+    def test_total_project_pages_are_derived_from_source_pages_and_columns(self) -> None:
+        for source_pages, columns, expected_total in ((100, 2, 200), (100, 1, 100), (100, 3, 300)):
+            with self.subTest(source_pages=source_pages, columns=columns):
+                normalized = normalize_project_database_values(
+                    {"NumberPages": source_pages, "NumberColumns": columns},
+                    available_languages=("eng",),
+                )
+
+                self.assertEqual(expected_total, normalized["TotalProjectPages"])
 
 
 if __name__ == "__main__":

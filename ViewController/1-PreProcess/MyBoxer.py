@@ -305,8 +305,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.ui.actionConvert_Greek_tiff_To_png.triggered.connect(self.actionConvert_Greek_tiff_To_png)
         self.ui.actionConvert_Latin_tiff_To_png.triggered.connect(self.actionConvert_Latin_tiff_To_png)
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
-        self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
-
         self.ui.actionBatchCrop_Greek_to_tif_Lines_tb.triggered.connect(self.actionCrop_Greek_To_tiff_Lines)
         self.ui.actionRename_Greek_tif_Lines_tb.triggered.connect(self.actionRename_Greek_tiff_Lines)
         self.ui.actionStage_Greek_tif_Lines_tb.triggered.connect(self.actionStage_Greek_tiff_Lines)
@@ -707,7 +705,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         self.latinlinesbox = get_setting('latinlinesbox', '')
         self.latinlinesautosplit = get_setting('latinlinesautosplit', '')
         if not self.font:
-            self.font = self.session_manager.get_active_project_font() or self.font
+            self.font = self.session_manager.get_active_ui_font() or self.font
 
         self.ui.fontComboBox.setCurrentText(self.font)
         self.ui.fontSizeBox.setValue(int(self.fontsize) if str(self.fontsize).isdigit() else self.ui.fontSizeBox.value())
@@ -2739,10 +2737,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
     def actionCorrect_OCR(self):
         print("performing OCR on current image")
         self.GetOCRText()
-
-    def actionUpdate_Wordlist(self):
-        pass
-
 
 ###########    Page Box Shared Methods    #############
     # Page Toolbar Actions

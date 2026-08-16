@@ -96,6 +96,7 @@ def build_runtime_paths(
 
 
 class SessionManager:
+    DEFAULT_UI_FONT = 'FROMVS.ttf'
     DEFAULT_PROJECT_FONT = 'FROMVS.ttf'
 
     @staticmethod
@@ -325,6 +326,41 @@ class SessionManager:
             'module': normalized_module,
         }
 
+    def build_workflow_wizard_defaults(
+        self,
+        mode: str,
+        module_name: Optional[str] = None,
+        filename: str = 'Session.json',
+    ) -> Dict[str, Any]:
+        normalized_mode = str(mode or '').strip().lower()
+        normalized_module = str(module_name or '').strip()
+
+        if normalized_mode not in {'project', 'page'}:
+            normalized_mode = ''
+
+        if not normalized_module:
+            normalized_module = (
+                self.get_active_workflow_wizard_module(filename)
+                or self.get_active_workflow_module(filename)
+                or 'MyServer'
+            )
+
+        active_project = self.get_active_project(filename)
+
+        return {
+            'mode': normalized_mode,
+            'module': normalized_module,
+            'active_project_root': active_project.get('project_root', ''),
+            'active_project_name': active_project.get('project_name', ''),
+            'active_workflow_module': self.get_active_workflow_module(filename),
+            'active_workflow_wizard_mode': self.get_active_workflow_wizard_mode(filename),
+            'active_workflow_wizard_module': self.get_active_workflow_wizard_module(filename),
+            'current_project_milestone': active_project.get('current_project_milestone', ''),
+            'current_page_milestone': active_project.get('current_page_milestone', ''),
+            'ui_font': self.get_active_ui_font(filename),
+            'project_font': self.get_active_project_font(filename),
+        }
+
     def update(self, filename: str, updates: Dict[str, Any]) -> None:
         path = self.session_path(filename)
         self._ensure_session_file(path)
@@ -438,6 +474,7 @@ class SessionManager:
     def resolve_font_path(self, font_name: str, module_dir: Optional[str] = None) -> Optional[str]:
         search_dirs = []
         search_dirs.append(self._project_font_dir())
+        search_dirs.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts'))
         if module_dir:
             search_dirs.append(os.path.join(module_dir, 'fonts'))
         search_dirs.extend(self.default_font_install_dirs())
@@ -521,7 +558,7 @@ class SessionManager:
             return
 
     def build_workflow_font(self, font_name: str, point_size: int = 20, module_dir: Optional[str] = None) -> qtg.QFont:
-        preferred_font = self.get_active_project_font() or str(font_name or "").strip()
+        preferred_font = self.get_active_ui_font() or str(font_name or "").strip()
         if not preferred_font:
             preferred_font = "FROMVS [MAXR]"
 
@@ -530,10 +567,28 @@ class SessionManager:
         font.setPointSize(point_size)
         return font
 
+    def get_active_ui_font(self, filename: str = 'Session.json') -> str:
+        return self._get_active_font_value(
+            "UIFont",
+            self.DEFAULT_UI_FONT,
+            filename,
+            legacy_field="ProjectFont",
+        )
+
     def get_active_project_font(self, filename: str = 'Session.json') -> str:
+        return self._get_active_font_value("ProjectFont", self.DEFAULT_PROJECT_FONT, filename)
+
+    def _get_active_font_value(
+        self,
+        field_name: str,
+        default_font: str,
+        filename: str,
+        *,
+        legacy_field: Optional[str] = None,
+    ) -> str:
         active_root = self.get_active_project_root(filename)
         if not active_root:
-            return self.DEFAULT_PROJECT_FONT
+            return default_font
 
         sqlite_candidates = (
             os.path.join(active_root, "Model", "Project", "Data", "sqlite", "project_metadata.sqlite"),
@@ -546,10 +601,18 @@ class SessionManager:
                 continue
             try:
                 with sqlite3.connect(sqlite_path) as conn:
-                    cursor = conn.execute("SELECT ProjectFont FROM project_metadata LIMIT 1")
-                    row = cursor.fetchone()
-                    if row and row[0]:
-                        return str(row[0]).strip()
+                    for candidate_field in (field_name, legacy_field):
+                        if not candidate_field:
+                            continue
+                        try:
+                            cursor = conn.execute(
+                                f"SELECT [{candidate_field}] FROM project_metadata LIMIT 1"
+                            )
+                            row = cursor.fetchone()
+                            if row and row[0]:
+                                return str(row[0]).strip()
+                        except sqlite3.Error:
+                            continue
             except sqlite3.Error:
                 continue
 
@@ -564,13 +627,14 @@ class SessionManager:
                 with open(json_path, "r", encoding="utf-8") as handle:
                     payload = json.load(handle)
                 if isinstance(payload, dict):
-                    value = payload.get("ProjectFont")
-                    if value:
-                        return str(value).strip()
+                    for candidate_field in (field_name, legacy_field):
+                        value = payload.get(candidate_field) if candidate_field else None
+                        if value:
+                            return str(value).strip()
             except (OSError, ValueError, TypeError):
                 continue
 
-        return self.DEFAULT_PROJECT_FONT
+        return default_font
 
     def _module_handshakes_path(self, project_root: str) -> str:
         candidates = (

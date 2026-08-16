@@ -32,6 +32,13 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
+        <widget class="QCheckBox" name="show_system_files_checkbox">
+         <property name="text">
+          <string>Show system files</string>
+         </property>
+        </widget>
+             </item>
+             <item row="1" column="0">
         <widget class="QCheckBox" name="exclude_empty_checkbox">
          <property name="text">
           <string>Exclude empty folders</string>
@@ -41,7 +48,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+             <item row="2" column="0">
         <widget class="QTreeView" name="treeView"/>
        </item>
       </layout>

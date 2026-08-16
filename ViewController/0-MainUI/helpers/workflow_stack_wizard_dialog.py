@@ -14,6 +14,8 @@ class WorkflowStackWizardDialog(qtw.QDialog):
         stage_plan: t.List[dict],
         run_stage_callback,
         run_all_callback,
+        auto_run: bool = False,
+        auto_run_delay_ms: int = 0,
         parent=None,
     ):
         super().__init__(parent)
@@ -23,9 +25,32 @@ class WorkflowStackWizardDialog(qtw.QDialog):
         self.stage_plan = stage_plan
         self.run_stage_callback = run_stage_callback
         self.run_all_callback = run_all_callback
+        self._auto_run = bool(auto_run)
+        self._auto_run_delay_ms = max(0, int(auto_run_delay_ms))
 
         self._build_ui(intro_text)
         self._populate_stage_pages()
+        if self._auto_run:
+            qtc.QTimer.singleShot(self._auto_run_delay_ms, self._run_all)
+
+    def _build_default_summary_widget(self, defaults: dict) -> qtw.QWidget:
+        container = qtw.QGroupBox("Session Defaults", self)
+        layout = qtw.QFormLayout(container)
+        layout.setLabelAlignment(qtc.Qt.AlignLeft)
+        layout.setFormAlignment(qtc.Qt.AlignTop)
+
+        if not defaults:
+            layout.addRow(qtw.QLabel("No session defaults are available."))
+            return container
+
+        for key, value in defaults.items():
+            label = str(key).replace('_', ' ').title()
+            rendered_value = str(value or '').strip() or '—'
+            field = qtw.QLabel(rendered_value)
+            field.setWordWrap(True)
+            layout.addRow(label, field)
+
+        return container
 
     def _make_scroll_page(self, content_widget: qtw.QWidget) -> qtw.QScrollArea:
         scroll = qtw.QScrollArea(self)
@@ -76,6 +101,7 @@ class WorkflowStackWizardDialog(qtw.QDialog):
             stage_title = stage.get("title", "Stage")
             description = stage.get("description", "")
             steps = stage.get("steps", [])
+            defaults = stage.get("defaults", {})
 
             self.stage_nav.addItem(stage_title)
 
@@ -94,6 +120,8 @@ class WorkflowStackWizardDialog(qtw.QDialog):
             desc_label = qtw.QLabel(description)
             desc_label.setWordWrap(True)
             layout.addWidget(desc_label)
+
+            layout.addWidget(self._build_default_summary_widget(defaults))
 
             step_list = qtw.QListWidget(page)
             for step in steps:

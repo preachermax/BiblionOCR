@@ -601,21 +601,21 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             print('New Setting: ',Setting['Setting'],Setting['CurrentValue'])
 
         print(f'Absolute Path to Project Directory: {self.projecthome}')
-        project_font = self.session_manager.get_active_project_font() or 'FROMVS'
+        ui_font = self.session_manager.get_active_ui_font() or 'FROMVS'
         if not hasattr(self, 'font') or not self.font:
-            self.font = project_font
+            self.font = ui_font
             try:
                 self.ui.fontComboBox.setCurrentText(self.font)
             except Exception:
                 pass
             self.on_font_update()
         try:
-            self.ui.PagefontComboBox.setCurrentText(project_font)
+            self.ui.PagefontComboBox.setCurrentText(ui_font)
             self.on_page_font_update()
         except Exception:
             pass
         try:
-            self.ui.VersefontComboBox.setCurrentText(project_font)
+            self.ui.VersefontComboBox.setCurrentText(ui_font)
             self.on_verse_font_update()
         except Exception:
             pass
@@ -635,7 +635,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 setattr(self, attribute_name, default_input)
 
         if not str(getattr(self, 'font', '') or '').strip():
-            self.font = self.session_manager.get_active_project_font() or self.font
+            self.font = self.session_manager.get_active_ui_font() or self.font
             try:
                 self.ui.fontComboBox.setCurrentText(self.font)
                 self.on_font_update()

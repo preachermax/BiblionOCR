@@ -30,6 +30,7 @@ from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
 from SessionManager import SessionManager
+from tesseract_wordlist_helper import update_tesseract_wordlist_from_text
 from SqliteHelper import *
 from ext import *
 from ext import reffind, versefind, versifiercount
@@ -163,6 +164,17 @@ class Ui_MainWindow(qtw.QMainWindow):
         self.ui.stepTrainingRefreshButton.clicked.connect(self.refresh_training_progress)
         self.ui.stepTrainingStartButton.clicked.connect(self.start_training)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.start_training)
+        self.ui.actionUpdate_Greek_Wordlist.triggered.connect(
+            lambda: self.update_training_wordlist("Greek", "feg")
+        )
+        self.ui.actionUpdate_Hebrew_Wordlist.triggered.connect(
+            lambda: self.update_training_wordlist("Hebrew", "heb")
+        )
+        self.ui.actionUpdate_Latin_Wordlist.triggered.connect(
+            lambda: self.update_training_wordlist("Latin", "lat")
+        )
+        self.ui.actionSelect_Language_Model.triggered.connect(self.select_language_model)
+        self.ui.actionSelect_Fonts.triggered.connect(self.select_training_fonts)
         self.refresh_training_progress()
         self.show()
 
@@ -219,6 +231,13 @@ class Ui_MainWindow(qtw.QMainWindow):
 
     def _training_environment(self) -> dict[str, str]:
         environment = build_training_command_environment(self.projecthome, language_code=self.workspace.language_code)
+        environment["BIBLION_PROJECT_FONT"] = self.session_manager.get_active_project_font()
+        selected_language_model = str(getattr(self, "selected_language_model", "") or "").strip()
+        selected_training_fonts = str(getattr(self, "selected_training_fonts", "") or "").strip()
+        if selected_language_model:
+            environment["BIBLION_TRAINING_LANGUAGE_MODEL"] = selected_language_model
+        if selected_training_fonts:
+            environment["BIBLION_TRAINING_FONTS_DIR"] = selected_training_fonts
         if self.installation:
             environment["TESSERACT_BIN"] = self.installation.binary_path
             if self.installation.tessdata_dir:
@@ -234,6 +253,7 @@ class Ui_MainWindow(qtw.QMainWindow):
         lines = [self._training_installation_summary()]
         if self.inbound_default_source:
             lines.append(f"Inbound source default: {self.inbound_default_source}")
+        lines.append(f"Tesseract project font: {self.session_manager.get_active_project_font()}")
         lines.append(f"Ground truth: {self.workspace.ground_truth_root}")
         lines.append(f"Wordlists: {self.workspace.wordlist_root}")
         lines.append(f"Configs: {self.workspace.config_root}")
@@ -297,6 +317,59 @@ class Ui_MainWindow(qtw.QMainWindow):
         }
         payload.update(updates)
         self.session_manager.update("Session.json", payload)
+
+    def update_training_wordlist(self, language_name: str, language_code: str) -> None:
+        source_path = qtw.QFileDialog.getOpenFileName(
+            self,
+            f"Select {language_name} wordlist source text",
+            self.inbound_default_source or str(self.project_root),
+            "Text Files (*.txt *.csv);;All Files (*.*)",
+        )[0]
+        if not source_path:
+            return
+
+        try:
+            source_text = Path(source_path).read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as error:
+            self.ui.OutputText.append(f"Could not read {source_path}: {error}")
+            return
+
+        output_dir = self.workspace.wordlist_root.parent / language_code
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / f"{language_code}.wordlist"
+        update_tesseract_wordlist_from_text(
+            source_text,
+            project_root=str(self.project_root),
+            output_path=str(output_path),
+        )
+        self.ui.OutputText.append(f"Updated {language_name} wordlist: {output_path}")
+
+    def select_language_model(self) -> None:
+        selected_path = qtw.QFileDialog.getOpenFileName(
+            self,
+            "Select Tesseract language model",
+            str(self.workspace.model_root),
+            "Tesseract Models (*.traineddata);;All Files (*.*)",
+        )[0]
+        if not selected_path:
+            return
+        self.selected_language_model = selected_path
+        self.save_session_settings(**{"self.selected_language_model": selected_path})
+        self.ui.OutputText.append(f"Training language model: {selected_path}")
+        self.refresh_training_progress()
+
+    def select_training_fonts(self) -> None:
+        selected_path = qtw.QFileDialog.getExistingDirectory(
+            self,
+            "Select training fonts directory",
+            str(self.project_root),
+        )
+        if not selected_path:
+            return
+        self.selected_training_fonts = selected_path
+        self.save_session_settings(**{"self.selected_training_fonts": selected_path})
+        self.ui.OutputText.append(f"Training fonts directory: {selected_path}")
+        self.refresh_training_progress()
 
     def refresh_training_progress(self):
         self.workspace.ensure_directories()

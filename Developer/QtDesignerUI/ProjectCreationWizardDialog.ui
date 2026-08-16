@@ -527,7 +527,7 @@ ColumnName and ColumnLanguage defaults can be manually overridden.</string>
              <item row="3" column="0">
               <widget class="QLabel" name="databaseNumberColumnsLabel">
                <property name="text">
-                <string>NumberColumns (required)</string>
+                                <string>Number of Columns Per Page</string>
                </property>
               </widget>
              </item>
@@ -569,6 +569,22 @@ ColumnName and ColumnLanguage defaults can be manually overridden.</string>
               <widget class="QLineEdit" name="database_column_language_edit">
                <property name="text">
                 <string>eng</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="databaseProjectFontLabel">
+               <property name="text">
+                <string>Project Font</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QFontComboBox" name="database_project_font_combo">
+               <property name="currentFont">
+                <font>
+                 <family>FROMVS</family>
+                </font>
                </property>
               </widget>
              </item>

@@ -13,6 +13,7 @@ PROJECT_DATABASE_EXPORT_FILENAME = "project_metadata.json"
 PROJECT_DATABASE_EXPORT_CSV_FILENAME = "project_metadata.csv"
 PROJECT_DATABASE_TABLE = "project_metadata"
 DEFAULT_SCRIPTURE_COLUMN_LANGUAGES = ["english", "greek", "hebrew", "latin"]
+DEFAULT_UI_FONT = "FROMVS.ttf"
 DEFAULT_PROJECT_FONT = "FROMVS.ttf"
 
 
@@ -85,7 +86,20 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             options=("Scriptural",),
         ),
         ProjectFieldDefinition("ProvenancePath", "Provenance Path", "path", default=""),
-        ProjectFieldDefinition("NumberPages", "Number of Pages", "int", default=0),
+        ProjectFieldDefinition(
+            "NumberPages",
+            "Total Source Document Pages",
+            "int",
+            default=1,
+            required=True,
+        ),
+        ProjectFieldDefinition(
+            "TotalProjectPages",
+            "Total Project Pages",
+            "int",
+            default=1,
+            help_text="Derived from total source document pages multiplied by columns per page.",
+        ),
         ProjectFieldDefinition("ProjectPageNumber", "Project Page Number", "int", default=1),
         ProjectFieldDefinition(
             "ProjectPageProgress",
@@ -125,11 +139,11 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
         ),
         ProjectFieldDefinition(
             "NumberColumns",
-            "Number of Columns",
+            "Number of Columns Per Page",
             "int",
-            default=4,
+            default=1,
             required=True,
-            help_text="Maximum of 4 columns per source page.",
+            help_text="Maximum of 3 columns per source page.",
         ),
         ProjectFieldDefinition(
             "ColumnName",
@@ -156,18 +170,25 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             help_text="Active OCR language from installed Tesseract languages.",
         ),
         ProjectFieldDefinition(
+            "UIFont",
+            "UI Font",
+            "text",
+            default=DEFAULT_UI_FONT,
+            help_text="Stable font used by BiblionOCR user interfaces.",
+        ),
+        ProjectFieldDefinition(
             "ProjectFont",
-            "Project Font",
+            "Tesseract Project Font",
             "text",
             default=DEFAULT_PROJECT_FONT,
-            help_text="Primary project font family used during transcription and rendering.",
+            help_text="Trainable project font generated, altered, and installed only by MyGlypher.",
         ),
         ProjectFieldDefinition("Notes", "Notes", "text", default=""),
         ProjectFieldDefinition(
             "NumberPageBoxes",
             "Number of Page Boxes",
             "int",
-            default=2,
+            default=1,
             help_text="Defaults to the number of columns per page.",
         ),
         ProjectFieldDefinition("NumberLanguages", "Number of Languages", "int", default=0),
@@ -232,6 +253,12 @@ def normalize_project_database_values(
         incoming["ProjectWord"] = incoming.get("CurrentWord")
     if incoming.get("project_font") and incoming.get("ProjectFont") in (None, ""):
         incoming["ProjectFont"] = incoming.get("project_font")
+    if incoming.get("ui_font") and incoming.get("UIFont") in (None, ""):
+        incoming["UIFont"] = incoming.get("ui_font")
+    if incoming.get("UIFont") in (None, "") and incoming.get("ProjectFont") not in (None, ""):
+        incoming["UIFont"] = incoming.get("ProjectFont")
+    if incoming.get("UIFont") in (None, ""):
+        incoming["UIFont"] = DEFAULT_UI_FONT
     if incoming.get("ProjectFont") in (None, ""):
         incoming["ProjectFont"] = DEFAULT_PROJECT_FONT
 
@@ -254,7 +281,9 @@ def normalize_project_database_values(
     normalized["ProjectPageNumber"] = max(1, _coerce_int(normalized.get("ProjectPageNumber"), 1))
     normalized["ProjectPageProgress"] = _clamp(_coerce_int(normalized.get("ProjectPageProgress"), 0), 0, 100)
 
-    normalized["NumberColumns"] = _clamp(_coerce_int(normalized.get("NumberColumns"), 4), 1, 4)
+    normalized["NumberPages"] = max(1, _coerce_int(normalized.get("NumberPages"), 1))
+    normalized["NumberColumns"] = _clamp(_coerce_int(normalized.get("NumberColumns"), 1), 1, 3)
+    normalized["TotalProjectPages"] = normalized["NumberPages"] * normalized["NumberColumns"]
     normalized["ColumnName"] = _normalize_column_names(
         normalized.get("ColumnName"),
         normalized["NumberColumns"],
@@ -330,6 +359,8 @@ def normalize_project_database_values(
         project_database = f"{project_database}.db"
     normalized["ProjectDatabase"] = project_database
 
+    if not str(normalized.get("UIFont") or "").strip():
+        normalized["UIFont"] = DEFAULT_UI_FONT
     if not str(normalized.get("ProjectFont") or "").strip():
         normalized["ProjectFont"] = DEFAULT_PROJECT_FONT
 

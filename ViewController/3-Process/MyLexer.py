@@ -54,7 +54,7 @@ from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeG
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
-from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
+from tesseract_wordlist_helper import show_word_count_dialog
 from Core.workflow_wizard_actions import (
     append_default_context_actions,
     install_workflow_wizard_menu_actions,
@@ -281,8 +281,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.EditCorrectedTextbutton.clicked.connect(self.open_text_with_myexplorer)
         self.ui.SaveAsBoxCorrTextbutton.clicked.connect(self.save_text_as_with_myexplorer)
         self.ui.SaveBoxCorrTextbutton.clicked.connect(self.save_text_with_myexplorer)
-        if hasattr(self.ui, 'actionUpdate_Wordlist_tb'):
-            self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
 
         #self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         #self.ui.textButton.clicked.connect(self.editText)
@@ -2034,11 +2032,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         filename = os.path.basename(path)
         self.ui.TextLE.setText(filename)
         file.close()
-
-    def actionUpdate_Wordlist(self):
-        target_text = self.ui.BoxDocument.toPlainText()
-        output_path = os.path.join(self.current_project_root or '', 'tesseract_wordlist.txt') if getattr(self, 'current_project_root', '') else None
-        update_tesseract_wordlist_from_text(target_text, project_root=os.getcwd(), output_path=output_path)
 
     def wordCount(self):
         show_word_count_dialog(self, self.ui.BoxText)

@@ -160,6 +160,26 @@ class ProjectWorkflowTracker:
             json.dump(state, handle, indent=2)
         return state
 
+    def record_page_completion(self, project_root: str, page_number: int) -> Dict[str, object]:
+        normalized_root = self._normalize_path(project_root)
+        if not normalized_root:
+            return self._default_tracking_state()
+
+        try:
+            normalized_page = max(1, int(page_number))
+        except (TypeError, ValueError):
+            return self.ensure_tracking_state(normalized_root)
+
+        state = self.ensure_tracking_state(normalized_root)
+        completed_pages = set(state.get("completed_pages", []))
+        completed_pages.add(normalized_page)
+        state["completed_pages"] = sorted(completed_pages)
+
+        path = self.tracking_file_path(normalized_root)
+        with open(path, "w", encoding="utf-8") as handle:
+            json.dump(state, handle, indent=2)
+        return state
+
     def milestone_rows(self, project_root: str) -> List[Dict[str, object]]:
         normalized_root = self._normalize_path(project_root)
         if not normalized_root:
@@ -331,8 +351,14 @@ class ProjectWorkflowTracker:
 
         project_context = self._load_project_context(resolved_root)
         total_pages = self._context_total_pages(project_context)
-        page_percent = project_percent
-        completed_pages = int(round((total_pages * page_percent) / 100)) if total_pages > 0 else 0
+        completed_page_numbers = {
+            page_number
+            for page_number in tracking_state.get("completed_pages", [])
+            if isinstance(page_number, int) and 1 <= page_number <= total_pages
+        }
+        completed_pages = len(completed_page_numbers)
+        page_percent = int((completed_pages * 100) / total_pages) if total_pages > 0 else 0
+        project_percent = min(project_percent, page_percent)
 
         return {
             "project_root": resolved_root,
@@ -675,7 +701,8 @@ class ProjectWorkflowTracker:
 
     def _default_tracking_state(self) -> Dict[str, object]:
         return {
-            "version": 1,
+            "version": 2,
+            "completed_pages": [],
             "milestones": {
                 milestone_key: {
                     "label": milestone_label,
@@ -694,6 +721,15 @@ class ProjectWorkflowTracker:
             return state
 
         state["version"] = raw_state.get("version", 1)
+        raw_completed_pages = raw_state.get("completed_pages", [])
+        if isinstance(raw_completed_pages, list):
+            completed_pages = []
+            for page_number in raw_completed_pages:
+                try:
+                    completed_pages.append(max(1, int(page_number)))
+                except (TypeError, ValueError):
+                    continue
+            state["completed_pages"] = sorted(set(completed_pages))
         raw_milestones = raw_state.get("milestones", {})
         if not isinstance(raw_milestones, dict):
             return state
@@ -835,6 +871,13 @@ class ProjectWorkflowTracker:
         return False
 
     def _context_total_pages(self, project_context: Dict[str, object]) -> int:
+        try:
+            total_project_pages = int(project_context.get("TotalProjectPages", 0) or 0)
+        except (TypeError, ValueError):
+            total_project_pages = 0
+        if total_project_pages > 0:
+            return total_project_pages
+
         try:
             number_pages = int(project_context.get("NumberPages", 0) or 0)
         except (TypeError, ValueError):

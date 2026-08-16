@@ -28,6 +28,145 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-08-16 02:20
+
+* Scope summary: moved e-Sword and theWord publication actions exclusively to MyWriter and made Unicode wordlist mutation reusable by MyTrainer, MyResolver, and future modules.
+* Touched files (`git status --short`):
+  * `Developer/QtDesignerUI/MyWriterUI.ui`
+  * `Developer/QtDesignerUI/MyServerUI.ui`
+  * non-Writer Designer templates containing orphan publication QAction definitions
+  * regenerated active module UI files under `ViewController/0-MainUI` through `ViewController/4-PostProcess`
+  * `ViewController/4-PostProcess/MyWriter.py`
+  * `ViewController/0-MainUI/helpers/tesseract_wordlist_helper.py`
+  * `ViewController/2-TrainTesseract/MyTrainer.py`
+  * `tests/test_myexplorer_picker.py`
+  * `tests/test_mywriter_module_exports.py`
+  * `tests/test_shared_wordlist_updates.py`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; full workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass for `Core`, active module directories, and tests; repository-wide `compileall` remains blocked by pre-existing indentation errors in `PageVerseCrossReference.py` and `tift2mono.py` under `ViewController/utilities`.
+  * tests: pass; `74 passed, 43 subtests passed`, including sole MyWriter action ownership, actual source exports, and shared Greek wordlist updates.
+  * smoke: pass; all 14 canonical Linux `run-my*.sh` launchers remained running through their offscreen startup smoke windows.
+  * manual UI checks: accepted by the maintainer as MyServer Prompt Pack Part 1 complete; focused offscreen menu/action checks also pass.
+* Ownership and behavior:
+  * MyWriter is the sole current Designer and runtime owner of e-Sword and theWord publication actions.
+  * e-Sword source exports to `Model/Project/Text/Esword/<project>.bblx.txt` as UTF-8.
+  * theWord source exports to `Model/Project/Text/TheWord/<project>.nt` as UTF-8 with BOM.
+  * MyTrainer remains the sole owner of Setup Training and Update Wordlists menus; reusable Unicode extraction and wordlist mutation live in `tesseract_wordlist_helper.py` for MyResolver and future MyLexer use.
+* Unresolved blockers/risks:
+  * publication actions export compiler-ready source artifacts; they do not claim to compile proprietary e-Sword/theWord binary module formats.
+  * `git diff --check` reports MyExplorer's repository-standard CRLF line endings as trailing whitespace; the committed baseline uses the same CRLF format and all other changed paths pass the check.
+* Next immediate action:
+  * commit Part 1, merge it to `master`, sync origin branches, and reserve Part 2 for follow-up debugging.
+
+### Session Handoff - 2026-08-16 01:12
+
+* Scope summary: centralized Setup Training, Unicode wordlist preparation, resource validation, Tesseract launch coordination, and progress reporting in MyTrainer only.
+* Touched files (`git status --short`):
+  * `Core/myexplorer_picker.py`
+  * `Core/workflow_wizard_actions.py`
+  * `Developer/QtDesignerUI/MyServerUI.ui`
+  * `Developer/QtDesignerUI/MyTrainerUI.ui`
+  * `Developer/QtDesignerUI/ImageEditUI.ui`
+  * `Developer/QtDesignerUI/MainUI.ui`
+  * `Developer/QtDesignerUI/VersifyText.ui`
+  * `ViewController/0-MainUI/MyServerUI.py`
+  * `ViewController/0-MainUI/MyServer.py`
+  * `ViewController/0-MainUI/MyLauncher.py`
+  * `ViewController/0-MainUI/helpers/MainUI.py`
+  * `ViewController/0-MainUI/helpers/SessionManager.py`
+  * `ViewController/0-MainUI/helpers/LocalFileDrop.py`
+  * `ViewController/1-PreProcess/MyBoxer.py`
+  * `ViewController/2-TrainTesseract/MyReader.py`
+  * `ViewController/2-TrainTesseract/MyTrainer.py`
+  * `ViewController/2-TrainTesseract/MyTrainerUI.py`
+  * `ViewController/2-TrainTesseract/helpers/run_tesseract_training.sh`
+  * `ViewController/3-Process/MyLexer.py`
+  * `ViewController/4-PostProcess/MyWriter.py`
+  * `tests/test_myexplorer_picker.py`
+  * `tests/test_session_manager_font_roles.py`
+  * `docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; full workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass; active runtimes, generated UIs, edited Designer templates, and the training shell wrapper compile or parse successfully.
+  * tests: pass; `28 passed, 3 subtests passed`, including exclusive MyTrainer menu ownership and Unicode wordlist behavior.
+  * smoke: pass; MyTrainer, MyServer, MyLexer, MyWriter, and MyLauncher remained running through their offscreen startup smoke windows.
+  * manual UI checks: pending.
+* Unresolved blockers/risks:
+  * MyExplorer currently selects from all visible files; legacy per-dialog extension filters are not passed into its CLI selection mode.
+  * Conducting a real training run still requires `TRAINING_COMMAND`, `TESSTRAIN_SH`, or `tesstrain.sh`; MyTrainer now validates and passes all selected resources to that entrypoint.
+* Next immediate action:
+  * manually verify MyTrainer's Update Wordlists and Setup Training menus, then run one configured Tesseract training job before commit/sync.
+
+### Session Handoff - 2026-08-16 00:54
+
+* Scope summary: removed the orphan Select Image and OCR Preprocess Tool actions from MyServer and deprecated the now-unreachable preprocess runtime path.
+* Touched files (`git status --short`):
+  * `Developer/QtDesignerUI/MyServerUI.ui`
+  * `ViewController/0-MainUI/MyServerUI.py`
+  * `ViewController/0-MainUI/MyServer.py`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; full workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass; edited Designer source regenerated successfully and both MyServer Python files compile.
+  * tests: pass; `18 passed, 3 subtests passed` across GUI runtime, launcher compatibility, and project schema tests.
+  * smoke: pass; offscreen UI inspection confirmed the OCR menu contains only Select Language and OCR Image, and MyServer remained running through its startup smoke window.
+  * manual UI checks: pending.
+* Unresolved blockers/risks:
+  * the standalone OCR preprocess helper files remain dormant for historical compatibility but have no MyServer import, action, connection, or live method.
+* Next immediate action:
+  * manually inspect the OCR menu, then pause before commit/sync.
+
+### Session Handoff - 2026-08-16 00:48
+
+* Scope summary: separated stable FROMVS UI font metadata from the MyGlypher-owned Tesseract project font without changing font selector controls or UI defaults.
+* Touched files (`git status --short`):
+  * `Core/engine.py`
+  * `Core/project_database.py`
+  * `ViewController/0-MainUI/helpers/SessionManager.py`
+  * `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py`
+  * `ViewController/0-MainUI/helpers/Dialogs/ProjectSettingsDialog.py`
+  * UI-font callers in MyServer, MyBoxer, MyGlypher, MyGrounder, MyReader, MyResolver, MyVersifier, and MyWriter
+  * `ViewController/2-TrainTesseract/MyTrainer.py`
+  * `ViewController/2-TrainTesseract/helpers/run_tesseract_training.sh`
+  * `tests/test_project_database_schema.py`
+  * `tests/test_session_manager_font_roles.py`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; full workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass; focused Python compilation and shell syntax checks completed without errors.
+  * tests: pass; `21 passed, 3 subtests passed` across schema, font-role migration, tracking, GUI runtime, and MyBoxer workflow tests.
+  * smoke: pass; New Project and Project Settings offscreen checks passed, and MyServer, MyGlypher, and MyTrainer remained running through their offscreen startup smoke windows.
+* Unresolved blockers/risks:
+  * legacy projects intentionally copy their prior `ProjectFont` value to `UIFont` during normalization so their visual appearance does not change.
+  * MyGlypher's existing project-font generation/family actions remain unimplemented; this change preserves those menu/control semantics and only establishes exclusive metadata ownership and installation/training flow.
+* Next immediate action:
+  * manually review the UI Font labels and MyGlypher's Tesseract project-font display, then pause before commit/sync.
+
+### Session Handoff - 2026-08-16 00:33
+
+* Scope summary: made total project pages a canonical source-pages-by-columns value and added exact, idempotent per-page workflow completion tracking.
+* Touched files (`git status --short`):
+  * `Core/project_database.py`
+  * `Core/project_tracking.py`
+  * `Core/workflow_wizard_actions.py`
+  * `ViewController/0-MainUI/helpers/Dialogs/ProjectSettingsDialog.py`
+  * `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py`
+  * `tests/test_project_database_schema.py`
+  * `tests/test_project_tracking_snapshot.py`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; touched-file Problems total `0` via `get_errors`.
+  * tests: pass; project database and tracking tests include `100 x 2 = 200`, 1/2/3-column cases, duplicate page-run idempotency, and all-pages completion.
+  * smoke: pass; both project dialogs instantiated offscreen and Project Settings recalculated `100 x 2 = 200` live.
+  * manual UI checks: pending; automated offscreen dialog checks passed.
+* Unresolved blockers/risks:
+  * legacy projects begin with an empty completed-page ledger and must complete each page through the MyWriter full page workflow to establish exact progress.
+* Next immediate action:
+  * manually verify the New Project and Project Settings page-count controls, then pause before commit/sync.
+
 ## Reusable Prompt Workflow (Developer Use)
 
 Use the module-scoped prompt workflow to reduce prompt-writing overhead while preserving validation discipline:
@@ -1534,3 +1673,104 @@ Windows transition runbooks (2026-08-13):
 
 * docs/development/WINDOWS10_REPO_BACKUP_AND_RECLEAN.md
 * docs/development/WINDOWS10_WINDOWS_DEVELOPMENT_BRANCH_SETUP.md
+
+---
+
+## Session Handoff (2026-08-15) - MyServer Project Menu and Language Toolbars
+
+Scope summary:
+
+* Moved MyServer project administration and workflow wizard actions under the Project menu, removed manual language-toolbar toggles, and made toolbar visibility follow the selected OCR language/model.
+* Removed the standalone Set Columns Per Page action. New Project and Project Settings now expose Number of Columns Per Page with default 1 and range 1 through 3.
+
+Touched-file list from git status --short (in-scope):
+
+* M Developer/QtDesignerUI/MyServerUI.ui
+* M Developer/QtDesignerUI/ProjectCreationWizardDialog.ui
+* M Core/project_database.py
+* M ViewController/0-MainUI/MyServer.py
+* M ViewController/0-MainUI/MyServerUI.py
+* M ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py
+* M ViewController/0-MainUI/helpers/Dialogs/ProjectSettingsDialog.py
+* M tests/test_project_database_schema.py
+* M docs/development/DEV_NOTEBOOK.md
+
+Validation status by gate:
+
+* problems/lint: full workspace 0; in-scope 0
+* compile: MyServer.py, generated MyServerUI.py, project_database.py, project_creation_wizard_dialog.py, and ProjectSettingsDialog.py passed py_compile
+* focused tests: project database schema, GUI runtime environment, and launcher entrypoint compatibility suites passed
+* behavior smoke: offscreen Qt assertions passed for Project-menu ownership and Greek/Latin/Hebrew toolbar states
+* project settings smoke: offscreen assertions passed for the Number of Columns Per Page label, default 1, maximum 3, New Project payload control, existing-project storage mapping, and shared range normalization
+* startup smoke: MyServer remained open for the bounded 10-second offscreen run with no traceback
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Commit/sync:
+
+* Not committed or synced; paused for maintainer review as required.
+
+Unresolved risks/blockers:
+
+* MyServer has no Hebrew-specific toolbar group, so Hebrew correctly hides both Greek and Latin groups.
+* Existing projects with NumberColumns greater than 3 normalize to the new maximum of 3 when saved through the shared project database API.
+* Pre-existing unrelated working-tree changes remain untouched, including runtime-local Session.json drift.
+
+Next immediate action:
+
+* Review the bounded MyServer diff, then commit only when explicitly requested.
+
+---
+
+## Session Handoff (2026-08-16) - Project Font Ownership
+
+Scope summary:
+
+* Removed MyServer's Online and project-font management actions, made MyGlypher the sole runtime installer, and added QFontComboBox project-font selection to New Project and Project Settings with FROMVS.ttf as the canonical default.
+
+Touched-file list from git status --short (in-scope):
+
+* M Core/project_database.py
+* M Developer/QtDesignerUI/MyServerUI.ui
+* M Developer/QtDesignerUI/MyGlypherUI.ui
+* M Developer/QtDesignerUI/ProjectCreationWizardDialog.ui
+* M ViewController/0-MainUI/MyServer.py
+* M ViewController/0-MainUI/MyServerUI.py
+* M ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py
+* M ViewController/0-MainUI/helpers/Dialogs/ProjectSettingsDialog.py
+* M ViewController/1-PreProcess/MyGlypher.py
+* M ViewController/1-PreProcess/MyGlypherUI.py
+* M tests/test_project_database_schema.py
+* M docs/development/DEV_NOTEBOOK.md
+
+Validation status by gate:
+
+* problems/lint: full workspace 0; in-scope 0
+* compile: all touched Python files passed py_compile
+* focused tests: project database schema, GUI runtime environment, and launcher entrypoint compatibility passed (13 tests)
+* behavior smoke: offscreen assertions passed for both QFontComboBox selectors, canonical FROMVS.ttf persistence, alternate installed-font selection, and MyGlypher install dispatch
+* startup smoke: MyServer and MyGlypher each remained open for bounded 10-second offscreen runs with no traceback
+
+Problems detail:
+
+* full-workspace total count: 0
+* in-scope count: 0
+* unresolved files: none
+
+Commit/sync:
+
+* Not committed or synced; paused for maintainer review as required.
+
+Unresolved risks/blockers:
+
+* MyGlypher's legacy Generate Project TTF/SFD controls have no current implementation. Archived SFD code is GPL-bound and depends on external potrace; no safe implementation was transplanted or fabricated in this change set.
+* FROMVS.ttf is bundled under ViewController/0-MainUI/helpers/fonts and is registered for selection at runtime; binary packaging must continue including that asset and perform product-level installation.
+* Pre-existing unrelated working-tree changes remain untouched, including runtime-local Session.json drift.
+
+Next immediate action:
+
+* Review the bounded project-font ownership diff, then commit only when explicitly requested.

@@ -285,9 +285,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         page_model_group = qtw.QGroupBox("Source page model")
         page_model_layout = qtw.QGridLayout(page_model_group)
-        page_model_layout.addWidget(qtw.QLabel("Source pages"), 0, 0)
+        page_model_layout.addWidget(qtw.QLabel("Total Source Document Pages"), 0, 0)
         self.source_pages_combo = qtw.QComboBox()
-        self.source_pages_combo.addItem("To Be Determined")
         for page_number in range(1, 1001):
             self.source_pages_combo.addItem(str(page_number))
         page_model_layout.addWidget(self.source_pages_combo, 0, 1)
@@ -299,11 +298,16 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         page_model_layout.addWidget(source_pages_note, 1, 0, 1, 2)
         self._configure_source_pages_dropdown()
 
-        page_model_layout.addWidget(qtw.QLabel("Columns per source page"), 2, 0)
+        page_model_layout.addWidget(qtw.QLabel("Number of Columns Per Page"), 2, 0)
         self.columns_per_page_spin = qtw.QSpinBox()
-        self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
-        self.columns_per_page_spin.setValue(len(self.DEFAULT_TESSERACT_LANGUAGES))
+        self.columns_per_page_spin.setRange(1, 3)
+        self.columns_per_page_spin.setValue(1)
         page_model_layout.addWidget(self.columns_per_page_spin, 2, 1)
+
+        page_model_layout.addWidget(qtw.QLabel("UI Font"), 3, 0)
+        self.ui_font_combo = qtw.QFontComboBox()
+        page_model_layout.addWidget(self.ui_font_combo, 3, 1)
+        self._configure_ui_font_selector()
 
         self.column_config_group = qtw.QGroupBox("Column language and name editor")
         self.column_config_layout = qtw.QGridLayout(self.column_config_group)
@@ -519,16 +523,12 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.scriptural_source_combo.currentIndexChanged.connect(self._refresh_folder_selection_page)
         self.source_pages_combo.currentIndexChanged.connect(self._refresh_column_preview)
         self.columns_per_page_spin.valueChanged.connect(self._refresh_column_preview)
+        self.ui_font_combo.currentFontChanged.connect(self._on_ui_font_changed)
         self.project_type_combo.currentIndexChanged.connect(self._refresh_column_preview)
         self._update_project_scope_state()
         self._refresh_column_preview()
 
     def _configure_source_pages_dropdown(self):
-        model = self.source_pages_combo.model()
-        if isinstance(model, qtg.QStandardItemModel):
-            placeholder_item = model.item(0)
-            if placeholder_item is not None:
-                placeholder_item.setEnabled(False)
         self.source_pages_combo.setCurrentText("1")
 
     def _source_pages_value(self):
@@ -637,7 +637,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.project_type_combo.setCurrentText("Scriptural")
         self.scriptural_source_combo.setEnabled(True)
         self.columns_per_page_spin.setEnabled(True)
-        self.columns_per_page_spin.setRange(1, len(self.DEFAULT_TESSERACT_LANGUAGES))
+        self.columns_per_page_spin.setRange(1, 3)
         self._refresh_review()
         self._refresh_folder_selection_page()
         self._refresh_column_preview()
@@ -658,6 +658,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self._set_project_db_value("Languages", ",".join(self._selected_tesseract_language_codes()))
             self._set_project_db_value("NumberLanguages", str(len(self._selected_tesseract_language_codes())))
             self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
+            self._set_project_db_value("UIFont", self._selected_ui_font())
         self._refresh_review()
         self._apply_required_field_state(self.project_name_edit, self.project_name_label, not self.project_name_edit.text().strip())
         self._apply_required_field_state(self.project_purpose_edit, self.project_purpose_label, not self.project_purpose_edit.toPlainText().strip())
@@ -878,10 +879,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             f"Intent: {self.user_intent_edit.toPlainText().strip() or 'Not set'}",
             f"Project type: {project_type}",
             f"Scriptural source: {scripture_source}",
-            f"Source pages: {source_pages}",
+            f"Total source document pages: {source_pages}",
             f"Columns per source page: {columns_per_page}",
+            f"UI font: {self._selected_ui_font()}",
             f"Column language/name: {', '.join(language_rows)}",
-            f"Total column pages: {total_column_pages}",
+            f"Total project pages: {total_column_pages}",
             f"Trigger: {self.creation_trigger_edit.text().strip() or 'MyServer_button'}",
             f"Source context: {self.source_context_edit.text().strip() or 'MyServer_UI'}",
             f"Creator: {creator}",
@@ -912,7 +914,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "\n".join([
                 "Columns are named from the editable column name and language rows:",
                 *named_columns,
-                f"Total column pages = source pages ({source_pages}) x columns per page ({columns_per_page}) = {total_column_pages}",
+                f"Total project pages = source document pages ({source_pages}) x columns per page ({columns_per_page}) = {total_column_pages}",
             ])
         )
         self._refresh_review()
@@ -942,7 +944,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
                 display_value = ",".join(str(part) for part in default_value)
             else:
                 display_value = "" if default_value is None else str(default_value)
-            table.setItem(row, 1, qtw.QTableWidgetItem(display_value))
+            value_item = qtw.QTableWidgetItem(display_value)
+            if definition.key == "ProjectFont":
+                value_item.setFlags(value_item.flags() & ~self.ITEM_IS_EDITABLE_FLAG)
+            table.setItem(row, 1, value_item)
 
             notes = definition.help_text or definition.label
             notes_item = qtw.QTableWidgetItem(notes)
@@ -960,6 +965,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self._set_project_db_value("Languages", ",".join(self._selected_tesseract_language_codes()))
         self._set_project_db_value("NumberLanguages", str(len(self._selected_tesseract_language_codes())))
         self._set_project_db_value("ProjectDatabase", self._default_project_database_name())
+        self._set_project_db_value("UIFont", self._selected_ui_font())
 
     def _load_milestones_defaults(self):
         table = self.milestones_table
@@ -1053,6 +1059,32 @@ class ProjectCreationWizardDialog(qtw.QDialog):
     def _default_project_database_name(self):
         project_name = self._sanitize_project_name(self.project_name_edit.text().strip()) or "project"
         return f"{project_name}.db"
+
+    def _configure_ui_font_selector(self):
+        font_path = os.path.join(os.path.dirname(__file__), "fonts", "FROMVS.ttf")
+        font_family = "FROMVS"
+        if os.path.isfile(font_path):
+            font_id = qtg.QFontDatabase.addApplicationFont(font_path)
+            if font_id != -1:
+                families = qtg.QFontDatabase.applicationFontFamilies(font_id)
+                if families:
+                    font_family = families[0]
+        self._default_ui_font_family = font_family
+        self.ui_font_combo.setCurrentFont(qtg.QFont(font_family))
+
+    def _selected_ui_font(self):
+        family = self.ui_font_combo.currentFont().family().strip()
+        if family.casefold() in {
+            self._default_ui_font_family.casefold(),
+            "fromvs",
+            "fromvs [maxr]",
+        }:
+            return "FROMVS.ttf"
+        return family or "FROMVS.ttf"
+
+    def _on_ui_font_changed(self, _font=None):
+        self._set_project_db_value("UIFont", self._selected_ui_font())
+        self._refresh_review()
 
     def _find_project_db_row(self, field_key):
         table = self.project_db_table
@@ -1345,7 +1377,8 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         self._sync_derived_fields_from_ris_tags(tags)
 
-        self._refresh_review()
+        if hasattr(self, "creator_edit"):
+            self._refresh_review()
 
     def _load_provenance_file(self, path):
         extension = os.path.splitext(path)[1].lower()
@@ -1563,6 +1596,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         selected_languages = self._selected_column_languages()
         number_columns = max(1, int(self.columns_per_page_spin.value()))
         number_pages = self._source_pages_value()
+        self._set_project_db_value("UIFont", self._selected_ui_font())
         project_db_values = self._collect_project_db_values()
         milestone_settings = self._collect_milestone_settings()
 
@@ -1584,10 +1618,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "ColumnLanguage": ",".join(self._selected_tesseract_language_codes()),
             "Languages": self._selected_tesseract_language_codes(),
             "NumberLanguages": len(self._selected_tesseract_language_codes()),
+            "TotalProjectPages": number_pages * number_columns,
             "TotalColumnPages": number_pages * number_columns,
             "SelectedProjectFolders": self._selected_project_folders(),
             "ProjectDatabase": project_database_name,
-            "ProjectFont": str(project_db_values.get("ProjectFont") or "").strip(),
+            "UIFont": self._selected_ui_font(),
             "ProjectDatabaseFields": project_db_values,
             "MilestoneSettings": milestone_settings,
         }

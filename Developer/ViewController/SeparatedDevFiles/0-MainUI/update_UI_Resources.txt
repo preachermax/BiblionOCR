@@ -1,8 +1,0 @@
-﻿This file moved.
-
-Canonical location:
-Developer/update_UI_Resources.txt
-
-Compatibility wrappers:
-Developer/ViewController/SeparatedDevFiles/0-MainUI/update_UI_Resources.sh
-Developer/ViewController/SeparatedDevFiles/0-MainUI/update_UI_Resources.cmd

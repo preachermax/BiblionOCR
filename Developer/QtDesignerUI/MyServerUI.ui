@@ -120,9 +120,25 @@
         <height>700</height>
        </size>
       </property>
+        <property name="font">
+         <font>
+          <family>FROMVS</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #aeb4bc;</string>
+        </property>
       <property name="text">
-       <string/>
+         <string>Drag and Drop Source Image File from MyExplorer
+      or select Open Image from the File Menu</string>
       </property>
+        <property name="margin">
+         <number>24</number>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
       <property name="scaledContents">
        <bool>false</bool>
       </property>
@@ -299,6 +315,10 @@
       <bold>false</bold>
      </font>
     </property>
+      <property name="placeholderText">
+       <string>Drag and Drop Text File from MyExplorer
+    or select Open Text from the File Menu</string>
+      </property>
    </widget>
    <widget class="QPushButton" name="reloadTextbutton">
     <property name="geometry">
@@ -1273,14 +1293,14 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>Open current image</string>
+      <string>Open image with MyExplorer</string>
     </property>
     <property name="text">
      <string/>
     </property>
     <property name="icon">
      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="MyPixlerbutton">
@@ -1352,6 +1372,7 @@
     </property>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Text"/>
+    <addaction name="actionMyExplorer"/>
     <addaction name="actionImageScanner"/>
     <addaction name="actionSave_Image"/>
     <addaction name="actionSave_As_Image"/>
@@ -1370,13 +1391,6 @@
     <addaction name="actionMyWriter"/>
     <addaction name="actionFind_and_Replace"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-    <addaction name="actionToggle_Greek_Toolbars"/>
-    <addaction name="actionToggle_Latin_Toolbars"/>
-   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
@@ -1384,48 +1398,26 @@
     <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+  <widget class="QMenu" name="menuProject">
     <property name="title">
      <string>Project</string>
     </property>
-    <addaction name="actionMyExplorer"/>
     <addaction name="actionNewProject"/>
     <addaction name="actionOpen_Project"/>
-    <addaction name="actionSet_Columns_Per_Page"/>
-    <addaction name="actionPrefernces"/>
+    <addaction name="actionProjectSettings"/>
    </widget>
    <widget class="QMenu" name="menuGlyphs">
     <property name="title">
      <string>Font</string>
     </property>
-    <addaction name="actionLine_tif_to_bmp"/>
     <addaction name="actionMyGlypher"/>
-    <addaction name="actionProjectFont"/>
-    <addaction name="actionInstall_Font"/>
    </widget>
    <widget class="QMenu" name="menuGround_Truth_2">
     <property name="title">
      <string>Training</string>
     </property>
-    <widget class="QMenu" name="menuUpdate_Wordlists">
-     <property name="title">
-      <string>Update Wordlists</string>
-     </property>
-     <addaction name="actionUpdate_Hebrew_Wordlist"/>
-     <addaction name="actionUpdate_Wordlist_tb"/>
-     <addaction name="actionUpdate_Wordlist_menu"/>
-    </widget>
-    <widget class="QMenu" name="menuSetup_Training">
-     <property name="title">
-      <string>Setup Training</string>
-     </property>
-     <addaction name="actionSelect_Language_Model"/>
-     <addaction name="actionSelect_Fonts"/>
-    </widget>
     <addaction name="actionMyBoxer"/>
     <addaction name="actionMyLexer"/>
-    <addaction name="menuUpdate_Wordlists"/>
-    <addaction name="menuSetup_Training"/>
     <addaction name="actionMyTrainer"/>
    </widget>
    <widget class="QMenu" name="menuPre_Process">
@@ -1478,8 +1470,6 @@
      <string>Post-Process</string>
     </property>
     <addaction name="actionMyWriter"/>
-    <addaction name="actionCreate_e_Sword_Bible_Module"/>
-    <addaction name="actionCreate_theWord_Bible_Module"/>
    </widget>
    <widget class="QMenu" name="menuModules">
     <property name="title">
@@ -1513,12 +1503,11 @@
     <addaction name="menuText_Modules"/>
     <addaction name="menuCombined_Modules"/>
    </widget>
-   <addaction name="menuHelp"/>
+  <addaction name="menuProject"/>
    <addaction name="menuModules"/>
    <addaction name="menuPre_Process"/>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuOCR"/>
    <addaction name="menuGlyphs"/>
@@ -1630,21 +1619,6 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QToolBar" name="ProjectFontToolBar">
-   <property name="windowTitle">
-    <string>Project Font Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Project Font Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionLine_tif_to_bmp"/>
-  </widget>
   <widget class="QToolBar" name="GreekTextLinesToolBar">
    <property name="windowTitle">
     <string>Greek Text Lines Tool Bar</string>
@@ -1658,7 +1632,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionUpdate_Wordlist_tb"/>
   </widget>
   <widget class="QToolBar" name="LatinTextLinesToolBar">
    <property name="enabled">
@@ -2096,21 +2069,6 @@
     <string>Validating current Ground Truth image|text pairs...</string>
    </property>
   </action>
-  <action name="actionUpdate_Wordlist_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/update-greek-wordlist.png</normaloff>:/Icons/Icons/update-greek-wordlist.png</iconset>
-   </property>
-   <property name="text">
-    <string>Update Greek Wordlist</string>
-   </property>
-   <property name="toolTip">
-    <string>Update Greek Wordlist for OCR Training</string>
-   </property>
-   <property name="statusTip">
-    <string>Upadting Greek wordlist...</string>
-   </property>
-  </action>
   <action name="actionImage_Lines_3">
    <property name="text">
     <string>Image Lines</string>
@@ -2119,11 +2077,6 @@
   <action name="actionReview_Ground_Truth_menu">
    <property name="text">
     <string>Review Ground Truth</string>
-   </property>
-  </action>
-  <action name="actionUpdate_Wordlist_menu">
-   <property name="text">
-    <string>Update Latin Wordlist</string>
    </property>
   </action>
   <action name="actiondeskew_mono">
@@ -2139,15 +2092,6 @@
    </property>
    <property name="statusTip">
     <string>Deskewing indexed tif pages...</string>
-   </property>
-  </action>
-  <action name="actionOpen_Image">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/folder-open-image.png</normaloff>:/Icons/Icons/folder-open-image.png</iconset>
-   </property>
-   <property name="text">
-    <string>Open Image</string>
    </property>
   </action>
   <action name="actionMyVersifier">
@@ -2216,39 +2160,27 @@
     <string>Extracting and trace bitmap glyphs with GlyphTracer...</string>
    </property>
   </action>
-  <action name="actionLine_tif_to_bmp">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff2bmp.png</normaloff>:/Icons/Icons/tiff2bmp.png</iconset>
-   </property>
-   <property name="text">
-    <string>Convert tif To bmp</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert current tif image to bmp</string>
-   </property>
-   <property name="statusTip">
-    <string>Converting current tif image to bmp...</string>
-   </property>
-  </action>
-  <action name="actionProjectFont">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
-   </property>
-   <property name="text">
-    <string>Project Font</string>
-   </property>
-   <property name="toolTip">
-    <string>Manage current project font assets</string>
-   </property>
-   <property name="statusTip">
-    <string>Managing current project font assets...</string>
-   </property>
-  </action>
-  <action name="actionPrefernces">
+  <action name="actionProjectSettings">
    <property name="text">
     <string>Project Settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
+   </property>
+  </action>
+  <action name="actionOpen_Image">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Load a source image with MyExplorer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionOpen_Text">
@@ -2258,6 +2190,12 @@
    </property>
    <property name="text">
     <string>Open Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Load a text document with MyExplorer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+O</string>
    </property>
   </action>
   <action name="actionSave_Image">
@@ -2316,11 +2254,6 @@
     <string>Hebrew</string>
    </property>
   </action>
-  <action name="actionUpdate_Hebrew_Wordlist">
-   <property name="text">
-    <string>Update Hebrew Wordlist</string>
-   </property>
-  </action>
   <action name="actionHebrew_3">
    <property name="text">
     <string>Hebrew</string>
@@ -2329,11 +2262,6 @@
   <action name="actionOCR_Image">
    <property name="text">
     <string>OCR Image</string>
-   </property>
-  </action>
-  <action name="actionSelect_Image">
-   <property name="text">
-    <string>Select Image</string>
    </property>
   </action>
   <action name="actionGreek_2">
@@ -2351,16 +2279,6 @@
     <string>Latin</string>
    </property>
   </action>
-  <action name="actionSelect_Language_Model">
-   <property name="text">
-    <string>Select Language Model</string>
-   </property>
-  </action>
-  <action name="actionSelect_Fonts">
-   <property name="text">
-    <string>Select Fonts</string>
-   </property>
-  </action>
   <action name="actionany">
    <property name="text">
     <string>any</string>
@@ -2374,24 +2292,6 @@
   <action name="actionStage_Ground_Truth">
    <property name="text">
     <string>Stage Ground Truth</string>
-   </property>
-  </action>
-  <action name="actionCreate_e_Sword_Bible_Module">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
-   </property>
-   <property name="text">
-    <string>e-Sword Bible Module</string>
-   </property>
-  </action>
-  <action name="actionCreate_theWord_Bible_Module">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
-   </property>
-   <property name="text">
-    <string>theWord Bible Module</string>
    </property>
   </action>
   <action name="actionEnglish">
@@ -2412,11 +2312,6 @@
   <action name="actionEnglish_3">
    <property name="text">
     <string>English</string>
-   </property>
-  </action>
-  <action name="actionOnline">
-   <property name="text">
-    <string>Online</string>
    </property>
   </action>
   <action name="actionManual_Crop_Image_tb">
@@ -2482,25 +2377,6 @@
     <string>Find and Replace</string>
    </property>
   </action>
-  <action name="actionInstall_Font">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
-   </property>
-   <property name="text">
-    <string>Install Font</string>
-   </property>
-  </action>
-  <action name="actionToggle_Greek_Toolbars">
-   <property name="text">
-    <string>Toggle Greek Toolbars</string>
-   </property>
-  </action>
-  <action name="actionToggle_Latin_Toolbars">
-   <property name="text">
-    <string>Toggle Latin Toolbars</string>
-   </property>
-  </action>
   <action name="actionPrepare_Text">
    <property name="text">
     <string>Prepare Text</string>
@@ -2553,15 +2429,6 @@
     <string>Libre Office Calc</string>
    </property>
   </action>
-  <action name="actionFont_Forge">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
-   </property>
-   <property name="text">
-    <string>Project Font</string>
-   </property>
-  </action>
   <action name="actionDeveloper">
    <property name="text">
     <string>Developer</string>
@@ -2599,11 +2466,17 @@
    <property name="text">
     <string>MyExplorer</string>
    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+E</string>
+    </property>
   </action>
   <action name="actionNewProject">
    <property name="text">
     <string>New Project</string>
    </property>
+  <property name="shortcut">
+   <string>Ctrl+N</string>
+  </property>
   </action>
   <action name="actionRecreateErasmus1516">
    <property name="text">
@@ -2615,11 +2488,6 @@
     <string>Edit</string>
    </property>
   </action>
-  <action name="actionPreferences">
-   <property name="text">
-    <string>Preferences</string>
-   </property>
-  </action>
   <action name="actionHebrew_6">
    <property name="text">
     <string>Hebrew</string>
@@ -2628,11 +2496,6 @@
   <action name="actionLatin_5">
    <property name="text">
     <string>Latin</string>
-   </property>
-  </action>
-  <action name="actionOCR_Preprocess">
-   <property name="text">
-    <string>OCR Preprocess Tool</string>
    </property>
   </action>
   <action name="actionMyWriter">
@@ -2693,6 +2556,9 @@
    <property name="text">
     <string>Open Project</string>
    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+O</string>
+    </property>
   </action>
   <action name="actionDevelopment_Backup">
    <property name="text">
@@ -2719,11 +2585,6 @@
    </property>
    <property name="toolTip">
     <string>Reserved for production backup and restore process wiring.</string>
-   </property>
-  </action>
-  <action name="actionSet_Columns_Per_Page">
-   <property name="text">
-    <string>Set Columns Per Page</string>
    </property>
   </action>
  </widget>

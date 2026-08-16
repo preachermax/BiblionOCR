@@ -1,5 +1,6 @@
 import os
 import re
+import unicodedata
 from collections import Counter
 from typing import Optional
 
@@ -7,8 +8,15 @@ from PyQt5 import QtWidgets
 
 
 def _normalize_word(word: str) -> str:
-    normalized = re.sub(r"[^a-zA-Z0-9]+", "", word).lower()
-    return normalized
+    return unicodedata.normalize("NFC", str(word or "").strip()).lower()
+
+
+def extract_wordlist_words(text: str) -> set[str]:
+    return {
+        _normalize_word(token)
+        for token in re.findall(r"[^\W_]+(?:['’][^\W_]+)*", text or "", flags=re.UNICODE)
+        if _normalize_word(token)
+    }
 
 
 def _read_existing_words(path: Optional[str]) -> set:
@@ -127,11 +135,7 @@ def update_tesseract_wordlist_from_text(
             output_path = os.path.join(os.getcwd(), "tesseract_wordlist.txt")
 
     existing_words = _read_existing_words(output_path) if include_existing else set()
-    discovered_words = Counter(
-        _normalize_word(word)
-        for word in re.split(r"\s+", text)
-        if _normalize_word(word)
-    )
+    discovered_words = Counter(extract_wordlist_words(text))
 
     combined = sorted(existing_words | set(discovered_words.keys()))
     output_dir = os.path.dirname(output_path)

@@ -2,78 +2,95 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
+from dataclasses import dataclass
 from typing import Callable, Optional
 
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
+from .myexplorer_picker import run_myexplorer_selection
+from .project_tracking import ProjectWorkflowTracker
 
-MODULE_PAGE_WORKFLOW_MILESTONES = {
+
+@dataclass(frozen=True)
+class WorkflowStepSpec:
+    label: str
+    method_name: Optional[str] = None
+    dialog_name: str = ""
+    picker_kind: str = "file"
+
+
+# NOTE:
+# The sequence declared below is a provisional baseline inferred from menu/toolbar order.
+# During module-by-module prompt-pack passes, the exact step order is expected to be
+# re-established and edited to match each module's real workflow behavior.
+MODULE_PAGE_WORKFLOW_STEPS = {
     "MyServer": [
-        "Review active project status",
-        "Validate project workflow readiness",
-        "Hand off module launch for next page stage",
+        WorkflowStepSpec("Review active project status", None, "Project status dialog", "file"),
+        WorkflowStepSpec("Validate project workflow readiness", None, "Workflow readiness dialog", "file"),
+        WorkflowStepSpec("Hand off module launch for next page stage", None, "Module launch dialog", "file"),
     ],
     "MyExplorer": [
-        "Confirm project folder target",
-        "Review page asset locations",
-        "Open file target in operating system",
+        WorkflowStepSpec("Confirm project folder target", None, "Project folder picker", "folder"),
+        WorkflowStepSpec("Review page asset locations", None, "Asset review picker", "folder"),
+        WorkflowStepSpec("Open file target in operating system", None, "System opener", "file"),
     ],
     "MyScanner": [
-        "Acquire or import source page image",
-        "Validate image orientation/quality",
-        "Export page image into project structure",
+        WorkflowStepSpec("Acquire or import source page image", "loadImage", "Image picker", "file"),
+        WorkflowStepSpec("Validate image orientation/quality", None, "Image validation dialog", "file"),
+        WorkflowStepSpec("Export page image into project structure", None, "Export dialog", "file"),
     ],
     "MyPixler": [
-        "Open current page image",
-        "Apply cleanup adjustments",
-        "Save updated page image",
+        WorkflowStepSpec("Open current page image", "loadImage", "Image picker", "file"),
+        WorkflowStepSpec("Apply cleanup adjustments", None, "Cleanup dialog", "file"),
+        WorkflowStepSpec("Save updated page image", None, "Save dialog", "file"),
     ],
     "MyBoxer": [
-        "Open page segmentation workspace",
-        "Run page/line box adjustments",
-        "Save box geometry updates",
+        WorkflowStepSpec("Open page segmentation workspace", "loadImage", "Image picker", "file"),
+        WorkflowStepSpec("Run page/line box adjustments", "loadText", "Text picker", "file"),
+        WorkflowStepSpec("Save box geometry updates", None, "Save dialog", "file"),
     ],
     "MyGlypher": [
-        "Load page line image",
-        "Extract glyph set",
-        "Save glyph updates",
+        WorkflowStepSpec("Load page line image", "loadImage", "Image picker", "file"),
+        WorkflowStepSpec("Extract glyph set", None, "Glyph extraction dialog", "file"),
+        WorkflowStepSpec("Save glyph updates", None, "Save dialog", "file"),
     ],
     "MyReader": [
-        "Load page image and OCR text",
-        "Review OCR output",
-        "Save text corrections",
+        WorkflowStepSpec("Load page image and OCR text", "loadImage", "Image picker", "file"),
+        WorkflowStepSpec("Review OCR output", "loadText", "Text picker", "file"),
+        WorkflowStepSpec("Save text corrections", None, "Save dialog", "file"),
     ],
     "MyGrounder": [
-        "Load page reference assets",
-        "Validate ground-truth alignment",
-        "Save ground-truth updates",
+        WorkflowStepSpec("Load page reference assets", "loadImage", "Image picker", "file"),
+        WorkflowStepSpec("Validate ground-truth alignment", "loadText", "Ground-truth dialog", "file"),
+        WorkflowStepSpec("Save ground-truth updates", None, "Save dialog", "file"),
     ],
     "MyTrainer": [
-        "Validate training inputs",
-        "Run training step for current page set",
-        "Review training log/output",
+        WorkflowStepSpec("Validate training inputs", None, "Training input dialog", "file"),
+        WorkflowStepSpec("Run training step for current page set", None, "Training dialog", "file"),
+        WorkflowStepSpec("Review training log/output", None, "Training log dialog", "file"),
     ],
     "MyLexer": [
-        "Load page text artifact",
-        "Run lexical processing",
-        "Save lexical updates",
+        WorkflowStepSpec("Load page text artifact", "loadText", "Text picker", "file"),
+        WorkflowStepSpec("Run lexical processing", None, "Lexical processing dialog", "file"),
+        WorkflowStepSpec("Save lexical updates", None, "Save dialog", "file"),
     ],
     "MyResolver": [
-        "Load unresolved variants",
-        "Apply resolution decisions",
-        "Save resolved variant updates",
+        WorkflowStepSpec("Load unresolved variants", None, "Variant picker", "file"),
+        WorkflowStepSpec("Apply resolution decisions", None, "Resolution dialog", "file"),
+        WorkflowStepSpec("Save resolved variant updates", None, "Save dialog", "file"),
     ],
     "MyVersifier": [
-        "Load verse comparison view",
-        "Apply verse alignment updates",
-        "Save verse corrections",
+        WorkflowStepSpec("Load verse comparison view", "loadText", "Text picker", "file"),
+        WorkflowStepSpec("Apply verse alignment updates", None, "Verse alignment dialog", "file"),
+        WorkflowStepSpec("Save verse corrections", None, "Save dialog", "file"),
     ],
     "MyWriter": [
-        "Load publication-ready text",
-        "Run final page validation",
-        "Export page output",
+        WorkflowStepSpec("Load publication-ready text", None, "Text picker", "file"),
+        WorkflowStepSpec("Run final page validation", None, "Validation dialog", "file"),
+        WorkflowStepSpec("Export page output", None, "Export dialog", "file"),
     ],
 }
 
@@ -125,6 +142,16 @@ _TEXT_HANDLER_CANDIDATES = (
     "loadTextPath",
     "loadTextFromPath",
 )
+
+_PAGE_WORKFLOW_DIALOG_ATTRS = {
+    "loadImage": "_image_open_dialog",
+    "loadText": "_text_open_dialog",
+}
+
+_PAGE_WORKFLOW_PICKER_KIND = {
+    "loadImage": "file",
+    "loadText": "file",
+}
 
 _MYEXPLORER_ALIAS_CANDIDATES = {
     "open_image_with_myexplorer": ("loadImage", "loadRefImg", "getImage"),
@@ -296,10 +323,8 @@ class _ExplorerPickerDialog(qtw.QDialog):
 
 
 def _explorer_get_open_file_name(parent=None, caption="", directory="", _filter="", *args, **kwargs):
-    dialog = _ExplorerPickerDialog(parent, caption or "Open File", directory, "open_file")
-    if dialog.exec_() == qtw.QDialog.Accepted:
-        return dialog.selected_path(), ""
-    return "", ""
+    selected_path = run_myexplorer_selection(caption or "Open File", directory, "file")
+    return selected_path, ""
 
 
 def _explorer_get_save_file_name(parent=None, caption="", directory="", _filter="", *args, **kwargs):
@@ -313,10 +338,7 @@ def _explorer_get_save_file_name(parent=None, caption="", directory="", _filter=
 
 
 def _explorer_get_existing_directory(parent=None, caption="", directory="", *args, **kwargs):
-    dialog = _ExplorerPickerDialog(parent, caption or "Select Folder", directory, "directory")
-    if dialog.exec_() == qtw.QDialog.Accepted:
-        return dialog.selected_path()
-    return ""
+    return run_myexplorer_selection(caption or "Select Folder", directory, "directory")
 
 
 def _install_explorer_backed_file_dialogs(window) -> None:
@@ -479,6 +501,7 @@ def append_default_context_actions(
 
         if action.shortcut().isEmpty():
             action.setShortcut(DEFAULT_MENU_SHORTCUTS[key])
+        action.setShortcutVisibleInContextMenu(True)
 
 
 def _canonical_action_name(raw_text: str) -> str:
@@ -530,9 +553,11 @@ def _ensure_module_menu_shortcuts(window) -> None:
             shortcut = SAVE_ACTION_SHORTCUTS.get(object_name)
             if shortcut is not None and action.shortcut().isEmpty():
                 action.setShortcut(shortcut)
+            action.setShortcutVisibleInContextMenu(True)
             continue
         if action.shortcut().isEmpty():
             action.setShortcut(DEFAULT_MENU_SHORTCUTS[canonical])
+        action.setShortcutVisibleInContextMenu(True)
 
 
 def _confirm_save_operation(window, label: str) -> bool:
@@ -819,6 +844,8 @@ class ModulePageWorkflowWizardDialog(qtw.QDialog):
         stage_plan,
         run_stage_callback,
         run_all_callback,
+        auto_run: bool = False,
+        auto_run_delay_ms: int = 0,
         parent=None,
     ):
         super().__init__(parent)
@@ -828,8 +855,31 @@ class ModulePageWorkflowWizardDialog(qtw.QDialog):
         self.stage_plan = stage_plan
         self.run_stage_callback = run_stage_callback
         self.run_all_callback = run_all_callback
+        self._auto_run = bool(auto_run)
+        self._auto_run_delay_ms = max(0, int(auto_run_delay_ms))
         self._build_ui(intro_text)
         self._populate_stage_pages()
+        if self._auto_run:
+            qtc.QTimer.singleShot(self._auto_run_delay_ms, self._run_all)
+
+    def _build_default_summary_widget(self, defaults: dict) -> qtw.QWidget:
+        container = qtw.QGroupBox("Session Defaults", self)
+        layout = qtw.QFormLayout(container)
+        layout.setLabelAlignment(qtc.Qt.AlignLeft)
+        layout.setFormAlignment(qtc.Qt.AlignTop)
+
+        if not defaults:
+            layout.addRow(qtw.QLabel("No session defaults are available."))
+            return container
+
+        for key, value in defaults.items():
+            label = str(key).replace('_', ' ').title()
+            rendered_value = str(value or '').strip() or '—'
+            field = qtw.QLabel(rendered_value)
+            field.setWordWrap(True)
+            layout.addRow(label, field)
+
+        return container
 
     def _make_scroll_page(self, content_widget: qtw.QWidget) -> qtw.QScrollArea:
         scroll = qtw.QScrollArea(self)
@@ -880,6 +930,8 @@ class ModulePageWorkflowWizardDialog(qtw.QDialog):
             stage_title = stage.get("title", "Stage")
             description = stage.get("description", "")
             steps = stage.get("steps", [])
+            defaults = stage.get("defaults", {})
+            module_name = stage.get("module_name", stage.get("key", ""))
 
             self.stage_nav.addItem(stage_title)
 
@@ -898,9 +950,16 @@ class ModulePageWorkflowWizardDialog(qtw.QDialog):
             desc_label.setWordWrap(True)
             layout.addWidget(desc_label)
 
+            if defaults:
+                layout.addWidget(self._build_default_summary_widget(defaults))
+
             step_list = qtw.QListWidget(page)
-            for step in steps:
-                step_list.addItem(f"{step.get('module', 'Module')}: {step.get('label', '')}")
+            for step in _module_workflow_steps(module_name):
+                dialog_name = step.get('dialog', '')
+                if dialog_name:
+                    step_list.addItem(f"{module_name or step.get('module', 'Module')}: {step.get('label', '')} -> {dialog_name}")
+                else:
+                    step_list.addItem(f"{module_name or step.get('module', 'Module')}: {step.get('label', '')}")
             layout.addWidget(step_list, 1)
 
             run_stage_button = qtw.QPushButton(f"Run {stage_title} Wizard")
@@ -1044,29 +1103,196 @@ def _open_module_page_wizard(window, module_name: str) -> None:
     open_default_module_page_workflow_wizard(window, module_name)
 
 
+def _myexplorer_script_path() -> str:
+    core_dir = os.path.abspath(os.path.dirname(__file__))
+    project_root = os.path.abspath(os.path.join(core_dir, ".."))
+    return os.path.join(project_root, "ViewController", "0-MainUI", "MyExplorer.py")
+
+
+def _launch_myexplorer_picker(title: str, start_dir: str, selection_kind: str) -> str:
+    explorer_path = _myexplorer_script_path()
+    if not os.path.exists(explorer_path):
+        return ""
+
+    fd, output_path = tempfile.mkstemp(prefix="biblion_workflow_pick_", suffix=".txt")
+    os.close(fd)
+    try:
+        os.unlink(output_path)
+    except OSError:
+        pass
+
+    command = [
+        sys.executable,
+        explorer_path,
+        "--start-dir",
+        start_dir or os.getcwd(),
+        "--output-file",
+        output_path,
+        "--title",
+        title,
+    ]
+    if selection_kind == "file":
+        command.append("--select-file")
+    else:
+        command.append("--select-dir")
+
+    process = subprocess.Popen(command)
+    waiter = qtc.QEventLoop()
+
+    def _check_completion() -> None:
+        if process.poll() is not None:
+            waiter.quit()
+            return
+        if os.path.exists(output_path):
+            try:
+                if os.path.getsize(output_path) > 0:
+                    waiter.quit()
+                    return
+            except OSError:
+                pass
+        qtc.QTimer.singleShot(150, _check_completion)
+
+    qtc.QTimer.singleShot(150, _check_completion)
+    waiter.exec_()
+
+    selected_path = ""
+    try:
+        if os.path.exists(output_path):
+            with open(output_path, "r", encoding="utf-8") as handle:
+                selected_path = handle.read().strip()
+    except OSError:
+        selected_path = ""
+    finally:
+        try:
+            os.unlink(output_path)
+        except OSError:
+            pass
+
+    return selected_path
+
+
+def _workflow_start_directory(window, module_name: str, load_method_name: str) -> str:
+    candidates = []
+    for attr_name in ("imgdir", "txtdir", "directory", "projecthome", "current_project_root"):
+        value = getattr(window, attr_name, "")
+        if value:
+            candidates.append(str(value))
+
+    session_manager = getattr(window, "session_manager", None)
+    if hasattr(session_manager, "get_active_project_root"):
+        project_root = session_manager.get_active_project_root("Session.json")
+        if project_root:
+            candidates.append(project_root)
+
+    candidates.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+    for candidate in candidates:
+        if candidate and os.path.isdir(candidate):
+            return os.path.abspath(candidate)
+    return os.getcwd()
+
+
+def _invoke_page_workflow_loader(window, load_method_name: str, selected_path: str) -> None:
+    load_method = getattr(window, load_method_name, None)
+    if not callable(load_method):
+        return
+
+    selected_path = str(selected_path or "").strip()
+    if not selected_path:
+        return
+
+    original_image_picker = getattr(window, "open_non_modal_image_picker", None)
+    original_text_picker = getattr(window, "open_non_modal_text_picker", None)
+    original_file_picker = getattr(window, "open_non_modal_file_picker", None)
+
+    def _direct_picker(_title, _directory, selected_handler, _dialog_attr_name, *_args, **_kwargs):
+        return selected_handler(selected_path)
+
+    try:
+        window.open_non_modal_file_picker = _direct_picker
+        window.open_non_modal_image_picker = _direct_picker
+        window.open_non_modal_text_picker = _direct_picker
+        load_method()
+    finally:
+        if original_file_picker is not None:
+            window.open_non_modal_file_picker = original_file_picker
+        if original_image_picker is not None:
+            window.open_non_modal_image_picker = original_image_picker
+        if original_text_picker is not None:
+            window.open_non_modal_text_picker = original_text_picker
+
+
+def _prompt_page_workflow_load(window, module_name: str, load_method_name: str) -> bool:
+    selection_kind = _PAGE_WORKFLOW_PICKER_KIND.get(load_method_name, "file")
+    start_dir = _workflow_start_directory(window, module_name, load_method_name)
+    prompt_title = f"{module_name}: select {load_method_name.replace('load', '').lower() or 'workflow input'}"
+    selected_path = _launch_myexplorer_picker(prompt_title, start_dir, selection_kind)
+    if not selected_path:
+        return False
+
+    _invoke_page_workflow_loader(window, load_method_name, selected_path)
+    return True
+
+
+def _prompt_module_page_workflow_inputs(window, module_name: str) -> bool:
+    for step in _module_workflow_steps(module_name):
+        if not step.method_name:
+            continue
+        if not _prompt_page_workflow_load(window, module_name, step.method_name):
+            return False
+    return True
+
+
+def _module_workflow_steps(module_name: str):
+    steps = MODULE_PAGE_WORKFLOW_STEPS.get(module_name)
+    if steps:
+        return steps
+    return [
+        WorkflowStepSpec("Load page context", "loadImage", "Generic input dialog", "file"),
+        WorkflowStepSpec("Run module workflow", None, "Execution dialog", "file"),
+        WorkflowStepSpec("Save module output", None, "Save dialog", "file"),
+    ]
+
+
 def open_default_module_page_workflow_wizard(window, module_name: str) -> None:
     """Open the default module-local page workflow wizard for a module window."""
 
+    session_manager = getattr(window, "session_manager", None)
+
+    if not _prompt_module_page_workflow_inputs(window, module_name):
+        return
+
     steps = [
-        {"module": module_name, "label": item}
-        for item in MODULE_PAGE_WORKFLOW_MILESTONES.get(
-            module_name,
-            [
-                "Load page context",
-                "Run page-specific workflow action",
-                "Save page workflow result",
-            ],
-        )
+        {
+            "module": module_name,
+            "label": step.label,
+            "dialog": step.dialog_name,
+            "method": step.method_name or "",
+            "picker_kind": step.picker_kind,
+        }
+        for step in _module_workflow_steps(module_name)
     ]
+    defaults = {}
+    if hasattr(session_manager, "build_workflow_wizard_defaults"):
+        defaults = session_manager.build_workflow_wizard_defaults("page", module_name)
+    defaults.update(
+        {
+            "stage_key": f"{module_name.lower()}_page_stage",
+            "stage_modules": module_name,
+            "step_count": len(steps),
+        }
+    )
 
     stage_plan = [
         {
             "key": f"{module_name.lower()}_page_stage",
+            "module_name": module_name,
             "title": f"{module_name} Page Workflow",
             "description": (
-                f"Run the {module_name} page workflow milestones for the active page context."
+                f"Run the standardized {module_name} page workflow sequence for the active page context."
             ),
             "steps": steps,
+            "defaults": defaults,
         }
     ]
 
@@ -1092,16 +1318,24 @@ def open_default_module_page_workflow_wizard(window, module_name: str) -> None:
     def run_all() -> None:
         for stage in stage_plan:
             run_stage(stage.get("key", ""))
+        if module_name == "MyWriter":
+            project_root = str(defaults.get("active_project_root") or "").strip()
+            if project_root:
+                tracker = ProjectWorkflowTracker()
+                context = tracker._load_project_context(project_root)
+                page_number = context.get("CurrentProjectPage", context.get("ProjectPageNumber", 1))
+                tracker.record_page_completion(project_root, page_number)
 
     dialog = ModulePageWorkflowWizardDialog(
         title=f"{module_name} Page Workflow Wizard",
         intro_text=(
             "Module-specific page workflow wizard. "
-            "Use Run buttons to execute page milestones for this module."
+            "It uses the shared step sequence -> dialog structure and pauses for MyExplorer file selection overrides before continuing."
         ),
         stage_plan=stage_plan,
         run_stage_callback=run_stage,
         run_all_callback=run_all,
+        auto_run=True,
         parent=window,
     )
     dialog.exec_()

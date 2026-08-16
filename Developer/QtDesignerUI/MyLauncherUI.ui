@@ -1115,8 +1115,6 @@
     </property>
     <addaction name="actionMy_Writer"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
-    <addaction name="actionCreate_e_Sword_Bible_Module"/>
-    <addaction name="actionCreate_theWord_Bible_Module"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -1972,24 +1970,6 @@
   <action name="actionStage_Ground_Truth">
    <property name="text">
     <string>Stage Ground Truth</string>
-   </property>
-  </action>
-  <action name="actionCreate_e_Sword_Bible_Module">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
-   </property>
-   <property name="text">
-    <string>e-Sword Bible Module</string>
-   </property>
-  </action>
-  <action name="actionCreate_theWord_Bible_Module">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
-   </property>
-   <property name="text">
-    <string>theWord Bible Module</string>
    </property>
   </action>
   <action name="actionEnglish">

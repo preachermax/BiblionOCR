@@ -717,7 +717,7 @@ class ProjectSettingsDialog(qtw.QDialog):
         intro_label = qtw.QLabel(
             "Edit project settings and provenance. Milestone and module handshake settings are on dedicated pages. "
             "Changes persist to project-local SQLite stores and project.ris.json. Recommended tool: DB Browser for SQLite. "
-            "Project font installation is handled automatically when ProjectFont is saved."
+            "Project font generation, editing, and installation are handled by MyGlypher."
         )
         intro_label.setWordWrap(True)
         layout.addWidget(intro_label)
@@ -748,7 +748,8 @@ class ProjectSettingsDialog(qtw.QDialog):
 
         project_db_help = qtw.QLabel(
             "Project database fields are stored in project_metadata.sqlite and can be edited here, "
-            "including ProjectDatabase and ProjectFont."
+            "including ProjectDatabase and the UI font selection. The Tesseract project font is read-only here "
+            "and is maintained by MyGlypher."
         )
         project_db_help.setWordWrap(True)
         project_db_layout.addWidget(project_db_help)
@@ -926,11 +927,20 @@ class ProjectSettingsDialog(qtw.QDialog):
     def _load_project_database_table(self):
         self.project_db_table.setRowCount(0)
         record = self._load_project_database_record()
+        page_count_spins = {}
         for definition in self._project_db_definitions:
             row = self.project_db_table.rowCount()
             self.project_db_table.insertRow(row)
 
-            key_item = qtw.QTableWidgetItem(definition.key)
+            field_label = definition.label if definition.key in {
+                "NumberPages",
+                "TotalProjectPages",
+                "NumberColumns",
+                "UIFont",
+                "ProjectFont",
+            } else definition.key
+            key_item = qtw.QTableWidgetItem(field_label)
+            key_item.setData(qtc.Qt.UserRole, definition.key)
             key_item.setFlags(key_item.flags() & ~qtc.Qt.ItemIsEditable)
             key_item.setToolTip(definition.help_text or definition.label)
             self.project_db_table.setItem(row, 0, key_item)
@@ -940,12 +950,58 @@ class ProjectSettingsDialog(qtw.QDialog):
                 display_value = ",".join(str(part) for part in raw_value)
             else:
                 display_value = "" if raw_value is None else str(raw_value)
-            self.project_db_table.setItem(row, 1, qtw.QTableWidgetItem(display_value))
+            if definition.key == "UIFont":
+                font_combo = qtw.QFontComboBox(self.project_db_table)
+                font_family = self._ui_font_family(display_value or "FROMVS.ttf")
+                font_combo.setCurrentFont(qtg.QFont(font_family or "FROMVS"))
+                self.project_db_table.setCellWidget(row, 1, font_combo)
+            elif definition.key in {"NumberPages", "NumberColumns", "TotalProjectPages"}:
+                spin = qtw.QSpinBox(self.project_db_table)
+                spin.setRange(1, 3 if definition.key == "NumberColumns" else 1_000_000)
+                spin.setValue(max(1, int(raw_value or definition.default or 1)))
+                spin.setReadOnly(definition.key == "TotalProjectPages")
+                spin.setButtonSymbols(
+                    qtw.QAbstractSpinBox.NoButtons
+                    if definition.key == "TotalProjectPages"
+                    else qtw.QAbstractSpinBox.UpDownArrows
+                )
+                self.project_db_table.setCellWidget(row, 1, spin)
+                page_count_spins[definition.key] = spin
+            else:
+                value_item = qtw.QTableWidgetItem(display_value)
+                if definition.key == "ProjectFont":
+                    value_item.setFlags(value_item.flags() & ~qtc.Qt.ItemIsEditable)
+                self.project_db_table.setItem(row, 1, value_item)
 
             notes = definition.help_text or definition.label
             note_item = qtw.QTableWidgetItem(notes)
             note_item.setFlags(note_item.flags() & ~qtc.Qt.ItemIsEditable)
             self.project_db_table.setItem(row, 2, note_item)
+
+        source_pages_spin = page_count_spins.get("NumberPages")
+        columns_spin = page_count_spins.get("NumberColumns")
+        total_pages_spin = page_count_spins.get("TotalProjectPages")
+        if source_pages_spin and columns_spin and total_pages_spin:
+            def update_total_project_pages():
+                total_pages_spin.setValue(source_pages_spin.value() * columns_spin.value())
+
+            source_pages_spin.valueChanged.connect(update_total_project_pages)
+            columns_spin.valueChanged.connect(update_total_project_pages)
+            update_total_project_pages()
+
+    def _ui_font_family(self, font_name):
+        requested = str(font_name or "FROMVS.ttf").strip()
+        if requested.casefold() not in {"fromvs", "fromvs.ttf", "fromvs [maxr]"}:
+            return requested
+
+        font_path = os.path.join(self._mainui_dir, "fonts", "FROMVS.ttf")
+        if os.path.isfile(font_path):
+            font_id = qtg.QFontDatabase.addApplicationFont(font_path)
+            if font_id != -1:
+                families = qtg.QFontDatabase.applicationFontFamilies(font_id)
+                if families:
+                    return families[0]
+        return "FROMVS"
 
     def _load_handshake_table(self):
         self.handshake_table.setRowCount(0)
@@ -1017,10 +1073,17 @@ class ProjectSettingsDialog(qtw.QDialog):
             value_item = self.project_db_table.item(row, 1)
             if key_item is None:
                 continue
-            key = key_item.text().strip()
+            key = str(key_item.data(qtc.Qt.UserRole) or key_item.text()).strip()
             if not key:
                 continue
-            raw_value = value_item.text().strip() if value_item is not None else ""
+            cell_widget = self.project_db_table.cellWidget(row, 1)
+            if key == "UIFont" and isinstance(cell_widget, qtw.QFontComboBox):
+                family = cell_widget.currentFont().family().strip()
+                raw_value = "FROMVS.ttf" if family.casefold() in {"fromvs", "fromvs [maxr]"} else family
+            elif isinstance(cell_widget, qtw.QSpinBox):
+                raw_value = str(cell_widget.value())
+            else:
+                raw_value = value_item.text().strip() if value_item is not None else ""
             definition = self._project_db_definition_map.get(key)
             if definition is None:
                 values[key] = raw_value
@@ -1208,13 +1271,6 @@ class ProjectSettingsDialog(qtw.QDialog):
         try:
             project_db_values = self._collect_project_database_values()
             create_project_database(self._project_metadata_db_path(), project_db_values)
-            installed_font_path = ""
-            project_font_name = str(project_db_values.get("ProjectFont", "") or "").strip()
-            if project_font_name:
-                installed_font_path = self.session_manager.ensure_project_font_installed(
-                    project_font_name,
-                    module_dir=self._mainui_dir,
-                )
             saved_values = self.store.save_ris_values(self._collect_values())
             milestone_updates = self._collect_milestone_updates()
             self.workflow_tracker.update_milestones(
@@ -1233,15 +1289,9 @@ class ProjectSettingsDialog(qtw.QDialog):
         timestamp_row = self._find_row("timestamp")
         if timestamp_row is not None:
             self.ris_table.item(timestamp_row, 1).setText(str(saved_values.get("timestamp", "")))
-        if installed_font_path:
-            self.status_label.setText(
-                "Project settings saved to SQLite plus project metadata JSON/CSV mirrors and project.ris.json. "
-                f"Project font installed at: {installed_font_path}"
-            )
-        else:
-            self.status_label.setText(
-                "Project settings saved to SQLite plus project metadata JSON/CSV mirrors and project.ris.json."
-            )
+        self.status_label.setText(
+            "Project settings saved to SQLite plus project metadata JSON/CSV mirrors and project.ris.json."
+        )
         super().accept()
 
     def reject(self):

@@ -104,6 +104,8 @@ Must be true before commit:
 
 ## G) Validation Sequence
 
+1. Before clearing Problems, audit every removed UI action/control against runtime imports, signal connections, and handlers; comment out deprecated orphan paths and verify no live references remain.
+1. Before clearing Problems, verify every open-file control uses the MyExplorer icon and invokes MyExplorer as the sole system file picker; direct `QFileDialog` open calls must be removed or demonstrably routed through the shared MyExplorer interception installed by `Core/workflow_wizard_actions.py`.
 1. Run a full-workspace Problems scan first and record the total count.
 1. Classify Problems into two buckets: pre-existing baseline (outside current scope), and introduced/regressed by the current change set.
 1. Repair all introduced/regressed Problems before any clean-status claim.

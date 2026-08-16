@@ -102,6 +102,44 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
 
             self.assertTrue(tracker._text_outputs_started(project_root))
 
+    def test_total_pages_use_derived_project_page_count(self) -> None:
+        tracker = ProjectWorkflowTracker()
+
+        self.assertEqual(
+            200,
+            tracker._context_total_pages(
+                {"NumberPages": 100, "NumberColumns": 2, "TotalProjectPages": 200}
+            ),
+        )
+        self.assertEqual(
+            200,
+            tracker._context_total_pages({"NumberPages": 100, "NumberColumns": 2}),
+        )
+
+    def test_snapshot_counts_unique_completed_pages_and_requires_all_pages(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = self._create_project_root(tmpdir)
+            create_project_database(
+                os.path.join(project_root, "project_metadata.sqlite"),
+                {"ProjectName": "Pages", "NumberPages": 2, "NumberColumns": 2},
+                available_languages=("eng",),
+            )
+            tracker = ProjectWorkflowTracker()
+
+            tracker.record_page_completion(project_root, 1)
+            tracker.record_page_completion(project_root, 1)
+            snapshot = tracker.snapshot("MyServer", project_root=project_root)
+            self.assertEqual(4, snapshot["total_pages"])
+            self.assertEqual(1, snapshot["completed_pages"])
+            self.assertEqual(25, snapshot["page_percent"])
+            self.assertLess(snapshot["project_percent"], 100)
+
+            for page_number in (2, 3, 4):
+                tracker.record_page_completion(project_root, page_number)
+            snapshot = tracker.snapshot("MyServer", project_root=project_root)
+            self.assertEqual(4, snapshot["completed_pages"])
+            self.assertEqual(100, snapshot["page_percent"])
+
 
 if __name__ == "__main__":
     unittest.main()

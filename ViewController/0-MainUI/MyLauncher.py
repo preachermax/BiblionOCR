@@ -153,7 +153,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self.ui, 'actionExplorer'):
             self.ui.actionExplorer.triggered.connect(self.OpenWithMyExplorer)
 
-        self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionTrain_Tesseract_tb.triggered.connect(self.actionTrain_Tesseract)
         if hasattr(self.ui, 'actionPage_Workflow_Wizard'):
             self.ui.actionPage_Workflow_Wizard.triggered.connect(lambda: self.open_page_workflow_wizard())
@@ -419,18 +418,31 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             ]
             if not steps:
                 continue
-            stage_plan.append(
-                {
-                    'key': stage_name,
-                    'title': stage_name,
-                    'description': (
-                        'Project-scoped workflow stage. Use this stage wizard to launch relevant modules in order.'
-                        if mode == 'project'
-                        else 'Page-scoped workflow stage. Use this stage wizard for page-level operations.'
-                    ),
-                    'steps': steps,
-                }
-            )
+            stage_data = {
+                'key': stage_name,
+                'title': stage_name,
+                'description': (
+                    'Project-scoped workflow stage. Use this stage wizard to launch relevant modules in order.'
+                    if mode == 'project'
+                    else 'Page-scoped workflow stage. Use this stage wizard for page-level operations.'
+                ),
+                'steps': steps,
+            }
+            if mode == 'page':
+                stage_defaults = self.session_manager.build_workflow_wizard_defaults(
+                    mode,
+                    requested_module,
+                    'Session.json',
+                )
+                stage_defaults.update(
+                    {
+                        'stage_key': stage_name,
+                        'stage_modules': ', '.join(step.get('module', '') for step in steps if step.get('module')),
+                        'step_count': len(steps),
+                    }
+                )
+                stage_data['defaults'] = stage_defaults
+            stage_plan.append(stage_data)
         return stage_plan
 
     def _run_stage_wizard(self, stage_key, stage_plan):
@@ -517,12 +529,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             title=dialog_title,
             intro_text=(
                 'Run page-oriented stages in numbered ViewController order. '
-                'Use this for module-specific page progression while preserving global project administration in MyServer. '
+                'The wizard uses session defaults and auto-runs the requested module workflow while preserving the stacked manual flow. '
                 'Line-splitting and box-preparation tasks are routed through MyBoxer in the pre-process stage.'
             ),
             stage_plan=stage_plan,
             run_stage_callback=lambda stage_key: self._run_stage_wizard(stage_key, stage_plan),
             run_all_callback=lambda: self._run_full_wizard(stage_plan),
+            auto_run=True,
             parent=self,
         )
         dialog.exec_()
@@ -623,9 +636,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             gimp_cmd = "/usr/bin/flatpak run --branch=stable --arch=aarch64 --command=gimp-2.10 --file-forwarding org.gimp.GIMP"'''
 
         os.system(gimp_cmd)
-
-    def actionUpdate_Wordlist(self):
-        pass
 
     def actionTrain_Tesseract(self):
         pass

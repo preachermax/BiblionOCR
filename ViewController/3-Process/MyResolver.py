@@ -86,9 +86,9 @@ def _apply_resolver_defaults():
         if hasattr(varui, "statusbar"):
             varui.statusbar.showMessage(f"Default input: {varui.inbound_default_dir}", 7000)
 
-    project_font = session_manager.get_active_project_font()
-    if project_font:
-        font_family = session_manager.register_application_font(project_font, script_dir)
+    ui_font = session_manager.get_active_ui_font()
+    if ui_font:
+        font_family = session_manager.register_application_font(ui_font, script_dir)
         resolver_font = QtGui.QFont(font_family)
         varui.setFont(resolver_font)
 

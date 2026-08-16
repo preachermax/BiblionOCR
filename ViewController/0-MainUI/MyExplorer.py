@@ -145,11 +145,20 @@ class ExplorerTreeView(QtWidgets.QTreeView):
         return candidate
 
 class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
-    def __init__(self, start_dir=None, maya=False, select_mode=False, selection_output_path="", window_title=""):
+    def __init__(
+        self,
+        start_dir=None,
+        maya=False,
+        select_mode=False,
+        selection_output_path="",
+        window_title="",
+        selection_kind="folder",
+    ):
         super(MyFileBrowser, self).__init__()
         self.start_dir = start_dir
         self.select_mode = bool(select_mode)
         self.selection_output_path = str(selection_output_path or "")
+        self.selection_kind = "file" if str(selection_kind or "").strip().lower() == "file" else "folder"
         self.session_manager = SessionManager()
         self.setupUi(self)
         if window_title:
@@ -177,11 +186,16 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView.setAcceptDrops(True)
         self.treeView.customContextMenuRequested.connect(self.context_menu)
         self.exclude_empty_checkbox.toggled.connect(self._toggle_empty_folder_filter)
+        if hasattr(self, "show_system_files_checkbox"):
+            self.show_system_files_checkbox.setChecked(False)
+            self.show_system_files_checkbox.toggled.connect(self._toggle_system_files_visibility)
         self.treeView.doubleClicked.connect(self._on_tree_double_clicked)
 
         if hasattr(self, "actionSelect_Folder"):
-            self.actionSelect_Folder.triggered.connect(self.select_current_folder)
+            self.actionSelect_Folder.triggered.connect(self.select_current_selection)
             self.actionSelect_Folder.setEnabled(self.select_mode)
+            if self.select_mode and self.selection_kind == "file":
+                self.actionSelect_Folder.setText("Select File")
         if hasattr(self, "actionOpen_Trash"):
             self.actionOpen_Trash.triggered.connect(self.open_system_trash)
         if hasattr(self, "actionRestore_From_Trash"):
@@ -218,22 +232,27 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             self.move(new_left, new_top)
 
     def _resolve_initial_directory(self):
-        candidate = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else RUNTIME_PATHS.model_dir
+        candidate = self.start_dir if self.start_dir and os.path.isdir(self.start_dir) else self._resolve_root_directory()
         if not os.path.isdir(candidate):
-            candidate = RUNTIME_PATHS.project_root
+            candidate = self._resolve_root_directory()
 
         normalized = os.path.abspath(candidate)
 
-        if os.path.basename(normalized) == 'Project' and os.path.basename(os.path.dirname(normalized)) == 'Model':
-            normalized = os.path.dirname(normalized)
-        elif os.path.isdir(os.path.join(normalized, 'Model', 'Project')):
-            normalized = os.path.join(normalized, 'Model')
+        root_dir = self._resolve_root_directory()
+        try:
+            if os.path.commonpath([normalized, root_dir]) != os.path.abspath(root_dir):
+                normalized = root_dir
+        except ValueError:
+            normalized = root_dir
 
         if os.path.isdir(normalized):
             return normalized
-        if os.path.isdir(RUNTIME_PATHS.model_dir):
-            return RUNTIME_PATHS.model_dir
-        return RUNTIME_PATHS.project_root
+        return root_dir
+
+    def _resolve_root_directory(self):
+        if getattr(self, "show_system_files_checkbox", None) is not None and self.show_system_files_checkbox.isChecked():
+            return os.path.abspath(os.sep)
+        return self._resolve_project_root_directory()
 
     def _resolve_project_root_directory(self):
         active_project_root = self.session_manager.get_active_project_root()
@@ -263,7 +282,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
     def populate(self):
         dir_path = self._resolve_initial_directory()
-        root_dir = self._resolve_project_root_directory()
+        root_dir = self._resolve_root_directory()
 
         self.model = QtWidgets.QFileSystemModel()
         self.model.setRootPath(root_dir)
@@ -302,6 +321,23 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
     def _toggle_empty_folder_filter(self, enabled):
         self.proxy_model.setExcludeEmptyDirs(enabled)
 
+    def _toggle_system_files_visibility(self, _enabled):
+        current_path = self._current_path()
+        self.populate()
+        if current_path and os.path.isdir(current_path):
+            candidate = os.path.abspath(current_path)
+            root_dir = self._resolve_root_directory()
+            try:
+                if os.path.commonpath([candidate, root_dir]) == os.path.abspath(root_dir):
+                    target_index = self.model.index(candidate)
+                    if target_index.isValid():
+                        proxy_index = self.proxy_model.mapFromSource(target_index)
+                        if proxy_index.isValid():
+                            self.treeView.setCurrentIndex(proxy_index)
+                            self.treeView.scrollTo(proxy_index, QtWidgets.QAbstractItemView.PositionAtCenter)
+            except ValueError:
+                pass
+
     def _current_path(self):
         index = self.treeView.currentIndex()
         if not index.isValid():
@@ -321,7 +357,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
     def _on_tree_double_clicked(self, _index):
         if self.select_mode:
-            self.select_current_folder()
+            self.select_current_selection()
 
     def _write_selection_output(self, selected_path):
         if not self.selection_output_path:
@@ -336,15 +372,25 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
                 f"Could not persist selection output:\n{exc}",
             )
 
-    def select_current_folder(self):
-        selected_dir = self._current_directory()
-        if not selected_dir:
-            QtWidgets.QMessageBox.information(self, "Select Folder", "Select a folder first.")
-            return
+    def select_current_selection(self):
+        if self.selection_kind == "file":
+            selected_path = self._current_path()
+            if not selected_path or not os.path.isfile(selected_path):
+                QtWidgets.QMessageBox.information(self, "Select File", "Select a file first.")
+                return
+            self._write_selection_output(selected_path)
+        else:
+            selected_dir = self._current_directory()
+            if not selected_dir:
+                QtWidgets.QMessageBox.information(self, "Select Folder", "Select a folder first.")
+                return
+            self._write_selection_output(selected_dir)
 
-        self._write_selection_output(selected_dir)
         if self.select_mode:
             self.close()
+
+    def select_current_folder(self):
+        self.select_current_selection()
 
     def open_system_trash(self):
         if sys.platform.startswith("win"):
@@ -527,6 +573,9 @@ if __name__ == '__main__':
         arg = argv[i]
         if arg == "--select-dir":
             select_dir_mode = True
+        elif arg == "--select-file":
+            select_dir_mode = True
+            window_title = window_title or "MyExplorer File Picker"
         elif arg == "--start-dir" and i + 1 < len(argv):
             i += 1
             start_dir = argv[i]
@@ -545,6 +594,7 @@ if __name__ == '__main__':
         select_mode=select_dir_mode,
         selection_output_path=output_file,
         window_title=window_title,
+        selection_kind="file" if "--select-file" in sys.argv[1:] else "folder",
     )
     fb.show()
     app.exec_()

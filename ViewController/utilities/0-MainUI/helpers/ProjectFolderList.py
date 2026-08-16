@@ -149,7 +149,7 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/2-TrainTesseract",
     "ViewController/1-PreProcess",
     "ViewController/0-MainUI/helpers/worker.py",
-    "Developer/update_UI_Resources.txt",
+    "Developer/QtDesignerUI/update_UI_Resources.txt",
     "Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.txt",
     "Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.py",
     "Developer/ViewController/SeparatedDevFiles/0-MainUI/Ui2Py.py",

@@ -4229,6 +4229,7 @@
     <addaction name="action_Trainer"/>
     <addaction name="action_Boxer"/>
     <addaction name="actionCharacter_Reference"/>
+    <addaction name="actionLine_tif_to_bmp"/>
    </widget>
    <widget class="QMenu" name="menuSplit">
     <property name="title">
@@ -5243,24 +5244,6 @@
     <string>Stage Ground Truth</string>
    </property>
   </action>
-  <action name="actionCreate_e_Sword_Bible_Module">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
-   </property>
-   <property name="text">
-    <string>e-Sword Bible Module</string>
-   </property>
-  </action>
-  <action name="actionCreate_theWord_Bible_Module">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
-   </property>
-   <property name="text">
-    <string>theWord Bible Module</string>
-   </property>
-  </action>
   <action name="actionEnglish">
    <property name="text">
     <string>English</string>
@@ -5279,11 +5262,6 @@
   <action name="actionEnglish_3">
    <property name="text">
     <string>English</string>
-   </property>
-  </action>
-  <action name="actionOnline">
-   <property name="text">
-    <string>Online</string>
    </property>
   </action>
   <action name="actionManual_Crop_Image_tb">
@@ -5347,15 +5325,6 @@
    </property>
    <property name="text">
     <string>Find and Replace</string>
-   </property>
-  </action>
-  <action name="actionInstall_Font">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/font.png</normaloff>:/Icons/Icons/font.png</iconset>
-   </property>
-   <property name="text">
-    <string>Install Font</string>
    </property>
   </action>
   <action name="actionToggle_Greek_Toolbars">

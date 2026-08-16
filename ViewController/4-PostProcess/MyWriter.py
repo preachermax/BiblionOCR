@@ -2,6 +2,7 @@
 
 import sys
 import os
+from pathlib import Path
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
@@ -40,7 +41,7 @@ from PyQt5.QtCore import Qt
 from ext import *
 from LocalFileDrop import LocalFileDropMixin
 from print_menu_support import install_print_menu_support, document_target
-from tesseract_wordlist_helper import show_word_count_dialog, update_tesseract_wordlist_from_text
+from tesseract_wordlist_helper import show_word_count_dialog
 
 from MyWriterUI import Ui_MyWriterUI
 
@@ -127,7 +128,7 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         self.reftxtfileList = get_setting('reftxtfileList', [])
 
         if not str(self.font or '').strip():
-            self.font = self.session_manager.get_active_project_font() or self.font
+            self.font = self.session_manager.get_active_ui_font() or self.font
 
         if hasattr(self, 'ui'):
             if hasattr(self.ui, 'bookComboBox'):
@@ -194,6 +195,8 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionDateTime.triggered.connect(datetime.DateTime(self).show)
         self.ui.actionWordcount.triggered.connect(self.wordCount)
         self.ui.actionInsertTable.triggered.connect(table.Table(self).show)
+        self.ui.actionCreate_e_Sword_Bible_Module.triggered.connect(self.export_esword_module_source)
+        self.ui.actionCreate_theWord_Bible_Module.triggered.connect(self.export_theword_module_source)
         #self.ui.actionInsertImage.triggered.connect(self.insertImage)
         self.ui.actionBulletList.triggered.connect(self.bulletList)
         self.ui.actionNumberedList.triggered.connect(self.numberList)
@@ -681,13 +684,31 @@ class Main(LocalFileDropMixin, qtw.QMainWindow):
     def wordCount(self):
         show_word_count_dialog(self, self.ui.textEdit)
 
-    def update_wordlist(self, text=None, output_path=None):
-        target_text = text if text is not None else self.ui.textEdit.toPlainText()
-        return update_tesseract_wordlist_from_text(
-            target_text,
-            project_root=self.current_project_root or self.current_project_name or os.getcwd(),
-            output_path=output_path,
-        )
+    def _export_bible_module_source(self, module_name, directory_name, extension, encoding):
+        project_root = str(self.current_project_root or "").strip()
+        if not project_root:
+            qtw.QMessageBox.warning(self, module_name, "Open a project before exporting a Bible module source.")
+            return ""
+
+        source_text = self.ui.textEdit.toPlainText()
+        if not source_text.strip():
+            qtw.QMessageBox.warning(self, module_name, "Load or enter publication text before exporting.")
+            return ""
+
+        base_name = str(self.current_project_name or Path(self.filename).stem or module_name).strip()
+        safe_name = "".join(character if character.isalnum() or character in "-_" else "_" for character in base_name)
+        output_dir = Path(project_root) / "Model" / "Project" / "Text" / directory_name
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / f"{safe_name}{extension}"
+        output_path.write_text(source_text, encoding=encoding)
+        self.statusBar().showMessage(f"Exported {module_name} source: {output_path}", 8000)
+        return str(output_path)
+
+    def export_esword_module_source(self):
+        return self._export_bible_module_source("e-Sword", "Esword", ".bblx.txt", "utf-8")
+
+    def export_theword_module_source(self):
+        return self._export_bible_module_source("theWord", "TheWord", ".nt", "utf-8-sig")
 
     def insertImage(self):
         def selected(filename):

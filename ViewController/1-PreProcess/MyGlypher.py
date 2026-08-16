@@ -161,9 +161,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
 
         self.ui.actionOpen_Greek_Page_Image.triggered.connect(self.loadImage)
+        self.ui.actionLine_tif_to_bmp.triggered.connect(self.convert_tif_to_bmp)
         self.ui.actionMake_Greek_GlyphBox_Files.triggered.connect(self.glyphbox_make_split)
         self.ui.actionEdit_Greek_GlyphBox_Files.triggered.connect(self.glyphbox_edit_split)
         self.ui.actionCharacter_Reference.triggered.connect(self.OpenChrReference)
+        self.ui.actionInstall_Project_Font.triggered.connect(self.install_project_font)
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
         #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)
 
@@ -313,6 +315,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Restore BoxerSession settings
         self.get_session_settings()
         self._apply_closed_loop_defaults()
+        self.ui.fontProjectFontName.setText(self.session_manager.get_active_project_font())
         self.project_status_controller = ProjectStatusController(
             self,
             'MyGlypher',
@@ -427,7 +430,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.latinpages = get_setting('latinpages', '')
         self.latinlinesbox = get_setting('latinlinesbox', '')
         if not self.font:
-            self.font = self.session_manager.get_active_project_font() or self.font
+            self.font = self.session_manager.get_active_ui_font() or self.font
 
         def _join_project_path(value: str) -> str:
             if not value:
@@ -735,6 +738,36 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath,
             'self.imgdir': self.imgdir,
         })
+
+    def convert_tif_to_bmp(self):
+        source_path = self.imgpath if os.path.isfile(self.imgpath) else ""
+        if source_path.lower().endswith((".tif", ".tiff")):
+            self._convert_tif_to_bmp_file(source_path)
+            return
+
+        self.open_non_modal_image_picker(
+            "Select TIFF Image",
+            self.imgdir if getattr(self, "imgdir", "") else self.projecthome,
+            self._convert_tif_to_bmp_file,
+            "_tif_to_bmp_dialog",
+        )
+
+    def _convert_tif_to_bmp_file(self, source_path):
+        source_path = os.fspath(source_path)
+        if not source_path.lower().endswith((".tif", ".tiff")):
+            qtw.QMessageBox.warning(self, "Convert TIFF to BMP", "Select a TIFF image to convert.")
+            return
+
+        destination_path = os.path.splitext(source_path)[0] + ".bmp"
+        try:
+            with Image.open(source_path) as source_image:
+                source_image.seek(0)
+                source_image.convert("1").save(destination_path, "BMP")
+        except (OSError, ValueError) as error:
+            qtw.QMessageBox.warning(self, "Convert TIFF to BMP", str(error))
+            return
+
+        self.statusBar().showMessage(f"Converted TIFF to BMP: {destination_path}", 5000)
 
     def sortImgFiles(self):
         #print(f'Image File List: {self.imgfileList}')
@@ -1204,6 +1237,28 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def OpenChrReference(self):
         self.chrrefmain = chrref.CharacterReference(self)
         self.chrrefmain.show()
+
+    def install_project_font(self):
+        project_font = self.session_manager.get_active_project_font()
+        installed_path = self.session_manager.ensure_project_font_installed(
+            project_font,
+            module_dir=_LEGACY_MAINUI_HELPERS_DIR,
+        )
+        if installed_path:
+            self.statusBar().showMessage(f"Installed project font: {installed_path}", 5000)
+            qtw.QMessageBox.information(
+                self,
+                "Install Project Font",
+                f"Installed {project_font} to:\n{installed_path}",
+            )
+            return installed_path
+
+        qtw.QMessageBox.warning(
+            self,
+            "Install Project Font",
+            f"Could not locate the selected project font: {project_font}",
+        )
+        return ""
 
     def on_font_update(self):
         # update font to selection and size

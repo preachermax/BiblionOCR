@@ -8,6 +8,11 @@ from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
+from Core.myexplorer_picker import (
+    build_myexplorer_selection_command,
+    read_myexplorer_selection,
+)
+
 
 class EmptyFolderFilterProxyModel(qtc.QSortFilterProxyModel):
     def __init__(self, parent=None):
@@ -93,110 +98,29 @@ class FileDragTreeView(qtw.QTreeView):
         drag.exec_(qtc.Qt.CopyAction)
 
 
-class FilePickerDialog(qtw.QDialog):
-    def __init__(self, title, directory, selected_handler, name_filters=None, parent=None):
+class MyExplorerPickerProcess(qtc.QObject):
+    finished = qtc.pyqtSignal()
+
+    def __init__(self, title, directory, selected_handler, parent=None):
         super().__init__(parent)
         self.selected_handler = selected_handler
-        self.setWindowTitle(title)
-        self.setWindowModality(qtc.Qt.NonModal)
-        self.setAttribute(qtc.Qt.WA_DeleteOnClose, True)
-        self.resize(800, 500)
+        self.process = qtc.QProcess(self)
+        self.command, self.output_file = build_myexplorer_selection_command(title, directory, "file")
+        self._completed = False
+        self.process.finished.connect(self._finish)
+        self.process.errorOccurred.connect(self._finish)
 
-        start_directory = directory or os.getcwd()
-        if not os.path.isdir(start_directory):
-            start_directory = os.path.dirname(start_directory) or os.getcwd()
+    def start(self):
+        self.process.start(self.command[0], self.command[1:])
 
-        self.model = qtw.QFileSystemModel(self)
-        self.model.setFilter(qtc.QDir.AllDirs | qtc.QDir.Files | qtc.QDir.NoDotAndDotDot)
-        self.model.setNameFilters(name_filters or ['*'])
-        self.model.setNameFilterDisables(False)
-        self.model.setReadOnly(True)
-        self.model.setRootPath(start_directory)
-
-        self.proxy_model = EmptyFolderFilterProxyModel(self)
-        self.proxy_model.setSourceModel(self.model)
-        self.proxy_model.setExcludeEmptyDirs(True)
-
-        self.path_edit = qtw.QLineEdit(start_directory)
-        self.up_button = qtw.QPushButton('Up')
-        self.open_button = qtw.QPushButton('Open')
-        self.close_button = qtw.QPushButton('Close')
-        self.exclude_empty_checkbox = qtw.QCheckBox('Exclude empty folders', self)
-        self.exclude_empty_checkbox.setChecked(True)
-        self.hint_label = qtw.QLabel('Drag a file to the application, double-click a file, or select a file and click Open.')
-
-        self.tree = FileDragTreeView(self)
-        self.tree.setModel(self.proxy_model)
-        self.tree.setRootIndex(self.proxy_model.mapFromSource(self.model.index(start_directory)))
-        self.tree.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
-        self.tree.setDragEnabled(True)
-        self.tree.setDragDropMode(qtw.QAbstractItemView.DragOnly)
-        self.tree.setDefaultDropAction(qtc.Qt.CopyAction)
-        self.tree.setAlternatingRowColors(True)
-        self.tree.setSortingEnabled(True)
-        self.tree.sortByColumn(0, qtc.Qt.AscendingOrder)
-
-        top_layout = qtw.QHBoxLayout()
-        top_layout.addWidget(self.path_edit, 1)
-        top_layout.addWidget(self.up_button)
-
-        button_layout = qtw.QHBoxLayout()
-        button_layout.addStretch(1)
-        button_layout.addWidget(self.open_button)
-        button_layout.addWidget(self.close_button)
-
-        layout = qtw.QVBoxLayout(self)
-        layout.addLayout(top_layout)
-        layout.addWidget(self.exclude_empty_checkbox)
-        layout.addWidget(self.hint_label)
-        layout.addWidget(self.tree, 1)
-        layout.addLayout(button_layout)
-
-        self.path_edit.returnPressed.connect(self._go_to_path)
-        self.up_button.clicked.connect(self._go_up)
-        self.open_button.clicked.connect(self._open_current)
-        self.close_button.clicked.connect(self.close)
-        self.exclude_empty_checkbox.toggled.connect(self._toggle_empty_folder_filter)
-        self.tree.doubleClicked.connect(self._open_or_enter)
-
-    def _set_root_path(self, path):
-        if not path or not os.path.isdir(path):
+    def _finish(self, *_args):
+        if self._completed:
             return
-        self.model.setRootPath(path)
-        self.tree.setRootIndex(self.proxy_model.mapFromSource(self.model.index(path)))
-        self.path_edit.setText(path)
-
-    def _toggle_empty_folder_filter(self, enabled):
-        self.proxy_model.setExcludeEmptyDirs(enabled)
-
-    def _go_to_path(self):
-        self._set_root_path(self.path_edit.text())
-
-    def _go_up(self):
-        current = self.path_edit.text()
-        parent = os.path.dirname(current)
-        if parent and parent != current:
-            self._set_root_path(parent)
-
-    def _open_or_enter(self, index):
-        source_index = self.proxy_model.mapToSource(index)
-        path = self.model.filePath(source_index)
-        if os.path.isdir(path):
-            self._set_root_path(path)
-        elif os.path.isfile(path):
-            self._select_file(path)
-
-    def _open_current(self):
-        source_index = self.proxy_model.mapToSource(self.tree.currentIndex())
-        path = self.model.filePath(source_index)
-        if os.path.isdir(path):
-            self._set_root_path(path)
-        elif os.path.isfile(path):
-            self._select_file(path)
-
-    def _select_file(self, path):
-        self.selected_handler(path)
-        self.close()
+        self._completed = True
+        selected_path = read_myexplorer_selection(self.output_file)
+        if selected_path:
+            self.selected_handler(selected_path)
+        self.finished.emit()
 
 
 class LocalFileDropMixin:
@@ -276,13 +200,11 @@ class LocalFileDropMixin:
             self.end_visible_file_load(label)
 
     def open_non_modal_file_picker(self, title, directory, selected_handler, dialog_attr_name, name_filters=None):
-        dialog = FilePickerDialog(title, directory, selected_handler, name_filters=name_filters, parent=self)
-        setattr(self, dialog_attr_name, dialog)
-        dialog.destroyed.connect(lambda *_: setattr(self, dialog_attr_name, None))
-        dialog.show()
-        dialog.raise_()
-        dialog.activateWindow()
-        return dialog
+        picker = MyExplorerPickerProcess(title, directory, selected_handler, parent=self)
+        setattr(self, dialog_attr_name, picker)
+        picker.finished.connect(lambda: setattr(self, dialog_attr_name, None))
+        picker.start()
+        return picker
 
     def open_non_modal_text_picker(self, title, directory, selected_handler, dialog_attr_name):
         def wrapped(path):

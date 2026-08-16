@@ -267,10 +267,24 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <widget class="QMenu" name="menuUpdate_Wordlists">
+     <property name="title">
+      <string>Update Wordlists</string>
+     </property>
+     <addaction name="actionUpdate_Greek_Wordlist"/>
+     <addaction name="actionUpdate_Hebrew_Wordlist"/>
+     <addaction name="actionUpdate_Latin_Wordlist"/>
+    </widget>
+    <widget class="QMenu" name="menuSetup_Training">
+     <property name="title">
+      <string>Setup Training</string>
+     </property>
+     <addaction name="actionSelect_Language_Model"/>
+     <addaction name="actionSelect_Fonts"/>
+    </widget>
     <addaction name="action_Writer"/>
-    <addaction name="actionUpdate_Greek_Wordlist"/>
-    <addaction name="actionUpdate_Hebrew_Wordlist"/>
-    <addaction name="actionUpdate_Latin_Wordlist"/>
+    <addaction name="menuUpdate_Wordlists"/>
+    <addaction name="menuSetup_Training"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1179,24 +1193,6 @@
   <action name="actionStage_Ground_Truth">
    <property name="text">
     <string>Stage Ground Truth</string>
-   </property>
-  </action>
-  <action name="actionCreate_e_Sword_Bible_Module">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
-   </property>
-   <property name="text">
-    <string>e-Sword Bible Module</string>
-   </property>
-  </action>
-  <action name="actionCreate_theWord_Bible_Module">
-   <property name="icon">
-    <iconset resource="../UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
-   </property>
-   <property name="text">
-    <string>theWord Bible Module</string>
    </property>
   </action>
   <action name="actionEnglish">

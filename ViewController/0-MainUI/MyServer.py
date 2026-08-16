@@ -3,9 +3,7 @@
 print("RUNNING:", __file__)
 # See dev_notebook.md for architecture + debugging notes
 #print(len(locals()))
-# Integrated with ChatGPT:
-# OCR Preprocess Tool (OpenCV morphology + tiffcapture bridge)
-# Next steps: OCR preview, multi-page TIFF, pipeline integration
+# Deprecated OCR Preprocess Tool path remains documented near its former wiring.
 # Python imports
 import importlib.util
 import sys
@@ -104,7 +102,8 @@ os.makedirs(SCANNED_FOLDER, exist_ok=True)
 
 
 from helpers.SessionManager import SessionManager
-from helpers.ocr_preprocess_tool import OCRPreprocessTool
+# Deprecated with the removed OCR Preprocess Tool menu action:
+# from helpers.ocr_preprocess_tool import OCRPreprocessTool
 #from subprocess import Popen, PIPE, CalledProcessError
 import pytesseract
 import tiffcapture
@@ -115,7 +114,6 @@ from helpers.HelpSystem import add_help_menu
 from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
-from Core.project_database import load_project_database_record
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
@@ -228,7 +226,6 @@ from helpers.Training import Train as tr
 from helpers.TiffStackWorker import TiffStackWorker
 from helpers.LocalFileDrop import LocalFileDropMixin
 from helpers.ScanWorkflow import ScanWizardDialog as SharedScanWizardDialog
-from helpers.project_column_settings import update_project_columns
 # Dialog Imports
 from helpers.Dialogs.ExtractDialog import Ui_ExtractDialog
 from helpers.Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
@@ -332,6 +329,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        placeholder_palette = self.ui.OCRText.palette()
+        placeholder_palette.setColor(qtg.QPalette.PlaceholderText, qtg.QColor("#aeb4bc"))
+        self.ui.OCRText.setPalette(placeholder_palette)
         self.install_local_file_drop(
             [self, getattr(self.ui, 'centralwidget', None)],
             image_handler=self.showImage,
@@ -346,6 +346,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.scannerManager = ScanManager()
 
         self.session_manager = SessionManager()
+        self.ui.Image.setFont(
+            self.session_manager.build_workflow_font(
+                "FROMVS.ttf",
+                14,
+                os.path.dirname(os.path.realpath(__file__)),
+            )
+        )
         self.current_project_root = self.session_manager.get_active_project_root() or self.current_project_root
 
         # -------------------------
@@ -381,6 +388,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
 
         self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
+        self.ui.actionOpen_Text.triggered.connect(self.open_text_with_myexplorer)
 
         if hasattr(self.ui, "actionPrint_Ref_Image"):
             self.ui.actionPrint_Ref_Image.triggered.connect(
@@ -410,16 +418,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionDeskewLatin_tiff_tb.triggered.connect(self.actionDeskewLatin_tiff)
         self.ui.actionResizeLatin_png_tb.triggered.connect(self.actionResizeLatin_png)
 
-        self.ui.actionUpdate_Wordlist_tb.triggered.connect(self.actionUpdate_Wordlist)
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
 
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
-        self.ui.actionPrefernces.triggered.connect(self.open_project_settings_dialog)
-        if hasattr(self.ui, "actionSet_Columns_Per_Page"):
-            self.ui.actionSet_Columns_Per_Page.triggered.connect(self.set_columns_per_page)
+        self.ui.actionProjectSettings.triggered.connect(self.open_project_settings_dialog)
 
-        self.ui.actionToggle_Greek_Toolbars.triggered.connect(self.toggleGreekToolbars)
-        self.ui.actionToggle_Latin_Toolbars.triggered.connect(self.toggleLatinToolbars)
         self._install_backup_restore_actions()
 
         # -------------------------
@@ -503,6 +506,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.fontComboBox.currentFontChanged.connect(self.on_font_update)
         self.ui.fontSizeBox.valueChanged.connect(self.on_font_update)
 
+        self.ui.OCRlangComboBox.currentTextChanged.connect(self.on_lang_select)
         self.ui.OCRModelComboBox.currentTextChanged.connect(self.on_lang_select)
         self.ui.bookComboBox.currentTextChanged.connect(self.selectBookCombo)
 
@@ -526,7 +530,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.OCRText.setDocument(self.ui.OCRDocument)
 
-        self.ui.actionOCR_Preprocess.triggered.connect(self.open_preprocess_tool)
+        # Deprecated with the removed OCR Preprocess Tool menu action:
+        # self.ui.actionOCR_Preprocess.triggered.connect(self.open_preprocess_tool)
 
         # -------------------------
         # Session Restore
@@ -543,7 +548,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.show()
         qtc.QTimer.singleShot(0, self._restore_session_content)
 
-        self.toggleLatinToolbars()
+        self.on_lang_select()
 
         self.setWindowFlags(
             Qt.Window |
@@ -924,7 +929,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
         self.run_child_module('MyExplorer.py', project_path)
         return project_path
-        return payload
+        # Deprecated orphan from the former project-opening path:
+        # return payload
 
     def _start_project_creation(self, payload, success_title, success_message):
         if self._project_thread is not None:
@@ -1039,54 +1045,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             getattr(self, "txtdir", ""),
         )
         self._open_project_settings_dialog_for_root(project_root)
-
-    def set_columns_per_page(self):
-        project_root = self.workflow_tracker.resolve_project_root(
-            self._shared_active_project_root(),
-            self.current_project_root,
-            getattr(self, "imgpath", ""),
-            getattr(self, "imgdir", ""),
-            getattr(self, "txtpath", ""),
-            getattr(self, "txtdir", ""),
-        )
-        if not project_root:
-            qtw.QMessageBox.information(
-                self,
-                "Set Columns Per Page",
-                "Open or create a project first.",
-            )
-            return
-
-        current_columns = 4
-        try:
-            metadata_path = os.path.join(
-                project_root,
-                "Model",
-                "Project",
-                "Data",
-                "sqlite",
-                "project_metadata.sqlite",
-            )
-            values = load_project_database_record(metadata_path)
-            current_columns = int(values.get("NumberColumns", 4) or 4)
-        except Exception:
-            current_columns = 4
-
-        new_value, accepted = qtw.QInputDialog.getInt(
-            self,
-            "Set Columns Per Page",
-            "Number of columns per source page:",
-            max(1, min(4, current_columns)),
-            1,
-            4,
-            1,
-        )
-        if not accepted:
-            return
-
-        update_project_columns(project_root, new_value)
-        self._refresh_project_status(project_root)
-        self.statusBar().showMessage(f"Project columns per page set to {new_value}", 5000)
 
     def collect_new_project_payload(self):
         dialog = ProjectCreationWizardDialog(self._projects_base_path(), self)
@@ -1351,7 +1309,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 self.imgdir = inbound_image_dir
 
         if not str(getattr(self, 'font', '') or '').strip():
-            self.font = self.session_manager.get_active_project_font() or self.font
+            self.font = self.session_manager.get_active_ui_font() or self.font
         if self.font and hasattr(self, 'ui') and hasattr(self.ui, 'fontComboBox'):
             self.ui.fontComboBox.setCurrentText(self.font)
 
@@ -1359,8 +1317,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not hasattr(self, 'ui'):
             return
 
+        language_blocker = qtc.QSignalBlocker(self.ui.OCRlangComboBox)
+        model_blocker = qtc.QSignalBlocker(self.ui.OCRModelComboBox)
         self.ui.OCRlangComboBox.setCurrentText(self.ocrlang)
         self.ui.OCRModelComboBox.setCurrentText(self.ocrmodel)
+        del language_blocker, model_blocker
+        self.on_lang_select()
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
         if self.font:
             self.ui.fontComboBox.setCurrentText(self.font)
@@ -1467,28 +1429,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             f.close()
 
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
-
-    def toggleGreekToolbars(self):
-
-        greekimgpagesstate = self.ui.GreekImagePagesToolBar.isVisible()
-        greekimglinesstate = self.ui.GreekImageLinesToolBar.isVisible()
-        greektxtlinesstate = self.ui.GreekTextLinesToolBar.isVisible()
-
-        # Set the visibility to its inverse
-        self.ui.GreekImagePagesToolBar.setVisible(not greekimgpagesstate)
-        self.ui.GreekImageLinesToolBar.setVisible(not greekimglinesstate)
-        self.ui.GreekTextLinesToolBar.setVisible(not greektxtlinesstate)
-
-    def toggleLatinToolbars(self):
-
-        latinimgpagesstate = self.ui.LatinImagePagesToolBar.isVisible()
-        latinimglinesstate = self.ui.LatinImageLinesToolBar.isVisible()
-        latintxtlinesstate = self.ui.LatinTextLinesToolBar.isVisible()
-
-        # Set the visibility to its inverse
-        self.ui.LatinImagePagesToolBar.setVisible(not latinimgpagesstate)
-        self.ui.LatinImageLinesToolBar.setVisible(not latinimglinesstate)
-        self.ui.LatinTextLinesToolBar.setVisible(not latintxtlinesstate)
 
     def actionextract_pdf(self):
         print("extracting pdf pages from source pdf")
@@ -2634,9 +2574,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         versify.ui.setupUi(versify.MainWindow)
         versify.MainWindow.show()
 
-    def actionUpdate_Wordlist(self):
-        pass
-
     def actionTrain_Tesseract(self):
         pass
 
@@ -2723,6 +2660,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             '_image_open_dialog',
         )
 
+    def open_image_with_myexplorer(self, *_args):
+        return self.open_non_modal_image_picker(
+            "Open Image",
+            self.imgdir if hasattr(self, 'imgdir') else self._projects_base_path(),
+            lambda selected_path: (
+                self.ui.ImageLE.setText(os.path.basename(selected_path)),
+                self.loadImageStackFromFile(selected_path),
+            ),
+            '_image_open_dialog',
+        )
+
     def loadImageStackFromFile(self, fileName=''):
         fileName = str(fileName)
 
@@ -2799,14 +2747,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Convert frame ndarray to a QImage.
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=True)
 
-    #def open_preprocess_tool(self, checked=False):
-    def open_preprocess_tool(self, checked=False):
-        initial_pixmap = getattr(self, "origpixmap", None)
-        if initial_pixmap is None or initial_pixmap.isNull():
-            initial_pixmap = getattr(self, "imagepixmap", None)
-
-        self.preprocess_window = OCRPreprocessTool(self, initial_pixmap=initial_pixmap)
-        self.preprocess_window.exec_()
+    # Deprecated with the removed OCR Preprocess Tool menu action.
+    # def open_preprocess_tool(self, checked=False):
+    #     initial_pixmap = getattr(self, "origpixmap", None)
+    #     if initial_pixmap is None or initial_pixmap.isNull():
+    #         initial_pixmap = getattr(self, "imagepixmap", None)
+    #     self.preprocess_window = OCRPreprocessTool(self, initial_pixmap=initial_pixmap)
+    #     self.preprocess_window.exec_()
 
 
     from PyQt5.QtGui import QPixmap, QImage
@@ -3125,11 +3072,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         return selected_path
 
     def _choose_file(self, title, name_filter='All Files (*.*)', start_dir=''):
+        return self._choose_file_with_myexplorer(title, start_dir)
+
+    def _choose_file_with_myexplorer(self, title, start_dir=''):
         return qtw.QFileDialog.getOpenFileName(
             self.ui.centralwidget,
             title,
             self._dialog_start_directory(start_dir),
-            name_filter,
         )[0]
 
     def _install_backup_restore_actions(self):
@@ -3400,22 +3349,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             '_text_open_dialog',
         )
 
-    def OpenTextFileDialog(self, MainWindow):
-        self.loadText()
-        return
+    def open_text_with_myexplorer(self, *_args):
+        return self.open_non_modal_text_picker(
+            "Open Text File",
+            self.txtdir if hasattr(self, 'txtdir') else self._projects_base_path(),
+            self.showText,
+            '_text_open_dialog',
+        )
 
-        txtpath = qtw.QFileDialog.getOpenFileName(
-            self.ui.centralwidget,
-            'Open text file',
-            self.txtdir if hasattr(self, 'txtdir') else '',
-            'Text files (*.txt *.csv)'
-        )[0]
-
-        if not txtpath:
-            return
-        else:
-            # Ã¢Å“â€¦ Delegate everything to showText (single source of truth)
-            self.showText(txtpath)
+    # Deprecated orphan replaced by open_text_with_myexplorer.
+    # def OpenTextFileDialog(self, MainWindow):
+    #     self.loadText()
 
     def showText(self, txtfilename):
         if not txtfilename:
@@ -4246,8 +4190,32 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.fontsize': self.fontsize,
         })
 
-    def on_lang_select(self):
-        pass
+    def on_lang_select(self, _selection=None):
+        self.ocrlang = self.ui.OCRlangComboBox.currentText()
+        self.ocrmodel = self.ui.OCRModelComboBox.currentText()
+
+        language = self.ocrlang.casefold()
+        model = self.ocrmodel.casefold()
+        show_greek = "greek" in language or model in {"ell", "grc", "feg"}
+        show_latin = not show_greek and ("latin" in language or model in {"lat", "fel"})
+
+        for toolbar in (
+            self.ui.GreekImagePagesToolBar,
+            self.ui.GreekImageLinesToolBar,
+            self.ui.GreekTextLinesToolBar,
+        ):
+            toolbar.setVisible(show_greek)
+        for toolbar in (
+            self.ui.LatinImagePagesToolBar,
+            self.ui.LatinImageLinesToolBar,
+            self.ui.LatinTextLinesToolBar,
+        ):
+            toolbar.setVisible(show_latin)
+
+        self.session_manager.update('Session.json', {
+            'self.ocrlang': self.ocrlang,
+            'self.ocrmodel': self.ocrmodel,
+        })
 
 # ================================
 # PROJECT REPLAY ENGINE

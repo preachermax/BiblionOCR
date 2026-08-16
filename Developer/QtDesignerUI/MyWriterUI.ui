@@ -126,9 +126,17 @@
     <addaction name="actionToggle_Formatbar"/>
     <addaction name="actionToggle_Statusbar"/>
    </widget>
+    <widget class="QMenu" name="menuBible_Modules">
+     <property name="title">
+      <string>Bible Modules</string>
+     </property>
+     <addaction name="actionCreate_e_Sword_Bible_Module"/>
+     <addaction name="actionCreate_theWord_Bible_Module"/>
+    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+    <addaction name="menuBible_Modules"/>
   </widget>
   <widget class="QToolBar" name="toolbar">
    <property name="windowTitle">
@@ -580,6 +588,24 @@
    </property>
    <property name="text">
     <string>Export</string>
+   </property>
+  </action>
+  <action name="actionCreate_e_Sword_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/esword.png</normaloff>:/Icons/Icons/esword.png</iconset>
+   </property>
+   <property name="text">
+    <string>e-Sword Bible Module</string>
+   </property>
+  </action>
+  <action name="actionCreate_theWord_Bible_Module">
+   <property name="icon">
+    <iconset resource="../UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/theword.png</normaloff>:/Icons/Icons/theword.png</iconset>
+   </property>
+   <property name="text">
+    <string>theWord Bible Module</string>
    </property>
   </action>
  </widget>
