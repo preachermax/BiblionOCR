@@ -91,10 +91,7 @@ class CharacterReference(qtw.QMainWindow):
         for candidate in candidate_paths:
             if os.path.isfile(candidate):
                 return candidate
-        raise FileNotFoundError(
-            'ProjectUnicodeRanges.json not found in expected locations: '
-            + ', '.join(candidate_paths)
-        )
+        return None
     
     #def on_language_select(self):
     
@@ -103,6 +100,13 @@ class CharacterReference(qtw.QMainWindow):
     def initUCodeRangeCombo(self):
         # Opening JSON file
         json_path = self._resolve_unicode_ranges_json_path()
+        if json_path is None:
+            self.ui.uCodeRangeComboBox.setEnabled(False)
+            self.ui.uCodeStartRangeComboBox.setEnabled(False)
+            self.ui.uCodeEndRangeComboBox.setEnabled(False)
+            self.ui.chrTableWidget.setRowCount(0)
+            self.ui.chrTableWidget.setColumnCount(0)
+            return
         with open(json_path) as f:
             # returns JSON object as
             # a dictionary
@@ -119,9 +123,13 @@ class CharacterReference(qtw.QMainWindow):
 
     def on_combo_select(self):
         self.ucoderange = self.ui.uCodeRangeComboBox.currentText()
+        if not self.ucoderange:
+            return
         # self.ui.uCodeRangeComboBox.setEditText(self.ucoderange)
         # Reopening JSON file
         json_path = self._resolve_unicode_ranges_json_path()
+        if json_path is None:
+            return
         with open(json_path) as f:
             # returns JSON object as
             # a dictionary

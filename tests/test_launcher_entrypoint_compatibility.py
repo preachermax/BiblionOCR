@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from contextlib import contextmanager
+from unittest import mock
 
 from PyQt5 import QtWidgets
 
@@ -59,7 +60,8 @@ class LauncherEntrypointCompatibilityTests(unittest.TestCase):
         app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
         lexer_path = os.path.join(REPO_ROOT, "ViewController", "3-Process", "MyLexer.py")
         module = _load_module("lexer_window_test_module", lexer_path)
-        window = module.MainWindow()
+        with mock.patch.object(module, "project_root", "/missing-clean-checkout-root"):
+            window = module.MainWindow()
         self.assertTrue(hasattr(window, "ui"))
         app.quit()
 
@@ -67,7 +69,16 @@ class LauncherEntrypointCompatibilityTests(unittest.TestCase):
         app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
         versifier_path = os.path.join(REPO_ROOT, "ViewController", "3-Process", "MyVersifier.py")
         module = _load_module("versifier_window_test_module", versifier_path)
-        window = module.Ui_MainWindow()
+        chr_reference_path = os.path.join(
+            REPO_ROOT, "ViewController", "0-MainUI", "helpers", "ChrReference.py"
+        )
+        chr_reference_module = _load_module("chr_reference_test_module", chr_reference_path)
+        with mock.patch.object(
+            chr_reference_module.CharacterReference,
+            "_resolve_unicode_ranges_json_path",
+            return_value=None,
+        ), mock.patch.object(module.chrref, "CharacterReference", chr_reference_module.CharacterReference):
+            window = module.Ui_MainWindow()
         self.assertTrue(hasattr(window, "ui"))
         app.quit()
 

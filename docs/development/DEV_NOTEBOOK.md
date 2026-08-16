@@ -28,6 +28,30 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-08-16 02:35
+
+* Scope summary: established the Part 2 clean-checkout debugging baseline by removing startup dependencies on ignored Lexer session and Unicode-range data files.
+* Touched files (`git status --short`):
+  * `ViewController/3-Process/MyLexer.py`
+  * `ViewController/0-MainUI/helpers/ChrReference.py`
+  * `tests/test_launcher_entrypoint_compatibility.py`
+  * `docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md`
+  * `docs/development/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; full workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass; all touched Python files compile.
+  * tests: pass; `74 passed, 43 subtests passed`, with compatibility tests forcing both ignored files to be absent.
+  * smoke: pass; MyLexer and MyVersifier remained running through their offscreen startup smoke windows.
+  * manual UI checks: not required for this startup fallback; no UI source or generated UI changed.
+* Behavior:
+  * MyLexer skips optional `BoxerSession.json` restoration and retains initialized defaults when the ignored file is absent.
+  * CharacterReference opens with empty disabled Unicode-range controls when no ignored range catalog is available.
+  * Existing project/session data is still loaded when present.
+* Unresolved blockers/risks:
+  * none for the clean-checkout startup baseline.
+* Next immediate action:
+  * commit and synchronize this baseline, then begin subsequent Part 2 debugging from the clean master worktree.
+
 ### Session Handoff - 2026-08-16 02:20
 
 * Scope summary: moved e-Sword and theWord publication actions exclusively to MyWriter and made Unicode wordlist mutation reusable by MyTrainer, MyResolver, and future modules.

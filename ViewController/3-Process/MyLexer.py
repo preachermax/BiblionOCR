@@ -538,8 +538,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # Define json data
         print("loading session")
-        #with open(self.userdir + '/Projects/BiblionOCR/Model/Project/Data/json/BoxerSession.json') as f:
-        with open('Model/Project/Data/json/BoxerSession.json') as f:
+        session_path = Path(project_root) / 'Model' / 'Project' / 'Data' / 'json' / 'BoxerSession.json'
+        if not session_path.is_file():
+            print(f"Optional Lexer session not found; using defaults: {session_path}")
+            return
+
+        with session_path.open(encoding='utf-8') as f:
             # returns JSON object as a dictionary
             data = json.load(f)
 

@@ -81,7 +81,7 @@ Expected completion response shape:
 
 ### 1) MyServer
 
-Status: Part 1 completed and accepted on 2026-08-16. Part 2 is reserved for follow-up debugging.
+Status: Part 1 completed and accepted on 2026-08-16. The Part 2 clean-checkout baseline was completed on 2026-08-16; further debugging starts from that synchronized baseline.
 
 Apply the strict header above.
 
