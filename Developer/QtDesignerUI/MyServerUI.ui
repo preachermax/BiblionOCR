@@ -1390,6 +1390,8 @@
     <addaction name="actionMyPixler"/>
     <addaction name="actionMyWriter"/>
     <addaction name="actionFind_and_Replace"/>
+    <addaction name="separator"/>
+    <addaction name="actionEditThemes"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -2166,6 +2168,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
+   </property>
+  </action>
+  <action name="actionEditThemes">
+   <property name="text">
+    <string>Edit Themes...</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust safe settings for existing themes</string>
    </property>
   </action>
   <action name="actionOpen_Image">

@@ -28,6 +28,36 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-08-16 Theme Schema v1
+
+* Scope summary: aligned Default, Classic, Dark Blue, Tigers, and Tide behind one generated stylesheet schema and a portable runtime catalog.
+* Theme behavior:
+  * Default preserves native Qt rendering with an empty stylesheet.
+  * Classic is the complete light gray/white legacy theme.
+  * Dark Blue remains the structural and image baseline; generated assets preserve the baseline bytes.
+  * Tigers replaces Dark Orange with navy `#0C2340` and orange `#FFA02F`.
+  * Tide derives from Tigers with crimson `#9E1B32` and white `#FFFFFF`.
+  * Classic, Dark Blue, Tigers, and Tide share all 256 canonical selectors and 46 assets.
+* Runtime compatibility:
+  * MyBoxer, MyGlypher, and MyLexer use the public `Stylesheets.load_stylesheet` API.
+  * Existing `darkOrange` methods remain compatibility entrypoints and select Tigers; Tide methods are available for future menu wiring.
+  * Stored QSS uses `@ASSET_ROOT@`; the loader resolves portable repository-local image paths at runtime.
+* Theme editor:
+  * MyServer owns an `Edit > Edit Themes...` action and applies saved preferences at startup.
+  * The dialog selects an existing theme and allow-listed text size, control spacing, corner style, and equal slider size settings.
+  * No color input or arbitrary CSS field is exposed; invalid persisted values fall back to safe defaults.
+  * The dialog visibly states that primary theme colors are locked and new themes must be created elsewhere.
+* Validation gates:
+  * problems/lint: pass; full-workspace Problems total `0` and in-scope Problems total `0`; `git diff --check` passes.
+  * compile: pass for the generator, catalog, three active runtime callers, and tests.
+  * tests: pass; focused theme catalog/editor suite `12 passed`; full repository suite `86 passed, 43 subtests passed`.
+  * smoke: pass; all five themes applied to representative offscreen Qt widgets with zero stylesheet parser diagnostics; all 14 Linux `run-my*.sh` launchers remained running through their startup windows without tracebacks.
+  * manual UI checks: pass; offscreen visual inspection confirmed the MyServer Edit menu action and Theme Editor dialog are visible, unclipped, and free of overlapping controls.
+* Unresolved blockers/risks:
+  * Project-local theme persistence and propagation to all separately launched modules/dialogs are intentionally deferred to the next theme slice; current preferences use application-level `QSettings` and are applied by MyServer.
+* Next immediate action:
+  * commit the theme schema/editor change set, promote it to `master`, and synchronize both origin branches.
+
 ### Session Handoff - 2026-08-16 02:35
 
 * Scope summary: established the Part 2 clean-checkout debugging baseline by removing startup dependencies on ignored Lexer session and Unicode-range data files.

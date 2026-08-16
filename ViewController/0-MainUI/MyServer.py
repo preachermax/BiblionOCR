@@ -112,6 +112,12 @@ from queue import Queue
 from helpers.ext import mainfind
 from helpers.HelpSystem import add_help_menu
 from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
+from helpers.Dialogs.ThemeEditorDialog import (
+    ThemeEditorDialog,
+    apply_theme_preferences,
+    load_theme_preferences,
+    save_theme_preferences,
+)
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
 from Core.workflow_wizard_actions import (
@@ -329,6 +335,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
+        apply_theme_preferences(load_theme_preferences())
         placeholder_palette = self.ui.OCRText.palette()
         placeholder_palette.setColor(qtg.QPalette.PlaceholderText, qtg.QColor("#aeb4bc"))
         self.ui.OCRText.setPalette(placeholder_palette)
@@ -422,6 +429,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         self.ui.actionProjectSettings.triggered.connect(self.open_project_settings_dialog)
+        self.ui.actionEditThemes.triggered.connect(self.open_theme_editor_dialog)
 
         self._install_backup_restore_actions()
 
@@ -1045,6 +1053,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             getattr(self, "txtdir", ""),
         )
         self._open_project_settings_dialog_for_root(project_root)
+
+    def open_theme_editor_dialog(self):
+        dialog = ThemeEditorDialog(load_theme_preferences(), self)
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            return
+        preferences = dialog.preferences()
+        save_theme_preferences(preferences)
+        apply_theme_preferences(preferences)
 
     def collect_new_project_payload(self):
         dialog = ProjectCreationWizardDialog(self._projects_base_path(), self)

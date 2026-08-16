@@ -37,6 +37,7 @@ import os
 import re
 from pathlib import Path
 from HelpSystem import add_help_menu
+from Stylesheets import load_stylesheet
 from Core.workflow_wizard_actions import (
     append_default_context_actions,
     install_workflow_wizard_menu_actions,
@@ -5974,16 +5975,19 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
 
     # Style Sheets
     def darkOrange(self):
-        app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_orange.qss').read_text())
+        app.setStyleSheet(load_stylesheet("tigers"))
 
     def darkBlue(self):
-        app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/dark_blue.qss').read_text())
+        app.setStyleSheet(load_stylesheet("dark_blue"))
 
     def classic(self):
-        app.setStyleSheet(Path('ViewController/0-MainUI/Stylesheets/classic.qss').read_text())
+        app.setStyleSheet(load_stylesheet("classic"))
+
+    def tide(self):
+        app.setStyleSheet(load_stylesheet("tide"))
 
     def standardUI(self):
-        app.setStyleSheet("")
+        app.setStyleSheet(load_stylesheet("default"))
 
 ###########    Other Classes and Subclasses    ############
 class ResizableRubberBand(QWidget):
