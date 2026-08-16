@@ -6,8 +6,10 @@ import tempfile
 import unittest
 
 from Core.project_database import (
+    DEFAULT_PROJECT_THEME,
     DEFAULT_PROJECT_FONT,
     DEFAULT_UI_FONT,
+    PROJECT_THEME_IDS,
     PROJECT_DATABASE_TABLE,
     build_project_field_definitions,
     create_project_database,
@@ -88,6 +90,19 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
         self.assertEqual("FROMVS.ttf", DEFAULT_PROJECT_FONT)
         self.assertEqual(DEFAULT_UI_FONT, normalized["UIFont"])
         self.assertEqual(DEFAULT_PROJECT_FONT, normalized["ProjectFont"])
+
+    def test_project_theme_defaults_and_choices(self) -> None:
+        definitions = {
+            definition.key: definition
+            for definition in build_project_field_definitions(("eng",))
+        }
+        self.assertEqual("default", DEFAULT_PROJECT_THEME)
+        self.assertEqual(PROJECT_THEME_IDS, tuple(definitions["ProjectTheme"].options))
+        self.assertEqual(DEFAULT_PROJECT_THEME, normalize_project_database_values({})["ProjectTheme"])
+        self.assertEqual(
+            DEFAULT_PROJECT_THEME,
+            normalize_project_database_values({"ProjectTheme": "unsupported"})["ProjectTheme"],
+        )
 
     def test_ui_and_tesseract_project_fonts_are_independent(self) -> None:
         normalized = normalize_project_database_values(

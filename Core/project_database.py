@@ -15,6 +15,8 @@ PROJECT_DATABASE_TABLE = "project_metadata"
 DEFAULT_SCRIPTURE_COLUMN_LANGUAGES = ["english", "greek", "hebrew", "latin"]
 DEFAULT_UI_FONT = "FROMVS.ttf"
 DEFAULT_PROJECT_FONT = "FROMVS.ttf"
+DEFAULT_PROJECT_THEME = "default"
+PROJECT_THEME_IDS = ("default", "classic", "dark_blue", "tigers", "tide")
 
 
 @dataclass(frozen=True)
@@ -182,6 +184,14 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "text",
             default=DEFAULT_PROJECT_FONT,
             help_text="Trainable project font generated, altered, and installed only by MyGlypher.",
+        ),
+        ProjectFieldDefinition(
+            "ProjectTheme",
+            "Project Theme",
+            "choice",
+            default=DEFAULT_PROJECT_THEME,
+            options=PROJECT_THEME_IDS,
+            help_text="Theme selected from MyServer's View menu.",
         ),
         ProjectFieldDefinition("Notes", "Notes", "text", default=""),
         ProjectFieldDefinition(

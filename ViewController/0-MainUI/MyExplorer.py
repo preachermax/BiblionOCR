@@ -153,12 +153,24 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         selection_output_path="",
         window_title="",
         selection_kind="folder",
+        allow_folder_selection=None,
+        allow_file_selection=None,
     ):
         super(MyFileBrowser, self).__init__()
         self.start_dir = start_dir
         self.select_mode = bool(select_mode)
         self.selection_output_path = str(selection_output_path or "")
         self.selection_kind = "file" if str(selection_kind or "").strip().lower() == "file" else "folder"
+        self.allow_folder_selection = (
+            self.select_mode and self.selection_kind == "folder"
+            if allow_folder_selection is None
+            else bool(allow_folder_selection)
+        )
+        self.allow_file_selection = (
+            self.select_mode and self.selection_kind == "file"
+            if allow_file_selection is None
+            else bool(allow_file_selection)
+        )
         self.session_manager = SessionManager()
         self.setupUi(self)
         if window_title:
@@ -177,7 +189,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.gridLayout_2.replaceWidget(original_tree, self.treeView)
         original_tree.deleteLater()
 
-        self.exclude_empty_checkbox.setChecked(True)
+        self.exclude_empty_checkbox.setChecked(not self.allow_folder_selection)
 
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treeView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -196,6 +208,12 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             self.actionSelect_Folder.setEnabled(self.select_mode)
             if self.select_mode and self.selection_kind == "file":
                 self.actionSelect_Folder.setText("Select File")
+        self.selectFolderButton.setVisible(self.select_mode)
+        self.selectFileButton.setVisible(self.select_mode)
+        self.selectFolderButton.setEnabled(self.select_mode and self.allow_folder_selection)
+        self.selectFileButton.setEnabled(self.select_mode and self.allow_file_selection)
+        self.selectFolderButton.clicked.connect(lambda: self.select_current_selection("folder"))
+        self.selectFileButton.clicked.connect(lambda: self.select_current_selection("file"))
         if hasattr(self, "actionOpen_Trash"):
             self.actionOpen_Trash.triggered.connect(self.open_system_trash)
         if hasattr(self, "actionRestore_From_Trash"):
@@ -215,6 +233,8 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
     def _stabilize_window_visibility(self):
         # Keep the window visible and focused even when many modules start together.
+        if not self.isVisible():
+            return
         self.showNormal()
         self.raise_()
         self.activateWindow()
@@ -252,6 +272,8 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
     def _resolve_root_directory(self):
         if getattr(self, "show_system_files_checkbox", None) is not None and self.show_system_files_checkbox.isChecked():
             return os.path.abspath(os.sep)
+        if self.select_mode and self.start_dir and os.path.isdir(self.start_dir):
+            return os.path.abspath(self.start_dir)
         return self._resolve_project_root_directory()
 
     def _resolve_project_root_directory(self):
@@ -287,6 +309,9 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.model = QtWidgets.QFileSystemModel()
         self.model.setRootPath(root_dir)
         self.model.setReadOnly(False)
+        self.model.directoryLoaded.connect(
+            lambda _path: QtCore.QTimer.singleShot(0, self._size_tree_columns)
+        )
 
         self.proxy_model = EmptyFolderFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.model)
@@ -317,6 +342,31 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView.setSortingEnabled(True)
         self.treeView.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.model.sort(0, QtCore.Qt.AscendingOrder)
+        QtCore.QTimer.singleShot(0, self._size_tree_columns)
+
+    def _size_tree_columns(self):
+        if not getattr(self, "treeView", None) or self.treeView.model() is None:
+            return
+        header = self.treeView.header()
+        header.setStretchLastSection(False)
+        for column in range(4):
+            header.setSectionResizeMode(column, QtWidgets.QHeaderView.Fixed)
+
+        available_width = self.treeView.viewport().width()
+        if not self.treeView.verticalScrollBar().isVisible():
+            available_width -= self.treeView.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
+        available_width = max(4, available_width)
+        proportions = (0.48, 0.13, 0.17)
+        assigned_width = 0
+        for column, proportion in enumerate(proportions):
+            width = max(1, int(available_width * proportion))
+            self.treeView.setColumnWidth(column, width)
+            assigned_width += width
+        self.treeView.setColumnWidth(3, max(1, available_width - assigned_width))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._size_tree_columns()
 
     def _toggle_empty_folder_filter(self, enabled):
         self.proxy_model.setExcludeEmptyDirs(enabled)
@@ -357,7 +407,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
     def _on_tree_double_clicked(self, _index):
         if self.select_mode:
-            self.select_current_selection()
+            self.select_current_selection(self.selection_kind)
 
     def _write_selection_output(self, selected_path):
         if not self.selection_output_path:
@@ -372,8 +422,13 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
                 f"Could not persist selection output:\n{exc}",
             )
 
-    def select_current_selection(self):
-        if self.selection_kind == "file":
+    def select_current_selection(self, selection_kind=None):
+        selection_kind = selection_kind or self.selection_kind
+        if selection_kind == "file" and not self.allow_file_selection:
+            return
+        if selection_kind == "folder" and not self.allow_folder_selection:
+            return
+        if selection_kind == "file":
             selected_path = self._current_path()
             if not selected_path or not os.path.isfile(selected_path):
                 QtWidgets.QMessageBox.information(self, "Select File", "Select a file first.")
@@ -564,6 +619,7 @@ if __name__ == '__main__':
 
     start_dir = None
     select_dir_mode = False
+    select_file_mode = False
     output_file = ""
     window_title = ""
 
@@ -574,7 +630,7 @@ if __name__ == '__main__':
         if arg == "--select-dir":
             select_dir_mode = True
         elif arg == "--select-file":
-            select_dir_mode = True
+            select_file_mode = True
             window_title = window_title or "MyExplorer File Picker"
         elif arg == "--start-dir" and i + 1 < len(argv):
             i += 1
@@ -591,10 +647,12 @@ if __name__ == '__main__':
 
     fb = MyFileBrowser(
         start_dir=start_dir,
-        select_mode=select_dir_mode,
+        select_mode=select_dir_mode or select_file_mode,
         selection_output_path=output_file,
         window_title=window_title,
-        selection_kind="file" if "--select-file" in sys.argv[1:] else "folder",
+        selection_kind="file" if select_file_mode else "folder",
+        allow_folder_selection=select_dir_mode,
+        allow_file_selection=select_file_mode,
     )
     fb.show()
     app.exec_()

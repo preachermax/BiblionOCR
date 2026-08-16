@@ -639,7 +639,7 @@ BiblionOCR/
 ### Stylesheets
 
 - Located in: `ViewController/0-MainUI/Stylesheets/`
-- Themes: Classic, Dark Blue, Dark Orange
+- Themes: Default, Classic, Dark, Tigers, Tide
 
 ### Icons
 

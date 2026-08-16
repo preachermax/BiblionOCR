@@ -87,6 +87,13 @@ class ProjectCreationEngine:
         "ViewController/0-MainUI/SessionManager.py",
     ]
 
+    REQUIRED_THEME_ENTRIES = [
+        "ViewController/0-MainUI/helpers/__init__.py",
+        "ViewController/0-MainUI/helpers/Dialogs/__init__.py",
+        "ViewController/0-MainUI/helpers/Dialogs/ThemeEditorDialog.py",
+        "ViewController/0-MainUI/helpers/Stylesheets => ViewController/0-MainUI/helpers/Stylesheets",
+    ]
+
     def __init__(self, base_path, event_bus, folder_list_path=None):
         self.base_path = base_path
         self.event_bus = event_bus
@@ -279,7 +286,13 @@ class ProjectCreationEngine:
             folder_path = destination_folder or folder
             os.makedirs(os.path.join(project_path, *folder_path.split("/")), exist_ok=True)
             if destination_folder or source_folder in {"Model/OT_BookFolders", "Model/NT_BookFolders"}:
-                self._create_directory_structure_from_template(repo_root, project_path, source_folder, folder_path)
+                self._create_directory_structure_from_template(
+                    repo_root,
+                    project_path,
+                    source_folder,
+                    folder_path,
+                    copy_files=bool(destination_folder and source_folder == destination_folder),
+                )
             completed_steps += 1
             self._emit_structure_progress(
                 stage="folders",
@@ -420,6 +433,10 @@ class ProjectCreationEngine:
                     continue
                 if entry not in entries:
                     entries.append(entry)
+
+        for entry in self.REQUIRED_THEME_ENTRIES:
+            if entry not in entries:
+                entries.append(entry)
 
         return entries
 
@@ -596,12 +613,28 @@ class ProjectCreationEngine:
         return total_bytes
 
     # -----------------------
-    def _create_directory_structure_from_template(self, repo_root, project_path, source_entry, destination_entry):
+    def _create_directory_structure_from_template(
+        self,
+        repo_root,
+        project_path,
+        source_entry,
+        destination_entry,
+        copy_files=False,
+    ):
         source_dir = os.path.join(repo_root, *source_entry.split("/"))
         if not os.path.isdir(source_dir):
             return
 
         destination_dir = os.path.join(project_path, *destination_entry.split("/"))
+        if copy_files:
+            shutil.copytree(
+                source_dir,
+                destination_dir,
+                dirs_exist_ok=True,
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+            )
+            return
+
         for current_root, current_dirs, _current_files in os.walk(source_dir):
             relative_root = os.path.relpath(current_root, source_dir)
             target_root = destination_dir if relative_root == "." else os.path.join(destination_dir, relative_root)

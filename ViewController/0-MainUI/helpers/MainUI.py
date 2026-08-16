@@ -494,7 +494,7 @@ class Ui_MainUI(object):
         self.menuType_Here.setObjectName("menuType_Here")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         font = QtGui.QFont()
-        font.setFamily("Ubuntu")
+        font.setFamily("FROMVS")
         font.setPointSize(11)
         self.menuFile.setFont(font)
         self.menuFile.setObjectName("menuFile")

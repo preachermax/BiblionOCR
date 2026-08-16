@@ -118,7 +118,7 @@ class Ui_Trainer(object):
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         font = QtGui.QFont()
-        font.setFamily("Ubuntu")
+        font.setFamily("FROMVS")
         font.setPointSize(11)
         self.menuFile.setFont(font)
         self.menuFile.setObjectName("menuFile")

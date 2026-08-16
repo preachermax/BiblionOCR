@@ -120,18 +120,8 @@
         <height>700</height>
        </size>
       </property>
-        <property name="font">
-         <font>
-          <family>FROMVS</family>
-          <pointsize>14</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: #aeb4bc;</string>
-        </property>
       <property name="text">
-         <string>Drag and Drop Source Image File from MyExplorer
-      or select Open Image from the File Menu</string>
+          <string/>
       </property>
         <property name="margin">
          <number>24</number>
@@ -143,7 +133,7 @@
        <bool>false</bool>
       </property>
       <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        <set>Qt::AlignCenter</set>
       </property>
      </widget>
      <widget class="QSlider" name="Zoomslider">
@@ -316,8 +306,7 @@
      </font>
     </property>
       <property name="placeholderText">
-       <string>Drag and Drop Text File from MyExplorer
-    or select Open Text from the File Menu</string>
+       <string/>
       </property>
    </widget>
    <widget class="QPushButton" name="reloadTextbutton">
@@ -1360,7 +1349,7 @@
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
-      <family>Ubuntu</family>
+      <family>FROMVS</family>
       <pointsize>11</pointsize>
       <weight>50</weight>
       <italic>false</italic>
@@ -1378,10 +1367,6 @@
     <addaction name="actionSave_As_Image"/>
     <addaction name="actionSave_Text"/>
     <addaction name="actionSave_As_Text"/>
-    <addaction name="separator"/>
-    <addaction name="actionDevelopment_Backup"/>
-    <addaction name="actionDevelopment_Restore"/>
-    <addaction name="actionProduction_Backup_Restore"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -1393,6 +1378,22 @@
     <addaction name="separator"/>
     <addaction name="actionEditThemes"/>
    </widget>
+    <widget class="QMenu" name="menuView">
+     <property name="title">
+      <string>View</string>
+     </property>
+     <widget class="QMenu" name="menuThemes">
+      <property name="title">
+      <string>Themes</string>
+      </property>
+      <addaction name="actionThemeDefault"/>
+      <addaction name="actionThemeClassic"/>
+      <addaction name="actionThemeDarkBlue"/>
+      <addaction name="actionThemeTigers"/>
+      <addaction name="actionThemeTide"/>
+     </widget>
+     <addaction name="menuThemes"/>
+    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
@@ -1510,6 +1511,7 @@
    <addaction name="menuPre_Process"/>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+  <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuOCR"/>
    <addaction name="menuGlyphs"/>
@@ -2178,6 +2180,46 @@
     <string>Adjust safe settings for existing themes</string>
    </property>
   </action>
+  <action name="actionThemeDefault">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Default</string>
+   </property>
+  </action>
+  <action name="actionThemeClassic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Classic</string>
+   </property>
+  </action>
+  <action name="actionThemeDarkBlue">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark</string>
+   </property>
+  </action>
+  <action name="actionThemeTigers">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tigers</string>
+   </property>
+  </action>
+  <action name="actionThemeTide">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tide</string>
+   </property>
+  </action>
   <action name="actionOpen_Image">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
@@ -2439,11 +2481,6 @@
     <string>Libre Office Calc</string>
    </property>
   </action>
-  <action name="actionDeveloper">
-   <property name="text">
-    <string>Developer</string>
-   </property>
-  </action>
   <action name="actionAcademic">
    <property name="text">
     <string>Academic</string>
@@ -2569,33 +2606,6 @@
     <property name="shortcut">
      <string>Ctrl+Shift+O</string>
     </property>
-  </action>
-  <action name="actionDevelopment_Backup">
-   <property name="text">
-    <string>Development Backup...</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a development backup snapshot.</string>
-   </property>
-  </action>
-  <action name="actionDevelopment_Restore">
-   <property name="text">
-    <string>Development Restore...</string>
-   </property>
-   <property name="toolTip">
-    <string>Restore a development backup snapshot to a staged folder.</string>
-   </property>
-  </action>
-  <action name="actionProduction_Backup_Restore">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Production Backup/Restore (Coming Soon)</string>
-   </property>
-   <property name="toolTip">
-    <string>Reserved for production backup and restore process wiring.</string>
-   </property>
   </action>
  </widget>
  <resources>

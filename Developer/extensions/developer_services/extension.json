@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "developer-services",
+  "name": "Developer Services",
+  "version": "1.0.0",
+  "description": "Installable developer utilities kept outside production application menus.",
+  "services": [
+    {
+      "id": "backup-restore",
+      "name": "Developer Backup/Restore",
+      "description": "Create development snapshots and non-destructive staged restores.",
+      "entry_point": "backup_restore.py:DevelopmentBackupDialog"
+    }
+  ]
+}

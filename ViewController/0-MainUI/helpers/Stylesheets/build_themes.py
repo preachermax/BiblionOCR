@@ -12,61 +12,77 @@ from PIL import Image
 THEME_DIR = Path(__file__).resolve().parent
 SOURCE_DIR = THEME_DIR / "src"
 SCHEMA_PATH = SOURCE_DIR / "theme_schema.qss.in"
+CLASSIC_SCHEMA_PATH = SOURCE_DIR / "classic_legacy.qss.in"
 BASE_IMAGE_DIR = SOURCE_DIR / "theme_base" / "img"
 SCHEMA_VERSION = 1
+CONTROL_ARROW_ASSETS = {
+    "up_arrow.png",
+    "up_arrow_disabled.png",
+    "down_arrow.png",
+    "down_arrow_disabled.png",
+    "left_arrow.png",
+    "left_arrow_disabled.png",
+    "right_arrow.png",
+    "right_arrow_disabled.png",
+    "increase_blue.png",
+    "decrease_blue.png",
+}
 
 THEMES = {
-    "classic": {
-        "name": "Classic",
-        "accent": "#8F8F91",
+    "dark_blue": {
+        "name": "Dark",
+        "accent": "#007ACC",
+        "arrow": "#FFFFFF",
         "colors": {
-            "#302F2F": "#F0F0F0",
-            "#201F1F": "#FFFFFF",
-            "#3A3939": "#B8B8B8",
-            "#4A4949": "#A0A0A0",
-            "#2A2929": "#E2E2E2",
-            "#605F5F": "#B0B0B0",
-            "#3d8ec9": "#8F8F91",
-            "#78879b": "#9A9B9E",
-            "#48576b": "#D5D5D7",
-            "#626873": "#DADADC",
-            "#4a4a4a": "#C8C8CA",
-            "#484846": "#D0D0D2",
-            "#403F3F": "#A8A8A8",
-            "#393838": "#B8B8B8",
-            "#5A5959": "#C0C0C0",
-            "#6A6969": "#909090",
-            "#6c6c6c": "#A0A0A0",
-            "#787876": "#C8C8C8",
-            "#808080": "#888888",
-            "#b1b1b1": "#303030",
-            "#bbb": "#303030",
-            "#777777": "#777777",
-            "#727272": "#A0A0A0",
-            "#a8a8a8": "#C0C0C0",
-            "#AAA": "#A0A0A0",
-            "#AAAAAA": "#A0A0A0",
-            "#444444": "#707070",
-            "#444": "#808080",
+            "#302F2F": "#252526",
+            "#201F1F": "#1E1E1E",
+            "#3A3939": "#3C3C3C",
+            "#4A4949": "#4A4A4A",
+            "#2A2929": "#2D2D30",
+            "#605F5F": "#565656",
+            "#3d8ec9": "#007ACC",
+            "#78879b": "#0E639C",
+            "#48576b": "#333337",
+            "#626873": "#3F3F46",
+            "#4a4a4a": "#3C3C3C",
+            "#484846": "#2D2D30",
+            "#403F3F": "#333333",
+            "#393838": "#3C3C3C",
+            "#5A5959": "#505050",
+            "#6A6969": "#606060",
+            "#6c6c6c": "#6A6A6A",
+            "#787876": "#707070",
+            "#808080": "#858585",
+            "#b1b1b1": "#F0F0F0",
+            "#bbb": "#F0F0F0",
+            "#777777": "#A0A0A0",
+            "#727272": "#909090",
+            "#a8a8a8": "#D0D0D0",
+            "#AAA": "#D0D0D0",
+            "#AAAAAA": "#D0D0D0",
+            "#444444": "#505050",
+            "#444": "#505050",
+            "#FEFEFC": "#1E1E1E",
+            "#1D1D1B": "#F0F0F0",
+            "#BDBDBA": "#3C3C3C",
+            "#CFCFCD": "#505050",
+            "#F4F4F2": "#F2F2F2",
+            "#D8D8D6": "#D0D0D0",
+            "#E6E6E4": "#FFFFFF",
         },
         "words": {
-            "silver": "#303030",
+            "silver": "#F0F0F0",
             "white": "#FFFFFF",
-            "black": "#202020",
-            "lightblue": "#C8C8CA",
-            "dimgray": "#D0D0D0",
+            "black": "#FFFFFF",
+            "lightblue": "#75BEFF",
+            "dimgray": "#858585",
             "darkgray": "#A0A0A0",
         },
-    },
-    "dark_blue": {
-        "name": "Dark Blue",
-        "accent": "#3D8EC9",
-        "colors": {},
-        "words": {},
     },
     "tigers": {
         "name": "Tigers",
         "accent": "#FFA02F",
+        "arrow": "#FFA02F",
         "colors": {
             "#302F2F": "#0C2340",
             "#201F1F": "#071526",
@@ -84,6 +100,13 @@ THEMES = {
             "#393838": "#1B365D",
             "#5A5959": "#365F87",
             "#6A6969": "#476D93",
+            "#FEFEFC": "#071526",
+            "#1D1D1B": "#F0F0F0",
+            "#BDBDBA": "#294C73",
+            "#CFCFCD": "#365F87",
+            "#F4F4F2": "#F2F2F2",
+            "#D8D8D6": "#D0D0D0",
+            "#E6E6E4": "#FFA02F",
         },
         "words": {
             "lightblue": "#FFA02F",
@@ -93,39 +116,52 @@ THEMES = {
     },
     "tide": {
         "name": "Tide",
-        "accent": "#9E1B32",
+        "accent": "#FFFFFF",
+        "arrow": "#F2F2F2",
         "colors": {
-            "#302F2F": "#FFFFFF",
-            "#201F1F": "#F7F7F7",
-            "#3A3939": "#D3D3D3",
-            "#4A4949": "#B8B8B8",
-            "#2A2929": "#EFEFEF",
-            "#605F5F": "#C5C5C5",
-            "#3d8ec9": "#9E1B32",
-            "#78879b": "#7A1426",
-            "#48576b": "#F0DDE1",
-            "#626873": "#E8C8CE",
-            "#4a4a4a": "#D9D9D9",
-            "#484846": "#E5E5E5",
-            "#403F3F": "#B8B8B8",
-            "#393838": "#D3D3D3",
-            "#5A5959": "#C5C5C5",
-            "#6A6969": "#A8A8A8",
-            "#6c6c6c": "#A8A8A8",
-            "#787876": "#D8D8D8",
-            "#808080": "#808080",
-            "#b1b1b1": "#2A2A2A",
-            "#bbb": "#2A2A2A",
-            "#727272": "#A0A0A0",
-            "#a8a8a8": "#C0C0C0",
+            "#302F2F": "#9E1B32",
+            "#201F1F": "#5C0F1D",
+            "#3A3939": "#7A1426",
+            "#4A4949": "#6B6C70",
+            "#2A2929": "#7A1426",
+            "#605F5F": "#B8B8B8",
+            "#3d8ec9": "#FFFFFF",
+            "#78879b": "#D9D9D9",
+            "#48576b": "#55565A",
+            "#626873": "#55565A",
+            "#4a4a4a": "#6B6C70",
+            "#484846": "#7A1426",
+            "#403F3F": "#C8C8C8",
+            "#393838": "#C8C8C8",
+            "#5A5959": "#8A8A8D",
+            "#6A6969": "#D0D0D0",
+            "#6c6c6c": "#C8C8C8",
+            "#787876": "#6B6C70",
+            "#808080": "#D0D0D0",
+            "#b1b1b1": "#F2F2F2",
+            "#bbb": "#F2F2F2",
+            "#777777": "#D0D0D0",
+            "#727272": "#C8C8C8",
+            "#a8a8a8": "#E0E0E0",
+            "#AAA": "#E0E0E0",
+            "#AAAAAA": "#E0E0E0",
+            "#444444": "#C8C8C8",
+            "#444": "#C8C8C8",
+            "#FEFEFC": "#FFFFFF",
+            "#1D1D1B": "#202020",
+            "#BDBDBA": "#C8C8C8",
+            "#CFCFCD": "#6B6C70",
+            "#F4F4F2": "#F2F2F2",
+            "#D8D8D6": "#D0D0D0",
+            "#E6E6E4": "#F2F2F2",
         },
         "words": {
-            "silver": "#2A2A2A",
+            "silver": "#F2F2F2",
             "white": "#FFFFFF",
             "black": "#1A1A1A",
-            "lightblue": "#E8C8CE",
-            "dimgray": "#D8D8D8",
-            "darkgray": "#A8A8A8",
+            "lightblue": "#FFFFFF",
+            "dimgray": "#7A1426",
+            "darkgray": "#B8B8B8",
         },
     },
 }
@@ -148,14 +184,22 @@ def _portable_asset_urls(source: str) -> str:
     return re.sub(r"url\(([^)]+)\)", replace, source)
 
 
-def _recolor_image(source_path: Path, output_path: Path, accent: str) -> None:
+def _recolor_image(
+    source_path: Path,
+    output_path: Path,
+    accent: str,
+    *,
+    force_accent: bool = False,
+) -> None:
     target_rgb = tuple(int(accent[index:index + 2], 16) / 255 for index in (1, 3, 5))
     target_hue, target_saturation, _ = colorsys.rgb_to_hsv(*target_rgb)
     image = Image.open(source_path).convert("RGBA")
     pixels = []
     for red, green, blue, alpha in image.getdata():
         hue, saturation, value = colorsys.rgb_to_hsv(red / 255, green / 255, blue / 255)
-        if alpha and saturation >= 0.18:
+        if alpha and force_accent:
+            red, green, blue = (round(channel * 255) for channel in target_rgb)
+        elif alpha and saturation >= 0.18:
             new_red, new_green, new_blue = colorsys.hsv_to_rgb(
                 target_hue,
                 max(target_saturation, saturation * 0.65),
@@ -199,13 +243,26 @@ def build_themes() -> None:
             if theme_id == "dark_blue":
                 shutil.copy2(source_image, output_image)
             else:
-                _recolor_image(source_image, output_image, theme["accent"])
+                _recolor_image(
+                    source_image,
+                    output_image,
+                    theme["arrow"] if source_image.name in CONTROL_ARROW_ASSETS else theme["accent"],
+                    force_accent=source_image.name in CONTROL_ARROW_ASSETS,
+                )
 
-    default_text = f"/* Native Qt Default theme; schema v{SCHEMA_VERSION}. */\n"
+    classic_text = CLASSIC_SCHEMA_PATH.read_text(encoding="utf-8").rstrip("\n") + "\n"
+    classic_dir = SOURCE_DIR / "classic"
+    if classic_dir.exists():
+        shutil.rmtree(classic_dir)
+    classic_dir.mkdir(parents=True)
+    (classic_dir / "style.qss").write_text(classic_text, encoding="utf-8")
+    (THEME_DIR / "classic.qss").write_text(classic_text, encoding="utf-8")
+
+    default_text = ""
     default_dir = SOURCE_DIR / "default"
     if default_dir.exists():
         shutil.rmtree(default_dir)
-    (default_dir / "img").mkdir(parents=True)
+    default_dir.mkdir(parents=True)
     (default_dir / "style.qss").write_text(default_text, encoding="utf-8")
     (THEME_DIR / "default.qss").write_text(default_text, encoding="utf-8")
 
@@ -214,6 +271,7 @@ def build_themes() -> None:
         "selectors": selectors,
         "themes": {
             "default": {"name": "Default", "native": True},
+            "classic": {"name": "Classic", "native": False},
             **{
                 theme_id: {"name": theme["name"], "native": False, "accent": theme["accent"]}
                 for theme_id, theme in THEMES.items()

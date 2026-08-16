@@ -1,0 +1,1 @@
+"""Bundled extension packages available to the Developer Extension Manager."""

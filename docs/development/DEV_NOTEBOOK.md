@@ -28,33 +28,101 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-08-16 Theme Alterations Phase 2
+
+* Scope summary: completed the integrated Developer Services separation, responsive MyExplorer picker, project-local five-theme catalog, theme editor, generated assets, and Classic/Default compatibility refinements.
+* Touched-file groups:
+  * shared project, picker, database, and workflow controls under `Core/`
+  * Developer Services extension registry, bundled extension, backup dialog, and Designer sources under `Developer/`
+  * MyServer, MyExplorer, themed module callers, generated UI modules, and the complete stylesheet package under `ViewController/`
+  * project folder manifests, architecture/development notes, and focused regression tests
+* Validation gates:
+  * problems/lint: full-workspace total `10`, all pre-existing Markdown style findings in untouched `docs/development/LOCAL_MASTER_SYNC_AFTER_PR.md`; in-scope total `0`.
+  * compile: pass for every modified or untracked Python file.
+  * UI lock-step: pass; all eight touched Designer/generated Python pairs match byte-for-byte after temporary regeneration.
+  * policy: pass; workflow wizard ownership and `Wizard` wording gates remain enforced.
+  * tests: pass; `111 passed, 45 subtests passed`.
+  * smoke: pass; all 14 canonical Linux `run-my*.sh` launchers remained running through the bounded startup window without traceback or missing dependency errors.
+  * manual UI checks: pass; maintainer accepted the five-theme visuals, arrow visibility, restored native Default, restored Classic appearance, and Default-sized Classic typography.
+  * whitespace: pass for the intended commit via `git diff --check`.
+* Commit exclusions:
+  * `ViewController/Model/Project/Data/json/Session.json` remains uncommitted runtime-local drift.
+  * `docs/development/WINDOWS10_REPO_BACKUP_AND_RECLEAN.md` and `docs/development/WINDOWS10_WINDOWS_DEVELOPMENT_BRANCH_SETUP.md` remain separate maintainer drafts.
+* Unresolved blockers/risks:
+  * native Windows visual smoke remains a release-machine validation step; runtime paths are emitted in Qt-compatible forward-slash form.
+* Next immediate action:
+  * commit as `Theme Alterations phase 2`, push to `origin/master` and `origin/ubuntu_development`, and verify branch parity.
+
+### Session Handoff - 2026-08-16 Developer Backup Utility Separation
+
+* Authorization finding:
+  * BiblionOCR currently has no authenticated user identity or developer-role authorization check.
+  * `DeveloperServices(enabled=...)` is an instrumentation switch and architecture skeleton, not proof that the current user is a developer.
+* Production boundary:
+  * MyServer no longer defines or displays Developer, Development Backup, Development Restore, or Production Backup/Restore actions.
+  * Development backup/restore methods and MyServer-specific action wiring were removed from the production runtime.
+* Developer utility:
+  * Developer Services is the first bundled installable extension; its schema-versioned manifest declares Developer Backup/Restore as its first service.
+  * The extension registry copies bundled packages into a per-user application-data extension root, discovers installed manifests, validates entry-point paths and IDs, dynamically loads services, and uninstalls cleanly.
+  * Developer Backup/Restore owns snapshot creation, volatile-directory exclusions, manifests, mounted-destination discovery, and non-destructive staged restore.
+  * Launch `.venv/bin/python -m Developer.extension_manager_dialog`, install Developer Services, then open Developer Backup/Restore.
+  * Future Developer Services are added to the extension manifest without restoring Developer actions or imports in MyServer.
+* Validation:
+  * focused extension discovery/install/load/uninstall and production-isolation suite: `3 passed`
+  * full repository suite: `98 passed, 45 subtests passed`
+
+### Session Handoff - 2026-08-16 Responsive MyExplorer Picker
+
+* Root cause:
+  * The shared MyExplorer picker used blocking `subprocess.run`, freezing MyServer's Qt event loop while Open Project waited and allowing the desktop to report Python as unresponsive.
+* Picker behavior:
+  * The shared picker now uses `Popen` with a Qt event loop and timer, keeping the calling application responsive until selection or child exit.
+  * Open, Save As, and folder selection all route through MyExplorer; the obsolete internal picker dialog was removed.
+  * MyExplorer Designer UI owns Select Folder and Select File pushbuttons. Callers enable folder-only, file-only, or both selectors through the selection mode flags.
+  * Picker mode honors the caller-provided start directory, including the parent directory used to choose an existing project.
+  * The visibility stabilizer no longer re-shows a picker that was already closed.
+
 ### Session Handoff - 2026-08-16 Theme Schema v1
 
-* Scope summary: aligned Default, Classic, Dark Blue, Tigers, and Tide behind one generated stylesheet schema and a portable runtime catalog.
+* Scope summary: Default, Classic, Dark, Tigers, and Tide are exposed through one portable runtime catalog, with the three newer themes sharing a generated schema.
 * Theme behavior:
-  * Default preserves native Qt rendering with an empty stylesheet.
-  * Classic is the complete light gray/white legacy theme.
-  * Dark Blue remains the structural and image baseline; generated assets preserve the baseline bytes.
+  * Default uses unmodified native Qt rendering.
+  * Classic preserves the compact light stylesheet used before the generated theme catalog.
+  * Dark uses a neutral VS Code-like white-on-charcoal palette while retaining the stable `dark_blue` project ID and baseline image assets.
   * Tigers replaces Dark Orange with navy `#0C2340` and orange `#FFA02F`.
-  * Tide derives from Tigers with crimson `#9E1B32` and white `#FFFFFF`.
-  * Classic, Dark Blue, Tigers, and Tide share all 256 canonical selectors and 46 assets.
+  * Tide mirrors Tigers as a dark theme, replacing navy surfaces with crimson `#9E1B32` and deeper crimson shades while replacing orange accents with white `#FFFFFF` or light gray.
+  * Dark, Tigers, and Tide share all 256 canonical selectors and 46 assets.
 * Runtime compatibility:
   * MyBoxer, MyGlypher, and MyLexer use the public `Stylesheets.load_stylesheet` API.
   * Existing `darkOrange` methods remain compatibility entrypoints and select Tigers; Tide methods are available for future menu wiring.
   * Stored QSS uses `@ASSET_ROOT@`; the loader resolves portable repository-local image paths at runtime.
 * Theme editor:
-  * MyServer owns an `Edit > Edit Themes...` action and applies saved preferences at startup.
+  * MyServer owns an `Edit > Edit Themes...` action and applies saved safe layout preferences with the active project's theme.
   * The dialog selects an existing theme and allow-listed text size, control spacing, corner style, and equal slider size settings.
   * No color input or arbitrary CSS field is exposed; invalid persisted values fall back to safe defaults.
   * The dialog visibly states that primary theme colors are locked and new themes must be created elsewhere.
+* Project theme selection:
+  * MyServer restores `View > Themes` with checkable Default, Classic, Dark, Tigers, and Tide actions in one exclusive action group.
+  * Every menu action routes through one setter that writes `ProjectTheme` to the active project's SQLite metadata and JSON/CSV mirrors.
+  * Activating another project reapplies its stored theme and synchronizes the menu check state; legacy projects normalize to Default.
+  * Every module that installs page workflow actions applies the active project's theme at startup and refreshes it immediately before opening the workflow and picker dialogs; these dialogs inherit the application stylesheet.
+* New project packaging:
+  * Scripture and General project manifests include the Theme Editor and complete `Stylesheets` package.
+  * Self-mapped manifest directories recursively copy files while existing book-folder mappings remain directory-only.
+  * Required theme entries bypass optional setup folder filtering; project setup exposes no theme selector and the catalog's native `default` entry remains the implicit initial theme.
+* Platform compatibility:
+  * Runtime image references use quoted absolute paths with forward slashes, including Windows drive-letter support and spaces, because Qt's stylesheet engine does not reliably paint these assets from `file:///` URLs.
+  * Theme sources and generated QSS contain no machine-specific Linux paths or Windows backslash paths.
+  * Qt loaded all 252 styled-theme image references with zero stylesheet diagnostics; a simulated Windows path with spaces passes `QUrl` local-file validation.
 * Validation gates:
   * problems/lint: pass; full-workspace Problems total `0` and in-scope Problems total `0`; `git diff --check` passes.
   * compile: pass for the generator, catalog, three active runtime callers, and tests.
-  * tests: pass; focused theme catalog/editor suite `12 passed`; full repository suite `86 passed, 43 subtests passed`.
+  * tests: pass; focused project-manifest/theme suite `34 passed, 45 subtests passed`; full repository suite `98 passed, 45 subtests passed`.
   * smoke: pass; all five themes applied to representative offscreen Qt widgets with zero stylesheet parser diagnostics; all 14 Linux `run-my*.sh` launchers remained running through their startup windows without tracebacks.
   * manual UI checks: pass; offscreen visual inspection confirmed the MyServer Edit menu action and Theme Editor dialog are visible, unclipped, and free of overlapping controls.
 * Unresolved blockers/risks:
-  * Project-local theme persistence and propagation to all separately launched modules/dialogs are intentionally deferred to the next theme slice; current preferences use application-level `QSettings` and are applied by MyServer.
+  * Page workflow dialogs now follow the selected project theme in separately launched modules. Broader propagation to unrelated module dialogs remains deferred; safe structural preferences remain application-level `QSettings` and are currently applied by MyServer.
+  * Native Windows visual smoke remains a release-machine validation step; automated contracts cover Windows path syntax, spaces, drive letters, copied assets, and Qt URL parsing from Linux.
 * Next immediate action:
   * commit the theme schema/editor change set, promote it to `master`, and synchronize both origin branches.
 

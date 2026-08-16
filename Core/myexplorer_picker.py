@@ -4,6 +4,8 @@ import sys
 import tempfile
 import time
 
+from PyQt5 import QtCore as qtc
+
 
 def build_myexplorer_selection_command(title, start_dir, selection_kind="file", output_file=""):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -12,11 +14,18 @@ def build_myexplorer_selection_command(title, start_dir, selection_kind="file", 
         tempfile.gettempdir(),
         f"biblion_myexplorer_select_{int(time.time() * 1000)}.txt",
     )
-    mode = "--select-dir" if selection_kind == "directory" else "--select-file"
+    selection_kind = str(selection_kind or "file").lower()
+    modes = []
+    if selection_kind in {"directory", "folder", "both"}:
+        modes.append("--select-dir")
+    if selection_kind in {"file", "both"}:
+        modes.append("--select-file")
+    if not modes:
+        raise ValueError(f"Unsupported MyExplorer selection kind: {selection_kind}")
     command = [
         sys.executable,
         explorer_path,
-        mode,
+        *modes,
         "--start-dir",
         str(start_dir or project_root),
         "--output-file",
@@ -48,7 +57,23 @@ def read_myexplorer_selection(output_file, *, cleanup=True):
 def run_myexplorer_selection(title, start_dir, selection_kind="file"):
     command, output_file = build_myexplorer_selection_command(title, start_dir, selection_kind)
     try:
-        subprocess.run(command, check=False)
+        process = subprocess.Popen(command)
     except OSError:
         return ""
+
+    application = qtc.QCoreApplication.instance()
+    if application is None:
+        process.wait()
+        return read_myexplorer_selection(output_file)
+
+    waiter = qtc.QEventLoop()
+
+    def check_completion():
+        if process.poll() is not None:
+            waiter.quit()
+            return
+        qtc.QTimer.singleShot(100, check_completion)
+
+    qtc.QTimer.singleShot(0, check_completion)
+    waiter.exec_()
     return read_myexplorer_selection(output_file)

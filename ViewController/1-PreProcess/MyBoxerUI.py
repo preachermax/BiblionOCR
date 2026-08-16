@@ -1180,7 +1180,7 @@ class Ui_Boxer(object):
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         font = QtGui.QFont()
-        font.setFamily("Ubuntu")
+        font.setFamily("FROMVS")
         font.setPointSize(11)
         font.setBold(False)
         font.setItalic(False)

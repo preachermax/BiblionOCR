@@ -1,5 +1,3 @@
-# DEVELOPER_MODE_ARCHITECTURE.md
-
 # BiblionOCR Developer Mode Architecture
 
 Version: 1.0
@@ -9,7 +7,7 @@ Last Updated: July 2026
 
 ---
 
-# 1. Purpose
+## 1. Purpose
 
 Developer Mode provides runtime observability for the BiblionOCR platform.
 
@@ -28,7 +26,7 @@ Developer Mode is intended to remain an integrated subsystem of BiblionOCR rathe
 
 ---
 
-# 2. Design Goals
+## 2. Design Goals
 
 Developer Mode shall:
 
@@ -46,7 +44,7 @@ Developer Mode shall:
 
 ---
 
-# 3. Architectural Philosophy
+## 3. Architectural Philosophy
 
 Developer Mode is a passive observer.
 
@@ -69,7 +67,7 @@ This preserves separation of concerns while maintaining a single event-driven ar
 
 ---
 
-# 4. Core Principles
+## 4. Core Principles
 
 ## Principle 1
 
@@ -123,7 +121,7 @@ Observed values may differ according to platform capabilities, active backends, 
 
 ---
 
-# 5. High-Level Architecture
+## 5. High-Level Architecture
 
                 BiblionOCR
 
@@ -150,7 +148,7 @@ Developer Services acts as the instrumentation layer between production code and
 
 ---
 
-# 6. Developer Services
+## 6. Developer Services
 
 Developer Services is the central runtime observer.
 
@@ -172,7 +170,7 @@ Production modules remain unaware of Developer Services.
 
 ---
 
-# 7. Runtime Components
+## 7. Runtime Components
 
 ## Runtime Inspector
 
@@ -310,7 +308,7 @@ They should only be written into a Project when a future workflow explicitly def
 
 ---
 
-# 8. Runtime State Model
+## 8. Runtime State Model
 
 Each observed module may expose:
 
@@ -336,7 +334,7 @@ Developer Mode reads these values only.
 
 ---
 
-# 9. Event Model
+## 9. Event Model
 
 Developer Mode observes EventBus traffic.
 
@@ -364,7 +362,7 @@ Additional events may be introduced without modifying Developer Mode architectur
 
 ---
 
-# 10. Performance Considerations
+## 10. Performance Considerations
 
 Developer Mode shall:
 
@@ -384,7 +382,7 @@ Developer-facing diagnostic artifacts should remain opt-in and should not expand
 
 ---
 
-# 11. Future Expansion
+## 11. Future Expansion
 
 Planned milestones include:
 
@@ -456,7 +454,7 @@ Community demonstrations
 
 ---
 
-# 12. Integration Strategy
+## 12. Integration Strategy
 
 Developer Mode will evolve incrementally.
 
@@ -492,6 +490,22 @@ Implementation order:
 
 Each milestone should remain independently functional.
 
+## Installable Developer Extensions
+
+Developer-facing capabilities are packaged separately from production application menus. The Developer Extension Manager discovers bundled extension manifests, installs selected extensions into the current user's application-data directory, and loads only services declared by an installed manifest.
+
+`developer-services` is the first installable extension. Developer Backup/Restore is its first declared service. Additional Developer Services are added as independent manifest entries so their installation and launch lifecycle does not require MyServer menu or runtime changes.
+
+Initial extension guarantees:
+
+- schema-versioned local manifests
+- per-user installation roots on Linux, Windows, and macOS
+- install, installed-discovery, service loading, and uninstall lifecycle
+- extension-contained entry-point path validation
+- identifier validation that prevents install-root path traversal
+- production MyServer remains independent of Developer extension imports
+
+The initial registry installs bundled extensions only. Third-party trust, signing, dependency resolution, and remote extension catalogs require a later security design.
 
 ## Definition
 
@@ -507,7 +521,7 @@ Developer Services observes those communications and maintains an internal repre
 
 ---
 
-# 13. Relationship to Existing Architecture
+## 13. Relationship to Existing Architecture
 
 Developer Mode extends the existing BiblionOCR architecture.
 
@@ -527,7 +541,7 @@ OCR Pipeline
 
 Instead, it provides runtime observability for these systems.
 
-# Runtime Instrumentation Contract
+## Runtime Instrumentation Contract
 
 Production modules should publish meaningful application events through the EventBus.
 
@@ -548,9 +562,10 @@ Developer Services is responsible for:
 • Metrics collection
 
 • Diagnostic publication
+
 ---
 
-# 14. Long-Term Vision
+## 14. Long-Term Vision
 
 Developer Mode should eventually become one of the defining capabilities of BiblionOCR.
 
@@ -570,7 +585,7 @@ serve as a living architectural reference for the project.
 
 Developer Mode should demonstrate not only what BiblionOCR does, but how it does it.
 
-# 15. Architectural Covenant
+## 15. Architectural Covenant
 
 The architecture documents within the BiblionOCR repository are the authoritative source of design intent.
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 import unittest
@@ -13,6 +14,15 @@ class _DummyEventBus:
 
 
 class ProjectStructureMinimumTests(unittest.TestCase):
+    def test_project_manifests_include_required_theme_entries(self) -> None:
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        for filename in ("ScriptureProjectFolderList.txt", "GeneralProjectFolderList.txt"):
+            with self.subTest(filename=filename):
+                manifest_path = os.path.join(repo_root, "ViewController", filename)
+                with open(manifest_path, "r", encoding="utf-8-sig") as handle:
+                    entries = {line.strip() for line in handle if line.strip()}
+                self.assertTrue(set(ProjectCreationEngine.REQUIRED_THEME_ENTRIES).issubset(entries))
+
     def test_default_structure_includes_required_model_project_layout(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             engine = ProjectCreationEngine(tmpdir, _DummyEventBus())
@@ -173,6 +183,59 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             self.assertIn("ViewController/3-Process/MyLexer.py", manifest_text)
             self.assertIn("ViewController/3-Process/MyResolver.py", manifest_text)
             self.assertIn("ViewController/3-Process/MyVersifier.py", manifest_text)
+
+    def test_required_theme_files_are_copied_without_setup_selection(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            manifest_path = os.path.join(tmpdir, "ProjectFolderList.txt")
+            with open(manifest_path, "w", encoding="utf-8") as handle:
+                handle.write("\n".join(ProjectCreationEngine.REQUIRED_THEME_ENTRIES) + "\n")
+
+            engine = ProjectCreationEngine(tmpdir, _DummyEventBus(), folder_list_path=manifest_path)
+            engine.context = {
+                "project_name": "default_theme_project",
+                "SelectedProjectFolders": ["Model/Project/Data"],
+            }
+            project_root = os.path.join(tmpdir, "project")
+            os.makedirs(project_root, exist_ok=True)
+            engine._create_project_structure(project_root)
+
+            relative_theme_dir = os.path.join("ViewController", "0-MainUI", "helpers", "Stylesheets")
+            source_theme_dir = os.path.join(repo_root, relative_theme_dir)
+            project_theme_dir = os.path.join(project_root, relative_theme_dir)
+            source_files = set()
+            for root, directories, files in os.walk(source_theme_dir):
+                directories[:] = [name for name in directories if name != "__pycache__"]
+                source_files.update(
+                    os.path.relpath(os.path.join(root, filename), source_theme_dir)
+                    for filename in files
+                    if not filename.endswith(".pyc")
+                )
+            project_files = {
+                os.path.relpath(os.path.join(root, filename), project_theme_dir)
+                for root, _directories, files in os.walk(project_theme_dir)
+                for filename in files
+                if filename != ".gitkeep"
+            }
+            self.assertEqual(source_files, project_files)
+            self.assertTrue(
+                os.path.isfile(
+                    os.path.join(
+                        project_root,
+                        "ViewController",
+                        "0-MainUI",
+                        "helpers",
+                        "Dialogs",
+                        "ThemeEditorDialog.py",
+                    )
+                )
+            )
+
+            with open(os.path.join(project_theme_dir, "theme_manifest.json"), "r", encoding="utf-8") as handle:
+                theme_manifest = json.load(handle)
+            self.assertEqual("default", next(iter(theme_manifest["themes"])))
+            self.assertTrue(theme_manifest["themes"]["default"]["native"])
+            self.assertFalse(any("theme" in key.lower() for key in engine.context))
 
 
 if __name__ == "__main__":

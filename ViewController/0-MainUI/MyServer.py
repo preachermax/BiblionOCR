@@ -17,9 +17,7 @@ from subprocess import Popen, PIPE, CalledProcessError
 import shutil
 import json
 import csv
-import time
 import hashlib
-from datetime import datetime, timezone
 from enum import Enum
 
 
@@ -57,9 +55,6 @@ if preprocess_dir not in sys.path:
 if script_dir not in sys.path:
     sys.path.insert(0, script_dir)
 
-developer_view_dir = os.path.join(project_root, "ViewController", "Developer")
-if developer_view_dir not in sys.path:
-    sys.path.insert(0, developer_view_dir)
 
 
 def _load_module_from_path(module_name, file_path):
@@ -113,11 +108,13 @@ from helpers.ext import mainfind
 from helpers.HelpSystem import add_help_menu
 from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from helpers.Dialogs.ThemeEditorDialog import (
+    ThemePreferences,
     ThemeEditorDialog,
     apply_theme_preferences,
     load_theme_preferences,
     save_theme_preferences,
 )
+from helpers.Stylesheets import load_project_theme, save_project_theme
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_tracking import ProjectWorkflowTracker
 from Core.workflow_wizard_actions import (
@@ -151,7 +148,6 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QBuffer, QIODevice
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QFileInfo
-from PyQt5.QtWidgets import QMainWindow, QAction
 
 _qt_previous_message_handler = None
 _qt_message_filter_installed = False
@@ -247,7 +243,6 @@ from helpers.Dialogs.latinmono2pngDialog import Ui_latinmono2pngDialog
 from helpers.Dialogs.deskew_latinmonoDialog import Ui_deskew_latinmonoDialog
 from helpers.Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
 from helpers.Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
-from Developer.developer_services import DeveloperServices
 
 #import MyPixler as pixler
 #import CropTif as croptif
@@ -335,7 +330,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui = Ui_MainUI()
         self.ui.setupUi(self)
-        apply_theme_preferences(load_theme_preferences())
+        self._init_theme_actions()
         placeholder_palette = self.ui.OCRText.palette()
         placeholder_palette.setColor(qtg.QPalette.PlaceholderText, qtg.QColor("#aeb4bc"))
         self.ui.OCRText.setPalette(placeholder_palette)
@@ -353,6 +348,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.scannerManager = ScanManager()
 
         self.session_manager = SessionManager()
+        self._init_panel_overlays()
         self.ui.Image.setFont(
             self.session_manager.build_workflow_font(
                 "FROMVS.ttf",
@@ -361,6 +357,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
         self.current_project_root = self.session_manager.get_active_project_root() or self.current_project_root
+        self._apply_project_theme(load_project_theme(self.current_project_root))
 
         # -------------------------
         # Progress Bar (FIXED)
@@ -430,8 +427,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionFind_and_Replace.triggered.connect(mainfind.Find(self).show)
         self.ui.actionProjectSettings.triggered.connect(self.open_project_settings_dialog)
         self.ui.actionEditThemes.triggered.connect(self.open_theme_editor_dialog)
-
-        self._install_backup_restore_actions()
 
         # -------------------------
         # Buttons / Navigation
@@ -797,6 +792,129 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def _shared_active_project_root(self):
         return self.session_manager.get_active_project_root()
 
+    def _init_theme_actions(self):
+        self._theme_actions = {
+            "default": self.ui.actionThemeDefault,
+            "classic": self.ui.actionThemeClassic,
+            "dark_blue": self.ui.actionThemeDarkBlue,
+            "tigers": self.ui.actionThemeTigers,
+            "tide": self.ui.actionThemeTide,
+        }
+        self._theme_action_group = qtw.QActionGroup(self)
+        self._theme_action_group.setExclusive(True)
+        for theme_id, action in self._theme_actions.items():
+            self._theme_action_group.addAction(action)
+            action.triggered.connect(
+                lambda _checked=False, selected_theme=theme_id: self.set_project_theme(selected_theme)
+            )
+
+    def _init_panel_overlays(self):
+        overlay_font = self.session_manager.build_workflow_font(
+            "FROMVS.ttf",
+            14,
+            os.path.dirname(os.path.realpath(__file__)),
+        )
+        overlays = (
+            (
+                "imagePanelOverlay",
+                self.ui.ImagescrollArea.viewport(),
+                "Drag and Drop Source Image File from MyExplorer\nor select Open Image from the File Menu",
+            ),
+            (
+                "textPanelOverlay",
+                self.ui.OCRText.viewport(),
+                "Drag and Drop Text File from MyExplorer\nor select Open Text from the File Menu",
+            ),
+        )
+        self._panel_overlay_filters = []
+        for object_name, panel, message in overlays:
+            overlay = qtw.QLabel(message, panel)
+            overlay.setObjectName(object_name)
+            overlay.setAlignment(Qt.AlignCenter)
+            overlay.setWordWrap(True)
+            overlay.setFont(overlay_font)
+            overlay.setStyleSheet("color: #c7c7c7; background: transparent;")
+            overlay.setAttribute(Qt.WA_TransparentForMouseEvents)
+            overlay.setFixedSize(500, 120)
+            self._center_panel_overlay(overlay, panel)
+            panel.installEventFilter(self)
+            overlay.show()
+            setattr(self.ui, object_name, overlay)
+        self.ui.OCRText.textChanged.connect(
+            lambda: self.ui.textPanelOverlay.setVisible(not self.ui.OCRText.toPlainText())
+        )
+
+    @staticmethod
+    def _center_panel_overlay(overlay, panel):
+        geometry = qtc.QRect(qtc.QPoint(), overlay.size())
+        geometry.moveCenter(panel.rect().center())
+        overlay.setGeometry(geometry)
+
+    def eventFilter(self, watched, event):
+        if event.type() == qtc.QEvent.Resize:
+            if watched is self.ui.ImagescrollArea.viewport():
+                self._center_panel_overlay(self.ui.imagePanelOverlay, watched)
+            elif watched is self.ui.OCRText.viewport():
+                self._center_panel_overlay(self.ui.textPanelOverlay, watched)
+        return super().eventFilter(watched, event)
+
+    def _preferences_for_theme(self, theme_id):
+        preferences = load_theme_preferences()
+        return ThemePreferences(
+            theme_id=theme_id,
+            text_size=preferences.text_size,
+            density=preferences.density,
+            corner_style=preferences.corner_style,
+            slider_size=preferences.slider_size,
+        )
+
+    def _sync_panel_overlay_contrast(self, theme_id):
+        overlay_color = "#6B6C70" if theme_id == "tide" else "#c7c7c7"
+        for overlay_name in ("imagePanelOverlay", "textPanelOverlay"):
+            overlay = getattr(self.ui, overlay_name, None)
+            if overlay is not None:
+                overlay.setStyleSheet(f"color: {overlay_color}; background: transparent;")
+
+    def _apply_project_theme(self, theme_id):
+        preferences = self._preferences_for_theme(theme_id)
+        apply_theme_preferences(preferences)
+        self._sync_panel_overlay_contrast(theme_id)
+        for action_theme, action in self._theme_actions.items():
+            action.setChecked(action_theme == theme_id)
+
+    def set_project_theme(self, theme_id, preferences=None):
+        project_root = self._shared_active_project_root() or self.current_project_root
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                "Project Theme",
+                "Open or create a project before selecting its theme.",
+            )
+            self._apply_project_theme("default")
+            return False
+
+        try:
+            saved_theme = save_project_theme(project_root, theme_id)
+        except (OSError, ValueError) as exc:
+            qtw.QMessageBox.warning(self, "Project Theme", f"Failed to save the project theme: {exc}")
+            self._apply_project_theme(load_project_theme(project_root))
+            return False
+
+        preferences = preferences or self._preferences_for_theme(saved_theme)
+        preferences = ThemePreferences(
+            theme_id=saved_theme,
+            text_size=preferences.text_size,
+            density=preferences.density,
+            corner_style=preferences.corner_style,
+            slider_size=preferences.slider_size,
+        )
+        save_theme_preferences(preferences)
+        apply_theme_preferences(preferences)
+        self._sync_panel_overlay_contrast(saved_theme)
+        for action_theme, action in self._theme_actions.items():
+            action.setChecked(action_theme == saved_theme)
+        return True
+
     def _set_current_project(self, project_root):
         if not project_root:
             return None
@@ -804,6 +922,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         resolved_root = self.workflow_tracker.resolve_project_root(project_root) or os.path.abspath(os.path.normpath(project_root))
         self.current_project_root = resolved_root
         self.session_manager.set_active_project(resolved_root)
+        self._apply_project_theme(load_project_theme(resolved_root))
         return resolved_root
 
     def _refresh_project_status(self, candidate_path=None):
@@ -935,7 +1054,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._record_project_milestone("project_ready", project_path)
         self._refresh_project_status(project_path)
         self.statusBar().showMessage(f"Project selected: {project_path}", 5000)
-        self.run_child_module('MyExplorer.py', project_path)
         return project_path
         # Deprecated orphan from the former project-opening path:
         # return payload
@@ -1055,12 +1173,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self._open_project_settings_dialog_for_root(project_root)
 
     def open_theme_editor_dialog(self):
-        dialog = ThemeEditorDialog(load_theme_preferences(), self)
+        project_root = self._shared_active_project_root() or self.current_project_root
+        theme_id = load_project_theme(project_root)
+        dialog = ThemeEditorDialog(self._preferences_for_theme(theme_id), self)
         if dialog.exec_() != qtw.QDialog.Accepted:
             return
         preferences = dialog.preferences()
-        save_theme_preferences(preferences)
-        apply_theme_preferences(preferences)
+        self.set_project_theme(preferences.theme_id, preferences)
 
     def collect_new_project_payload(self):
         dialog = ProjectCreationWizardDialog(self._projects_base_path(), self)
@@ -2779,6 +2898,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def showImage(self,imgfilename):
         self.imgpath = imgfilename
+        self.ui.imagePanelOverlay.hide()
         self._active_print_target = "primary"
         print(f"[MyServer DEBUG] self.imgpath set to: {self.imgpath}")
         self.imgfilename = self.imgpath
@@ -3040,53 +3160,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
 
-    def _choose_directory_with_myexplorer(self, title, start_dir=''):
-        """Use MyExplorer as the default directory picker for workflow dialogs."""
-        start_path = self._dialog_start_directory(start_dir)
-        output_file = os.path.join(
-            tempfile.gettempdir(),
-            f"biblion_myexplorer_select_{int(time.time() * 1000)}.txt",
-        )
-        module_path = os.path.join(script_dir, "MyExplorer.py")
-
-        cmd = [
-            sys.executable,
-            module_path,
-            "--select-dir",
-            "--start-dir",
-            start_path,
-            "--output-file",
-            output_file,
-            "--title",
-            title,
-        ]
-
-        try:
-            subprocess.run(cmd, check=False)
-        except OSError as exc:
-            qtw.QMessageBox.warning(
-                self,
-                "MyExplorer Picker",
-                f"Could not start MyExplorer picker:\n{exc}\n\nFalling back to system folder dialog.",
-            )
-            return self._choose_directory(title, start_dir)
-
-        selected_path = ""
-        if os.path.isfile(output_file):
-            try:
-                with open(output_file, "r", encoding="utf-8") as handle:
-                    selected_path = handle.read().strip()
-            except OSError:
-                selected_path = ""
-
-        try:
-            if os.path.exists(output_file):
-                os.remove(output_file)
-        except OSError:
-            pass
-
-        return selected_path
-
     def _choose_file(self, title, name_filter='All Files (*.*)', start_dir=''):
         return self._choose_file_with_myexplorer(title, start_dir)
 
@@ -3096,266 +3169,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             title,
             self._dialog_start_directory(start_dir),
         )[0]
-
-    def _install_backup_restore_actions(self):
-        """Install development backup/restore menu actions into File menu."""
-        if hasattr(self.ui, "actionDevelopment_Backup"):
-            self.ui.actionDevelopment_Backup.triggered.connect(self.open_development_backup_dialog)
-        if hasattr(self.ui, "actionDevelopment_Restore"):
-            self.ui.actionDevelopment_Restore.triggered.connect(self.open_development_restore_dialog)
-        if hasattr(self.ui, "actionProduction_Backup_Restore"):
-            self.ui.actionProduction_Backup_Restore.setEnabled(False)
-
-        # Backward-compatible fallback for older UI artifacts.
-        if not hasattr(self.ui, "actionDevelopment_Backup") and hasattr(self.ui, "menuFile"):
-            self.actionDevelopmentBackup = QAction("Development Backup...", self)
-            self.actionDevelopmentRestore = QAction("Development Restore...", self)
-            self.actionProductionBackupRestore = QAction("Production Backup/Restore (Coming Soon)", self)
-            self.actionProductionBackupRestore.setEnabled(False)
-
-            self.actionDevelopmentBackup.triggered.connect(self.open_development_backup_dialog)
-            self.actionDevelopmentRestore.triggered.connect(self.open_development_restore_dialog)
-
-            self.ui.menuFile.addSeparator()
-            self.ui.menuFile.addAction(self.actionDevelopmentBackup)
-            self.ui.menuFile.addAction(self.actionDevelopmentRestore)
-            self.ui.menuFile.addAction(self.actionProductionBackupRestore)
-
-    def _default_backup_source_dir(self):
-        """Return the default development backup source directory."""
-        return os.path.abspath(project_root)
-
-    def _default_external_backup_root(self):
-        """Resolve best-effort mounted external root; prefer large mounts (for 32TB SSD)."""
-        user = os.environ.get("USER", "")
-        candidates = []
-
-        for base in (
-            os.path.join("/media", user),
-            os.path.join("/run", "media", user),
-            "/mnt",
-        ):
-            if os.path.isdir(base):
-                for name in os.listdir(base):
-                    path = os.path.join(base, name)
-                    if os.path.ismount(path):
-                        candidates.append(path)
-
-        best_path = ""
-        best_size = -1
-        for candidate in candidates:
-            try:
-                total = shutil.disk_usage(candidate).total
-            except OSError:
-                continue
-            if total > best_size:
-                best_size = total
-                best_path = candidate
-
-        if best_path:
-            return best_path
-
-        return qtc.QDir.homePath()
-
-    def _development_backup_root(self, destination_root):
-        return os.path.join(destination_root, "BiblionOCR_Backups", "Development")
-
-    def _build_copy_ignore(self):
-        """Return ignore function for volatile dev artifacts that should not be backed up."""
-        ignored = {
-            ".venv",
-            "__pycache__",
-            ".pytest_cache",
-            ".mypy_cache",
-            ".ruff_cache",
-            ".coverage",
-        }
-
-        def _ignore(_current_dir, names):
-            return {name for name in names if name in ignored}
-
-        return _ignore
-
-    def _copy_tree_with_feedback(self, source_dir, destination_dir):
-        """Copy tree and present a simple wait cursor/status experience for long operations."""
-        qtw.QApplication.setOverrideCursor(Qt.WaitCursor)
-        self.statusBar().showMessage(f"Copying: {source_dir} -> {destination_dir}")
-        qtw.QApplication.processEvents()
-        try:
-            shutil.copytree(
-                source_dir,
-                destination_dir,
-                dirs_exist_ok=False,
-                ignore=self._build_copy_ignore(),
-            )
-        finally:
-            self.statusBar().clearMessage()
-            qtw.QApplication.restoreOverrideCursor()
-
-    def _write_backup_manifest(self, snapshot_dir, source_dir, payload_dir):
-        manifest_path = os.path.join(snapshot_dir, "backup_manifest.json")
-        manifest = {
-            "process": "development",
-            "module": "MyServer",
-            "created_utc": datetime.now(timezone.utc).isoformat(),
-            "source_dir": os.path.abspath(source_dir),
-            "payload_dir": os.path.abspath(payload_dir),
-            "host_platform": platform.platform(),
-            "python": sys.version,
-        }
-
-        with open(manifest_path, "w", encoding="utf-8") as handle:
-            json.dump(manifest, handle, indent=2)
-
-    def open_development_backup_dialog(self):
-        """Run the development backup workflow with manual step-by-step dialogs."""
-        source_default = self._default_backup_source_dir()
-        destination_default = self._default_external_backup_root()
-
-        source_dir = self._choose_directory_with_myexplorer(
-            "Development Backup: Select source folder",
-            source_default,
-        )
-        if not source_dir:
-            return
-
-        destination_root = self._choose_directory_with_myexplorer(
-            "Development Backup: Select destination root (mounted SSD)",
-            destination_default,
-        )
-        if not destination_root:
-            return
-
-        if not os.path.isdir(source_dir):
-            qtw.QMessageBox.warning(self, "Development Backup", f"Source folder not found:\n{source_dir}")
-            return
-        if not os.path.isdir(destination_root):
-            qtw.QMessageBox.warning(self, "Development Backup", f"Destination root not found:\n{destination_root}")
-            return
-
-        backup_root = self._development_backup_root(destination_root)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        snapshot_dir = os.path.join(backup_root, f"dev_backup_{timestamp}")
-        payload_dir = os.path.join(snapshot_dir, os.path.basename(os.path.abspath(source_dir)))
-
-        confirmation = qtw.QMessageBox.question(
-            self,
-            "Confirm Development Backup",
-            (
-                "Create development backup with these settings?\n\n"
-                f"Source:\n{source_dir}\n\n"
-                f"Destination Root:\n{destination_root}\n\n"
-                f"Snapshot Folder:\n{snapshot_dir}"
-            ),
-            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
-            qtw.QMessageBox.Yes,
-        )
-        if confirmation != qtw.QMessageBox.Yes:
-            return
-
-        try:
-            os.makedirs(snapshot_dir, exist_ok=False)
-            self._copy_tree_with_feedback(source_dir, payload_dir)
-            self._write_backup_manifest(snapshot_dir, source_dir, payload_dir)
-        except Exception as exc:
-            qtw.QMessageBox.critical(
-                self,
-                "Development Backup Failed",
-                f"Backup failed with error:\n{exc}",
-            )
-            return
-
-        qtw.QMessageBox.information(
-            self,
-            "Development Backup Complete",
-            f"Backup created successfully:\n{snapshot_dir}",
-        )
-
-    def _find_restore_payload_dir(self, backup_snapshot_dir):
-        """Resolve payload directory inside a backup snapshot (expects BiblionOCR folder payload)."""
-        preferred = os.path.join(backup_snapshot_dir, "BiblionOCR")
-        if os.path.isdir(preferred):
-            return preferred
-
-        for child in os.listdir(backup_snapshot_dir):
-            child_path = os.path.join(backup_snapshot_dir, child)
-            if os.path.isdir(child_path) and child.lower().startswith("biblion"):
-                return child_path
-
-        return ""
-
-    def open_development_restore_dialog(self):
-        """Run the development restore workflow as a safe staged restore (non-destructive)."""
-        backup_start = self._development_backup_root(self._default_external_backup_root())
-        backup_snapshot_dir = self._choose_directory_with_myexplorer(
-            "Development Restore: Select backup snapshot folder",
-            backup_start,
-        )
-        if not backup_snapshot_dir:
-            return
-
-        if not os.path.isdir(backup_snapshot_dir):
-            qtw.QMessageBox.warning(
-                self,
-                "Development Restore",
-                f"Backup snapshot folder not found:\n{backup_snapshot_dir}",
-            )
-            return
-
-        payload_dir = self._find_restore_payload_dir(backup_snapshot_dir)
-        if not payload_dir:
-            qtw.QMessageBox.warning(
-                self,
-                "Development Restore",
-                "Selected backup does not contain a recognizable BiblionOCR payload folder.",
-            )
-            return
-
-        restore_parent_default = os.path.dirname(self._default_backup_source_dir())
-        restore_parent = self._choose_directory_with_myexplorer(
-            "Development Restore: Select restore parent folder",
-            restore_parent_default,
-        )
-        if not restore_parent:
-            return
-
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        restore_target = os.path.join(restore_parent, f"BiblionOCR_dev_restore_{timestamp}")
-
-        confirmation = qtw.QMessageBox.question(
-            self,
-            "Confirm Development Restore",
-            (
-                "Restore will create a new restored folder (non-destructive).\n\n"
-                f"Backup Snapshot:\n{backup_snapshot_dir}\n\n"
-                f"Payload:\n{payload_dir}\n\n"
-                f"Restore Target:\n{restore_target}"
-            ),
-            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
-            qtw.QMessageBox.Yes,
-        )
-        if confirmation != qtw.QMessageBox.Yes:
-            return
-
-        try:
-            self._copy_tree_with_feedback(payload_dir, restore_target)
-        except Exception as exc:
-            qtw.QMessageBox.critical(
-                self,
-                "Development Restore Failed",
-                f"Restore failed with error:\n{exc}",
-            )
-            return
-
-        qtw.QMessageBox.information(
-            self,
-            "Development Restore Complete",
-            (
-                "Restore completed to a new folder:\n"
-                f"{restore_target}\n\n"
-                "Review and validate it before manual cutover."
-            ),
-        )
 
     def loadText(self):
         self.open_non_modal_text_picker(

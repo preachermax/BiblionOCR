@@ -87,6 +87,7 @@
     "QHeaderView::section:checked",
     "QHeaderView::up-arrow",
     "QLabel",
+    "QLabel#Image",
     "QLineEdit",
     "QLineEdit:hover",
     "QListView",
@@ -145,6 +146,8 @@
     "QRadioButton::indicator:unchecked:pressed",
     "QRadioButton:disabled",
     "QRadioButton:focus",
+    "QScrollArea#ImagescrollArea",
+    "QScrollArea#ImagescrollArea > QWidget#qt_scrollarea_viewport",
     "QScrollBar::add-line:horizontal",
     "QScrollBar::add-line:horizontal:hover",
     "QScrollBar::add-line:horizontal:on",
@@ -211,6 +214,7 @@
     "QTableView::item:selected:active",
     "QTextBrowser",
     "QTextEdit",
+    "QTextEdit#OCRText",
     "QTextEdit:hover",
     "QToolBar",
     "QToolBar::handle:horizontal",
@@ -253,6 +257,7 @@
     "QTreeView:branch:selected",
     "QTreeView:hover",
     "QWidget",
+    "QWidget#ImagescrollAreaWidgetContents",
     "QWidget:disabled",
     "QWidget:focus",
     "QWidget:item:hover",
@@ -265,13 +270,12 @@
     },
     "classic": {
       "name": "Classic",
-      "native": false,
-      "accent": "#8F8F91"
+      "native": false
     },
     "dark_blue": {
-      "name": "Dark Blue",
+      "name": "Dark",
       "native": false,
-      "accent": "#3D8EC9"
+      "accent": "#007ACC"
     },
     "tigers": {
       "name": "Tigers",
@@ -281,7 +285,7 @@
     "tide": {
       "name": "Tide",
       "native": false,
-      "accent": "#9E1B32"
+      "accent": "#FFFFFF"
     }
   }
 }

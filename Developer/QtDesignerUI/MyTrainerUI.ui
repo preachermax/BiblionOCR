@@ -240,7 +240,7 @@
    <widget class="QMenu" name="menuFile">
     <property name="font">
      <font>
-      <family>Ubuntu</family>
+      <family>FROMVS</family>
       <pointsize>11</pointsize>
      </font>
     </property>

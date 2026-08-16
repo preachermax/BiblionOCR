@@ -141,7 +141,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.workflow_tracker = ProjectWorkflowTracker(
             workspace_root=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
         )
-        self._project_db_definitions = build_project_field_definitions()
+        self._project_db_definitions = [
+            definition
+            for definition in build_project_field_definitions()
+            if definition.key != "ProjectTheme"
+        ]
         self._project_db_definition_map = {
             definition.key: definition for definition in self._project_db_definitions
         }

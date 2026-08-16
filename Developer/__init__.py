@@ -5,5 +5,11 @@ remain separate from production business logic.
 """
 
 from .developer_services import DeveloperServices
+from .extension_registry import ExtensionManifest, ExtensionRegistry, ServiceManifest
 
-__all__ = ["DeveloperServices"]
+__all__ = [
+	"DeveloperServices",
+	"ExtensionManifest",
+	"ExtensionRegistry",
+	"ServiceManifest",
+]

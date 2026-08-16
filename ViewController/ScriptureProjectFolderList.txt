@@ -1,6 +1,10 @@
 Core/MyServer.py => ViewController/0-MainUI/MyServer.py
 Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py
 Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui
+ViewController/0-MainUI/helpers/__init__.py
+ViewController/0-MainUI/helpers/Dialogs/__init__.py
+ViewController/0-MainUI/helpers/Dialogs/ThemeEditorDialog.py
+ViewController/0-MainUI/helpers/Stylesheets => ViewController/0-MainUI/helpers/Stylesheets
 Model/Project/Data
 Model/Project/Data/sqlite
 Model/Project/Data/sqlite/project_metadata.sqlite

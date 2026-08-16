@@ -26,7 +26,7 @@ import os
 import re
 from pathlib import Path
 from HelpSystem import add_help_menu
-from Stylesheets import load_stylesheet
+from Stylesheets import apply_theme
 from SessionManager import SessionManager
 from project_status_controller import ProjectStatusController
 from Core.workflow_wizard_actions import (
@@ -2981,19 +2981,19 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     # Style Sheets
     def darkOrange(self):
-        app.setStyleSheet(load_stylesheet("tigers"))
+        apply_theme("tigers", app)
 
     def darkBlue(self):
-        app.setStyleSheet(load_stylesheet("dark_blue"))
+        apply_theme("dark_blue", app)
 
     def classic(self):
-        app.setStyleSheet(load_stylesheet("classic"))
+        apply_theme("classic", app)
 
     def tide(self):
-        app.setStyleSheet(load_stylesheet("tide"))
+        apply_theme("tide", app)
 
     def standardUI(self):
-        app.setStyleSheet(load_stylesheet("default"))
+        apply_theme("default", app)
 
 class ResizableRubberBand(QWidget):
     """Wrapper to make QRubberBand mouse-resizable using QSizeGrip

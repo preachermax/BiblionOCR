@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
 
-from ..Stylesheets import THEME_IDS, get_theme, load_stylesheet
+from ..Stylesheets import THEME_IDS, apply_system_ui_font, get_theme, load_stylesheet
 
 
 TEXT_SIZES = {
@@ -98,6 +98,7 @@ def apply_theme_preferences(preferences: ThemePreferences, application=None) -> 
     application = application or qtw.QApplication.instance()
     if application is not None:
         application.setStyleSheet(customized_stylesheet(preferences))
+        apply_system_ui_font(application)
 
 
 class ThemeEditorDialog(qtw.QDialog):

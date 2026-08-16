@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 from dataclasses import dataclass
 from typing import Callable, Optional
 
@@ -20,6 +19,32 @@ class WorkflowStepSpec:
     method_name: Optional[str] = None
     dialog_name: str = ""
     picker_kind: str = "file"
+
+
+def apply_active_project_theme(window) -> str:
+    """Apply the active project's theme so workflow dialogs inherit it."""
+    session_manager = getattr(window, "session_manager", None)
+    project_root = ""
+    if session_manager is not None and hasattr(session_manager, "get_active_project_root"):
+        project_root = session_manager.get_active_project_root()
+    if not project_root:
+        project_root = str(getattr(window, "current_project_root", "") or "")
+
+    try:
+        from Stylesheets import apply_theme, load_project_theme
+    except ImportError:
+        from helpers.Stylesheets import apply_theme, load_project_theme
+
+    theme_id = load_project_theme(project_root)
+    window_theme_applier = getattr(window, "_apply_project_theme", None)
+    if callable(window_theme_applier):
+        window_theme_applier(theme_id)
+        return theme_id
+
+    application = qtw.QApplication.instance()
+    if application is not None:
+        apply_theme(theme_id, application)
+    return theme_id
 
 
 # NOTE:
@@ -182,146 +207,6 @@ _ORIGINAL_GET_SAVE_FILE_NAME = qtw.QFileDialog.getSaveFileName
 _ORIGINAL_GET_EXISTING_DIRECTORY = qtw.QFileDialog.getExistingDirectory
 
 
-def _project_root_from_core() -> str:
-    core_dir = os.path.abspath(os.path.dirname(__file__))
-    return os.path.abspath(os.path.join(core_dir, ".."))
-
-
-def _coerce_start_directory(path_hint: str) -> str:
-    if not path_hint:
-        return _project_root_from_core()
-    candidate = os.path.abspath(path_hint)
-    if os.path.isfile(candidate):
-        candidate = os.path.dirname(candidate)
-    if os.path.isdir(candidate):
-        return candidate
-    parent = os.path.dirname(candidate)
-    if os.path.isdir(parent):
-        return parent
-    return _project_root_from_core()
-
-
-class _ExplorerPickerDialog(qtw.QDialog):
-    def __init__(self, parent, caption: str, start_dir: str, mode: str, suggested_name: str = ""):
-        super().__init__(parent)
-        self._mode = mode
-        self._selected_path = ""
-        self.setWindowTitle(caption or "Select Path")
-        self.resize(860, 560)
-
-        root = _project_root_from_core()
-        initial_dir = _coerce_start_directory(start_dir)
-
-        layout = qtw.QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(8)
-
-        self._model = qtw.QFileSystemModel(self)
-        self._model.setRootPath(root)
-        self._model.setReadOnly(False)
-
-        self._tree = qtw.QTreeView(self)
-        self._tree.setModel(self._model)
-        self._tree.setRootIndex(self._model.index(root))
-        self._tree.setSortingEnabled(True)
-        self._tree.sortByColumn(0, qtc.Qt.AscendingOrder)
-        self._tree.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
-        self._tree.doubleClicked.connect(self._on_double_click)
-        layout.addWidget(self._tree, 1)
-
-        form = qtw.QHBoxLayout()
-        form.addWidget(qtw.QLabel("Selected:"))
-        self._path_display = qtw.QLineEdit(self)
-        self._path_display.setReadOnly(True)
-        form.addWidget(self._path_display, 1)
-        layout.addLayout(form)
-
-        self._name_edit = qtw.QLineEdit(self)
-        if mode == "save_file":
-            self._name_edit.setPlaceholderText("File name")
-            if suggested_name:
-                self._name_edit.setText(suggested_name)
-            layout.addWidget(self._name_edit)
-
-        button_row = qtw.QHBoxLayout()
-        button_row.addStretch(1)
-        self._select_button = qtw.QPushButton("Select", self)
-        self._cancel_button = qtw.QPushButton("Cancel", self)
-        button_row.addWidget(self._select_button)
-        button_row.addWidget(self._cancel_button)
-        layout.addLayout(button_row)
-
-        self._select_button.clicked.connect(self._accept_selection)
-        self._cancel_button.clicked.connect(self.reject)
-        self._tree.selectionModel().currentChanged.connect(self._on_selection_changed)
-
-        initial_index = self._model.index(initial_dir)
-        if initial_index.isValid():
-            self._tree.setCurrentIndex(initial_index)
-            self._tree.scrollTo(initial_index, qtw.QAbstractItemView.PositionAtCenter)
-        self._on_selection_changed(self._tree.currentIndex(), qtc.QModelIndex())
-
-    def selected_path(self) -> str:
-        return self._selected_path
-
-    def _on_selection_changed(self, current, _previous) -> None:
-        if not current.isValid():
-            self._path_display.clear()
-            return
-        self._path_display.setText(self._model.filePath(current))
-
-    def _on_double_click(self, index) -> None:
-        if self._mode != "open_file":
-            return
-        if not index.isValid():
-            return
-        path = self._model.filePath(index)
-        if os.path.isfile(path):
-            self._selected_path = path
-            self.accept()
-
-    def _accept_selection(self) -> None:
-        index = self._tree.currentIndex()
-        if not index.isValid():
-            qtw.QMessageBox.information(self, "Select Path", "Please select a location.")
-            return
-
-        selected = self._model.filePath(index)
-        if self._mode == "directory":
-            if os.path.isfile(selected):
-                selected = os.path.dirname(selected)
-            if not os.path.isdir(selected):
-                qtw.QMessageBox.information(self, "Select Folder", "Please select a folder.")
-                return
-            self._selected_path = selected
-            self.accept()
-            return
-
-        if self._mode == "open_file":
-            if not os.path.isfile(selected):
-                qtw.QMessageBox.information(self, "Open File", "Please select a file.")
-                return
-            self._selected_path = selected
-            self.accept()
-            return
-
-        if self._mode == "save_file":
-            filename = self._name_edit.text().strip() if hasattr(self, "_name_edit") else ""
-            if not filename and os.path.isfile(selected):
-                filename = os.path.basename(selected)
-                selected = os.path.dirname(selected)
-            if not filename:
-                qtw.QMessageBox.information(self, "Save File", "Please enter a file name.")
-                return
-            if os.path.isfile(selected):
-                selected = os.path.dirname(selected)
-            if not os.path.isdir(selected):
-                qtw.QMessageBox.information(self, "Save File", "Please select a valid destination folder.")
-                return
-            self._selected_path = os.path.join(selected, filename)
-            self.accept()
-
-
 def _explorer_get_open_file_name(parent=None, caption="", directory="", _filter="", *args, **kwargs):
     selected_path = run_myexplorer_selection(caption or "Open File", directory, "file")
     return selected_path, ""
@@ -331,10 +216,11 @@ def _explorer_get_save_file_name(parent=None, caption="", directory="", _filter=
     suggested_name = ""
     if directory:
         suggested_name = os.path.basename(directory) if os.path.basename(directory) else ""
-    dialog = _ExplorerPickerDialog(parent, caption or "Save File", directory, "save_file", suggested_name)
-    if dialog.exec_() == qtw.QDialog.Accepted:
-        return dialog.selected_path(), ""
-    return "", ""
+    start_dir = os.path.dirname(directory) if directory and suggested_name else directory
+    selected_path = run_myexplorer_selection(caption or "Save File", start_dir, "both")
+    if selected_path and os.path.isdir(selected_path) and suggested_name:
+        selected_path = os.path.join(selected_path, suggested_name)
+    return selected_path, ""
 
 
 def _explorer_get_existing_directory(parent=None, caption="", directory="", *args, **kwargs):
@@ -1103,72 +989,8 @@ def _open_module_page_wizard(window, module_name: str) -> None:
     open_default_module_page_workflow_wizard(window, module_name)
 
 
-def _myexplorer_script_path() -> str:
-    core_dir = os.path.abspath(os.path.dirname(__file__))
-    project_root = os.path.abspath(os.path.join(core_dir, ".."))
-    return os.path.join(project_root, "ViewController", "0-MainUI", "MyExplorer.py")
-
-
 def _launch_myexplorer_picker(title: str, start_dir: str, selection_kind: str) -> str:
-    explorer_path = _myexplorer_script_path()
-    if not os.path.exists(explorer_path):
-        return ""
-
-    fd, output_path = tempfile.mkstemp(prefix="biblion_workflow_pick_", suffix=".txt")
-    os.close(fd)
-    try:
-        os.unlink(output_path)
-    except OSError:
-        pass
-
-    command = [
-        sys.executable,
-        explorer_path,
-        "--start-dir",
-        start_dir or os.getcwd(),
-        "--output-file",
-        output_path,
-        "--title",
-        title,
-    ]
-    if selection_kind == "file":
-        command.append("--select-file")
-    else:
-        command.append("--select-dir")
-
-    process = subprocess.Popen(command)
-    waiter = qtc.QEventLoop()
-
-    def _check_completion() -> None:
-        if process.poll() is not None:
-            waiter.quit()
-            return
-        if os.path.exists(output_path):
-            try:
-                if os.path.getsize(output_path) > 0:
-                    waiter.quit()
-                    return
-            except OSError:
-                pass
-        qtc.QTimer.singleShot(150, _check_completion)
-
-    qtc.QTimer.singleShot(150, _check_completion)
-    waiter.exec_()
-
-    selected_path = ""
-    try:
-        if os.path.exists(output_path):
-            with open(output_path, "r", encoding="utf-8") as handle:
-                selected_path = handle.read().strip()
-    except OSError:
-        selected_path = ""
-    finally:
-        try:
-            os.unlink(output_path)
-        except OSError:
-            pass
-
-    return selected_path
+    return run_myexplorer_selection(title, start_dir, selection_kind)
 
 
 def _workflow_start_directory(window, module_name: str, load_method_name: str) -> str:
@@ -1257,6 +1079,7 @@ def _module_workflow_steps(module_name: str):
 def open_default_module_page_workflow_wizard(window, module_name: str) -> None:
     """Open the default module-local page workflow wizard for a module window."""
 
+    apply_active_project_theme(window)
     session_manager = getattr(window, "session_manager", None)
 
     if not _prompt_module_page_workflow_inputs(window, module_name):
@@ -1348,13 +1171,14 @@ def install_workflow_wizard_menu_actions(
     include_project_wizard: Optional[bool] = None,
     include_page_wizard: bool = True,
 ) -> None:
+    apply_active_project_theme(window)
     _install_default_context_menu_behavior(window)
     _install_explorer_backed_file_dialogs(window)
     _install_myexplorer_method_aliases(window)
     _install_myexplorer_icon_lockstep(window)
     _install_panel_file_drop_behavior(window)
     _install_save_confirmation_wrappers(window)
-    if module_name != "MyWriter":
+    if module_name not in {"MyExplorer", "MyWriter"}:
         _install_close_confirmation(window)
     _ensure_module_menu_shortcuts(window)
 
