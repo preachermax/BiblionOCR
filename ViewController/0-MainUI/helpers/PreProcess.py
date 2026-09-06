@@ -22,23 +22,23 @@ from PyQt5 import QtCore as qtc
 
 class PreProcess():  
     
-    def pdfExtractPages(source, destination,firstpage,lastpage):
+    def pdfExtractPages(project_name, source, destination,firstpage,lastpage):
 
         args = [
         '-sDEVICE=pdfwrite', ' -dNOPAUSE', ' -dBATCH',
         ' -dSAFER', ' -dFirstPage=' + firstpage, ' -dLastPage=' + lastpage,
-        ' -sOutputFile=' + destination + '1516_Page_' + firstpage + '-' + lastpage + '.pdf'
+        ' -sOutputFile=' + destination + project_name + '_Page_' + firstpage + '-' + lastpage + '.pdf'
         ]
         gs_cmd = 'gs ' + ' '.join(args) +' '+ source
         os.system(gs_cmd)
 
-    def pdf4tif(source, destination):
+    def pdf4tif(project_name, source, destination):
         #idx = destination.rindex('.')
         #destination = destination[:idx]
         args = [
         '-q', '-sDEVICE=tiff24nc',
         '-r300', '-sPAPERSIZE=letter', '-sCompression=lzw',
-        '-o ' + destination + '1516_Page_%03d.tif'
+        '-o ' + destination + project_name + '_Page_%03d.tif'
         ]
         gs_cmd = 'gs ' + ' '.join(args) +' '+ source
         os.system(gs_cmd)

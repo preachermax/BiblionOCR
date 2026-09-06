@@ -3,34 +3,34 @@
         "Sequence": "SP1",
         "DialogUi": "ExtractDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "Model/Project/Images/Complete/Source/pdf_source/1516.pdf",
+        "DefaultSource": "Model/Project/Images/MyServer/Source/pdf/1516.pdf",
         "FolderName": "pdf_page_files",
-        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/pdf_page_files",
-        "CompleteFullPath": "Model/Project/Images/Complete/Source/pdf_page_files"
+        "WorkflowFullPath": "Model/Project/Images/MyPixler/Source/pdf_page_files",
+        "CompleteFullPath": ""
     },
     {
         "Sequence": "SP2",
         "DialogUi": "pdf4tifDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "Model/Project/Images/Workflow/Source/pdf_page_files",
+        "DefaultSource": "Model/Project/Images/MyPixler/Source/pdf_page_files",
         "FolderName": "pdf_pages_4tif",
-        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/pdf_pages_4tif",
-        "CompleteFullPath": "Model/Project/Images/Complete/Source/pdf_pages_4tif"
+        "WorkflowFullPath": "Model/Project/Images/MyPixler/Source/pdf_pages_4tif",
+        "CompleteFullPath": ""
     },
     {
         "Sequence": "SP3",
         "DialogUi": "pdf2tifDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "Model/Project/Images/Workflow/Source/pdf_pages_4tif",
+        "DefaultSource": "Model/Project/Images/MyPixler/Source/pdf_pages_4tif",
         "FolderName": "pdf_pages_2tif",
-        "WorkflowFullPath": "Model/Project/Images/Workflow/Source/pdf_pages_2tif",
-        "CompleteFullPath": "Model/Project/Images/Complete/Source/pdf_pages_2tif"
+        "WorkflowFullPath": "Model/Project/Images/MyPixler/Source/pdf_pages_2tif",
+        "CompleteFullPath": ""
     },
     {
         "Sequence": "SP4",
         "DialogUi": "tif2monoDialog",
         "Category": "Source Page Images",
-        "DefaultSource": "Model/Project/Images/Workflow/Source/pdf_pages_2tif",
+        "DefaultSource": "Model/Project/Images/MyPixler/Source/pdf_pages_2tif",
         "FolderName": "tif_black_white",
         "WorkflowFullPath": "Model/Project/Images/Workflow/Source/tif_black_white",
         "CompleteFullPath": "Model/Project/Images/Complete/Source/tif_black_white"

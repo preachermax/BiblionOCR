@@ -24,6 +24,7 @@ Public release guidance:
 - Remove or relocate separately licensed assets if you do not want to publish them.
 - The stock-media workflow under [Developer/assets](Developer/assets) should be treated separately from software licensing because media redistribution terms are not the same as code licensing.
 - For commercial Windows/Linux binary planning, treat Qt/PyQt dependency licensing as a separate release gate even when your own code is Apache-2.0.
+- The optional MyServer QtPdf renderer depends on PyQt6, which is available under GPLv3 or a Riverbank commercial license. Resolve that license choice before distributing a proprietary binary that bundles the renderer.
 
 See also:
 

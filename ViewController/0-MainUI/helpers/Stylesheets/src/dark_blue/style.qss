@@ -62,6 +62,7 @@ QWidget:item:hover
 QWidget:item:selected
 {
     background-color: #007ACC;
+    color: #FFFFFF;
 }
 
 QCheckBox
@@ -224,6 +225,7 @@ QMenuBar::item:selected
 {
     background: transparent;
     border: 1px solid #3C3C3C;
+    color: #F0F0F0;
 }
 
 QMenuBar::item:pressed
@@ -701,6 +703,7 @@ QComboBox QAbstractItemView
     border-radius: 2px;
     border: 1px solid #505050;
     selection-background-color: #007ACC;
+    selection-color: #FFFFFF;
     color: #F0F0F0;
 }
 
@@ -973,7 +976,7 @@ QTreeView, QListView, QTextBrowser, AtLineEdit, AtLineEdit::hover {
     background-color: #F0F0F0;
     border-radius: 3px;
     margin-left: 3px;
-    color: #FFFFFF;
+    color: #1A1A1A;
 }
 
 QTreeView:branch:selected, QTreeView:branch:hover {
@@ -1060,10 +1063,10 @@ QSlider::handle:vertical {
 }
 
 QToolButton {
-    /*  background-color: transparent; */
     border: 2px transparent #3C3C3C;
     border-radius: 4px;
     background-color: #858585;
+    color: #FFFFFF;
     margin: 2px;
     padding: 2px;
 }

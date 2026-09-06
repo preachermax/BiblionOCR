@@ -66,7 +66,7 @@ Developer contributors use a PR-only intake path and do not execute the full che
 
 Required checklist:
 
-- [docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
+- [Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
 
 Policy requirements:
 
@@ -82,7 +82,7 @@ For runtime/UI refactors that can regress behavior across modules, contributors 
 
 Workflow reference:
 
-- [docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md](docs/development/CHANGESET_PROMPT_PACK_2026-08-07.md)
+- [Developer/documentation/CHANGESET_PROMPT_PACK_2026-08-07.md](Developer/documentation/CHANGESET_PROMPT_PACK_2026-08-07.md)
 
 Recommended operating pattern:
 
@@ -173,7 +173,7 @@ Do not submit:
 - Security-sensitive changes should be reviewed before merge.
 - Content and publication assets should be reviewed for provenance and public redistribution rights.
 - Changes that affect licensing or policy should be reviewed carefully before merge.
-- Pull requests should include checklist evidence aligned with [docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md).
+- Pull requests should include checklist evidence aligned with [Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md).
 
 ## Recommended GitHub Settings
 

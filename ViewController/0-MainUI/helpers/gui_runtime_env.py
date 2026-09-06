@@ -15,6 +15,37 @@ _SANITIZED_MARKER = "BIBLION_GUI_ENV_SANITIZED"
 _QT_FONT_POLICY_INSTALLED = False
 _FONT_DISABLE_ENV = "BIBLION_DISABLE_DEFAULT_QT_FONT"
 _FONT_OVERRIDE_ENV = "BIBLION_DEFAULT_QT_FONT"
+_QT_APPLICATION_IDENTITIES = {
+    "MyServer": ("My Server", "My Server"),
+    "MyExplorer": ("Biblion Explorer", "Biblion Explorer"),
+    "MyBoxer": ("Biblion Boxer", "Biblion Boxer"),
+    "MyGlypher": ("Biblion Glypher", "Biblion Glypher"),
+    "MyGrounder": ("Biblion Grounder", "Biblion Grounder"),
+    "MyLauncher": ("Biblion Launcher", "Biblion Launcher"),
+    "MyPixler": ("Biblion Pixler", "Biblion Pixler"),
+    "MyReader": ("Biblion Reader", "Biblion Reader"),
+    "MyResolver": ("Biblion Resolver", "Biblion Resolver"),
+    "MyScanner": ("Biblion Scanner", "Biblion Scanner"),
+    "MyTrainer": ("Biblion Trainer", "Biblion Trainer"),
+    "MyVersifier": ("Biblion Versifier", "Biblion Versifier"),
+    "MyWriter": ("Biblion Writer", "Biblion Writer"),
+}
+_QT_APPLICATION_ICONS = {
+    "MyServer": "BiblionServer.png",
+    "MyExplorer": "BiblionExplorer.png",
+    "MyBoxer": "BiblionBoxer2.png",
+    "MyGlypher": "BiblionGlypher.png",
+    "MyGrounder": "BiblionGrounder.png",
+    "MyLauncher": "BiblionLauncher.png",
+    "MyPixler": "BiblionPixler1.png",
+    "MyReader": "BiblionReader2.png",
+    "MyResolver": "BiblionResolver2.png",
+    "MyScanner": "BiblionScanner1.png",
+    "MyTrainer": "BiblionTrainer1.png",
+    "MyVersifier": "BiblionVersifier2.png",
+    "MyWriter": "BiblionWriter1.png",
+}
+_WINDOWS_APP_ID_PREFIX = "preachermax.BiblionOCR"
 
 
 def sanitize_current_process_and_reexec() -> None:
@@ -106,6 +137,7 @@ def install_default_qt_font_policy() -> None:
         return
 
     try:
+        from PyQt5 import QtCore as qtc
         from PyQt5 import QtGui as qtg
         from PyQt5 import QtWidgets as qtw
     except Exception:
@@ -114,7 +146,10 @@ def install_default_qt_font_policy() -> None:
     original_init = qtw.QApplication.__init__
 
     def patched_init(app_self, *args, **kwargs):
+        _prepare_qt_application_identity(qtc)
         original_init(app_self, *args, **kwargs)
+        _apply_qt_application_identity(app_self)
+        _apply_qt_application_icon_policy(app_self, qtc, qtg)
         _apply_default_qt_font(app_self, qtg, qtw)
 
     qtw.QApplication.__init__ = patched_init
@@ -122,7 +157,91 @@ def install_default_qt_font_policy() -> None:
 
     existing_app = qtw.QApplication.instance()
     if existing_app is not None:
+        _apply_qt_application_identity(existing_app)
+        _apply_qt_application_icon_policy(existing_app, qtc, qtg)
         _apply_default_qt_font(existing_app, qtg, qtw)
+
+
+def _qt_application_identity():
+    module_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+    identity = _QT_APPLICATION_IDENTITIES.get(module_name)
+    if identity is None:
+        return None
+    desktop_file_name, display_name = identity
+    return module_name, desktop_file_name, display_name
+
+
+def _prepare_qt_application_identity(qtc) -> None:
+    """Set platform taskbar identity before QApplication initializes."""
+
+    identity = _qt_application_identity()
+    if identity is None:
+        return
+    module_name, _desktop_file_name, _display_name = identity
+    qtc.QCoreApplication.setApplicationName(f"{module_name}.py")
+    _set_windows_app_user_model_id(module_name)
+
+
+def _apply_qt_application_identity(app) -> None:
+    """Expose a stable Linux desktop identity for launcher/taskbar matching."""
+
+    identity = _qt_application_identity()
+    if identity is None:
+        return
+
+    _module_name, desktop_file_name, display_name = identity
+    app.setApplicationDisplayName(display_name)
+    app.setDesktopFileName(desktop_file_name)
+
+
+def _set_windows_app_user_model_id(module_name) -> None:
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            f"{_WINDOWS_APP_ID_PREFIX}.{module_name}"
+        )
+    except (AttributeError, OSError):
+        pass
+
+
+def _application_icon_path(module_name):
+    icon_name = _QT_APPLICATION_ICONS.get(module_name)
+    if icon_name is None:
+        return None
+    return os.path.join(os.path.dirname(__file__), "Icons", icon_name)
+
+
+def _apply_qt_application_icon_policy(app, qtc, qtg) -> None:
+    identity = _qt_application_identity()
+    if identity is None:
+        return
+
+    icon_path = _application_icon_path(identity[0])
+    if icon_path is None or not os.path.isfile(icon_path):
+        return
+    icon = qtg.QIcon(icon_path)
+    if icon.isNull():
+        return
+
+    app.setWindowIcon(icon)
+    for window in app.topLevelWidgets():
+        window.setWindowIcon(icon)
+
+    if getattr(app, "_biblion_window_icon_filter", None) is not None:
+        return
+
+    class WindowIconFilter(qtc.QObject):
+        def eventFilter(self, watched, event):
+            if event.type() == qtc.QEvent.Show and getattr(watched, "isWindow", lambda: False)():
+                watched.setWindowIcon(icon)
+            return False
+
+    icon_filter = WindowIconFilter(app)
+    app.installEventFilter(icon_filter)
+    app._biblion_window_icon_filter = icon_filter
 
 
 def _apply_default_qt_font(app, qtg, qtw) -> None:

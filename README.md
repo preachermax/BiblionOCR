@@ -22,7 +22,7 @@ If you want the documentation-first entry point, begin with:
 
 1. [docs/README.md](docs/README.md)
 2. [docs/architecture/PROJECT_ARCHITECTURE.md](docs/architecture/PROJECT_ARCHITECTURE.md)
-3. [docs/development/DEV_NOTEBOOK.md](docs/development/DEV_NOTEBOOK.md)
+3. [Developer/documentation/DEV_NOTEBOOK.md](Developer/documentation/DEV_NOTEBOOK.md)
 4. [Developer/video/README.md](Developer/video/README.md)
 
 ## Repository Focus
@@ -122,7 +122,7 @@ This repository also contains third-party components under their own licenses. S
 Developer contributions and content submissions do not follow the same review path.
 
 - Developers should contribute through pull requests and repository review.
-- Developers are required to complete the development checklist before opening pull requests: docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md.
+- Developers are required to complete the development checklist before opening pull requests: Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md.
 - Pull requests are expected to use the repository PR template and include checklist confirmations.
 - Content creators should only submit material that the project has clear rights to publish and redistribute.
 - Membership requests now start through GitHub issue forms and are approved through the reviewed registry in `.github/membership-registry.json`.

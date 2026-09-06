@@ -17,6 +17,8 @@ This folder is the architecture/documentation lane for the Jetson Nano as a Bibl
   - Strategic architecture direction tying Nano into Compute Engine and workflow intelligence.
 - `NANO_ARCHITECTURE_VALIDATION_2026-08-13.md`
   - Validation mapping of Nano intended use against current architecture contract/roadmap.
+- `BiblionOCR_Nano_Project_Page_Workflow_Feasibility.md`
+  - Living, evidence-based path for integrating Nano jobs into project and page workflows, including benchmark gates and update triggers.
 - `Jetson Nano Headless Setup — Updated.md`
   - Practical post-setup operational sequence.
 
@@ -26,3 +28,5 @@ This folder is the architecture/documentation lane for the Jetson Nano as a Bibl
 - `Nano - Headless sea trial response log.txt`
 
 These logs capture command output used to validate runtime identity, networking, and CUDA/Tegra stack presence.
+
+Update the feasibility study when new workflow candidates, provider contracts, local optimizations, or Nano measurements change the execution decision.

@@ -398,4 +398,4 @@ python3 ViewController/utilities/0-MainUI/helpers/ProjectFolderList.py
 
 - Print this checklist as-is for session tracking.
 - Mark failures with the exact module, command, traceback, and data path involved.
-- After the session, fold results back into `docs/development/DEV_NOTEBOOK.md` or a focused bug-fix PR.
+- After the session, fold results back into `Developer/documentation/DEV_NOTEBOOK.md` or a focused bug-fix PR.

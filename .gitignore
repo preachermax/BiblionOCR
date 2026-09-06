@@ -85,7 +85,10 @@ Developer/video/*.kdenlive.ass
 
 # Explicit local cleanup exclusions
 ViewController/archives/
-Model/Project/Data/json/
+Model/Project/Data/json/*
+!Model/Project/Data/json/ReaderSession.json
+!Model/Project/Data/json/ScannerSession.json
+!Model/Project/Data/json/Session.json
 
 # Patreon local tooling runtime artifacts
 docs/patreon/local_blog_tool/playwright_profile/
@@ -94,3 +97,16 @@ docs/patreon/local_blog_tool_transfer_*.tar.gz
 docs/patreon/local_blog_tool_transfer_portable/
 docs/patreon/local_blog_tool_transfer_portable_*.zip
 docs/patreon/local_blog_tool_transfer_portable_*.tar.gz
+
+# Local project state and generated inventories
+Model/Project/Data/SQLite/
+Model/Project/Data/csv/*_inventory.csv
+Model/Project/Data/csv/project_database.csv
+Model/Project/Data/csv/project_metadata.csv
+Model/Project/Data/csv/.~lock.*#
+Model/Project/Images/Scanned/
+Model/Project/Images/MyServer/source_images/pdf_acq_src_image/
+ViewController/0-MainUI/helpers/file_drop_debug.log
+
+# Large local reference datasets
+Developer/utilities/Reference/

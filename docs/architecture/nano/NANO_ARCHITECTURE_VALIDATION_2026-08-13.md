@@ -85,9 +85,11 @@ This follows existing contract constraints:
 
 ## 6. Next Architecture-Safe Step
 
-Implement one measurable Nano-backed compute path under provider abstraction, with:
+Follow the living feasibility and admission process in `BiblionOCR_Nano_Project_Page_Workflow_Feasibility.md`. Implement one measurable Nano-backed compute path under provider abstraction, with:
 
 - explicit capability check
+- end-to-end queue, staging, compute, return, and integration timings
 - runtime status capture
 - deterministic fallback to CPU
 - provenance entry for provider/device used
+- canonical project page-count and page-workflow progress updates

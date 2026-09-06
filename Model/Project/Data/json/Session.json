@@ -1,0 +1,197 @@
+[
+    {
+        "Setting": "self.font",
+        "CurrentValue": "FROMVS",
+        "DefaultValue": "Noto Sans"
+    },
+    {
+        "Setting": "self.fontsize",
+        "CurrentValue": 20,
+        "DefaultValue": 20
+    },
+    {
+        "Setting": "self.linespacing",
+        "CurrentValue": "100",
+        "DefaultValue": "100"
+    },
+    {
+        "Setting": "self.active_workflow_module",
+        "CurrentValue": "MyExplorer",
+        "DefaultValue": "MyServer"
+    },
+    {
+        "Setting": "self.active_workflow_wizard_mode",
+        "CurrentValue": "project",
+        "DefaultValue": "page"
+    },
+    {
+        "Setting": "self.active_workflow_wizard_module",
+        "CurrentValue": "MyServer",
+        "DefaultValue": "MyGlypher"
+    },
+    {
+        "Setting": "self.ocrlang",
+        "CurrentValue": "Ancient Greek",
+        "DefaultValue": "Ancient Greek"
+    },
+    {
+        "Setting": "self.ocrmodel",
+        "CurrentValue": "feg",
+        "DefaultValue": "ell"
+    },
+    {
+        "Setting": "self.current_project_page",
+        "CurrentValue": 110,
+        "DefaultValue": 1
+    },
+    {
+        "Setting": "self.current_project_milestone",
+        "CurrentValue": "source_acquired",
+        "DefaultValue": "project_ready"
+    },
+    {
+        "Setting": "self.current_page_milestone",
+        "CurrentValue": "source_acquired",
+        "DefaultValue": "project_ready"
+    },
+    {
+        "Setting": "self.active_project_root",
+        "CurrentValue": "/home/max-richey/Projects/Erasmus1516",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516"
+    },
+    {
+        "Setting": "self.active_project_name",
+        "CurrentValue": "Erasmus1516",
+        "DefaultValue": "Erasmus1516"
+    },
+    {
+        "Setting": "self.project_root",
+        "CurrentValue": "/home/max-richey/Projects/Erasmus1516",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516"
+    },
+    {
+        "Setting": "self.project_name",
+        "CurrentValue": "Erasmus1516",
+        "DefaultValue": "Erasmus1516"
+    },
+    {
+        "Setting": "self.inbound_default_source",
+        "CurrentValue": "",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.current_project_root",
+        "CurrentValue": "/home/max-richey/Projects/Erasmus1516",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516"
+    },
+    {
+        "Setting": "self.current_project_name",
+        "CurrentValue": "Erasmus1516",
+        "DefaultValue": "Erasmus1516"
+    },
+    {
+        "Setting": "self.project_settings_active_tab",
+        "CurrentValue": 0,
+        "DefaultValue": 0
+    },
+    {
+        "Setting": "self.project_settings_dialog_geometry",
+        "CurrentValue": "AdnQywADAAAAAAEXAAAAmQAABOoAAAONAAABFwAAAL4AAATqAAADjQAAAAAAAAAAB4AAAAEXAAAAvgAABOoAAAON",
+        "DefaultValue": "AdnQywADAAAAAAAAAAAAAAAAA9MAAALPAAAAAAAAAAAAAAPTAAACzwAAAAAAAAAAAyAAAAAAAAAAAAAAA9MAAALP"
+    },
+    {
+        "Setting": "self.imgpath",
+        "CurrentValue": "/home/max-richey/Projects/BiblionOCR/Model/Project/Images/Scanned/scan_000003.tif",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516/Model/Project/Images/MyServer/Source/pdf/1516.pdf"
+    },
+    {
+        "Setting": "self.imgdir",
+        "CurrentValue": "/home/max-richey/Projects/BiblionOCR/Model/Project/Images/Scanned",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516/Model/Project/Images/MyServer/Source/pdf"
+    },
+    {
+        "Setting": "self.sourcefile",
+        "CurrentValue": "/home/max-richey/Projects/Erasmus1516/Model/Project/Images/MyServer/source_images/pdf_acq_src_image/1516_Page_38-109.pdf",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516/Model/Project/Images/MyServer/Source/pdf/1516.pdf"
+    },
+    {
+        "Setting": "self.zoom",
+        "CurrentValue": "50 %",
+        "DefaultValue": "50 %"
+    },
+    {
+        "Setting": "self.zoomslidervalue",
+        "CurrentValue": 50,
+        "DefaultValue": 50
+    },
+    {
+        "Setting": "self.sourcefolder",
+        "CurrentValue": "/home/max-richey/Projects/Erasmus1516/Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
+        "DefaultValue": "/home/max-richey/Projects/Erasmus1516/Model/Project/Images/MyServer/Source/pdf"
+    },
+    {
+        "Setting": "self.firstpage",
+        "CurrentValue": "554",
+        "DefaultValue": "38"
+    },
+    {
+        "Setting": "self.lastpage",
+        "CurrentValue": "592",
+        "DefaultValue": "72"
+    },
+    {
+        "Setting": "self.scan_destination_folder",
+        "CurrentValue": "/home/max-richey/Projects/BiblionOCR/Model/Project/Images/Scanned",
+        "DefaultValue": "/home/max-richey/Projects/BiblionOCR/Model/Project/Images/Scanned"
+    },
+    {
+        "Setting": "self.scan_backend_preference",
+        "CurrentValue": "ESCLScanner",
+        "DefaultValue": "ESCLScanner"
+    },
+    {
+        "Setting": "self.scan_device_name",
+        "CurrentValue": "192.168.2.29",
+        "DefaultValue": ""
+    },
+    {
+        "Setting": "self.scan_allow_network_fallback",
+        "CurrentValue": true,
+        "DefaultValue": true
+    },
+    {
+        "Setting": "self.scan_mode",
+        "CurrentValue": "color",
+        "DefaultValue": "mono"
+    },
+    {
+        "Setting": "self.scan_dpi",
+        "CurrentValue": 300,
+        "DefaultValue": 300
+    },
+    {
+        "Setting": "self.scan_source_type",
+        "CurrentValue": "flatbed",
+        "DefaultValue": "flatbed"
+    },
+    {
+        "Setting": "self.scan_duplex",
+        "CurrentValue": false,
+        "DefaultValue": false
+    },
+    {
+        "Setting": "self.scan_persist_format",
+        "CurrentValue": "tiff",
+        "DefaultValue": "tiff"
+    },
+    {
+        "Setting": "self.current_project_page_path",
+        "CurrentValue": "/home/max-richey/Projects/BiblionOCR/Model/Project/Images/MyPixler/VerseSections/Complete/15_pdf_verse_book_src_pages/book_41_Mark/1516_Page_110-153.pdf",
+        "DefaultValue": "/home/max-richey/Projects/BiblionOCR/Model/Project/Images/Scanned/scan_000003.tif"
+    },
+    {
+        "Setting": "self.current_project_page_updated_by",
+        "CurrentValue": "My\u03b2\u03ca\u03d0\u03bb\u03af\u03bf\u03bdPixler",
+        "DefaultValue": "MyServer"
+    }
+]

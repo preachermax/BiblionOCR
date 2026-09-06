@@ -28,6 +28,19 @@ from Stylesheets.theme_catalog import (
 
 
 class ThemeCatalogTests(unittest.TestCase):
+    @staticmethod
+    def _contrast_ratio(first_hex: str, second_hex: str) -> float:
+        def luminance(color_hex: str) -> float:
+            channels = [int(color_hex[index:index + 2], 16) / 255 for index in (1, 3, 5)]
+            linear_channels = [
+                channel / 12.92 if channel <= 0.04045 else ((channel + 0.055) / 1.055) ** 2.4
+                for channel in channels
+            ]
+            return 0.2126 * linear_channels[0] + 0.7152 * linear_channels[1] + 0.0722 * linear_channels[2]
+
+        lighter, darker = sorted((luminance(first_hex), luminance(second_hex)), reverse=True)
+        return (lighter + 0.05) / (darker + 0.05)
+
     def test_catalog_contains_all_project_themes(self) -> None:
         self.assertEqual(("default", "classic", "dark_blue", "tigers", "tide"), THEME_IDS)
         self.assertEqual("Classic", get_theme("classic")["name"])
@@ -154,6 +167,83 @@ class ThemeCatalogTests(unittest.TestCase):
                 if selector.strip()
             }
             self.assertEqual(expected, selectors, theme_id)
+
+    def test_dialog_interaction_states_keep_text_contrast(self) -> None:
+        expected_pairs = {
+            "dark_blue": (("#007ACC", "#FFFFFF"), ("#0E639C", "#FFFFFF")),
+            "tigers": (("#FFA02F", "#000000"), ("#D7801A", "#000000")),
+            "tide": (("#FFFFFF", "#1A1A1A"), ("#D9D9D9", "#1A1A1A")),
+        }
+        selectors = (
+            "QWidget:item:selected",
+            "QPushButton:focus",
+            "QComboBox QAbstractItemView",
+            "QListView::item:selected:hover, QListView::item:selected:hover, QTreeView::item:selected:hover",
+            "QTableView::item:pressed, QListView::item:pressed, QTreeView::item:pressed",
+            "QTableView::item:selected:active, QTreeView::item:selected:active, QListView::item:selected:active",
+        )
+
+        for theme_id, ((selection_background, selection_text), (hover_background, hover_text)) in expected_pairs.items():
+            stylesheet = load_stylesheet(theme_id)
+            for background, foreground in ((selection_background, selection_text), (hover_background, hover_text)):
+                self.assertGreaterEqual(self._contrast_ratio(background, foreground), 4.5, theme_id)
+            for selector in selectors:
+                match = re.search(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", stylesheet)
+                self.assertIsNotNone(match, f"{theme_id}: {selector}")
+                declarations = match.group(1)
+                expected_text = hover_text if ":pressed" in selector else selection_text
+                equivalent_text = {
+                    "#000000": r"(?:#000000|black)",
+                    "#FFFFFF": r"(?:#FFFFFF|white)",
+                }.get(expected_text, re.escape(expected_text))
+                self.assertRegex(
+                    declarations,
+                    rf"(?:selection-)?color:\s*{equivalent_text};",
+                    f"{theme_id}: {selector}",
+                )
+
+    def test_remaining_generated_interaction_pairs_keep_text_contrast(self) -> None:
+        expected_pairs = {
+            "dark_blue": (("#707070", "#FFFFFF"), ("#F0F0F0", "#1A1A1A"), ("#505050", "#FFFFFF")),
+            "tigers": (("#787876", "#000000"), ("#C0C0C0", "#000000"), ("#365F87", "#FFFFFF")),
+            "tide": (("#6B6C70", "#FFFFFF"), ("#F2F2F2", "#1A1A1A"), ("#8A8A8D", "#1A1A1A")),
+        }
+        selectors = (
+            "QMainWindow::separator:hover",
+            "QTreeView, QListView, QTextBrowser, AtLineEdit, AtLineEdit::hover",
+            "QHeaderView::section:checked",
+        )
+
+        for theme_id, pairs in expected_pairs.items():
+            stylesheet = load_stylesheet(theme_id)
+            for selector, (background, foreground) in zip(selectors, pairs):
+                self.assertGreaterEqual(self._contrast_ratio(background, foreground), 4.5, f"{theme_id}: {selector}")
+                match = re.search(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", stylesheet)
+                self.assertIsNotNone(match, f"{theme_id}: {selector}")
+                self.assertIn(f"color: {foreground};", match.group(1), f"{theme_id}: {selector}")
+
+    def test_tool_buttons_use_icon_revealing_surfaces(self) -> None:
+        expected_pairs = {
+            "dark_blue": ("#858585", "#FFFFFF"),
+            "tigers": ("#C0C0C0", "#000000"),
+            "tide": ("#D0D0D0", "#1A1A1A"),
+        }
+
+        for theme_id, (background, foreground) in expected_pairs.items():
+            stylesheet = load_stylesheet(theme_id)
+            match = re.search(r"QToolButton\s*\{([^}]+)\}", stylesheet)
+            self.assertIsNotNone(match, theme_id)
+            declarations = match.group(1)
+            self.assertIn(f"background-color: {background};", declarations, theme_id)
+            self.assertIn(f"color: {foreground};", declarations, theme_id)
+
+    def test_tigers_top_menu_hover_uses_light_text(self) -> None:
+        stylesheet = load_stylesheet("tigers")
+        match = re.search(r"QMenuBar::item:selected\s*\{([^}]+)\}", stylesheet)
+
+        self.assertIsNotNone(match)
+        self.assertIn("color: #FFFFFF;", match.group(1))
+        self.assertGreaterEqual(self._contrast_ratio("#0C2340", "#FFFFFF"), 4.5)
 
     def test_every_resolved_asset_reference_exists(self) -> None:
         for theme_id in ("dark_blue", "tigers", "tide"):
@@ -314,7 +404,7 @@ class ThemeCatalogTests(unittest.TestCase):
         self.assertIn("#007ACC", dark)
         self.assertFalse((STYLESHEET_DIR / "dark_orange.qss").exists())
 
-        notebook = Path(__file__).resolve().parents[1] / "docs" / "development" / "DEV_NOTEBOOK.md"
+        notebook = Path(__file__).resolve().parents[1] / "Developer" / "documentation" / "DEV_NOTEBOOK.md"
         theme_files = [path for path in STYLESHEET_DIR.rglob("*") if path.is_file()]
         theme_text = "\n".join(
             path.read_text(encoding="utf-8", errors="ignore")

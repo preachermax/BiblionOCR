@@ -33,6 +33,14 @@ THEMES = {
         "name": "Dark",
         "accent": "#007ACC",
         "arrow": "#FFFFFF",
+        "interaction_text": {
+            "@CHECKED_HEADER_TEXT@": "#FFFFFF",
+            "@LIGHT_SURFACE_TEXT@": "#1A1A1A",
+            "@SEPARATOR_HOVER_TEXT@": "#FFFFFF",
+            "@MENU_BAR_HOVER_TEXT@": "#F0F0F0",
+            "@TOOL_BUTTON_BACKGROUND@": "#858585",
+            "@TOOL_BUTTON_TEXT@": "#FFFFFF",
+        },
         "colors": {
             "#302F2F": "#252526",
             "#201F1F": "#1E1E1E",
@@ -83,6 +91,14 @@ THEMES = {
         "name": "Tigers",
         "accent": "#FFA02F",
         "arrow": "#FFA02F",
+        "interaction_text": {
+            "@CHECKED_HEADER_TEXT@": "#FFFFFF",
+            "@LIGHT_SURFACE_TEXT@": "#000000",
+            "@SEPARATOR_HOVER_TEXT@": "#000000",
+            "@MENU_BAR_HOVER_TEXT@": "#FFFFFF",
+            "@TOOL_BUTTON_BACKGROUND@": "#C0C0C0",
+            "@TOOL_BUTTON_TEXT@": "#000000",
+        },
         "colors": {
             "#302F2F": "#0C2340",
             "#201F1F": "#071526",
@@ -118,6 +134,14 @@ THEMES = {
         "name": "Tide",
         "accent": "#FFFFFF",
         "arrow": "#F2F2F2",
+        "interaction_text": {
+            "@CHECKED_HEADER_TEXT@": "#1A1A1A",
+            "@LIGHT_SURFACE_TEXT@": "#1A1A1A",
+            "@SEPARATOR_HOVER_TEXT@": "#FFFFFF",
+            "@MENU_BAR_HOVER_TEXT@": "#F2F2F2",
+            "@TOOL_BUTTON_BACKGROUND@": "#D0D0D0",
+            "@TOOL_BUTTON_TEXT@": "#1A1A1A",
+        },
         "colors": {
             "#302F2F": "#9E1B32",
             "#201F1F": "#5C0F1D",
@@ -173,6 +197,8 @@ def _replace_palette(source: str, theme: dict) -> str:
         rendered = re.sub(re.escape(old), new, rendered, flags=re.IGNORECASE)
     for old, new in theme["words"].items():
         rendered = re.sub(rf"\b{re.escape(old)}\b", new, rendered, flags=re.IGNORECASE)
+    for token, color in theme["interaction_text"].items():
+        rendered = rendered.replace(token, color)
     return rendered
 
 

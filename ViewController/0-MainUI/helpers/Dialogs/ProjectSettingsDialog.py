@@ -822,14 +822,14 @@ class ProjectSettingsDialog(qtw.QDialog):
         milestones_layout.setSpacing(8)
 
         milestones_help = qtw.QLabel(
-            "Milestones are loaded from workflow tracking and module_handshakes.csv. "
-            "Rows are grouped by module and shown in sequential order. Adjust completion and weight to tune project/page progress calculations."
+            "Page milestones are loaded from page_workflow_milestones.csv for the current project page. "
+            "Only milestones marked as overridable in that worksheet can be changed here."
         )
         milestones_help.setWordWrap(True)
         milestones_layout.addWidget(milestones_help)
 
         self.milestones_table = qtw.QTableWidget(0, 6, self)
-        self.milestones_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone Key", "Label", "Weight", "Complete"])
+        self.milestones_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone Key", "Label", "Progress %", "Complete"])
         self.milestones_table.verticalHeader().setVisible(False)
         self.milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
         self.milestones_table.setAlternatingRowColors(True)
@@ -896,7 +896,7 @@ class ProjectSettingsDialog(qtw.QDialog):
 
     def _load_milestones_table(self):
         self.milestones_table.setRowCount(0)
-        rows = self.workflow_tracker.milestone_rows(self.project_root)
+        rows = self.workflow_tracker.page_milestone_rows(self.project_root)
         rows = sorted(rows, key=self._milestone_row_sort_key)
         for row_data in rows:
             row = self.milestones_table.rowCount()
@@ -918,12 +918,14 @@ class ProjectSettingsDialog(qtw.QDialog):
             label_item.setFlags(label_item.flags() & ~qtc.Qt.ItemIsEditable)
             self.milestones_table.setItem(row, 3, label_item)
 
-            weight_value = int(row_data.get("weight", 1))
-            weight_item = qtw.QTableWidgetItem(str(weight_value))
+            weight_value = float(row_data.get("weight", 0.0))
+            weight_item = qtw.QTableWidgetItem(f"{weight_value:.2f}")
+            weight_item.setFlags(weight_item.flags() & ~qtc.Qt.ItemIsEditable)
             self.milestones_table.setItem(row, 4, weight_item)
 
             complete_checkbox = qtw.QCheckBox()
             complete_checkbox.setChecked(bool(row_data.get("complete", False)))
+            complete_checkbox.setEnabled(bool(row_data.get("override_allowed", False)))
             complete_widget = qtw.QWidget()
             complete_layout = qtw.QHBoxLayout(complete_widget)
             complete_layout.setContentsMargins(0, 0, 0, 0)
@@ -1111,11 +1113,6 @@ class ProjectSettingsDialog(qtw.QDialog):
             if not milestone_key:
                 continue
 
-            try:
-                milestone_weight = max(1, int((weight_item.text() if weight_item else "1").strip()))
-            except (TypeError, ValueError, AttributeError):
-                milestone_weight = 1
-
             milestone_complete = False
             if complete_widget is not None:
                 checkbox = complete_widget.findChild(qtw.QCheckBox)
@@ -1123,7 +1120,6 @@ class ProjectSettingsDialog(qtw.QDialog):
                     milestone_complete = checkbox.isChecked()
 
             updates[milestone_key] = {
-                "weight": milestone_weight,
                 "complete": milestone_complete,
             }
         return updates
@@ -1272,8 +1268,10 @@ class ProjectSettingsDialog(qtw.QDialog):
             create_project_database(self._project_metadata_db_path(), project_db_values)
             saved_values = self.store.save_ris_values(self._collect_values())
             milestone_updates = self._collect_milestone_updates()
-            self.workflow_tracker.update_milestones(
+            page_number = project_db_values.get("CurrentProjectPage", project_db_values.get("ProjectPageNumber", 1))
+            self.workflow_tracker.update_page_milestones(
                 self.project_root,
+                page_number,
                 milestone_updates,
                 updated_by="ProjectSettingsDialog",
             )

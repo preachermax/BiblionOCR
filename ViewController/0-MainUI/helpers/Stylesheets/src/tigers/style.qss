@@ -62,6 +62,7 @@ QWidget:item:hover
 QWidget:item:selected
 {
     background-color: #FFA02F;
+    color: black;
 }
 
 QCheckBox
@@ -224,6 +225,7 @@ QMenuBar::item:selected
 {
     background: transparent;
     border: 1px solid #1B365D;
+    color: #FFFFFF;
 }
 
 QMenuBar::item:pressed
@@ -570,7 +572,7 @@ QMainWindow::separator:hover
 {
 
     background-color: #787876;
-    color: white;
+    color: #000000;
     padding-left: 4px;
     border: 1px solid #1B365D;
     spacing: 2px;
@@ -657,7 +659,7 @@ QPushButton:disabled
 
 QPushButton:focus {
     background-color: #FFA02F;
-    color: white;
+    color: black;
 }
 
 QComboBox
@@ -701,6 +703,7 @@ QComboBox QAbstractItemView
     border-radius: 2px;
     border: 1px solid #444;
     selection-background-color: #FFA02F;
+    selection-color: black;
     color: silver;
 }
 
@@ -973,7 +976,7 @@ QTreeView, QListView, QTextBrowser, AtLineEdit, AtLineEdit::hover {
     background-color: silver;
     border-radius: 3px;
     margin-left: 3px;
-    color: black;
+    color: #000000;
 }
 
 QTreeView:branch:selected, QTreeView:branch:hover {
@@ -1020,7 +1023,7 @@ QListView::item:!selected:hover, QListView::item:!selected:hover, QTreeView::ite
 
 QListView::item:selected:hover, QListView::item:selected:hover, QTreeView::item:selected:hover  {
     background: #FFA02F;
-    color: #FFFFFF;
+    color: black;
 }
 
 QSlider::groove:horizontal {
@@ -1060,10 +1063,10 @@ QSlider::handle:vertical {
 }
 
 QToolButton {
-    /*  background-color: transparent; */
     border: 2px transparent #294C73;
     border-radius: 4px;
-    background-color: #294C73;
+    background-color: #C0C0C0;
+    color: #000000;
     margin: 2px;
     padding: 2px;
 }
@@ -1136,12 +1139,12 @@ QTableView, QHeaderView
 
 QTableView::item:pressed, QListView::item:pressed, QTreeView::item:pressed  {
     background: #D7801A;
-    color: #FFFFFF;
+    color: black;
 }
 
 QTableView::item:selected:active, QTreeView::item:selected:active, QListView::item:selected:active  {
     background: #FFA02F;
-    color: #FFFFFF;
+    color: black;
 }
 
 
@@ -1185,7 +1188,7 @@ QHeaderView::section::horizontal
 
 QHeaderView::section:checked
  {
-    color: white;
+    color: #FFFFFF;
     background-color: #365F87;
  }
 

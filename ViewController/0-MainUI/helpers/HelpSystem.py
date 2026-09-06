@@ -1359,7 +1359,7 @@ STARTING MYSERVER:
     2. Launch Runtime Inspector to observe module state and recent events
     3. Use documentation-first references for architecture and workflow context:
        - docs/README.md
-       - docs/development/DEV_NOTEBOOK.md
+       - Developer/documentation/DEV_NOTEBOOK.md
        - docs/development/QUICK_REFERENCE.md
 '''
     },

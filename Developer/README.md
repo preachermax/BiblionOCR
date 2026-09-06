@@ -2,6 +2,15 @@
 
 Developer capabilities are installed and launched outside production application menus.
 
+## Development Workflow Documentation
+
+Operational documents used during module development live in `Developer/documentation`:
+
+- [Change-Set Prompt Pack](documentation/CHANGESET_PROMPT_PACK_2026-08-07.md)
+- [Development Routine Checklist](documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
+- [Development Routine Playbook](documentation/DEVELOPMENT_ROUTINE_PLAYBOOK.md)
+- [Development Notebook](documentation/DEV_NOTEBOOK.md)
+
 ## Extension Manager
 
 Launch the manager from a development checkout:

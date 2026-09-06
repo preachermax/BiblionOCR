@@ -92,7 +92,26 @@ def install_file(src: Path, dst: Path, mode: int) -> None:
     os.chmod(dst, mode)
 
 
-def format_desktop_entry(name: str, comment: str, exec_cmd: str, try_exec: str, icon: str, cwd: str) -> str:
+def mark_desktop_launcher_trusted(path: Path) -> None:
+    if not shutil.which("gio"):
+        return
+    subprocess.run(
+        ["gio", "set", str(path), "metadata::trusted", "true"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def format_desktop_entry(
+    name: str,
+    comment: str,
+    exec_cmd: str,
+    try_exec: str,
+    icon: str,
+    cwd: str,
+    startup_wm_class: str | None,
+) -> str:
     lines = [
         "[Desktop Entry]",
         "Type=Application",
@@ -104,8 +123,13 @@ def format_desktop_entry(name: str, comment: str, exec_cmd: str, try_exec: str, 
         f"Icon={icon}",
         f"Path={cwd}",
         "Terminal=true",
-        "Categories=Utility;",
     ]
+    if startup_wm_class:
+        lines.extend([
+            "StartupNotify=true",
+            f"StartupWMClass={startup_wm_class}",
+        ])
+    lines.append("Categories=Utility;")
     return "\n".join(lines) + "\n"
 
 
@@ -168,6 +192,7 @@ def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
             try_exec = "/usr/bin/python3"
 
         desktop_name = f"{label}.desktop"
+        startup_wm_class = None if module == "MyLexer" else f"{module}.py"
         launchers[desktop_name] = format_desktop_entry(
             name=label,
             comment=f"Launch {label}",
@@ -175,6 +200,7 @@ def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
             try_exec=try_exec,
             icon=str(icon_path),
             cwd=str(repo_root),
+            startup_wm_class=startup_wm_class,
         )
 
         for greek_name in greek_label_variants(label):
@@ -186,6 +212,7 @@ def build_generated_launchers(repo_root: Path) -> Dict[str, str]:
                 try_exec=try_exec,
                 icon=str(icon_path),
                 cwd=str(repo_root),
+                startup_wm_class=startup_wm_class,
             )
 
     return launchers
@@ -216,6 +243,20 @@ def remove_legacy_launchers(apps_dir: Path, desktop_dir: Path, remove_desktop_co
     return removed
 
 
+def remove_redundant_desktop_launchers(desktop_dir: Path) -> List[str]:
+    removed: List[str] = []
+    for _module, label, _icon_name in CANONICAL_MODULES:
+        desktop_target = desktop_dir / f"{label}.desktop"
+        if desktop_target.exists():
+            desktop_target.unlink()
+            removed.append(str(desktop_target))
+    return removed
+
+
+def is_preferred_desktop_alias(file_name: str) -> bool:
+    return file_name.startswith(f"{GREEK_BRAND} ")
+
+
 def main() -> int:
     args = parse_args()
     repo_root = Path(args.repo_root).expanduser().resolve()
@@ -229,6 +270,8 @@ def main() -> int:
 
     installed: List[str] = []
     removed = remove_legacy_launchers(apps_dir, desktop_dir, not args.no_desktop_copy)
+    if not args.no_desktop_copy:
+        removed.extend(remove_redundant_desktop_launchers(desktop_dir))
 
     for desktop_file in sorted(repo_root.glob("*.desktop")):
         if desktop_file.name in LEGACY_LAUNCHERS_TO_REMOVE:
@@ -245,6 +288,7 @@ def main() -> int:
         if not args.no_desktop_copy:
             desktop_target = desktop_dir / desktop_file.name
             install_file(temp, desktop_target, 0o755)
+            mark_desktop_launcher_trusted(desktop_target)
             installed.append(str(desktop_target))
 
         temp.unlink(missing_ok=True)
@@ -257,10 +301,11 @@ def main() -> int:
             os.chmod(apps_target, 0o644)
             installed.append(str(apps_target))
 
-            if not args.no_desktop_copy:
+            if not args.no_desktop_copy and is_preferred_desktop_alias(file_name):
                 desktop_target = desktop_dir / file_name
                 write_text(desktop_target, content)
                 os.chmod(desktop_target, 0o755)
+                mark_desktop_launcher_trusted(desktop_target)
                 installed.append(str(desktop_target))
 
     for wrapper in (repo_root / "launchers").glob("run-*.sh"):

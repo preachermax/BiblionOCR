@@ -82,6 +82,24 @@ which pyrcc5
 which designer
 ```
 
+### QtPdf source-document viewer
+
+MyServer remains a PyQt5 application. PDF pages are rendered by a separate
+PyQt6 QtPdf process so PyQt5 and PyQt6 objects are never mixed in one process.
+
+Install the pinned renderer dependency inside the project virtual environment:
+
+```bash
+source .venv/bin/activate
+python3 -m pip install -r requirements-qt-pdf.txt
+```
+
+The PyQt6 wheel includes the QtPdf binding and Qt 6 runtime on supported Linux
+and Windows systems. The Linux wheel requires a modern glibc environment;
+Ubuntu 24 satisfies that requirement. Windows 10/11 64-bit is supported by the
+corresponding PyQt6 wheel. A system `libqt5pdf5` package alone is insufficient
+because it does not provide the Python `QPdfDocument` binding used here.
+
 ## 5. OCR / Imaging / Scanner Packages
 
 ```bash

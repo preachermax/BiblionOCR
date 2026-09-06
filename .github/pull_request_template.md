@@ -12,7 +12,7 @@ Explain the requirement/problem this PR addresses.
 
 Checklist reference:
 
-- [docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](docs/development/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
+- [Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md](Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
 
 Use this section only for agent-managed implementation work.
 
