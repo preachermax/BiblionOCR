@@ -17,7 +17,7 @@
    <string>Project Explorer</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../UI_Icons.qrc">
+   <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -33,12 +33,15 @@
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QCheckBox" name="show_system_files_checkbox">
+         <property name="contextMenuPolicy">
+          <enum>Qt::DefaultContextMenu</enum>
+         </property>
          <property name="text">
           <string>Show system files</string>
          </property>
         </widget>
-             </item>
-             <item row="1" column="0">
+       </item>
+       <item row="1" column="0">
         <widget class="QCheckBox" name="exclude_empty_checkbox">
          <property name="text">
           <string>Exclude empty folders</string>
@@ -48,50 +51,50 @@
          </property>
         </widget>
        </item>
-           <item row="2" column="0">
-            <layout class="QHBoxLayout" name="selectionButtonLayout">
-             <item>
-              <widget class="QPushButton" name="selectFolderButton">
-               <property name="enabled">
+       <item row="2" column="0">
+        <layout class="QHBoxLayout" name="selectionButtonLayout">
+         <item>
+          <widget class="QPushButton" name="selectFolderButton">
+           <property name="enabled">
             <bool>false</bool>
-               </property>
-               <property name="visible">
+           </property>
+           <property name="visible">
             <bool>false</bool>
-               </property>
-               <property name="text">
+           </property>
+           <property name="text">
             <string>Select Folder</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="selectFileButton">
-               <property name="enabled">
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="selectFileButton">
+           <property name="enabled">
             <bool>false</bool>
-               </property>
-               <property name="visible">
+           </property>
+           <property name="visible">
             <bool>false</bool>
-               </property>
-               <property name="text">
+           </property>
+           <property name="text">
             <string>Select File</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="selectionButtonSpacer">
-               <property name="orientation">
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="selectionButtonSpacer">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
+           </property>
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
             </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="3" column="0">
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
         <widget class="QTreeView" name="treeView"/>
        </item>
       </layout>
@@ -105,64 +108,96 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
-    <widget class="QMenu" name="menuFile">
-     <property name="title">
-      <string>File</string>
-     </property>
-     <addaction name="actionSelect_Folder"/>
-     <addaction name="separator"/>
-     <addaction name="actionOpen_Trash"/>
-     <addaction name="actionRestore_From_Trash"/>
-     <addaction name="actionRestore_From_Backup"/>
-     <addaction name="separator"/>
-     <addaction name="actionExit"/>
-    </widget>
-    <addaction name="menuFile"/>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSelect_Folder"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpen_Trash"/>
+    <addaction name="actionRestore_From_Trash"/>
+    <addaction name="actionRestore_From_Backup"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionBulk_Rename"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-    <action name="actionSelect_Folder">
-    <property name="text">
-     <string>Select Current Folder</string>
-    </property>
-    <property name="toolTip">
-     <string>Use the current folder selection and return it to the calling workflow.</string>
-    </property>
-    </action>
-    <action name="actionOpen_Trash">
-    <property name="text">
-     <string>Open System Trash</string>
-    </property>
-    <property name="toolTip">
-     <string>Open the operating system trash location.</string>
-    </property>
-    </action>
-    <action name="actionRestore_From_Trash">
-    <property name="text">
-     <string>Restore From Trash...</string>
-    </property>
-    <property name="toolTip">
-     <string>Restore a trashed item to its original folder or the current folder.</string>
-    </property>
-    </action>
-    <action name="actionRestore_From_Backup">
-    <property name="text">
-     <string>Restore From Backup...</string>
-    </property>
-    <property name="toolTip">
-     <string>Copy a selected backup file or folder into the currently selected folder.</string>
-    </property>
-    </action>
-    <action name="actionExit">
-    <property name="text">
-     <string>Exit</string>
-    </property>
-    </action>
+  <action name="actionSelect_Folder">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Current Folder</string>
+   </property>
+   <property name="toolTip">
+    <string>Use the current folder selection and return it to the calling workflow.</string>
+   </property>
+  </action>
+  <action name="actionOpen_Trash">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trash.png</normaloff>:/Icons/Icons/trash.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open System Trash</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the operating system trash location.</string>
+   </property>
+  </action>
+  <action name="actionRestore_From_Trash">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/up_alt.png</normaloff>:/Icons/Icons/up_alt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Restore From Trash...</string>
+   </property>
+   <property name="toolTip">
+    <string>Restore a trashed item to its original folder or the current folder.</string>
+   </property>
+  </action>
+  <action name="actionRestore_From_Backup">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/up_alt.png</normaloff>:/Icons/Icons/up_alt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Restore From Backup...</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy a selected backup file or folder into the currently selected folder.</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionBulk_Rename">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/rename.png</normaloff>:/Icons/Icons/rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bulk Rename</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="../UI_Icons.qrc"/>
+  <include location="../../ViewController/0-MainUI/helpers/UI_Icons.qrc"/>
  </resources>
  <connections/>
 </ui>

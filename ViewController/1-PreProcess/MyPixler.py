@@ -1,3 +1,4 @@
+# pyright: reportGeneralTypeIssues=false, reportOptionalMemberAccess=false, reportAssignmentType=false, reportArgumentType=false, reportAttributeAccessIssue=false, reportCallIssue=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportPossiblyUnboundVariable=false, reportIncompatibleMethodOverride=false, reportRedeclaration=false, reportOperatorIssue=false
 # -*- coding: utf-8 -*-
 
 # Python imports
@@ -19,7 +20,6 @@ from gui_runtime_env import sanitize_current_process_and_reexec
 sanitize_current_process_and_reexec()
 
 import re
-import json
 import io
 import pathlib
 import tiffcapture
@@ -51,7 +51,17 @@ if project_root not in sys.path:
 
 
 from HelpSystem import add_help_menu
+from pdf_viewer_dialog import PdfViewerDock
+from Core.page_workflow import (
+    PAGE_WORKFLOW_FILENAME,
+    WORKFLOW_DIRECTORY,
+    advance_page_workflow_files,
+    load_page_workflow,
+    resolve_page_workflow_path,
+    select_page_workflow_step,
+)
 from Core.project_tracking import ProjectWorkflowTracker
+from Core.source_documents import find_project_pdf_source
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
@@ -93,44 +103,6 @@ from Dialogs.latinmono2pngDialog import Ui_latinmono2pngDialog
 from Dialogs.deskew_latinmonoDialog import Ui_deskew_latinmonoDialog
 from Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
 
-# The new Stream Object which replaces the default stream associated with sys.stdout
-# This object just puts data in a queue!
-# class WriteStream(object):
-#     def __init__(self,queue):
-#         self.queue = queue
-
-#     def write(self, text):
-#         self.queue.put(text)
-
-#     def flush(self):
-#         """
-#         Stream flush implementation
-#         """
-#         pass
-
-# A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
-# It blocks until data is available, and once it has got something from the queue, it sends
-# it to the "MainThread" by emitting a Qt Signal
-# class ThreadConsoleTextQueueReceiver(qtc.QObject):
-
-#     queue_element_received_signal = qtc.pyqtSignal(str)
-
-#     def __init__(self, q: Queue, *args, **kwargs):
-#         qtc.QObject.__init__(self, *args, **kwargs)
-#         self.queue = q
-
-#     @qtc.pyqtSlot()
-#     def run(self):
-#         self.queue_element_received_signal.emit('---> Console text queue reception Started <---\n')
-#         while True:
-#             text = self.queue.get()
-#             self.queue_element_received_signal.emit(text)
-
-#     @qtc.pyqtSlot()
-#     def finished(self):
-#         self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')
-
-
 def _copy_qimage_resolution_metadata(source, target):
     if source is None or target is None or source.isNull() or target.isNull():
         return
@@ -147,21 +119,6 @@ def _copy_qimage_resolution_metadata(source, target):
         except Exception:
             pass
 
-
-def _load_workflow_entries():
-    workflow_path = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-    try:
-        with open(workflow_path, "r", encoding="utf-8") as handle:
-            workflow_entries = json.load(handle)
-    except (OSError, ValueError, TypeError):
-        return []
-
-    if isinstance(workflow_entries, list):
-        return workflow_entries
-
-    return []
-
-
 def _qimage_to_cv_bgr_image(qimage):
     if qimage is None or qimage.isNull():
         return None
@@ -172,7 +129,6 @@ def _qimage_to_cv_bgr_image(qimage):
     pil_image = pilimg.open(io.BytesIO(buffer.data())).convert("RGB")
     return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
-
 def _morphology_shape_constant(shape_name):
     shape_map = {
         "rect": cv2.MORPH_RECT,
@@ -180,7 +136,6 @@ def _morphology_shape_constant(shape_name):
         "cross": cv2.MORPH_CROSS,
     }
     return shape_map.get(shape_name, cv2.MORPH_RECT)
-
 
 def process_morphology_qimage(qimage, params, progress_callback=None, status_callback=None):
     def report_progress(value):
@@ -260,7 +215,6 @@ def process_morphology_qimage(qimage, params, progress_callback=None, status_cal
     report_progress(100)
     return result_qimage
 
-
 class MorphologyApplyWorker(qtc.QObject):
     progress = qtc.pyqtSignal(int)
     status = qtc.pyqtSignal(str)
@@ -284,7 +238,6 @@ class MorphologyApplyWorker(qtc.QObject):
             self.finished.emit(result)
         except Exception as exc:
             self.error.emit(str(exc))
-
 
 class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
@@ -351,6 +304,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.current_project_milestone = ""
         self.current_page_milestone = ""
         self._active_project_sync_timer = None
+        self.pdf_source_path = ""
+        self.pdf_page_count = 0
+        self.pdf_viewer_dialog = None
 
         # -------------------------
         # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ARGUMENT HANDLING (MyServer ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ MyPixler)
@@ -367,6 +323,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             imgpath, subprocess_mode, return_path = self._parse_launch_arguments(sys.argv[1:])
             self.subprocess_mode = subprocess_mode
             self.subprocess_return_path = return_path
+
+        if not imgpath:
+            shared_page = self.shared_session_manager.get_active_project_page_state()
+            shared_page_path = str(shared_page.get("page_path", "") or "")
+            if os.path.isfile(shared_page_path) and self.is_image_file(shared_page_path):
+                imgpath = shared_page_path
 
         if imgpath:
             imgpath = os.path.abspath(os.path.normpath(imgpath))
@@ -409,11 +371,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.progress_bar.setVisible(False)
         self._init_project_status_widgets()
         self.statusBar().addPermanentWidget(self.progress_bar)
-        self._start_active_project_sync()
 
         add_help_menu(self, 'MyPixler')
 
         self.initUI()
+        self._start_active_project_sync()
+        qtc.QTimer.singleShot(250, self._open_project_source_pdf_on_startup)
 
         print("[INIT] UI READY")
 
@@ -487,302 +450,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         return imgpath, subprocess_mode, return_path
 
-
-
-    # def __init__(self, imgpath=None, parent=None):
-    #     super().__init__(parent)
-
-    #     print("=== INIT START ===")
-    #     # -------------------------
-    #     # Phase 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â CORE STATE
-    #     # -------------------------
-    #     self.imgpath = None
-    #     self.refimgpath = None
-
-    #     if imgpath is None and len(sys.argv) > 1:
-    #         imgpath = sys.argv[1]
-
-    #     if imgpath:
-    #         imgpath = os.path.abspath(os.path.normpath(imgpath))
-    #         self.imgpath = imgpath
-    #         self.refimgpath = imgpath
-
-    #     self.refimgdir = os.path.dirname(self.refimgpath) if self.refimgpath else ""
-    #     self.imagedir = ""
-
-    #     self.refimgfiles = []
-    #     self.refimgindex = -1
-    #     self.imagefiles = []
-    #     self.imageindex = -1
-
-    #     self.RefImgchangesSaved = True
-
-    #     # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ THREADING STATE (NEW ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â REQUIRED)
-    #     self._thread = None
-    #     self._worker = None
-
-    #     print(f"[INIT] imgpath: {self.imgpath}")
-    #     print(f"[INIT] refimgpath: {self.refimgpath}")
-
-    #     # -------------------------
-    #     # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PATH SYSTEM
-    #     # -------------------------
-    #     self.mod_dirname = os.path.dirname(__file__)
-    #     self.mod_rootdir = os.path.join(self.mod_dirname, "..", "..")
-    #     self.mod_realpath = os.path.realpath(self.mod_rootdir)
-    #     self.mod_abspath = os.path.abspath(self.mod_realpath)
-    #     self.projecthome = os.path.normpath(self.mod_abspath)
-
-    #     print(f"[PATH] Project Home: {self.projecthome}")
-
-    #     # -------------------------
-    #     # Phase 2.5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PATH SANITY
-    #     # -------------------------
-    #     def _assert_clean_path(label, path):
-    #         if path and os.path.isabs(path):
-    #             tail = path[len(self.projecthome):] if path.startswith(self.projecthome) else ""
-    #             if ":" in tail:
-    #                 print(f"[PATH ERROR] {label} appears double-prefixed: {path}")
-
-    #     _assert_clean_path("refimgpath", self.refimgpath)
-
-    #     # -------------------------
-    #     # Phase 3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â UI SETUP
-    #     # -------------------------
-    #     self.ui = Ui_Pixler()
-    #     self.ui.setupUi(self)
-
-    #     # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ FIXED Progress Bar (was broken before)
-    #     self.progress_bar = qtw.QProgressBar()
-    #     self.progress_bar.setRange(0, 100)
-    #     self.progress_bar.setValue(0)
-    #     self.progress_bar.setVisible(False)
-    #     self.statusBar().addPermanentWidget(self.progress_bar)
-
-    #     add_help_menu(self, 'MyPixler')
-
-    #     # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ KEEP THIS (your extended UI wiring lives here)
-    #     self.initUI()
-
-    #     print("[INIT] UI READY")
-
-    #     # -------------------------
-    #     # Phase 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â IMAGE STATE
-    #     # -------------------------
-    #     self.origin = QPoint()
-
-    #     self.refimgscale = 1
-    #     self.imagescale = 1
-
-    #     self.refimgpixmap = qtg.QPixmap()
-    #     self.refimgqimage = qtg.QImage()
-
-    #     self.imagepixmap = qtg.QPixmap()
-    #     self.imageqimage = qtg.QImage()
-
-    #     # -------------------------
-    #     # Phase 5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â SIGNALS
-    #     # -------------------------
-    #     self.ui.actionExtract_pdf.triggered.connect(self.actionextract_pdf)
-    #     self.ui.actionpdf_For_tiff.triggered.connect(self.actionpdf_for_tiff)
-    #     self.ui.actionpdf_To_tiff.triggered.connect(self.actionpdf_to_tiff)
-    #     self.ui.actiontiff_indexed.triggered.connect(self.actiontiff_to_mono)
-    #     self.ui.actionpng_indexed.triggered.connect(self.actionmono_to_png)
-
-    #     self.ui.actionAuto_Crop_Languages.triggered.connect(self.actionCrop_Languages)
-    #     self.ui.actionManually_Crop_Language_Pages.triggered.connect(self.actionCropPreview)
-
-    #     self.ui.actionConvert_Greek_tiff_To_png.triggered.connect(self.actionConvert_Greek_tiff_To_png)
-    #     self.ui.actionDeskew_Greek_tiff.triggered.connect(self.actionDeskew_Greek_tiff)
-    #     self.ui.actionResize_Greek_png_pages.triggered.connect(self.actionResize_Greek_png)
-
-    #     self.ui.actionConvert_Latin_tiff_To_png.triggered.connect(self.actionConvert_Latin_tiff_To_png)
-    #     self.ui.actionDeskew_Latin_tiff.triggered.connect(self.actionDeskew_Latin_tiff)
-    #     self.ui.actionResize_Latin_png_pages.triggered.connect(self.actionResize_Latin_png)
-
-    #     # -------------------------
-    #     # Phase 5.5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â FOCUS SYSTEM
-    #     # -------------------------
-    #     self.ui.RefImg.setFocusPolicy(qtc.Qt.StrongFocus)
-    #     self.ui.Image.setFocusPolicy(qtc.Qt.StrongFocus)
-
-    #     self.ui.RefImgLE.setFocusPolicy(qtc.Qt.ClickFocus)
-    #     self.ui.ImageLE.setFocusPolicy(qtc.Qt.ClickFocus)
-
-    #     # -------------------------
-    #     # Phase 6 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â RUBBER BAND
-    #     # -------------------------
-    #     self.rubberBand = ResizableRubberBand(self)
-    #     self.rubberBand.hide()
-
-    #     # -------------------------
-    #     # Phase 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â STARTUP LOGIC
-    #     # -------------------------
-    #     exists = os.path.exists(self.refimgpath) if self.refimgpath else None
-    #     print(f"[INIT CHECK] refimgpath exists? {self.refimgpath} -> {exists}")
-
-    #     self._startup_load = bool(self.refimgpath and os.path.isfile(self.refimgpath))
-
-    #     if self._startup_load:
-    #         print("[INIT] Valid startup image detected")
-    #     else:
-    #         print("[INIT] No valid startup image")
-
-    #     # -------------------------
-    #     # Phase 8 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DEFERRED LOAD (SAFE)
-    #     # -------------------------
-    #     if self._startup_load:
-    #         def _startup():
-    #             print("[INIT] Deferred startup executing")
-
-    #             self.setupRefImages()  # index only
-
-    #             # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ delay thread start slightly
-    #             qtc.QTimer.singleShot(100, lambda: self.start_image_load(self.refimgpath, target="ref"))
-
-    #         # def _startup():
-    #         #     print("[INIT] Deferred startup executing")
-    #         #     self.setupRefImages()  # index only
-    #         #     self.start_image_load(self.refimgpath, target="ref")
-    #         # qtc.QTimer.singleShot(0, _startup)
-
-    #     print("=== INIT COMPLETE ===")
-
-    # def __init__(self, imgpath=None, parent=None):
-    #     super().__init__(parent)
-
-    #     print("=== INIT START ===")
-
-    #     # -------------------------
-    #     # Phase 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â STATE ONLY (ALWAYS DEFINE)
-    #     # -------------------------
-    #     self.imgpath = None
-    #     self.refimgpath = None
-
-    #     if imgpath:
-    #         imgpath = os.path.abspath(os.path.normpath(imgpath))
-    #         self.imgpath = imgpath
-    #         self.refimgpath = imgpath
-
-    #     self.refimgdir = os.path.dirname(self.refimgpath) if self.refimgpath else ""
-    #     self.imagedir = ""
-
-    #     self.refimgfiles = []
-    #     self.refimgindex = -1
-    #     self.imagefiles = []
-    #     self.imageindex = -1
-
-    #     self.RefImgchangesSaved = True
-    #     self.image_load_path = os.path.join(script_dir, "ImageLoadWorker.py")
-
-    #     print(f"[INIT] imgpath: {self.imgpath}")
-    #     print(f"[INIT] refimgpath: {self.refimgpath}")
-
-    #     # -------------------------
-    #     # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PATH SYSTEM
-    #     # -------------------------
-    #     self.mod_dirname = os.path.dirname(__file__)
-    #     self.mod_rootdir = os.path.join(self.mod_dirname, "..", "..")
-    #     self.mod_realpath = os.path.realpath(self.mod_rootdir)
-    #     self.mod_abspath = os.path.abspath(self.mod_realpath)
-    #     self.projecthome = os.path.normpath(self.mod_abspath)
-
-    #     print(f"[PATH] Project Home: {self.projecthome}")
-
-    #     # -------------------------
-    #     # Phase 2.5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PATH SANITY GUARD
-    #     # -------------------------
-    #     def _assert_clean_path(label, path):
-    #         if path and os.path.isabs(path):
-    #             tail = path[len(self.projecthome):] if path.startswith(self.projecthome) else ""
-    #             if ":" in tail:
-    #                 print(f"[PATH ERROR] {label} appears double-prefixed: {path}")
-
-    #     _assert_clean_path("refimgpath", self.refimgpath)
-
-    #     # -------------------------
-    #     # Phase 3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â UI SETUP
-    #     # -------------------------
-    #     self.ui = Ui_Pixler()
-    #     self.ui.setupUi(self)
-    #     #implement self.progress_bar = qtw.QProgressBar()
-    #     self.progress_bar.setRange(0, 100)
-    #     self.progress_bar.setValue(0)
-    #     self.progress_bar.setVisible(False)
-    #     self.statusBar().addPermanentWidget(self.progress_bar)
-    #     add_help_menu(self, 'MyPixler')
-
-    #     self.initUI()
-
-    #     print("[INIT] UI READY")
-
-    #     # -------------------------
-    #     # Phase 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â IMAGE STATE INIT
-    #     # -------------------------
-    #     self.origin = QPoint()
-    #     self.refimgscale = 1
-    #     self.imagescale = 1
-
-    #     self.refimgpixmap = qtg.QPixmap()
-    #     self.refimgqimage = qtg.QImage()
-    #     self.imagepixmap = qtg.QPixmap()
-    #     self.imageqimage = qtg.QImage()
-
-    #     # -------------------------
-    #     # Phase 5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â SIGNALS
-    #     # -------------------------
-    #     self.ui.actionExtract_pdf.triggered.connect(self.actionextract_pdf)
-    #     self.ui.actionpdf_For_tiff.triggered.connect(self.actionpdf_for_tiff)
-    #     self.ui.actionpdf_To_tiff.triggered.connect(self.actionpdf_to_tiff)
-    #     self.ui.actiontiff_indexed.triggered.connect(self.actiontiff_to_mono)
-    #     self.ui.actionpng_indexed.triggered.connect(self.actionmono_to_png)
-    #     self.ui.actionAuto_Crop_Languages.triggered.connect(self.actionCrop_Languages)
-    #     self.ui.actionManually_Crop_Language_Pages.triggered.connect(self.actionCropPreview)
-    #     self.ui.actionConvert_Greek_tiff_To_png.triggered.connect(self.actionConvert_Greek_tiff_To_png)
-    #     self.ui.actionDeskew_Greek_tiff.triggered.connect(self.actionDeskew_Greek_tiff)
-    #     self.ui.actionResize_Greek_png_pages.triggered.connect(self.actionResize_Greek_png)
-    #     self.ui.actionConvert_Latin_tiff_To_png.triggered.connect(self.actionConvert_Latin_tiff_To_png)
-    #     self.ui.actionDeskew_Latin_tiff.triggered.connect(self.actionDeskew_Latin_tiff)
-    #     self.ui.actionResize_Latin_png_pages.triggered.connect(self.actionResize_Latin_png)
-
-    #     # Establish Panel focus policy for keypress events (arrows for next/prev)
-    #     self.ui.RefImg.setFocusPolicy(qtc.Qt.StrongFocus)
-    #     self.ui.Image.setFocusPolicy(qtc.Qt.StrongFocus)
-    #     self.ui.RefImgLE.setFocusPolicy(qtc.Qt.ClickFocus)
-    #     self.ui.ImageLE.setFocusPolicy(qtc.Qt.ClickFocus)
-
-    #     self.rubberBand = ResizableRubberBand(self)
-    #     self.rubberBand.hide()
-
-    #     # -------------------------
-    #     # Phase 6 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â STARTUP FLAG
-    #     # -------------------------
-    #     print(f"[INIT CHECK] refimgpath exists? {self.refimgpath} -> {os.path.exists(self.refimgpath) if self.refimgpath else 'None'}")
-
-    #     self._startup_load = bool(self.refimgpath and os.path.isfile(self.refimgpath))
-
-    #     if self._startup_load:
-    #         print("[INIT] Valid startup image detected")
-    #     else:
-    #         print("[INIT] No valid startup image")
-
-    #     # -------------------------
-    #     # Phase 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â SINGLE DEFERRED LOAD (ONLY ONE)
-    #     # -------------------------
-    #     # if self._startup_load:
-    #     #     def _startup():
-    #     #         print("[INIT] Deferred startup executing")
-    #     #         self.setupRefImages()              # index only
-    #     #         self.start_image_load(path, target="ref")   # render once
-
-    #     #     qtc.QTimer.singleShot(0, _startup)
-
-    #     print("=== INIT COMPLETE ===")
     @qtc.pyqtSlot(str)
     def append_text(self,text):
         self.ui.OutputText.append(text)
 
-#custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
+    #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
     def output_terminal_written(self, text):
         self.ui.OutputText.append(text)
 
@@ -964,14 +636,15 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             SessionManager(base).update('PixlerSession.json', payload)
 
     def get_workflow_settings(self):
-
-        data = _load_workflow_entries()
-        if not data:
-            print("[WORKFLOW] No workflow file found; continuing with empty defaults.")
+        definition_root = self._workflow_definition_root()
+        steps, _notes = load_page_workflow(definition_root)
+        if not steps:
+            print("[WORKFLOW] No page_workflow.csv file found; continuing with manual paths.")
             return
 
-        for sequence in data:
-            print(sequence['Sequence'], sequence['DialogUi'], sequence['DefaultSource'])
+        for step in steps:
+            if step.module == "MyPixler":
+                print(step.sequence, step.dialog_ui, step.workflow_source)
 
     def initToolbar(self):
         # Signals(Slots)
@@ -981,11 +654,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionDenoise.triggered.connect(self.openDenoiseDialog)
         self.ui.actionClipRefImg.triggered.connect(self.clip)
         self.ui.actionErase.triggered.connect(self.eraser)
-        #self.ui.actionFlipRefImg.triggered.connect()
         self.ui.actionRotateRefImg_90_CW.triggered.connect(self.rotateRefImg90CW)
         self.ui.actionRotateRefImg_90_CCW.triggered.connect(self.rotateRefImg90CCW)
-        self.ui.actionRotateRefImg_180_deg_CW.triggered.connect(self.rotateRefImg180CW)
-        #self.ui.actionFillTransparent.triggered.connect()
 
     def initMenubar(self):
 
@@ -996,14 +666,23 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionOverwrite_Reference_Image.triggered.connect(self.OverwriteRefImg)
         self.ui.actionImport_Current_Image.triggered.connect(self.importRefImg)
         self.ui.actionLanguage_Morphology.triggered.connect(self.openMorphologyDialog)
+        if hasattr(self.ui, "actionStage_pdf"):
+            self.ui.actionStage_pdf.triggered.connect(self.actionstage_pdf)
+        self.view_source_document_action = qtw.QAction("Display Source Document", self)
+        self.view_source_document_action.setEnabled(bool(self._project_source_pdf()))
+        self.view_source_document_action.triggered.connect(self._view_source_document_triggered)
+        self.ui.menuView.addAction(self.view_source_document_action)
+        self.source_viewer_visibility_action = qtw.QAction("Show Source Document Viewer", self)
+        self.source_viewer_visibility_action.setCheckable(True)
+        self.source_viewer_visibility_action.setEnabled(False)
+        self.source_viewer_visibility_action.triggered.connect(self._set_pdf_viewer_visibility)
+        self.ui.menuView.addAction(self.source_viewer_visibility_action)
         #self.ui.actionExport_Image.triggered.connect()
 
         # Edit Menu Signals(Slots)
 
         self.ui.actionFillBackground.triggered.connect(self.choose_fill_background_color)
         self.ui.actionFillForeground.triggered.connect(self.choose_fill_foreground_color)
-
-
 
     def initUI(self):
 
@@ -1038,10 +717,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # Image
         # -------------------------
         self.ui.ImageLE.textChanged.connect(self.changed_RefImg)
-
-        #self.ui.PrevImagebutton.clicked.connect(self.prevImage)
-        #elf.ui.NextImagebutton.clicked.connect(self.nextImage)
-
         self.ui.Imagezoomslider.valueChanged.connect(self.on_Imagezoomslider)
         self.ui.ImageZoomComboBox.currentTextChanged.connect(self.on_Imagezoom)
         self.ui.ImageZoombutton.clicked.connect(self.get_Imagezoom)
@@ -1142,8 +817,117 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if not shared_root or shared_root == self.current_project_root:
             return
 
+        viewer = self.pdf_viewer_dialog
+        if viewer is not None and not self._path_is_within(viewer.pdf_path, shared_root):
+            self._close_pdf_viewer_automatically()
         self.current_project_root = shared_root
+        self.view_source_document_action.setEnabled(bool(self._project_source_pdf(shared_root)))
         self._refresh_project_status(shared_root)
+
+    def _project_source_pdf(self, project_root=None):
+        active_root = project_root or self._shared_active_project_root() or self.current_project_root
+        if not active_root:
+            return ""
+        return find_project_pdf_source(str(active_root))
+
+    def view_source_document(self):
+        source_path = self._project_source_pdf()
+        if not source_path:
+            qtw.QMessageBox.information(
+                self,
+                "Display Source Document",
+                "The active project does not have a PDF source document.",
+            )
+            return False
+        return self._open_pdf_source(source_path, floating=False)
+
+    def _open_project_source_pdf_on_startup(self):
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+        viewer = self.pdf_viewer_dialog
+        if viewer is not None:
+            viewer.show_viewer()
+            return True
+
+        source_path = self._project_source_pdf()
+        if not source_path:
+            return False
+        return self._open_pdf_source(source_path, floating=False)
+
+    def _view_source_document_triggered(self, _checked=False):
+        self.view_source_document()
+
+    @staticmethod
+    def _path_is_within(path, directory):
+        try:
+            return os.path.commonpath((os.path.abspath(path), os.path.abspath(directory))) == os.path.abspath(directory)
+        except ValueError:
+            return False
+
+    def _sync_pdf_viewer_visibility_action(self, visible):
+        action = getattr(self, "source_viewer_visibility_action", None)
+        if action is None:
+            return
+        try:
+            action.blockSignals(True)
+            action.setChecked(bool(visible))
+            action.blockSignals(False)
+        except RuntimeError:
+            return
+
+    def _set_pdf_viewer_visibility(self, visible):
+        viewer = self.pdf_viewer_dialog
+        if viewer is None:
+            if visible:
+                self.view_source_document()
+            return
+        viewer.set_viewer_visible(bool(visible))
+        if visible and viewer.is_viewer_floating():
+            viewer.raise_()
+            viewer.activateWindow()
+
+    def _close_pdf_viewer_automatically(self):
+        viewer = self.pdf_viewer_dialog
+        if viewer is None:
+            return
+        self.pdf_viewer_dialog = None
+        viewer.close_automatically()
+        self._sync_pdf_viewer_visibility_action(False)
+        self.source_viewer_visibility_action.setEnabled(False)
+
+    def _on_pdf_viewer_destroyed(self, closed_viewer):
+        if self.pdf_viewer_dialog is not closed_viewer:
+            return
+        self.pdf_viewer_dialog = None
+        self._sync_pdf_viewer_visibility_action(False)
+        self.source_viewer_visibility_action.setEnabled(False)
+
+    def _open_pdf_source(self, pdf_path, floating=True):
+        try:
+            viewer = PdfViewerDock(pdf_path, self)
+            self._close_pdf_viewer_automatically()
+            self.pdf_viewer_dialog = viewer
+            self.pdf_source_path = os.path.abspath(pdf_path)
+            self.pdf_page_count = viewer.page_count
+            self.addDockWidget(qtc.Qt.DockWidgetArea.LeftDockWidgetArea, viewer)
+            viewer.viewerVisibilityChanged.connect(self._sync_pdf_viewer_visibility_action)
+            viewer.destroyed.connect(
+                lambda _object=None, closed_viewer=viewer: self._on_pdf_viewer_destroyed(closed_viewer)
+            )
+            self.source_viewer_visibility_action.setEnabled(True)
+            viewer.show_viewer()
+            self.resizeDocks([viewer], [420], qtc.Qt.Horizontal)
+            if floating:
+                viewer.float_viewer()
+        except (RuntimeError, ValueError) as exc:
+            self.pdf_source_path = ""
+            self.pdf_page_count = 0
+            qtw.QMessageBox.warning(
+                self,
+                "Open PDF Source",
+                f"Could not display the PDF source document.\n\n{exc}",
+            )
+            return False
+        return True
 
     def _format_module_workflow_status(self, module_name, snapshot):
         module_total = int(snapshot.get("module_total_count", 0))
@@ -1175,6 +959,15 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def _sync_project_page_state(self, page_path=None, project_milestone=None, page_milestone=None):
         page_number = self._page_number_from_path(page_path)
+        if page_path and os.path.isfile(page_path):
+            page_state = self.shared_session_manager.set_active_project_page_state(
+                page_path,
+                page_number=page_number,
+                module_name="MyPixler",
+            )
+            page_number = page_state["page_number"]
+        else:
+            self.shared_session_manager.set_active_project_page(page_number)
         self.current_project_page = page_number
 
         payload = {
@@ -1309,6 +1102,111 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self._refresh_project_status(project_root)
         return project_root
 
+    def _workflow_definition_root(self):
+        active_root = self.current_project_root or self._shared_active_project_root()
+        for candidate in (active_root, self.projecthome, project_root):
+            if not candidate:
+                continue
+            workflow_csv = os.path.join(candidate, WORKFLOW_DIRECTORY, PAGE_WORKFLOW_FILENAME)
+            if os.path.isfile(workflow_csv):
+                return candidate
+        return self.projecthome
+
+    def _workflow_step_for_method(self, method_name):
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        context = self.workflow_tracker._load_project_context(active_root)
+        page_number = max(
+            1,
+            int(context.get("CurrentProjectPage", getattr(self, "current_project_page", 1)) or 1),
+        )
+        page_section = context.get("CurrentSourceSection", "Front Matter")
+        state = self.workflow_tracker.load_tracking_state(active_root)
+        page_state = state.get("page_milestones", {}).get(str(page_number), {})
+        completed = {
+            key
+            for key, value in page_state.items()
+            if isinstance(value, dict) and value.get("complete")
+        } if isinstance(page_state, dict) else set()
+        step = select_page_workflow_step(
+            self._workflow_definition_root(),
+            "MyPixler",
+            method_name,
+            page_section,
+            completed,
+        )
+        if step is None:
+            self.statusBar().showMessage(
+                f"No pending MyPixler {method_name} step for {page_section}.",
+                7000,
+            )
+        return step
+
+    def _workflow_step_paths(self, step):
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        return (
+            resolve_page_workflow_path(active_root, step.workflow_source),
+            resolve_page_workflow_path(active_root, step.complete_destination),
+            resolve_page_workflow_path(active_root, step.workflow_handshake),
+        )
+
+    @staticmethod
+    def _first_workflow_file(workflow_dir):
+        if not workflow_dir or not os.path.isdir(workflow_dir):
+            return ""
+        for name in sorted(os.listdir(workflow_dir)):
+            candidate = os.path.join(workflow_dir, name)
+            if os.path.isfile(candidate):
+                return candidate
+        return ""
+
+    def _finish_page_workflow_step(self, step, details=None, stage_source=False):
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        advance_page_workflow_files(active_root, step, stage_source=stage_source)
+        page_number = self._page_number_from_path(
+            getattr(self, "refimgpath", ""),
+            fallback=getattr(self, "current_project_page", 1),
+        )
+        self.workflow_tracker.record_page_milestone(
+            active_root,
+            page_number,
+            step.milestone_name,
+            module_name="MyPixler",
+            details=details,
+        )
+        self._sync_project_page_state(
+            getattr(self, "refimgpath", ""),
+            project_milestone=step.milestone_name,
+            page_milestone=step.milestone_name,
+        )
+        self._refresh_project_status(active_root)
+
+    def actionstage_pdf(self):
+        step = self._workflow_step_for_method("actionstage_pdf")
+        if step is None:
+            return
+        workflow_source, complete_destination, workflow_handshake = self._workflow_step_paths(step)
+        if not os.path.isdir(workflow_source) or not os.listdir(workflow_source):
+            qtw.QMessageBox.warning(
+                self,
+                "Stage Source PDF",
+                f"No source PDF is staged in:\n{workflow_source}",
+            )
+            return
+        response = qtw.QMessageBox.question(
+            self,
+            "Stage Source PDF",
+            f"Stage {step.page_section} source files into the MyPixler page workflow?",
+            qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
+            qtw.QMessageBox.Yes,
+        )
+        if response != qtw.QMessageBox.Yes:
+            return
+        self._finish_page_workflow_step(
+            step,
+            details={"source": "actionstage_pdf"},
+            stage_source=True,
+        )
+
     def _init_subprocess_return_controls(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
             return
@@ -1328,63 +1226,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage(
             f"Subprocess return ready: {self.subprocess_return_path}"
         )
-    # def initUI(self):
-
-    #     self.get_session_settings()
-    #     '''if self.imgpath != "":
-    #         self.refimgpath = self.imgpath
-    #         self.importRefImg()'''
-
-    #     self.initMenubar()
-    #     self.initToolbar()
-
-    #     # Button Row Signals(Slots)
-
-    #     # Ref Image
-
-    #     self.ui.OpenRefImgbutton.clicked.connect(self.open_image_with_myexplorer)
-    #     self.ui.ImportRefImgFilebutton.clicked.connect(self.importRefImg)
-    #     self.ui.Deskewbutton.clicked.connect(self.deskewRefImg)
-
-    #     self.ui.OverwriteRefImgbutton.clicked.connect(self.OverwriteRefImg)
-
-    #     self.ui.RefImgZoombutton.clicked.connect(self.get_RefImgzoom)
-    #     self.ui.RefImgZoomComboBox.currentTextChanged.connect(self.on_RefImgzoom)
-    #     self.ui.RefImgzoomslider.valueChanged.connect(self.on_RefImgzoomslider)
-    #     self.ui.RefImgzoomslider.sliderReleased.connect(self.disable_RefImgzoomslider)
-    #     self.ui.RefImgzoomslider.hide()
-
-    #     self.ui.NextRefImgbutton.clicked.connect(self.nextRefImage)
-    #     self.ui.PrevRefImgbutton.clicked.connect(self.prevRefImage)
-
-    #     # Both
-    #     '''
-    #     self.ui.BothLoadButton.clicked.connect(self.bothLoad)
-    #     self.ui.BothNextImageButton.clicked.connect(nextRefImage)
-    #     self.ui.BothNextImageButton.clicked.connect(nextImage)
-    #     self.ui.BothPrevImageButton.clicked.connect(prevRefImage)
-    #     self.ui.BothPrevImageButton.clicked.connect(prevImage)'''
-
-    #     self.ui.reloadImagebutton.clicked.connect(self.reloadImage)
-    #     self.ui.reloadRefImgbutton.clicked.connect(self.reloadRefImg)
-
-    #     # Image
-    #     self.ui.ImageLE.textChanged.connect(self.changed_RefImg)
-
-    #     self.ui.PrevImagebutton.clicked.connect(self.prevImage)
-    #     self.ui.NextImagebutton.clicked.connect(self.nextImage)
-
-    #     self.ui.Imagezoomslider.valueChanged.connect(self.on_Imagezoomslider)
-    #     self.ui.ImageZoomComboBox.currentTextChanged.connect(self.on_Imagezoom)
-    #     self.ui.ImageZoombutton.clicked.connect(self.get_Imagezoom)
-    #     self.ui.Imagezoomslider.sliderReleased.connect(self.disable_Imagezoomslider)
-
-    #     self.ui.ExportRefImgFilebutton.clicked.connect(self.ExportImage)
-    #     self.ui.SaveImagebutton.clicked.connect(self.save_image_with_myexplorer)
-    #     self.ui.SaveAsImagebutton.clicked.connect(self.save_image_as_with_myexplorer)
-
-    #     self.ui.RefImgzoomslider.hide()
-    #     self.ui.Imagezoomslider.hide()
 
     def setStack(self, tiffCaptureHandle):
             """ Set the scene's current TIFF image stack to the input TiffCapture object.
@@ -1434,16 +1275,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage("Loading TIFF reference image...")
         self._show_progress(0)
 
-    # def loadStackFromFile(self,fileName=''):
-    #     fileName = str(fileName)
-    #     if len(fileName) and os.path.isfile(fileName):
-    #         self._tiffCaptureHandle = tiffcapture.opentiff(fileName)
-
     def on_stack_progress(self, value):
         print(f"[STACK] {value}%")
         self._set_progress_percent(value)
         self.statusBar().showMessage(f"Loading TIFF reference image... {int(value)}%")
-
 
     def on_stack_loaded(self, handle):
         print("[STACK] Loaded")
@@ -1459,6 +1294,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if self.refimgpath:
             self.refimgdir = os.path.dirname(self.refimgpath)
         self._update_pixler_session_paths()
+        self._sync_project_page_state(self.refimgpath)
 
         # display
         self.ui.RefImg.setPixmap(
@@ -1473,7 +1309,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage("Reference TIFF loaded.")
         print("[STACK] Render complete")
 
-
     def on_stack_error(self, msg):
         print(f"[STACK ERROR] {msg}")
         self._hide_progress()
@@ -1482,7 +1317,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     def _on_stack_thread_finished(self):
         self._stack_thread = None
         self._stack_worker = None
-
 
     def numFrames(self):
         """ Return the number of image frames in the stack.
@@ -1514,72 +1348,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             return
         # Convert frame ndarray to a QImage.
         self.qimage = qimage2ndarray.array2qimage(self.frame, normalize=False)
-
-    # def showRefImg(self, imgpath):
-    #     print(f"[SHOW] Display only: {imgpath}")
-
-    #     if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
-    #         print("[SHOW] No image loaded yet")
-    #         return
-
-    #     pix = qtg.QPixmap.fromImage(self.refimgqimage)
-
-    #     self.ui.RefImg.setPixmap(pix.scaled(self.ui.RefImg.size(),qtc.Qt.KeepAspectRatio,transformMode=qtc.Qt.SmoothTransformation))
-
-    # def showRefImg(self, imgpath):
-    #     print(f"[SHOW] Called with: {imgpath}")
-
-    #     if not imgpath:
-    #         print("[SHOW] No path provided")
-    #         return
-
-    #     imgpath = os.path.normpath(imgpath)
-
-    #     if not os.path.isfile(imgpath):
-    #         print(f"[SHOW] Invalid file: {imgpath}")
-    #         return
-
-    #     self.refimgpath = imgpath  # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ sync state
-
-    #     print(f"[SHOW] Rendering: {imgpath}")
-
-    #     if imgpath.lower().endswith('.tif'):
-    #         print("[SHOW] TIFF detected")
-
-    #         # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ async load handles everything now
-    #         self.loadStackFromFile(imgpath)
-
-    #         return   # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ CRITICAL: stop here (thread will finish rendering)
-
-    #     # if imgpath.lower().endswith('.tif'):
-    #     #     print("[SHOW] TIFF detected")
-
-    #     #     self.loadStackFromFile(imgpath)
-    #     #     self.showFrame(0)
-
-    #     #     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ CRITICAL: persist qimage
-    #     #     self.refimgqimage = self.qimage
-
-    #     #     self.refimgpixmap = qtg.QPixmap.fromImage(self.refimgqimage)
-
-    #     else:
-    #         print("[SHOW] Standard image")
-
-    #         self.refimgpixmap = qtg.QPixmap(imgpath)
-
-    #         # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ CRITICAL: create qimage from pixmap
-    #         self.refimgqimage = self.refimgpixmap.toImage()
-
-    #     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ display
-    #     self.ui.RefImg.setPixmap(
-    #         self.refimgpixmap.scaled(
-    #             self.ui.RefImg.size(),
-    #             qtc.Qt.KeepAspectRatio,
-    #             transformMode=qtc.Qt.SmoothTransformation
-    #         )
-    #     )
-
-    #     print("[SHOW] Render complete")
 
     def showImage(self,imgfilename):
         #self.imgfilename = self.imgpath
@@ -1660,10 +1428,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             else:
                 event.ignore()
 
+        if event.isAccepted():
+            self._close_pdf_viewer_automatically()
+
 # Application Controllers
 
     # Workflow Controllers
     def actionextract_pdf(self):
+        workflow_step = self._workflow_step_for_method("actionextract_pdf")
+        workflow_source, complete_folder, _workflow_handshake = (
+            self._workflow_step_paths(workflow_step) if workflow_step else ("", "", "")
+        )
+        workflow_folder = complete_folder
         print("extracting pdf pages from source pdf")
 
         def accept():
@@ -1690,9 +1466,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
 
 
-            # Extract to default Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
             print("pdf page extraction complete")
 
             base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
@@ -1707,12 +1480,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 'self.firstpage': self.firstpage,
                 'self.lastpage': self.lastpage,
             })
-            ### PAGE MILESTONE - source_acquired-15% ###
-            self._record_project_milestone(
-                "source_acquired",
-                workflow_folder,
-                details={"source": "actionextract_pdf"},
-            )
+            if workflow_step:
+                self._finish_page_workflow_step(
+                    workflow_step,
+                    details={"source": "actionextract_pdf"},
+                )
 
         def reject():
             pass
@@ -1721,8 +1493,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.pdfx_ui = Ui_ExtractDialog()
         self.pdfx_ui.setupUi(self.pdfxDialog)
         self.pdfxDialog.show()
-        seq = "SP1"
-
         def setdefault():
             if self.pdfx_ui.defaultsrcBox.isChecked():
                 self.pdfx_ui.SourceButton.setEnabled(False)
@@ -1738,26 +1508,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.pdfx_ui.buttonBox.rejected.connect(reject)
 
         if self.pdfx_ui.defaultsrcBox.isChecked():
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.pdfx_ui.SourceLineEdit.setText(Sequence['DefaultSource'])
-                        self.pdfx_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
+            source_file = self._first_workflow_file(workflow_source)
+            self.pdfx_ui.SourceLineEdit.setText(source_file or workflow_source)
+            self.pdfx_ui.DestinationLineEdit.setText(complete_folder)
 
         rsp = self.pdfxDialog.exec_()
 
     def actionpdf_for_tiff(self):
+        workflow_step = self._workflow_step_for_method("actionpdf_for_tiff")
+        source_folder, complete_folder, _workflow_handshake = (
+            self._workflow_step_paths(workflow_step) if workflow_step else ("", "", "")
+        )
+        workflow_folder = complete_folder
         print("extracting pdf pages for tif")
 
         def accept():
@@ -1782,16 +1544,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_file_path, workflow_folder)
             pp.pdf4tif(source_file_path, workflow_folder)
-            # Extract to default Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
             print("pdf pages for tif extraction complete")
-            ### PAGE MILESTONE - source_converted-20% ###
-            self._record_project_milestone(
-                "source_converted",
-                workflow_folder,
-                details={"source": "actionpdf_for_tiff"},
-            )
+            if workflow_step:
+                self._finish_page_workflow_step(
+                    workflow_step,
+                    details={"source": "actionpdf_for_tiff"},
+                )
         def reject():
             pass
 
@@ -1799,8 +1557,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.pdf4tif_ui = Ui_pdf4tifDialog()
         self.pdf4tif_ui.setupUi(self.pdf4tifDialog)
         self.pdf4tifDialog.show()
-
-        seq = "SP2"
 
         def setdefault():
             if self.pdf4tif_ui.defaultsrcBox.isChecked():
@@ -1818,30 +1574,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
 
         if self.pdf4tif_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.pdf4tif_ui.SourceLineEdit.setText(Sequence['DefaultSource'])
-                        self.pdf4tif_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath'])
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+            self.pdf4tif_ui.SourceLineEdit.setText(source_folder)
+            self.pdf4tif_ui.DestinationLineEdit.setText(complete_folder)
+            print(source_folder, workflow_folder, complete_folder)
 
         rsp = self.pdf4tifDialog.exec_()
 
     def actionpdf_to_tiff(self):
+        workflow_step = self._workflow_step_for_method("actionpdf_to_tiff")
+        source_folder, complete_folder, _workflow_handshake = (
+            self._workflow_step_paths(workflow_step) if workflow_step else ("", "", "")
+        )
+        workflow_folder = complete_folder
         print("converting pdf pages to tiff")
 
         def accept():
@@ -1866,21 +1610,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print(source_folder, workflow_folder)
             #pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
             pp.pdf2tif(self.pdf2tif_ui.SourceLineEdit.text(), self.pdf2tif_ui.DestinationLineEdit.text(), self.pdf2tif_ui.StartPageLineEdit.text())
-            # Move Workflow folder into Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
-            ### PAGE MILESTONE - source_converted-20% ###
-            self._record_project_milestone(
-                "source_converted",
-                workflow_folder,
-                details={"source": "actiontiff_to_mono"},
-            )
-            ### PAGE MILESTONE - source_converted-20% ###
-            self._record_project_milestone(
-                "source_converted",
-                workflow_folder,
-                details={"source": "actionpdf_to_tiff"},
-            )
+            if workflow_step:
+                self._finish_page_workflow_step(
+                    workflow_step,
+                    details={"source": "actionpdf_to_tiff"},
+                )
         def reject():
             pass
 
@@ -1888,8 +1622,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.pdf2tif_ui = Ui_pdf2tifDialog()
         self.pdf2tif_ui.setupUi(self.pdf2tifDialog)
         self.pdf2tifDialog.show()
-
-        seq = "SP3"
 
         def setdefault():
             if self.pdf2tif_ui.defaultsrcBox.isChecked():
@@ -1906,27 +1638,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.pdf2tif_ui.buttonBox.rejected.connect(reject)
 
         if self.pdf2tif_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.pdf2tif_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.pdf2tif_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
-                        start_page = self.firstpage
-                        self.pdf2tif_ui.StartPageLineEdit.setText(start_page)
-                        print(source_folder,workflow_folder,complete_folder,start_page)
+            source_file = self._first_workflow_file(source_folder)
+            self.pdf2tif_ui.SourceLineEdit.setText(source_file or source_folder)
+            self.pdf2tif_ui.DestinationLineEdit.setText(complete_folder)
+            start_page = self.firstpage
+            self.pdf2tif_ui.StartPageLineEdit.setText(start_page)
+            print(source_folder, workflow_folder, complete_folder, start_page)
 
         rsp = self.pdf2tifDialog.exec_()
 
@@ -1935,6 +1652,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         print("tif pages conversion complete")
 
     def actiontiff_to_mono(self):
+        workflow_step = self._workflow_step_for_method("actiontiff_to_mono")
+        source_folder, complete_folder, _workflow_handshake = (
+            self._workflow_step_paths(workflow_step) if workflow_step else ("", "", "")
+        )
+        workflow_folder = complete_folder
         print("creating indexed(BW) tiff")
 
         def accept():
@@ -1959,15 +1681,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2tiffidx(self.tif2mono_ui.SourceLineEdit.text(), self.tif2mono_ui.DestinationLineEdit.text())
-            # Move Workflow folder into Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
-            ### PAGE MILESTONE - source_converted-20% ###
-            self._record_project_milestone(
-                "source_converted",
-                workflow_folder,
-                details={"source": "actionmono_to_png"},
-            )
+            if workflow_step:
+                self._finish_page_workflow_step(
+                    workflow_step,
+                    details={"source": "actiontiff_to_mono"},
+                )
         def reject():
             pass
 
@@ -1977,8 +1695,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.tif2mono_ui = Ui_tif2monoDialog()
         self.tif2mono_ui.setupUi(self.tif2monoDialog)
         self.tif2monoDialog.show()
-
-        seq = "SP4"
 
         def setdefault():
             if self.tif2mono_ui.defaultsrcBox.isChecked():
@@ -1995,26 +1711,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.tif2mono_ui.buttonBox.rejected.connect(reject)
 
         if self.tif2mono_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.tif2mono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.tif2mono_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+            self.tif2mono_ui.SourceLineEdit.setText(source_folder)
+            self.tif2mono_ui.DestinationLineEdit.setText(complete_folder)
+            print(source_folder, workflow_folder, complete_folder)
 
         rsp = self.tif2monoDialog.exec_()
 
@@ -2026,6 +1725,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         print("creating indexed(BW) png")
 
         def accept():
+            source_folder = self.mono2png_ui.SourceLineEdit.text()
+            workflow_folder = self.mono2png_ui.DestinationLineEdit.text()
+            complete_folder = ""
             # if self.mono2pngDialog.Accepted:
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
@@ -2047,9 +1749,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
-            # Move Workflow folder into Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
         def reject():
             pass
 
@@ -2059,8 +1758,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.mono2png_ui = Ui_mono2pngDialog()
         self.mono2png_ui.setupUi(self.mono2pngDialog)
         self.mono2pngDialog.show()
-
-        seq = "SP5"
 
         def setdefault():
             if self.mono2png_ui.defaultsrcBox.isChecked():
@@ -2078,26 +1775,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
 
         if self.mono2png_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.mono2png_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.mono2png_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+            self.mono2png_ui.defaultsrcBox.setChecked(False)
+        self.mono2png_ui.defaultsrcBox.setEnabled(False)
+        self.mono2png_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
 
         rsp = self.mono2pngDialog.exec_()
 
@@ -2108,6 +1788,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         print("deskewing monochrome tiff and png files")
 
         def accept():
+            source_folder = self.deskew_mono_ui.SourceLineEdit.text()
+            tif_workflow_folder = self.deskew_mono_ui.DestTifLineEdit.text()
+            png_workflow_folder = self.deskew_mono_ui.DestPngLineEdit.text()
+            tif_complete_folder = ""
+            png_complete_folder = ""
             # if self.deskew_monoDialog.Accepted:
             # Empty default Workflow folders
             print('tif Workflow Folder:'+ tif_workflow_folder,'tif Complete Folder:'+ tif_complete_folder)
@@ -2142,17 +1827,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folders
             print(source_folder, png_workflow_folder, tif_workflow_folder)
             pp.deskewfiles(self.deskew_mono_ui.SourceLineEdit.text(), self.deskew_mono_ui.DestPngLineEdit.text(),self.deskew_mono_ui.DestTifLineEdit.text())
-            # Move Workflow folders into Complete folders
-            if tif_complete_folder:
-                self._move_workflow_entries(tif_workflow_folder, tif_complete_folder)
-            if png_complete_folder:
-                self._move_workflow_entries(png_workflow_folder, png_complete_folder)
-            ### PAGE MILESTONE - source_converted-20% ###
-            self._record_project_milestone(
-                "source_converted",
-                tif_workflow_folder,
-                details={"source": "actiondeskew_mono"},
-            )
         def reject():
             pass
 
@@ -2163,8 +1837,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.deskew_mono_ui.setupUi(self.deskew_monoDialog)
         self.deskew_monoDialog.show()
 
-        seq = "SP6"
-
         def setdefault():
             if self.deskew_mono_ui.defaultsrcBox.isChecked():
                 self.deskew_mono_ui.SourceButton.setEnabled(False)
@@ -2174,28 +1846,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 self.deskew_mono_ui.DestTifButton.setEnabled(True)
 
         if self.deskew_mono_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.deskew_mono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.deskew_mono_ui.DestTifLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        tif_workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        tif_complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(source_folder,tif_workflow_folder,tif_complete_folder)
-
-        seq = "SP7"
+            self.deskew_mono_ui.defaultsrcBox.setChecked(False)
 
         def setdefault():
             if self.deskew_mono_ui.defaultsrcBox.isChecked():
@@ -2212,26 +1863,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.deskew_mono_ui.buttonBox.rejected.connect(reject)
 
         if self.deskew_mono_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.deskew_mono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.deskew_mono_ui.DestPngLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        #source_folder = Sequence['DefaultSource']+r'/'
-                        png_workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        png_complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(png_workflow_folder,png_complete_folder)
+            self.deskew_mono_ui.defaultsrcBox.setChecked(False)
+        self.deskew_mono_ui.defaultsrcBox.setEnabled(False)
+        self.deskew_mono_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
 
         rsp = self.deskew_monoDialog.exec_()
         print("completed deskewing monochrome tiff and png files")
@@ -2240,6 +1874,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         print("creating cropped language tif files")
 
         def accept():
+            source_folder = self.crop_languages_ui.SourceLineEdit.text()
+            workflow_box_folder = self.crop_languages_ui.BoxFolderLineEdit.text()
+            workflow_elim_folder = self.crop_languages_ui.ElimFolderLineEdit.text()
+            workflow_greek_folder = self.crop_languages_ui.DestGreekLineEdit.text()
+            workflow_latin_folder = self.crop_languages_ui.DestLatinLineEdit.text()
         #if self.crop_languagesDialog.Accepted:
             # Empty default tif Workflow folders
             if workflow_greek_folder:
@@ -2253,7 +1892,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                             shutil.rmtree(file_path)
                     except Exception as e:
                         print('Failed to delete %s. Reason: %s' % (file_path, e))
-                    # Empty default tif Workflow folders
+            # Empty default tif Workflow folders
             if workflow_latin_folder:
                 for filename in os.listdir(workflow_latin_folder):
                     file_path = os.path.join(workflow_latin_folder, filename)
@@ -2267,23 +1906,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         print('Failed to delete %s. Reason: %s' % (file_path, e))
             pp.croplangs(self.crop_languages_ui.SourceLineEdit.text(), self.crop_languages_ui.BoxFolderLineEdit.text(),self.crop_languages_ui.DestGreekLineEdit.text(),self.crop_languages_ui.DestLatinLineEdit.text(),self.crop_languages_ui.ElimFolderLineEdit.text())
             print("completed creating cropped language tif files")
-            # move workflow images to complete images
-            if workflow_box_folder:
-                self._move_workflow_entries(workflow_box_folder, complete_box_folder)
-            if workflow_elim_folder:
-                self._move_workflow_entries(workflow_elim_folder, complete_elim_folder)
-
-            if workflow_greek_folder:
-                self._move_workflow_entries(workflow_greek_folder, complete_greek_folder)
-
-            if workflow_latin_folder:
-                self._move_workflow_entries(workflow_latin_folder, complete_latin_folder)
-            ### PAGE MILESTONE - pages_prepared-20% ###
-            self._record_project_milestone(
-                "pages_prepared",
-                workflow_greek_folder or workflow_latin_folder,
-                details={"source": "actionCrop_Languages"},
-            )
 
         def reject():
             pass
@@ -2303,59 +1925,19 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_languages_ui.buttonBox.accepted.connect(accept)
         self.crop_languages_ui.buttonBox.rejected.connect(reject)
 
-        seq = ["SP10","SP11","GP1","GP2","LP1","LP2"]
-
         if self.crop_languages_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            for step in seq:
-
-                # Define json data
-
-                jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-                with open(jsonfile, 'r') as f:
-                    data = json.load(f)
-
-                    # Search the key value using 'in' operator
-                    for Sequence in data:
-                        print(Sequence['Sequence'])
-                        if Sequence['Sequence'] == step:
-                            # set line edits to their default workflow folders
-                            if step == "SP10":
-                                self.crop_languages_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                                source_folder = Sequence['DefaultSource']+r'/'
-                                self.crop_languages_ui.BoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_box_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                            elif step == "SP11":
-                                self.crop_languages_ui.ElimFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_elim_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_elim_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                            elif step == "GP1":
-                                self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_greek_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                            elif step == "GP2":
-                                #self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_dup_greek_folder = Sequence['WorkflowFullPath']+r'/'
-                                #complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                            elif step == "LP1":
-                                self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_latin_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
-                            elif step == "LP2":
-                                #self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_dup_latin_folder = Sequence['WorkflowFullPath']+r'/'
-                                #complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
-
-                f.close()
-        print(source_folder,workflow_box_folder,workflow_elim_folder,workflow_greek_folder,workflow_latin_folder)
+            self.crop_languages_ui.defaultsrcBox.setChecked(False)
+        self.crop_languages_ui.defaultsrcBox.setEnabled(False)
+        self.crop_languages_ui.defaultsrcBox.setToolTip("Column cropping is governed by MyBoxer in page_workflow.csv.")
         rsp = self.crop_languagesDialog.exec_()
 
     def actionConvert_Greek_tiff_To_png(self):
         print("creating indexed(BW) Greek png files")
         #usage: pp.tiff2pngidx(source, destination)
         def accept():
+            source_folder = self.greekmono2png_ui.SourceLineEdit.text()
+            workflow_folder = self.greekmono2png_ui.DestinationLineEdit.text()
+            complete_folder = ""
             # if self.mono2pngDialog.Accepted:
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
@@ -2377,9 +1959,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             pp.tiff2pngidx(self.greekmono2png_ui.SourceLineEdit.text(), self.greekmono2png_ui.DestinationLineEdit.text())
-            # Move Workflow folder into Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
         def reject():
             pass
 
@@ -2389,8 +1968,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.greekmono2png_ui = Ui_greekmono2pngDialog()
         self.greekmono2png_ui.setupUi(self.greekmono2pngDialog)
         self.greekmono2pngDialog.show()
-
-        seq = "GP5"
 
         def setdefault():
             if self.greekmono2png_ui.defaultsrcBox.isChecked():
@@ -2408,34 +1985,23 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
 
         if self.greekmono2png_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.greekmono2png_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.greekmono2png_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+            self.greekmono2png_ui.defaultsrcBox.setChecked(False)
+        self.greekmono2png_ui.defaultsrcBox.setEnabled(False)
+        self.greekmono2png_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
 
         rsp = self.greekmono2pngDialog.exec_()
         print("completed creating indexed(BW) png")
+
     def actionDeskew_Greek_tiff(self):
         print("deskewing Greek tiff files")
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
 
         def accept():
+            source_folder = self.deskew_greekmono_ui.SourceLineEdit.text()
+            tif_workflow_folder = self.deskew_greekmono_ui.DestTifLineEdit.text()
+            png_workflow_folder = self.deskew_greekmono_ui.DestPngLineEdit.text()
+            tif_complete_folder = ""
+            png_complete_folder = ""
             # if self.deskew_greekmonoDialog.Accepted:
             # Empty default Workflow folders
             print('tif Workflow Folder:'+ tif_workflow_folder,'tif Complete Folder:'+ tif_complete_folder)
@@ -2470,11 +2036,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folders
             print(source_folder, png_workflow_folder, tif_workflow_folder)
             pp.deskewfiles(self.deskew_greekmono_ui.SourceLineEdit.text(), self.deskew_greekmono_ui.DestPngLineEdit.text(),self.deskew_greekmono_ui.DestTifLineEdit.text())
-            # Move Workflow folders into Complete folders
-            if tif_complete_folder:
-                self._move_workflow_entries(tif_workflow_folder, tif_complete_folder)
-            if png_complete_folder:
-                self._move_workflow_entries(png_workflow_folder, png_complete_folder)
         def reject():
             pass
 
@@ -2485,8 +2046,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.deskew_greekmono_ui.setupUi(self.deskew_greekmonoDialog)
         self.deskew_greekmonoDialog.show()
 
-        seq = "GP6"
-
         def setdefault():
             if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
                 self.deskew_greekmono_ui.SourceButton.setEnabled(False)
@@ -2496,28 +2055,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 self.deskew_greekmono_ui.DestTifButton.setEnabled(True)
 
         if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.deskew_greekmono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.deskew_greekmono_ui.DestTifLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        tif_workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        tif_complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,tif_workflow_folder,tif_complete_folder)
-
-        seq = "GP7"
+            self.deskew_greekmono_ui.defaultsrcBox.setChecked(False)
 
         def setdefault():
             if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
@@ -2534,26 +2072,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.deskew_greekmono_ui.buttonBox.rejected.connect(reject)
 
         if self.deskew_greekmono_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        #self.deskew_greekmono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.deskew_greekmono_ui.DestPngLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        #source_folder = Sequence['DefaultSource']+r'/'
-                        png_workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        png_complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,png_workflow_folder,png_complete_folder)
+            self.deskew_greekmono_ui.defaultsrcBox.setChecked(False)
+        self.deskew_greekmono_ui.defaultsrcBox.setEnabled(False)
+        self.deskew_greekmono_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
 
         rsp = self.deskew_greekmonoDialog.exec_()
 
@@ -2561,6 +2082,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         print("resizing Greek png files")
         #usage: pp.resizepngs(source, destination)
         def accept():
+            source_folder = self.greekresizepng_ui.SourceLineEdit.text()
+            workflow_folder = self.greekresizepng_ui.DestinationLineEdit.text()
+            complete_folder = ""
             # Empty default Workflow folder
             print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
             for filename in os.listdir(workflow_folder):
@@ -2582,9 +2106,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print(source_folder, workflow_folder)
             pp.resizepngs(self.greekresizepng_ui.SourceLineEdit.text(), self.greekresizepng_ui.DestinationLineEdit.text())
 
-            # Move Workflow folder into Complete folder
-            if complete_folder:
-                self._move_workflow_entries(workflow_folder, complete_folder)
         def reject():
             pass
 
@@ -2594,8 +2115,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.greekresizepng_ui = Ui_greekresizepngDialog()
         self.greekresizepng_ui.setupUi(self.greekresizepngDialog)
         self.greekresizepngDialog.show()
-
-        seq = "GP10"
 
         def setdefault():
             if self.greekresizepng_ui.defaultsrcBox.isChecked():
@@ -2613,26 +2132,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
 
         if self.greekresizepng_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.greekresizepng_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.greekresizepng_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+            self.greekresizepng_ui.defaultsrcBox.setChecked(False)
+        self.greekresizepng_ui.defaultsrcBox.setEnabled(False)
+        self.greekresizepng_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
 
         rsp = self.greekresizepngDialog.exec_()
         print("completed resizing indexed(BW) png")
@@ -2990,7 +2492,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self._set_progress_percent(value)
         self.statusBar().showMessage(f"Loading reference image... {int(value)}%")
 
-
     def on_image_loaded(self, qimage):
         self.refimgqimage = qimage
 
@@ -3001,6 +2502,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if self.refimgpath:
             self.refimgdir = os.path.dirname(self.refimgpath)
         self._update_pixler_session_paths()
+        self._sync_project_page_state(self.refimgpath)
 
         # display
         self.ui.RefImg.setPixmap(self.refimgpixmap.scaled(self.ui.RefImg.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation))
@@ -3016,84 +2518,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         self._refresh_project_status(self.refimgpath or self.refimgdir)
         self.statusBar().showMessage("Reference image loaded.")
-
-    # def on_image_loaded(self, qimage):
-    #     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ STORE BOTH (CRITICAL)
-    #     self.refimgqimage = qimage
-    #     self.refimgpixmap = qtg.QPixmap.fromImage(qimage)
-
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setValue(100)
-    #         self.progress_bar.setVisible(False)
-
-    #     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ USE STORED PIXMAP (not a temporary one)
-    #     self.ui.RefImg.setPixmap(
-    #         self.refimgpixmap.scaled(self.ui.RefImg.size(),qtc.Qt.KeepAspectRatio,transformMode=qtc.Qt.SmoothTransformation))
-
-
-    # def on_image_loaded(self, qimage):
-    #     self.refimgqimage = qimage
-
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setValue(100)
-    #         self.progress_bar.setVisible(False)
-
-    #     pix = qtg.QPixmap.fromImage(qimage)
-
-    #     self.ui.RefImg.setPixmap(pix.scaled(self.ui.RefImg.size(), qtc.Qt.KeepAspectRatio, transformMode=qtc.Qt.SmoothTransformation))
-
-    # def on_image_loaded(self, qimage):
-    #     print("[LOAD] Complete")
-
-    #     self.refimgqimage = qimage
-
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setValue(100)
-    #         self.progress_bar.setVisible(False)
-
-    #     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ now display
-    #     self.showRefImg(self.refimgpath)
-
-    # def on_image_loaded(self, qimage):
-    #     print("[LOAD] Complete")
-
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setValue(100)
-    #         self.progress_bar.setVisible(False)
-
-    #     if self._load_target == "ref":
-    #         self.refimgqimage = qimage
-    #         self.refimgpixmap = QPixmap.fromImage(qimage)  # must exist
-
-    #         # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ route back into your rendering pipeline
-    #         # self.showRefImg(self.refimgpath)
-
-    #     elif self._load_target == "main":
-    #         self.imgqimage = qimage
-    #         self.showImg(self.imgpath)
-
-
-
-    # def on_image_loaded(self, qimage):
-    #     print("[LOAD] Complete")
-
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setValue(100)
-    #         self.progress_bar.setVisible(False)
-
-    #     # -------------------------
-    #     # ROUTING (THIS is critical)
-    #     # -------------------------
-    #     if self._load_target == "ref":
-    #         self.refimgqimage = qimage
-    #         pix = qtg.QPixmap.fromImage(qimage)
-    #         self.ui.RefImg.setPixmap(pix)
-
-    #     elif self._load_target == "main":
-    #         self.imgqimage = qimage
-    #         pix = qtg.QPixmap.fromImage(qimage)
-    #         self.ui.Image.setPixmap(pix)
-
 
     def on_load_error(self, msg):
         print(f"[LOAD ERROR] {msg}")
@@ -3171,34 +2595,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ CRITICAL: async load
         # -------------------------
         self.start_image_load(fileName, target="ref")
-
-
-    # def loadRefImg(self, path):
-    #     print(f"[LOAD REF] Requested: {path}")
-
-    #     if not path:
-    #         print("[LOAD REF] Invalid path")
-    #         return
-    #     else:
-    #         # store path like before (keep your logic intact)
-    #         self.refimgpath = path
-    #         filestr = os.path.basename(path)
-    #         self.ui.ImageLE.setText(filestr)
-    #         # ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥ NEW: async load instead of direct render
-    #         self.start_image_load(path, target="ref")
-
-
-
-    # def loadRefImg(self):
-    #     print("Loading current reference image path provided by open file dialog")
-    #     self.refimgpath = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget, 'Open image file',self.refimgdir,'Images (*.png *.jpeg *.jpg *.bmp *.gif *.tif)')[0]
-    #     if self.refimgpath:
-    #         self.ui.RefImgLE.setText(os.path.basename(self.refimgpath))
-    #         print("[Pixler] Ref image indexed")
-
-    #     #self.image_load_path = os.path.join(script_dir, "ImageLoadWorker.py")
-    #     #self.start_image_load(self.image_load_path, target="ref")
-    #     #self.refimgpath =
 
     def sortRefImgFiles(self):
         import os
@@ -3351,6 +2747,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         print(f"[NAV] Next ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {self.refimgpath}")
         self.start_image_load(self.refimgpath, target="ref")
+
     def prevRefImage(self):
         if not self.refimgfiles:
             return
@@ -3414,7 +2811,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.RefImgzoomslider.setEnabled(True)
         self.ui.RefImgzoomslider.setValue(int(self.ui.RefImgZoomComboBox.currentText()[0]))
 
-
     def on_RefImgzoomslider(self):
         zoomValue = self.ui.RefImgzoomslider.value()
         self.ui.RefImgZoomComboBox.blockSignals(True)
@@ -3424,14 +2820,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.refimgscale = zoomValue / 100
         print(self.refimgscale)
         self.resize_RefImg()
-
-    # def on_RefImgzoomslider(self):
-    #     #if self.ui.Zoomslider.isEnabled():
-    #     RefImgzoomValue = self.ui.RefImgzoomslider.value()
-    #     self.ui.RefImgZoomComboBox.setCurrentText(str(RefImgzoomValue) + " %")
-    #     print(RefImgzoomValue)
-    #     self.refimgscale = RefImgzoomValue/100
-    #     print(self.refimgscale)
 
     def on_RefImgzoom(self):
         seltext = self.ui.RefImgZoomComboBox.currentText()
@@ -3580,7 +2968,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             transformMode=qtc.Qt.FastTransformation
         )
         self.ui.Image.setPixmap(scaled_pixmap)
-
 
     def ExportImage(self):
         pass
@@ -4155,11 +3542,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             except Exception:
                 pass
 
-
-    # def crop_processor(self, qimage, params):
-    #     # TEMP: pass-through (no actual cropping yet)
-    #     return qimage
-
     def actionCropImage(self):
         print("[NEW CROP]")
 
@@ -4173,47 +3555,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print("[CROP] Using full-resolution crop result: {}x{}".format(
                 self.imageqimage.width(), self.imageqimage.height()
             ))
-
-
-    # def applyProcessedImage(self, qimage):
-    #     if qimage is None or qimage.isNull():
-    #         print("[APPLY] Invalid processed image")
-    #         return
-
-    #     print("[APPLY] Applying processed image")
-
-    #     # Update internal state
-    #     self.refimgqimage = qimage
-    #     self.refimgpixmap = qtg.QPixmap.fromImage(qimage)
-
-    #     # Render to UI
-    #     self.ui.RefImg.setPixmap(
-    #         self.refimgpixmap.scaled(
-    #             self.ui.RefImg.size(),
-    #             qtc.Qt.KeepAspectRatio,
-    #             transformMode=qtc.Qt.SmoothTransformation
-    #         )
-    #     )
-
-    # def actionCropPreview(self, checked=False):
-
-    #     print("[ACTION] Crop Preview triggered")
-
-    #     if not self.refimgqimage or self.refimgqimage.isNull():
-    #         print("[ACTION] No image loaded")
-    #         return
-
-    #     dialog = ImagePreviewDialog(
-    #         self.refimgqimage,
-    #         crop_processor,
-    #         {},        # params (placeholder for now)
-    #         self       # parent
-    #     )
-
-    #     if dialog.exec_():
-    #         result = dialog.get_result()
-    #         self.actionCropImage(result)
-
 
     def deskewRefImg(self):
         print("[DESKEW] Opening preview")
@@ -4904,260 +4245,6 @@ class Adjust(QWidget):
         self.img_class.grand_reset()
         self.update_img()
         self.vbox.addWidget(self.base_frame)
-
-    # def start_image_load(self, path, target="ref"):
-    #     print(f"[THREAD] Start load ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ {path} ({target})")
-
-    #     # store target so handler knows where to route image
-    #     self._load_target = target
-
-    #     self._thread = qtc.QThread()
-    #     self._worker = ImageLoadWorker(self.image_load_path)
-
-    #     self._worker.moveToThread(self._thread)
-
-    #     # --- signals
-    #     self._thread.started.connect(self._worker.run)
-    #     self._worker.progress.connect(self.on_load_progress)
-    #     self._worker.finished.connect(self.on_image_loaded)
-    #     self._worker.error.connect(self.on_load_error)
-
-    #     # --- cleanup
-    #     self._worker.finished.connect(self._thread.quit)
-    #     self._worker.finished.connect(self._worker.deleteLater)
-    #     self._thread.finished.connect(self._thread.deleteLater)
-
-    #     # --- start
-    #     self._thread.start()
-
-    #     # show progress immediately
-    #     if hasattr(self, "progress_bar"):
-    #         self.progress_bar.setValue(0)
-    #         self.progress_bar.setVisible(True)
-# Legacy in-file ImagePreviewDialog implementation removed; use ImagePreviewDialog.py.
-# class ImagePreviewDialog(qtw.QDialog):
-#     def __init__(self, original_qimage, processor, params=None, parent=None):
-#         super().__init__(parent)
-
-#         screen = qtw.QApplication.primaryScreen().availableGeometry()
-
-#         # Use ~80% of screen size
-#         self.resize(int(screen.width() * 0.8), int(screen.height() * 0.8))
-
-#         self.setWindowTitle("Preview")
-
-#         # -------------------------
-#         # Phase 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Store data ONLY
-#         # -------------------------
-#         self.original = original_qimage
-#         self.processor = processor
-#         self.params = params or {}
-
-#         # -------------------------
-#         # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Build UI FIRST
-#         # -------------------------
-#         layout = qtw.QVBoxLayout(self)
-
-#         # Create labels
-#         self.left_label = qtw.QLabel()
-#         self.right_label = qtw.QLabel()
-
-#         self.left_label.setAlignment(qtc.Qt.AlignCenter)
-#         self.right_label.setAlignment(qtc.Qt.AlignCenter)
-
-#         # Wrap in scroll areas
-#         self.left_scroll = qtw.QScrollArea()
-#         self.right_scroll = qtw.QScrollArea()
-
-#         self.left_scroll.setWidget(self.left_label)
-#         self.right_scroll.setWidget(self.right_label)
-
-#         self.left_scroll.setWidgetResizable(True)
-#         self.right_scroll.setWidgetResizable(True)
-
-#         # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ NOW it exists ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ install filter
-#         self.left_scroll.viewport().installEventFilter(self)
-
-#         # Add to layout (side-by-side)
-#         image_layout = qtw.QHBoxLayout()
-#         image_layout.addWidget(self.left_scroll)
-#         image_layout.addWidget(self.right_scroll)
-
-#         # Then add this layout into your main dialog layout
-#         layout.addLayout(image_layout, stretch=1)
-
-#         # Buttons
-#         btn_layout = qtw.QHBoxLayout()
-#         self.apply_btn = qtw.QPushButton("Apply")
-#         self.cancel_btn = qtw.QPushButton("Cancel")
-
-#         btn_layout.addWidget(self.apply_btn)
-#         btn_layout.addWidget(self.cancel_btn)
-
-#         layout.addLayout(btn_layout)
-#         # zoom state
-
-#         # slider creation
-#         # -------------------------
-#         # Zoom Slider
-#         # -------------------------
-#         zoom_layout = qtw.QHBoxLayout()
-
-#         zoom_label = qtw.QLabel("Zoom:")
-#         self.zoom_slider = qtw.QSlider(qtc.Qt.Horizontal)
-
-#         self.zoom_slider.setMinimum(1)    # 10%
-#         self.zoom_slider.setMaximum(125)   # 125%
-#         self.zoom_slider.setSingleStep(1)  # 1% increments
-
-#         # self.zoom_slider.setMinimum(25)    # 0.25x
-#         # self.zoom_slider.setMaximum(200)   # 2.0x
-
-#         default_zoom = 11  # your preferred baseline
-
-#         self.zoom_slider.setValue(default_zoom)
-#         self.zoom_factor = default_zoom / 100.0
-
-#         # connect signal
-#         self.zoom_slider.valueChanged.connect(self.on_zoom_changed)
-
-#         zoom_layout.addWidget(zoom_label)
-#         zoom_layout.addWidget(self.zoom_slider)
-
-#         layout.addLayout(zoom_layout)
-
-#         layout.setStretchFactor(image_layout, 1)
-#         layout.setStretchFactor(btn_layout, 0)
-#         layout.setStretchFactor(zoom_layout, 0)
-
-#         # -------------------------
-#         # Phase 3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Signals
-#         # -------------------------
-
-#         self.apply_btn.setMinimumHeight(30)
-#         self.cancel_btn.setMinimumHeight(30)
-#         self.zoom_slider.setMinimumHeight(25)
-
-#         self.apply_btn.clicked.connect(self.accept)
-#         self.cancel_btn.clicked.connect(self.reject)
-
-#         self.rubberBand = qtw.QRubberBand(qtw.QRubberBand.Rectangle, self.left_label)
-#         self.origin = qtc.QPoint()
-
-#         self.left_label.setMouseTracking(True)
-
-# class ImagePreviewDialog(qtw.QDialog):
-#     def __init__(self, original_qimage, processor, params=None, parent=None):
-#         super().__init__(parent)
-
-#         # -------------------------
-#         # Phase 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â CORE STATE (ALWAYS FIRST)
-#         # -------------------------
-#         self.original = original_qimage
-#         self.processor = processor
-#         self.params = params or {}
-
-#         # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ MUST exist before ANY preview call
-#         self.zoom_factor = 0.11   # 11% default (your preferred baseline)
-
-#         # -------------------------
-#         # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â WINDOW SETUP
-#         # -------------------------
-#         screen = qtw.QApplication.primaryScreen().availableGeometry()
-#         self.resize(int(screen.width() * 0.8), int(screen.height() * 0.8))
-#         self.setWindowTitle("Preview")
-#         self.update_preview()
-
-#     # ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ THIS MUST BE AT CLASS LEVEL (not inside __init__)
-#     def eventFilter(self, obj, event):
-#         if obj == self.left_scroll.viewport():
-
-#             if event.type() == qtc.QEvent.MouseButtonPress:
-#                 self.origin = self.left_label.mapFrom(
-#                     self.left_scroll.viewport(), event.pos()
-#                 )
-#                 self.rubberBand.setGeometry(qtc.QRect(self.origin, qtc.QSize()))
-#                 self.rubberBand.show()
-
-#             elif event.type() == qtc.QEvent.MouseMove:
-#                 if self.rubberBand.isVisible():
-#                     current_pos = self.left_label.mapFrom(
-#                         self.left_scroll.viewport(), event.pos()
-#                     )
-#                     rect = qtc.QRect(self.origin, current_pos).normalized()
-#                     self.rubberBand.setGeometry(rect)
-
-#             elif event.type() == qtc.QEvent.MouseButtonRelease:
-#                 self.rubberBand.hide()
-
-#                 current_pos = self.left_label.mapFrom(
-#                     self.left_scroll.viewport(), event.pos()
-#                 )
-#                 rect = qtc.QRect(self.origin, current_pos).normalized()
-
-#                 scale = self.zoom_factor
-
-#                 x = int(rect.x() / scale)
-#                 y = int(rect.y() / scale)
-#                 w = int(rect.width() / scale)
-#                 h = int(rect.height() / scale)
-
-#                 self.params.update({
-#                     "x": x,
-#                     "y": y,
-#                     "w": max(1, w),
-#                     "h": max(1, h)
-#                 })
-
-#                 print(f"[CROP] x={x}, y={y}, w={w}, h={h}")
-
-#                 self.update_preview()
-
-#         return super().eventFilter(obj, event)
-
-#         # -------------------------
-#         # Phase 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â NOW safe to process
-#         # -------------------------
-#         self.update_preview()
-
-#     def on_zoom_changed(self, value):
-#         print(f"[ZOOM] Slider value: {value}")  # debug
-#         self.zoom_factor = value / 100.0
-#         self.update_preview()
-
-#     def update_preview(self):
-#         if not self.original or self.original.isNull():
-#             return
-
-#         # Process image
-#         processed = self.processor(self.original, self.params)
-
-#         # Convert to pixmaps
-#         orig_pix = qtg.QPixmap.fromImage(self.original)
-#         proc_pix = qtg.QPixmap.fromImage(processed)
-
-#         # Apply zoom scaling ONLY HERE
-#         scale = self.zoom_factor
-
-#         new_size = orig_pix.size() * scale
-
-#         orig_scaled = orig_pix.scaled(
-#             new_size,
-#             qtc.Qt.KeepAspectRatio,
-#             qtc.Qt.SmoothTransformation
-#         )
-
-#         proc_scaled = proc_pix.scaled(
-#             new_size,
-#             qtc.Qt.KeepAspectRatio,
-#             qtc.Qt.SmoothTransformation
-#         )
-
-#         self.left_label.setPixmap(orig_scaled)
-#         self.right_label.setPixmap(proc_scaled)
-
-#     def get_result(self):
-#         return self.processor(self.original, self.params)
 
 class ResizableRubberBand(QWidget):
     """Crop overlay with sibling grip handles that stay visible above it.

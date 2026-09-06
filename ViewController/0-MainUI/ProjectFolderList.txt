@@ -58,7 +58,10 @@ launchers/run-mywriter.cmd
 launchers/run-mywriter.sh
 Model/Project/Data
 Model/Project/Data/csv/module_handshakes.csv
+Model/Project/Data/csv/page_workflow.csv
 Model/Project/Data/csv/page_workflow_milestones.csv
+Model/Project/Data/csv/project_workflow.csv
+Model/Project/Data/csv/project_workflow_milestones.csv
 Model/Project/Data/csv/ProjectWorkflow.csv
 Model/Project/Data/csv/ProjectWorkflow.ods
 Model/Project/Data/esword

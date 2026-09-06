@@ -135,86 +135,6 @@ from Dialogs.ImageTextPairDialog import Ui_ImageTextPairDialog
 from Dialogs.split_greek_text_linesDialog import Ui_splitgreektextlinesDialog
 from Dialogs.rename_greek_text_linesDialog import Ui_renamegreektextlinesDialog
 
-###########    Unused Thread Classes   ############
-'''class WriteStream(object):
-    # The new Stream Object which replaces the default stream associated with sys.stdout
-    # This object just puts data in a queue!
-    def __init__(self,queue):
-        self.queue = queue
-
-    def write(self, text):
-        self.queue.put(text)
-
-    def flush(self):
-        """
-        Stream flush implementation
-        """
-        pass'''
-'''class ThreadConsoleTextQueueReceiver(qtc.QObject):
-    # A QObject (to be run in a QThread) which sits waiting for data to come through a Queue.Queue().
-    # It blocks until data is available, and once it has got something from the queue, it sends
-    # it to the "MainThread" by emitting a Qt Signal
-    queue_element_received_signal = qtc.pyqtSignal(str)
-
-    def __init__(self, q: Queue, *args, **kwargs):
-        qtc.QObject.__init__(self, *args, **kwargs)
-        self.queue = q
-
-    @qtc.pyqtSlot()
-    def run(self):
-        self.queue_element_received_signal.emit('---> Console text queue reception Started <---\n')
-        while True:
-            text = self.queue.get()
-            self.queue_element_received_signal.emit(text)
-
-    @qtc.pyqtSlot()
-    def finished(self):
-        self.queue_element_received_signal.emit('---> Console text queue reception Stopped <---\n')'''
-'''class Logging(qtc.QObject):
-    def setup_logging(log_prefix):
-        global __is_setup_done
-
-        if __is_setup_done:
-            pass
-        else:
-            __log_file_name = "{}-{}_log_file.txt".format(log_prefix,
-                                                        datetime.datetime.utcnow().isoformat().replace(":", "-"))
-
-            __log_format = '%(asctime)s - %(name)-30s - %(levelname)s - %(message)s'
-            __console_date_format = '%Y-%m-%d %H:%M:%S'
-            __file_date_format = '%Y-%m-%d %H-%M-%S'
-
-            root = logging.getLogger()
-            root.setLevel(logging.DEBUG)
-
-            console_formatter = logging.Formatter(__log_format, __console_date_format)
-
-            file_formatter = logging.Formatter(__log_format, __file_date_format)
-            file_handler = logging.FileHandler(__log_file_name, mode='a', delay=True)
-
-            file_handler.setLevel(logging.DEBUG)
-            file_handler.setFormatter(file_formatter)
-            root.addHandler(file_handler)
-
-            tqdm_handler = TqdmLoggingHandler()
-            tqdm_handler.setLevel(logging.DEBUG)
-            tqdm_handler.setFormatter(console_formatter)
-            root.addHandler(tqdm_handler)
-
-            __is_setup_done = True
-
-class TqdmLoggingHandler(logging.StreamHandler):
-
-    def __init__(self, level=logging.NOTSET):
-        logging.StreamHandler.__init__(self)
-
-    def emit(self, record):
-        msg = self.format(record)
-        tqdm.write(msg)
-        # from https://stackoverflow.com/questions/38543506/change-logging-print-function-to-tqdm-write-so-logging-doesnt-interfere-wit/38739634#38739634
-        self.flush()
-'''
-
 ###########    Partially Used Classes    ############
 class ProgThread(QThread):
     # Create a counter thread
@@ -614,16 +534,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         #self.ui.OutputText.moveCursor(QTextCursor.End)
         #self.ui.OutputText.insertPlainText(text)
         self.ui.OutputText.append(text)
-
-    '''def onUpdateText(self, text):
-        cursor = self.process.textCursor()
-        cursor.movePosition(QtGui.QTextCursor.End)
-        cursor.insertText(text)
-        self.process.setTextCursor(cursor)
-        self.process.ensureCursorVisible()'''
-    '''def output_terminal_written(self, text):
-        #custom method to write anything printed out to console/terminal to my QTextEdit widget via append function.
-        self.ui.OutputText.append(text)'''
 
 ###########    Initialize Session    ############
     def get_session_settings(self):
@@ -1253,6 +1163,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
             'self.imgpath': self.imgpath,
             'self.imgdir': self.imgdir,
         })
+        self.record_current_project_page(self.imgpath)
 
     def sortImgFiles(self):
         #print(f'Image File List: {self.imgfileList}')
@@ -1677,457 +1588,467 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         if directory:
             line_edit.setText(directory + os.sep)
 
-    def actionextract_pdf(self):
-        print("extracting pdf pages from source pdf")
+    def _open_csv_page_workflow(self, _checked=False):
+        self.open_page_workflow_wizard('MyBoxer')
 
-        def accept():
-            workflow_folder = self._resolve_workflow_path(workflow_folder_path)
-            complete_folder = self._resolve_workflow_path(complete_folder_path)
-            if os.path.isdir(workflow_folder):
-                for filename in os.listdir(workflow_folder):
-                    file_path = os.path.join(workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
+    actionextract_pdf = _open_csv_page_workflow
+    actionpdf_for_tiff = _open_csv_page_workflow
+    actionpdf_to_tiff = _open_csv_page_workflow
+    actiontiff_to_mono = _open_csv_page_workflow
+    actionmono_to_png = _open_csv_page_workflow
+    actiondeskew_mono = _open_csv_page_workflow
 
-            self.sourcefile = self.pdfx_ui.SourceLineEdit.text()
-            self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
-            self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
-            pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(), self.firstpage, self.lastpage)
+    # def actionextract_pdf(self):
+    #     print("extracting pdf pages from source pdf")
 
-            if complete_folder:
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
+    #     def accept():
+    #         workflow_folder = self._resolve_workflow_path(workflow_folder_path)
+    #         complete_folder = self._resolve_workflow_path(complete_folder_path)
+    #         if os.path.isdir(workflow_folder):
+    #             for filename in os.listdir(workflow_folder):
+    #                 file_path = os.path.join(workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
 
-        def reject():
-            pass
+    #         self.sourcefile = self.pdfx_ui.SourceLineEdit.text()
+    #         self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
+    #         self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
+    #         pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(), self.firstpage, self.lastpage)
 
-        self.pdfxDialog = qtw.QDialog()
-        self.pdfx_ui = Ui_ExtractDialog()
-        self.pdfx_ui.setupUi(self.pdfxDialog)
-        self.pdfxDialog.show()
+    #         if complete_folder:
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        workflow_folder_path = ""
-        complete_folder_path = ""
-        seq = "SP1"
+    #     def reject():
+    #         pass
 
-        def setdefault():
-            if self.pdfx_ui.defaultsrcBox.isChecked():
-                self.pdfx_ui.SourceButton.setEnabled(False)
-                self.pdfx_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdfx_ui.SourceButton.setEnabled(True)
-                self.pdfx_ui.DestinationButton.setEnabled(True)
+    #     self.pdfxDialog = qtw.QDialog()
+    #     self.pdfx_ui = Ui_ExtractDialog()
+    #     self.pdfx_ui.setupUi(self.pdfxDialog)
+    #     self.pdfxDialog.show()
 
-        self.pdfx_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdfx_ui.SourceButton.clicked.connect(lambda: self._browse_for_file(self.pdfx_ui.SourceLineEdit, "Select pdf source file", "*.pdf"))
-        self.pdfx_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.pdfx_ui.DestinationLineEdit, "Select destination folder"))
-        self.pdfx_ui.buttonBox.accepted.connect(accept)
-        self.pdfx_ui.buttonBox.rejected.connect(reject)
+    #     workflow_folder_path = ""
+    #     complete_folder_path = ""
+    #     seq = "SP1"
 
-        if self.pdfx_ui.defaultsrcBox.isChecked():
-            workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(workflow_file, 'r') as handle:
-                data = json.load(handle)
-                for sequence in data:
-                    if sequence['Sequence'] == seq:
-                        self.pdfx_ui.SourceLineEdit.setText(sequence['DefaultSource'])
-                        self.pdfx_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        complete_folder_path = sequence['CompleteFullPath'] + r'/'
+    #     def setdefault():
+    #         if self.pdfx_ui.defaultsrcBox.isChecked():
+    #             self.pdfx_ui.SourceButton.setEnabled(False)
+    #             self.pdfx_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.pdfx_ui.SourceButton.setEnabled(True)
+    #             self.pdfx_ui.DestinationButton.setEnabled(True)
 
-        self.pdfxDialog.exec_()
+    #     self.pdfx_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.pdfx_ui.SourceButton.clicked.connect(lambda: self._browse_for_file(self.pdfx_ui.SourceLineEdit, "Select pdf source file", "*.pdf"))
+    #     self.pdfx_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.pdfx_ui.DestinationLineEdit, "Select destination folder"))
+    #     self.pdfx_ui.buttonBox.accepted.connect(accept)
+    #     self.pdfx_ui.buttonBox.rejected.connect(reject)
 
-    def actionpdf_for_tiff(self):
-        print("extracting pdf pages for tif")
+    #     if self.pdfx_ui.defaultsrcBox.isChecked():
+    #         workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(workflow_file, 'r') as handle:
+    #             data = json.load(handle)
+    #             for sequence in data:
+    #                 if sequence['Sequence'] == seq:
+    #                     self.pdfx_ui.SourceLineEdit.setText(sequence['DefaultSource'])
+    #                     self.pdfx_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     complete_folder_path = sequence['CompleteFullPath'] + r'/'
 
-        def accept():
-            workflow_folder = self._resolve_workflow_path(workflow_folder_path)
-            complete_folder = self._resolve_workflow_path(complete_folder_path)
-            source_folder = self._resolve_workflow_path(source_folder_path)
-            if os.path.isdir(workflow_folder):
-                for filename in os.listdir(workflow_folder):
-                    file_path = os.path.join(workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
+    #     self.pdfxDialog.exec_()
 
-            pp.pdf4tif(os.path.join(source_folder, os.path.basename(source_folder)), workflow_folder)
-            if complete_folder:
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
+    # def actionpdf_for_tiff(self):
+    #     print("extracting pdf pages for tif")
 
-        def reject():
-            pass
+    #     def accept():
+    #         workflow_folder = self._resolve_workflow_path(workflow_folder_path)
+    #         complete_folder = self._resolve_workflow_path(complete_folder_path)
+    #         source_folder = self._resolve_workflow_path(source_folder_path)
+    #         if os.path.isdir(workflow_folder):
+    #             for filename in os.listdir(workflow_folder):
+    #                 file_path = os.path.join(workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
 
-        self.pdf4tifDialog = qtw.QDialog()
-        self.pdf4tif_ui = Ui_pdf4tifDialog()
-        self.pdf4tif_ui.setupUi(self.pdf4tifDialog)
-        self.pdf4tifDialog.show()
+    #         pp.pdf4tif(os.path.join(source_folder, os.path.basename(source_folder)), workflow_folder)
+    #         if complete_folder:
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        workflow_folder_path = ""
-        complete_folder_path = ""
-        source_folder_path = ""
-        seq = "SP2"
+    #     def reject():
+    #         pass
 
-        def setdefault():
-            if self.pdf4tif_ui.defaultsrcBox.isChecked():
-                self.pdf4tif_ui.SourceButton.setEnabled(False)
-                self.pdf4tif_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdf4tif_ui.SourceButton.setEnabled(True)
-                self.pdf4tif_ui.DestinationButton.setEnabled(True)
+    #     self.pdf4tifDialog = qtw.QDialog()
+    #     self.pdf4tif_ui = Ui_pdf4tifDialog()
+    #     self.pdf4tif_ui.setupUi(self.pdf4tifDialog)
+    #     self.pdf4tifDialog.show()
 
-        self.pdf4tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdf4tif_ui.SourceButton.clicked.connect(lambda: self._browse_for_file(self.pdf4tif_ui.SourceLineEdit, "Select pdf source file", "*.pdf"))
-        self.pdf4tif_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.pdf4tif_ui.DestinationLineEdit, "Select destination folder"))
-        self.pdf4tif_ui.buttonBox.accepted.connect(accept)
-        self.pdf4tif_ui.buttonBox.rejected.connect(reject)
+    #     workflow_folder_path = ""
+    #     complete_folder_path = ""
+    #     source_folder_path = ""
+    #     seq = "SP2"
 
-        if self.pdf4tif_ui.defaultsrcBox.isChecked():
-            workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(workflow_file, 'r') as handle:
-                data = json.load(handle)
-                for sequence in data:
-                    if sequence['Sequence'] == seq:
-                        self.pdf4tif_ui.SourceLineEdit.setText(sequence['DefaultSource'])
-                        self.pdf4tif_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        source_folder_path = sequence['DefaultSource'] + r'/'
-                        workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        complete_folder_path = sequence['CompleteFullPath'] + r'/'
+    #     def setdefault():
+    #         if self.pdf4tif_ui.defaultsrcBox.isChecked():
+    #             self.pdf4tif_ui.SourceButton.setEnabled(False)
+    #             self.pdf4tif_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.pdf4tif_ui.SourceButton.setEnabled(True)
+    #             self.pdf4tif_ui.DestinationButton.setEnabled(True)
 
-        self.pdf4tifDialog.exec_()
+    #     self.pdf4tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.pdf4tif_ui.SourceButton.clicked.connect(lambda: self._browse_for_file(self.pdf4tif_ui.SourceLineEdit, "Select pdf source file", "*.pdf"))
+    #     self.pdf4tif_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.pdf4tif_ui.DestinationLineEdit, "Select destination folder"))
+    #     self.pdf4tif_ui.buttonBox.accepted.connect(accept)
+    #     self.pdf4tif_ui.buttonBox.rejected.connect(reject)
 
-    def actionpdf_to_tiff(self):
-        print("converting pdf pages to tiff")
+    #     if self.pdf4tif_ui.defaultsrcBox.isChecked():
+    #         workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(workflow_file, 'r') as handle:
+    #             data = json.load(handle)
+    #             for sequence in data:
+    #                 if sequence['Sequence'] == seq:
+    #                     self.pdf4tif_ui.SourceLineEdit.setText(sequence['DefaultSource'])
+    #                     self.pdf4tif_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     source_folder_path = sequence['DefaultSource'] + r'/'
+    #                     workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     complete_folder_path = sequence['CompleteFullPath'] + r'/'
 
-        def accept():
-            workflow_folder = self._resolve_workflow_path(workflow_folder_path)
-            complete_folder = self._resolve_workflow_path(complete_folder_path)
-            source_folder = self._resolve_workflow_path(source_folder_path)
-            if os.path.isdir(workflow_folder):
-                for filename in os.listdir(workflow_folder):
-                    file_path = os.path.join(workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
+    #     self.pdf4tifDialog.exec_()
 
-            pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-            if complete_folder:
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
+    # def actionpdf_to_tiff(self):
+    #     print("converting pdf pages to tiff")
 
-        def reject():
-            pass
+    #     def accept():
+    #         workflow_folder = self._resolve_workflow_path(workflow_folder_path)
+    #         complete_folder = self._resolve_workflow_path(complete_folder_path)
+    #         source_folder = self._resolve_workflow_path(source_folder_path)
+    #         if os.path.isdir(workflow_folder):
+    #             for filename in os.listdir(workflow_folder):
+    #                 file_path = os.path.join(workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
 
-        self.pdf2tifDialog = qtw.QDialog()
-        self.pdf2tif_ui = Ui_pdf2tifDialog()
-        self.pdf2tif_ui.setupUi(self.pdf2tifDialog)
-        self.pdf2tifDialog.show()
+    #         pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
+    #         if complete_folder:
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        workflow_folder_path = ""
-        complete_folder_path = ""
-        source_folder_path = ""
-        seq = "SP3"
+    #     def reject():
+    #         pass
 
-        def setdefault():
-            if self.pdf2tif_ui.defaultsrcBox.isChecked():
-                self.pdf2tif_ui.SourceButton.setEnabled(False)
-                self.pdf2tif_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdf2tif_ui.SourceButton.setEnabled(True)
-                self.pdf2tif_ui.DestinationButton.setEnabled(True)
+    #     self.pdf2tifDialog = qtw.QDialog()
+    #     self.pdf2tif_ui = Ui_pdf2tifDialog()
+    #     self.pdf2tif_ui.setupUi(self.pdf2tifDialog)
+    #     self.pdf2tifDialog.show()
 
-        self.pdf2tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdf2tif_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.pdf2tif_ui.SourceLineEdit, "Select pdf pages source folder"))
-        self.pdf2tif_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.pdf2tif_ui.DestinationLineEdit, "Select destination folder"))
-        self.pdf2tif_ui.buttonBox.accepted.connect(accept)
-        self.pdf2tif_ui.buttonBox.rejected.connect(reject)
+    #     workflow_folder_path = ""
+    #     complete_folder_path = ""
+    #     source_folder_path = ""
+    #     seq = "SP3"
 
-        if self.pdf2tif_ui.defaultsrcBox.isChecked():
-            workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(workflow_file, 'r') as handle:
-                data = json.load(handle)
-                for sequence in data:
-                    if sequence['Sequence'] == seq:
-                        self.pdf2tif_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
-                        self.pdf2tif_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        source_folder_path = sequence['DefaultSource'] + r'/'
-                        workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        complete_folder_path = sequence['CompleteFullPath'] + r'/'
-                        self.pdf2tif_ui.StartPageLineEdit.setText(self.firstpage)
+    #     def setdefault():
+    #         if self.pdf2tif_ui.defaultsrcBox.isChecked():
+    #             self.pdf2tif_ui.SourceButton.setEnabled(False)
+    #             self.pdf2tif_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.pdf2tif_ui.SourceButton.setEnabled(True)
+    #             self.pdf2tif_ui.DestinationButton.setEnabled(True)
 
-        self.pdf2tifDialog.exec_()
+    #     self.pdf2tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.pdf2tif_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.pdf2tif_ui.SourceLineEdit, "Select pdf pages source folder"))
+    #     self.pdf2tif_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.pdf2tif_ui.DestinationLineEdit, "Select destination folder"))
+    #     self.pdf2tif_ui.buttonBox.accepted.connect(accept)
+    #     self.pdf2tif_ui.buttonBox.rejected.connect(reject)
 
-    def actiontiff_to_mono(self):
-        print("creating indexed(BW) tiff")
+    #     if self.pdf2tif_ui.defaultsrcBox.isChecked():
+    #         workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(workflow_file, 'r') as handle:
+    #             data = json.load(handle)
+    #             for sequence in data:
+    #                 if sequence['Sequence'] == seq:
+    #                     self.pdf2tif_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
+    #                     self.pdf2tif_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     source_folder_path = sequence['DefaultSource'] + r'/'
+    #                     workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     complete_folder_path = sequence['CompleteFullPath'] + r'/'
+    #                     self.pdf2tif_ui.StartPageLineEdit.setText(self.firstpage)
 
-        def accept():
-            workflow_folder = self._resolve_workflow_path(workflow_folder_path)
-            complete_folder = self._resolve_workflow_path(complete_folder_path)
-            source_folder = self._resolve_workflow_path(source_folder_path)
-            if os.path.isdir(workflow_folder):
-                for filename in os.listdir(workflow_folder):
-                    file_path = os.path.join(workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
+    #     self.pdf2tifDialog.exec_()
 
-            pp.tiff2tiffidx(source_folder, workflow_folder)
-            if complete_folder:
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
+    # def actiontiff_to_mono(self):
+    #     print("creating indexed(BW) tiff")
 
-        def reject():
-            pass
+    #     def accept():
+    #         workflow_folder = self._resolve_workflow_path(workflow_folder_path)
+    #         complete_folder = self._resolve_workflow_path(complete_folder_path)
+    #         source_folder = self._resolve_workflow_path(source_folder_path)
+    #         if os.path.isdir(workflow_folder):
+    #             for filename in os.listdir(workflow_folder):
+    #                 file_path = os.path.join(workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
 
-        self.tif2monoDialog = qtw.QDialog()
-        self.tif2mono_ui = Ui_tif2monoDialog()
-        self.tif2mono_ui.setupUi(self.tif2monoDialog)
-        self.tif2monoDialog.show()
+    #         pp.tiff2tiffidx(source_folder, workflow_folder)
+    #         if complete_folder:
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        workflow_folder_path = ""
-        complete_folder_path = ""
-        source_folder_path = ""
-        seq = "SP4"
+    #     def reject():
+    #         pass
 
-        def setdefault():
-            if self.tif2mono_ui.defaultsrcBox.isChecked():
-                self.tif2mono_ui.SourceButton.setEnabled(False)
-                self.tif2mono_ui.DestinationButton.setEnabled(False)
-            else:
-                self.tif2mono_ui.SourceButton.setEnabled(True)
-                self.tif2mono_ui.DestinationButton.setEnabled(True)
+    #     self.tif2monoDialog = qtw.QDialog()
+    #     self.tif2mono_ui = Ui_tif2monoDialog()
+    #     self.tif2mono_ui.setupUi(self.tif2monoDialog)
+    #     self.tif2monoDialog.show()
 
-        self.tif2mono_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.tif2mono_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.tif2mono_ui.SourceLineEdit, "Select pdf pages source folder"))
-        self.tif2mono_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.tif2mono_ui.DestinationLineEdit, "Select destination folder"))
-        self.tif2mono_ui.buttonBox.accepted.connect(accept)
-        self.tif2mono_ui.buttonBox.rejected.connect(reject)
+    #     workflow_folder_path = ""
+    #     complete_folder_path = ""
+    #     source_folder_path = ""
+    #     seq = "SP4"
 
-        if self.tif2mono_ui.defaultsrcBox.isChecked():
-            workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(workflow_file, 'r') as handle:
-                data = json.load(handle)
-                for sequence in data:
-                    if sequence['Sequence'] == seq:
-                        self.tif2mono_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
-                        self.tif2mono_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        source_folder_path = sequence['DefaultSource'] + r'/'
-                        workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
+    #     def setdefault():
+    #         if self.tif2mono_ui.defaultsrcBox.isChecked():
+    #             self.tif2mono_ui.SourceButton.setEnabled(False)
+    #             self.tif2mono_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.tif2mono_ui.SourceButton.setEnabled(True)
+    #             self.tif2mono_ui.DestinationButton.setEnabled(True)
 
-        self.tif2monoDialog.exec_()
+    #     self.tif2mono_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.tif2mono_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.tif2mono_ui.SourceLineEdit, "Select pdf pages source folder"))
+    #     self.tif2mono_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.tif2mono_ui.DestinationLineEdit, "Select destination folder"))
+    #     self.tif2mono_ui.buttonBox.accepted.connect(accept)
+    #     self.tif2mono_ui.buttonBox.rejected.connect(reject)
 
-    def actionmono_to_png(self):
-        print("creating indexed(BW) png")
+    #     if self.tif2mono_ui.defaultsrcBox.isChecked():
+    #         workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(workflow_file, 'r') as handle:
+    #             data = json.load(handle)
+    #             for sequence in data:
+    #                 if sequence['Sequence'] == seq:
+    #                     self.tif2mono_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
+    #                     self.tif2mono_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     source_folder_path = sequence['DefaultSource'] + r'/'
+    #                     workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
 
-        def accept():
-            workflow_folder = self._resolve_workflow_path(workflow_folder_path)
-            complete_folder = self._resolve_workflow_path(complete_folder_path)
-            source_folder = self._resolve_workflow_path(source_folder_path)
-            if os.path.isdir(workflow_folder):
-                for filename in os.listdir(workflow_folder):
-                    file_path = os.path.join(workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
+    #     self.tif2monoDialog.exec_()
 
-            pp.tiff2pngidx(source_folder, workflow_folder)
-            if complete_folder:
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
+    # def actionmono_to_png(self):
+    #     print("creating indexed(BW) png")
 
-        def reject():
-            pass
+    #     def accept():
+    #         workflow_folder = self._resolve_workflow_path(workflow_folder_path)
+    #         complete_folder = self._resolve_workflow_path(complete_folder_path)
+    #         source_folder = self._resolve_workflow_path(source_folder_path)
+    #         if os.path.isdir(workflow_folder):
+    #             for filename in os.listdir(workflow_folder):
+    #                 file_path = os.path.join(workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
 
-        self.mono2pngDialog = qtw.QDialog()
-        self.mono2png_ui = Ui_mono2pngDialog()
-        self.mono2png_ui.setupUi(self.mono2pngDialog)
-        self.mono2pngDialog.show()
+    #         pp.tiff2pngidx(source_folder, workflow_folder)
+    #         if complete_folder:
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        workflow_folder_path = ""
-        complete_folder_path = ""
-        source_folder_path = ""
-        seq = "SP5"
+    #     def reject():
+    #         pass
 
-        def setdefault():
-            if self.mono2png_ui.defaultsrcBox.isChecked():
-                self.mono2png_ui.SourceButton.setEnabled(False)
-                self.mono2png_ui.DestinationButton.setEnabled(False)
-            else:
-                self.mono2png_ui.SourceButton.setEnabled(True)
-                self.mono2png_ui.DestinationButton.setEnabled(True)
+    #     self.mono2pngDialog = qtw.QDialog()
+    #     self.mono2png_ui = Ui_mono2pngDialog()
+    #     self.mono2png_ui.setupUi(self.mono2pngDialog)
+    #     self.mono2pngDialog.show()
 
-        self.mono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.mono2png_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.mono2png_ui.SourceLineEdit, "Select mono tif pages source folder"))
-        self.mono2png_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.mono2png_ui.DestinationLineEdit, "Select destination folder"))
-        self.mono2png_ui.buttonBox.accepted.connect(accept)
-        self.mono2png_ui.buttonBox.rejected.connect(reject)
+    #     workflow_folder_path = ""
+    #     complete_folder_path = ""
+    #     source_folder_path = ""
+    #     seq = "SP5"
 
-        if self.mono2png_ui.defaultsrcBox.isChecked():
-            workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(workflow_file, 'r') as handle:
-                data = json.load(handle)
-                for sequence in data:
-                    if sequence['Sequence'] == seq:
-                        self.mono2png_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
-                        self.mono2png_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        source_folder_path = sequence['DefaultSource'] + r'/'
-                        workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
+    #     def setdefault():
+    #         if self.mono2png_ui.defaultsrcBox.isChecked():
+    #             self.mono2png_ui.SourceButton.setEnabled(False)
+    #             self.mono2png_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.mono2png_ui.SourceButton.setEnabled(True)
+    #             self.mono2png_ui.DestinationButton.setEnabled(True)
 
-        self.mono2pngDialog.exec_()
+    #     self.mono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.mono2png_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.mono2png_ui.SourceLineEdit, "Select mono tif pages source folder"))
+    #     self.mono2png_ui.DestinationButton.clicked.connect(lambda: self._browse_for_directory(self.mono2png_ui.DestinationLineEdit, "Select destination folder"))
+    #     self.mono2png_ui.buttonBox.accepted.connect(accept)
+    #     self.mono2png_ui.buttonBox.rejected.connect(reject)
 
-    def actiondeskew_mono(self):
-        print("deskewing monochrome tiff and png files")
+    #     if self.mono2png_ui.defaultsrcBox.isChecked():
+    #         workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(workflow_file, 'r') as handle:
+    #             data = json.load(handle)
+    #             for sequence in data:
+    #                 if sequence['Sequence'] == seq:
+    #                     self.mono2png_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
+    #                     self.mono2png_ui.DestinationLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     source_folder_path = sequence['DefaultSource'] + r'/'
+    #                     workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
 
-        def accept():
-            tif_workflow_folder = self._resolve_workflow_path(tif_workflow_folder_path)
-            tif_complete_folder = self._resolve_workflow_path(tif_complete_folder_path)
-            png_workflow_folder = self._resolve_workflow_path(png_workflow_folder_path)
-            png_complete_folder = self._resolve_workflow_path(png_complete_folder_path)
-            source_folder = self._resolve_workflow_path(source_folder_path)
-            if os.path.isdir(tif_workflow_folder):
-                for filename in os.listdir(tif_workflow_folder):
-                    file_path = os.path.join(tif_workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
-            if os.path.isdir(png_workflow_folder):
-                for filename in os.listdir(png_workflow_folder):
-                    file_path = os.path.join(png_workflow_folder, filename)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as exc:
-                        print(f"Failed to delete {file_path}. Reason: {exc}")
+    #     self.mono2pngDialog.exec_()
 
-            pp.deskewfiles(source_folder, png_workflow_folder, tif_workflow_folder)
-            if tif_complete_folder:
-                for item in os.listdir(tif_workflow_folder):
-                    source = os.path.join(tif_workflow_folder, item)
-                    destination = os.path.join(tif_complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
-            if png_complete_folder:
-                for item in os.listdir(png_workflow_folder):
-                    source = os.path.join(png_workflow_folder, item)
-                    destination = os.path.join(png_complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, False, None)
-                    else:
-                        shutil.copy2(source, destination)
+    # def actiondeskew_mono(self):
+    #     print("deskewing monochrome tiff and png files")
 
-        def reject():
-            pass
+    #     def accept():
+    #         tif_workflow_folder = self._resolve_workflow_path(tif_workflow_folder_path)
+    #         tif_complete_folder = self._resolve_workflow_path(tif_complete_folder_path)
+    #         png_workflow_folder = self._resolve_workflow_path(png_workflow_folder_path)
+    #         png_complete_folder = self._resolve_workflow_path(png_complete_folder_path)
+    #         source_folder = self._resolve_workflow_path(source_folder_path)
+    #         if os.path.isdir(tif_workflow_folder):
+    #             for filename in os.listdir(tif_workflow_folder):
+    #                 file_path = os.path.join(tif_workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
+    #         if os.path.isdir(png_workflow_folder):
+    #             for filename in os.listdir(png_workflow_folder):
+    #                 file_path = os.path.join(png_workflow_folder, filename)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as exc:
+    #                     print(f"Failed to delete {file_path}. Reason: {exc}")
 
-        self.deskew_monoDialog = qtw.QDialog()
-        self.deskew_mono_ui = Ui_deskew_monoDialog()
-        self.deskew_mono_ui.setupUi(self.deskew_monoDialog)
-        self.deskew_monoDialog.show()
+    #         pp.deskewfiles(source_folder, png_workflow_folder, tif_workflow_folder)
+    #         if tif_complete_folder:
+    #             for item in os.listdir(tif_workflow_folder):
+    #                 source = os.path.join(tif_workflow_folder, item)
+    #                 destination = os.path.join(tif_complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #         if png_complete_folder:
+    #             for item in os.listdir(png_workflow_folder):
+    #                 source = os.path.join(png_workflow_folder, item)
+    #                 destination = os.path.join(png_complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, False, None)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        source_folder_path = ""
-        tif_workflow_folder_path = ""
-        tif_complete_folder_path = ""
-        png_workflow_folder_path = ""
-        png_complete_folder_path = ""
-        seq_tif = "SP6"
-        seq_png = "SP7"
+    #     def reject():
+    #         pass
 
-        def setdefault_tif():
-            if self.deskew_mono_ui.defaultsrcBox.isChecked():
-                self.deskew_mono_ui.SourceButton.setEnabled(False)
-                self.deskew_mono_ui.DestTifButton.setEnabled(False)
-            else:
-                self.deskew_mono_ui.SourceButton.setEnabled(True)
-                self.deskew_mono_ui.DestTifButton.setEnabled(True)
+    #     self.deskew_monoDialog = qtw.QDialog()
+    #     self.deskew_mono_ui = Ui_deskew_monoDialog()
+    #     self.deskew_mono_ui.setupUi(self.deskew_monoDialog)
+    #     self.deskew_monoDialog.show()
 
-        def setdefault_png():
-            if self.deskew_mono_ui.defaultsrcBox.isChecked():
-                self.deskew_mono_ui.SourceButton.setEnabled(False)
-                self.deskew_mono_ui.DestPngButton.setEnabled(False)
-            else:
-                self.deskew_mono_ui.SourceButton.setEnabled(True)
-                self.deskew_mono_ui.DestPngButton.setEnabled(True)
+    #     source_folder_path = ""
+    #     tif_workflow_folder_path = ""
+    #     tif_complete_folder_path = ""
+    #     png_workflow_folder_path = ""
+    #     png_complete_folder_path = ""
+    #     seq_tif = "SP6"
+    #     seq_png = "SP7"
 
-        self.deskew_mono_ui.defaultsrcBox.stateChanged.connect(setdefault_tif)
-        self.deskew_mono_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.deskew_mono_ui.SourceLineEdit, "Select pdf pages source folder"))
-        self.deskew_mono_ui.DestPngButton.clicked.connect(lambda: self._browse_for_directory(self.deskew_mono_ui.DestPngLineEdit, "Select destination folder"))
-        self.deskew_mono_ui.DestTifButton.clicked.connect(lambda: self._browse_for_directory(self.deskew_mono_ui.DestTifLineEdit, "Select destination folder"))
-        self.deskew_mono_ui.buttonBox.accepted.connect(accept)
-        self.deskew_mono_ui.buttonBox.rejected.connect(reject)
+    #     def setdefault_tif():
+    #         if self.deskew_mono_ui.defaultsrcBox.isChecked():
+    #             self.deskew_mono_ui.SourceButton.setEnabled(False)
+    #             self.deskew_mono_ui.DestTifButton.setEnabled(False)
+    #         else:
+    #             self.deskew_mono_ui.SourceButton.setEnabled(True)
+    #             self.deskew_mono_ui.DestTifButton.setEnabled(True)
 
-        if self.deskew_mono_ui.defaultsrcBox.isChecked():
-            workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(workflow_file, 'r') as handle:
-                data = json.load(handle)
-                for sequence in data:
-                    if sequence['Sequence'] == seq_tif:
-                        self.deskew_mono_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
-                        self.deskew_mono_ui.DestTifLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        source_folder_path = sequence['DefaultSource'] + r'/'
-                        tif_workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        tif_complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
-                    if sequence['Sequence'] == seq_png:
-                        self.deskew_mono_ui.DestPngLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
-                        png_workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
-                        png_complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
+    #     def setdefault_png():
+    #         if self.deskew_mono_ui.defaultsrcBox.isChecked():
+    #             self.deskew_mono_ui.SourceButton.setEnabled(False)
+    #             self.deskew_mono_ui.DestPngButton.setEnabled(False)
+    #         else:
+    #             self.deskew_mono_ui.SourceButton.setEnabled(True)
+    #             self.deskew_mono_ui.DestPngButton.setEnabled(True)
 
-        self.deskew_monoDialog.exec_()
+    #     self.deskew_mono_ui.defaultsrcBox.stateChanged.connect(setdefault_tif)
+    #     self.deskew_mono_ui.SourceButton.clicked.connect(lambda: self._browse_for_directory(self.deskew_mono_ui.SourceLineEdit, "Select pdf pages source folder"))
+    #     self.deskew_mono_ui.DestPngButton.clicked.connect(lambda: self._browse_for_directory(self.deskew_mono_ui.DestPngLineEdit, "Select destination folder"))
+    #     self.deskew_mono_ui.DestTifButton.clicked.connect(lambda: self._browse_for_directory(self.deskew_mono_ui.DestTifLineEdit, "Select destination folder"))
+    #     self.deskew_mono_ui.buttonBox.accepted.connect(accept)
+    #     self.deskew_mono_ui.buttonBox.rejected.connect(reject)
+
+    #     if self.deskew_mono_ui.defaultsrcBox.isChecked():
+    #         workflow_file = self.workflow if self.workflow else os.path.join(self.projecthome, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(workflow_file, 'r') as handle:
+    #             data = json.load(handle)
+    #             for sequence in data:
+    #                 if sequence['Sequence'] == seq_tif:
+    #                     self.deskew_mono_ui.SourceLineEdit.setText(sequence['DefaultSource'] + r'/')
+    #                     self.deskew_mono_ui.DestTifLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     source_folder_path = sequence['DefaultSource'] + r'/'
+    #                     tif_workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     tif_complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
+    #                 if sequence['Sequence'] == seq_png:
+    #                     self.deskew_mono_ui.DestPngLineEdit.setText(sequence['WorkflowFullPath'] + r'/')
+    #                     png_workflow_folder_path = sequence['WorkflowFullPath'] + r'/'
+    #                     png_complete_folder_path = sequence['CompleteFullPath'] + r'/' + self.sourcebookmarkdown + r'/'
+
+    #     self.deskew_monoDialog.exec_()
 
     def actionCrop_Languages(self):
         print("creating cropped language tif files")

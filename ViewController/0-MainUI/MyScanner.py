@@ -1044,6 +1044,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 self.imgfileList.append(ipath)'''
 
         self.sortImgFiles()
+        self.record_current_project_page(self.imgpath)
 
     def sortImgFiles(self):
         convert = lambda text: int(text) if text.isdigit() else text.lower()

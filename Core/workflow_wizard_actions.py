@@ -1,5 +1,6 @@
 import os
 import re
+import inspect
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -646,7 +647,21 @@ def _install_myexplorer_method_aliases(window) -> None:
                 continue
 
             def _make_alias(method):
-                return lambda *args, **kwargs: method(*args, **kwargs)
+                try:
+                    signature = inspect.signature(method)
+                except (TypeError, ValueError):
+                    signature = None
+
+                def _alias(*args, **kwargs):
+                    if signature is not None and args and isinstance(args[0], bool):
+                        try:
+                            signature.bind(*args, **kwargs)
+                        except TypeError:
+                            signature.bind(*args[1:], **kwargs)
+                            return method(*args[1:], **kwargs)
+                    return method(*args, **kwargs)
+
+                return _alias
 
             setattr(window, alias_name, _make_alias(target))
             break

@@ -7,7 +7,11 @@ from PyQt5 import QtCore, QtWidgets
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MODULE_PATH = REPO_ROOT / "ViewController" / "0-MainUI" / "helpers" / "LocalFileDrop.py"
+HELPERS_DIR = REPO_ROOT / "ViewController" / "0-MainUI" / "helpers"
+if str(HELPERS_DIR) not in sys.path:
+    sys.path.insert(0, str(HELPERS_DIR))
+
+MODULE_PATH = HELPERS_DIR / "LocalFileDrop.py"
 SPEC = importlib.util.spec_from_file_location("local_file_drop", MODULE_PATH)
 LOCAL_FILE_DROP = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(LOCAL_FILE_DROP)

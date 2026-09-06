@@ -1,20 +1,53 @@
-MilestoneNum MilestoneName Language Progress% Override OutputModule OutputPath
-1 extracted Greek 5.56% Y MyServer MyServer/Complete/Greek/extracted
-2 scanned Greek 5.56% Y MyScanner
-3 cleaned Greek 5.56% Y MyPixler
-4 autosplit Greek 5.88% Y MyBoxer
-5 pageboxed Greek 5.56% N MyBoxer
-6 lineboxed Greek 5.56% N MyBoxer
-7 wordboxed Greek 5.56% N MyBoxer
-8 glyphboxed Greek 5.56% N MyGlypher
-9 fonted Greek 5.56% Y MyGlypher
-10 proofread Greek 5.56% Y MyReader
-11 versified Greek 5.56% N MyVersifier
-12 resolved Greek 5.56% N MyResolver
-13 wordlisted Greek 5.56% Y MyLexer
-14 wordlisted Greek 5.56% Y MyReader
-15 wordlisted Greek 5.56% Y MyVersifier
-16 wordlisted Greek 5.56% Y MyWriter
-17 grounded Greek 5.56% N MyGrounder
-18 trained Greek 5.56% N MyTrainer
-19 published Greek 5.56% Y MyWriter
+MilestoneNum,MilestoneName,Language,PageProgress%,Override,Module
+1,src_pages_front_matter_staged,Greek,1.82%,N,MyPixler
+2,src_pages_front_matter_extracted,Greek,1.82%,N,MyPixler
+3,front_matter_pages_extracted_for_tif,Greek,1.82%,Y,MyPixler
+4,front_matter_pages_converted_to_tif,Greek,1.82%,N,MyPixler
+5,front_matter_tif_pages_indexed,Greek,1.82%,Y,MyPixler
+6,front_matter_tif_pages_clipped,Greek,1.82%,Y,MyPixler
+7,front_matter_tif_pages_erased,Greek,1.82%,Y,MyPixler
+8,front_matter_tif_pages_to_columns_boxed,Greek,1.82%,N,MyBoxer
+9,front_matter_col_tif_pages_page_boxed,Greek,1.82%,N,MyBoxer
+10,src_pages_middle_matter_staged,Greek,1.82%,N,MyPixler
+11,src_pages_middle_matter_extracted,Greek,1.82%,N,MyPixler
+12,middle_matter_pages_extracted_to_books,Greek,1.82%,N,MyPixler
+13,middle_matter_books_pages_extracted_for_tif,Greek,1.82%,Y,MyPixler
+14,middle_matter_books_pages_converted_to_tif,Greek,1.82%,N,MyPixler
+15,middle_matter_books_tif_pages_indexed,Greek,1.82%,N,MyPixler
+16,middle_matter_books_tif_pages_clipped,Greek,1.82%,Y,MyPixler
+17,middle_matter_books_tif_pages_erased,Greek,1.82%,Y,MyPixler
+18,middle_matter_books_tif_pages_to_columns_boxed,Greek,1.82%,N,MyBoxer
+19,middle_matter_books_col_tif_pages_page_boxed,Greek,1.82%,N,MyBoxer
+20,src_pages_verses_staged,Greek,1.82%,N,MyPixler
+21,src_pages_verses_extracted,Greek,1.82%,N,MyPixler
+22,verse_pages_extracted_to_books,Greek,1.82%,N,MyPixler
+23,verse_books_pages_extracted_for_tif,Greek,1.82%,Y,MyPixler
+24,verse_books_pages_converted_to_tif,Greek,1.82%,N,MyPixler
+25,verse_books_tif_pages_indexed,Greek,1.82%,N,MyPixler
+26,verse_books_tif_pages_clipped,Greek,1.82%,Y,MyPixler
+27,verse_books_tif_pages_erased,Greek,1.82%,Y,MyPixler
+28,verse_books_tif_pages_to_columns_boxed,Greek,1.82%,N,MyBoxer
+29,verse_books_col_tif_pages_page_boxed,Greek,1.82%,N,MyBoxer
+30,src_pages_back_matter_staged,Greek,1.82%,N,MyPixler
+31,src_pages_back_matter_extracted,Greek,1.82%,N,MyPixler
+32,back_matter_pages_extracted_for_tif,Greek,1.82%,Y,MyPixler
+33,back_matter_pages_converted_to_tif,Greek,1.82%,N,MyPixler
+34,back_matter_tif_pages_indexed,Greek,1.82%,N,MyPixler
+35,back_matter_tif_pages_clipped,Greek,1.82%,Y,MyPixler
+36,back_matter_tif_pages_erased,Greek,1.82%,Y,MyPixler
+37,back_matter_tif_pages_to_columns_boxed,Greek,1.82%,N,MyBoxer
+38,back_matter_col_tif_pages_page_boxed,Greek,1.82%,N,MyBoxer
+40,col_tif_pages_Ine_boxed,Greek,1.82%,N,MyBoxer
+41,col_tif_pages_word_boxed,Greek,1.82%,N,MyBoxer
+43,col_tif_pages_glyph_boxed,Greek,1.82%,N,MyGlypher
+44,glyph_pages_for_project_font,Greek,1.82%,Y,MyGlypher
+46,col_tif_pages_proof_read,Greek,1.82%,Y,MyReader
+47,col_tif_pages_versified,Greek,1.82%,N,MyVersifier
+48,col_tif_pages_resolved,Greek,1.82%,N,MyResolver
+49,col_tif_pages_lexer_word_listed,Greek,1.82%,Y,MyLexer
+50,col_tif_pages_reader_word_listed,Greek,1.82%,Y,MyReader
+51,col_tif_pages_versifier_word_listed,Greek,1.82%,Y,MyVersifier
+52,col_tif_pages_writer_word_listed,Greek,1.82%,Y,MyWriter
+53,col_tif_pages_grounded,Greek,1.82%,N,MyGrounder
+54,col_tif_pages_trained,Greek,1.82%,N,MyTrainer
+55,col_tif_pages_published,Greek,1.82%,Y,MyWriter

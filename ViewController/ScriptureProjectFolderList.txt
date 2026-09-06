@@ -31,7 +31,10 @@ Model/Project/Data/csv
 Model/Project/Data/csv/ProjectWorkflow.ods
 Model/Project/Data/csv/ProjectWorkflow.csv
 Model/Project/Data/csv/module_handshakes.csv
+Model/Project/Data/csv/page_workflow.csv
 Model/Project/Data/csv/page_workflow_milestones.csv
+Model/Project/Data/csv/project_workflow.csv
+Model/Project/Data/csv/project_workflow_milestones.csv
 Model/Project/Data/csv/BooksAbbrName.csv
 Model/Project/Data/csv/BooksAbbrNameNumIndex.csv
 Model/Project/Data/csv/BooksFolderList.csv

@@ -2,6 +2,7 @@ import os
 import json
 import csv
 import platform
+import re
 import sqlite3
 import shutil
 import subprocess
@@ -34,6 +35,12 @@ ACTIVE_WORKFLOW_WIZARD_MODULE_KEYS = (
 )
 ACTIVE_CURRENT_PROJECT_PAGE_KEYS = (
     'self.current_project_page',
+)
+ACTIVE_CURRENT_PROJECT_PAGE_PATH_KEYS = (
+    'self.current_project_page_path',
+)
+ACTIVE_CURRENT_PROJECT_PAGE_MODULE_KEYS = (
+    'self.current_project_page_updated_by',
 )
 ACTIVE_CURRENT_PROJECT_MILESTONE_KEYS = (
     'self.current_project_milestone',
@@ -193,6 +200,8 @@ class SessionManager:
             'project_root': project_root,
             'project_name': project_name,
             'current_project_page': str(values.get('self.current_project_page', '') or ''),
+            'current_project_page_path': str(values.get('self.current_project_page_path', '') or ''),
+            'current_project_page_updated_by': str(values.get('self.current_project_page_updated_by', '') or ''),
             'current_project_milestone': str(values.get('self.current_project_milestone', '') or ''),
             'current_page_milestone': str(values.get('self.current_page_milestone', '') or ''),
         }
@@ -241,6 +250,73 @@ class SessionManager:
         normalized_page = self._coerce_page_number(page_number, 1)
         self.update(filename, {'self.current_project_page': normalized_page})
         return normalized_page
+
+    @classmethod
+    def page_number_from_path(cls, page_path: Any, default: int = 1) -> int:
+        stem = os.path.splitext(os.path.basename(str(page_path or '').strip()))[0]
+        for pattern in (
+            r'(?:^|[_\-\s])page[_\-\s]*(\d+)',
+            r'(?:^|[_\-\s])p(?:age)?[_\-\s]*(\d+)',
+            r'(\d+)$',
+        ):
+            match = re.search(pattern, stem, re.IGNORECASE)
+            if match:
+                return cls._coerce_page_number(match.group(1), default)
+        return cls._coerce_page_number(default, 1)
+
+    def get_active_project_page_state(self, filename: str = 'Session.json') -> Dict[str, Any]:
+        values = self.values(filename)
+        page_path = ''
+        for key in ACTIVE_CURRENT_PROJECT_PAGE_PATH_KEYS:
+            value = values.get(key)
+            if value:
+                page_path = normalize_path(str(value))
+                break
+
+        updated_by = ''
+        for key in ACTIVE_CURRENT_PROJECT_PAGE_MODULE_KEYS:
+            value = values.get(key)
+            if value:
+                updated_by = str(value).strip()
+                break
+
+        return {
+            'page_number': self.get_active_project_page(filename),
+            'page_path': page_path,
+            'updated_by': updated_by,
+        }
+
+    def set_active_project_page_state(
+        self,
+        page_path: Any,
+        *,
+        page_number: Any = None,
+        module_name: str = '',
+        filename: str = 'Session.json',
+    ) -> Dict[str, Any]:
+        normalized_path = normalize_path(str(page_path or '').strip())
+        if not os.path.isfile(normalized_path):
+            raise ValueError('Current project page must be an existing file')
+
+        fallback_page = self.get_active_project_page(filename)
+        normalized_page = self._coerce_page_number(
+            page_number if page_number not in (None, '') else self.page_number_from_path(normalized_path, fallback_page),
+            fallback_page,
+        )
+        updated_by = str(module_name or '').strip()
+        self.update(
+            filename,
+            {
+                'self.current_project_page': normalized_page,
+                'self.current_project_page_path': normalized_path,
+                'self.current_project_page_updated_by': updated_by,
+            },
+        )
+        return {
+            'page_number': normalized_page,
+            'page_path': normalized_path,
+            'updated_by': updated_by,
+        }
 
     def get_active_project_milestone(self, filename: str = 'Session.json') -> str:
         values = self.values(filename)

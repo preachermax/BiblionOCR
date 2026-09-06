@@ -3,6 +3,7 @@
     "ViewController"
   ],
   "extraPaths": [
+    ".",
     "ViewController/0-MainUI",
     "ViewController/0-MainUI/helpers",
     "ViewController/0-MainUI/helpers/Dialogs",
@@ -10,6 +11,7 @@
     "ViewController/1-PreProcess",
     "ViewController/2-TrainTesseract",
     "ViewController/3-Process",
-    "ViewController/4-PostProcess"
+    "ViewController/4-PostProcess",
+    "./ViewController/0-MainUI/helpers/BulkRenameUtility"
   ]
 }

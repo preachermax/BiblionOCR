@@ -12,6 +12,7 @@ from Core.myexplorer_picker import (
     build_myexplorer_selection_command,
     read_myexplorer_selection,
 )
+from SessionManager import SessionManager
 
 
 class EmptyFolderFilterProxyModel(qtc.QSortFilterProxyModel):
@@ -195,9 +196,58 @@ class LocalFileDropMixin:
     def run_file_handler_with_feedback(self, label, file_path, handler):
         self.begin_visible_file_load(label, file_path)
         try:
-            return handler(file_path)
+            result = handler(file_path)
+            if result is not False:
+                self.record_current_project_page(file_path)
+            return result
         finally:
             self.end_visible_file_load(label)
+
+    def record_current_project_page(self, file_path, page_number=None):
+        if not file_path or not os.path.isfile(file_path):
+            return None
+
+        session_manager = (
+            getattr(self, "shared_session_manager", None)
+            or getattr(self, "session_manager", None)
+            or SessionManager()
+        )
+        status_controller = getattr(self, "project_status_controller", None)
+        module_name = getattr(status_controller, "module_name", "")
+        if not module_name:
+            title = self._module_progress_label().replace("Biblion", "").strip().replace(" ", "")
+            module_name = title if title.startswith("My") else f"My{title}"
+
+        try:
+            return session_manager.set_active_project_page_state(
+                file_path,
+                page_number=page_number,
+                module_name=module_name,
+            )
+        except (OSError, ValueError):
+            return None
+
+    def current_project_page_path(self):
+        session_manager = (
+            getattr(self, "shared_session_manager", None)
+            or getattr(self, "session_manager", None)
+            or SessionManager()
+        )
+        page_path = session_manager.get_active_project_page_state().get("page_path", "")
+        return page_path if page_path and os.path.isfile(page_path) else ""
+
+    def restore_current_project_page(self):
+        page_path = self.current_project_page_path()
+        if not page_path:
+            return False
+
+        if self.is_image_file(page_path) and self._file_drop_image_handler:
+            self.run_file_handler_with_feedback("Current project page", page_path, self._file_drop_image_handler)
+            return True
+        if self.is_text_file(page_path) and self._file_drop_text_handler:
+            self.run_file_handler_with_feedback("Current project page", page_path, self._file_drop_text_handler)
+            return True
+        return False
 
     def open_non_modal_file_picker(self, title, directory, selected_handler, dialog_attr_name, name_filters=None):
         picker = MyExplorerPickerProcess(title, directory, selected_handler, parent=self)
@@ -227,8 +277,16 @@ class LocalFileDropMixin:
             self._file_drop_image_handler = None
         if not hasattr(self, "_file_drop_text_handler"):
             self._file_drop_text_handler = None
+        if not hasattr(self, "_current_page_restore_scheduled"):
+            self._current_page_restore_scheduled = False
 
-    def install_local_file_drop(self, targets, image_handler=None, text_handler=None):
+    def install_local_file_drop(
+        self,
+        targets,
+        image_handler=None,
+        text_handler=None,
+        restore_current_page=True,
+    ):
         self._ensure_file_drop_state()
         self._file_drop_targets.clear()
         self._file_drop_handlers.clear()
@@ -239,6 +297,10 @@ class LocalFileDropMixin:
             if target is None:
                 continue
             self._register_file_drop_target(target, image_handler=image_handler, text_handler=text_handler)
+
+        if restore_current_page and not self._current_page_restore_scheduled and (image_handler or text_handler):
+            self._current_page_restore_scheduled = True
+            qtc.QTimer.singleShot(0, self.restore_current_project_page)
 
     def install_local_file_drop_target(self, target, image_handler=None, text_handler=None):
         self._ensure_file_drop_state()

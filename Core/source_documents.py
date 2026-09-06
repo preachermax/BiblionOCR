@@ -4,6 +4,8 @@ import os
 import shutil
 import stat
 
+from Core.project_database import load_project_database_record, project_metadata_database_path
+
 
 PDF_SOURCE_RELATIVE_DIR = os.path.join(
     "Model",
@@ -13,6 +15,9 @@ PDF_SOURCE_RELATIVE_DIR = os.path.join(
     "source_images",
     "pdf_acq_src_image",
 )
+LEGACY_PDF_SOURCE_RELATIVE_DIRS = (
+    os.path.join("Model", "Project", "Images", "MyServer", "Source", "pdf"),
+)
 
 
 def project_pdf_source_path(project_root: str, filename: str) -> str:
@@ -20,16 +25,32 @@ def project_pdf_source_path(project_root: str, filename: str) -> str:
 
 
 def find_project_pdf_source(project_root: str) -> str:
-    source_dir = os.path.join(os.path.abspath(project_root), PDF_SOURCE_RELATIVE_DIR)
-    if not os.path.isdir(source_dir):
-        return ""
+    absolute_project_root = os.path.abspath(project_root)
+    metadata = load_project_database_record(project_metadata_database_path(absolute_project_root))
+    registered_path = str(metadata.get("SourceDocumentPath", "") or "").strip()
+    if registered_path and not os.path.isabs(registered_path):
+        registered_path = os.path.join(absolute_project_root, registered_path)
+    if registered_path and registered_path.lower().endswith(".pdf") and os.path.isfile(registered_path):
+        return os.path.abspath(registered_path)
 
-    pdf_files = sorted(
-        os.path.join(source_dir, filename)
-        for filename in os.listdir(source_dir)
-        if filename.lower().endswith(".pdf") and os.path.isfile(os.path.join(source_dir, filename))
+    source_directories = (
+        os.path.join(absolute_project_root, PDF_SOURCE_RELATIVE_DIR),
+        *(
+            os.path.join(absolute_project_root, relative_dir)
+            for relative_dir in LEGACY_PDF_SOURCE_RELATIVE_DIRS
+        ),
     )
-    return pdf_files[0] if pdf_files else ""
+    for source_dir in source_directories:
+        if not os.path.isdir(source_dir):
+            continue
+        pdf_files = sorted(
+            os.path.join(source_dir, filename)
+            for filename in os.listdir(source_dir)
+            if filename.lower().endswith(".pdf") and os.path.isfile(os.path.join(source_dir, filename))
+        )
+        if pdf_files:
+            return pdf_files[0]
+    return ""
 
 
 def copy_pdf_source_readonly(source_path: str, project_root: str) -> str:

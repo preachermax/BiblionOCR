@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import tempfile
 import unittest
 
@@ -14,6 +15,14 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
         project_root = os.path.join(base_dir, name)
         os.makedirs(os.path.join(project_root, "Model", "Project", "Data", "json"), exist_ok=True)
         return project_root
+
+    def _copy_page_milestones(self, project_root: str) -> None:
+        source = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "Model", "Project", "Data", "csv", "page_workflow_milestones.csv")
+        )
+        destination_dir = os.path.join(project_root, "Model", "Project", "Data", "csv")
+        os.makedirs(destination_dir, exist_ok=True)
+        shutil.copy2(source, os.path.join(destination_dir, "page_workflow_milestones.csv"))
 
     def test_tracker_loads_project_local_manual_handshake_export(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -180,6 +189,72 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
             snapshot = tracker.snapshot("MyServer", project_root=project_root)
             self.assertEqual(4, snapshot["completed_pages"])
             self.assertEqual(100, snapshot["page_percent"])
+
+    def test_page_milestones_drive_current_page_and_module_progress(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = self._create_project_root(tmpdir)
+            self._copy_page_milestones(project_root)
+            create_project_database(
+                os.path.join(project_root, "project_metadata.sqlite"),
+                {"ProjectName": "Pages", "NumberPages": 2, "NumberColumns": 1, "CurrentProjectPage": 1},
+                available_languages=("eng",),
+            )
+            tracker = ProjectWorkflowTracker()
+
+            tracker.record_page_milestone(
+                project_root,
+                1,
+                "src_pages_front_matter_staged",
+                module_name="MyPixler",
+            )
+            snapshot = tracker.snapshot("MyPixler", project_root=project_root)
+
+            self.assertGreater(snapshot["page_percent"], 0)
+            self.assertEqual(1, snapshot["module_completed_count"])
+            self.assertEqual("Src Pages Front Matter Extracted", snapshot["module_next_label"])
+
+    def test_completed_pages_are_not_limited_by_current_page_progress(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = self._create_project_root(tmpdir)
+            self._copy_page_milestones(project_root)
+            create_project_database(
+                os.path.join(project_root, "project_metadata.sqlite"),
+                {"ProjectName": "Pages", "NumberPages": 2, "NumberColumns": 1, "CurrentProjectPage": 2},
+                available_languages=("eng",),
+            )
+            tracker = ProjectWorkflowTracker()
+
+            tracker.record_page_completion(project_root, 1)
+            tracker.record_page_milestone(
+                project_root,
+                2,
+                "src_pages_front_matter_staged",
+                module_name="MyPixler",
+            )
+            snapshot = tracker.snapshot("MyPixler", project_root=project_root)
+
+            self.assertEqual(2, snapshot["page_percent"])
+            self.assertEqual(51, snapshot["project_percent"])
+
+    def test_page_milestone_override_respects_worksheet_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = self._create_project_root(tmpdir)
+            self._copy_page_milestones(project_root)
+            tracker = ProjectWorkflowTracker()
+
+            tracker.update_page_milestones(
+                project_root,
+                1,
+                {
+                    "src_pages_front_matter_staged": {"complete": True},
+                    "front_matter_pages_extracted_for_tif": {"complete": True},
+                },
+                updated_by="test",
+            )
+            rows = {row["key"]: row for row in tracker.page_milestone_rows(project_root, 1)}
+
+            self.assertFalse(rows["src_pages_front_matter_staged"]["complete"])
+            self.assertTrue(rows["front_matter_pages_extracted_for_tif"]["complete"])
 
 
 if __name__ == "__main__":

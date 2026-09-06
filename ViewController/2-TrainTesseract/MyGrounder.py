@@ -836,6 +836,7 @@ class Ui_MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #print(list(self.imgfileList))
         #self.sortImgFiles()
         self.autoScan()
+        self.record_current_project_page(self.imgpath)
 
     '''
     def setFwdImgDirIterator(self):

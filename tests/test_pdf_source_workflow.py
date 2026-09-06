@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import os
 import stat
 import subprocess
@@ -13,7 +14,7 @@ from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
 
 from Core.engine import ProjectCreationEngine
-from Core.project_database import load_project_database_record, project_metadata_database_path
+from Core.project_database import create_project_database, load_project_database_record, project_metadata_database_path
 from Core.source_documents import copy_pdf_source_readonly, find_project_pdf_source, project_pdf_source_path
 
 
@@ -25,6 +26,15 @@ if str(HELPERS_DIR) not in sys.path:
 
 from project_creation_wizard_dialog import ProjectCreationWizardDialog
 from pdf_viewer_dialog import PdfViewerDialog, PdfViewerDock
+
+
+def _load_mypixler_module():
+    module_path = ROOT_DIR / "ViewController" / "1-PreProcess" / "MyPixler.py"
+    spec = importlib.util.spec_from_file_location("mypixler_pdf_test", module_path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class _DummyEventBus:
@@ -166,13 +176,20 @@ def test_pdf_viewer_docks_floats_hides_and_confirms_manual_close(tmp_path, monke
     pdf_path = tmp_path / "source.pdf"
     _create_test_pdf(pdf_path)
     window = qtw.QMainWindow()
+    central_widget = qtw.QWidget(window)
+    window.setCentralWidget(central_widget)
     dock = PdfViewerDock(str(pdf_path), window)
     window.addDockWidget(qtc.Qt.LeftDockWidgetArea, dock)
+    window.resize(1200, 800)
     window.show()
     dock.show()
+    window.resizeDocks([dock], [420], qtc.Qt.Horizontal)
     app.processEvents()
 
     assert window.dockWidgetArea(dock) == qtc.Qt.LeftDockWidgetArea
+    assert dock.width() <= 500
+    assert central_widget.isVisible()
+    assert central_widget.width() >= 600
     dock.toggle_floating()
     assert dock.isFloating()
 
@@ -206,11 +223,14 @@ def test_pdf_viewer_embeds_in_host_and_can_hide_float_redock_and_close(tmp_path,
     assert dock.is_viewer_visible()
     assert not dock.is_viewer_floating()
     assert dock.viewer.parentWidget() is host
+    assert dock.viewer.isVisible()
 
     dock.viewer.hideRequested.emit()
     assert not dock.is_viewer_visible()
+    assert not dock.viewer.isVisible()
     dock.show_viewer()
     assert dock.is_viewer_visible()
+    assert dock.viewer.isVisible()
 
     dock.toggle_floating()
     assert dock.is_viewer_floating()
@@ -228,6 +248,50 @@ def test_pdf_viewer_embeds_in_host_and_can_hide_float_redock_and_close(tmp_path,
     assert dock.close()
     assert not host.isVisible()
     window.close()
+
+
+def test_mypixler_displays_active_project_pdf_in_shared_viewer(tmp_path, monkeypatch) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    project_root = tmp_path / "Project"
+    pdf_path = Path(project_pdf_source_path(str(project_root), "source.pdf"))
+    pdf_path.parent.mkdir(parents=True)
+    _create_test_pdf(pdf_path)
+    monkeypatch.setenv("BIBLION_GUI_ENV_SANITIZED", "1")
+    mypixler = _load_mypixler_module()
+    window = mypixler.PixlerMain.__new__(mypixler.PixlerMain)
+    qtw.QMainWindow.__init__(window)
+    window.current_project_root = str(project_root)
+    window.pdf_source_path = ""
+    window.pdf_page_count = 0
+    window.pdf_viewer_dialog = None
+    window.view_source_document_action = qtw.QAction("Display Source Document", window)
+    window.source_viewer_visibility_action = qtw.QAction("Show Source Document Viewer", window)
+    window.source_viewer_visibility_action.setCheckable(True)
+    monkeypatch.setattr(window, "_shared_active_project_root", lambda: str(project_root))
+    window.show()
+    app.processEvents()
+
+    assert window._project_source_pdf() == str(pdf_path)
+    assert window._open_project_source_pdf_on_startup()
+    assert window.pdf_viewer_dialog is not None
+    assert window.pdf_viewer_dialog.pdf_path == str(pdf_path)
+    assert window.pdf_page_count == 2
+    assert window.dockWidgetArea(window.pdf_viewer_dialog) == qtc.Qt.LeftDockWidgetArea
+    assert not window.pdf_viewer_dialog.is_viewer_floating()
+    assert window.pdf_viewer_dialog.is_viewer_visible()
+    assert window.source_viewer_visibility_action.isEnabled()
+    assert window.source_viewer_visibility_action.isChecked()
+
+    window._set_pdf_viewer_visibility(False)
+    assert not window.pdf_viewer_dialog.is_viewer_visible()
+    window._set_pdf_viewer_visibility(True)
+    assert window.pdf_viewer_dialog.is_viewer_visible()
+
+    window._close_pdf_viewer_automatically()
+    assert window.pdf_viewer_dialog is None
+    assert not window.source_viewer_visibility_action.isEnabled()
+    app.processEvents()
+    window.deleteLater()
 
 
 def test_pdf_source_is_copied_to_project_as_read_only(tmp_path) -> None:
@@ -252,6 +316,23 @@ def test_project_pdf_source_is_resolved_from_canonical_directory(tmp_path) -> No
     (first_path.parent / "notes.txt").write_text("not a PDF", encoding="utf-8")
 
     assert find_project_pdf_source(str(project_root)) == str(second_path)
+
+
+def test_project_pdf_source_prefers_registered_legacy_source_path(tmp_path) -> None:
+    project_root = tmp_path / "Project"
+    legacy_path = project_root / "Model" / "Project" / "Images" / "MyServer" / "Source" / "pdf" / "legacy.pdf"
+    legacy_path.parent.mkdir(parents=True)
+    legacy_path.write_bytes(b"%PDF-1.4\n")
+    create_project_database(
+        project_metadata_database_path(str(project_root)),
+        {
+            "ProjectName": "Project",
+            "SourceType": "PDF",
+            "SourceDocumentPath": str(legacy_path),
+        },
+    )
+
+    assert find_project_pdf_source(str(project_root)) == str(legacy_path)
 
 
 def test_engine_reports_created_source_document_path(tmp_path) -> None:

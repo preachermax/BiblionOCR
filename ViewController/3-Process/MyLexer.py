@@ -731,7 +731,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             print(f'Absolute Path to User Directory: {self.userdir}')
 
     def _restore_session_documents(self):
-        imgpath = getattr(self, 'imgpath', None)
+        shared_page_path = self.current_project_page_path()
+        imgpath = shared_page_path if self.is_image_file(shared_page_path) else getattr(self, 'imgpath', None)
         txtpath = getattr(self, 'txtpath', None)
         if imgpath and os.path.isfile(imgpath):
             self.showImage(imgpath)
@@ -1561,6 +1562,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         with open(jsonfile, 'w') as f:
             json.dump(data, f, indent=4)
         f.close()
+        self.record_current_project_page(self.imgpath)
 
     def sortImgFiles(self):
         #print(f'Image File List: {self.imgfileList}')

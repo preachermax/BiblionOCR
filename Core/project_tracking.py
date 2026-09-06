@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Optional, Sequence
 
+from .page_workflow import PageWorkflowMilestone, load_page_workflow_milestones
 from .project_database import load_project_database_record, source_section_for_page
 
 
@@ -179,6 +180,92 @@ class ProjectWorkflowTracker:
             json.dump(state, handle, indent=2)
         return state
 
+    def record_page_milestone(
+        self,
+        project_root: str,
+        page_number: int,
+        milestone_key: str,
+        module_name: Optional[str] = None,
+        details: Optional[Dict[str, object]] = None,
+    ) -> Dict[str, object]:
+        normalized_root = self._normalize_path(project_root)
+        if not normalized_root:
+            return self._default_tracking_state()
+
+        normalized_page = max(1, int(page_number))
+        state = self.ensure_tracking_state(normalized_root)
+        page_milestones = state.setdefault("page_milestones", {})
+        milestones = page_milestones.setdefault(str(normalized_page), {})
+        milestone = milestones.setdefault(milestone_key, {})
+        milestone["complete"] = True
+        milestone["completed_at"] = self._utc_now_iso()
+        if module_name:
+            milestone["updated_by"] = module_name
+        if details:
+            milestone["details"] = details
+        self._write_tracking_state(normalized_root, state)
+        return state
+
+    def page_milestone_rows(
+        self,
+        project_root: str,
+        page_number: Optional[int] = None,
+    ) -> List[Dict[str, object]]:
+        normalized_root = self._normalize_path(project_root)
+        if not normalized_root:
+            return []
+        context = self._load_project_context(normalized_root)
+        normalized_page = max(
+            1,
+            int(page_number or context.get("CurrentProjectPage", context.get("ProjectPageNumber", 1)) or 1),
+        )
+        state = self.ensure_tracking_state(normalized_root)
+        tracked = state.get("page_milestones", {}).get(str(normalized_page), {})
+        rows = []
+        for milestone in self._page_milestone_definitions(normalized_root):
+            tracked_value = tracked.get(milestone.name, {}) if isinstance(tracked, dict) else {}
+            rows.append(
+                {
+                    "key": milestone.name,
+                    "label": self._humanize_milestone_name(milestone.name),
+                    "module": milestone.module,
+                    "sequence": milestone.number,
+                    "weight": milestone.progress_percent,
+                    "override_allowed": milestone.override_allowed,
+                    "complete": bool(tracked_value.get("complete", False)) if isinstance(tracked_value, dict) else False,
+                }
+            )
+        return rows
+
+    def update_page_milestones(
+        self,
+        project_root: str,
+        page_number: int,
+        milestone_updates: Dict[str, Dict[str, object]],
+        updated_by: Optional[str] = None,
+    ) -> Dict[str, object]:
+        normalized_root = self._normalize_path(project_root)
+        if not normalized_root:
+            return self._default_tracking_state()
+
+        normalized_page = max(1, int(page_number))
+        definitions = {item.name: item for item in self._page_milestone_definitions(normalized_root)}
+        state = self.ensure_tracking_state(normalized_root)
+        page_state = state.setdefault("page_milestones", {}).setdefault(str(normalized_page), {})
+        for milestone_key, update in milestone_updates.items():
+            definition = definitions.get(milestone_key)
+            if definition is None or not definition.override_allowed or not isinstance(update, dict):
+                continue
+            target = page_state.setdefault(milestone_key, {})
+            complete = bool(update.get("complete", False))
+            target["complete"] = complete
+            target["completed_at"] = self._utc_now_iso() if complete else None
+            if updated_by:
+                target["updated_by"] = updated_by
+            target["override"] = True
+        self._write_tracking_state(normalized_root, state)
+        return state
+
     def milestone_rows(self, project_root: str) -> List[Dict[str, object]]:
         normalized_root = self._normalize_path(project_root)
         if not normalized_root:
@@ -347,20 +434,35 @@ class ProjectWorkflowTracker:
         completed_labels = [item["label"] for item in milestone_states if item["complete"]]
         next_overall = next((item for item in milestone_states if not item["complete"]), None)
 
-        module_keys = tuple(MODULE_MILESTONES.get(module_name, ()))
-        module_states = [item for item in milestone_states if item["key"] in module_keys]
-        next_module = next((item for item in module_states if not item["complete"]), None)
-
         project_context = self._load_project_context(resolved_root)
         total_pages = self._context_total_pages(project_context)
+        current_page = max(
+            1,
+            int(project_context.get("CurrentProjectPage", project_context.get("ProjectPageNumber", 1)) or 1),
+        )
+        page_rows = self.page_milestone_rows(resolved_root, current_page)
+        if page_rows:
+            page_total_weight = sum(float(item["weight"]) for item in page_rows) or 1.0
+            page_completed_weight = sum(float(item["weight"]) for item in page_rows if item["complete"])
+            page_percent = int(round((page_completed_weight * 100.0) / page_total_weight))
+            module_states = [item for item in page_rows if item["module"] == module_name]
+        else:
+            page_percent = 0
+            module_keys = tuple(MODULE_MILESTONES.get(module_name, ()))
+            module_states = [item for item in milestone_states if item["key"] in module_keys]
+        next_module = next((item for item in module_states if not item["complete"]), None)
+
         completed_page_numbers = {
             page_number
             for page_number in tracking_state.get("completed_pages", [])
             if isinstance(page_number, int) and 1 <= page_number <= total_pages
         }
         completed_pages = len(completed_page_numbers)
-        page_percent = int((completed_pages * 100) / total_pages) if total_pages > 0 else 0
-        project_percent = min(project_percent, page_percent)
+        if not page_rows:
+            page_percent = int((completed_pages * 100) / total_pages) if total_pages > 0 else 0
+        elif total_pages > 0:
+            partial_page = 0.0 if current_page in completed_page_numbers else page_percent / 100.0
+            project_percent = int(round(((completed_pages + partial_page) * 100.0) / total_pages))
 
         return {
             "project_root": resolved_root,
@@ -723,6 +825,7 @@ class ProjectWorkflowTracker:
         return {
             "version": 2,
             "completed_pages": [],
+            "page_milestones": {},
             "milestones": {
                 milestone_key: {
                     "label": milestone_label,
@@ -750,6 +853,9 @@ class ProjectWorkflowTracker:
                 except (TypeError, ValueError):
                     continue
             state["completed_pages"] = sorted(set(completed_pages))
+        raw_page_milestones = raw_state.get("page_milestones", {})
+        if isinstance(raw_page_milestones, dict):
+            state["page_milestones"] = raw_page_milestones
         raw_milestones = raw_state.get("milestones", {})
         if not isinstance(raw_milestones, dict):
             return state
@@ -770,6 +876,18 @@ class ProjectWorkflowTracker:
             if "details" in existing:
                 target["details"] = existing.get("details")
         return state
+
+    def _page_milestone_definitions(self, project_root: str) -> List[PageWorkflowMilestone]:
+        definitions = load_page_workflow_milestones(project_root)
+        if definitions or not self.workspace_root:
+            return definitions
+        return load_page_workflow_milestones(self.workspace_root)
+
+    def _write_tracking_state(self, project_root: str, state: Dict[str, object]) -> None:
+        path = self.tracking_file_path(project_root)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as handle:
+            json.dump(state, handle, indent=2)
 
     def _build_milestone_catalog(self) -> List[tuple]:
         catalog = [(m.key, m.label, m.weight) for m in OVERALL_MILESTONES]

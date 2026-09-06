@@ -26,6 +26,12 @@ class ProjectSessionManager(SessionManager):
 
 
 class SessionManagerFontRoleTests(unittest.TestCase):
+    def test_default_session_directory_is_root_project_json_directory(self) -> None:
+        manager = SessionManager()
+        expected = Path(__file__).resolve().parents[1] / "Model" / "Project" / "Data" / "json"
+
+        self.assertEqual(expected, Path(manager.base_dir))
+
     def test_default_ui_font_resolves_to_bundled_fromvs_file(self) -> None:
         manager = SessionManager()
 

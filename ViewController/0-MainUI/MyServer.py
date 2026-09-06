@@ -302,6 +302,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self._thread = None
         self._worker = None
+        self._image_thread = None
+        self._image_worker = None
+        self._active_tiff_load_path = ""
+        self._pending_tiff_load_path = ""
         self._project_thread = None
         self._project_worker = None
         self._scan_thread = None
@@ -346,6 +350,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             [self, getattr(self.ui, 'centralwidget', None)],
             image_handler=self.showImage,
             text_handler=self.showText,
+            restore_current_page=False,
         )
         self._apply_scan_icon()
         # self.ui.NetworkTable = QTableWidget(self.ui.centralwidget)
@@ -577,6 +582,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.on_project_created
         )
         self._refresh_project_status()
+        qtc.QTimer.singleShot(250, self._open_project_source_pdf_on_startup)
 
     def get_file_paths(self):
         active_image_path = getattr(self, 'imgpath', None)
@@ -776,11 +782,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def _sync_project_page_state(self, page_path=None, project_milestone=None, page_milestone=None):
         page_number = self._page_number_from_path(page_path)
+        if page_path and os.path.isfile(page_path):
+            page_state = self.session_manager.set_active_project_page_state(
+                page_path,
+                page_number=page_number,
+                module_name="MyServer",
+            )
+            page_number = page_state["page_number"]
+        else:
+            self.session_manager.set_active_project_page(page_number)
         self.current_project_page = page_number
 
-        payload = {
-            'self.current_project_page': page_number,
-        }
+        payload = {}
 
         if project_milestone is not None:
             self.current_project_milestone = str(project_milestone or '').strip()
@@ -790,7 +803,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.current_page_milestone = str(page_milestone or '').strip()
             payload['self.current_page_milestone'] = self.current_page_milestone
 
-        self.session_manager.update('Session.json', payload)
+        if payload:
+            self.session_manager.update('Session.json', payload)
         return page_number
 
     def _shared_active_project_root(self):
@@ -875,6 +889,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def closeEvent(self, event):
         self._close_pdf_viewer_automatically()
+        self._pending_tiff_load_path = ""
+        for thread in (self._thread, self._image_thread):
+            if thread is not None and thread.isRunning():
+                thread.quit()
+                if not thread.wait(5000):
+                    event.ignore()
+                    return
         super().closeEvent(event)
 
     def _preferences_for_theme(self, theme_id):
@@ -973,6 +994,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 "Display Source Document",
                 "The active project does not have a PDF source document.",
             )
+            return False
+        return self._open_pdf_source(source_path, floating=False)
+
+    def _open_project_source_pdf_on_startup(self):
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+        viewer = self.pdf_viewer_dialog
+        if viewer is not None:
+            viewer.show_viewer()
+            return True
+
+        source_path = self._project_source_pdf()
+        if not source_path:
             return False
         return self._open_pdf_source(source_path, floating=False)
 
@@ -1532,7 +1565,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def _restore_session_content(self):
         self._apply_session_ui_state()
 
-        restored_imgpath = getattr(self, 'imgpath', '')
+        shared_page_path = self.current_project_page_path()
+        restored_imgpath = (
+            shared_page_path
+            if LocalFileDropMixin.is_image_file(shared_page_path)
+            else getattr(self, 'imgpath', '')
+        )
         restored_txtpath = getattr(self, 'txtpath', '')
 
         if restored_imgpath and os.path.isfile(restored_imgpath):
@@ -2790,27 +2828,34 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # store target so handler knows where to route image
         self._load_target = target
 
-        self._thread = qtc.QThread()
-        self._worker = ImageLoadWorker(self.image_load_path)
+        self._image_thread = qtc.QThread()
+        self._image_worker = ImageLoadWorker(path)
 
-        self._worker.moveToThread(self._thread)
+        self._image_worker.moveToThread(self._image_thread)
 
         # --- signals
-        self._thread.started.connect(self._worker.run)
-        self._worker.progress.connect(self.on_load_progress)
-        self._worker.finished.connect(self.on_image_loaded)
-        self._worker.error.connect(self.on_load_error)
+        self._image_thread.started.connect(self._image_worker.run)
+        self._image_worker.progress.connect(self.on_load_progress)
+        self._image_worker.finished.connect(self.on_image_loaded)
+        self._image_worker.error.connect(self.on_load_error)
 
         # --- cleanup
-        self._worker.finished.connect(self._thread.quit)
-        self._worker.finished.connect(self._worker.deleteLater)
-        self._thread.finished.connect(self._thread.deleteLater)
+        self._image_worker.finished.connect(self._image_thread.quit)
+        self._image_worker.error.connect(self._image_thread.quit)
+        self._image_worker.finished.connect(self._image_worker.deleteLater)
+        self._image_worker.error.connect(self._image_worker.deleteLater)
+        self._image_thread.finished.connect(self._image_thread.deleteLater)
+        self._image_thread.finished.connect(self._clear_image_load_references)
 
         # --- start
-        self._thread.start()
+        self._image_thread.start()
 
         # show progress immediately
         self._show_progress(0)
+
+    def _clear_image_load_references(self):
+        self._image_thread = None
+        self._image_worker = None
 
 
     def on_image_loaded(self, qimage):
@@ -2882,7 +2927,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         print(f"[STACK LOAD] Requested: {fileName}")
 
+        active_thread = self._thread
+        if active_thread is not None and active_thread.isRunning():
+            if os.path.normcase(fileName) == os.path.normcase(self._active_tiff_load_path):
+                print(f"[STACK LOAD] Already loading: {fileName}")
+            else:
+                self._pending_tiff_load_path = fileName
+                print(f"[STACK LOAD] Queued: {fileName}")
+            return False
+
         self._stack_path = fileName
+        self._active_tiff_load_path = fileName
         self._load_target = "main"  # or "ref" if needed
 
         # -------------------------
@@ -2898,13 +2953,23 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         # --- signals (ONLY ONCE)
         self._worker.progress.connect(self.on_load_progress)
-        self._worker.finished.connect(self.on_image_loaded)
-        self._worker.error.connect(self.on_load_error)
+        self._worker.finished.connect(
+            lambda qimage, loaded_path=fileName: self._on_tiff_stack_loaded(loaded_path, qimage)
+        )
+        self._worker.error.connect(
+            lambda message, loaded_path=fileName: self._on_tiff_stack_error(loaded_path, message)
+        )
 
         # --- cleanup (CRITICAL)
         self._worker.finished.connect(self._thread.quit)
+        self._worker.error.connect(self._thread.quit)
         self._worker.finished.connect(self._worker.deleteLater)
+        self._worker.error.connect(self._worker.deleteLater)
         self._thread.finished.connect(self._thread.deleteLater)
+        active_thread = self._thread
+        self._thread.finished.connect(
+            lambda active_thread=active_thread: self._on_tiff_stack_thread_finished(active_thread)
+        )
 
         # -------------------------
         # Start thread
@@ -2917,6 +2982,29 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if hasattr(self, "progress_bar"):
             self.progress_bar.setValue(0)
             self.progress_bar.setVisible(True)
+        return True
+
+    def _on_tiff_stack_loaded(self, loaded_path, qimage):
+        if self._pending_tiff_load_path:
+            return
+        self._stack_path = loaded_path
+        self.on_image_loaded(qimage)
+
+    def _on_tiff_stack_error(self, loaded_path, message):
+        if not self._pending_tiff_load_path:
+            self.on_load_error(message)
+
+    def _on_tiff_stack_thread_finished(self, finished_thread):
+        if self._thread is not finished_thread:
+            return
+
+        self._thread = None
+        self._worker = None
+        self._active_tiff_load_path = ""
+        pending_path = self._pending_tiff_load_path
+        self._pending_tiff_load_path = ""
+        if pending_path:
+            qtc.QTimer.singleShot(0, lambda: self.loadImageStackFromFile(pending_path))
 
     def numFrames(self):
         """ Return the number of image frames in the stack.
@@ -3035,17 +3123,18 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def _open_pdf_source(self, pdf_path, floating=True):
         try:
-            viewer = PdfViewerDock(pdf_path, self, embedded_host=self.ui.sourcePdfViewerHost)
+            viewer = PdfViewerDock(pdf_path, self)
             self._register_pdf_source(pdf_path, viewer.page_count)
             self._close_pdf_viewer_automatically()
             self.pdf_viewer_dialog = viewer
             self.addDockWidget(qtc.Qt.LeftDockWidgetArea, viewer)
-            viewer.dock_in_host(visible=True)
             viewer.viewerVisibilityChanged.connect(self._sync_pdf_viewer_visibility_action)
             viewer.destroyed.connect(
                 lambda _object=None, closed_viewer=viewer: self._on_pdf_viewer_destroyed(closed_viewer)
             )
             self.source_viewer_visibility_action.setEnabled(True)
+            viewer.show_viewer()
+            self.resizeDocks([viewer], [420], qtc.Qt.Horizontal)
             if floating:
                 self._float_pdf_viewer()
         except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
@@ -4165,6 +4254,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return
 
         source_path = os.path.abspath(os.path.normpath(source_path))
+        self._sync_project_page_state(source_path)
         self.pending_pixler_source_path = source_path
         create_return_path = getattr(self, '_create_pixler_return_path', None)
         if callable(create_return_path):
@@ -4176,7 +4266,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         cmd = [
             sys.executable,
             module_path,
-            source_path,
             '--subprocess-mode',
             '--return-path',
             self.pixler_return_path,

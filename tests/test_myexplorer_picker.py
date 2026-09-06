@@ -15,6 +15,7 @@ from Core.myexplorer_picker import build_myexplorer_selection_command, run_myexp
 from Core.workflow_wizard_actions import (
     _ensure_module_menu_shortcuts,
     _explorer_get_save_file_name,
+    install_myexplorer_method_aliases,
     install_workflow_wizard_menu_actions,
 )
 
@@ -120,6 +121,34 @@ class MyExplorerPickerTests(unittest.TestCase):
         self.assertEqual("", selected_filter)
         picker.assert_called_once_with("Save OCR Text", tempfile.gettempdir(), "both")
 
+    def test_generated_image_alias_discards_unaccepted_qt_checked_argument(self) -> None:
+        calls = []
+
+        class Window:
+            def loadRefImg(self):
+                calls.append("load")
+
+        window = Window()
+        install_myexplorer_method_aliases(window)
+
+        window.open_image_with_myexplorer(True)
+
+        self.assertEqual(["load"], calls)
+
+    def test_generated_image_alias_preserves_arguments_accepted_by_target(self) -> None:
+        calls = []
+
+        class Window:
+            def loadImage(self, checked):
+                calls.append(checked)
+
+        window = Window()
+        install_myexplorer_method_aliases(window)
+
+        window.open_image_with_myexplorer(True)
+
+        self.assertEqual([True], calls)
+
     def test_designer_owns_caller_enabled_file_and_folder_buttons(self) -> None:
         module_path = MAIN_UI_DIR / "MyExplorerUI.py"
         spec = importlib.util.spec_from_file_location("test_myexplorer_ui", module_path)
@@ -137,15 +166,28 @@ class MyExplorerPickerTests(unittest.TestCase):
         self.assertFalse(ui.selectFileButton.isVisible())
 
         runtime_source = (MAIN_UI_DIR / "MyExplorer.py").read_text(encoding="utf-8")
-        self.assertIn("self.selectFolderButton.setEnabled(self.select_mode and self.allow_folder_selection)", runtime_source)
-        self.assertIn("self.selectFileButton.setEnabled(self.select_mode and self.allow_file_selection)", runtime_source)
-        self.assertIn("if self.select_mode and self.start_dir and os.path.isdir(self.start_dir):", runtime_source)
-        self.assertIn("if not self.isVisible():", runtime_source)
-        self.assertIn("QtCore.QTimer.singleShot(0, self._size_tree_columns)", runtime_source)
-        self.assertIn("self.model.directoryLoaded.connect", runtime_source)
-        self.assertIn("QtWidgets.QStyle.PM_ScrollBarExtent", runtime_source)
-        self.assertIn("proportions = (0.48, 0.13, 0.17)", runtime_source)
-        self.assertIn("available_width - assigned_width", runtime_source)
+        compact_runtime_source = "".join(runtime_source.split())
+        self.assertIn(
+            "self.selectFolderButton.setEnabled(self.select_modeandself.allow_folder_selection)",
+            compact_runtime_source,
+        )
+        self.assertIn(
+            "self.selectFileButton.setEnabled(self.select_modeandself.allow_file_selection)",
+            compact_runtime_source,
+        )
+        self.assertIn(
+            "if(self.select_modeandself.start_dirandos.path.isdir(self.start_dir)):",
+            compact_runtime_source,
+        )
+        self.assertIn("ifnotself.isVisible():", compact_runtime_source)
+        self.assertIn(
+            "QtCore.QTimer.singleShot(0,self._size_tree_columns)",
+            compact_runtime_source,
+        )
+        self.assertIn("self.model.directoryLoaded.connect", compact_runtime_source)
+        self.assertIn("QtWidgets.QStyle.PM_ScrollBarExtent", compact_runtime_source)
+        self.assertIn("proportions=(0.48,0.13,0.17)", compact_runtime_source)
+        self.assertIn("available_width-assigned_width", compact_runtime_source)
 
         window.close()
 

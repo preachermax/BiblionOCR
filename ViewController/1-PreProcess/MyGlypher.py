@@ -739,6 +739,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.imgpath': self.imgpath,
             'self.imgdir': self.imgdir,
         })
+        self.record_current_project_page(self.imgpath)
 
     def convert_tif_to_bmp(self):
         source_path = self.imgpath if os.path.isfile(self.imgpath) else ""

@@ -280,6 +280,7 @@ class PdfViewerDock(qtw.QDockWidget):
         self._embedded = False
         self.viewer = PdfViewerWidget(self.pdf_path, self)
         self.setWidget(self.viewer)
+        self.setMinimumWidth(320)
         self.setAllowedAreas(qtc.Qt.LeftDockWidgetArea)
         self.setFeatures(
             qtw.QDockWidget.DockWidgetClosable
@@ -310,7 +311,10 @@ class PdfViewerDock(qtw.QDockWidget):
         if self._embedded:
             self._embedded_host.setVisible(bool(visible))
             if visible:
+                self.viewer.show()
                 self._embedded_host.raise_()
+            else:
+                self.viewer.hide()
         else:
             self.setVisible(bool(visible))
         self.viewerVisibilityChanged.emit(bool(visible))
