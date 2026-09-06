@@ -17,6 +17,8 @@ DEFAULT_UI_FONT = "FROMVS.ttf"
 DEFAULT_PROJECT_FONT = "FROMVS.ttf"
 DEFAULT_PROJECT_THEME = "default"
 PROJECT_THEME_IDS = ("default", "classic", "dark_blue", "tigers", "tide")
+DEFAULT_SOURCE_PAGE_SECTION_NAMES = ("Front Matter", "Scripture", "Back Matter")
+DEFAULT_SCRIPTURE_WORKFLOW_LEVELS = ("book", "chapter", "verse", "word", "character")
 
 
 @dataclass(frozen=True)
@@ -81,6 +83,20 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             options=("PDF", "TIFF", "JPG", "PNG", "Scan", "other"),
         ),
         ProjectFieldDefinition(
+            "SourceDocumentPath",
+            "Source Document Path",
+            "path",
+            default="",
+            help_text="Canonical protected source document stored inside the project.",
+        ),
+        ProjectFieldDefinition(
+            "SourceDocumentDirectory",
+            "Source Document Directory",
+            "path",
+            default="",
+            help_text="Default folder containing the protected source document.",
+        ),
+        ProjectFieldDefinition(
             "RefTextType",
             "Reference Text Type",
             "choice",
@@ -101,6 +117,31 @@ def build_project_field_definitions(available_languages: Optional[Sequence[str]]
             "int",
             default=1,
             help_text="Derived from total source document pages multiplied by columns per page.",
+        ),
+        ProjectFieldDefinition(
+            "SourcePageSectionCount",
+            "Source Page Section Count",
+            "int",
+            default=3,
+            required=True,
+        ),
+        ProjectFieldDefinition(
+            "SourcePageSections",
+            "Source Page Sections",
+            "json",
+            default=[],
+            required=True,
+            help_text=(
+                "Ordered Front Matter, Scripture, and Back Matter page ranges. Scripture is divided into "
+                "book, chapter, verse, word, and character workflows as page assignments are verified."
+            ),
+        ),
+        ProjectFieldDefinition(
+            "CurrentSourceSection",
+            "Current Source Page Section",
+            "choice",
+            default=DEFAULT_SOURCE_PAGE_SECTION_NAMES[0],
+            options=DEFAULT_SOURCE_PAGE_SECTION_NAMES,
         ),
         ProjectFieldDefinition("ProjectPageNumber", "Project Page Number", "int", default=1),
         ProjectFieldDefinition(
@@ -282,6 +323,8 @@ def normalize_project_database_values(
             normalized[definition.key] = _coerce_choice(raw_value, definition.options, definition.default)
         elif definition.field_type == "multi_choice":
             normalized[definition.key] = _coerce_multi_choice(raw_value, definition.options)
+        elif definition.field_type == "json":
+            normalized[definition.key] = _coerce_json(raw_value, definition.default)
         else:
             normalized[definition.key] = "" if raw_value is None else str(raw_value)
 
@@ -291,7 +334,23 @@ def normalize_project_database_values(
     normalized["ProjectPageNumber"] = max(1, _coerce_int(normalized.get("ProjectPageNumber"), 1))
     normalized["ProjectPageProgress"] = _clamp(_coerce_int(normalized.get("ProjectPageProgress"), 0), 0, 100)
 
+    normalized["ScripturalSource"] = _coerce_choice(
+        normalized.get("ScripturalSource"),
+        ("old_testament", "new_testament", "both"),
+        "both",
+    )
     normalized["NumberPages"] = max(1, _coerce_int(normalized.get("NumberPages"), 1))
+    normalized["SourcePageSectionCount"] = len(DEFAULT_SOURCE_PAGE_SECTION_NAMES)
+    normalized["SourcePageSections"] = _normalize_source_page_sections(
+        normalized.get("SourcePageSections"),
+        normalized["NumberPages"],
+        normalized["ScripturalSource"],
+    )
+    normalized["CurrentSourceSection"] = source_section_for_page(
+        normalized["SourcePageSections"],
+        normalized.get("CurrentProjectPage", normalized.get("ProjectPageNumber", 1)),
+        normalized.get("CurrentSourceSection"),
+    )
     normalized["NumberColumns"] = _clamp(_coerce_int(normalized.get("NumberColumns"), 1), 1, 3)
     normalized["TotalProjectPages"] = normalized["NumberPages"] * normalized["NumberColumns"]
     normalized["ColumnName"] = _normalize_column_names(
@@ -312,12 +371,6 @@ def normalize_project_database_values(
 
     normalized["ProjectType"] = "Scriptural"
     normalized["RefTextType"] = "Scriptural"
-    normalized["ScripturalSource"] = _coerce_choice(
-        normalized.get("ScripturalSource"),
-        ("old_testament", "new_testament", "both"),
-        "both",
-    )
-
     # Keep legacy fields synchronized while phase 1 introduces page-centric naming.
     normalized["CurrentPage"] = normalized["ProjectPageNumber"]
     normalized["CurrentProjectPage"] = max(1, _coerce_int(normalized.get("CurrentProjectPage"), normalized["ProjectPageNumber"]))
@@ -417,6 +470,28 @@ def create_project_database(
     sync_project_database_mirrors(database_path)
 
     return normalized
+
+
+def project_metadata_database_path(project_root: str) -> str:
+    candidates = [
+        os.path.join(project_root, "Model", "Project", "Data", "SQLite", PROJECT_DATABASE_FILENAME),
+        os.path.join(project_root, "Model", "Project", "Data", "sqlite", PROJECT_DATABASE_FILENAME),
+        os.path.join(project_root, PROJECT_DATABASE_FILENAME),
+    ]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+    return candidates[0]
+
+
+def update_project_database_values(
+    database_path: str,
+    updates: Dict[str, Any],
+    available_languages: Optional[Sequence[str]] = None,
+) -> Dict[str, Any]:
+    values = load_project_database_record(database_path)
+    values.update(updates)
+    return create_project_database(database_path, values, available_languages)
 
 
 def export_project_database_json(
@@ -551,6 +626,78 @@ def _coerce_multi_choice(value: Any, options: Sequence[str]) -> List[str]:
     return [candidate for candidate in dict.fromkeys(candidates) if candidate in allowed]
 
 
+def _coerce_json(value: Any, default: Any) -> Any:
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return default
+    if value is None:
+        return default
+    return value
+
+
+def _normalize_source_page_sections(
+    value: Any,
+    total_pages: int,
+    scriptural_source: str,
+) -> List[Dict[str, Any]]:
+    incoming_sections = value if isinstance(value, list) else []
+    incoming_by_key = {
+        str(section.get("key") or "").strip(): section
+        for section in incoming_sections
+        if isinstance(section, dict)
+    }
+    sections: List[Dict[str, Any]] = []
+    for order, name in enumerate(DEFAULT_SOURCE_PAGE_SECTION_NAMES, start=1):
+        key = name.lower().replace(" ", "_")
+        incoming = incoming_by_key.get(key, {})
+        start_page = _optional_page_number(incoming.get("start_page"), total_pages)
+        end_page = _optional_page_number(incoming.get("end_page"), total_pages)
+        if start_page is not None and end_page is not None and end_page < start_page:
+            end_page = None
+        page_count = end_page - start_page + 1 if start_page is not None and end_page is not None else 0
+        section = {
+            "key": key,
+            "name": name,
+            "order": order,
+            "start_page": start_page,
+            "end_page": end_page,
+            "page_count": page_count,
+        }
+        if key == "scripture":
+            section["testament_scope"] = scriptural_source
+            section["workflow_levels"] = [
+                {
+                    "key": level,
+                    "order": level_order,
+                    "assignment": "page_workflow",
+                }
+                for level_order, level in enumerate(DEFAULT_SCRIPTURE_WORKFLOW_LEVELS, start=1)
+            ]
+        sections.append(section)
+    return sections
+
+
+def _optional_page_number(value: Any, total_pages: int) -> Optional[int]:
+    if value in (None, "", 0, "0"):
+        return None
+    return _clamp(_coerce_int(value, 1), 1, total_pages)
+
+
+def source_section_for_page(sections: List[Dict[str, Any]], page_number: Any, fallback: Any = None) -> str:
+    current_page = max(1, _coerce_int(page_number, 1))
+    for section in sections:
+        start_page = section.get("start_page")
+        end_page = section.get("end_page")
+        if isinstance(start_page, int) and isinstance(end_page, int) and start_page <= current_page <= end_page:
+            return str(section["name"])
+    fallback_text = str(fallback or "").strip()
+    if fallback_text in DEFAULT_SOURCE_PAGE_SECTION_NAMES:
+        return fallback_text
+    return DEFAULT_SOURCE_PAGE_SECTION_NAMES[0]
+
+
 def _normalize_project_type(value: Any) -> str:
     text = str(value or "").strip().lower()
     if text in {"scripture", "scriptural"}:
@@ -619,6 +766,6 @@ def _clamp(value: int, minimum: int, maximum: int) -> int:
 
 
 def _serialize_for_sqlite(value: Any) -> Any:
-    if isinstance(value, (list, tuple, set)):
-        return json.dumps(list(value))
+    if isinstance(value, (dict, list, tuple, set)):
+        return json.dumps(list(value) if isinstance(value, (tuple, set)) else value)
     return value

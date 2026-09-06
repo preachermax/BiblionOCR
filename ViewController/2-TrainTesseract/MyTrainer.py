@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+os.environ["QT_API"] = "PyQt5"
+
 _CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(_CURRENT_DIR, "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
@@ -28,6 +30,8 @@ sanitize_current_process_and_reexec()
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 from SessionManager import SessionManager
 from tesseract_wordlist_helper import update_tesseract_wordlist_from_text
@@ -40,9 +44,6 @@ from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
 )
-
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 
 from MyTrainerUI import Ui_Trainer
 from Dialogs.VariantRecorderDialog import Ui_RecorderDialog

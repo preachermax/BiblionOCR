@@ -121,19 +121,19 @@
        </size>
       </property>
       <property name="text">
-          <string/>
+       <string/>
       </property>
-        <property name="margin">
-         <number>24</number>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
       <property name="scaledContents">
        <bool>false</bool>
       </property>
       <property name="alignment">
-        <set>Qt::AlignCenter</set>
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="margin">
+       <number>24</number>
       </property>
      </widget>
      <widget class="QSlider" name="Zoomslider">
@@ -180,6 +180,33 @@
       </property>
      </widget>
     </widget>
+   </widget>
+   <widget class="QWidget" name="sourcePdfViewerHost" native="true">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>551</width>
+      <height>831</height>
+     </rect>
+    </property>
+    <property name="visible">
+     <bool>false</bool>
+    </property>
+    <layout class="QVBoxLayout" name="sourcePdfViewerLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+    </layout>
    </widget>
    <widget class="QLineEdit" name="ImageLE">
     <property name="geometry">
@@ -305,9 +332,9 @@
       <bold>false</bold>
      </font>
     </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
    </widget>
    <widget class="QPushButton" name="reloadTextbutton">
     <property name="geometry">
@@ -1246,7 +1273,7 @@
    <widget class="QPushButton" name="imageScannerbutton">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>50</x>
       <y>0</y>
       <width>20</width>
       <height>25</height>
@@ -1260,13 +1287,13 @@
     </property>
     <property name="icon">
      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-      <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+      <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="OpenImageFilebutton">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>20</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1282,7 +1309,7 @@
      </font>
     </property>
     <property name="toolTip">
-      <string>Open image with MyExplorer</string>
+     <string>Open image with MyExplorer</string>
     </property>
     <property name="text">
      <string/>
@@ -1295,7 +1322,7 @@
    <widget class="QPushButton" name="MyPixlerbutton">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>80</x>
       <y>0</y>
       <width>21</width>
       <height>25</height>
@@ -1310,6 +1337,29 @@
     <property name="icon">
      <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
       <normaloff>:/Icons/Icons/BiblionPixler1.png</normaloff>:/Icons/Icons/BiblionPixler1.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>0</y>
+      <width>21</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../ViewController/0-MainUI/helpers/Icons/stage.png</normaloff>../../ViewController/0-MainUI/helpers/Icons/stage.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>24</width>
+      <height>24</height>
+     </size>
     </property>
    </widget>
   </widget>
@@ -1378,22 +1428,22 @@
     <addaction name="separator"/>
     <addaction name="actionEditThemes"/>
    </widget>
-    <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuThemes">
      <property name="title">
-      <string>View</string>
-     </property>
-     <widget class="QMenu" name="menuThemes">
-      <property name="title">
       <string>Themes</string>
-      </property>
-      <addaction name="actionThemeDefault"/>
-      <addaction name="actionThemeClassic"/>
-      <addaction name="actionThemeDarkBlue"/>
-      <addaction name="actionThemeTigers"/>
-      <addaction name="actionThemeTide"/>
-     </widget>
-     <addaction name="menuThemes"/>
+     </property>
+     <addaction name="actionThemeDefault"/>
+     <addaction name="actionThemeClassic"/>
+     <addaction name="actionThemeDarkBlue"/>
+     <addaction name="actionThemeTigers"/>
+     <addaction name="actionThemeTide"/>
     </widget>
+    <addaction name="menuThemes"/>
+   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
@@ -1401,7 +1451,7 @@
     <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
    </widget>
-  <widget class="QMenu" name="menuProject">
+   <widget class="QMenu" name="menuProject">
     <property name="title">
      <string>Project</string>
     </property>
@@ -1432,17 +1482,8 @@
       <string>Source</string>
      </property>
      <addaction name="actionImageScanner_tb"/>
-     <addaction name="actionextract_pdf_tb"/>
-     <addaction name="actionpdf_for_tiff_tb"/>
-     <addaction name="actionpdf_to_tiff_tb"/>
-     <addaction name="actiontiff_to_mono_tb"/>
-     <addaction name="actionmono_to_png_tb"/>
-     <addaction name="actiondeskew_mono"/>
-    </widget>
-    <widget class="QMenu" name="menuType_Here_2">
-     <property name="title">
-      <string>Type Here</string>
-     </property>
+     <addaction name="actionMyExplorer"/>
+     <addaction name="actionStage_Workflow"/>
     </widget>
     <widget class="QMenu" name="menuLanguages_2">
      <property name="title">
@@ -1456,17 +1497,13 @@
       <property name="title">
        <string>Greek</string>
       </property>
-      <addaction name="actionConvert_Greek_tiff_To_png"/>
-      <addaction name="actionResizeGreek_png_tb"/>
      </widget>
-     <addaction name="actionCrop_Languages_tb"/>
      <addaction name="actionHebrew_6"/>
      <addaction name="menuGreek_3"/>
      <addaction name="actionLatin_5"/>
     </widget>
     <addaction name="menuSource"/>
     <addaction name="menuLanguages_2"/>
-    <addaction name="menuType_Here_2"/>
    </widget>
    <widget class="QMenu" name="menuPost_Process">
     <property name="title">
@@ -1484,6 +1521,7 @@
      </property>
      <addaction name="actionMyPixler"/>
      <addaction name="actionMyGlypher"/>
+     <addaction name="actionMyScanner"/>
     </widget>
     <widget class="QMenu" name="menuText_Modules">
      <property name="title">
@@ -1501,17 +1539,18 @@
      <addaction name="actionMyBoxer"/>
      <addaction name="actionMyGrounder"/>
      <addaction name="actionMyTrainer"/>
+     <addaction name="actionMyReader"/>
     </widget>
     <addaction name="menuImage_Modules"/>
     <addaction name="menuText_Modules"/>
     <addaction name="menuCombined_Modules"/>
    </widget>
-  <addaction name="menuProject"/>
+   <addaction name="menuProject"/>
    <addaction name="menuModules"/>
    <addaction name="menuPre_Process"/>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-  <addaction name="menuView"/>
+   <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuOCR"/>
    <addaction name="menuGlyphs"/>
@@ -1520,140 +1559,6 @@
    <addaction name="menuPost_Process"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="ExtractPagesToolBar">
-   <property name="windowTitle">
-    <string>Extract Source Pages Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Extract Source Pages Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionextract_pdf_tb"/>
-   <addaction name="actionpdf_for_tiff_tb"/>
-   <addaction name="actionpdf_to_tiff_tb"/>
-  </widget>
-  <widget class="QToolBar" name="ConvertPagesToolBar">
-   <property name="windowTitle">
-    <string>Convert Source Pages Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert Source Pages Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actiontiff_to_mono_tb"/>
-   <addaction name="actionmono_to_png_tb"/>
-   <addaction name="actiondeskew_mono"/>
-   <addaction name="actionCrop_Languages_tb"/>
-  </widget>
-  <widget class="QToolBar" name="GreekImagePagesToolBar">
-   <property name="windowTitle">
-    <string>Greek Image Pages Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Greek Image Pages Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionConvert_Greek_tiff_To_png"/>
-   <addaction name="actionDeskewGreek_tiff_tb"/>
-   <addaction name="actionResizeGreek_png_tb"/>
-  </widget>
-  <widget class="QToolBar" name="LatinImagePagesToolBar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="windowTitle">
-    <string>Latin Image Pages Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Latin Image Pages Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionDeskewLatin_tiff_tb"/>
-   <addaction name="actionConvert_Latin_tiff_To_png"/>
-   <addaction name="actionResizeLatin_png_tb"/>
-  </widget>
-  <widget class="QToolBar" name="GreekImageLinesToolBar">
-   <property name="windowTitle">
-    <string>Greek Image Lines Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Greek Image Lines Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QToolBar" name="LatinImageLinesToolBar">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="windowTitle">
-    <string>Latin Image Lines Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Latin Image Lines Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QToolBar" name="GreekTextLinesToolBar">
-   <property name="windowTitle">
-    <string>Greek Text Lines Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Greek Text Lines Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QToolBar" name="LatinTextLinesToolBar">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="windowTitle">
-    <string>Latin Text Lines Tool Bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Latin Text Lines Tool Bar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <widget class="QToolBar" name="ModulesToolBar">
    <property name="windowTitle">
     <string>Versify Text Tool Bar</string>
@@ -1667,11 +1572,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionProjectSettings"/>
+   <addaction name="actionMyPixler"/>
    <addaction name="actionMyBoxer"/>
    <addaction name="actionMyGlypher"/>
    <addaction name="actionMyVersifier"/>
    <addaction name="actionMyResolver"/>
    <addaction name="actionMyLexer"/>
+   <addaction name="actionMyReader"/>
    <addaction name="actionMyGrounder"/>
    <addaction name="actionMyTrainer"/>
   </widget>
@@ -1719,188 +1627,9 @@
     <string>pdf for tiff</string>
    </property>
   </action>
-  <action name="actionpdf_for_tiff_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/pdf4tiff.png</normaloff>:/Icons/Icons/pdf4tiff.png</iconset>
-   </property>
-   <property name="text">
-    <string>pdf For tiff</string>
-   </property>
-   <property name="toolTip">
-    <string>Stage extracted pdf pages FOR tif conversion</string>
-   </property>
-   <property name="statusTip">
-    <string>Staging extracted pdf pages...</string>
-   </property>
-  </action>
-  <action name="actionpdf_to_tiff_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/pdf2tiff.png</normaloff>:/Icons/Icons/pdf2tiff.png</iconset>
-   </property>
-   <property name="text">
-    <string>pdf To tiff</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert staged pdf pages TO tif pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Converting staged pdf pages...</string>
-   </property>
-  </action>
-  <action name="actiontiff_to_mono_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff-file.png</normaloff>:/Icons/Icons/tiff-file.png</iconset>
-   </property>
-   <property name="text">
-    <string>tiff indexed</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert tif pages TO black&amp;white indexed</string>
-   </property>
-   <property name="statusTip">
-    <string>Converting tif pages to black&amp;white indexed...</string>
-   </property>
-  </action>
-  <action name="actionmono_to_png_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/png-file.png</normaloff>:/Icons/Icons/png-file.png</iconset>
-   </property>
-   <property name="text">
-    <string>png indexed</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert indexed tif pages TO png</string>
-   </property>
-   <property name="statusTip">
-    <string>Converting indexed tif pages to png pages...</string>
-   </property>
-  </action>
   <action name="actionLatin">
    <property name="text">
     <string>Latin</string>
-   </property>
-  </action>
-  <action name="actiontiff_to_png_3">
-   <property name="text">
-    <string>tiff to png</string>
-   </property>
-  </action>
-  <action name="actiontiff_to_png_4">
-   <property name="text">
-    <string>tiff to png</string>
-   </property>
-  </action>
-  <action name="actionDeskewGreek_tiff_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/deskew-greek.png</normaloff>:/Icons/Icons/deskew-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Deskew Greek tiff</string>
-   </property>
-   <property name="toolTip">
-    <string>Deskew Greek tif pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Deskewing Greek tif pages...</string>
-   </property>
-  </action>
-  <action name="actiontiff_to_png_5">
-   <property name="text">
-    <string>tiff to png</string>
-   </property>
-  </action>
-  <action name="actionDeskewLatin_tiff_tb">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/deskew-latin.png</normaloff>:/Icons/Icons/deskew-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Deskew Latin tif pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Deskewing Latin tif pages...</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionResizeGreek_png_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Resize Greek png pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Resizing Greek png pages...</string>
-   </property>
-  </action>
-  <action name="actionResizeLatin_png_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Resize Latin png pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Resizing Latin png pages</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionCrop_Languages_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/split-langs.png</normaloff>:/Icons/Icons/split-langs.png</iconset>
-   </property>
-   <property name="text">
-    <string>Auto Crop Languages</string>
-   </property>
-   <property name="toolTip">
-    <string>Auto crop language pages into separate tif files</string>
-   </property>
-   <property name="statusTip">
-    <string>Auto cropping language pages...</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>FROMVS</family>
-    </font>
-   </property>
-  </action>
-  <action name="actionextract_pdf_tb">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/pdf-extract1.png</normaloff>:/Icons/Icons/pdf-extract1.png</iconset>
-   </property>
-   <property name="text">
-    <string>Extract pdf</string>
-   </property>
-   <property name="toolTip">
-    <string>Extract pdf pages from pdf source document</string>
-   </property>
-   <property name="statusTip">
-    <string>Extracting pdf pages...</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::TextHeuristicRole</enum>
    </property>
   </action>
   <action name="actiontiff_for_Ground_Truth">
@@ -2083,21 +1812,6 @@
     <string>Review Ground Truth</string>
    </property>
   </action>
-  <action name="actiondeskew_mono">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/deskew-tiff-file.png</normaloff>:/Icons/Icons/deskew-tiff-file.png</iconset>
-   </property>
-   <property name="text">
-    <string>Deskew indexed</string>
-   </property>
-   <property name="toolTip">
-    <string>Transform indexed tif pages To deskewed tif and png pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Deskewing indexed tif pages...</string>
-   </property>
-  </action>
   <action name="actionMyVersifier">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
@@ -2111,42 +1825,6 @@
    </property>
    <property name="statusTip">
     <string>Assigning Book Chapter:Verse to text lines</string>
-   </property>
-  </action>
-  <action name="actionConvert_Greek_tiff_To_png">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff2png-greek.png</normaloff>:/Icons/Icons/tiff2png-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Convert Greek tif To png</string>
-   </property>
-   <property name="statusTip">
-    <string>Converting Greek tif pages to png pages</string>
-   </property>
-  </action>
-  <action name="actionConvert_Latin_tiff_To_png">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff2png-latin.png</normaloff>:/Icons/Icons/tiff2png-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Convert Latin tif To png</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert Latin tif pages To png pages</string>
-   </property>
-   <property name="statusTip">
-    <string>Converting Latin tif pages To png pages</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
    </property>
   </action>
   <action name="actionMyGlypher">
@@ -2165,6 +1843,10 @@
    </property>
   </action>
   <action name="actionProjectSettings">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/settings.png</normaloff>:/Icons/Icons/settings.png</iconset>
+   </property>
    <property name="text">
     <string>Project Settings</string>
    </property>
@@ -2501,7 +2183,7 @@
    </property>
    <property name="font">
     <font>
-     <family>FROMVS</family>
+     <family>Ubuntu Sans</family>
     </font>
    </property>
   </action>
@@ -2513,17 +2195,21 @@
    <property name="text">
     <string>MyExplorer</string>
    </property>
-    <property name="shortcut">
-     <string>Ctrl+Shift+E</string>
-    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
+   </property>
   </action>
   <action name="actionNewProject">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scroll2.png</normaloff>:/Icons/Icons/scroll2.png</iconset>
+   </property>
    <property name="text">
     <string>New Project</string>
    </property>
-  <property name="shortcut">
-   <string>Ctrl+N</string>
-  </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionRecreateErasmus1516">
    <property name="text">
@@ -2593,19 +2279,50 @@
   <action name="actionImageScanner_tb">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/scanner.png</normaloff>:/Icons/Icons/scanner.png</iconset>
+     <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
    </property>
    <property name="text">
-    <string>ImageScanner</string>
+    <string>MyScanner</string>
    </property>
   </action>
   <action name="actionOpen_Project">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionExplorer.png</normaloff>:/Icons/Icons/BiblionExplorer.png</iconset>
+   </property>
    <property name="text">
     <string>Open Project</string>
    </property>
-    <property name="shortcut">
-     <string>Ctrl+Shift+O</string>
-    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="actionMyScanner">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionScanner.png</normaloff>:/Icons/Icons/BiblionScanner.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyScanner</string>
+   </property>
+  </action>
+  <action name="actionMyReader">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/BiblionReader2.png</normaloff>:/Icons/Icons/BiblionReader2.png</iconset>
+   </property>
+   <property name="text">
+    <string>MyReader</string>
+   </property>
+  </action>
+  <action name="actionStage_Workflow">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/stage.png</normaloff>:/Icons/Icons/stage.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stage Workflow</string>
+   </property>
   </action>
  </widget>
  <resources>

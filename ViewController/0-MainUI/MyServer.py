@@ -20,7 +20,6 @@ import csv
 import hashlib
 from enum import Enum
 
-
 # Path configuration and directory setup
 script_dir = os.path.dirname(os.path.realpath(__file__))
 helpers_dir = os.path.join(script_dir, "helpers")
@@ -54,8 +53,6 @@ if preprocess_dir not in sys.path:
     sys.path.insert(0, preprocess_dir)
 if script_dir not in sys.path:
     sys.path.insert(0, script_dir)
-
-
 
 def _load_module_from_path(module_name, file_path):
     spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -106,6 +103,7 @@ import qimage2ndarray
 from queue import Queue
 from helpers.ext import mainfind
 from helpers.HelpSystem import add_help_menu
+from helpers.pdf_viewer_dialog import PdfViewerDock
 from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
 from helpers.Dialogs.ThemeEditorDialog import (
     ThemePreferences,
@@ -116,7 +114,9 @@ from helpers.Dialogs.ThemeEditorDialog import (
 )
 from helpers.Stylesheets import load_project_theme, save_project_theme
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
+from Core.project_database import project_metadata_database_path, update_project_database_values
 from Core.project_tracking import ProjectWorkflowTracker
+from Core.source_documents import copy_pdf_source_readonly, find_project_pdf_source  # pyright: ignore[reportMissingImports]
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
@@ -278,6 +278,10 @@ def configure_tesseract():
 class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 # Menu and Toolbar Action Methods
+    @classmethod
+    def is_image_file(cls, file_path):
+        return LocalFileDropMixin.is_image_file(file_path) or os.path.splitext(file_path)[1].lower() == ".pdf"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -319,6 +323,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.current_project_page = 1
         self.current_project_milestone = ""
         self.current_page_milestone = ""
+        self.pdf_source_path = ""
+        self.pdf_page_count = 0
+        self.pdf_viewer_dialog = None
+        self.sourcefolder = ""
 
         # self.networkScanner = NetworkScanner()
         # self.networkScanner.deviceFound.connect(self.onDeviceFound)
@@ -390,6 +398,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionNewProject.triggered.connect(self.on_new_project_clicked)
         if hasattr(self.ui, "actionOpen_Project"):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
+        self.view_source_document_action = qtw.QAction("Display Source Document", self)
+        self.view_source_document_action.setEnabled(False)
+        self.view_source_document_action.triggered.connect(self.view_source_document)
+        self.ui.menuView.addAction(self.view_source_document_action)
+        self.source_viewer_visibility_action = qtw.QAction("Show Source Document Viewer", self)
+        self.source_viewer_visibility_action.setCheckable(True)
+        self.source_viewer_visibility_action.setEnabled(False)
+        self.source_viewer_visibility_action.triggered.connect(self._set_pdf_viewer_visibility)
+        self.ui.menuView.addAction(self.source_viewer_visibility_action)
 
         self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
         self.ui.actionOpen_Text.triggered.connect(self.open_text_with_myexplorer)
@@ -404,23 +421,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             self.ui.actionPrint_Preview.triggered.connect(self.print_active_preview)
         if hasattr(self.ui, "actionExit"):
             self.ui.actionExit.triggered.connect(self.close)
-
-        self.ui.actionextract_pdf_tb.triggered.connect(self.actionextract_pdf)
-        self.ui.actionpdf_for_tiff_tb.triggered.connect(self.actionpdf_for_tiff)
-        self.ui.actionpdf_to_tiff_tb.triggered.connect(self.actionpdf_to_tiff)
-        self.ui.actiontiff_to_mono_tb.triggered.connect(self.actiontiff_to_mono)
-        self.ui.actiondeskew_mono.triggered.connect(self.actiondeskew_mono)
-        self.ui.actionmono_to_png_tb.triggered.connect(self.actionmono_to_png)
-        self.ui.actionCrop_Languages_tb.triggered.connect(self.actionCrop_Languages)
-        #self.ui.actionManual_Crop_Image_tb.triggered.connect(self.actionCropImage)
-
-        self.ui.actionConvert_Greek_tiff_To_png.triggered.connect(self.actionConvert_Greek_tiff_To_png)
-        self.ui.actionDeskewGreek_tiff_tb.triggered.connect(self.actionDeskewGreek_tiff)
-        self.ui.actionResizeGreek_png_tb.triggered.connect(self.actionResizeGreek_png)
-
-        self.ui.actionConvert_Latin_tiff_To_png.triggered.connect(self.actionConvert_Latin_tiff_To_png)
-        self.ui.actionDeskewLatin_tiff_tb.triggered.connect(self.actionDeskewLatin_tiff)
-        self.ui.actionResizeLatin_png_tb.triggered.connect(self.actionResizeLatin_png)
 
         self.ui.actionCorrect_OCR_tb.triggered.connect(self.actionCorrect_OCR)
 
@@ -548,15 +548,19 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         # Final UI State
         # -------------------------
-        self.show()
-        qtc.QTimer.singleShot(0, self._restore_session_content)
-
-        self.on_lang_select()
-
         self.setWindowFlags(
             Qt.Window |
             Qt.WindowCloseButtonHint |
-            Qt.WindowMinMaxButtonsHint        )
+            Qt.WindowMinMaxButtonsHint
+        )
+        self.show()
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+        qtc.QTimer.singleShot(0, self._restore_session_content)
+        qtc.QTimer.singleShot(0, self._ensure_main_window_visible)
+
+        self.on_lang_select()
         # existing UI/event system
         self.event_bus = EventBus()
 
@@ -850,6 +854,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         geometry.moveCenter(panel.rect().center())
         overlay.setGeometry(geometry)
 
+    def _ensure_main_window_visible(self):
+        self.setWindowState(self.windowState() & ~Qt.WindowMinimized)
+        frame_geometry = self.frameGeometry()
+        screens = qtw.QApplication.screens()
+        if screens and not any(screen.availableGeometry().intersects(frame_geometry) for screen in screens):
+            available_geometry = qtw.QApplication.primaryScreen().availableGeometry()
+            self.move(available_geometry.topLeft() + qtc.QPoint(40, 40))
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+
     def eventFilter(self, watched, event):
         if event.type() == qtc.QEvent.Resize:
             if watched is self.ui.ImagescrollArea.viewport():
@@ -857,6 +872,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             elif watched is self.ui.OCRText.viewport():
                 self._center_panel_overlay(self.ui.textPanelOverlay, watched)
         return super().eventFilter(watched, event)
+
+    def closeEvent(self, event):
+        self._close_pdf_viewer_automatically()
+        super().closeEvent(event)
 
     def _preferences_for_theme(self, theme_id):
         preferences = load_theme_preferences()
@@ -920,10 +939,42 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return None
 
         resolved_root = self.workflow_tracker.resolve_project_root(project_root) or os.path.abspath(os.path.normpath(project_root))
+        viewer = self.pdf_viewer_dialog
+        if viewer is not None and not self._path_is_within(viewer.pdf_path, resolved_root):
+            self._close_pdf_viewer_automatically()
         self.current_project_root = resolved_root
         self.session_manager.set_active_project(resolved_root)
         self._apply_project_theme(load_project_theme(resolved_root))
+        if hasattr(self, "view_source_document_action"):
+            self.view_source_document_action.setEnabled(bool(self._project_source_pdf(resolved_root)))
         return resolved_root
+
+    def _project_source_pdf(self, project_root=None):
+        resolved_root = project_root or self._shared_active_project_root() or self.current_project_root
+        if not resolved_root:
+            return ""
+
+        source_file = str(getattr(self, "sourcefile", "") or "").strip()
+        if os.path.isfile(source_file) and os.path.splitext(source_file)[1].lower() == ".pdf":
+            absolute_source_file = os.path.abspath(source_file)
+            try:
+                if os.path.commonpath((os.path.abspath(resolved_root), absolute_source_file)) == os.path.abspath(resolved_root):
+                    return absolute_source_file
+            except ValueError:
+                pass
+
+        return find_project_pdf_source(resolved_root)
+
+    def view_source_document(self):
+        source_path = self._project_source_pdf()
+        if not source_path:
+            qtw.QMessageBox.information(
+                self,
+                "Display Source Document",
+                "The active project does not have a PDF source document.",
+            )
+            return False
+        return self._open_pdf_source(source_path, floating=False)
 
     def _refresh_project_status(self, candidate_path=None):
         snapshot = self.workflow_tracker.snapshot(
@@ -1110,6 +1161,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 )
                 self._refresh_project_status(self._pending_project_root)
 
+                source_document_path = str(result.get("source_document_path") or "").strip()
+                if source_document_path:
+                    self._register_pdf_source(source_document_path)
+
                 # Project administration remains centralized in MyServer via Project Settings.
                 self._open_project_settings_dialog_for_root(self._pending_project_root)
             qtw.QMessageBox.information(
@@ -1188,6 +1243,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         payload = dialog.get_payload()
         project_name = self._normalize_project_name(payload.get("project_name", ""))
+        self.project_name = project_name
         if project_name is None:
             qtw.QMessageBox.warning(self, "New Project", "Project name is required.")
             return None
@@ -1399,6 +1455,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.greekbookmarkdown = get_setting('greekbookmarkdown', '')
         self.latinbookmarkdown = get_setting('latinbookmarkdown', '')
         self.sourcefile = get_setting('sourcefile', '')
+        self.sourcefolder = get_setting(
+            'sourcefolder',
+            os.path.dirname(self.sourcefile) if self.sourcefile else '',
+        )
         self.firstpage = get_setting('firstpage', '1')
         self.lastpage = get_setting('lastpage', '1')
         self.deltapages = get_setting('deltapages', '1')
@@ -1565,446 +1625,453 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
 
-    def actionextract_pdf(self):
-        print("extracting pdf pages from source pdf")
+    # def actionextract_pdf(self):
+    #     print("extracting pdf pages from source pdf")
+    #     active_project_root = self._active_project_root_for_source()
+    #     if not active_project_root:
+    #         qtw.QMessageBox.information(
+    #             self,
+    #             "Extract PDF Pages",
+    #             "Open or create a project before extracting PDF pages.",
+    #         )
+    #         return None
+    #     source_pdf_folder = os.path.join(active_project_root, "Model", "Project", "Images", "MyServer", "Source", "pdf")
+    #     workflow_folder = source_pdf_folder
+    #     complete_folder = os.path.join(active_project_root, "Model", "Project", "Images", "MyPixler", "Complete", "Source", "pdf_scripture_src_pages")
+    #     os.makedirs(workflow_folder, exist_ok=True)
+    #     os.makedirs(complete_folder, exist_ok=True)
 
-        def accept():
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                #print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
+    #     def accept():
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         # for filename in os.listdir(workflow_folder):
+    #         #     file_path = os.path.join(workflow_folder, filename)
+    #         #     #print('File Name:'+filename, 'File Path:'+file_path)
+    #         #     try:
+    #         #         if os.path.isfile(file_path):
+    #         #             os.remove(file_path)
+    #         #         elif os.path.isdir(file_path):
+    #         #             shutil.rmtree(file_path)
+    #         #     except Exception as e:
+    #         #         print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-            self.sourcefile = self.pdfx_ui.SourceLineEdit.text()
-            self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
-            self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
+    #         self.sourcefile = self.pdfx_ui.SourceLineEdit.text()
+    #         self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
+    #         self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
 
-            # Extract to default Workflow folder
-            print(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
-            pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
+    #         # Extract to default Workflow folder
+    #         print(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
+    #         pp.pdfExtractPages(self.project_name,self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
 
-            if complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            print("pdf page extraction complete")
+    #         if complete_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #         print("pdf page extraction complete")
 
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                sourcefile_key = r"self.sourcefile"
-                firstpage_key = r"self.firstpage"
-                lastpage_key = r"self.lastpage"
-                for Setting in data:
-                    if Setting['Setting'] == sourcefile_key:
-                        Setting['CurrentValue'] = self.sourcefile
-                        print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == firstpage_key:
-                        Setting['CurrentValue'] = self.firstpage
-                        print(Setting['CurrentValue'])
-                    elif Setting['Setting'] == lastpage_key:
-                        Setting['CurrentValue'] = self.lastpage
-                        print(Setting['CurrentValue'])
-            f.close()
+    #         self.session_manager.update('Session.json', {
+    #             'self.sourcefile': self.sourcefile,
+    #             'self.firstpage': self.firstpage,
+    #             'self.lastpage': self.lastpage,
+    #         })
 
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
+    #     def reject():
+    #         pass
 
-        def reject():
-            pass
+    #     self.pdfxDialog = qtw.QDialog()
+    #     self.pdfx_ui = Ui_ExtractDialog()
+    #     self.pdfx_ui.setupUi(self.pdfxDialog)
+    #     self.pdfxDialog.show()
 
-        self.pdfxDialog = qtw.QDialog()
-        self.pdfx_ui = Ui_ExtractDialog()
-        self.pdfx_ui.setupUi(self.pdfxDialog)
-        self.pdfxDialog.show()
+    #     seq = "SP1"
 
-        seq = "SP1"
+    #     def setdefault():
+    #         if self.pdfx_ui.defaultsrcBox.isChecked():
+    #             self.pdfx_ui.SourceButton.setEnabled(False)
+    #             self.pdfx_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.pdfx_ui.SourceButton.setEnabled(True)
+    #             self.pdfx_ui.DestinationButton.setEnabled(True)
 
-        def setdefault():
-            if self.pdfx_ui.defaultsrcBox.isChecked():
-                self.pdfx_ui.SourceButton.setEnabled(False)
-                self.pdfx_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdfx_ui.SourceButton.setEnabled(True)
-                self.pdfx_ui.DestinationButton.setEnabled(True)
+    #     self.pdfx_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.pdfx_ui.SourceButton.clicked.connect(self.OpenPdfFileDialog)
+    #     self.pdfx_ui.DestinationButton.clicked.connect(self.DestPdfFileDialog)
+    #     self.pdfx_ui.buttonBox.accepted.connect(accept)
+    #     self.pdfx_ui.buttonBox.rejected.connect(reject)
 
-        self.pdfx_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdfx_ui.SourceButton.clicked.connect(self.OpenPdfFileDialog)
-        self.pdfx_ui.DestinationButton.clicked.connect(self.DestPdfFileDialog)
-        self.pdfx_ui.buttonBox.accepted.connect(accept)
-        self.pdfx_ui.buttonBox.rejected.connect(reject)
+    #     if self.pdf_source_path and os.path.isfile(self.pdf_source_path):
+    #         self.pdfx_ui.SourceLineEdit.setText(self.pdf_source_path)
+    #         self.pdfx_ui.DestinationLineEdit.setText(workflow_folder + os.sep)
 
-        if self.pdfx_ui.defaultsrcBox.isChecked():
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-               # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.pdfx_ui.SourceLineEdit.setText(Sequence['DefaultSource'])
-                        self.pdfx_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
+    #     if self.pdfx_ui.defaultsrcBox.isChecked():
+    #         self.pdfx_ui.SourceLineEdit.setText(self.pdf_source_path or self.sourcefile)
+    #         self.pdfx_ui.DestinationLineEdit.setText(workflow_folder + os.sep)
 
-        rsp = self.pdfxDialog.exec_()
+    #     rsp = self.pdfxDialog.exec_()
 
-    def actionpdf_for_tiff(self):
-        print("extracting pdf pages for tif")
+    # def actionpdf_for_tiff(self):
+    #     print("extracting pdf pages for conversion totif")
+    #     active_project_root = self._active_project_root_for_source()
+    #     if not active_project_root:
+    #         qtw.QMessageBox.information(
+    #             self,
+    #             "Extract PDF Pages For Conversion to TIFF",
+    #             "Open or create a project before extracting PDF pages.",
+    #         )
+    #         return None
 
-        def accept():
-            # if self.pdf4tifDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
+    #     def accept():
+    #         # if self.pdf4tifDialog.Accepted:
+    #         # designate pdf source folder to serve as workflow folder
+    #         source_pdf_folder = os.path.join(active_project_root, "Model", "Project", "Images", "MyPixler", "Workflow", "pdf_book_src_pages")
 
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
+    #         # designate current book's workflow folder
+    #         current_book_folder = os.path.join(source_pdf_folder, self.sourcebookmarkdown)
 
-            # Extract to default Workflow folder
-            print(source_file_path, workflow_folder)
-            pp.pdf4tif(source_file_path, workflow_folder)
-            # Extract to default Complete folder
-            if complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            print("pdf pages for tif extraction complete")
-        def reject():
-            pass
+    #         workflow_folder = current_book_folder
+    #         complete_folder = os.path.join(active_project_root, "Model", "Project", "Images", "MyPixler", "Complete", "Source", "pdf_scripture_src_pages")
 
-        self.pdf4tifDialog = qtw.QDialog()
-        self.pdf4tif_ui = Ui_pdf4tifDialog()
-        self.pdf4tif_ui.setupUi(self.pdf4tifDialog)
-        self.pdf4tifDialog.show()
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         # for filename in os.listdir(workflow_folder):
+    #         #     file_path = os.path.join(workflow_folder, filename)
+    #         #     print('File Name:'+filename, 'File Path:'+file_path)
+    #         #     try:
+    #         #         if os.path.isfile(file_path):
+    #         #             os.remove(file_path)
+    #         #         elif os.path.isdir(file_path):
+    #         #             shutil.rmtree(file_path)
+    #         #     except Exception as e:
+    #         #         print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-        seq = "SP2"
+    #         for filename in os.listdir(source_folder):
+    #             print(source_folder,filename)
+    #             source_file_path = os.path.join(source_folder, filename)
 
-        def setdefault():
-            if self.pdf4tif_ui.defaultsrcBox.isChecked():
-                self.pdf4tif_ui.SourceButton.setEnabled(False)
-                self.pdf4tif_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdf4tif_ui.SourceButton.setEnabled(True)
-                self.pdf4tif_ui.DestinationButton.setEnabled(True)
+    #         # Extract to default Workflow folder
+    #         print(source_file_path, workflow_folder)
+    #         pp.pdf4tif(self.project_name, source_file_path, workflow_folder)
+    #         # Extract to default Complete folder
+    #         if complete_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #         print("pdf pages for tif extraction complete")
+    #     def reject():
+    #         pass
 
-        self.pdf4tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdf4tif_ui.SourceButton.clicked.connect(self.PdfForTifDialog)
-        self.pdf4tif_ui.DestinationButton.clicked.connect(self.DestPdfForTifDialog)
-        self.pdf4tif_ui.buttonBox.accepted.connect(accept)
-        self.pdf4tif_ui.buttonBox.rejected.connect(reject)
+    #     self.pdf4tifDialog = qtw.QDialog()
+    #     self.pdf4tif_ui = Ui_pdf4tifDialog()
+    #     self.pdf4tif_ui.setupUi(self.pdf4tifDialog)
+    #     self.pdf4tifDialog.show()
 
+    #     seq = "SP2"
 
-        if self.pdf4tif_ui.defaultsrcBox.isChecked():
-            # get default folder
-            # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.pdf4tif_ui.SourceLineEdit.setText(Sequence['DefaultSource'])
-                        self.pdf4tif_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath'])
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+    #     def setdefault():
+    #         if self.pdf4tif_ui.defaultsrcBox.isChecked():
+    #             self.pdf4tif_ui.SourceButton.setEnabled(False)
+    #             self.pdf4tif_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.pdf4tif_ui.SourceButton.setEnabled(True)
+    #             self.pdf4tif_ui.DestinationButton.setEnabled(True)
 
-        rsp = self.pdf4tifDialog.exec_()
-
-    def actionpdf_to_tiff(self):
-        print("converting pdf pages to tiff")
-
-        def accept():
-        # if self.pdf2tifDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            #pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-            pp.pdf2tif(self.pdf2tif_ui.SourceLineEdit.text(), self.pdf2tif_ui.DestinationLineEdit.text(), self.pdf2tif_ui.StartPageLineEdit.text())
-            # Copy Workflow folder to default Complete folder
-            if complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-        def reject():
-            pass
-
-        self.pdf2tifDialog = qtw.QDialog()
-        self.pdf2tif_ui = Ui_pdf2tifDialog()
-        self.pdf2tif_ui.setupUi(self.pdf2tifDialog)
-        self.pdf2tifDialog.show()
-
-        seq = "SP3"
-
-        def setdefault():
-            if self.pdf2tif_ui.defaultsrcBox.isChecked():
-                self.pdf2tif_ui.SourceButton.setEnabled(False)
-                self.pdf2tif_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdf2tif_ui.SourceButton.setEnabled(True)
-                self.pdf2tif_ui.DestinationButton.setEnabled(True)
-
-        self.pdf2tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdf2tif_ui.SourceButton.clicked.connect(self.PdfToTifDialog)
-        self.pdf2tif_ui.DestinationButton.clicked.connect(self.DestPdfToTifDialog)
-        self.pdf2tif_ui.buttonBox.accepted.connect(accept)
-        self.pdf2tif_ui.buttonBox.rejected.connect(reject)
-
-        if self.pdf2tif_ui.defaultsrcBox.isChecked():
-            # get default folder
-            # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.pdf2tif_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.pdf2tif_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'
-                        start_page = self.firstpage
-                        self.pdf2tif_ui.StartPageLineEdit.setText(start_page)
-                        print(source_folder,workflow_folder,complete_folder,start_page)
-
-            rsp = self.pdf2tifDialog.exec_()
-
-        print("tif pages conversion complete")
-
-    def actiontiff_to_mono(self):
-        print("creating indexed(BW) tiff")
-
-        def accept():
-            # if self.tif2monoDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.tiff2tiffidx(self.tif2mono_ui.SourceLineEdit.text(), self.tif2mono_ui.DestinationLineEdit.text())
-            # Copy Workflow folder to default Complete folder
-            if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-        def reject():
-            pass
-
-        #usage: pp.tiff2tiffidx(source, destination)
-
-        self.tif2monoDialog = qtw.QDialog()
-        self.tif2mono_ui = Ui_tif2monoDialog()
-        self.tif2mono_ui.setupUi(self.tif2monoDialog)
-        self.tif2monoDialog.show()
-
-        seq = "SP4"
-
-        def setdefault():
-            if self.tif2mono_ui.defaultsrcBox.isChecked():
-                self.tif2mono_ui.SourceButton.setEnabled(False)
-                self.tif2mono_ui.DestinationButton.setEnabled(False)
-            else:
-                self.tif2mono_ui.SourceButton.setEnabled(True)
-                self.tif2mono_ui.DestinationButton.setEnabled(True)
-
-        self.tif2mono_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.tif2mono_ui.SourceButton.clicked.connect(self.TifToMonoDialog)
-        self.tif2mono_ui.DestinationButton.clicked.connect(self.DestTifToMonoDialog)
-        self.tif2mono_ui.buttonBox.accepted.connect(accept)
-        self.tif2mono_ui.buttonBox.rejected.connect(reject)
-
-        if self.tif2mono_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            # get default folder
-            # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.tif2mono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.tif2mono_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
-
-        rsp = self.tif2monoDialog.exec_()
+    #     self.pdf4tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.pdf4tif_ui.SourceButton.clicked.connect(self.PdfForTifDialog)
+    #     self.pdf4tif_ui.DestinationButton.clicked.connect(self.DestPdfForTifDialog)
+    #     self.pdf4tif_ui.buttonBox.accepted.connect(accept)
+    #     self.pdf4tif_ui.buttonBox.rejected.connect(reject)
 
 
+    #     if self.pdf4tif_ui.defaultsrcBox.isChecked():
+    #         # get default folder
+    #         # Define json data
+    #         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(jsonfile, 'r') as f:
+    #             data = json.load(f)
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.pdf4tif_ui.SourceLineEdit.setText(Sequence['DefaultSource'])
+    #                     self.pdf4tif_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath'])
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'
+    #                     print(source_folder,workflow_folder,complete_folder)
 
-        print("completed creating indexed(BW) tiff")
+    #     rsp = self.pdf4tifDialog.exec_()
 
-    def actionmono_to_png(self):
-        print("creating indexed(BW) png")
+    # def actionpdf_to_tiff(self):
+    #     print("converting pdf pages to tiff")
 
-        def accept():
-            # if self.mono2pngDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
+    #     def accept():
+    #     # if self.pdf2tifDialog.Accepted:
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         for filename in os.listdir(workflow_folder):
+    #             file_path = os.path.join(workflow_folder, filename)
+    #             print('File Name:'+filename, 'File Path:'+file_path)
+    #             try:
+    #                 if os.path.isfile(file_path):
+    #                     os.remove(file_path)
+    #                 elif os.path.isdir(file_path):
+    #                     shutil.rmtree(file_path)
+    #             except Exception as e:
+    #                 print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
+    #         for filename in os.listdir(source_folder):
+    #             print(source_folder,filename)
+    #             source_file_path = os.path.join(source_folder, filename)
 
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
-            # Copy Workflow folder to default Complete folder
-            if complete_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-        def reject():
-            pass
+    #         # Extract to default Workflow folder
+    #         print(source_folder, workflow_folder)
+    #         #pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
+    #         pp.pdf2tif(self.pdf2tif_ui.SourceLineEdit.text(), self.pdf2tif_ui.DestinationLineEdit.text(), self.pdf2tif_ui.StartPageLineEdit.text())
+    #         # Copy Workflow folder to default Complete folder
+    #         if complete_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #     def reject():
+    #         pass
 
-        #usage: pp.tiff2pngidx(source, destination)
+    #     self.pdf2tifDialog = qtw.QDialog()
+    #     self.pdf2tif_ui = Ui_pdf2tifDialog()
+    #     self.pdf2tif_ui.setupUi(self.pdf2tifDialog)
+    #     self.pdf2tifDialog.show()
 
-        self.mono2pngDialog = qtw.QDialog()
-        self.mono2png_ui = Ui_mono2pngDialog()
-        self.mono2png_ui.setupUi(self.mono2pngDialog)
-        self.mono2pngDialog.show()
+    #     seq = "SP3"
 
-        seq = "SP5"
+    #     def setdefault():
+    #         if self.pdf2tif_ui.defaultsrcBox.isChecked():
+    #             self.pdf2tif_ui.SourceButton.setEnabled(False)
+    #             self.pdf2tif_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.pdf2tif_ui.SourceButton.setEnabled(True)
+    #             self.pdf2tif_ui.DestinationButton.setEnabled(True)
 
-        def setdefault():
-            if self.mono2png_ui.defaultsrcBox.isChecked():
-                self.mono2png_ui.SourceButton.setEnabled(False)
-                self.mono2png_ui.DestinationButton.setEnabled(False)
-            else:
-                self.mono2png_ui.SourceButton.setEnabled(True)
-                self.mono2png_ui.DestinationButton.setEnabled(True)
+    #     self.pdf2tif_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.pdf2tif_ui.SourceButton.clicked.connect(self.PdfToTifDialog)
+    #     self.pdf2tif_ui.DestinationButton.clicked.connect(self.DestPdfToTifDialog)
+    #     self.pdf2tif_ui.buttonBox.accepted.connect(accept)
+    #     self.pdf2tif_ui.buttonBox.rejected.connect(reject)
 
-        if self.mono2png_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
+    #     if self.pdf2tif_ui.defaultsrcBox.isChecked():
+    #         # get default folder
+    #         # Define json data
+    #         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(jsonfile, 'r') as f:
+    #             data = json.load(f)
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.pdf2tif_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                     self.pdf2tif_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'
+    #                     start_page = self.firstpage
+    #                     self.pdf2tif_ui.StartPageLineEdit.setText(start_page)
+    #                     print(source_folder,workflow_folder,complete_folder,start_page)
 
-            # get default folder
-            # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.mono2png_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.mono2png_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+    #         rsp = self.pdf2tifDialog.exec_()
 
-        self.mono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.mono2png_ui.SourceButton.clicked.connect(self.MonoToPngDialog)
-        self.mono2png_ui.DestinationButton.clicked.connect(self.DestMonoToPngDialog)
-        self.mono2png_ui.buttonBox.accepted.connect(accept)
-        self.mono2png_ui.buttonBox.rejected.connect(reject)
+    #     print("tif pages conversion complete")
 
-        rsp = self.mono2pngDialog.exec_()
-        print("completed creating indexed(BW) png")
+    # def actiontiff_to_mono(self):
+    #     print("creating indexed(BW) tiff")
+
+    #     def accept():
+    #         # if self.tif2monoDialog.Accepted:
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         for filename in os.listdir(workflow_folder):
+    #             file_path = os.path.join(workflow_folder, filename)
+    #             print('File Name:'+filename, 'File Path:'+file_path)
+    #             try:
+    #                 if os.path.isfile(file_path):
+    #                     os.remove(file_path)
+    #                 elif os.path.isdir(file_path):
+    #                     shutil.rmtree(file_path)
+    #             except Exception as e:
+    #                 print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    #         for filename in os.listdir(source_folder):
+    #             print(source_folder,filename)
+    #             source_file_path = os.path.join(source_folder, filename)
+
+    #         # Extract to default Workflow folder
+    #         print(source_folder, workflow_folder)
+    #         pp.tiff2tiffidx(self.tif2mono_ui.SourceLineEdit.text(), self.tif2mono_ui.DestinationLineEdit.text())
+    #         # Copy Workflow folder to default Complete folder
+    #         if complete_folder:
+    #             #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #     def reject():
+    #         pass
+
+    #     #usage: pp.tiff2tiffidx(source, destination)
+
+    #     self.tif2monoDialog = qtw.QDialog()
+    #     self.tif2mono_ui = Ui_tif2monoDialog()
+    #     self.tif2mono_ui.setupUi(self.tif2monoDialog)
+    #     self.tif2monoDialog.show()
+
+    #     seq = "SP4"
+
+    #     def setdefault():
+    #         if self.tif2mono_ui.defaultsrcBox.isChecked():
+    #             self.tif2mono_ui.SourceButton.setEnabled(False)
+    #             self.tif2mono_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.tif2mono_ui.SourceButton.setEnabled(True)
+    #             self.tif2mono_ui.DestinationButton.setEnabled(True)
+
+    #     self.tif2mono_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.tif2mono_ui.SourceButton.clicked.connect(self.TifToMonoDialog)
+    #     self.tif2mono_ui.DestinationButton.clicked.connect(self.DestTifToMonoDialog)
+    #     self.tif2mono_ui.buttonBox.accepted.connect(accept)
+    #     self.tif2mono_ui.buttonBox.rejected.connect(reject)
+
+    #     if self.tif2mono_ui.defaultsrcBox.isChecked():
+    #         # disable source button (default)
+
+    #         # get default folder
+    #         # Define json data
+    #         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(jsonfile, 'r') as f:
+    #             data = json.load(f)
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.tif2mono_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                     self.tif2mono_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+    #                     print(source_folder,workflow_folder,complete_folder)
+
+    #     rsp = self.tif2monoDialog.exec_()
+
+
+
+    #     print("completed creating indexed(BW) tiff")
+
+    # def actionmono_to_png(self):
+    #     print("creating indexed(BW) png")
+
+    #     def accept():
+    #         # if self.mono2pngDialog.Accepted:
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         for filename in os.listdir(workflow_folder):
+    #             file_path = os.path.join(workflow_folder, filename)
+    #             print('File Name:'+filename, 'File Path:'+file_path)
+    #             try:
+    #                 if os.path.isfile(file_path):
+    #                     os.remove(file_path)
+    #                 elif os.path.isdir(file_path):
+    #                     shutil.rmtree(file_path)
+    #             except Exception as e:
+    #                 print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    #         for filename in os.listdir(source_folder):
+    #             print(source_folder,filename)
+    #             source_file_path = os.path.join(source_folder, filename)
+
+    #         # Extract to default Workflow folder
+    #         print(source_folder, workflow_folder)
+    #         pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
+    #         # Copy Workflow folder to default Complete folder
+    #         if complete_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #     def reject():
+    #         pass
+
+    #     #usage: pp.tiff2pngidx(source, destination)
+
+    #     self.mono2pngDialog = qtw.QDialog()
+    #     self.mono2png_ui = Ui_mono2pngDialog()
+    #     self.mono2png_ui.setupUi(self.mono2pngDialog)
+    #     self.mono2pngDialog.show()
+
+    #     seq = "SP5"
+
+    #     def setdefault():
+    #         if self.mono2png_ui.defaultsrcBox.isChecked():
+    #             self.mono2png_ui.SourceButton.setEnabled(False)
+    #             self.mono2png_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.mono2png_ui.SourceButton.setEnabled(True)
+    #             self.mono2png_ui.DestinationButton.setEnabled(True)
+
+    #     if self.mono2png_ui.defaultsrcBox.isChecked():
+    #         # disable source button (default)
+
+    #         # get default folder
+    #         # Define json data
+    #         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(jsonfile, 'r') as f:
+    #             data = json.load(f)
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.mono2png_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                     self.mono2png_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+    #                     print(source_folder,workflow_folder,complete_folder)
+
+    #     self.mono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.mono2png_ui.SourceButton.clicked.connect(self.MonoToPngDialog)
+    #     self.mono2png_ui.DestinationButton.clicked.connect(self.DestMonoToPngDialog)
+    #     self.mono2png_ui.buttonBox.accepted.connect(accept)
+    #     self.mono2png_ui.buttonBox.rejected.connect(reject)
+
+    #     rsp = self.mono2pngDialog.exec_()
+    #     print("completed creating indexed(BW) png")
 
     def actiondeskew_mono(self):
         print("deskewing monochrome tiff and png files")
@@ -2146,232 +2213,232 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         rsp = self.deskew_monoDialog.exec_()
         print("completed deskewing monochrome tiff and png files")
 
-    def actionCrop_Languages(self):
-        print("creating cropped language tif files")
+    # def actionCrop_Languages(self):
+    #     print("creating cropped language tif files")
 
-        def accept():
-        #if self.crop_languagesDialog.Accepted:
-            # Empty default tif Workflow folders
-            if workflow_greek_folder:
-                for filename in os.listdir(workflow_greek_folder):
-                    file_path = os.path.join(workflow_greek_folder, filename)
-                    print('tif File Name:'+filename, 'tif File Path:'+file_path)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))
-                    # Empty default tif Workflow folders
-            if workflow_latin_folder:
-                for filename in os.listdir(workflow_latin_folder):
-                    file_path = os.path.join(workflow_latin_folder, filename)
-                    print('tif File Name:'+filename, 'tif File Path:'+file_path)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))
-            pp.croplangs(self.crop_languages_ui.SourceLineEdit.text(), self.crop_languages_ui.BoxFolderLineEdit.text(),self.crop_languages_ui.DestGreekLineEdit.text(),self.crop_languages_ui.DestLatinLineEdit.text(),self.crop_languages_ui.ElimFolderLineEdit.text())
-            print("completed creating cropped language tif files")
-            # copy workflow images to complete images
-            if workflow_box_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_box_folder):
-                    source = os.path.join(workflow_box_folder, item)
-                    destination = os.path.join(complete_box_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-            if workflow_elim_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_elim_folder):
-                    source = os.path.join(workflow_elim_folder, item)
-                    destination = os.path.join(complete_elim_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+    #     def accept():
+    #     #if self.crop_languagesDialog.Accepted:
+    #         # Empty default tif Workflow folders
+    #         if workflow_greek_folder:
+    #             for filename in os.listdir(workflow_greek_folder):
+    #                 file_path = os.path.join(workflow_greek_folder, filename)
+    #                 print('tif File Name:'+filename, 'tif File Path:'+file_path)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as e:
+    #                     print('Failed to delete %s. Reason: %s' % (file_path, e))
+    #                 # Empty default tif Workflow folders
+    #         if workflow_latin_folder:
+    #             for filename in os.listdir(workflow_latin_folder):
+    #                 file_path = os.path.join(workflow_latin_folder, filename)
+    #                 print('tif File Name:'+filename, 'tif File Path:'+file_path)
+    #                 try:
+    #                     if os.path.isfile(file_path):
+    #                         os.remove(file_path)
+    #                     elif os.path.isdir(file_path):
+    #                         shutil.rmtree(file_path)
+    #                 except Exception as e:
+    #                     print('Failed to delete %s. Reason: %s' % (file_path, e))
+    #         pp.croplangs(self.crop_languages_ui.SourceLineEdit.text(), self.crop_languages_ui.BoxFolderLineEdit.text(),self.crop_languages_ui.DestGreekLineEdit.text(),self.crop_languages_ui.DestLatinLineEdit.text(),self.crop_languages_ui.ElimFolderLineEdit.text())
+    #         print("completed creating cropped language tif files")
+    #         # copy workflow images to complete images
+    #         if workflow_box_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_box_folder):
+    #                 source = os.path.join(workflow_box_folder, item)
+    #                 destination = os.path.join(complete_box_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #         if workflow_elim_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_elim_folder):
+    #                 source = os.path.join(workflow_elim_folder, item)
+    #                 destination = os.path.join(complete_elim_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-            if workflow_greek_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_greek_folder):
-                    source = os.path.join(workflow_greek_folder, item)
-                    destination = os.path.join(complete_greek_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+    #         if workflow_greek_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_greek_folder):
+    #                 source = os.path.join(workflow_greek_folder, item)
+    #                 destination = os.path.join(complete_greek_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-            if workflow_latin_folder:
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_latin_folder):
-                    source = os.path.join(workflow_latin_folder, item)
-                    destination = os.path.join(complete_latin_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
+    #         if workflow_latin_folder:
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_latin_folder):
+    #                 source = os.path.join(workflow_latin_folder, item)
+    #                 destination = os.path.join(complete_latin_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
 
-        def reject():
-            pass
+    #     def reject():
+    #         pass
 
-        #usage: pp.croplangs(source, boxdir, greekdir, latindir, elimdir)
-        self.crop_languagesDialog = qtw.QDialog()
-        self.crop_languages_ui = Ui_crop_languagesDialog()
-        self.crop_languages_ui.setupUi(self.crop_languagesDialog)
-        self.crop_languagesDialog.show()
-
-
-        self.crop_languages_ui.SourceButton.clicked.connect(self.CropLanguagesDialog)
-        self.crop_languages_ui.BoxFolderButton.clicked.connect(self.BoxFolderDialog)
-        self.crop_languages_ui.ElimFolderButton.clicked.connect(self.ElimFolderDialog)
-        self.crop_languages_ui.DestGreekButton.clicked.connect(self.DestGreekDialog)
-        self.crop_languages_ui.DestLatinButton.clicked.connect(self.DestLatinDialog)
-        self.crop_languages_ui.buttonBox.accepted.connect(accept)
-        self.crop_languages_ui.buttonBox.rejected.connect(reject)
-
-        seq = ["SP10","SP11","GP1","GP2","LP1","LP2"]
-
-        if self.crop_languages_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
-
-            for step in seq:
-                jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-                with open(jsonfile, 'r') as f:
-                    data = json.load(f)
-
-                    # Search the key value using 'in' operator
-                    for Sequence in data:
-                        print(Sequence['Sequence'])
-                        if Sequence['Sequence'] == step:
-                            # set line edits to their default workflow folders
-                            if step == "SP10":
-                                self.crop_languages_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                                source_folder = Sequence['DefaultSource']+r'/'
-                                self.crop_languages_ui.BoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_box_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                            elif step == "SP11":
-                                self.crop_languages_ui.ElimFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_elim_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_elim_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
-                            elif step == "GP1":
-                                self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_greek_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                            elif step == "GP2":
-                                #self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_dup_greek_folder = Sequence['WorkflowFullPath']+r'/'
-                                #complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                            elif step == "LP1":
-                                self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_latin_folder = Sequence['WorkflowFullPath']+r'/'
-                                complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
-                            elif step == "LP2":
-                                #self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                                workflow_dup_latin_folder = Sequence['WorkflowFullPath']+r'/'
-                                #complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
-
-                f.close()
-        print(source_folder,workflow_box_folder,workflow_elim_folder,workflow_greek_folder,workflow_latin_folder)
-        rsp = self.crop_languagesDialog.exec_()
-
-    def actionConvert_Greek_tiff_To_png(self):
-        print("creating indexed(BW) Greek png files")
-        #usage: pp.tiff2pngidx(source, destination)
-        def accept():
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.tiff2pngidx(self.greekmono2png_ui.SourceLineEdit.text(), self.greekmono2png_ui.DestinationLineEdit.text())
-            # Copy Workflow folder to default Complete folder
-            if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-        def reject():
-            pass
-
-        #usage: pp.tiff2pngidx(source, destination)
-
-        self.greekmono2pngDialog = qtw.QDialog()
-        self.greekmono2png_ui = Ui_greekmono2pngDialog()
-        self.greekmono2png_ui.setupUi(self.greekmono2pngDialog)
-        self.greekmono2pngDialog.show()
-
-        seq = "GP5"
-
-        def setdefault():
-            if self.greekmono2png_ui.defaultsrcBox.isChecked():
-                self.greekmono2png_ui.SourceButton.setEnabled(False)
-                self.greekmono2png_ui.DestinationButton.setEnabled(False)
-            else:
-                self.greekmono2png_ui.SourceButton.setEnabled(True)
-                self.greekmono2png_ui.DestinationButton.setEnabled(True)
-
-        self.greekmono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.greekmono2png_ui.SourceButton.clicked.connect(self.GreekMonoToPngDialog)
-        self.greekmono2png_ui.DestinationButton.clicked.connect(self.GreekDestMonoToPngDialog)
-        self.greekmono2png_ui.buttonBox.accepted.connect(accept)
-        self.greekmono2png_ui.buttonBox.rejected.connect(reject)
+    #     #usage: pp.croplangs(source, boxdir, greekdir, latindir, elimdir)
+    #     self.crop_languagesDialog = qtw.QDialog()
+    #     self.crop_languages_ui = Ui_crop_languagesDialog()
+    #     self.crop_languages_ui.setupUi(self.crop_languagesDialog)
+    #     self.crop_languagesDialog.show()
 
 
-        if self.greekmono2png_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
+    #     self.crop_languages_ui.SourceButton.clicked.connect(self.CropLanguagesDialog)
+    #     self.crop_languages_ui.BoxFolderButton.clicked.connect(self.BoxFolderDialog)
+    #     self.crop_languages_ui.ElimFolderButton.clicked.connect(self.ElimFolderDialog)
+    #     self.crop_languages_ui.DestGreekButton.clicked.connect(self.DestGreekDialog)
+    #     self.crop_languages_ui.DestLatinButton.clicked.connect(self.DestLatinDialog)
+    #     self.crop_languages_ui.buttonBox.accepted.connect(accept)
+    #     self.crop_languages_ui.buttonBox.rejected.connect(reject)
 
-            # get default folder
-            # Define json data
+    #     seq = ["SP10","SP11","GP1","GP2","LP1","LP2"]
 
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
+    #     if self.crop_languages_ui.defaultsrcBox.isChecked():
+    #         # disable source button (default)
 
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.greekmono2png_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.greekmono2png_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+    #         for step in seq:
+    #             jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #             with open(jsonfile, 'r') as f:
+    #                 data = json.load(f)
 
-        rsp = self.greekmono2pngDialog.exec_()
-        print("completed creating indexed(BW) png")
+    #                 # Search the key value using 'in' operator
+    #                 for Sequence in data:
+    #                     print(Sequence['Sequence'])
+    #                     if Sequence['Sequence'] == step:
+    #                         # set line edits to their default workflow folders
+    #                         if step == "SP10":
+    #                             self.crop_languages_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                             source_folder = Sequence['DefaultSource']+r'/'
+    #                             self.crop_languages_ui.BoxFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                             workflow_box_folder = Sequence['WorkflowFullPath']+r'/'
+    #                             complete_box_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+    #                         elif step == "SP11":
+    #                             self.crop_languages_ui.ElimFolderLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                             workflow_elim_folder = Sequence['WorkflowFullPath']+r'/'
+    #                             complete_elim_folder = Sequence['CompleteFullPath']+r'/'+self.sourcebookmarkdown+r'/'
+    #                         elif step == "GP1":
+    #                             self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                             workflow_greek_folder = Sequence['WorkflowFullPath']+r'/'
+    #                             complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+    #                         elif step == "GP2":
+    #                             #self.crop_languages_ui.DestGreekLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                             workflow_dup_greek_folder = Sequence['WorkflowFullPath']+r'/'
+    #                             #complete_greek_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+    #                         elif step == "LP1":
+    #                             self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                             workflow_latin_folder = Sequence['WorkflowFullPath']+r'/'
+    #                             complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
+    #                         elif step == "LP2":
+    #                             #self.crop_languages_ui.DestLatinLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                             workflow_dup_latin_folder = Sequence['WorkflowFullPath']+r'/'
+    #                             #complete_latin_folder = Sequence['CompleteFullPath']+r'/'+self.latinbookmarkdown+r'/'
+
+    #             f.close()
+    #     print(source_folder,workflow_box_folder,workflow_elim_folder,workflow_greek_folder,workflow_latin_folder)
+    #     rsp = self.crop_languagesDialog.exec_()
+
+    # def actionConvert_Greek_tiff_To_png(self):
+    #     print("creating indexed(BW) Greek png files")
+    #     #usage: pp.tiff2pngidx(source, destination)
+    #     def accept():
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         for filename in os.listdir(workflow_folder):
+    #             file_path = os.path.join(workflow_folder, filename)
+    #             print('File Name:'+filename, 'File Path:'+file_path)
+    #             try:
+    #                 if os.path.isfile(file_path):
+    #                     os.remove(file_path)
+    #                 elif os.path.isdir(file_path):
+    #                     shutil.rmtree(file_path)
+    #             except Exception as e:
+    #                 print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    #         for filename in os.listdir(source_folder):
+    #             print(source_folder,filename)
+    #             source_file_path = os.path.join(source_folder, filename)
+
+    #         # Extract to default Workflow folder
+    #         print(source_folder, workflow_folder)
+    #         pp.tiff2pngidx(self.greekmono2png_ui.SourceLineEdit.text(), self.greekmono2png_ui.DestinationLineEdit.text())
+    #         # Copy Workflow folder to default Complete folder
+    #         if complete_folder:
+    #             #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #     def reject():
+    #         pass
+
+    #     #usage: pp.tiff2pngidx(source, destination)
+
+    #     self.greekmono2pngDialog = qtw.QDialog()
+    #     self.greekmono2png_ui = Ui_greekmono2pngDialog()
+    #     self.greekmono2png_ui.setupUi(self.greekmono2pngDialog)
+    #     self.greekmono2pngDialog.show()
+
+    #     seq = "GP5"
+
+    #     def setdefault():
+    #         if self.greekmono2png_ui.defaultsrcBox.isChecked():
+    #             self.greekmono2png_ui.SourceButton.setEnabled(False)
+    #             self.greekmono2png_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.greekmono2png_ui.SourceButton.setEnabled(True)
+    #             self.greekmono2png_ui.DestinationButton.setEnabled(True)
+
+    #     self.greekmono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.greekmono2png_ui.SourceButton.clicked.connect(self.GreekMonoToPngDialog)
+    #     self.greekmono2png_ui.DestinationButton.clicked.connect(self.GreekDestMonoToPngDialog)
+    #     self.greekmono2png_ui.buttonBox.accepted.connect(accept)
+    #     self.greekmono2png_ui.buttonBox.rejected.connect(reject)
+
+
+    #     if self.greekmono2png_ui.defaultsrcBox.isChecked():
+    #         # disable source button (default)
+
+    #         # get default folder
+    #         # Define json data
+
+    #         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(jsonfile, 'r') as f:
+    #             data = json.load(f)
+
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.greekmono2png_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                     self.greekmono2png_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+    #                     print(source_folder,workflow_folder,complete_folder)
+
+    #     rsp = self.greekmono2pngDialog.exec_()
+    #     print("completed creating indexed(BW) png")
 
     def actionDeskewGreek_tiff(self):
         print("deskewing Greek tiff files")
@@ -2530,127 +2597,127 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         #dsk.deskewfiles("/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","/home/jetson/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
         #pp.deskewfiles("/home/jetson/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "/home/jetson/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","/home/jetson/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
 
-    def actionResizeGreek_png(self):
-        print("resizing Greek png files")
-        #usage: pp.resizepngs(source, destination)
-        def accept():
-            # if self.mono2pngDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
+    # def actionResizeGreek_png(self):
+    #     print("resizing Greek png files")
+    #     #usage: pp.resizepngs(source, destination)
+    #     def accept():
+    #         # if self.mono2pngDialog.Accepted:
+    #         # Empty default Workflow folder
+    #         print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
+    #         for filename in os.listdir(workflow_folder):
+    #             file_path = os.path.join(workflow_folder, filename)
+    #             print('File Name:'+filename, 'File Path:'+file_path)
+    #             try:
+    #                 if os.path.isfile(file_path):
+    #                     os.remove(file_path)
+    #                 elif os.path.isdir(file_path):
+    #                     shutil.rmtree(file_path)
+    #             except Exception as e:
+    #                 print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
+    #         for filename in os.listdir(source_folder):
+    #             print(source_folder,filename)
+    #             source_file_path = os.path.join(source_folder, filename)
 
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.resizepngs(self.greekresizepng_ui.SourceLineEdit.text(), self.greekresizepng_ui.DestinationLineEdit.text())
+    #         # Extract to default Workflow folder
+    #         print(source_folder, workflow_folder)
+    #         pp.resizepngs(self.greekresizepng_ui.SourceLineEdit.text(), self.greekresizepng_ui.DestinationLineEdit.text())
 
-            # Copy Workflow folder to default Complete folder
-            if complete_folder:
-                #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-                symlinks=False
-                ignore=None
-                for item in os.listdir(workflow_folder):
-                    source = os.path.join(workflow_folder, item)
-                    destination = os.path.join(complete_folder, item)
-                    if os.path.isdir(source):
-                        shutil.copytree(source, destination, symlinks, ignore)
-                    else:
-                        shutil.copy2(source, destination)
-        def reject():
-            pass
+    #         # Copy Workflow folder to default Complete folder
+    #         if complete_folder:
+    #             #pp.pdf2tif(source_folder, complete_folder, self.pdf2tif_ui.StartPageLineEdit.text())
+    #             symlinks=False
+    #             ignore=None
+    #             for item in os.listdir(workflow_folder):
+    #                 source = os.path.join(workflow_folder, item)
+    #                 destination = os.path.join(complete_folder, item)
+    #                 if os.path.isdir(source):
+    #                     shutil.copytree(source, destination, symlinks, ignore)
+    #                 else:
+    #                     shutil.copy2(source, destination)
+    #     def reject():
+    #         pass
 
-        #usage: pp.tiff2pngidx(source, destination)
+    #     #usage: pp.tiff2pngidx(source, destination)
 
-        self.greekresizepngDialog = qtw.QDialog()
-        self.greekresizepng_ui = Ui_greekresizepngDialog()
-        self.greekresizepng_ui.setupUi(self.greekresizepngDialog)
-        self.greekresizepngDialog.show()
+    #     self.greekresizepngDialog = qtw.QDialog()
+    #     self.greekresizepng_ui = Ui_greekresizepngDialog()
+    #     self.greekresizepng_ui.setupUi(self.greekresizepngDialog)
+    #     self.greekresizepngDialog.show()
 
-        seq = "GP10"
+    #     seq = "GP10"
 
-        def setdefault():
-            if self.greekresizepng_ui.defaultsrcBox.isChecked():
-                self.greekresizepng_ui.SourceButton.setEnabled(False)
-                self.greekresizepng_ui.DestinationButton.setEnabled(False)
-            else:
-                self.greekresizepng_ui.SourceButton.setEnabled(True)
-                self.greekresizepng_ui.DestinationButton.setEnabled(True)
+    #     def setdefault():
+    #         if self.greekresizepng_ui.defaultsrcBox.isChecked():
+    #             self.greekresizepng_ui.SourceButton.setEnabled(False)
+    #             self.greekresizepng_ui.DestinationButton.setEnabled(False)
+    #         else:
+    #             self.greekresizepng_ui.SourceButton.setEnabled(True)
+    #             self.greekresizepng_ui.DestinationButton.setEnabled(True)
 
-        self.greekresizepng_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.greekresizepng_ui.SourceButton.clicked.connect(self.GreekResizePngDialog)
-        self.greekresizepng_ui.DestinationButton.clicked.connect(self.DestGreekResizePngDialog)
-        self.greekresizepng_ui.buttonBox.accepted.connect(accept)
-        self.greekresizepng_ui.buttonBox.rejected.connect(reject)
+    #     self.greekresizepng_ui.defaultsrcBox.stateChanged.connect(setdefault)
+    #     self.greekresizepng_ui.SourceButton.clicked.connect(self.GreekResizePngDialog)
+    #     self.greekresizepng_ui.DestinationButton.clicked.connect(self.DestGreekResizePngDialog)
+    #     self.greekresizepng_ui.buttonBox.accepted.connect(accept)
+    #     self.greekresizepng_ui.buttonBox.rejected.connect(reject)
 
 
-        if self.greekresizepng_ui.defaultsrcBox.isChecked():
-            # disable source button (default)
+    #     if self.greekresizepng_ui.defaultsrcBox.isChecked():
+    #         # disable source button (default)
 
-            # get default folder
-            # Define json data
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.greekresizepng_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.greekresizepng_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
-            with open(jsonfile, 'r') as f:
-                # returns JSON object as
-                # a dictionary
-                data = json.load(f)
-                # Search the key value using 'in' operator
-                for Sequence in data:
-                    print(Sequence['Sequence'])
-                    if Sequence['Sequence'] == seq:
-                        # set source line edit to default workflow folder
-                        self.greekresizepng_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
-                        self.greekresizepng_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
-                        source_folder = Sequence['DefaultSource']+r'/'
-                        workflow_folder = Sequence['WorkflowFullPath']+r'/'
-                        complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
-                        print(source_folder,workflow_folder,complete_folder)
+    #         # get default folder
+    #         # Define json data
+    #         jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Workflow.json")
+    #         with open(jsonfile, 'r') as f:
+    #             data = json.load(f)
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.greekresizepng_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                     self.greekresizepng_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+    #                     print(source_folder,workflow_folder,complete_folder)
+    #         with open(jsonfile, 'r') as f:
+    #             # returns JSON object as
+    #             # a dictionary
+    #             data = json.load(f)
+    #             # Search the key value using 'in' operator
+    #             for Sequence in data:
+    #                 print(Sequence['Sequence'])
+    #                 if Sequence['Sequence'] == seq:
+    #                     # set source line edit to default workflow folder
+    #                     self.greekresizepng_ui.SourceLineEdit.setText(Sequence['DefaultSource']+r'/')
+    #                     self.greekresizepng_ui.DestinationLineEdit.setText(Sequence['WorkflowFullPath']+r'/')
+    #                     source_folder = Sequence['DefaultSource']+r'/'
+    #                     workflow_folder = Sequence['WorkflowFullPath']+r'/'
+    #                     complete_folder = Sequence['CompleteFullPath']+r'/'+self.greekbookmarkdown+r'/'
+    #                     print(source_folder,workflow_folder,complete_folder)
 
-        rsp = self.greekresizepngDialog.exec_()
-        print("completed resizing indexed(BW) png")
+    #     rsp = self.greekresizepngDialog.exec_()
+    #     print("completed resizing indexed(BW) png")
 
-    def actionConvert_Latin_tiff_To_png(self):
-        print("creating indexed(BW) Latin png files")
-        #usage: pp.tiff2pngidx(source, destination)
-        self.latinmono2pngDialog = qtw.QDialog()
-        self.latinmono2png_ui = Ui_latinmono2pngDialog()
-        self.latinmono2png_ui.setupUi(self.latinmono2pngDialog)
-        self.latinmono2pngDialog.show()
+    # def actionConvert_Latin_tiff_To_png(self):
+    #     print("creating indexed(BW) Latin png files")
+    #     #usage: pp.tiff2pngidx(source, destination)
+    #     self.latinmono2pngDialog = qtw.QDialog()
+    #     self.latinmono2png_ui = Ui_latinmono2pngDialog()
+    #     self.latinmono2png_ui.setupUi(self.latinmono2pngDialog)
+    #     self.latinmono2pngDialog.show()
 
-        self.latinmono2png_ui.SourceButton.clicked.connect(self.LatinMonoToPngDialog)
-        self.latinmono2png_ui.DestinationButton.clicked.connect(self.LatinDestMonoToPngDialog)
+    #     self.latinmono2png_ui.SourceButton.clicked.connect(self.LatinMonoToPngDialog)
+    #     self.latinmono2png_ui.DestinationButton.clicked.connect(self.LatinDestMonoToPngDialog)
 
-        rsp = self.latinmono2pngDialog.exec_()
+    #     rsp = self.latinmono2pngDialog.exec_()
 
-        if self.latinmono2pngDialog.Accepted:
-            pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
-            print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
+    #     if self.latinmono2pngDialog.Accepted:
+    #         pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
+    #         print("completed creating indexed(BW) png")
+    #     #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "/home/jetson/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
+    #     #pp.tiff2pngidx(r"/home/jetson/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "/home/jetson/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
 
     def actionDeskewLatin_tiff(self):
         print("deskewing Latin tiff files")
@@ -2797,11 +2864,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def open_image_with_myexplorer(self, *_args):
         return self.open_non_modal_image_picker(
-            "Open Image",
+            "Open Image or PDF Source Document",
             self.imgdir if hasattr(self, 'imgdir') else self._projects_base_path(),
             lambda selected_path: (
                 self.ui.ImageLE.setText(os.path.basename(selected_path)),
-                self.loadImageStackFromFile(selected_path),
+                self.showImage(selected_path),
             ),
             '_image_open_dialog',
         )
@@ -2896,7 +2963,153 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     import tifffile
     import numpy as np
 
+    def _active_project_root_for_source(self):
+        return self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+        )
+
+    def _ingest_pdf_source(self, source_path):
+        project_root_path = self._active_project_root_for_source()
+        if not project_root_path:
+            qtw.QMessageBox.information(
+                self,
+                "Open PDF Source",
+                "Open or create a project before loading a PDF source document.",
+            )
+            return ""
+        try:
+            return copy_pdf_source_readonly(source_path, project_root_path)
+        except (OSError, ValueError) as exc:
+            qtw.QMessageBox.warning(self, "Open PDF Source", f"Could not save the PDF source document.\n\n{exc}")
+            return ""
+
+    @staticmethod
+    def _path_is_within(path, directory):
+        try:
+            return os.path.commonpath((os.path.abspath(path), os.path.abspath(directory))) == os.path.abspath(directory)
+        except ValueError:
+            return False
+
+    def _sync_pdf_viewer_visibility_action(self, visible):
+        action = getattr(self, "source_viewer_visibility_action", None)
+        if action is None:
+            return
+        action.blockSignals(True)
+        action.setChecked(bool(visible))
+        action.blockSignals(False)
+
+    def _set_pdf_viewer_visibility(self, visible):
+        viewer = self.pdf_viewer_dialog
+        if viewer is None:
+            if visible:
+                self.view_source_document()
+            return
+        viewer.set_viewer_visible(bool(visible))
+        if visible and viewer.is_viewer_floating():
+            viewer.raise_()
+            viewer.activateWindow()
+
+    def _float_pdf_viewer(self):
+        viewer = self.pdf_viewer_dialog
+        if viewer is None:
+            return
+        viewer.float_viewer()
+
+    def _close_pdf_viewer_automatically(self):
+        viewer = self.pdf_viewer_dialog
+        if viewer is None:
+            return
+        self.pdf_viewer_dialog = None
+        viewer.close_automatically()
+        self._sync_pdf_viewer_visibility_action(False)
+        self.source_viewer_visibility_action.setEnabled(False)
+
+    def _on_pdf_viewer_destroyed(self, closed_viewer):
+        if self.pdf_viewer_dialog is not closed_viewer:
+            return
+        self.pdf_viewer_dialog = None
+        self._sync_pdf_viewer_visibility_action(False)
+        self.source_viewer_visibility_action.setEnabled(False)
+
+    def _open_pdf_source(self, pdf_path, floating=True):
+        try:
+            viewer = PdfViewerDock(pdf_path, self, embedded_host=self.ui.sourcePdfViewerHost)
+            self._register_pdf_source(pdf_path, viewer.page_count)
+            self._close_pdf_viewer_automatically()
+            self.pdf_viewer_dialog = viewer
+            self.addDockWidget(qtc.Qt.LeftDockWidgetArea, viewer)
+            viewer.dock_in_host(visible=True)
+            viewer.viewerVisibilityChanged.connect(self._sync_pdf_viewer_visibility_action)
+            viewer.destroyed.connect(
+                lambda _object=None, closed_viewer=viewer: self._on_pdf_viewer_destroyed(closed_viewer)
+            )
+            self.source_viewer_visibility_action.setEnabled(True)
+            if floating:
+                self._float_pdf_viewer()
+        except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            self.pdf_source_path = ""
+            self.pdf_page_count = 0
+            qtw.QMessageBox.warning(self, "Open PDF Source", f"Could not display the PDF source document.\n\n{exc}")
+            return False
+        return True
+
+    def _register_pdf_source(self, pdf_path, page_count=None):
+        try:
+            project_root_path = self._active_project_root_for_source()
+            if not project_root_path:
+                raise ValueError("No active project is available for PDF metadata.")
+            self.pdf_source_path = os.path.abspath(pdf_path)
+            metadata_updates = {
+                "SourceType": "PDF",
+                "SourceDocumentPath": self.pdf_source_path,
+                "SourceDocumentDirectory": os.path.dirname(self.pdf_source_path),
+            }
+            if page_count is not None:
+                self.pdf_page_count = int(page_count)
+                metadata_updates["NumberPages"] = self.pdf_page_count
+            update_project_database_values(
+                project_metadata_database_path(project_root_path),
+                metadata_updates,
+            )
+            self.sourcefile = self.pdf_source_path
+            self.sourcefolder = os.path.dirname(self.sourcefile)
+            self.session_manager.update('Session.json', {
+                'self.sourcefile': self.sourcefile,
+                'self.sourcefolder': self.sourcefolder,
+            })
+            self.view_source_document_action.setEnabled(True)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            qtw.QMessageBox.warning(self, "PDF Source", f"Could not register the PDF source document.\n\n{exc}")
+            return False
+        return True
+
     def showImage(self,imgfilename):
+        self._float_pdf_viewer()
+        if os.path.splitext(str(imgfilename))[1].lower() == ".pdf":
+            saved_pdf_path = self._ingest_pdf_source(imgfilename)
+            if not saved_pdf_path or not self._open_pdf_source(saved_pdf_path, floating=True):
+                return
+            session_updates = {
+                'self.sourcefile': self.sourcefile,
+            }
+            if os.path.splitext(str(getattr(self, "imgpath", "")))[1].lower() == ".pdf":
+                self.imgpath = ""
+                self.imgdir = ""
+                session_updates.update({
+                    'self.imgpath': "",
+                    'self.imgdir': "",
+                })
+            self.session_manager.update('Session.json', session_updates)
+            self._record_project_milestone(
+                "source_acquired",
+                saved_pdf_path,
+                details={"source": "pdf", "page_count": self.pdf_page_count},
+            )
+            self._refresh_project_status(saved_pdf_path)
+            return
+
         self.imgpath = imgfilename
         self.ui.imagePanelOverlay.hide()
         self._active_print_target = "primary"
@@ -3194,6 +3407,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not txtfilename:
             return
 
+        self._float_pdf_viewer()
+
         from PyQt5 import QtCore as qtc
 
         # Ã¢Å“â€¦ Always sync internal state
@@ -3412,205 +3627,205 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if self.directory:
             self.pdfx_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def PdfForTifDialog(self):
-        self.path = self._choose_file('Select pdf pages source file', '*.pdf', getattr(self, 'path', ''))
+    # def PdfForTifDialog(self):
+    #     self.path = self._choose_file('Select pdf pages source file', '*.pdf', getattr(self, 'path', ''))
 
-        if self.path:
-            self.pdf4tif_ui.SourceLineEdit.setText(self.path)
+    #     if self.path:
+    #         self.pdf4tif_ui.SourceLineEdit.setText(self.path)
 
-    def DestPdfForTifDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.pdf4tif_ui.DestinationLineEdit.text())
+    # def DestPdfForTifDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.pdf4tif_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.pdf4tif_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.pdf4tif_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def PdfToTifDialog(self):
-        self.directory = self._choose_directory("Select pdf pages source folder", self.pdf2tif_ui.SourceLineEdit.text())
+    # def PdfToTifDialog(self):
+    #     self.directory = self._choose_directory("Select pdf pages source folder", self.pdf2tif_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.pdf2tif_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.pdf2tif_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestPdfToTifDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.pdf2tif_ui.DestinationLineEdit.text())
+    # def DestPdfToTifDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.pdf2tif_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.pdf2tif_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.pdf2tif_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def TifToMonoDialog(self):
-        self.directory = self._choose_directory("Select pdf pages source folder", self.tif2mono_ui.SourceLineEdit.text())
+    # def TifToMonoDialog(self):
+    #     self.directory = self._choose_directory("Select pdf pages source folder", self.tif2mono_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.tif2mono_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.tif2mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestTifToMonoDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.tif2mono_ui.DestinationLineEdit.text())
+    # def DestTifToMonoDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.tif2mono_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.tif2mono_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.tif2mono_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def MonoToPngDialog(self):
-        self.directory = self._choose_directory("Select mono tif pages source folder", self.mono2png_ui.SourceLineEdit.text())
+    # def MonoToPngDialog(self):
+    #     self.directory = self._choose_directory("Select mono tif pages source folder", self.mono2png_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.mono2png_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.mono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestMonoToPngDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.mono2png_ui.DestinationLineEdit.text())
+    # def DestMonoToPngDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.mono2png_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def GreekMonoToPngDialog(self):
-        self.directory = self._choose_directory("Select greek mono tif pages source folder", self.greekmono2png_ui.SourceLineEdit.text())
+    # def GreekMonoToPngDialog(self):
+    #     self.directory = self._choose_directory("Select greek mono tif pages source folder", self.greekmono2png_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.greekmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.greekmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def GreekDestMonoToPngDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.greekmono2png_ui.DestinationLineEdit.text())
+    # def GreekDestMonoToPngDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.greekmono2png_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.greekmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.greekmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def DeskewMonoDialog(self):
-        self.directory = self._choose_directory("Select pdf pages source folder", self.deskew_mono_ui.SourceLineEdit.text())
+    # def DeskewMonoDialog(self):
+    #     self.directory = self._choose_directory("Select pdf pages source folder", self.deskew_mono_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewPngDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.deskew_mono_ui.DestPngLineEdit.text())
+    # # def DestDeskewPngDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.deskew_mono_ui.DestPngLineEdit.text())
 
-        if self.directory:
-            self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewTifDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.deskew_mono_ui.DestTifLineEdit.text())
+    # def DestDeskewTifDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.deskew_mono_ui.DestTifLineEdit.text())
 
-        if self.directory:
-            self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
-    def DeskewGreekMonoDialog(self):
-        self.directory = self._choose_directory("Select greek pages source folder", self.deskew_greekmono_ui.SourceLineEdit.text())
+    # def DeskewGreekMonoDialog(self):
+    #     self.directory = self._choose_directory("Select greek pages source folder", self.deskew_greekmono_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.deskew_greekmono_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_greekmono_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewGreekPngDialog(self):
-        self.directory = self._choose_directory("Select greek png pages destination folder", self.deskew_greekmono_ui.DestPngLineEdit.text())
+    # def DestDeskewGreekPngDialog(self):
+    #     self.directory = self._choose_directory("Select greek png pages destination folder", self.deskew_greekmono_ui.DestPngLineEdit.text())
 
-        if self.directory:
-            self.deskew_greekmono_ui.DestPngLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_greekmono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewGreekTifDialog(self):
-        self.directory = self._choose_directory("Select greek tif pages destination folder", self.deskew_greekmono_ui.DestTifLineEdit.text())
+    # def DestDeskewGreekTifDialog(self):
+    #     self.directory = self._choose_directory("Select greek tif pages destination folder", self.deskew_greekmono_ui.DestTifLineEdit.text())
 
-        if self.directory:
-            self.deskew_greekmono_ui.DestTifLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_greekmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
-    def GreekResizePngDialog(self):
-        self.directory = self._choose_directory("Select greek pages source folder", self.greekresizepng_ui.SourceLineEdit.text())
+    # def GreekResizePngDialog(self):
+    #     self.directory = self._choose_directory("Select greek pages source folder", self.greekresizepng_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.greekresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.greekresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestGreekResizePngDialog(self):
-        self.directory = self._choose_directory("Select greek png pages destination folder", self.greekresizepng_ui.DestinationLineEdit.text())
+    # def DestGreekResizePngDialog(self):
+    #     self.directory = self._choose_directory("Select greek png pages destination folder", self.greekresizepng_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.greekresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.greekresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def DeskewLatinMonoDialog(self):
-        self.directory = self._choose_directory("Select latin pages source folder", self.deskew_latinmono_ui.SourceLineEdit.text())
+    # def DeskewLatinMonoDialog(self):
+    #     self.directory = self._choose_directory("Select latin pages source folder", self.deskew_latinmono_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.deskew_latinmono_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_latinmono_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def LatinMonoToPngDialog(self):
-        self.directory = self._choose_directory("Select latin mono tif pages source folder", self.latinmono2png_ui.SourceLineEdit.text())
+    # def LatinMonoToPngDialog(self):
+    #     self.directory = self._choose_directory("Select latin mono tif pages source folder", self.latinmono2png_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.latinmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.latinmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def LatinDestMonoToPngDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.latinmono2png_ui.DestinationLineEdit.text())
+    # def LatinDestMonoToPngDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.latinmono2png_ui.DestinationLineEdit.text())
 
-        if self.directory:
-            self.latinmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.latinmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def DestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+    # def DestMonoToPngDialog(self):
+    #     self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
 
-        if self.directory:
-            self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def DeskewMonoDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
+    # def DeskewMonoDialog(self):
+    #     self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
 
-        if self.directory:
-            self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_mono_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+    # def DestDeskewPngDialog(self):
+    #     self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
 
-        if self.directory:
-            self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_mono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewTifDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
+    # def DestDeskewTifDialog(self):
+    #     self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
 
-        if self.directory:
-            self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_mono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewLatinPngDialog(self):
-        self.directory = self._choose_directory("Select latin png pages destination folder", self.deskew_latinmono_ui.DestPngLineEdit.text())
+    # def DestDeskewLatinPngDialog(self):
+    #     self.directory = self._choose_directory("Select latin png pages destination folder", self.deskew_latinmono_ui.DestPngLineEdit.text())
 
-        if self.directory:
-            self.deskew_latinmono_ui.DestPngLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_latinmono_ui.DestPngLineEdit.setText(self.directory+r'/')
 
-    def DestDeskewLatinTifDialog(self):
-        self.directory = self._choose_directory("Select latin tif pages destination folder", self.deskew_latinmono_ui.DestTifLineEdit.text())
+    # def DestDeskewLatinTifDialog(self):
+    #     self.directory = self._choose_directory("Select latin tif pages destination folder", self.deskew_latinmono_ui.DestTifLineEdit.text())
 
-        if self.directory:
-            self.deskew_latinmono_ui.DestTifLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.deskew_latinmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
-    def LatinResizePngDialog(self):
-        self.directory = self._choose_directory("Select latin pages source folder", self.latinresizepng_ui.SourceLineEdit.text())
+    # def LatinResizePngDialog(self):
+    #     self.directory = self._choose_directory("Select latin pages source folder", self.latinresizepng_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.latinresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.latinresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def DestLatinResizePngDialog(self):
+    # def DestLatinResizePngDialog(self):
         self.directory = self._choose_directory("Select latin png pages destination folder", self.latinresizepng_ui.DestinationLineEdit.text())
 
         if self.directory:
             self.latinresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def CropLanguagesDialog(self):
-        self.directory = self._choose_directory("Select pdf pages source folder", self.crop_languages_ui.SourceLineEdit.text())
+    # def CropLanguagesDialog(self):
+    #     self.directory = self._choose_directory("Select pdf pages source folder", self.crop_languages_ui.SourceLineEdit.text())
 
-        if self.directory:
-            self.crop_languages_ui.SourceLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.crop_languages_ui.SourceLineEdit.setText(self.directory+r'/')
 
-    def BoxFolderDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.BoxFolderLineEdit.text())
+    # def BoxFolderDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.BoxFolderLineEdit.text())
 
-        if self.directory:
-            self.crop_languages_ui.BoxFolderLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.crop_languages_ui.BoxFolderLineEdit.setText(self.directory+r'/')
 
-    def ElimFolderDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.ElimFolderLineEdit.text())
+    # def ElimFolderDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.ElimFolderLineEdit.text())
 
-        if self.directory:
-            self.crop_languages_ui.ElimFolderLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.crop_languages_ui.ElimFolderLineEdit.setText(self.directory+r'/')
 
-    def DestGreekDialog(self):
-        self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.DestGreekLineEdit.text())
+    # def DestGreekDialog(self):
+    #     self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.DestGreekLineEdit.text())
 
-        if self.directory:
-            self.crop_languages_ui.DestGreekLineEdit.setText(self.directory+r'/')
+    #     if self.directory:
+    #         self.crop_languages_ui.DestGreekLineEdit.setText(self.directory+r'/')
 
-    def DestLatinDialog(self):
+    # def DestLatinDialog(self):
         self.directory = self._choose_directory("Select destination folder", self.crop_languages_ui.DestLatinLineEdit.text())
 
         if self.directory:
@@ -3760,7 +3975,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             'self.zoom': combo_text,
             'self.zoomslidervalue': value,
         })
-
 
     def run_child_module(self, filename, *args):
         module_path = os.path.abspath(os.path.join(script_dir, filename))
@@ -4022,24 +4236,6 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
     def on_lang_select(self, _selection=None):
         self.ocrlang = self.ui.OCRlangComboBox.currentText()
         self.ocrmodel = self.ui.OCRModelComboBox.currentText()
-
-        language = self.ocrlang.casefold()
-        model = self.ocrmodel.casefold()
-        show_greek = "greek" in language or model in {"ell", "grc", "feg"}
-        show_latin = not show_greek and ("latin" in language or model in {"lat", "fel"})
-
-        for toolbar in (
-            self.ui.GreekImagePagesToolBar,
-            self.ui.GreekImageLinesToolBar,
-            self.ui.GreekTextLinesToolBar,
-        ):
-            toolbar.setVisible(show_greek)
-        for toolbar in (
-            self.ui.LatinImagePagesToolBar,
-            self.ui.LatinImageLinesToolBar,
-            self.ui.LatinTextLinesToolBar,
-        ):
-            toolbar.setVisible(show_latin)
 
         self.session_manager.update('Session.json', {
             'self.ocrlang': self.ocrlang,

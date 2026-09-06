@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Optional, Sequence
 
-from .project_database import load_project_database_record
+from .project_database import load_project_database_record, source_section_for_page
 
 
 @dataclass(frozen=True)
@@ -69,9 +69,8 @@ TRACKING_FILENAME = "ProjectTracking.json"
 HANDSHAKE_FILENAME = os.path.join(
     "Model",
     "Project",
-    "Images",
-    "MyServer",
-    "Workflow",
+    "Data",
+    "csv",
     "module_handshakes.csv",
 )
 ACTIVE_PROJECT_ROOT_KEYS = (
@@ -287,6 +286,9 @@ class ProjectWorkflowTracker:
                 "overall_percent": 0,
                 "page_percent": 0,
                 "total_pages": 0,
+                "source_document_pages": 0,
+                "source_page_sections": [],
+                "current_source_section": "Front Matter",
                 "completed_pages": 0,
                 "overall_completed_count": 0,
                 "overall_total_count": len(OVERALL_MILESTONES),
@@ -367,6 +369,9 @@ class ProjectWorkflowTracker:
             "overall_percent": overall_percent,
             "page_percent": page_percent,
             "total_pages": total_pages,
+            "source_document_pages": self._source_document_pages(project_context),
+            "source_page_sections": project_context.get("SourcePageSections", []),
+            "current_source_section": project_context.get("CurrentSourceSection", "Front Matter"),
             "completed_pages": completed_pages,
             "overall_completed_count": len(completed_labels),
             "overall_total_count": len(milestone_states),
@@ -577,7 +582,22 @@ class ProjectWorkflowTracker:
             if isinstance(languages, list) and languages:
                 normalized["CurrentLanguage"] = str(languages[0])
 
+        source_sections = normalized.get("SourcePageSections")
+        if isinstance(source_sections, list):
+            normalized["CurrentSourceSection"] = source_section_for_page(
+                source_sections,
+                normalized.get("CurrentProjectPage", normalized.get("ProjectPageNumber", 1)),
+                normalized.get("CurrentSourceSection"),
+            )
+
         return normalized
+
+    @staticmethod
+    def _source_document_pages(project_context: Dict[str, object]) -> int:
+        try:
+            return max(0, int(project_context.get("NumberPages", 0) or 0))
+        except (TypeError, ValueError):
+            return 0
 
     def _source_acquired(self, project_root: str) -> bool:
         images_root = os.path.join(project_root, "Model", "Project", "Images")

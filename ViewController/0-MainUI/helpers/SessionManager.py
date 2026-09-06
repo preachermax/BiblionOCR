@@ -134,7 +134,7 @@ class SessionManager:
         else:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             self.base_dir = os.path.normpath(
-                os.path.join(current_dir, '..', '..', 'Model', 'Project', 'Data', 'json')
+                os.path.join(current_dir, '..', '..', '..', 'Model', 'Project', 'Data', 'json')
             )
 
     def _project_font_dir(self) -> str:

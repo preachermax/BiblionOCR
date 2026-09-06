@@ -43,7 +43,40 @@ PROJECT_LIST_FILENAME = "ProjectFolderList.txt"
 SESSION_JSON_GLOB = "*Session.json"
 
 REQUIRED_PROJECT_FILES = {
+    "Model/Project/Data/csv/ProjectWorkflow.ods",
+    "Model/Project/Data/csv/ProjectWorkflow.csv",
+    "Model/Project/Data/csv/module_handshakes.csv",
+    "Model/Project/Data/csv/page_workflow_milestones.csv",
     "requirements.txt",
+}
+
+PAGE_WORKFLOW_STAGES = {
+    "1_pdf_front_src_pages_staged",
+    "2_pdf_front_src_pages_extracted",
+    "3_pdf_front_src_pages_for_tif",
+    "4_pdf_front_src_pages_to_tif",
+    "5_tif_front_src_pages_indexed",
+    "6_tif_front_src_pages_cleaned",
+    "7_pdf_middle_src_pages_staged",
+    "8_pdf_middle_book_src_pages",
+    "9_pdf_middle_book_src_pages_extracted",
+    "10_pdf_middle_book_src_pages_for_tif",
+    "11_pdf_middle_book_src_pages_to_tif",
+    "12_tif_middle_book_src_pages_indexed",
+    "13_tif_middle_book_src_pages_cleaned",
+    "14_pdf_verse_src_pages_staged",
+    "15_pdf_verse_book_src_pages",
+    "16_pdf_verse_book_src_pages_extracted",
+    "17_pdf_verse_book_src_pages_for_tif",
+    "18_pdf_verse_book_src_pages_to_tif",
+    "19_tif_verse_book_src_pages_indexed",
+    "20_tif_verse_book_src_pages_cleaned",
+    "21_pdf_back_src_pages_staged",
+    "22_pdf_back_src_pages_extracted",
+    "23_pdf_back_src_pages_for_tif",
+    "24_pdf_back_src_pages_to_tif",
+    "25_tif_back_src_pages_indexed",
+    "26_tif_back_src_pages_cleaned",
 }
 
 # Manifest copy overrides use the form:
@@ -100,6 +133,13 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Data/SQLite",
     "Model/Project/Data/esword",
     "Model/Project/Utilities",
+    "Model/Project/Images/Scanned",
+    "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
+    "Model/Project/Images/MyServer/source_images/pdf_combined_src_images",
+    "Model/Project/Images/MyServer/source_images/tif_acq_src_image",
+    "Model/Project/Images/MyServer/source_images/tif_combined_src_images",
+    "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
+    "Model/Project/Images/MyScanner/scanned_images/tif_scan_src_image",
     "Model/Project/Images/Complete/Greek",
     "Model/Project/Images/Complete/Latin",
     "Model/Project/Images/Complete/Source",
@@ -113,6 +153,41 @@ STATIC_PROJECT_FOLDERS = {
     "ViewController/0-MainUI/helpers/fonts",
     "Developer/QtDesignerUI",
 }
+
+PROJECT_IMAGE_MODULES = {
+    "MyBoxer",
+    "MyGlypher",
+    "MyGrounder",
+    "MyReader",
+    "MyTrainer",
+}
+
+PROJECT_TEXT_MODULES = {
+    "MyBoxer",
+    "MyGrounder",
+    "MyLexer",
+    "MyReader",
+    "MyScanner",
+    "MyServer",
+    "MyTrainer",
+    "MyWriter",
+}
+
+STATIC_PROJECT_FOLDERS.update(
+    f"Model/Project/Images/{module}/{stage}"
+    for module in PROJECT_IMAGE_MODULES
+    for stage in ("Complete", "Source", "Workflow")
+)
+STATIC_PROJECT_FOLDERS.update(
+    f"Model/Project/Text/{module}/{stage}"
+    for module in PROJECT_TEXT_MODULES
+    for stage in ("Complete", "Reference", "Workflow")
+)
+STATIC_PROJECT_FOLDERS.update(
+    f"Model/Project/Images/MyPixler/VerseSections/{state}/{stage}"
+    for state in ("Workflow", "Complete")
+    for stage in PAGE_WORKFLOW_STAGES
+)
 
 MINIMAL_IMAGE_FOLDERS = {
     "Model/Project/Images",
@@ -148,7 +223,12 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/3-Process",
     "ViewController/2-TrainTesseract",
     "ViewController/1-PreProcess",
+    "ViewController/3-Process/MyLexer.py",
     "ViewController/0-MainUI/helpers/worker.py",
+    "ViewController/0-MainUI/helpers/ProjectTrackingDialog.py",
+    "ViewController/0-MainUI/helpers/fonts/FROMVS.ttf",
+    "ViewController/0-MainUI/helpers/ext/find.py",
+    "ViewController/0-MainUI/helpers/Dialogs/pdf2tifDialog.py",
     "Developer/QtDesignerUI/update_UI_Resources.txt",
     "Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.txt",
     "Developer/ViewController/SeparatedDevFiles/0-MainUI/update_fonts.py",
@@ -316,6 +396,9 @@ class ProjectFolderListBuilder:
         self.main_ui_project_list_path = (
             self.project_root / "ViewController" / "0-MainUI" / PROJECT_LIST_FILENAME
         )
+        self.main_ui_helpers_project_list_path = (
+            self.project_root / "ViewController" / "0-MainUI" / "helpers" / PROJECT_LIST_FILENAME
+        )
         self.session_json_dir = self.project_root / "Model" / "Project" / "Data" / "json"
 
     @staticmethod
@@ -338,7 +421,7 @@ class ProjectFolderListBuilder:
 
     def build(self, include_existing: bool = True, scan_filesystem: bool = False) -> list[str]:
         folders: Set[str] = set(STATIC_PROJECT_FOLDERS)
-        files: Set[str] = set()
+        files: Set[str] = set(REQUIRED_PROJECT_FILES)
         existing_entries: Set[str] = set()
 
         if include_existing:
@@ -385,9 +468,11 @@ class ProjectFolderListBuilder:
         self._assert_no_deprecated_model_references(folder_list)
         text = "\n".join(folder_list).rstrip() + "\n"
 
-        output_paths = [self.project_list_path]
-        if self.main_ui_project_list_path != self.project_list_path:
-            output_paths.append(self.main_ui_project_list_path)
+        output_paths = {
+            self.project_list_path,
+            self.main_ui_project_list_path,
+            self.main_ui_helpers_project_list_path,
+        }
 
         for output_path in output_paths:
             output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -812,6 +897,9 @@ class ProjectFolderListBuilder:
                 path = path[idx + len(marker) :]
                 break
 
+        if path.startswith("/") or re.match(r"^[a-zA-Z]:/", path):
+            return None
+
         pure_path = PurePosixPath(path)
 
         if reduce_file_paths and pure_path.suffix.lower() in KNOWN_FILE_EXTENSIONS:
@@ -863,6 +951,8 @@ class ProjectFolderListBuilder:
         normalized = path.replace("\\", "/").strip("/")
         return (
             normalized == "Model/Project/Data"
+            or normalized == "Model/Project/Data/csv"
+            or normalized in REQUIRED_PROJECT_FILES
             or normalized == "Model/Project/Data/json"
             or normalized.startswith("Model/Project/Data/json/")
             or normalized == "Model/Project/Data/esword"

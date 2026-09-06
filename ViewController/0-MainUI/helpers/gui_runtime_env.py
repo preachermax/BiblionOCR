@@ -21,6 +21,7 @@ def sanitize_current_process_and_reexec() -> None:
     """Sanitize process environment and re-exec once if required."""
 
     if os.environ.get(_SANITIZED_MARKER) == "1":
+        install_default_qt_font_policy()
         return
 
     env = dict(os.environ)

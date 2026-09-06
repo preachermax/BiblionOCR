@@ -15,6 +15,22 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
         os.makedirs(os.path.join(project_root, "Model", "Project", "Data", "json"), exist_ok=True)
         return project_root
 
+    def test_tracker_loads_project_local_manual_handshake_export(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            handshake_dir = os.path.join(tmpdir, "Model", "Project", "Data", "csv")
+            os.makedirs(handshake_dir, exist_ok=True)
+            handshake_path = os.path.join(handshake_dir, "module_handshakes.csv")
+            with open(handshake_path, "w", encoding="utf-8") as handle:
+                handle.write(
+                    "MilestoneName UI_Action Override Language InputPath InputModule OutputModule OutputPath\n"
+                    "source_staged Y Y english source MyServer MyPixler destination\n"
+                )
+
+            tracker = ProjectWorkflowTracker(workspace_root=tmpdir)
+
+            self.assertEqual(handshake_path, tracker._resolve_handshake_file_path())
+            self.assertIn("source_staged", [row[0] for row in tracker._milestone_catalog])
+
     def test_snapshot_includes_project_metadata_context_from_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             project_root = self._create_project_root(tmpdir)
@@ -89,6 +105,31 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
             self.assertEqual("right", context.get("ActiveColumnName"))
             self.assertEqual("eng", context.get("CurrentLanguage"))
             self.assertEqual("EB Garamond", context.get("ProjectFont"))
+
+    def test_snapshot_exposes_source_page_count_sections_and_current_section(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = self._create_project_root(tmpdir)
+            create_project_database(
+                os.path.join(project_root, "project_metadata.sqlite"),
+                {
+                    "ProjectName": "SectionedProject",
+                    "NumberPages": 100,
+                    "CurrentProjectPage": 45,
+                    "SourcePageSections": [
+                        {"key": "front_matter", "start_page": 1, "end_page": 10},
+                        {"key": "scripture", "start_page": 11, "end_page": 90},
+                        {"key": "back_matter", "start_page": 91, "end_page": 100},
+                    ],
+                },
+                available_languages=("eng",),
+            )
+
+            snapshot = ProjectWorkflowTracker().snapshot("MyServer", project_root=project_root)
+
+            self.assertEqual(100, snapshot["source_document_pages"])
+            self.assertEqual(3, len(snapshot["source_page_sections"]))
+            self.assertEqual("Scripture", snapshot["current_source_section"])
+            self.assertEqual("Scripture", snapshot["project_context"]["CurrentSourceSection"])
 
     def test_text_outputs_started_detects_workflow_output_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

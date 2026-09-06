@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="Icons">
+    <file>Icons/settings.png</file>
+    <file>Icons/scroll2.png</file>
     <file>Icons/Patreon_Header.png</file>
     <file>Icons/BiblionLauncher.png</file>
     <file>Icons/BiblionResolver.png</file>
@@ -380,6 +382,7 @@
     <file>Icons/image-sunset.png</file>
   </qresource>
   <qresource prefix="Icons/">
+    <file>Icons/stage.png</file>
     <file>Icons/BiblionLexer2.png</file>
   </qresource>
 </RCC>

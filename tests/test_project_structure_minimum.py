@@ -14,6 +14,47 @@ class _DummyEventBus:
 
 
 class ProjectStructureMinimumTests(unittest.TestCase):
+    def test_project_creation_uses_current_myserver_source_layout(self) -> None:
+        default_folders = set(ProjectCreationEngine.DEFAULT_PROJECT_FOLDERS)
+
+        self.assertIn(
+            "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
+            default_folders,
+        )
+        self.assertFalse(any(
+            path.startswith("Model/Project/Images/MyServer/Source")
+            for path in default_folders
+        ))
+
+    def test_project_folder_manifests_are_synchronized_and_complete(self) -> None:
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        manifest_paths = [
+            os.path.join(repo_root, "ProjectFolderList.txt"),
+            os.path.join(repo_root, "ViewController", "0-MainUI", "ProjectFolderList.txt"),
+            os.path.join(repo_root, "ViewController", "0-MainUI", "helpers", "ProjectFolderList.txt"),
+        ]
+        manifest_entries = []
+        for manifest_path in manifest_paths:
+            with open(manifest_path, "r", encoding="utf-8-sig") as handle:
+                manifest_entries.append({line.strip() for line in handle if line.strip()})
+
+        self.assertEqual(manifest_entries[0], manifest_entries[1])
+        self.assertEqual(manifest_entries[0], manifest_entries[2])
+        self.assertTrue(
+            {
+                "ViewController/0-MainUI/helpers/Dialogs/pdf2tifDialog.py",
+                "ViewController/0-MainUI/helpers/ext/find.py",
+                "ViewController/0-MainUI/helpers/fonts/FROMVS.ttf",
+                "ViewController/0-MainUI/helpers/ProjectTrackingDialog.py",
+                "ViewController/3-Process/MyLexer.py",
+                "Model/Project/Training/Tesseract/models/feg",
+            }.issubset(manifest_entries[0])
+        )
+        required_model_folders = {
+            path for path in ProjectCreationEngine.DEFAULT_PROJECT_FOLDERS if path.startswith("Model/")
+        }
+        self.assertTrue(required_model_folders.issubset(manifest_entries[0]))
+
     def test_project_manifests_include_required_theme_entries(self) -> None:
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         for filename in ("ScriptureProjectFolderList.txt", "GeneralProjectFolderList.txt"):
@@ -22,6 +63,19 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                 with open(manifest_path, "r", encoding="utf-8-sig") as handle:
                     entries = {line.strip() for line in handle if line.strip()}
                 self.assertTrue(set(ProjectCreationEngine.REQUIRED_THEME_ENTRIES).issubset(entries))
+
+    def test_scripture_manifests_include_default_source_page_sections(self) -> None:
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        section_entries = {
+            f"Model/Project/Images/{stage}/Source/{section}"
+            for stage in ("Workflow", "Complete")
+            for section in ("FrontMatter", "Scripture", "BackMatter")
+        }
+        manifest_path = os.path.join(repo_root, "ViewController", "ScriptureProjectFolderList.txt")
+        with open(manifest_path, "r", encoding="utf-8-sig") as handle:
+            entries = {line.strip() for line in handle if line.strip()}
+
+        self.assertTrue(section_entries.issubset(entries))
 
     def test_default_structure_includes_required_model_project_layout(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -36,19 +90,15 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                 "Model/Project/Data",
                 "Model/Project/Images",
                 "Model/Project/Text",
-                "Model/Project/Images/MyServer",
-                "Model/Project/Images/MyScanner",
                 "Model/Project/Images/MyBoxer",
                 "Model/Project/Images/MyGlypher",
                 "Model/Project/Images/MyReader",
                 "Model/Project/Images/MyGrounder",
                 "Model/Project/Images/MyTrainer",
-                "Model/Project/Images/MyServer/Source",
-                "Model/Project/Images/MyServer/Workflow",
-                "Model/Project/Images/MyServer/Complete",
-                "Model/Project/Images/MyScanner/Source",
-                "Model/Project/Images/MyScanner/Workflow",
-                "Model/Project/Images/MyScanner/Complete",
+                "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
+                "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
+                "Model/Project/Images/MyPixler/VerseSections/Workflow/1_pdf_front_src_pages_staged",
+                "Model/Project/Images/MyPixler/VerseSections/Complete/26_tif_back_src_pages_cleaned",
                 "Model/Project/Text/MyServer/Reference",
                 "Model/Project/Text/MyServer/Workflow",
                 "Model/Project/Text/MyServer/Complete",
@@ -114,6 +164,44 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                 )
             )
 
+    def test_new_testament_projects_create_page_workflow_book_folders(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            engine = ProjectCreationEngine(tmpdir, _DummyEventBus())
+            engine.context = {
+                "project_name": "nt_project",
+                "ProjectType": "Scriptural",
+                "ScripturalSource": "new_testament",
+            }
+            engine._resolve_folder_list_path = lambda: os.path.join(
+                repo_root, "ViewController", "ScriptureProjectFolderList.txt"
+            )
+
+            project_root = os.path.join(tmpdir, "project")
+            os.makedirs(project_root, exist_ok=True)
+            engine._create_project_structure(project_root)
+
+            for state in ("Workflow", "Complete"):
+                for stage in ("8_pdf_middle_book_src_pages", "16_pdf_verse_book_src_pages_extracted"):
+                    stage_root = os.path.join(
+                        project_root,
+                        "Model",
+                        "Project",
+                        "Images",
+                        "MyPixler",
+                        "VerseSections",
+                        state,
+                        stage,
+                    )
+                    books = sorted(
+                        name for name in os.listdir(stage_root)
+                        if os.path.isdir(os.path.join(stage_root, name))
+                    )
+                    self.assertEqual(27, len(books))
+                    self.assertEqual("book_40_Matthew", books[0])
+                    self.assertIn("book_66_Revelation", books)
+                    self.assertFalse(any(name.startswith("book_01_") for name in books))
+
     def test_explicit_folder_selection_controls_scripture_manifest_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -159,6 +247,13 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                         "book_40_Matthew",
                     )
                 )
+            )
+
+            self.assertTrue(
+                os.path.isfile(os.path.join(project_root, "ViewController", "0-MainUI", "MyServer.py"))
+            )
+            self.assertTrue(
+                os.path.isfile(os.path.join(project_root, "ViewController", "3-Process", "MyLexer.py"))
             )
 
     def test_scripture_manifest_keeps_process_modules(self) -> None:

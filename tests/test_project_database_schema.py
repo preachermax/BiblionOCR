@@ -8,6 +8,7 @@ import unittest
 from Core.project_database import (
     DEFAULT_PROJECT_THEME,
     DEFAULT_PROJECT_FONT,
+    DEFAULT_SCRIPTURE_WORKFLOW_LEVELS,
     DEFAULT_UI_FONT,
     PROJECT_THEME_IDS,
     PROJECT_DATABASE_TABLE,
@@ -15,10 +16,37 @@ from Core.project_database import (
     create_project_database,
     load_project_database_record,
     normalize_project_database_values,
+    update_project_database_values,
 )
 
 
 class ProjectDatabaseSchemaTests(unittest.TestCase):
+    def test_source_sections_include_testament_scoped_scripture_hierarchy(self) -> None:
+        normalized = normalize_project_database_values(
+            {
+                "ProjectName": "NT Demo",
+                "ScripturalSource": "new_testament",
+                "NumberPages": 100,
+            },
+            available_languages=("eng",),
+        )
+
+        self.assertEqual("new_testament", normalized["ScripturalSource"])
+        self.assertEqual(
+            ["front_matter", "scripture", "back_matter"],
+            [section["key"] for section in normalized["SourcePageSections"]],
+        )
+        scripture = normalized["SourcePageSections"][1]
+        self.assertEqual("new_testament", scripture["testament_scope"])
+        self.assertEqual(
+            list(DEFAULT_SCRIPTURE_WORKFLOW_LEVELS),
+            [level["key"] for level in scripture["workflow_levels"]],
+        )
+        self.assertTrue(all(
+            level["assignment"] == "page_workflow"
+            for level in scripture["workflow_levels"]
+        ))
+
     def test_phase1_defaults_and_normalization(self) -> None:
         normalized = normalize_project_database_values(
             {
@@ -213,10 +241,45 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
         self.assertEqual("Total Source Document Pages", definitions["NumberPages"].label)
         self.assertTrue(definitions["NumberPages"].required)
         self.assertEqual(1, definitions["NumberPages"].default)
+        self.assertIn("SourceDocumentPath", definitions)
+        self.assertIn("SourceDocumentDirectory", definitions)
         self.assertIn("TotalProjectPages", definitions)
         self.assertIn("CurrentProjectPage", definitions)
         self.assertIn("CurrentProjectMilestone", definitions)
         self.assertIn("CurrentPageMilestone", definitions)
+        self.assertEqual(3, definitions["SourcePageSectionCount"].default)
+        self.assertIn("SourcePageSections", definitions)
+        self.assertIn("CurrentSourceSection", definitions)
+
+    def test_scripture_projects_default_to_three_unassigned_source_sections(self) -> None:
+        normalized = normalize_project_database_values({"NumberPages": 583})
+
+        self.assertEqual(3, normalized["SourcePageSectionCount"])
+        self.assertEqual(
+            ["Front Matter", "Scripture", "Back Matter"],
+            [section["name"] for section in normalized["SourcePageSections"]],
+        )
+        self.assertTrue(
+            all(section["start_page"] is None and section["end_page"] is None for section in normalized["SourcePageSections"])
+        )
+        self.assertEqual("Front Matter", normalized["CurrentSourceSection"])
+
+    def test_page_count_update_preserves_and_clamps_verified_section_ranges(self) -> None:
+        normalized = normalize_project_database_values(
+            {
+                "NumberPages": 95,
+                "CurrentProjectPage": 92,
+                "SourcePageSections": [
+                    {"key": "front_matter", "start_page": 1, "end_page": 10},
+                    {"key": "scripture", "start_page": 11, "end_page": 90},
+                    {"key": "back_matter", "start_page": 91, "end_page": 100},
+                ],
+            }
+        )
+
+        self.assertEqual(95, normalized["NumberPages"])
+        self.assertEqual(5, normalized["SourcePageSections"][2]["page_count"])
+        self.assertEqual("Back Matter", normalized["CurrentSourceSection"])
 
     def test_total_project_pages_are_derived_from_source_pages_and_columns(self) -> None:
         for source_pages, columns, expected_total in ((100, 2, 200), (100, 1, 100), (100, 3, 300)):
@@ -227,6 +290,27 @@ class ProjectDatabaseSchemaTests(unittest.TestCase):
                 )
 
                 self.assertEqual(expected_total, normalized["TotalProjectPages"])
+
+    def test_page_count_update_preserves_columns_and_derives_project_pages(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            database_path = os.path.join(tmpdir, "project_metadata.sqlite")
+            create_project_database(
+                database_path,
+                {"ProjectName": "PDF Demo", "NumberPages": 1, "NumberColumns": 2},
+                available_languages=("eng",),
+            )
+
+            updated = update_project_database_values(
+                database_path,
+                {"SourceType": "PDF", "NumberPages": 37},
+                available_languages=("eng",),
+            )
+
+            self.assertEqual("PDF", updated["SourceType"])
+            self.assertEqual(37, updated["NumberPages"])
+            self.assertEqual(2, updated["NumberColumns"])
+            self.assertEqual(74, updated["TotalProjectPages"])
+            self.assertEqual(updated, load_project_database_record(database_path))
 
 
 if __name__ == "__main__":

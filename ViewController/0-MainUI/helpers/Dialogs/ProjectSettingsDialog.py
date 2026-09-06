@@ -14,6 +14,7 @@ from Core.project_database import (
     build_project_field_definitions,
     create_project_database,
     load_project_database_record,
+    project_metadata_database_path,
 )
 from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 
@@ -396,6 +397,12 @@ class ProjectSettingsStore:
 
         conn = sqlite3.connect(candidate_db_path)
         try:
+            table_exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'ris'"
+            ).fetchone()
+            if table_exists is None:
+                return {}
+
             cursor = conn.execute(
                 "SELECT field_key, field_value FROM ris ORDER BY field_order ASC, field_key ASC"
             )
@@ -1049,15 +1056,7 @@ class ProjectSettingsDialog(qtw.QDialog):
         )
 
     def _project_metadata_db_path(self):
-        candidates = [
-            os.path.join(self.project_root, "Model", "Project", "Data", "sqlite", "project_metadata.sqlite"),
-            os.path.join(self.project_root, "Model", "Project", "Data", "SQLite", "project_metadata.sqlite"),
-            os.path.join(self.project_root, "project_metadata.sqlite"),
-        ]
-        for candidate in candidates:
-            if os.path.exists(candidate):
-                return candidate
-        return candidates[0]
+        return project_metadata_database_path(self.project_root)
 
     def _load_project_database_record(self):
         db_path = self._project_metadata_db_path()

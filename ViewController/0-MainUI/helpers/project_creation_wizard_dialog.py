@@ -3,13 +3,19 @@ import json
 import os
 import re
 import subprocess
+from urllib.parse import unquote, urlparse
 
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
+from Core.myexplorer_picker import run_myexplorer_selection
 from Core.project_database import build_project_field_definitions
 from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
+try:
+    from helpers.pdf_viewer_dialog import PdfViewerDialog
+except ModuleNotFoundError:
+    from pdf_viewer_dialog import PdfViewerDialog
 
 
 class ProjectCreationWizardDialog(qtw.QDialog):
@@ -267,6 +273,24 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.project_purpose_edit.setFixedHeight(72)
         details_layout.addWidget(self.project_purpose_label)
         details_layout.addWidget(self.project_purpose_edit)
+
+        source_document_label = qtw.QLabel("Source image document (optional)")
+        details_layout.addWidget(source_document_label)
+        source_document_row = qtw.QHBoxLayout()
+        self.source_document_edit = qtw.QLineEdit()
+        self.source_document_edit.setReadOnly(True)
+        self.source_document_edit.setPlaceholderText("No PDF source selected")
+        source_document_row.addWidget(self.source_document_edit, 1)
+        self.source_document_button = qtw.QPushButton("Load Source Image")
+        self.source_document_button.clicked.connect(self._browse_for_source_document)
+        source_document_row.addWidget(self.source_document_button)
+        self.view_source_document_button = qtw.QPushButton("View")
+        self.view_source_document_button.clicked.connect(self._view_selected_source_document)
+        source_document_row.addWidget(self.view_source_document_button)
+        self.clear_source_document_button = qtw.QPushButton("Clear")
+        self.clear_source_document_button.clicked.connect(self._clear_source_document)
+        source_document_row.addWidget(self.clear_source_document_button)
+        details_layout.addLayout(source_document_row)
 
         project_scope_row = qtw.QHBoxLayout()
         project_scope_column = qtw.QVBoxLayout()
@@ -1171,11 +1195,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         return updates
 
     def _browse_for_ris(self):
-        path, _ = qtw.QFileDialog.getOpenFileName(
-            self,
+        path = run_myexplorer_selection(
             "Select Provenance File",
             self.projects_base_path,
-            "Provenance files (*.json *.ris *.txt *.csv);;JSON files (*.json);;RIS text files (*.ris *.txt);;CSV files (*.csv);;All Files (*.*)",
+            "file",
         )
         if not path:
             return
@@ -1191,6 +1214,46 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.status_label.setText("Provenance loaded. Edit fields below or continue to project details.")
         self.page_stack.setCurrentIndex(0)
         self._update_page_state()
+
+    def _browse_for_source_document(self):
+        path = run_myexplorer_selection(
+            "Select Source Image Document",
+            self.projects_base_path,
+            "file",
+        )
+        if path:
+            source_path = os.path.abspath(path)
+            try:
+                viewer = PdfViewerDialog(source_path, self)
+                self._set_detected_source_page_count(viewer.page_count)
+                viewer.exec_()
+            except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
+                qtw.QMessageBox.warning(self, "Source PDF", f"Could not display the source document.\n\n{exc}")
+                return
+            self.source_document_edit.setText(source_path)
+
+    def _clear_source_document(self):
+        self.source_document_edit.clear()
+        self._set_detected_source_page_count(1)
+
+    def _set_detected_source_page_count(self, page_count):
+        page_count = max(1, int(page_count))
+        page_text = str(page_count)
+        if self.source_pages_combo.findText(page_text) < 0:
+            self.source_pages_combo.addItem(page_text)
+        self.source_pages_combo.setCurrentText(page_text)
+        self._update_validation_state()
+
+    def _view_selected_source_document(self):
+        source_path = self.source_document_edit.text().strip()
+        if not source_path:
+            qtw.QMessageBox.information(self, "Source PDF", "Select a source document first.")
+            return
+        try:
+            viewer = PdfViewerDialog(source_path, self)
+            viewer.exec_()
+        except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            qtw.QMessageBox.warning(self, "Source PDF", f"Could not display the source document.\n\n{exc}")
 
     def _clear_ris(self):
         self.ris_path_edit.clear()
@@ -1245,7 +1308,51 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self.creator_edit.setText(str(payload.get("creator", "")))
 
         self._populate_ris_editor(payload)
+        cited_source_path = self._source_document_from_provenance(payload)
+        if cited_source_path and not self.source_document_edit.text().strip():
+            self.source_document_edit.setText(cited_source_path)
+            try:
+                viewer = PdfViewerDialog(cited_source_path, self)
+                self._set_detected_source_page_count(viewer.page_count)
+                viewer.deleteLater()
+            except (RuntimeError, ValueError, json.JSONDecodeError):
+                self.source_document_edit.clear()
         self._refresh_review()
+
+    def _source_document_from_provenance(self, payload):
+        candidates = []
+        for key in (
+            "SourceImageDocument",
+            "source_image_document",
+            "source_document_path",
+            "source_document",
+            "pdf_path",
+            "source_file",
+        ):
+            value = payload.get(key)
+            if value:
+                candidates.extend(value if isinstance(value, list) else [value])
+
+        tags = payload.get("source_provenance_tags")
+        if isinstance(tags, dict):
+            for tag in ("L1", "L2"):
+                value = tags.get(tag)
+                if value:
+                    candidates.extend(value if isinstance(value, list) else [value])
+
+        provenance_path = str(payload.get("source_provenance_path") or "").strip()
+        provenance_dir = os.path.dirname(provenance_path) if provenance_path else self.projects_base_path
+        for candidate in candidates:
+            candidate_path = str(candidate or "").strip().strip('"')
+            if candidate_path.startswith("file://"):
+                candidate_path = unquote(urlparse(candidate_path).path)
+            candidate_path = os.path.expanduser(candidate_path)
+            if not os.path.isabs(candidate_path):
+                candidate_path = os.path.join(provenance_dir, candidate_path)
+            candidate_path = os.path.abspath(candidate_path)
+            if os.path.isfile(candidate_path) and os.path.splitext(candidate_path)[1].lower() == ".pdf":
+                return candidate_path
+        return ""
 
     def _build_ris_spec_editor_rows(self):
         self.ris_editor_table.setRowCount(0)
@@ -1492,7 +1599,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             line = raw_line.rstrip()
             if not line.strip():
                 continue
-            match = re.match(r"^([A-Z0-9]{2})\s{1,2}-\s(.*)$", line)
+            match = re.match(r"^([A-Z0-9]{2})\s{1,2}-\s?(.*)$", line)
             if match:
                 current_tag = match.group(1)
                 tags.setdefault(current_tag, []).append(match.group(2).strip())
@@ -1629,6 +1736,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             "UIFont": self._selected_ui_font(),
             "ProjectDatabaseFields": project_db_values,
             "MilestoneSettings": milestone_settings,
+            "SourceImageDocument": self.source_document_edit.text().strip(),
         }
         creator = self.creator_edit.text().strip()
         if creator:

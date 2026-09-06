@@ -22,7 +22,7 @@ def _ensure_paths():
 
 def _sanitize_runtime_env():
     _ensure_paths()
-    from gui_runtime_env import sanitize_current_process_and_reexec
+    from helpers.gui_runtime_env import sanitize_current_process_and_reexec
 
     sanitize_current_process_and_reexec()
 
@@ -35,7 +35,7 @@ def run_preview(projects_base_path, smoke_test=False):
     _sanitize_runtime_env()
 
     from PyQt5 import QtWidgets as qtw
-    from project_creation_wizard_dialog import ProjectCreationWizardDialog
+    from helpers.project_creation_wizard_dialog import ProjectCreationWizardDialog
 
     app = qtw.QApplication.instance() or qtw.QApplication(sys.argv)
     dialog = ProjectCreationWizardDialog(projects_base_path=projects_base_path)

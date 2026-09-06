@@ -16,6 +16,45 @@ from .project_tracking import ProjectWorkflowTracker
 from .event_bus import normalize_event
 from .ris import capture_provenance as capture_ris_provenance
 from .ris import finalize_ris
+from .source_documents import copy_pdf_source_readonly, project_pdf_source_path
+
+
+PAGE_WORKFLOW_STAGES = (
+    "1_pdf_front_src_pages_staged",
+    "2_pdf_front_src_pages_extracted",
+    "3_pdf_front_src_pages_for_tif",
+    "4_pdf_front_src_pages_to_tif",
+    "5_tif_front_src_pages_indexed",
+    "6_tif_front_src_pages_cleaned",
+    "7_pdf_middle_src_pages_staged",
+    "8_pdf_middle_book_src_pages",
+    "9_pdf_middle_book_src_pages_extracted",
+    "10_pdf_middle_book_src_pages_for_tif",
+    "11_pdf_middle_book_src_pages_to_tif",
+    "12_tif_middle_book_src_pages_indexed",
+    "13_tif_middle_book_src_pages_cleaned",
+    "14_pdf_verse_src_pages_staged",
+    "15_pdf_verse_book_src_pages",
+    "16_pdf_verse_book_src_pages_extracted",
+    "17_pdf_verse_book_src_pages_for_tif",
+    "18_pdf_verse_book_src_pages_to_tif",
+    "19_tif_verse_book_src_pages_indexed",
+    "20_tif_verse_book_src_pages_cleaned",
+    "21_pdf_back_src_pages_staged",
+    "22_pdf_back_src_pages_extracted",
+    "23_pdf_back_src_pages_for_tif",
+    "24_pdf_back_src_pages_to_tif",
+    "25_tif_back_src_pages_indexed",
+    "26_tif_back_src_pages_cleaned",
+)
+
+PAGE_WORKFLOW_BOOK_STAGES = PAGE_WORKFLOW_STAGES[7:13] + PAGE_WORKFLOW_STAGES[14:20]
+
+PAGE_WORKFLOW_FOLDERS = tuple(
+    f"Model/Project/Images/MyPixler/VerseSections/{state}/{stage}"
+    for state in ("Workflow", "Complete")
+    for stage in PAGE_WORKFLOW_STAGES
+)
 
 
 class ProjectCreationEngine:
@@ -34,13 +73,15 @@ class ProjectCreationEngine:
         "output/corrected",
         "output/exports",
         "Model/Project/Data",
-        "Model/Project/Data/sqlite",
-        "Model/Project/Images/MyServer/Source",
-        "Model/Project/Images/MyServer/Workflow",
-        "Model/Project/Images/MyServer/Complete",
-        "Model/Project/Images/MyScanner/Source",
-        "Model/Project/Images/MyScanner/Workflow",
-        "Model/Project/Images/MyScanner/Complete",
+        "Model/Project/Data/SQLite",
+        "Model/Project/Images/Scanned",
+        "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
+        "Model/Project/Images/MyServer/source_images/pdf_combined_src_images",
+        "Model/Project/Images/MyServer/source_images/tif_acq_src_image",
+        "Model/Project/Images/MyServer/source_images/tif_combined_src_images",
+        "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
+        "Model/Project/Images/MyScanner/scanned_images/tif_scan_src_image",
+        *PAGE_WORKFLOW_FOLDERS,
         "Model/Project/Images/MyBoxer/Source",
         "Model/Project/Images/MyBoxer/Workflow",
         "Model/Project/Images/MyBoxer/Complete",
@@ -132,6 +173,7 @@ class ProjectCreationEngine:
                 "status": "ok",
                 "project": self.context.get("project_name"),
                 "path": os.path.join(self.base_path, self.context.get("project_name")),
+                "source_document_path": self._created_source_document_path(),
             }
 
         except Exception as e:
@@ -139,6 +181,15 @@ class ProjectCreationEngine:
             self.state = ProjectState.FAILED
             self.emit("project_failed", {"error": str(e)})
             return {"status": "error", "error": str(e)}
+
+    def _created_source_document_path(self):
+        filename = str(self.context.get("SourceImageDocumentName") or "").strip()
+        if not filename:
+            return ""
+        return project_pdf_source_path(
+            os.path.join(self.base_path, self.context.get("project_name")),
+            filename,
+        )
 
     # -----------------------
     def validate(self):
@@ -188,6 +239,7 @@ class ProjectCreationEngine:
             json.dump(self.ris, f, indent=2)
 
         self._create_project_structure(tmp)
+        self._copy_source_image_document(tmp)
         self._initialize_project_databases(tmp)
         self._write_git_support_files(tmp)
 
@@ -195,6 +247,14 @@ class ProjectCreationEngine:
         self._initialize_git_repository(path)
 
         self.emit("filesystem_written")
+
+    def _copy_source_image_document(self, project_path):
+        source_path = str(self.context.get("SourceImageDocument") or "").strip()
+        if not source_path:
+            return ""
+        destination_path = copy_pdf_source_readonly(source_path, project_path)
+        self.context["SourceImageDocumentName"] = os.path.basename(destination_path)
+        return destination_path
 
     # -----------------------
     def register_project(self):
@@ -301,6 +361,13 @@ class ProjectCreationEngine:
                 path=folder_path,
             )
 
+        if self._is_scriptural_project():
+            self._create_pdf_stage_book_folders(
+                repo_root,
+                project_path,
+                self._normalize_scriptural_source(),
+            )
+
         for file_path in sorted_files:
             file_size = self._create_file_from_template(
 
@@ -350,6 +417,39 @@ class ProjectCreationEngine:
             "file_count": len(files),
             "folder_list_path": folder_list_path,
         })
+
+    def _create_pdf_stage_book_folders(self, repo_root, project_path, source_choice):
+        source_roots = []
+        if source_choice in {"old_testament", "both"}:
+            source_roots.append("Model/OT_BookFolders")
+        if source_choice in {"new_testament", "both"}:
+            source_roots.append("Model/NT_BookFolders")
+
+        book_folders = []
+        for source_root in source_roots:
+            template_root = os.path.join(repo_root, *source_root.split("/"))
+            if not os.path.isdir(template_root):
+                continue
+            book_folders.extend(
+                name
+                for name in os.listdir(template_root)
+                if name.startswith("book_") and os.path.isdir(os.path.join(template_root, name))
+            )
+
+        for state in ("Workflow", "Complete"):
+            for stage in PAGE_WORKFLOW_BOOK_STAGES:
+                stage_root = os.path.join(
+                    project_path,
+                    "Model",
+                    "Project",
+                    "Images",
+                    "MyPixler",
+                    "VerseSections",
+                    state,
+                    stage,
+                )
+                for book_folder in sorted(set(book_folders)):
+                    os.makedirs(os.path.join(stage_root, book_folder), exist_ok=True)
 
     # -----------------------
     def _emit_structure_progress(self, stage, completed, total, path=None, bytes_completed=None, bytes_total=None):
@@ -422,7 +522,12 @@ class ProjectCreationEngine:
 
         selected_folders = self._selected_project_folders()
         if selected_folders:
-            entries = [entry for entry in entries if self._entry_matches_selected_folder(entry, selected_folders)]
+            entries = [
+                entry
+                for entry in entries
+                if not self._entry_is_selectable_project_folder(entry)
+                or self._entry_matches_selected_folder(entry, selected_folders)
+            ]
 
         if self._is_scriptural_project():
             for entry in self._scriptural_project_entries(source_choice, entries):
@@ -512,6 +617,17 @@ class ProjectCreationEngine:
             if candidate.startswith(selected_folder + "/"):
                 return True
         return False
+
+    def _entry_is_selectable_project_folder(self, entry):
+        normalized_entry = self._normalize_structure_entry(entry, None)
+        if not normalized_entry:
+            return False
+        source_entry, destination_entry = self._split_structure_copy_entry(normalized_entry)
+        candidate = destination_entry or source_entry
+        return candidate.startswith("Model/Project/") or source_entry in {
+            "Model/OT_BookFolders",
+            "Model/NT_BookFolders",
+        }
 
     def _normalize_structure_entry(self, entry, folder_list_path):
 
@@ -681,8 +797,10 @@ class ProjectCreationEngine:
 
     # -----------------------
     def _initialize_project_databases(self, project_path):
-        sqlite_dir = os.path.join(project_path, "Model", "Project", "Data", "sqlite")
+        sqlite_dir = os.path.join(project_path, "Model", "Project", "Data", "SQLite")
         os.makedirs(sqlite_dir, exist_ok=True)
+
+        source_document_path = self._created_source_document_path()
 
         project_metadata_db_path = os.path.join(sqlite_dir, PROJECT_DATABASE_FILENAME)
         project_metadata_json_path = os.path.join(
@@ -694,14 +812,22 @@ class ProjectCreationEngine:
             "project_metadata.json",
         )
 
-        database_seed = {
+        extra_project_db_fields = self.context.get("ProjectDatabaseFields")
+        database_seed = dict(extra_project_db_fields) if isinstance(extra_project_db_fields, dict) else {}
+        database_seed.update({
             "ProjectName": self.context.get("project_name", ""),
             "ProjectDatabase": self.context.get("ProjectDatabase") or self.context.get("project_database") or "",
             "ProjectType": self.context.get("ProjectType", "Scriptural"),
             "ScripturalSource": self.context.get("ScripturalSource", "both"),
+            "SourceType": "PDF" if source_document_path else self.context.get("SourceType", "Scan"),
+            "SourceDocumentPath": source_document_path,
+            "SourceDocumentDirectory": os.path.dirname(source_document_path) if source_document_path else "",
             "NumberPages": self.context.get("NumberPages", 0),
             "NumberColumns": self.context.get("NumberColumns", 1),
             "TotalProjectPages": self.context.get("TotalProjectPages", 0),
+            "SourcePageSectionCount": self.context.get("SourcePageSectionCount", 3),
+            "SourcePageSections": self.context.get("SourcePageSections", []),
+            "CurrentSourceSection": self.context.get("CurrentSourceSection", "Front Matter"),
             "ColumnName": self.context.get("ColumnName", ""),
             "ColumnLanguage": self.context.get("ColumnLanguage", ""),
             "NumberLanguages": self.context.get("NumberLanguages", 0),
@@ -710,10 +836,7 @@ class ProjectCreationEngine:
             "ProjectFont": self.context.get("ProjectFont") or self.context.get("project_font") or "",
             "ProvenancePath": self.context.get("source_provenance_path", ""),
             "Notes": self.context.get("user_intent_summary", ""),
-        }
-        extra_project_db_fields = self.context.get("ProjectDatabaseFields")
-        if isinstance(extra_project_db_fields, dict):
-            database_seed.update(extra_project_db_fields)
+        })
 
         normalized_db_seed = create_project_database(project_metadata_db_path, database_seed)
         export_project_database_json(project_metadata_db_path, project_metadata_json_path)
