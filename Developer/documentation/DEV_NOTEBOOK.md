@@ -28,6 +28,33 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-07 MyPixler Stage Button And MyExplorer Wizard Icon
+
+* Scope summary: repaired MyPixler's Stage Source toolbar button so it renders only the updated `stage.png` artwork while retaining a descriptive menu label, and repaired MyExplorer's missing Page Workflow Wizard icon by prioritizing the canonical generated Qt resource bundle.
+* Intended commit scope:
+  * `Developer/QtDesignerUI/MyPixlerUI.ui`
+  * `UI_Icons.py`
+  * `ViewController/0-MainUI/helpers/Icons/stage.png`
+  * `ViewController/0-MainUI/helpers/Icons/stage.xcf`
+  * `ViewController/0-MainUI/helpers/UI_Icons.py`
+  * `ViewController/1-PreProcess/MyPixler.py`
+  * `ViewController/1-PreProcess/MyPixlerUI.py`
+  * `tests/test_myexplorer_picker.py`
+  * `tests/test_pdf_source_workflow.py`
+  * this handoff entry.
+* Explicit commit exclusions: `Model/Project/Data/json/ReaderSession.json` and `Model/Project/Data/json/Session.json` are runtime-local state; `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg` is unrelated and unused.
+* Validation gates:
+  * Problems/lint: full-workspace Problems `0`; in-scope Problems `0`.
+  * compile: `UI_Icons.py`, MyPixler runtime/generated UI, and both touched test files passed `.venv/bin/python -m py_compile`.
+  * focused tests in isolated processes: MyPixler toolbar/import tests `2 passed`; MyExplorer tests `16 passed`; page workflow tests `7 passed`; resource generator tests `3 passed`.
+  * broad test note: the combined Qt batch reached 29 passing tests before the known mixed-PyQt5/PyQt6 native-lifetime segfault in an unrelated PDF viewer test; all changed lanes pass in fresh processes.
+  * UI/resource lockstep: `.venv/bin/python Developer/update_ui_resources.py --check` reported `22 unchanged, 0 stale`.
+  * manual/offscreen UI checks: MyPixler's actual `QToolButton` reports `ToolButtonIconOnly`, the action retains `Stage Source PDF`, and `stage.png` renders; MyExplorer's Page Workflow Wizard renders a non-null `wand.png` pixmap through the root compatibility shim.
+  * icon validation: `stage.png` is 536x373 RGBA with transparent corners and non-empty foreground; its same-sized GIMP source is retained as `stage.xcf`.
+  * launcher smoke: all 12 canonical Linux launchers reached stable five-second offscreen startup without traceback, missing import/file error, or crash.
+* Unresolved blockers/risks: the obsolete `ViewController/0-MainUI/MyPixlerUI.py` remains tracked for compatibility, but MyPixler now explicitly loads its canonical adjacent generated module; mixed PyQt5/PyQt6 PDF tests remain unsafe in one process.
+* Next immediate action: stage the intended files, verify exclusions and staged diff, commit, synchronize `ubuntu_development` and `master`, and confirm remote parity.
+
 ### Session Handoff - 2026-09-07 MyExplorer, Patreon, And Workflow Icons
 
 * Scope summary: completed reversible MyExplorer file operations and shortcuts, added editable/importable Patreon Markdown with a seven-post queue, and installed transparent Page/Project Workflow Wizard icons through the shared action policy.

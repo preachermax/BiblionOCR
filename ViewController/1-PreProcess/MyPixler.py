@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Python imports
+import importlib.util
 import sys
 import os
 
@@ -87,7 +88,13 @@ from TiffStackWorker import TiffStackWorker
 # Custom imports
 from PreProcess import PreProcess as pp
 #from MyScanner import Ui_Scanner
-from MyPixlerUI import Ui_Pixler
+_UI_MODULE_PATH = os.path.join(_LOCAL_MODULE_DIR, "MyPixlerUI.py")
+_UI_SPEC = importlib.util.spec_from_file_location("biblion_mypixler_ui", _UI_MODULE_PATH)
+if _UI_SPEC is None or _UI_SPEC.loader is None:
+    raise ImportError(f"Unable to load MyPixler UI module from {_UI_MODULE_PATH}")
+_UI_MODULE = importlib.util.module_from_spec(_UI_SPEC)
+_UI_SPEC.loader.exec_module(_UI_MODULE)
+Ui_Pixler = _UI_MODULE.Ui_Pixler
 from Adjust import crop_processor, get_processor, rotate_processor, threshold_processor, PROCESSORS
 from ImagePreviewDialog import ImagePreviewDialog
 from MorphologyDialog import MorphologyDialog

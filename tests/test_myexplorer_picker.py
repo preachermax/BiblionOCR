@@ -439,6 +439,12 @@ class MyExplorerPickerTests(unittest.TestCase):
         self.assertEqual(":/Icons/Icons/wizard-hat.png", PROJECT_WORKFLOW_WIZARD_ICON)
         self.assertFalse(window.actionPage_Workflow_Wizard.icon().isNull())
         self.assertFalse(window.actionProject_Workflow_Wizard.icon().isNull())
+        self.assertFalse(
+            window.actionPage_Workflow_Wizard.icon().pixmap(32, 32).isNull()
+        )
+        self.assertFalse(
+            window.actionProject_Workflow_Wizard.icon().pixmap(32, 32).isNull()
+        )
         self.assertNotEqual(
             window.actionPage_Workflow_Wizard.icon().pixmap(32, 32).toImage(),
             window.actionProject_Workflow_Wizard.icon().pixmap(32, 32).toImage(),

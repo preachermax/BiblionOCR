@@ -483,6 +483,7 @@ class Ui_Pixler(object):
         self.EditToolBar.setObjectName("EditToolBar")
         Pixler.addToolBar(QtCore.Qt.TopToolBarArea, self.EditToolBar)
         self.SourceToolBar = QtWidgets.QToolBar(Pixler)
+        self.SourceToolBar.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         self.SourceToolBar.setObjectName("SourceToolBar")
         Pixler.addToolBar(QtCore.Qt.TopToolBarArea, self.SourceToolBar)
         self.GreekToolBar = QtWidgets.QToolBar(Pixler)
@@ -1048,7 +1049,7 @@ class Ui_Pixler(object):
         self.actionBlack.setText(_translate("Pixler", "Black"))
         self.actionMyScanner.setText(_translate("Pixler", "MyScanner"))
         self.actionMyExplorer.setText(_translate("Pixler", "MyExplorer"))
-        self.actionStage_pdf.setText(_translate("Pixler", "Stage Source pdf"))
+        self.actionStage_pdf.setText(_translate("Pixler", "Stage Source PDF"))
         self.actionAuto_Crop.setText(_translate("Pixler", "Auto Crop Columns"))
 import UI_Icons
 

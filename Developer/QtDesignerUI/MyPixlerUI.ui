@@ -1306,6 +1306,9 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonIconOnly</enum>
+    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -2009,7 +2012,7 @@
      <normaloff>:/Icons/Icons/stage.png</normaloff>:/Icons/Icons/stage.png</iconset>
    </property>
    <property name="text">
-    <string>Stage Source pdf</string>
+    <string>Stage Source PDF</string>
    </property>
   </action>
   <action name="actionAuto_Crop">

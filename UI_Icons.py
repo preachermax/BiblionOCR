@@ -10,8 +10,8 @@ import sys
 
 
 _RESOURCE_PATHS = (
-    os.path.join(os.path.dirname(os.path.realpath(__file__)), "ViewController", "0-MainUI", "UI_Icons.py"),
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "ViewController", "0-MainUI", "helpers", "UI_Icons.py"),
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "ViewController", "0-MainUI", "UI_Icons.py"),
 )
 
 

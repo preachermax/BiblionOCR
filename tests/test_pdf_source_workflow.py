@@ -68,6 +68,29 @@ def test_mypixler_prefers_installed_workflow_definition_over_project_snapshot(tm
     assert mypixler.PixlerMain._workflow_definition_root(owner) == str(ROOT_DIR)
 
 
+def test_mypixler_stage_source_toolbar_button_is_icon_only() -> None:
+    mypixler = _load_mypixler_module()
+    expected_ui_path = (
+        ROOT_DIR / "ViewController" / "1-PreProcess" / "MyPixlerUI.py"
+    ).resolve()
+
+    assert Path(mypixler._UI_MODULE.__file__).resolve() == expected_ui_path
+
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    window = qtw.QMainWindow()
+    ui = mypixler.Ui_Pixler()
+    ui.setupUi(window)
+    stage_button = ui.SourceToolBar.widgetForAction(ui.actionStage_pdf)
+
+    assert ui.SourceToolBar.toolButtonStyle() == qtc.Qt.ToolButtonIconOnly
+    assert stage_button.toolButtonStyle() == qtc.Qt.ToolButtonIconOnly
+    assert ui.actionStage_pdf.text() == "Stage Source PDF"
+    assert not ui.actionStage_pdf.icon().isNull()
+
+    window.close()
+    app.processEvents()
+
+
 class _DummyEventBus:
     def emit(self, _event):
         return None
