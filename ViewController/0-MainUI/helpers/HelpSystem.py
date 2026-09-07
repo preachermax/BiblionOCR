@@ -236,6 +236,7 @@ FEATURES:
 • Display the active project's PDF or multipage TIFF source document
 • Dock, float, hide, and reopen the shared Source Document Viewer
 • Restore the active project source document at startup when available
+• Open source pages at Fit to Width and expand the main window while docked
 • Image transformation tools (rotate, crop, scale)
 • Histogram and analysis tools
 • Color space conversions
@@ -243,10 +244,11 @@ FEATURES:
 
 PRIMARY WORKFLOW:
 1. Open an active project with a registered PDF or TIFF source
-2. Use Display Source Document to inspect the protected source beside working images
-3. Load a working image or TIFF stack for preprocessing
-4. Navigate pages and apply transformations as needed
-5. Export processed images and continue the page workflow
+2. Open Page Workflow Wizard to view the ordered steps for the active source section
+3. Run the first incomplete sequence; later steps remain locked until it completes
+4. Use Display Source Document to inspect the protected source beside working images
+5. Complete each dialog or preview to update the page milestone and advance progress
+6. Export processed images and continue to the next module workflow
 
 KEY SHORTCUTS:
 • Ctrl+O: Open image
@@ -274,6 +276,7 @@ SOURCE DOCUMENT NOTES:
 • The source reader is for reference; image-processing commands operate on working files
 • PDF and multipage TIFF sources use the same reader controls and project metadata
 • Source visibility can be toggled without unloading the active project
+• Undocking or closing the source reader restores the main window's original size
 
 See also: MyBoxer, MyGrounder
 ''',
@@ -1304,6 +1307,7 @@ FEATURES:
     • Optional PDF or multipage TIFF source-document registration
     • Responsive source preparation with visible loading progress
     • Shared docked or floating Source Document Viewer
+    • Automatic Fit to Width display and reversible three-panel window sizing
     • Shared scanner workflow integration
     • PDF/TIFF extraction and conversion workflows
     • Launch points into downstream modules such as MyPixler, MyScanner, and MyBoxer
@@ -1346,6 +1350,7 @@ USES IN PIPELINE:
     • New Project uses RIS import, project details, project settings, milestones, and project folders.
     • Large source documents are prepared in a worker thread; progress remains visible in the wizard.
     • The Source Document Viewer supports PDF and multipage TIFF reference documents.
+    • Docking expands the main window for all three panels; undocking or closing restores its prior size.
     • MyServer and MyScanner share the same scanner workflow services.
     • MyBoxer now owns the migrated Greek/Latin line preprocessing and box-preparation tasks.
     • The Runtime Inspector is available through the Developer menu when enabled.

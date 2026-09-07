@@ -1483,6 +1483,7 @@
      </property>
      <addaction name="actionImageScanner_tb"/>
      <addaction name="actionMyExplorer"/>
+    <addaction name="actionCombineSourcePages"/>
      <addaction name="actionStage_Workflow"/>
     </widget>
     <widget class="QMenu" name="menuLanguages_2">
@@ -2322,6 +2323,14 @@
    </property>
    <property name="text">
     <string>Stage Workflow</string>
+   </property>
+  </action>
+  <action name="actionCombineSourcePages">
+   <property name="text">
+    <string>Combine Source Pages</string>
+   </property>
+   <property name="toolTip">
+    <string>Combine acquired and scanned PDF source pages</string>
    </property>
   </action>
  </widget>

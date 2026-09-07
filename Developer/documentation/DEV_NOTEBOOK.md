@@ -28,6 +28,156 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-06 Final Source Workflow And MyPixler Wizard Commit
+
+* Scope summary: finalized project source acquisition, two-stage PDF extraction, threaded source readers, workflow milestone tracking, Designer-owned project/MyPixler wizards, MyPixler preprocessing ownership, and obsolete PNG workflow cleanup.
+* Intended staged files:
+  * `Core/project_tracking.py`
+  * `Core/source_documents.py`
+  * `Developer/QtDesignerUI/MyPixlerPageWorkflowWizardUI.ui`
+  * `Developer/QtDesignerUI/MyPixlerUI.ui`
+  * `Developer/QtDesignerUI/MyServerUI.ui`
+  * deleted obsolete `Developer/QtDesignerUI/ProjectCreationWizardDialog.ui`
+  * `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui`
+  * `Developer/QtDesignerUI/pdf4tifDialog.ui`
+  * `Developer/documentation/DEV_NOTEBOOK.md`
+  * `Model/Project/Data/csv/ProjectWorkflow.ods`
+  * `Model/Project/Data/csv/Workflow.csv`
+  * `Model/Project/Data/csv/page_workflow.csv`
+  * `Model/Project/Data/csv/project_workflow.csv`
+  * `Model/Project/Data/csv/project_workflow_milestones.csv`
+  * `ViewController/0-MainUI/MyScanner.py`
+  * `ViewController/0-MainUI/MyServer.py`
+  * `ViewController/0-MainUI/MyServerUI.py`
+  * `ViewController/0-MainUI/helpers/Dialogs/pdf4tifDialog.py`
+  * `ViewController/0-MainUI/helpers/HelpSystem.py`
+  * `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py`
+  * `ViewController/0-MainUI/helpers/pdf_viewer_dialog.py`
+  * `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py`
+  * `ViewController/1-PreProcess/MyBoxer.py`
+  * `ViewController/1-PreProcess/MyPixler.py`
+  * `ViewController/1-PreProcess/MyPixlerPageWorkflowWizard.py`
+  * `ViewController/1-PreProcess/MyPixlerPageWorkflowWizardUI.py`
+  * `ViewController/1-PreProcess/MyPixlerUI.py`
+  * `docs/architecture/PAGE_WORKFLOW_WIZARD_ARCHITECTURE.md`
+  * `requirements-qt-pdf.txt`
+  * `tests/test_help_system_content.py`
+  * `tests/test_launcher_entrypoint_compatibility.py`
+  * `tests/test_mypixler_page_workflow_wizard.py`
+  * `tests/test_page_workflow.py`
+  * `tests/test_pdf_source_workflow.py`
+  * `tests/test_project_tracking_snapshot.py`
+* Validation gates:
+  * Problems: full-workspace `0`; in-scope `0`; unresolved files: none.
+  * compile: all `21` changed Python files passed `py_compile`.
+  * tests: all `30` test files passed in fresh processes; `189 passed` plus `41 subtests passed`, with `0` failed files.
+  * launcher smoke: all `14` Linux `run-my*.sh` launchers reached stable offscreen startup with no early traceback.
+  * UI lockstep: fresh `pyuic5` output matches all five touched generated modules byte-for-byte: MyServer, MyPixler, Project Creation Wizard, PDF-for-TIFF dialog, and MyPixler Page Workflow Wizard.
+  * worksheet parity: `project_workflow`, `project_workflow_milestones`, `page_workflow`, and `page_workflow_milestones` ODS sheets match their CSV exports after display normalization.
+  * wizard policy: MyServer exposes Project + Page Workflow Wizard; MyPixler exposes Page Workflow Wizard only; actions are attached to `menuProject` without `menuFile` duplicates.
+  * manual UI: offscreen visual inspection passed for the five-page Project Creation Wizard and the MyPixler sequence wizard; long sequence labels wrap without overlap and progress/navigation controls remain stable.
+  * whitespace: `git diff --check` passed.
+* Explicit commit exclusions:
+  * `Model/Project/Data/json/Session.json`
+  * `Model/Project/Data/json/ReaderSession.json`
+* Residual risk: physical scanner execution and native-display interaction remain hardware/display-dependent; automated conversion, workflow, UI, and launcher gates pass.
+* Next immediate action: stage the listed files, verify staged scope, commit, push `ubuntu_development`, and confirm local/remote revision parity.
+
+### Session Handoff - 2026-09-06 PDF Extraction And Wizard Designer Ownership
+
+* Scope summary: separated section-range extraction from individual-page extraction, completed threaded MyServer/MyPixler reader readiness, moved all five New Project wizard pages into Designer, and removed superseded MyServer/MyPixler PNG workflow tools.
+* PDF workflow contracts:
+  * `extract_pdf_page_range` writes one multipage section PDF from a 1-based inclusive range.
+  * `extract_pdf_pages` writes one content-preserving PDF per page from a 1-based inclusive range; `actionpdf_for_tiff` owns this stage.
+  * `convert_pdf_pages_to_tiff` renders those individual PDFs to TIFF for `actionpdf_to_tiff`.
+  * MyPixler owns preprocessing; the commented MyServer copies and their unused dialog imports were removed.
+* UI authority:
+  * `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui` now contains all five stacked pages and every stable wizard control. Python retains runtime row population, column-language rows, folder checkboxes, signal wiring, and business logic.
+  * `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py` is generated from that file and matches a fresh `pyuic5` result byte-for-byte.
+  * `Developer/QtDesignerUI/pdf4tifDialog.ui` owns the stage-two first/last page range controls and generates `ViewController/0-MainUI/helpers/Dialogs/pdf4tifDialog.py`.
+* PNG policy:
+  * PNG conversion and resize commands were removed from the active MyPixler UI and the obsolete MyServer/MyPixler inventory and legacy workflow rows.
+  * Temporary QtPdf render files, the in-memory Qt/OpenCV bridge, icons, and test fixtures remain because they are implementation dependencies rather than project workflow artifacts.
+* Threading contract: `PdfViewerDock.documentLoaded` and `loadFailed` are emitted only after worker-thread cleanup, so MyServer/MyPixler can consume or close a ready reader without a modal race.
+* Validation gates:
+  * problems/lint: pass; all affected files report `0` Problems.
+  * source workflow: pass; `27 passed` before the final explicit subrange/UI ownership additions.
+  * workflow/launchers: pass; `13 passed` after ownership and PNG cleanup.
+  * focused extraction/page workflow: pass; `8 passed`, including explicit stage-two range extraction.
+  * UI lockstep: pass for the project wizard; generated setup owns exactly five pages before behavior initialization.
+* Commit exclusions: `Model/Project/Data/json/Session.json` and `Model/Project/Data/json/ReaderSession.json` remain runtime state and must not be staged.
+* Next immediate action: perform the final affected regression set and manual visual smoke of the five-page wizard and stage-two range dialog.
+
+### Session Handoff - 2026-09-06 MyPixler Page Workflow Wizard
+
+* Scope summary: replaced MyPixler's generic three-item page-workflow placeholder with a Designer-backed sequence wizard driven by the authoritative worksheet rows.
+* UI lockstep:
+  * `Developer/QtDesignerUI/MyPixlerPageWorkflowWizardUI.ui` declares 30 pages, one for every current MyPixler row in `page_workflow.csv`.
+  * `ViewController/1-PreProcess/MyPixlerPageWorkflowWizardUI.py` is generated by `pyuic5` and matches a fresh generation byte-for-byte.
+  * `ViewController/1-PreProcess/MyPixlerPageWorkflowWizard.py` validates the ordered `(PageSections, Sequence, MilestoneName, Method)` contract before opening.
+* Runtime behavior:
+  * navigation is filtered to the active page's source section;
+  * completed and pending rows remain visible, but only the first incomplete sequence can run;
+  * successful actions refresh page milestones, update progress, and select the next sequence;
+  * accepted interactive methods returning `True` are recorded by the wizard, while extraction/conversion methods retain their existing milestone recording.
+* Architecture: `docs/architecture/PAGE_WORKFLOW_WIZARD_ARCHITECTURE.md` records the convention for subsequent module-by-module rollout.
+* Validation gates:
+  * generated UI page count: `30`;
+  * active Front-section page count: `7`;
+  * focused lockstep/progression tests: `2 passed`.
+  * workflow, launcher, and help regression set: `17 passed`;
+  * source workflow integration in a fresh process: `28 passed`;
+  * offscreen visual check: pass after wrapping long navigation labels and removing horizontal overflow.
+* Next immediate action: perform a native-display MyPixler wizard smoke test before applying the convention to the next module.
+
+### Session Handoff - 2026-09-06 Workflow Method Wiring And Comments
+
+* Scope summary: replaced the page-workflow `erase` alias with `eraser`, assigned concrete methods to all project-workflow rows, added Sequence/MilestoneName comments, and wired file acquisition, scanner PDF production, and source-PDF combination to project milestones.
+* Workflow authority:
+  * `Model/Project/Data/csv/ProjectWorkflow.ods` remains authoritative.
+  * `project_workflow.csv`, `project_workflow_milestones.csv`, `page_workflow.csv`, and `page_workflow_milestones.csv` match their ODS sheets after blank-cell and displayed-percentage normalization.
+  * `src_pages_combined` was added to project milestones; 14 equal milestone weights now display as `7.14%`.
+* Runtime mapping:
+  * `ASPF / src_pages_acquired` -> `MyServer.on_new_project_clicked`.
+  * `ASPS / src_pages_scanned` -> `MyScanner.actionScanImage`.
+  * `CASS / src_pages_combined` -> `MyServer.actionCombineSourcePages`.
+  * `MC2E` rows now name the existing `MyPixler.eraser` method directly.
+* UI authority: `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui` is the active editable wizard source and generates `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py`; `ProjectCreationWizardDialog.ui` is not the active generated-source pair.
+* Validation gates:
+  * problems/lint: pass; all affected files report `0` Problems.
+  * compile: pass for workflow services, MyServer, MyScanner, MyPixler, MyBoxer, generated MyServer UI, and tests.
+  * focused tests: pass; page workflow `7`, project tracking `11`, MyBoxer workflow `1`, launcher compatibility `6`, and source workflow `24` (`49 passed` total).
+  * UI lock-step: pass; `MyServerUI.py` regenerated from `Developer/QtDesignerUI/MyServerUI.ui`.
+  * worksheet parity: pass for all four separated workflow CSV exports.
+* Commit exclusions:
+  * `Model/Project/Data/json/Session.json` and `Model/Project/Data/json/ReaderSession.json` remain untouched runtime state.
+* Unresolved blockers/risks:
+  * scanner hardware execution and visual menu placement require a physical-device/manual UI smoke test; conversion, merge ordering, action presence, and milestone contracts are automated.
+* Next immediate action:
+  * await maintainer review or an explicit commit/sync request.
+
+### Session Handoff - 2026-09-06 Source Reader Fit And Window Sizing
+
+* Scope summary: made the shared source reader open at Fit to Width, expand a non-maximized parent window while docked, and restore its original geometry when floated, undocked, closed, or replaced.
+* Touched files:
+  * `ViewController/0-MainUI/helpers/pdf_viewer_dialog.py`
+  * `ViewController/0-MainUI/helpers/HelpSystem.py`
+  * `tests/test_pdf_source_workflow.py`
+  * `tests/test_help_system_content.py`
+* Validation gates:
+  * problems/lint: pass; in-scope Problems total `0`.
+  * compile: pass for all touched Python and test files.
+  * tests: pass; source-reader, help, and launcher-path regression set `31 passed`.
+  * UI behavior: pass through Qt geometry tests covering initial Fit to Width, dock expansion, float/close restoration, redocking, and reader replacement.
+  * UI lock-step: not applicable; no Designer source or generated UI module changed.
+  * whitespace: pass via `git diff --check`.
+* Commit exclusions:
+  * `Model/Project/Data/json/Session.json` and `Model/Project/Data/json/ReaderSession.json` remain uncommitted runtime state.
+* Unresolved blockers/risks:
+  * maximized and fullscreen windows are intentionally not resized because they already occupy the available display area.
+* Next immediate action:
+  * await maintainer review or an explicit commit/sync request.
+
 ### Session Handoff - 2026-09-06 Help System Source Workflow Reflow
 
 * Scope summary: reflowed MyServer and MyPixler help to document the five-step project wizard, threaded PDF/TIFF preparation, project-local source/provenance storage, and shared source-reader behavior.

@@ -43,5 +43,7 @@ def test_mypixler_help_documents_shared_source_reader() -> None:
         "Dock, float, hide, and reopen",
         "Restore the active project source document at startup",
         "reader is for reference",
+        "Fit to Width",
+        "restores the main window's original size",
     ):
         assert expected_text in help_text

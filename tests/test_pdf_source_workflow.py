@@ -6,6 +6,7 @@ import os
 import stat
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -13,14 +14,20 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
 from PIL import Image
+from pypdf import PdfReader
 
 from Core.engine import ProjectCreationEngine
 from Core.project_database import create_project_database, load_project_database_record, project_metadata_database_path
 from Core.source_documents import (
+    combine_project_source_pdfs,
+    convert_pdf_pages_to_tiff,
+    convert_scan_to_project_pdf,
     copy_pdf_source_readonly,
     copy_source_document_readonly,
     find_project_pdf_source,
     find_project_source_document,
+    extract_pdf_page_range,
+    extract_pdf_pages,
     project_pdf_source_path,
     project_source_document_path,
 )
@@ -33,6 +40,8 @@ if str(HELPERS_DIR) not in sys.path:
     sys.path.insert(0, str(HELPERS_DIR))
 
 from project_creation_wizard_dialog import ProjectCreationWizardDialog
+from ProjectCreationWizardDialogUI import Ui_ProjectCreationWizardDialog
+import pdf_viewer_dialog
 from pdf_viewer_dialog import PdfViewerDialog, PdfViewerDock
 
 
@@ -48,6 +57,24 @@ def _load_mypixler_module():
 class _DummyEventBus:
     def emit(self, _event):
         return None
+
+
+def test_generated_project_wizard_ui_defines_all_five_pages() -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    shell = qtw.QDialog()
+    ui = Ui_ProjectCreationWizardDialog()
+
+    ui.setupUi(shell)
+
+    assert ui.page_stack.count() == 5
+    assert ui.ris_editor_table is not None
+    assert ui.source_document_edit is not None
+    assert ui.project_db_table is not None
+    assert ui.milestones_table is not None
+    assert ui.handshake_table is not None
+    assert ui.folder_selection_stack is not None
+    shell.close()
+    app.processEvents()
 
 
 def _create_test_pdf(pdf_path: Path) -> None:
@@ -69,6 +96,106 @@ painter.end()
 def _create_test_tiff(tiff_path: Path) -> None:
     pages = [Image.new("RGB", (80, 120), color) for color in ("white", "gray", "black")]
     pages[0].save(tiff_path, save_all=True, append_images=pages[1:], format="TIFF")
+
+
+def _wait_for_dock_load(dock: PdfViewerDock, timeout_ms: int = 10000) -> None:
+    if dock.viewer is not None:
+        return
+    loop = qtc.QEventLoop()
+    errors = []
+    dock.documentLoaded.connect(loop.quit)
+    dock.loadFailed.connect(lambda message: (errors.append(message), loop.quit()))
+    qtc.QTimer.singleShot(timeout_ms, loop.quit)
+    loop.exec_()
+    assert not errors, errors[0] if errors else ""
+    assert dock.viewer is not None, "Source reader did not finish loading"
+
+
+def test_pdf_viewer_dock_opens_without_waiting_for_source_preparation(tmp_path, monkeypatch) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    pdf_path = tmp_path / "source.pdf"
+    _create_test_pdf(pdf_path)
+    original_page_count = pdf_viewer_dialog._source_page_count
+
+    def delayed_page_count(source_path):
+        time.sleep(0.25)
+        return original_page_count(source_path)
+
+    monkeypatch.setattr(pdf_viewer_dialog, "_source_page_count", delayed_page_count)
+    window = qtw.QMainWindow()
+    window.show()
+    app.processEvents()
+    started_at = time.monotonic()
+    dock = PdfViewerDock(str(pdf_path), window)
+    window.addDockWidget(qtc.Qt.LeftDockWidgetArea, dock)
+    dock.show_viewer()
+    elapsed = time.monotonic() - started_at
+
+    assert elapsed < 0.15
+    assert dock.is_loading
+    assert dock.viewer is None
+    assert dock._loading_progress.isVisible()
+    _wait_for_dock_load(dock)
+    assert dock.page_count == 2
+    dock.close_automatically()
+    app.processEvents()
+    window.close()
+
+
+def test_scan_conversion_and_project_pdf_combination(tmp_path) -> None:
+    project_root = tmp_path / "project"
+    acquired_pdf = project_root / "Model/Project/Images/MyServer/source_images/pdf_acq_src_image/acquired.pdf"
+    acquired_pdf.parent.mkdir(parents=True)
+    _create_test_pdf(acquired_pdf)
+    scan_path = tmp_path / "scan.tif"
+    _create_test_tiff(scan_path)
+
+    scanned_pdf = Path(convert_scan_to_project_pdf(str(scan_path), str(project_root)))
+    combined_pdf = Path(combine_project_source_pdfs(str(project_root)))
+
+    assert scanned_pdf.parent.name == "pdf_scan_src_image"
+    assert len(PdfReader(str(scanned_pdf)).pages) == 3
+    assert combined_pdf.parent.name == "pdf_combined_src_images"
+    assert len(PdfReader(str(combined_pdf)).pages) == 5
+
+
+def test_pdf_page_range_extraction_preserves_all_selected_page_content(tmp_path) -> None:
+    source_path = tmp_path / "source.pdf"
+    destination_dir = tmp_path / "section"
+    _create_test_pdf(source_path)
+
+    extracted_path = Path(extract_pdf_page_range(source_path, destination_dir, 1, 2))
+    extracted_pages = PdfReader(str(extracted_path)).pages
+
+    assert len(extracted_pages) == 2
+    assert "Page\tone" in extracted_pages[0].extract_text()
+    assert "Page\ttwo" in extracted_pages[1].extract_text()
+
+
+def test_section_pdf_extracts_to_individual_page_pdfs_then_tiffs(tmp_path) -> None:
+    section_pdf = tmp_path / "section.pdf"
+    page_pdf_dir = tmp_path / "page-pdfs"
+    selected_page_dir = tmp_path / "selected-page-pdfs"
+    tiff_dir = tmp_path / "tiffs"
+    _create_test_pdf(section_pdf)
+
+    page_paths = [Path(path) for path in extract_pdf_pages(section_pdf, page_pdf_dir)]
+    selected_paths = [Path(path) for path in extract_pdf_pages(section_pdf, selected_page_dir, 2, 2)]
+    tiff_paths = [Path(path) for path in convert_pdf_pages_to_tiff(page_pdf_dir, tiff_dir, 10)]
+
+    assert [path.name for path in page_paths] == ["section_Page_001.pdf", "section_Page_002.pdf"]
+    assert [len(PdfReader(str(path)).pages) for path in page_paths] == [1, 1]
+    assert "Page\tone" in PdfReader(str(page_paths[0])).pages[0].extract_text()
+    assert "Page\ttwo" in PdfReader(str(page_paths[1])).pages[0].extract_text()
+    assert [path.name for path in selected_paths] == ["section_Page_002.pdf"]
+    assert "Page\ttwo" in PdfReader(str(selected_paths[0])).pages[0].extract_text()
+    assert [path.name for path in tiff_paths] == [
+        "section_Page_001_010.tif",
+        "section_Page_002_011.tif",
+    ]
+    with Image.open(tiff_paths[0]) as first_tiff:
+        assert first_tiff.width > 0
+        assert first_tiff.height > 0
 
 
 def test_qtpdf_renderer_reports_and_renders_pages(tmp_path) -> None:
@@ -123,6 +250,8 @@ def test_pdf_viewer_renders_and_navigates_pages(tmp_path) -> None:
     viewer.show()
     viewer.resize(400, 400)
     app.processEvents()
+    assert viewer.fit_width
+    assert abs(viewer.page_label.pixmap().width() - viewer.scroll_area.viewport().width()) <= 4
     viewer.zoom_slider.setValue(150)
     app.processEvents()
     assert viewer.zoom_percent == 150
@@ -237,6 +366,7 @@ def test_pdf_viewer_toolbar_tools_fit_at_narrow_docked_width(tmp_path) -> None:
     window.show()
     dock.dock_in_host()
     app.processEvents()
+    _wait_for_dock_load(dock)
     viewer = dock.viewer
 
     tools = (
@@ -279,6 +409,7 @@ def test_pdf_viewer_docks_floats_hides_and_confirms_manual_close(tmp_path, monke
     dock.show()
     window.resizeDocks([dock], [420], qtc.Qt.Horizontal)
     app.processEvents()
+    _wait_for_dock_load(dock)
 
     assert window.dockWidgetArea(dock) == qtc.Qt.LeftDockWidgetArea
     assert dock.width() <= 500
@@ -300,6 +431,71 @@ def test_pdf_viewer_docks_floats_hides_and_confirms_manual_close(tmp_path, monke
     window.close()
 
 
+def test_docked_source_reader_expands_and_restores_parent_window(tmp_path, monkeypatch) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    pdf_path = tmp_path / "source.pdf"
+    _create_test_pdf(pdf_path)
+    window = qtw.QMainWindow()
+    window.setCentralWidget(qtw.QWidget(window))
+    window.setGeometry(40, 40, 500, 480)
+    window.show()
+    app.processEvents()
+    default_geometry = window.geometry()
+
+    dock = PdfViewerDock(str(pdf_path), window)
+    window.addDockWidget(qtc.Qt.LeftDockWidgetArea, dock)
+    dock.show_viewer()
+    app.processEvents()
+    _wait_for_dock_load(dock)
+
+    assert window.width() > default_geometry.width()
+    dock.toggle_floating()
+    app.processEvents()
+    assert window.geometry() == default_geometry
+
+    dock.toggle_floating()
+    app.processEvents()
+    assert window.width() > default_geometry.width()
+
+    monkeypatch.setattr(qtw.QMessageBox, "question", lambda *_args, **_kwargs: qtw.QMessageBox.Yes)
+    assert dock.close()
+    app.processEvents()
+    assert window.geometry() == default_geometry
+    window.close()
+
+
+def test_replacing_docked_source_reader_preserves_default_window_geometry(tmp_path) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    pdf_path = tmp_path / "source.pdf"
+    _create_test_pdf(pdf_path)
+    window = qtw.QMainWindow()
+    window.setCentralWidget(qtw.QWidget(window))
+    window.setGeometry(40, 40, 500, 480)
+    window.show()
+    app.processEvents()
+    default_geometry = window.geometry()
+
+    first_dock = PdfViewerDock(str(pdf_path), window)
+    window.addDockWidget(qtc.Qt.LeftDockWidgetArea, first_dock)
+    first_dock.show_viewer()
+    app.processEvents()
+    _wait_for_dock_load(first_dock)
+    assert window.width() > default_geometry.width()
+
+    replacement_dock = PdfViewerDock(str(pdf_path), window)
+    first_dock.close_automatically()
+    window.addDockWidget(qtc.Qt.LeftDockWidgetArea, replacement_dock)
+    replacement_dock.show_viewer()
+    app.processEvents()
+    _wait_for_dock_load(replacement_dock)
+    assert window.width() > default_geometry.width()
+
+    replacement_dock.close_automatically()
+    app.processEvents()
+    assert window.geometry() == default_geometry
+    window.close()
+
+
 def test_pdf_viewer_embeds_in_host_and_can_hide_float_redock_and_close(tmp_path, monkeypatch) -> None:
     app = qtw.QApplication.instance() or qtw.QApplication([])
     pdf_path = tmp_path / "source.pdf"
@@ -313,6 +509,7 @@ def test_pdf_viewer_embeds_in_host_and_can_hide_float_redock_and_close(tmp_path,
     window.show()
     dock.dock_in_host()
     app.processEvents()
+    _wait_for_dock_load(dock)
 
     assert dock.is_viewer_visible()
     assert not dock.is_viewer_floating()
@@ -368,6 +565,7 @@ def test_mypixler_displays_active_project_pdf_in_shared_viewer(tmp_path, monkeyp
     assert window._project_source_pdf() == str(pdf_path)
     assert window._open_project_source_pdf_on_startup()
     assert window.pdf_viewer_dialog is not None
+    _wait_for_dock_load(window.pdf_viewer_dialog)
     assert window.pdf_viewer_dialog.pdf_path == str(pdf_path)
     assert window.pdf_page_count == 2
     assert window.dockWidgetArea(window.pdf_viewer_dialog) == qtc.Qt.LeftDockWidgetArea

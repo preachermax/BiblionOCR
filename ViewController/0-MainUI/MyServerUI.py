@@ -837,6 +837,8 @@ class Ui_MainUI(object):
         icon39.addPixmap(QtGui.QPixmap(":/Icons/Icons/stage.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionStage_Workflow.setIcon(icon39)
         self.actionStage_Workflow.setObjectName("actionStage_Workflow")
+        self.actionCombineSourcePages = QtWidgets.QAction(MainUI)
+        self.actionCombineSourcePages.setObjectName("actionCombineSourcePages")
         self.menuTraining.addAction(self.actionMyVersifier)
         self.menuTraining.addAction(self.actionMyResolver)
         self.menuTraining.addAction(self.actionMyGrounder)
@@ -876,6 +878,7 @@ class Ui_MainUI(object):
         self.menuGround_Truth_2.addAction(self.actionMyTrainer)
         self.menuSource.addAction(self.actionImageScanner_tb)
         self.menuSource.addAction(self.actionMyExplorer)
+        self.menuSource.addAction(self.actionCombineSourcePages)
         self.menuSource.addAction(self.actionStage_Workflow)
         self.menuLanguages_2.addAction(self.actionHebrew_6)
         self.menuLanguages_2.addAction(self.menuGreek_3.menuAction())
@@ -1157,6 +1160,8 @@ class Ui_MainUI(object):
         self.actionMyScanner.setText(_translate("MainUI", "MyScanner"))
         self.actionMyReader.setText(_translate("MainUI", "MyReader"))
         self.actionStage_Workflow.setText(_translate("MainUI", "Stage Workflow"))
+        self.actionCombineSourcePages.setText(_translate("MainUI", "Combine Source Pages"))
+        self.actionCombineSourcePages.setToolTip(_translate("MainUI", "Combine acquired and scanned PDF source pages"))
 import UI_Icons
 
 

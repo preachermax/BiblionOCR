@@ -40,6 +40,14 @@ class ProjectTrackingSnapshotTests(unittest.TestCase):
             self.assertEqual(handshake_path, tracker._resolve_handshake_file_path())
             self.assertIn("source_staged", [row[0] for row in tracker._milestone_catalog])
 
+    def test_tracker_catalogs_project_workflow_milestones(self) -> None:
+        tracker = ProjectWorkflowTracker()
+        milestone_keys = [row[0] for row in tracker._milestone_catalog]
+
+        self.assertIn("src_pages_acquired", milestone_keys)
+        self.assertIn("src_pages_scanned", milestone_keys)
+        self.assertIn("src_pages_combined", milestone_keys)
+
     def test_snapshot_includes_project_metadata_context_from_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             project_root = self._create_project_root(tmpdir)

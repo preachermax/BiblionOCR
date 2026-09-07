@@ -219,6 +219,7 @@ class PdfViewerWidget(qtw.QWidget):
             self._load_document()
         else:
             self._apply_loaded_page(int(preloaded_page_count), preloaded_image_path)
+        self._initial_fit_pending = True
 
     @property
     def renderer_path(self):
@@ -338,6 +339,27 @@ class PdfViewerWidget(qtw.QWidget):
         self.fit_width = True
         self._render_page(self.page_index)
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not self._initial_fit_pending:
+            return
+        self._initial_fit_pending = False
+        qtc.QTimer.singleShot(0, self._apply_initial_fit_width)
+
+    def _apply_initial_fit_width(self):
+        if self._rendered_pixmap.isNull():
+            return
+        self.fit_width = True
+        render_width = max(200, self.scroll_area.viewport().width() - 4)
+        if self._rendered_pixmap.width() != render_width:
+            self._rendered_pixmap = self._rendered_pixmap.scaledToWidth(
+                render_width,
+                qtc.Qt.SmoothTransformation,
+            )
+            self.page_label.setPixmap(self._rendered_pixmap)
+            self.page_label.setFixedSize(self._rendered_pixmap.size())
+        self._update_zoom_buttons()
+
     def _update_zoom_buttons(self):
         effective_zoom = self.zoom_percent if not self.fit_width else 100
         self.zoom_out_button.setEnabled(self.fit_width or effective_zoom > self.ZOOM_LEVELS[0])
@@ -371,6 +393,10 @@ class PdfViewerDialog(qtw.QDialog):
 
 class PdfViewerDock(qtw.QDockWidget):
     viewerVisibilityChanged = qtc.pyqtSignal(bool)
+    loadProgress = qtc.pyqtSignal(int, str)
+    documentLoaded = qtc.pyqtSignal(str, int)
+    loadFailed = qtc.pyqtSignal(str)
+    DOCK_PANEL_WIDTH = 420
 
     def __init__(self, pdf_path, parent=None, embedded_host=None):
         super().__init__(f"Source Reader - {os.path.basename(pdf_path)}", parent)
@@ -378,8 +404,27 @@ class PdfViewerDock(qtw.QDockWidget):
         self._automatic_close = False
         self._embedded_host = embedded_host
         self._embedded = False
-        self.viewer = PdfViewerWidget(self.pdf_path, self)
-        self.setWidget(self.viewer)
+        self._parent_window = parent if isinstance(parent, qtw.QMainWindow) else None
+        self._parent_default_geometry = None
+        self._parent_window_expanded = False
+        self._source_load_thread = None
+        self._source_load_worker = None
+        self._pending_load_result = None
+        self._pending_load_error = None
+        self._pending_close_after_load = False
+        self.viewer = None
+        self._loading_widget = qtw.QWidget(self)
+        loading_layout = qtw.QVBoxLayout(self._loading_widget)
+        loading_layout.addStretch(1)
+        self._loading_label = qtw.QLabel("Preparing source document...", self._loading_widget)
+        self._loading_label.setAlignment(qtc.Qt.AlignCenter)
+        loading_layout.addWidget(self._loading_label)
+        self._loading_progress = qtw.QProgressBar(self._loading_widget)
+        self._loading_progress.setRange(0, 100)
+        self._loading_progress.setValue(0)
+        loading_layout.addWidget(self._loading_progress)
+        loading_layout.addStretch(1)
+        self.setWidget(self._loading_widget)
         self.setMinimumWidth(320)
         self.setAllowedAreas(qtc.Qt.LeftDockWidgetArea)
         self.setFeatures(
@@ -388,16 +433,18 @@ class PdfViewerDock(qtw.QDockWidget):
             | qtw.QDockWidget.DockWidgetFloatable
         )
         self.setAttribute(qtc.Qt.WA_DeleteOnClose, True)
-        self.viewer.closeRequested.connect(self.close)
-        self.viewer.hideRequested.connect(self.hide_viewer)
-        self.viewer.dockToggleRequested.connect(self.toggle_floating)
         self.visibilityChanged.connect(self._relay_dock_visibility)
-        self.topLevelChanged.connect(self._sync_dock_button)
+        self.topLevelChanged.connect(self._on_top_level_changed)
         self._sync_dock_button(self.isFloating())
+        qtc.QTimer.singleShot(0, self._start_source_load)
 
     @property
     def page_count(self):
-        return self.viewer.page_count
+        return self.viewer.page_count if self.viewer is not None else 0
+
+    @property
+    def is_loading(self):
+        return self._source_load_thread is not None
 
     def is_viewer_visible(self):
         if self._embedded:
@@ -410,10 +457,10 @@ class PdfViewerDock(qtw.QDockWidget):
     def set_viewer_visible(self, visible):
         if self._embedded:
             self._embedded_host.setVisible(bool(visible))
-            if visible:
+            if visible and self.viewer is not None:
                 self.viewer.show()
                 self._embedded_host.raise_()
-            else:
+            elif self.viewer is not None:
                 self.viewer.hide()
         else:
             self.setVisible(bool(visible))
@@ -421,6 +468,9 @@ class PdfViewerDock(qtw.QDockWidget):
 
     def show_viewer(self):
         self.set_viewer_visible(True)
+        self._start_source_load()
+        if not self.is_viewer_floating():
+            self._expand_parent_window()
 
     def hide_viewer(self):
         self.set_viewer_visible(False)
@@ -432,23 +482,26 @@ class PdfViewerDock(qtw.QDockWidget):
             return
         self._embedded = True
         super().hide()
-        self.viewer.setParent(self._embedded_host)
-        self._embedded_host.layout().addWidget(self.viewer)
+        content_widget = self.viewer or self._loading_widget
+        content_widget.setParent(self._embedded_host)
+        self._embedded_host.layout().addWidget(content_widget)
         self._sync_dock_button(False)
         self.set_viewer_visible(visible)
 
     def float_viewer(self):
         if self._embedded:
             was_visible = self._embedded_host.isVisible()
-            self._embedded_host.layout().removeWidget(self.viewer)
+            content_widget = self.viewer or self._loading_widget
+            self._embedded_host.layout().removeWidget(content_widget)
             self._embedded_host.hide()
-            self.viewer.setParent(self)
-            self.setWidget(self.viewer)
+            content_widget.setParent(self)
+            self.setWidget(content_widget)
             self._embedded = False
         else:
             was_visible = self.isVisible()
         if not self.isFloating():
             self.setFloating(True)
+        self._restore_parent_window()
         self.resize(1000, 800)
         if was_visible:
             self.show()
@@ -478,10 +531,140 @@ class PdfViewerDock(qtw.QDockWidget):
             self.viewerVisibilityChanged.emit(visible)
 
     def _sync_dock_button(self, floating):
+        if self.viewer is None:
+            return
         action = "Dock" if floating else "Undock"
         self.viewer.dock_toggle_button.setToolTip(f"{action} source viewer")
 
+    def _start_source_load(self):
+        if self.viewer is not None or self._source_load_thread is not None:
+            return
+        thread = qtc.QThread(self)
+        worker = SourceDocumentLoadWorker(self.pdf_path)
+        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.progress.connect(self._on_source_load_progress)
+        worker.loaded.connect(self._on_source_document_loaded)
+        worker.failed.connect(self._on_source_document_load_failed)
+        worker.loaded.connect(thread.quit)
+        worker.failed.connect(thread.quit)
+        worker.loaded.connect(worker.deleteLater)
+        worker.failed.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(self._on_source_load_thread_finished)
+        self._source_load_thread = thread
+        self._source_load_worker = worker
+        thread.start()
+
+    def _on_source_load_progress(self, value, message):
+        self._loading_progress.setValue(int(value))
+        self._loading_label.setText(str(message))
+        self.loadProgress.emit(int(value), str(message))
+
+    def _on_source_document_loaded(self, source_path, page_count, image_path):
+        try:
+            self._loading_progress.setValue(100)
+            viewer = PdfViewerWidget(
+                source_path,
+                self,
+                preloaded_page_count=page_count,
+                preloaded_image_path=image_path,
+            )
+            viewer.closeRequested.connect(self.close)
+            viewer.hideRequested.connect(self.hide_viewer)
+            viewer.dockToggleRequested.connect(self.toggle_floating)
+            self.viewer = viewer
+            if self._embedded:
+                self._embedded_host.layout().removeWidget(self._loading_widget)
+                viewer.setParent(self._embedded_host)
+                self._embedded_host.layout().addWidget(viewer)
+                if self._embedded_host.isVisible():
+                    viewer.show()
+            else:
+                self.setWidget(viewer)
+            self._sync_dock_button(self.isFloating())
+            self._pending_load_result = (source_path, int(page_count))
+        except (RuntimeError, ValueError) as exc:
+            self._on_source_document_load_failed(str(exc))
+        finally:
+            try:
+                os.remove(image_path)
+            except OSError:
+                pass
+
+    def _on_source_document_load_failed(self, message):
+        self._loading_label.setText("Source document could not be loaded.")
+        self._loading_progress.hide()
+        self._pending_load_error = str(message)
+
+    def _on_source_load_thread_finished(self):
+        self._source_load_thread = None
+        self._source_load_worker = None
+        if self._pending_load_error is not None:
+            message = self._pending_load_error
+            self._pending_load_error = None
+            self.loadFailed.emit(message)
+        elif self._pending_load_result is not None:
+            source_path, page_count = self._pending_load_result
+            self._pending_load_result = None
+            self.documentLoaded.emit(source_path, page_count)
+        if self._pending_close_after_load:
+            self._pending_close_after_load = False
+            qtc.QTimer.singleShot(0, self.close)
+
+    def _on_top_level_changed(self, floating):
+        self._sync_dock_button(floating)
+        if floating:
+            self._restore_parent_window()
+        elif self.isVisible():
+            self._expand_parent_window()
+
+    def _expand_parent_window(self):
+        window = self._parent_window
+        if window is None or self._embedded or self.isFloating() or self._parent_window_expanded:
+            return
+        if window.isMaximized() or window.isFullScreen():
+            return
+
+        self._parent_default_geometry = qtc.QByteArray(window.saveGeometry())
+        current_geometry = window.geometry()
+        target_width = current_geometry.width() + self.DOCK_PANEL_WIDTH
+        screen = window.screen() or qtw.QApplication.primaryScreen()
+        if screen is not None:
+            available = screen.availableGeometry()
+            target_width = max(current_geometry.width(), min(target_width, available.width()))
+            target_x = min(current_geometry.x(), available.right() - target_width + 1)
+            target_x = max(available.x(), target_x)
+        else:
+            target_x = current_geometry.x()
+        if target_width <= current_geometry.width():
+            self._parent_default_geometry = None
+            return
+
+        window.setGeometry(target_x, current_geometry.y(), target_width, current_geometry.height())
+        self._parent_window_expanded = True
+
+    def _restore_parent_window(self):
+        if not self._parent_window_expanded or self._parent_window is None:
+            return
+        self._parent_window.restoreGeometry(self._parent_default_geometry)
+        self._parent_default_geometry = None
+        self._parent_window_expanded = False
+
     def closeEvent(self, event):
+        if self._source_load_thread is not None:
+            if self._automatic_close:
+                self._pending_close_after_load = True
+                self.hide()
+                self._restore_parent_window()
+            else:
+                qtw.QMessageBox.information(
+                    self,
+                    "Source Document Loading",
+                    "Wait for the source document to finish loading before closing the reader.",
+                )
+            event.ignore()
+            return
         if not self._automatic_close:
             answer = qtw.QMessageBox.question(
                 self,
@@ -493,11 +676,13 @@ class PdfViewerDock(qtw.QDockWidget):
             if answer != qtw.QMessageBox.Yes:
                 event.ignore()
                 return
+        self._restore_parent_window()
         if self._embedded:
-            self._embedded_host.layout().removeWidget(self.viewer)
+            content_widget = self.viewer or self._loading_widget
+            self._embedded_host.layout().removeWidget(content_widget)
             self._embedded_host.hide()
-            self.viewer.setParent(self)
-            self.setWidget(self.viewer)
+            content_widget.setParent(self)
+            self.setWidget(content_widget)
             self._embedded = False
             self.viewerVisibilityChanged.emit(False)
         event.accept()

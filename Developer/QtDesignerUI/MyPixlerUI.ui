@@ -1328,9 +1328,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionConvert_Greek_tiff_To_png"/>
    <addaction name="actionDeskew_Greek_tiff"/>
-   <addaction name="actionResize_Greek_png_pages"/>
   </widget>
   <widget class="QToolBar" name="LatinToolBar">
    <property name="windowTitle">
@@ -1342,9 +1340,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionConvert_Latin_tiff_To_png"/>
    <addaction name="actionDeskew_Latin_tiff"/>
-   <addaction name="actionResize_Latin_png_pages"/>
   </widget>
   <widget class="QToolBar" name="DestinationToolBar">
    <property name="windowTitle">
@@ -1895,20 +1891,6 @@
     </font>
    </property>
   </action>
-  <action name="actionConvert_Greek_tiff_To_png">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff2png-greek.png</normaloff>:/Icons/Icons/tiff2png-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Convert Greek tiff To png</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>FROMVS</family>
-    </font>
-   </property>
-  </action>
   <action name="actionDeskew_Greek_tiff">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
@@ -1918,29 +1900,6 @@
     <string>Deskew Greek tiff pages</string>
    </property>
   </action>
-  <action name="actionResize_Greek_png_pages">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/resize-png-greek.png</normaloff>:/Icons/Icons/resize-png-greek.png</iconset>
-   </property>
-   <property name="text">
-    <string>Resize Greek png pages</string>
-   </property>
-  </action>
-  <action name="actionConvert_Latin_tiff_To_png">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/tiff2png-latin.png</normaloff>:/Icons/Icons/tiff2png-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Convert Latin tif pages To png</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>FROMVS</family>
-    </font>
-   </property>
-  </action>
   <action name="actionDeskew_Latin_tiff">
    <property name="icon">
     <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
@@ -1948,20 +1907,6 @@
    </property>
    <property name="text">
     <string>Deskew Latin tiff pages</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>FROMVS</family>
-    </font>
-   </property>
-  </action>
-  <action name="actionResize_Latin_png_pages">
-   <property name="icon">
-    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
-     <normaloff>:/Icons/Icons/resize-png-latin.png</normaloff>:/Icons/Icons/resize-png-latin.png</iconset>
-   </property>
-   <property name="text">
-    <string>Resize Latin png pages</string>
    </property>
    <property name="font">
     <font>

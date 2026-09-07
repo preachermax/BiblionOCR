@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import csv
 import os
+import re
 import tempfile
 import unittest
 
@@ -45,6 +47,90 @@ class PageWorkflowWorkbookTests(unittest.TestCase):
         self.assertAlmostEqual(1.82, milestones[0].progress_percent)
         self.assertFalse(milestones[0].override_allowed)
         self.assertEqual("MyPixler", milestones[0].module)
+
+    def test_workflow_methods_include_sequence_and_milestone_comments(self) -> None:
+        module_paths = {
+            "MyServer": os.path.join(self.workspace_root, "ViewController", "0-MainUI", "MyServer.py"),
+            "MyScanner": os.path.join(self.workspace_root, "ViewController", "0-MainUI", "MyScanner.py"),
+            "MyPixler": os.path.join(self.workspace_root, "ViewController", "1-PreProcess", "MyPixler.py"),
+            "MyBoxer": os.path.join(self.workspace_root, "ViewController", "1-PreProcess", "MyBoxer.py"),
+        }
+        references = {}
+        workflow_specs = (
+            ("page_workflow.csv", "Module", {}),
+            (
+                "project_workflow.csv",
+                "SourceModule",
+                {"on_new_project_clicked": "MyServer"},
+            ),
+        )
+        for filename, module_column, method_modules in workflow_specs:
+            workflow_path = os.path.join(
+                self.workspace_root,
+                "Model",
+                "Project",
+                "Data",
+                "csv",
+                filename,
+            )
+            with open(workflow_path, newline="", encoding="utf-8-sig") as workflow_file:
+                for row in csv.DictReader(workflow_file):
+                    method_name = (row.get("Method") or "").strip()
+                    module_name = method_modules.get(
+                        method_name,
+                        (row.get(module_column) or "").strip(),
+                    )
+                    sequence = (row.get("Sequence") or "").strip()
+                    milestone_name = (row.get("MilestoneName") or "").strip()
+                    if not method_name or module_name not in module_paths:
+                        continue
+                    references.setdefault((module_name, method_name), set()).add(
+                        (sequence, milestone_name)
+                    )
+
+        for (module_name, method_name), method_references in references.items():
+            with open(module_paths[module_name], encoding="utf-8") as source_file:
+                source_lines = source_file.readlines()
+            definition_indexes = [
+                index
+                for index, line in enumerate(source_lines)
+                if re.match(rf"\s+def {re.escape(method_name)}\(", line)
+            ]
+            self.assertTrue(definition_indexes, f"Missing {module_name}.{method_name}")
+            for definition_index in definition_indexes:
+                comment_lines = []
+                index = definition_index - 1
+                while index >= 0 and source_lines[index].lstrip().startswith("#"):
+                    comment_lines.append(source_lines[index].strip())
+                    index -= 1
+                comment_text = "\n".join(reversed(comment_lines))
+                for sequence, milestone_name in method_references:
+                    self.assertIn(
+                        f"Sequence {sequence}; MilestoneName {milestone_name}",
+                        comment_text,
+                        f"Missing workflow comment above {module_name}.{method_name}",
+                    )
+
+    def test_project_workflow_method_cells_name_runtime_methods(self) -> None:
+        workflow_path = os.path.join(
+            self.workspace_root,
+            "Model",
+            "Project",
+            "Data",
+            "csv",
+            "project_workflow.csv",
+        )
+        with open(workflow_path, newline="", encoding="utf-8-sig") as workflow_file:
+            methods = [
+                (row.get("Method") or "").strip()
+                for row in csv.DictReader(workflow_file)
+                if (row.get("Method") or "").strip()
+            ]
+
+        self.assertEqual(
+            ["on_new_project_clicked", "actionScanImage", "actionCombineSourcePages"],
+            methods,
+        )
 
     def test_selects_next_incomplete_method_for_active_section(self) -> None:
         step = select_page_workflow_step(

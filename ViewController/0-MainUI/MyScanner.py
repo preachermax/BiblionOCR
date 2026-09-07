@@ -77,6 +77,7 @@ from project_status_controller import ProjectStatusController
 from print_menu_support import install_print_menu_support, image_target, document_target
 from project_column_settings import update_project_columns, project_metadata_db_path
 from Core.project_database import load_project_database_record
+from Core.source_documents import convert_scan_to_project_pdf, project_scan_image_directory
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
@@ -682,7 +683,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.run_child_module('MyReader.py')
 
     def _default_scan_request(self):
-        return self.scannerManager.request_from_state(self, SCANNED_FOLDER)
+        project_root_path = self.project_status_controller.resolve_project_root()
+        destination_folder = (
+            project_scan_image_directory(project_root_path)
+            if project_root_path
+            else SCANNED_FOLDER
+        )
+        return self.scannerManager.request_from_state(self, destination_folder)
 
     def _persist_scan_request(self, request, pending_scan_handoff=False):
         normalized_request = self.scannerManager.apply_request_state(self, request, SCANNED_FOLDER)
@@ -704,7 +711,16 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage('ADF workflow redirected from MyServer. Review the scan request and continue here.', 8000)
         self.actionScanImage(self._default_scan_request())
 
+    # Project workflow: Sequence ASPS; MilestoneName src_pages_scanned.
     def actionScanImage(self, initial_request=None):
+        project_root_path = self.project_status_controller.resolve_project_root()
+        if not project_root_path:
+            qtw.QMessageBox.information(
+                self,
+                'Scan Image',
+                'Open or create a project before scanning source pages.',
+            )
+            return None
         dialog = ScanWizardDialog(
             self.scannerManager,
             SCANNED_FOLDER,
@@ -715,6 +731,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return None
 
         request = dialog.get_request()
+        request['destination_folder'] = project_scan_image_directory(project_root_path)
         self._persist_scan_request(request)
         return self._start_scan_workflow(request)
 
@@ -784,8 +801,29 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.imgpath = result['path']
         self.showImage(result['path'])
+        project_root_path = self.project_status_controller.resolve_project_root(result['path'])
+        if not project_root_path:
+            qtw.QMessageBox.warning(
+                self,
+                'Scan to PDF Failed',
+                'The active project could not be resolved after scanning completed.',
+            )
+            return
+        try:
+            scanned_pdf_path = convert_scan_to_project_pdf(result['path'], project_root_path)
+        except (OSError, ValueError) as exc:
+            qtw.QMessageBox.warning(self, 'Scan to PDF Failed', str(exc))
+            return
+        self.project_status_controller.workflow_tracker.record_milestone(
+            project_root_path,
+            'src_pages_scanned',
+            module_name='MyScanner',
+            details={'source_image': result['path'], 'pdf_path': scanned_pdf_path},
+        )
+        self.session_manager.set_active_project_milestone('src_pages_scanned')
+        self.project_status_controller.refresh_status(project_root_path)
         self.statusBar().showMessage(
-            f"Scanned via {result.get('backend', 'scanner backend')}: {result['path']}",
+            f"Scanned via {result.get('backend', 'scanner backend')}: {scanned_pdf_path}",
             5000,
         )
 

@@ -74,6 +74,13 @@ HANDSHAKE_FILENAME = os.path.join(
     "csv",
     "module_handshakes.csv",
 )
+PROJECT_MILESTONES_FILENAME = os.path.join(
+    "Model",
+    "Project",
+    "Data",
+    "csv",
+    "project_workflow_milestones.csv",
+)
 ACTIVE_PROJECT_ROOT_KEYS = (
     "self.active_project_root",
     "self.project_root",
@@ -99,6 +106,7 @@ class ProjectWorkflowTracker:
     def __init__(self, workspace_root: Optional[str] = None):
         self.workspace_root = self._normalize_path(workspace_root)
         self._handshake_rows = self._load_handshake_rows()
+        self._project_milestone_rows = self._load_project_milestone_rows()
         self._handshake_milestone_weights = self._build_handshake_weight_map()
         self._handshake_milestone_order = self._build_handshake_order_map()
         self._handshake_milestone_modules = self._build_handshake_module_map()
@@ -891,6 +899,16 @@ class ProjectWorkflowTracker:
 
     def _build_milestone_catalog(self) -> List[tuple]:
         catalog = [(m.key, m.label, m.weight) for m in OVERALL_MILESTONES]
+        for row in self._project_milestone_rows:
+            milestone_key = row.get("MilestoneName", "").strip()
+            if not milestone_key or any(existing_key == milestone_key for existing_key, _label, _weight in catalog):
+                continue
+            progress_text = row.get("ProjectProgress%", "").strip().rstrip("%")
+            try:
+                milestone_weight = max(1, int(round(float(progress_text))))
+            except (TypeError, ValueError):
+                milestone_weight = 1
+            catalog.append((milestone_key, self._humanize_milestone_name(milestone_key), milestone_weight))
         ordered_handshake_keys = sorted(
             self._handshake_milestone_weights.keys(),
             key=lambda key: self._handshake_milestone_order.get(key, 10_000),
@@ -900,6 +918,24 @@ class ProjectWorkflowTracker:
                 continue
             catalog.append((milestone_key, self._humanize_milestone_name(milestone_key), self._handshake_milestone_weights[milestone_key]))
         return catalog
+
+    def _load_project_milestone_rows(self) -> List[Dict[str, str]]:
+        candidates = []
+        if self.workspace_root:
+            candidates.append(os.path.join(self.workspace_root, PROJECT_MILESTONES_FILENAME))
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+        candidates.append(os.path.join(repo_root, PROJECT_MILESTONES_FILENAME))
+        candidates.append(os.path.join(os.getcwd(), PROJECT_MILESTONES_FILENAME))
+
+        milestone_path = next((path for path in candidates if os.path.isfile(path)), "")
+        if not milestone_path:
+            return []
+        with open(milestone_path, "r", encoding="utf-8-sig", newline="") as handle:
+            return [
+                {str(key).strip(): str(value or "").strip() for key, value in row.items() if key}
+                for row in csv.DictReader(handle)
+                if row and (row.get("MilestoneName") or "").strip()
+            ]
 
     def _build_handshake_order_map(self) -> Dict[str, int]:
         order_map: Dict[str, int] = {}

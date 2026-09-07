@@ -2050,6 +2050,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
 
     #     self.deskew_monoDialog.exec_()
 
+    # Page workflow: Sequence AE2C; MilestoneName front_matter_tif_pages_to_columns_boxed.
+    # Page workflow: Sequence AE2C; MilestoneName middle_matter_tif_pages_to_columns_boxed.
+    # Page workflow: Sequence AE2C; MilestoneName verse_books_tif_pages_to_columns_boxed.
+    # Page workflow: Sequence AE2C; MilestoneName back_matter_tif_pages_to_columns_boxed.
     def actionCrop_Languages(self):
         print("creating cropped language tif files")
 
@@ -2807,6 +2811,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         #dsk.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_40_Matthew/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_40_Matthew/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_40_Matthew/")
         #pp.deskewfiles("~/Projects/Python/Images/Greek/png_greek/greek_book_41_Mark/", "~/Projects/Python/Images/Greek/png_greek_deskew/greek_book_41_Mark/","~/Projects/Python/Images/Greek/tif_greek_deskew/greek_book_41_Mark/")
 
+    # Page workflow: Sequence AE2C; MilestoneName front_matter_tif_pages_to_columns_boxed.
+    # Page workflow: Sequence AE2C; MilestoneName middle_matter_tif_pages_to_columns_boxed.
+    # Page workflow: Sequence AE2C; MilestoneName verse_books_tif_pages_to_columns_boxed.
+    # Page workflow: Sequence AE2C; MilestoneName back_matter_tif_pages_to_columns_boxed.
     def actionCrop_Languages(self):
         print("creating cropped language tif files")
 
@@ -3230,6 +3238,10 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
     # Start Page Box Methods
 
     # Page Box Methods
+    # Page workflow: Sequence CA2C; MilestoneName front_matter_col_tif_pages_page_boxed.
+    # Page workflow: Sequence CA2C; MilestoneName middle_matter_books_col_tif_pages_page_boxed.
+    # Page workflow: Sequence CA2C; MilestoneName verse_books_col_tif_pages_page_boxed.
+    # Page workflow: Sequence CA2C; MilestoneName back_matter_col_tif_pages_page_boxed.
     def pagebox_make_split(self):
             path_of_images = self.pages
             dest_of_box = self.pagesbox

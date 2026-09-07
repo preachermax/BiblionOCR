@@ -183,349 +183,136 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         return scroll
 
     def _build_ui(self):
-        ris_page = qtw.QWidget()
-        ris_layout = qtw.QVBoxLayout(ris_page)
-        ris_layout.setSpacing(10)
-
-        ris_label = qtw.QLabel("Optional: load an existing RIS file")
-        ris_layout.addWidget(ris_label)
-
-        ris_help = qtw.QLabel(
-            "If you already have provenance metadata, load it here to prefill the project fields before continuing."
+        control_names = (
+            "ris_path_edit",
+            "ris_browse_button",
+            "ris_clear_button",
+            "status_label",
+            "ris_editor_group",
+            "ris_editor_table",
+            "project_name_label",
+            "project_name_edit",
+            "project_name_hint_label",
+            "project_purpose_label",
+            "project_purpose_edit",
+            "source_document_edit",
+            "source_document_button",
+            "view_source_document_button",
+            "clear_source_document_button",
+            "project_type_combo",
+            "scriptural_source_combo",
+            "source_pages_combo",
+            "columns_per_page_spin",
+            "ui_font_combo",
+            "column_config_group",
+            "column_config_layout",
+            "column_preview_label",
+            "user_intent_label",
+            "user_intent_edit",
+            "creation_trigger_edit",
+            "source_context_edit",
+            "creator_edit",
+            "review_label",
+            "details_status_label",
+            "project_db_table",
+            "milestones_table",
+            "handshake_table",
+            "folder_selection_stack",
         )
-        ris_help.setWordWrap(True)
-        ris_layout.addWidget(ris_help)
+        for control_name in control_names:
+            setattr(self, control_name, getattr(self.ui, control_name))
 
-        ris_row = qtw.QHBoxLayout()
-        self.ris_path_edit = qtw.QLineEdit()
-        self.ris_path_edit.setPlaceholderText("project.ris.json, Primo_RIS_Export.ris, or similar")
-        self.ris_path_edit.setReadOnly(True)
-        ris_row.addWidget(self.ris_path_edit, 1)
-
-        self.ris_browse_button = qtw.QPushButton("Load RIS...")
-        self.ris_browse_button.clicked.connect(self._browse_for_ris)
-        ris_row.addWidget(self.ris_browse_button)
-
-        self.ris_clear_button = qtw.QPushButton("Clear RIS")
-        self.ris_clear_button.clicked.connect(self._clear_ris)
-        ris_row.addWidget(self.ris_clear_button)
-
-        ris_layout.addLayout(ris_row)
-
-        self.status_label = qtw.QLabel("")
-        self.status_label.setWordWrap(True)
-        ris_layout.addWidget(self.status_label)
-
-        self.ris_editor_group = qtw.QGroupBox("RIS metadata fields (full spec)")
-        ris_editor_layout = qtw.QVBoxLayout(self.ris_editor_group)
-        ris_editor_help = qtw.QLabel(
-            "Edit all RIS tags here. Use semicolons to separate multiple values for a tag."
-        )
-        ris_editor_help.setWordWrap(True)
-        ris_editor_layout.addWidget(ris_editor_help)
-
-        self.ris_editor_table = qtw.QTableWidget(0, 3, self)
-        ris_table = self.ris_editor_table
-        ris_table.setHorizontalHeaderLabels(["Tag", "Field", "Value(s)"])
-        ris_vertical_header = ris_table.verticalHeader()
-        if ris_vertical_header is not None:
-            ris_vertical_header.setVisible(False)
-        ris_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        ris_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
-        ris_table.setAlternatingRowColors(True)
-        ris_horizontal_header = ris_table.horizontalHeader()
-        if ris_horizontal_header is not None:
-            ris_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-            ris_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
-            ris_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.Stretch)
-        ris_table.itemChanged.connect(self._sync_ris_editor_to_imported_provenance)
-        ris_editor_layout.addWidget(ris_table)
-        self._build_ris_spec_editor_rows()
         self.ris_editor_group.setVisible(False)
-        ris_layout.addWidget(self.ris_editor_group)
+        self.ris_editor_table.setColumnCount(3)
+        self.ris_editor_table.setHorizontalHeaderLabels(["Tag", "Field", "Value(s)"])
+        self.ris_editor_table.verticalHeader().setVisible(False)
+        self.ris_editor_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.ris_editor_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        self.ris_editor_table.setAlternatingRowColors(True)
+        self.ris_editor_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.ris_editor_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
+        self.ris_editor_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
 
-        ris_layout.addStretch(1)
-        self.page_stack.addWidget(self._make_scroll_page(ris_page))
-
-        details_page = qtw.QWidget()
-        details_layout = qtw.QVBoxLayout(details_page)
-        details_layout.setSpacing(10)
-
-        details_label = qtw.QLabel("Project details")
-        details_layout.addWidget(details_label)
-
-        self.project_name_label = qtw.QLabel("Project name")
-        self.project_name_edit = qtw.QLineEdit()
-        self.project_name_edit.setPlaceholderText("Erasmus1523")
-        details_layout.addWidget(self.project_name_label)
-        details_layout.addWidget(self.project_name_edit)
-
-        self.project_name_hint_label = qtw.QLabel("")
-        self.project_name_hint_label.setWordWrap(True)
-        details_layout.addWidget(self.project_name_hint_label)
-
-        self.project_purpose_label = qtw.QLabel("Project purpose")
-        self.project_purpose_edit = qtw.QPlainTextEdit()
-        self.project_purpose_edit.setPlaceholderText("Create a readable text version of the source file with duplicate font")
-        self.project_purpose_edit.setFixedHeight(72)
-        details_layout.addWidget(self.project_purpose_label)
-        details_layout.addWidget(self.project_purpose_edit)
-
-        source_document_label = qtw.QLabel("Source document (PDF or TIFF, optional)")
-        details_layout.addWidget(source_document_label)
-        source_document_row = qtw.QHBoxLayout()
-        self.source_document_edit = qtw.QLineEdit()
-        self.source_document_edit.setReadOnly(True)
-        self.source_document_edit.setPlaceholderText("No PDF or TIFF source selected")
-        source_document_row.addWidget(self.source_document_edit, 1)
-        self.source_document_button = qtw.QPushButton("Load Source Document")
-        self.source_document_button.clicked.connect(self._browse_for_source_document)
-        source_document_row.addWidget(self.source_document_button)
-        self.view_source_document_button = qtw.QPushButton("View")
-        self.view_source_document_button.clicked.connect(self._view_selected_source_document)
-        source_document_row.addWidget(self.view_source_document_button)
-        self.clear_source_document_button = qtw.QPushButton("Clear")
-        self.clear_source_document_button.clicked.connect(self._clear_source_document)
-        source_document_row.addWidget(self.clear_source_document_button)
-        details_layout.addLayout(source_document_row)
-
-        project_scope_row = qtw.QHBoxLayout()
-        project_scope_column = qtw.QVBoxLayout()
-        project_scope_column.addWidget(qtw.QLabel("Project type (fixed)"))
-        self.project_type_combo = qtw.QComboBox()
-        self.project_type_combo.addItems(["Scriptural"])
+        self.project_type_combo.addItem("Scriptural")
         self.project_type_combo.setCurrentText("Scriptural")
-        self.project_type_combo.setEnabled(False)
-        project_scope_column.addWidget(self.project_type_combo)
-        project_scope_row.addLayout(project_scope_column)
-
-        scripture_scope_column = qtw.QVBoxLayout()
-        scripture_scope_column.addWidget(qtw.QLabel("Scriptural source"))
-        self.scriptural_source_combo = qtw.QComboBox()
         self.scriptural_source_combo.addItems(["both", "OT", "NT"])
-        self.scriptural_source_combo.setCurrentText("both")
-        scripture_scope_column.addWidget(self.scriptural_source_combo)
-        project_scope_row.addLayout(scripture_scope_column)
-        details_layout.addLayout(project_scope_row)
-
-        page_model_group = qtw.QGroupBox("Source page model")
-        page_model_layout = qtw.QGridLayout(page_model_group)
-        page_model_layout.addWidget(qtw.QLabel("Total Source Document Pages"), 0, 0)
-        self.source_pages_combo = qtw.QComboBox()
-        for page_number in range(1, 1001):
-            self.source_pages_combo.addItem(str(page_number))
-        page_model_layout.addWidget(self.source_pages_combo, 0, 1)
-
-        source_pages_note = qtw.QLabel(
-            "Source pages are determined by extract (MyServer) or multi-page scans (MyScanner)."
-        )
-        source_pages_note.setWordWrap(True)
-        page_model_layout.addWidget(source_pages_note, 1, 0, 1, 2)
+        self.source_pages_combo.addItems([str(page_number) for page_number in range(1, 1001)])
         self._configure_source_pages_dropdown()
-
-        page_model_layout.addWidget(qtw.QLabel("Number of Columns Per Page"), 2, 0)
-        self.columns_per_page_spin = qtw.QSpinBox()
         self.columns_per_page_spin.setRange(1, 3)
         self.columns_per_page_spin.setValue(1)
-        page_model_layout.addWidget(self.columns_per_page_spin, 2, 1)
-
-        page_model_layout.addWidget(qtw.QLabel("UI Font"), 3, 0)
-        self.ui_font_combo = qtw.QFontComboBox()
-        self.ui_font_combo.setObjectName("ui_font_combo")
-        page_model_layout.addWidget(self.ui_font_combo, 3, 1)
+        self.creation_trigger_edit.setText("MyServer_button")
+        self.source_context_edit.setText("MyServer_UI")
         self._configure_ui_font_selector()
-
-        self.column_config_group = qtw.QGroupBox("Column language and name editor")
-        self.column_config_group.setObjectName("column_config_group")
-        self.column_config_layout = qtw.QGridLayout(self.column_config_group)
-        self.column_config_layout.addWidget(qtw.QLabel("Column"), 0, 0)
-        self.column_config_layout.addWidget(qtw.QLabel("Column name"), 0, 1)
-        self.column_config_layout.addWidget(qtw.QLabel("Tesseract language"), 0, 2)
 
         for index, default_language in enumerate(self.DEFAULT_TESSERACT_LANGUAGES):
             row = index + 1
-            row_label = qtw.QLabel(f"{index + 1}")
-            self.column_config_layout.addWidget(row_label, row, 0)
-
+            self.column_config_layout.addWidget(qtw.QLabel(str(index + 1)), row, 0)
             name_edit = qtw.QLineEdit(default_language)
             name_edit.textChanged.connect(self._on_column_configuration_changed)
             self.column_config_layout.addWidget(name_edit, row, 1)
             self._column_name_edits.append(name_edit)
-
             language_combo = qtw.QComboBox()
             language_combo.addItems(self.available_tesseract_languages)
-            language_combo.setCurrentText(default_language if default_language in self.available_tesseract_languages else self.available_tesseract_languages[0])
+            selected_language = (
+                default_language
+                if default_language in self.available_tesseract_languages
+                else self.available_tesseract_languages[0]
+            )
+            language_combo.setCurrentText(selected_language)
             language_combo.currentIndexChanged.connect(self._on_column_configuration_changed)
             self.column_config_layout.addWidget(language_combo, row, 2)
             self._column_language_combos.append(language_combo)
 
-        page_model_layout.addWidget(self.column_config_group, 4, 0, 1, 2)
+        self.project_db_table.setColumnCount(3)
+        self.project_db_table.setHorizontalHeaderLabels(["Field", "Value", "Notes"])
+        self.project_db_table.verticalHeader().setVisible(False)
+        self.project_db_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.project_db_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
+        self.project_db_table.setAlternatingRowColors(True)
+        self.project_db_table.horizontalHeader().setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
+        self.project_db_table.horizontalHeader().setSectionResizeMode(1, qtw.QHeaderView.Stretch)
+        self.project_db_table.horizontalHeader().setSectionResizeMode(2, qtw.QHeaderView.Stretch)
 
-        self.column_preview_label = qtw.QLabel("")
-        self.column_preview_label.setWordWrap(True)
-        page_model_layout.addWidget(self.column_preview_label, 5, 0, 1, 2)
-        details_layout.addWidget(page_model_group)
-
-        self.user_intent_label = qtw.QLabel("User intent summary")
-        self.user_intent_edit = qtw.QPlainTextEdit()
-        self.user_intent_edit.setPlaceholderText("Describe the user intent for this project")
-        self.user_intent_edit.setFixedHeight(72)
-        details_layout.addWidget(self.user_intent_label)
-        details_layout.addWidget(self.user_intent_edit)
-
-        metadata_row = qtw.QHBoxLayout()
-
-        trigger_column = qtw.QVBoxLayout()
-        trigger_column.addWidget(qtw.QLabel("Creation trigger"))
-        self.creation_trigger_edit = qtw.QLineEdit("MyServer_button")
-        trigger_column.addWidget(self.creation_trigger_edit)
-        metadata_row.addLayout(trigger_column)
-
-        context_column = qtw.QVBoxLayout()
-        context_column.addWidget(qtw.QLabel("Source context"))
-        self.source_context_edit = qtw.QLineEdit("MyServer_UI")
-        context_column.addWidget(self.source_context_edit)
-        metadata_row.addLayout(context_column)
-
-        details_layout.addLayout(metadata_row)
-
-        details_layout.addWidget(qtw.QLabel("Creator (optional)"))
-        self.creator_edit = qtw.QLineEdit()
-        self.creator_edit.setPlaceholderText("Optional")
-        details_layout.addWidget(self.creator_edit)
-
-        details_layout.addWidget(qtw.QLabel("Review"))
-        self.review_label = qtw.QLabel("")
-        self.review_label.setWordWrap(True)
-        details_layout.addWidget(self.review_label)
-
-        self.details_status_label = qtw.QLabel("")
-        self.details_status_label.setWordWrap(True)
-        details_layout.addWidget(self.details_status_label)
-
-        details_layout.addStretch(1)
-        self.page_stack.addWidget(self._make_scroll_page(details_page))
-
-        project_settings_page = qtw.QWidget()
-        project_settings_layout = qtw.QVBoxLayout(project_settings_page)
-        project_settings_layout.setSpacing(10)
-
-        project_settings_label = qtw.QLabel("Project settings")
-        project_settings_layout.addWidget(project_settings_label)
-
-        project_settings_help = qtw.QLabel(
-            "These values initialize project_metadata.sqlite. Recommended tools: DB Browser for SQLite."
+        self.milestones_table.setColumnCount(6)
+        self.milestones_table.setHorizontalHeaderLabels(
+            ["Module", "Sequence", "Milestone Key", "Label", "Weight", "Complete"]
         )
-        project_settings_help.setWordWrap(True)
-        project_settings_layout.addWidget(project_settings_help)
+        self.milestones_table.verticalHeader().setVisible(False)
+        self.milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.milestones_table.setAlternatingRowColors(True)
+        for column in (0, 1, 2, 4, 5):
+            self.milestones_table.horizontalHeader().setSectionResizeMode(column, qtw.QHeaderView.ResizeToContents)
+        self.milestones_table.horizontalHeader().setSectionResizeMode(3, qtw.QHeaderView.Stretch)
 
-        self.project_db_table = qtw.QTableWidget(0, 3, self)
-        project_db_table = self.project_db_table
-        project_db_table.setHorizontalHeaderLabels(["Field", "Value", "Notes"])
-        project_db_vertical_header = project_db_table.verticalHeader()
-        if project_db_vertical_header is not None:
-            project_db_vertical_header.setVisible(False)
-        project_db_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        project_db_table.setSelectionMode(qtw.QAbstractItemView.SingleSelection)
-        project_db_table.setAlternatingRowColors(True)
-        project_db_horizontal_header = project_db_table.horizontalHeader()
-        if project_db_horizontal_header is not None:
-            project_db_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-            project_db_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.Stretch)
-            project_db_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.Stretch)
-        project_settings_layout.addWidget(project_db_table, 1)
+        self.handshake_table.setColumnCount(6)
+        self.handshake_table.setHorizontalHeaderLabels(
+            ["Module", "Sequence", "Milestone", "Language", "Input Path", "Output Path"]
+        )
+        self.handshake_table.verticalHeader().setVisible(False)
+        self.handshake_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
+        self.handshake_table.setAlternatingRowColors(True)
+        self.handshake_table.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
+        for column in (0, 1, 2, 3):
+            self.handshake_table.horizontalHeader().setSectionResizeMode(column, qtw.QHeaderView.ResizeToContents)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(4, qtw.QHeaderView.Stretch)
+        self.handshake_table.horizontalHeader().setSectionResizeMode(5, qtw.QHeaderView.Stretch)
 
-        self.page_stack.addWidget(self._make_scroll_page(project_settings_page))
+        self._build_ris_spec_editor_rows()
         self._load_project_database_defaults()
-
-        milestones_page = qtw.QWidget()
-        milestones_layout = qtw.QVBoxLayout(milestones_page)
-        milestones_layout.setSpacing(10)
-
-        milestones_label = qtw.QLabel("Milestone and module handshake settings")
-        milestones_layout.addWidget(milestones_label)
-
-        milestones_help = qtw.QLabel(
-            "Milestones and handshakes are grouped by module and shown in sequential order."
-        )
-        milestones_help.setWordWrap(True)
-        milestones_layout.addWidget(milestones_help)
-
-        milestones_tabs = qtw.QTabWidget(self)
-
-        milestone_tab = qtw.QWidget()
-        milestone_tab_layout = qtw.QVBoxLayout(milestone_tab)
-        self.milestones_table = qtw.QTableWidget(0, 6, self)
-        milestones_table = self.milestones_table
-        milestones_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone Key", "Label", "Weight", "Complete"])
-        milestones_vertical_header = milestones_table.verticalHeader()
-        if milestones_vertical_header is not None:
-            milestones_vertical_header.setVisible(False)
-        milestones_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        milestones_table.setAlternatingRowColors(True)
-        milestones_horizontal_header = milestones_table.horizontalHeader()
-        if milestones_horizontal_header is not None:
-            milestones_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-            milestones_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
-            milestones_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
-            milestones_horizontal_header.setSectionResizeMode(3, qtw.QHeaderView.Stretch)
-            milestones_horizontal_header.setSectionResizeMode(4, qtw.QHeaderView.ResizeToContents)
-            milestones_horizontal_header.setSectionResizeMode(5, qtw.QHeaderView.ResizeToContents)
-        milestone_tab_layout.addWidget(milestones_table)
-        milestones_tabs.addTab(milestone_tab, "Milestones")
-
-        handshake_tab = qtw.QWidget()
-        handshake_tab_layout = qtw.QVBoxLayout(handshake_tab)
-        self.handshake_table = qtw.QTableWidget(0, 6, self)
-        handshake_table = self.handshake_table
-        handshake_table.setHorizontalHeaderLabels(["Module", "Sequence", "Milestone", "Language", "Input Path", "Output Path"])
-        handshake_vertical_header = handshake_table.verticalHeader()
-        if handshake_vertical_header is not None:
-            handshake_vertical_header.setVisible(False)
-        handshake_table.setSelectionBehavior(qtw.QAbstractItemView.SelectRows)
-        handshake_table.setAlternatingRowColors(True)
-        handshake_table.setEditTriggers(qtw.QAbstractItemView.NoEditTriggers)
-        handshake_horizontal_header = handshake_table.horizontalHeader()
-        if handshake_horizontal_header is not None:
-            handshake_horizontal_header.setSectionResizeMode(0, qtw.QHeaderView.ResizeToContents)
-            handshake_horizontal_header.setSectionResizeMode(1, qtw.QHeaderView.ResizeToContents)
-            handshake_horizontal_header.setSectionResizeMode(2, qtw.QHeaderView.ResizeToContents)
-            handshake_horizontal_header.setSectionResizeMode(3, qtw.QHeaderView.ResizeToContents)
-            handshake_horizontal_header.setSectionResizeMode(4, qtw.QHeaderView.Stretch)
-            handshake_horizontal_header.setSectionResizeMode(5, qtw.QHeaderView.Stretch)
-        handshake_tab_layout.addWidget(handshake_table)
-        milestones_tabs.addTab(handshake_tab, "Module Handshakes")
-
-        milestones_layout.addWidget(milestones_tabs, 1)
-        self.page_stack.addWidget(self._make_scroll_page(milestones_page))
         self._load_milestones_defaults()
         self._load_handshake_rows()
-
-        folder_selection_page = qtw.QWidget()
-        folder_selection_layout = qtw.QVBoxLayout(folder_selection_page)
-        folder_selection_layout.setSpacing(10)
-
-        folder_selection_label = qtw.QLabel("Choose project folders")
-        folder_selection_layout.addWidget(folder_selection_label)
-
-        folder_selection_help = qtw.QLabel(
-            "The defaults below are already preselected. You can keep the current selection and continue with Next."
-        )
-        folder_selection_help.setWordWrap(True)
-        folder_selection_layout.addWidget(folder_selection_help)
-
-        self.folder_selection_stack = qtw.QStackedWidget(self)
-        folder_selection_layout.addWidget(self.folder_selection_stack, 1)
-
         self._build_folder_selection_page("scriptural", "Scriptural project folders")
 
-        self.page_stack.addWidget(self._make_scroll_page(folder_selection_page))
-
+        self.ris_browse_button.clicked.connect(self._browse_for_ris)
+        self.ris_clear_button.clicked.connect(self._clear_ris)
+        self.ris_editor_table.itemChanged.connect(self._sync_ris_editor_to_imported_provenance)
+        self.source_document_button.clicked.connect(self._browse_for_source_document)
+        self.view_source_document_button.clicked.connect(self._view_selected_source_document)
+        self.clear_source_document_button.clicked.connect(self._clear_source_document)
         self.back_button.clicked.connect(self._go_back)
         self.next_button.clicked.connect(self._go_next)
         self.cancel_button.clicked.connect(self.reject)
         self.create_button.clicked.connect(self._attempt_accept)
-
         self.project_name_edit.textChanged.connect(self._update_validation_state)
         self.project_purpose_edit.textChanged.connect(self._update_validation_state)
         self.user_intent_edit.textChanged.connect(self._update_validation_state)

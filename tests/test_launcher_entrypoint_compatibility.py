@@ -56,6 +56,15 @@ class LauncherEntrypointCompatibilityTests(unittest.TestCase):
         helper_path = os.path.join(REPO_ROOT, "ViewController", "0-MainUI", "helpers", "QtCropImage.py")
         self.assertTrue(os.path.exists(helper_path), "QtCropImage helper shim should exist")
 
+    def test_myserver_pixler_return_handoff_uses_preprocess_entrypoint(self):
+        server_path = os.path.join(REPO_ROOT, "ViewController", "0-MainUI", "MyServer.py")
+        with open(server_path, encoding="utf-8") as source_file:
+            source = source_file.read()
+
+        self.assertIn("os.path.join(preprocess_dir, 'MyPixler.py')", source)
+        self.assertNotIn("os.path.join(script_dir, 'MyPixler.py')", source)
+        self.assertNotIn("run_child_module('MyPixler.py')", source)
+
     def test_lexer_window_initializes_without_optional_button_widget(self):
         app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
         lexer_path = os.path.join(REPO_ROOT, "ViewController", "3-Process", "MyLexer.py")

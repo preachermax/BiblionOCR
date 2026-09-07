@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ui version="4.0">
  <class>ProjectCreationWizardDialog</class>
  <widget class="QDialog" name="ProjectCreationWizardDialog">
@@ -47,31 +47,581 @@
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="page_stack"/>
+    <widget class="QStackedWidget" name="page_stack">
+     <widget class="QScrollArea" name="ris_page">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="ris_page_content">
+       <layout class="QVBoxLayout" name="ris_page_layout">
+        <item>
+         <widget class="QLabel" name="ris_intro_label">
+          <property name="text">
+           <string>Optional: load an existing RIS file</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="ris_help_label">
+          <property name="text">
+           <string>If you already have provenance metadata, load it here to prefill the project fields before continuing.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="ris_file_layout">
+          <item>
+           <widget class="QLineEdit" name="ris_path_edit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>project.ris.json, Primo_RIS_Export.ris, or similar</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ris_browse_button">
+            <property name="text">
+             <string>Load RIS...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ris_clear_button">
+            <property name="text">
+             <string>Clear RIS</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="status_label">
+          <property name="text">
+           <string />
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="ris_editor_group">
+          <property name="title">
+           <string>RIS metadata fields (full spec)</string>
+          </property>
+          <layout class="QVBoxLayout" name="ris_editor_layout">
+           <item>
+            <widget class="QLabel" name="ris_editor_help_label">
+             <property name="text">
+              <string>Edit all RIS tags here. Use semicolons to separate multiple values for a tag.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="ris_editor_table" />
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="ris_page_spacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QScrollArea" name="details_page">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="details_page_content">
+       <layout class="QVBoxLayout" name="details_page_layout">
+        <item>
+         <widget class="QLabel" name="details_heading_label">
+          <property name="text">
+           <string>Project details</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="project_name_label">
+          <property name="text">
+           <string>Project name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="project_name_edit">
+          <property name="placeholderText">
+           <string>Erasmus1523</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="project_name_hint_label">
+          <property name="text">
+           <string />
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="project_purpose_label">
+          <property name="text">
+           <string>Project purpose</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="project_purpose_edit">
+          <property name="placeholderText">
+           <string>Create a readable text version of the source file with duplicate font</string>
+          </property>
+          <property name="maximumHeight">
+           <number>72</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="source_document_label">
+          <property name="text">
+           <string>Source document (PDF or TIFF, optional)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="source_document_layout">
+          <item>
+           <widget class="QLineEdit" name="source_document_edit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>No PDF or TIFF source selected</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="source_document_button">
+            <property name="text">
+             <string>Load Source Document</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="view_source_document_button">
+            <property name="text">
+             <string>View</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clear_source_document_button">
+            <property name="text">
+             <string>Clear</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="project_scope_layout">
+          <item>
+           <layout class="QVBoxLayout" name="project_type_layout">
+            <item>
+             <widget class="QLabel" name="project_type_label">
+              <property name="text">
+               <string>Project type (fixed)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="project_type_combo">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="scriptural_source_layout">
+            <item>
+             <widget class="QLabel" name="scriptural_source_label">
+              <property name="text">
+               <string>Scriptural source</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="scriptural_source_combo" />
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="page_model_group">
+          <property name="title">
+           <string>Source page model</string>
+          </property>
+          <layout class="QGridLayout" name="page_model_layout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="source_pages_label">
+             <property name="text">
+              <string>Total Source Document Pages</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="source_pages_combo" />
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="columns_per_page_label">
+             <property name="text">
+              <string>Number of Columns Per Page</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="columns_per_page_spin" />
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="ui_font_label">
+             <property name="text">
+              <string>UI Font</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QFontComboBox" name="ui_font_combo" />
+           </item>
+           <item row="1" column="0" rowspan="1" colspan="2">
+            <widget class="QLabel" name="source_pages_note_label">
+             <property name="text">
+              <string>Source pages are determined by extract (MyServer) or multi-page scans (MyScanner).</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" rowspan="1" colspan="2">
+            <widget class="QGroupBox" name="column_config_group">
+             <property name="title">
+              <string>Column language and name editor</string>
+             </property>
+             <layout class="QGridLayout" name="column_config_layout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="column_number_heading">
+                <property name="text">
+                 <string>Column</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="column_name_heading">
+                <property name="text">
+                 <string>Column name</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="column_language_heading">
+                <property name="text">
+                 <string>Tesseract language</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="5" column="0" rowspan="1" colspan="2">
+            <widget class="QLabel" name="column_preview_label">
+             <property name="text">
+              <string />
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="user_intent_label">
+          <property name="text">
+           <string>User intent summary</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="user_intent_edit">
+          <property name="placeholderText">
+           <string>Describe the user intent for this project</string>
+          </property>
+          <property name="maximumHeight">
+           <number>72</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="metadata_layout">
+          <item>
+           <layout class="QVBoxLayout" name="creation_trigger_layout">
+            <item>
+             <widget class="QLabel" name="creation_trigger_label">
+              <property name="text">
+               <string>Creation trigger</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="creation_trigger_edit" />
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="source_context_layout">
+            <item>
+             <widget class="QLabel" name="source_context_label">
+              <property name="text">
+               <string>Source context</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="source_context_edit" />
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="creator_label">
+          <property name="text">
+           <string>Creator (optional)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="creator_edit">
+          <property name="placeholderText">
+           <string>Optional</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="review_heading_label">
+          <property name="text">
+           <string>Review</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="review_label">
+          <property name="text">
+           <string />
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="details_status_label">
+          <property name="text">
+           <string />
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="details_page_spacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QScrollArea" name="project_settings_page">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="project_settings_page_content">
+       <layout class="QVBoxLayout" name="project_settings_page_layout">
+        <item>
+         <widget class="QLabel" name="project_settings_heading_label">
+          <property name="text">
+           <string>Project settings</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="project_settings_help_label">
+          <property name="text">
+           <string>These values initialize project_metadata.sqlite. Recommended tools: DB Browser for SQLite.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="project_db_table" />
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QScrollArea" name="milestones_page">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="milestones_page_content">
+       <layout class="QVBoxLayout" name="milestones_page_layout">
+        <item>
+         <widget class="QLabel" name="milestones_heading_label">
+          <property name="text">
+           <string>Milestone and module handshake settings</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="milestones_help_label">
+          <property name="text">
+           <string>Milestones and handshakes are grouped by module and shown in sequential order.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTabWidget" name="milestones_tabs">
+          <widget class="QWidget" name="milestone_tab">
+           <attribute name="title">
+            <string>Milestones</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="milestone_tab_layout">
+            <item>
+             <widget class="QTableWidget" name="milestones_table" />
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="handshake_tab">
+           <attribute name="title">
+            <string>Module Handshakes</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="handshake_tab_layout">
+            <item>
+             <widget class="QTableWidget" name="handshake_table" />
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QScrollArea" name="folder_selection_page">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="folder_selection_page_content">
+       <layout class="QVBoxLayout" name="folder_selection_page_layout">
+        <item>
+         <widget class="QLabel" name="folder_selection_heading_label">
+          <property name="text">
+           <string>Choose project folders</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="folder_selection_help_label">
+          <property name="text">
+           <string>The defaults below are already preselected. You can keep the current selection and continue with Next.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QStackedWidget" name="folder_selection_stack" />
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
    </item>
-    <item>
-     <widget class="QLabel" name="source_load_status_label">
-      <property name="visible">
-        <bool>false</bool>
-      </property>
-      <property name="text">
-        <string>Preparing source document...</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="source_load_progress_bar">
-      <property name="visible">
-        <bool>false</bool>
-      </property>
-      <property name="value">
-        <number>0</number>
-      </property>
-      <property name="textVisible">
-        <bool>true</bool>
-      </property>
-     </widget>
-    </item>
+   <item>
+    <widget class="QLabel" name="source_load_status_label">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Preparing source document...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QProgressBar" name="source_load_progress_bar">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="navigation_layout">
      <item>
@@ -119,6 +669,6 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

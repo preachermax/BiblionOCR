@@ -5,9 +5,12 @@
 import sys
 import os
 
-_LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "0-MainUI"))
+_LOCAL_MODULE_DIR = os.path.abspath(os.path.dirname(__file__))
+_LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(_LOCAL_MODULE_DIR, "..", "0-MainUI"))
 _LEGACY_MAINUI_HELPERS_DIR = os.path.abspath(os.path.join(_LEGACY_MAINUI_DIR, "helpers"))
-_LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "helpers"))
+_LOCAL_HELPERS_DIR = os.path.abspath(os.path.join(_LOCAL_MODULE_DIR, "helpers"))
+if _LOCAL_MODULE_DIR not in sys.path:
+    sys.path.insert(0, _LOCAL_MODULE_DIR)
 if _LEGACY_MAINUI_DIR not in sys.path:
     sys.path.insert(0, _LEGACY_MAINUI_DIR)
 if _LEGACY_MAINUI_HELPERS_DIR not in sys.path:
@@ -61,10 +64,14 @@ from Core.page_workflow import (
     select_page_workflow_step,
 )
 from Core.project_tracking import ProjectWorkflowTracker
-from Core.source_documents import find_project_pdf_source
+from Core.source_documents import (
+    convert_pdf_pages_to_tiff,
+    extract_pdf_page_range,
+    extract_pdf_pages,
+    find_project_pdf_source,
+)
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
-    open_default_module_page_workflow_wizard,
 )
 from SessionManager import SessionManager
 # PyQt5 imports
@@ -85,6 +92,7 @@ from Adjust import crop_processor, get_processor, rotate_processor, threshold_pr
 from ImagePreviewDialog import ImagePreviewDialog
 from MorphologyDialog import MorphologyDialog
 from LocalFileDrop import LocalFileDropMixin
+from MyPixlerPageWorkflowWizard import MyPixlerPageWorkflowWizardDialog
 
 
 # Dialog Imports
@@ -92,16 +100,10 @@ from Dialogs.ExtractDialog import Ui_ExtractDialog
 from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
 from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
 from Dialogs.tif2monoDialog import Ui_tif2monoDialog
-from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
-from Dialogs.mono2pngDialog import Ui_mono2pngDialog
 from Dialogs.deskew_monoDialog import Ui_deskew_monoDialog
 from Dialogs.crop_languagesDialog import Ui_crop_languagesDialog
-from Dialogs.greekmono2pngDialog import Ui_greekmono2pngDialog
 from Dialogs.deskew_greekmonoDialog import Ui_deskew_greekmonoDialog
-from Dialogs.greekresizepngDialog import Ui_greekresizepngDialog
-from Dialogs.latinmono2pngDialog import Ui_latinmono2pngDialog
 from Dialogs.deskew_latinmonoDialog import Ui_deskew_latinmonoDialog
-from Dialogs.latinresizepngDialog import Ui_latinresizepngDialog
 
 def _copy_qimage_resolution_metadata(source, target):
     if source is None or target is None or source.isNull() or target.isNull():
@@ -358,9 +360,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             include_project_wizard=False,
             include_page_wizard=True,
         )
-        self.open_page_workflow_wizard = (
-            lambda _requested_module=None: open_default_module_page_workflow_wizard(self, 'MyPixler')
-        )
+        self.open_page_workflow_wizard = self._open_page_workflow_wizard
 
         # Progress bar (safe)
         if not hasattr(self, "progress_bar"):
@@ -423,6 +423,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         self._refresh_project_status(self.refimgpath or self.imgpath)
         print("=== INIT COMPLETE ===")
+
+    def _open_page_workflow_wizard(self, _requested_module=None):
+        dialog = MyPixlerPageWorkflowWizardDialog(self, self)
+        dialog.exec_()
 
     def _parse_launch_arguments(self, argv):
         imgpath = None
@@ -901,15 +905,50 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self._sync_pdf_viewer_visibility_action(False)
         self.source_viewer_visibility_action.setEnabled(False)
 
+    def _on_pdf_source_loaded(self, viewer, pdf_path, page_count):
+        if self.pdf_viewer_dialog is not viewer:
+            return
+        self.pdf_source_path = os.path.abspath(pdf_path)
+        self.pdf_page_count = int(page_count)
+        self.statusBar().showMessage(
+            f"Source document ready: {page_count} page{'s' if page_count != 1 else ''}",
+            5000,
+        )
+
+    def _on_pdf_source_load_failed(self, viewer, message):
+        if self.pdf_viewer_dialog is not viewer:
+            return
+        self.pdf_source_path = ""
+        self.pdf_page_count = 0
+        qtw.QMessageBox.warning(
+            self,
+            "Open Source Document",
+            f"Could not display the source document.\n\n{message}",
+        )
+        self._close_pdf_viewer_automatically()
+
     def _open_pdf_source(self, pdf_path, floating=True):
         try:
             viewer = PdfViewerDock(pdf_path, self)
             self._close_pdf_viewer_automatically()
             self.pdf_viewer_dialog = viewer
             self.pdf_source_path = os.path.abspath(pdf_path)
-            self.pdf_page_count = viewer.page_count
+            self.pdf_page_count = 0
             self.addDockWidget(qtc.Qt.DockWidgetArea.LeftDockWidgetArea, viewer)
             viewer.viewerVisibilityChanged.connect(self._sync_pdf_viewer_visibility_action)
+            viewer.documentLoaded.connect(
+                lambda loaded_path, page_count, active_viewer=viewer: self._on_pdf_source_loaded(
+                    active_viewer,
+                    loaded_path,
+                    page_count,
+                )
+            )
+            viewer.loadFailed.connect(
+                lambda message, active_viewer=viewer: self._on_pdf_source_load_failed(
+                    active_viewer,
+                    message,
+                )
+            )
             viewer.destroyed.connect(
                 lambda _object=None, closed_viewer=viewer: self._on_pdf_viewer_destroyed(closed_viewer)
             )
@@ -1180,6 +1219,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         )
         self._refresh_project_status(active_root)
 
+    # Page workflow: Sequence SSHF; MilestoneName src_pages_front_matter_staged.
+    # Page workflow: Sequence SSHM; MilestoneName src_pages_middle_matter_staged.
+    # Page workflow: Sequence SSHV; MilestoneName src_pages_verses_staged.
+    # Page workflow: Sequence SSHB; MilestoneName src_pages_back_matter_staged.
     def actionstage_pdf(self):
         step = self._workflow_step_for_method("actionstage_pdf")
         if step is None:
@@ -1435,6 +1478,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     # Workflow Controllers
 
+    # Page workflow: Sequence ES2F; MilestoneName src_pages_front_matter_extracted.
+    # Page workflow: Sequence ES2M; MilestoneName src_pages_middle_matter_extracted.
+    # Page workflow: Sequence EM2B; MilestoneName middle_matter_pages_extracted_to_books.
+    # Page workflow: Sequence ES2V; MilestoneName src_pages_verses_extracted.
+    # Page workflow: Sequence EV2B; MilestoneName verse_pages_extracted_to_books.
+    # Page workflow: Sequence ES2B; MilestoneName src_pages_back_matter_extracted.
     def actionextract_pdf(self):
         workflow_step = self._workflow_step_for_method("actionextract_pdf")
         workflow_source, complete_folder, _workflow_handshake = (
@@ -1462,12 +1511,22 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
             self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
 
-            # Extract to default Workflow folder
-            print(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
-            pp.pdfExtractPages(self.pdfx_ui.SourceLineEdit.text(), self.pdfx_ui.DestinationLineEdit.text(),self.pdfx_ui.FirstPageLineEdit.text(),self.pdfx_ui.LastPageLineEdit.text())
+            try:
+                extracted_path = extract_pdf_page_range(
+                    self.pdfx_ui.SourceLineEdit.text(),
+                    self.pdfx_ui.DestinationLineEdit.text(),
+                    self.pdfx_ui.FirstPageLineEdit.text(),
+                    self.pdfx_ui.LastPageLineEdit.text(),
+                )
+            except (OSError, ValueError) as exc:
+                qtw.QMessageBox.warning(
+                    self.pdfxDialog,
+                    "Extract PDF Pages",
+                    f"Could not extract the selected PDF pages.\n\n{exc}",
+                )
+                return
 
-
-            print("pdf page extraction complete")
+            print(f"pdf page extraction complete: {extracted_path}")
 
             base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
 
@@ -1515,6 +1574,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         rsp = self.pdfxDialog.exec_()
 
+    # Page workflow: Sequence EF4T; MilestoneName front_matter_pages_extracted_for_tif.
+    # Page workflow: Sequence EB4T; MilestoneName middle_matter_pages_extracted_for_tif.
+    # Page workflow: Sequence EB4T; MilestoneName verse_books_pages_extracted_for_tif.
+    # Page workflow: Sequence EB4T; MilestoneName back_matter_pages_extracted_for_tif.
     def actionpdf_for_tiff(self):
         workflow_step = self._workflow_step_for_method("actionpdf_for_tiff")
         source_folder, complete_folder, _workflow_handshake = (
@@ -1538,14 +1601,24 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_file_path, workflow_folder)
-            pp.pdf4tif(source_file_path, workflow_folder)
-            print("pdf pages for tif extraction complete")
+            source_file_path = self.pdf4tif_ui.SourceLineEdit.text().strip()
+            if os.path.isdir(source_file_path):
+                source_file_path = self._first_workflow_file(source_file_path)
+            try:
+                extracted_paths = extract_pdf_pages(
+                    source_file_path,
+                    self.pdf4tif_ui.DestinationLineEdit.text(),
+                    self.pdf4tif_ui.FirstPageSpinBox.value(),
+                    self.pdf4tif_ui.LastPageSpinBox.value() or None,
+                )
+            except (OSError, ValueError) as exc:
+                qtw.QMessageBox.warning(
+                    self.pdf4tifDialog,
+                    "Extract PDF Pages for TIFF",
+                    f"Could not extract the section PDF into individual pages.\n\n{exc}",
+                )
+                return
+            print(f"pdf pages for tif extraction complete: {len(extracted_paths)} pages")
             if workflow_step:
                 self._finish_page_workflow_step(
                     workflow_step,
@@ -1581,6 +1654,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         rsp = self.pdf4tifDialog.exec_()
 
+    # Page workflow: Sequence 4T2T; MilestoneName front_matter_pages_converted_to_tif.
+    # Page workflow: Sequence 4T2T; MilestoneName middle_matter_pages_converted_to_tif.
+    # Page workflow: Sequence 4T2T; MilestoneName verse_books_pages_converted_to_tif.
+    # Page workflow: Sequence 4T2T; MilestoneName back_matter_pages_converted_to_tif.
     def actionpdf_to_tiff(self):
         workflow_step = self._workflow_step_for_method("actionpdf_to_tiff")
         source_folder, complete_folder, _workflow_handshake = (
@@ -1610,7 +1687,20 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             # Extract to default Workflow folder
             print(source_folder, workflow_folder)
             #pp.pdf2tif(source_folder, workflow_folder, self.pdf2tif_ui.StartPageLineEdit.text())
-            pp.pdf2tif(self.pdf2tif_ui.SourceLineEdit.text(), self.pdf2tif_ui.DestinationLineEdit.text(), self.pdf2tif_ui.StartPageLineEdit.text())
+            try:
+                converted_paths = convert_pdf_pages_to_tiff(
+                    self.pdf2tif_ui.SourceLineEdit.text(),
+                    self.pdf2tif_ui.DestinationLineEdit.text(),
+                    self.pdf2tif_ui.StartPageLineEdit.text(),
+                )
+            except (OSError, RuntimeError, ValueError) as exc:
+                qtw.QMessageBox.warning(
+                    self.pdf2tifDialog,
+                    "Convert PDF Pages to TIFF",
+                    f"Could not convert the individual PDF pages to TIFF.\n\n{exc}",
+                )
+                return
+            print(f"pdf pages converted to tiff: {len(converted_paths)} pages")
             if workflow_step:
                 self._finish_page_workflow_step(
                     workflow_step,
@@ -1652,6 +1742,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         print("tif pages conversion complete")
 
+    # Page workflow: Sequence 2T2I; MilestoneName front_matter_tif_pages_indexed.
+    # Page workflow: Sequence 2T2I; MilestoneName middle_matter_tif_pages_indexed.
+    # Page workflow: Sequence 2T2I; MilestoneName verse_books_tif_pages_indexed.
+    # Page workflow: Sequence 2T2I; MilestoneName back_matter_tif_pages_indexed.
     def actiontiff_to_mono(self):
         workflow_step = self._workflow_step_for_method("actiontiff_to_mono")
         source_folder, complete_folder, _workflow_handshake = (
@@ -1721,69 +1815,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
 
         print("completed creating indexed(BW) tiff")
-
-    def actionmono_to_png(self):
-        print("creating indexed(BW) png")
-
-        def accept():
-            source_folder = self.mono2png_ui.SourceLineEdit.text()
-            workflow_folder = self.mono2png_ui.DestinationLineEdit.text()
-            complete_folder = ""
-            # if self.mono2pngDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.tiff2pngidx(self.mono2png_ui.SourceLineEdit.text(), self.mono2png_ui.DestinationLineEdit.text())
-        def reject():
-            pass
-
-        #usage: pp.tiff2pngidx(source, destination)
-
-        self.mono2pngDialog = qtw.QDialog()
-        self.mono2png_ui = Ui_mono2pngDialog()
-        self.mono2png_ui.setupUi(self.mono2pngDialog)
-        self.mono2pngDialog.show()
-
-        def setdefault():
-            if self.mono2png_ui.defaultsrcBox.isChecked():
-                self.mono2png_ui.SourceButton.setEnabled(False)
-                self.mono2png_ui.DestinationButton.setEnabled(False)
-            else:
-                self.mono2png_ui.SourceButton.setEnabled(True)
-                self.mono2png_ui.DestinationButton.setEnabled(True)
-
-        self.mono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.mono2png_ui.SourceButton.clicked.connect(self.MonoToPngDialog)
-        self.mono2png_ui.DestinationButton.clicked.connect(self.DestMonoToPngDialog)
-        self.mono2png_ui.buttonBox.accepted.connect(accept)
-        self.mono2png_ui.buttonBox.rejected.connect(reject)
-
-
-        if self.mono2png_ui.defaultsrcBox.isChecked():
-            self.mono2png_ui.defaultsrcBox.setChecked(False)
-        self.mono2png_ui.defaultsrcBox.setEnabled(False)
-        self.mono2png_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
-
-        rsp = self.mono2pngDialog.exec_()
-
-
-        print("completed creating indexed(BW) png")
 
     def actiondeskew_mono(self):
         print("deskewing monochrome tiff and png files")
@@ -1932,67 +1963,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_languages_ui.defaultsrcBox.setToolTip("Column cropping is governed by MyBoxer in page_workflow.csv.")
         rsp = self.crop_languagesDialog.exec_()
 
-    def actionConvert_Greek_tiff_To_png(self):
-        print("creating indexed(BW) Greek png files")
-        #usage: pp.tiff2pngidx(source, destination)
-        def accept():
-            source_folder = self.greekmono2png_ui.SourceLineEdit.text()
-            workflow_folder = self.greekmono2png_ui.DestinationLineEdit.text()
-            complete_folder = ""
-            # if self.mono2pngDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.tiff2pngidx(self.greekmono2png_ui.SourceLineEdit.text(), self.greekmono2png_ui.DestinationLineEdit.text())
-        def reject():
-            pass
-
-        #usage: pp.tiff2pngidx(source, destination)
-
-        self.greekmono2pngDialog = qtw.QDialog()
-        self.greekmono2png_ui = Ui_greekmono2pngDialog()
-        self.greekmono2png_ui.setupUi(self.greekmono2pngDialog)
-        self.greekmono2pngDialog.show()
-
-        def setdefault():
-            if self.greekmono2png_ui.defaultsrcBox.isChecked():
-                self.greekmono2png_ui.SourceButton.setEnabled(False)
-                self.greekmono2png_ui.DestinationButton.setEnabled(False)
-            else:
-                self.greekmono2png_ui.SourceButton.setEnabled(True)
-                self.greekmono2png_ui.DestinationButton.setEnabled(True)
-
-        self.greekmono2png_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.greekmono2png_ui.SourceButton.clicked.connect(self.GreekMonoToPngDialog)
-        self.greekmono2png_ui.DestinationButton.clicked.connect(self.GreekDestMonoToPngDialog)
-        self.greekmono2png_ui.buttonBox.accepted.connect(accept)
-        self.greekmono2png_ui.buttonBox.rejected.connect(reject)
-
-
-        if self.greekmono2png_ui.defaultsrcBox.isChecked():
-            self.greekmono2png_ui.defaultsrcBox.setChecked(False)
-        self.greekmono2png_ui.defaultsrcBox.setEnabled(False)
-        self.greekmono2png_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
-
-        rsp = self.greekmono2pngDialog.exec_()
-        print("completed creating indexed(BW) png")
-
     def actionDeskew_Greek_tiff(self):
         print("deskewing Greek tiff files")
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
@@ -2079,86 +2049,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         rsp = self.deskew_greekmonoDialog.exec_()
 
-    def actionResize_Greek_png(self):
-        print("resizing Greek png files")
-        #usage: pp.resizepngs(source, destination)
-        def accept():
-            source_folder = self.greekresizepng_ui.SourceLineEdit.text()
-            workflow_folder = self.greekresizepng_ui.DestinationLineEdit.text()
-            complete_folder = ""
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-            for filename in os.listdir(source_folder):
-                print(source_folder,filename)
-                source_file_path = os.path.join(source_folder, filename)
-
-            # Extract to default Workflow folder
-            print(source_folder, workflow_folder)
-            pp.resizepngs(self.greekresizepng_ui.SourceLineEdit.text(), self.greekresizepng_ui.DestinationLineEdit.text())
-
-        def reject():
-            pass
-
-        #usage: pp.tiff2pngidx(source, destination)
-
-        self.greekresizepngDialog = qtw.QDialog()
-        self.greekresizepng_ui = Ui_greekresizepngDialog()
-        self.greekresizepng_ui.setupUi(self.greekresizepngDialog)
-        self.greekresizepngDialog.show()
-
-        def setdefault():
-            if self.greekresizepng_ui.defaultsrcBox.isChecked():
-                self.greekresizepng_ui.SourceButton.setEnabled(False)
-                self.greekresizepng_ui.DestinationButton.setEnabled(False)
-            else:
-                self.greekresizepng_ui.SourceButton.setEnabled(True)
-                self.greekresizepng_ui.DestinationButton.setEnabled(True)
-
-        self.greekresizepng_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.greekresizepng_ui.SourceButton.clicked.connect(self.GreekResizePngDialog)
-        self.greekresizepng_ui.DestinationButton.clicked.connect(self.DestGreekResizePngDialog)
-        self.greekresizepng_ui.buttonBox.accepted.connect(accept)
-        self.greekresizepng_ui.buttonBox.rejected.connect(reject)
-
-
-        if self.greekresizepng_ui.defaultsrcBox.isChecked():
-            self.greekresizepng_ui.defaultsrcBox.setChecked(False)
-        self.greekresizepng_ui.defaultsrcBox.setEnabled(False)
-        self.greekresizepng_ui.defaultsrcBox.setToolTip("This manual tool is not part of page_workflow.csv.")
-
-        rsp = self.greekresizepngDialog.exec_()
-        print("completed resizing indexed(BW) png")
-
-    def actionConvert_Latin_tiff_To_png(self):
-        print("creating indexed(BW) Latin png files")
-        #usage: pp.tiff2pngidx(source, destination)
-        self.latinmono2pngDialog = qtw.QDialog()
-        self.latinmono2png_ui = Ui_latinmono2pngDialog()
-        self.latinmono2png_ui.setupUi(self.latinmono2pngDialog)
-        self.latinmono2pngDialog.show()
-
-        self.latinmono2png_ui.SourceButton.clicked.connect(self.LatinMonoToPngDialog)
-        self.latinmono2png_ui.DestinationButton.clicked.connect(self.LatinDestMonoToPngDialog)
-
-        rsp = self.latinmono2pngDialog.exec_()
-
-        if self.latinmono2pngDialog.Accepted:
-            pp.tiff2pngidx(self.latinmono2png_ui.SourceLineEdit.text(), self.latinmono2png_ui.DestinationLineEdit.text())
-            print("completed creating indexed(BW) png")
-        #pp.tiff2pngidx(r"~/Projects/Python/Images/Source/tif_black_white/source_book_40_Matthew/", "~/Projects/Python/Images/Source/tif_black_white_2png/source_book_40_Matthew/")
-        #pp.tiff2pngidx(r"~/Projects/Python/Images/Latin/tif_latin/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/")
-
     def actionDeskew_Latin_tiff(self):
         print("deskewing Latin tiff files")
         #usage: dsk.deskewfiles(source, pngdest, tifdest)
@@ -2178,27 +2068,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             print("completed deskewing monochrome tiff and png files")
         #dsk.deskewfiles("~/Projects/Python/Images/Latin/png_latin/latin_book_40_Matthew/", "~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_40_Matthew/")
         #pp.deskewfiles("~/Projects/Python/Images/Latin/png_latin/latin_book_41_Mark/", "~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","~/Projects/Python/Images/Latin/tif_latin_deskew/latin_book_41_Mark/")
-
-    def actionResize_Latin_png(self):
-        print("resizing Latin png files")
-        #usage: pp.resizepngs(source, destination)
-        self.latinresizepngDialog = qtw.QDialog()
-        self.latinresizepng_ui = Ui_latinresizepngDialog()
-        self.latinresizepng_ui.setupUi(self.latinresizepngDialog)
-        self.latinresizepngDialog.show()
-
-        self.latinresizepng_ui.SourceButton.clicked.connect(self.LatinResizePngDialog)
-        self.latinresizepng_ui.DestinationButton.clicked.connect(self.DestLatinResizePngDialog)
-
-        rsp = self.latinresizepngDialog.exec_()
-
-        if self.latinresizepngDialog.Accepted:
-            pp.resizepngs(self.latinresizepng_ui.SourceLineEdit.text(), self.latinresizepng_ui.DestinationLineEdit.text())
-            print("completed creating indexed(BW) png")
-        #pp.resizepngs(r"~/Projects/Python/Images/Greek/png_latin_deskew/latin_book_40_Matthew/","~/Projects/Python/Images/Greek/png_latin_resize/latin_book_40_Matthew/")
-        #pp.resizepngs(r"~/Projects/Python/Images/Latin/png_latin_deskew/latin_book_41_Mark/","~/Projects/Python/Images/Latin/png_latin_resize/latin_book_41_Mark/")
-
-    # Dialog Controllers
 
     def OpenPdfFileDialog(self):
         self.path = qtw.QFileDialog.getOpenFileName(self.ui.centralwidget,'Select pdf source file','','*.pdf')[0]
@@ -2248,30 +2117,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if self.directory:
             self.tif2mono_ui.DestinationLineEdit.setText(self.directory+r'/')
 
-    def MonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select mono tif pages source folder"))
-
-        if self.directory:
-            self.mono2png_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-
-        if self.directory:
-            self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
-
-    def GreekMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek mono tif pages source folder"))
-
-        if self.directory:
-            self.greekmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def GreekDestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-
-        if self.directory:
-            self.greekmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
-
     def DeskewMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
 
@@ -2308,41 +2153,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if self.directory:
             self.deskew_greekmono_ui.DestTifLineEdit.setText(self.directory+r'/')
 
-    def GreekResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek pages source folder"))
-
-        if self.directory:
-            self.greekresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestGreekResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select greek png pages destination folder"))
-
-        if self.directory:
-            self.greekresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
-
     def DeskewLatinMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin pages source folder"))
 
         if self.directory:
             self.deskew_latinmono_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def LatinMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin mono tif pages source folder"))
-
-        if self.directory:
-            self.latinmono2png_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def LatinDestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-
-        if self.directory:
-            self.latinmono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
-
-    def DestMonoToPngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select destination folder"))
-
-        if self.directory:
-            self.mono2png_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def DeskewMonoDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
@@ -2373,18 +2188,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         if self.directory:
             self.deskew_latinmono_ui.DestTifLineEdit.setText(self.directory+r'/')
-
-    def LatinResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin pages source folder"))
-
-        if self.directory:
-            self.latinresizepng_ui.SourceLineEdit.setText(self.directory+r'/')
-
-    def DestLatinResizePngDialog(self):
-        self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select latin png pages destination folder"))
-
-        if self.directory:
-            self.latinresizepng_ui.DestinationLineEdit.setText(self.directory+r'/')
 
     def CropLanguagesDialog(self):
         self.directory = str(qtw.QFileDialog.getExistingDirectory(self.ui.centralwidget, "Select pdf pages source folder"))
@@ -3150,6 +2953,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.crop_selection_ready = False
         self.crop_drawing_active = False
 
+    # Page workflow: Sequence MI2C; MilestoneName front_matter_tif_pages_clipped.
+    # Page workflow: Sequence MI2C; MilestoneName middle_matter_tif_pages_clipped.
+    # Page workflow: Sequence MI2C; MilestoneName back_matter_tif_pages_clipped (VerseSections row).
+    # Page workflow: Sequence MI2C; MilestoneName back_matter_tif_pages_clipped.
     def clip(self):
         print("[CUT] Opening cut preview")
         return self._launch_preview_tool(
@@ -3159,6 +2966,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             enable_crop=True,
         )
 
+    # Page workflow Method "eraser": Sequence MC2E; MilestoneName front_matter_tif_pages_erased.
+    # Page workflow Method "eraser": Sequence MC2E; MilestoneName middle_matter_tif_pages_erased.
+    # Page workflow Method "eraser": Sequence MC2E; MilestoneName verse_books_tif_pages_erased.
+    # Page workflow Method "eraser": Sequence MC2E; MilestoneName back_matter_tif_pages_erased.
     def eraser(self):
         print("[ERASE] Opening preview")
         if not hasattr(self, "refimgqimage") or self.refimgqimage.isNull():
