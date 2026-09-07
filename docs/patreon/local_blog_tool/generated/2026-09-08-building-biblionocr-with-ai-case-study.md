@@ -1,0 +1,274 @@
+# Building BiblionOCR with AI: An Accidental Case Study
+
+I have begun to suspect that BiblionOCR is becoming something slightly more interesting than the software project I originally set out to build.
+
+It may be turning into a case study.
+
+Not merely in OCR. Not merely in digital humanities. And not even merely in what one person can accomplish with modern AI coding tools.
+
+It is becoming a case study in what happens when a human being deliberately attempts to organize several AI systems into something resembling a small software-development organization.
+
+And, as it turns out, that is a rather strange thing to do.
+
+## The human is still the architect
+
+One misconception about AI-assisted programming is that the interesting question is how much code the AI can write.
+
+That isn't really the interesting question anymore.
+
+The more interesting question is:
+
+**What happens when the AI can write considerably more code than the human can comfortably inspect line by line?**
+
+That changes the nature of software development.
+
+With BiblionOCR, I have increasingly found myself working less like a conventional programmer and more like a software architect, technical director, product manager, tester, and—occasionally—an exasperated code reviewer.
+
+The AI systems do a tremendous amount of implementation work.
+
+But I remain responsible for deciding what the system is supposed to be.
+
+That distinction has become extremely important.
+
+I can ask an AI agent to implement a feature. I can ask another to investigate a bug. I can have another reason through an architectural problem. I can have one examine a repository and another help me think through licensing or productization.
+
+But none of those agents gets to decide what BiblionOCR ultimately *means*.
+
+That remains my job.
+
+## The Development Notebook became surprisingly important
+
+One of the strangest discoveries has been the importance of documentation.
+
+I originally thought of the development notebook as a convenient record of what I had been doing.
+
+It became something much more significant.
+
+It became **institutional memory**.
+
+AI agents have enormous technical capability, but they do not possess the continuous personal history of a human maintainer. Context disappears. Conversations end. Different agents encounter the same repository from different perspectives.
+
+So I began documenting architectural decisions, validation requirements, workflow rules, known problems, rejected approaches, and handoff information.
+
+Eventually the repository itself began to contain a kind of memory of the development process.
+
+That matters.
+
+An AI agent arriving at the project does not merely encounter Python files. It encounters an architecture, a development notebook, tests, documentation, conventions, licensing decisions, and explicit boundaries.
+
+In effect, the project tells the next AI:
+
+> **“This is what we have already decided.”**
+
+That is surprisingly powerful.
+
+## AI as a development team
+
+My current workflow is therefore not really:
+
+> Human → AI → Code
+
+It is closer to:
+
+> Human architect
+>
+> ↓
+>
+> AI-assisted analysis
+>
+> ↓
+>
+> AI-assisted implementation
+>
+> ↓
+>
+> Automated tests
+>
+> ↓
+>
+> Human validation
+>
+> ↓
+>
+> Documentation
+>
+> ↓
+>
+> Next development cycle
+
+Different AI tools can occupy different roles in that process.
+
+One may be particularly useful for repository-local coding and debugging. Another may be better for architectural reasoning or historical context. Another may be useful for reviewing a problem from a completely different perspective.
+
+I am effectively assembling a small virtual engineering team.
+
+Except that the members of this team are extraordinarily fast, occasionally brilliant, occasionally stubborn, sometimes confidently wrong, and completely incapable of going to lunch with me.
+
+There are advantages.
+
+There are also disadvantages.
+
+## The dangerous part
+
+The most important caution I have discovered is this:
+
+**AI can now generate progress faster than a human can necessarily understand that progress.**
+
+That is a very different problem from the old problem of not having enough programming help.
+
+If an AI writes ten lines of code and you understand every line, wonderful.
+
+If an AI helps produce ten thousand lines of code while simultaneously modifying architecture, tests, configuration, interfaces, documentation, and workflows, you have created something else.
+
+You have created a system whose complexity can grow faster than your mental model of the system.
+
+That is dangerous.
+
+It means that successful compilation is not enough.
+
+Passing tests is not enough.
+
+Even a working application is not necessarily enough.
+
+At some point the human architect has to ask:
+
+> **“Do I still understand what I have built?”**
+
+That question may become one of the defining questions of AI-assisted software engineering.
+
+## The unexpected result
+
+What has surprised me most is that increasing AI assistance has not caused me to become *less* concerned with architecture.
+
+It has done the opposite.
+
+The more capable the AI becomes, the more important architecture becomes.
+
+The AI is perfectly happy to implement something that works.
+
+It is the human's job to determine whether that thing belongs in the system.
+
+That has led me to put considerably more emphasis on:
+
+- architectural boundaries;
+- explicit ownership of responsibilities;
+- automated tests;
+- validation gates;
+- development notes;
+- reproducible workflows;
+- licensing;
+- dependency provenance;
+- documentation;
+- and clear distinctions between experimental code and production code.
+
+In other words, **the better the AI gets at writing software, the more important it becomes to know what software you actually want.**
+
+## And then there is the commercial question
+
+BiblionOCR was conceived as an open-source project.
+
+That remains an important part of the project.
+
+But some of the technology being developed around it may eventually become commercial software.
+
+That forced another realization.
+
+AI-assisted development doesn't eliminate the boring parts of software engineering.
+
+It makes them more important.
+
+Licensing still matters.
+
+Copyright still matters.
+
+Dependency provenance still matters.
+
+Third-party libraries still have licenses.
+
+Qt still has licenses.
+
+Open-source obligations still exist.
+
+And if you intend to distribute commercial binaries, you cannot simply say:
+
+> “The AI wrote it.”
+
+That is not a legal strategy.
+
+So the project is now developing along two related tracks: an open-source BiblionOCR ecosystem and a carefully separated commercial product track, beginning with the scanner technology.
+
+That separation is being designed rather than improvised.
+
+## Why this might matter beyond BiblionOCR
+
+I don't know yet whether the methodology I have stumbled into is broadly useful.
+
+That is precisely why I think it is worth documenting.
+
+There are plenty of demonstrations of AI writing programs.
+
+There are plenty of discussions about “vibe coding.”
+
+There are plenty of claims about autonomous AI software engineers.
+
+What interests me is the space between those extremes.
+
+What happens when a human does **not** try to write every line of code personally—but also does **not** simply hand the entire project over to an AI?
+
+What happens when the human becomes the architect and the AI becomes a collection of extraordinarily capable engineering assistants?
+
+What processes are necessary?
+
+Where does it fail?
+
+How much documentation is enough?
+
+How much testing is enough?
+
+How do you prevent architectural drift?
+
+How do you keep several AI agents from independently reinventing the same parts of the system?
+
+How do you maintain institutional memory?
+
+And perhaps most importantly:
+
+**How do you remain the person who understands the system when the machines are doing most of the typing?**
+
+I don't have all of those answers.
+
+But BiblionOCR is giving me an unusually good place to find out.
+
+And I intend to document what I learn.
+
+## A modest proposal
+
+So perhaps BiblionOCR is becoming an accidental experiment in AI-assisted software engineering.
+
+If so, I'm perfectly happy to be the guinea pig.
+
+The software is real.
+
+The repository is real.
+
+The commits are real.
+
+The mistakes are real.
+
+The architectural arguments are real.
+
+And, fortunately, the tests are real too.
+
+If this turns out to be useful to other developers, researchers, AI companies, or digital-humanities projects, I'll be happy to share the experience.
+
+And if somebody eventually decides that this makes a good case study and wants to buy me lunch—or send me some expensive computer hardware—I certainly won't stand in the way of science.
+
+After all, **research funding comes in many forms.**
+
+Sometimes it arrives as a grant.
+
+Sometimes it arrives as a Jetson Nano.
+
+And sometimes it arrives as a really good excuse to buy another computer.
+
+— Max

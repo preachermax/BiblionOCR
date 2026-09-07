@@ -10,6 +10,8 @@ This local-only workspace manages a rolling seven-post Patreon queue and renders
 4. Use the `post` action to prepare a manual-safe publish in your normal browser.
 5. Use `complete-post` only after the Patreon post is actually live, so the queue rolls at the right moment.
 6. Use the launcher preview and copy actions to move ready-to-paste content into Patreon after login.
+7. Edit the final publishable Markdown directly in the launcher and use **Save Markdown** before leaving the selected queue item.
+8. Use **Import Markdown** to replace the selected queue slot with an externally authored `.md` post. The file chooser opens in `external/` by default.
 
 ## Audience Fields
 
@@ -23,6 +25,8 @@ This lets you draft a members-only style post that is temporarily published as p
 ```powershell
 python docs/patreon/local_blog_tool/patreon_blog_tool.py list
 python docs/patreon/local_blog_tool/patreon_blog_tool.py render
+python docs/patreon/local_blog_tool/patreon_blog_tool.py import-md "BiblionOCR case study.md"
+python docs/patreon/local_blog_tool/patreon_blog_tool.py import-md "/other/path/post.md" --replace-slug existing-queue-slug
 python docs/patreon/local_blog_tool/patreon_blog_tool.py set-visibility website-prototype-members-preview public
 python docs/patreon/local_blog_tool/patreon_blog_tool.py seed-week --start-date 2026-07-07 --force
 python docs/patreon/local_blog_tool/patreon_blog_tool.py doctor
@@ -40,6 +44,12 @@ Patreon does not currently expose public API write endpoints for creating posts,
 The automation is configured through `patreon_post_config.json`, so if Patreon changes its composer labels or button text you can adjust the local config instead of editing Python code.
 
 Each queue item can carry a `pre_post_body`. That field is treated as the primary ready-to-paste composer text. If it is empty, the tool falls back to generating body copy from the excerpt, sections, links, and call to action.
+
+### Editable Markdown and external imports
+
+The launcher displays each selected post as final publishable Markdown, including its H1 title. The editor's **Save Markdown**, **Render**, **Copy Packet**, and **Post** actions save the current editor text back into the queue and write the final `.md` file under `generated/`.
+
+**Import Markdown** opens in `docs/patreon/local_blog_tool/external/` and loads the chosen file into the currently selected queue slot. Its H1 becomes the post title, its remaining Markdown becomes the post body, and the selected slot keeps its scheduled date, audience intent, and visibility. The CLI `import-md` command provides the same workflow; relative paths resolve from `external/`, while absolute paths remain supported.
 
 ### Local setup
 
@@ -80,4 +90,4 @@ The `render` command now also writes a companion `-composer.txt` file for each p
 
 ## Output
 
-Rendered drafts are written to `generated/` using the pattern `YYYY-MM-DD-slug.md`.
+Rendered, editable drafts are written to `generated/` using the pattern `YYYY-MM-DD-slug.md`. These files contain the final title and publishable Markdown body; scheduling and visibility metadata remain in `blog_queue.json`.

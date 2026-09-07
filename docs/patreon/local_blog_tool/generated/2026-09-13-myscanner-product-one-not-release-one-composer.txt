@@ -1,0 +1,26 @@
+TITLE: Why MyScanner Is Product 1, Not Release 1
+VISIBILITY: Public
+
+This draft is written as a public-facing Patreon update, with enough context for someone following the project without needing to track every internal implementation detail.
+
+Today’s focus is why myscanner is product 1, not release 1, which sits at the intersection of the project’s public story and the practical work needed to keep the platform moving.
+
+MyScanner has been designated as BiblionOCR's first standalone productization track, with an explicit boundary between strategic priority and release readiness.
+
+A priority, not a premature promise:
+
+MyScanner is now the first active standalone productization track. That means its boundaries, dependencies, packaging needs, hardware behavior, licensing, and support model receive focused attention first.
+
+It does not mean a supported binary is ready today. The project documentation now distinguishes Product 1 status from technical-preview and supported-release readiness so an internal priority cannot be mistaken for a public promise.
+
+Two related tracks:
+
+BiblionOCR remains an open-source ecosystem. Separately productized module binaries may help fund continued development, beginning with scanner technology, but that commercial boundary must be designed and reviewed rather than inferred after packaging.
+
+Current blockers remain explicit: dependency and repository coupling, standalone build manifests, scanner-backend tests, hardware acceptance, and licensing review all have to be resolved before release.
+
+Useful links:
+
+- Standalone release order: https://github.com/preachermax/BiblionOCR/blob/master/docs/development/STANDALONE_RELEASE_ORDER_2026-08-05.md
+
+Support the work needed to turn a promising scanner module into a tested, supportable standalone product without compromising the open-source BiblionOCR ecosystem.

@@ -18,6 +18,7 @@ import webbrowser
 ROOT = Path(__file__).resolve().parent
 QUEUE_PATH = ROOT / "blog_queue.json"
 OUTPUT_DIR = ROOT / "generated"
+EXTERNAL_DIR = ROOT / "external"
 ARCHIVE_PATH = ROOT / "posted_posts.jsonl"
 PLAYWRIGHT_PROFILE_DIR = ROOT / "playwright_profile"
 PATREON_COMPOSE_URL = "https://www.patreon.com/posts/new"
@@ -233,7 +234,6 @@ def render_link_path(path: str) -> str:
 
 
 def build_post_markdown(post: BlogPost) -> str:
-    composer_body = build_composer_body(post)
     link_lines = []
     for link in post.links:
         link_lines.append(f"- [{link.label}]({render_link_path(link.path)})")
@@ -262,17 +262,20 @@ def build_post_markdown(post: BlogPost) -> str:
         "",
         post.excerpt,
         "",
-        "## Key Links",
-        "",
     ]
 
     if not link_lines:
         link_lines.append("- No external links attached to this draft yet.")
 
+    body_lines = []
+    if post.pre_post_body:
+        body_lines = ["## Post Body", "", build_composer_body(post), ""]
+
     content = "\n".join(
         [
             *lead_lines,
-            composer_body,
+            *body_lines,
+            "## Key Links",
             "",
             *link_lines,
             "",
@@ -345,9 +348,66 @@ def prepare_manual_post(post: BlogPost, posting_config: dict, open_browser: bool
 def render_post(post: BlogPost) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_path = OUTPUT_DIR / f"{post.scheduled_date}-{post.slug}.md"
-    content = build_post_markdown(post)
+    content = build_editable_markdown(post)
     output_path.write_text(content, encoding="utf-8")
     return output_path
+
+
+def build_editable_markdown(post: BlogPost) -> str:
+    return f"# {post.title}\n\n{build_composer_body(post).strip()}\n"
+
+
+def parse_markdown_post(markdown: str, fallback_title: str) -> tuple[str, str]:
+    normalized = markdown.replace("\r\n", "\n").strip()
+    lines = normalized.splitlines()
+    title = fallback_title.strip()
+    body_start = 0
+    for index, line in enumerate(lines):
+        if line.startswith("# "):
+            title = line[2:].strip() or title
+            body_start = index + 1
+            break
+        if line.strip():
+            break
+    body = "\n".join(lines[body_start:]).strip()
+    if not title:
+        raise ValueError("Imported Markdown needs an H1 title or a usable filename.")
+    if not body:
+        raise ValueError("Imported Markdown does not contain a post body.")
+    return title, body
+
+
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug or "imported-post"
+
+
+def excerpt_from_markdown(body: str, limit: int = 240) -> str:
+    paragraphs = re.split(r"\n\s*\n", body.strip())
+    for paragraph in paragraphs:
+        candidate = " ".join(line.strip() for line in paragraph.splitlines() if not line.lstrip().startswith(("#", ">")))
+        if candidate:
+            return candidate if len(candidate) <= limit else candidate[: limit - 1].rstrip() + "…"
+    return "Imported Markdown post ready for editorial review."
+
+
+def import_markdown_post(path: Path, target: BlogPost) -> BlogPost:
+    title, body = parse_markdown_post(path.read_text(encoding="utf-8"), path.stem)
+    target.title = title
+    target.slug = slugify(path.stem)
+    target.excerpt = excerpt_from_markdown(body)
+    target.sections = []
+    target.pre_post_body = body
+    return target
+
+
+def save_edited_markdown(post: BlogPost, markdown: str) -> Path:
+    title, body = parse_markdown_post(markdown, post.title)
+    post.title = title
+    post.excerpt = excerpt_from_markdown(body)
+    post.sections = []
+    post.pre_post_body = body
+    return render_post(post)
 
 
 def build_intro_paragraphs(post: BlogPost) -> list[str]:
@@ -634,6 +694,33 @@ def command_render(args: argparse.Namespace) -> int:
     return 0
 
 
+def resolve_external_markdown_path(value: str) -> Path:
+    candidate = Path(value).expanduser()
+    if not candidate.is_absolute():
+        candidate = EXTERNAL_DIR / candidate
+    candidate = candidate.resolve()
+    if candidate.suffix.lower() != ".md":
+        raise SystemExit(f"External post must be a Markdown file: {candidate}")
+    if not candidate.is_file():
+        raise SystemExit(f"External Markdown file not found: {candidate}")
+    return candidate
+
+
+def command_import_markdown(args: argparse.Namespace) -> int:
+    posts = load_queue()
+    target = find_post(posts, args.replace_slug)
+    source_path = resolve_external_markdown_path(args.path)
+    previous_slug = target.slug
+    import_markdown_post(source_path, target)
+    save_queue(posts)
+    rendered_path = render_post(target)
+    print(f"IMPORTED {source_path}")
+    print(f"REPLACED {previous_slug}")
+    print(f"QUEUED {target.slug}")
+    print(f"EDITABLE {rendered_path}")
+    return 0
+
+
 def command_set_visibility(args: argparse.Namespace) -> int:
     validate_audience(args.visibility)
     posts = load_queue()
@@ -666,7 +753,7 @@ def command_post(args: argparse.Namespace) -> int:
     posts = load_queue()
     post = find_post(posts, args.slug)
     rendered_path = render_post(post)
-    body_markdown = build_post_markdown(post)
+    body_markdown = build_composer_body(post)
     posting_config = load_posting_config()
 
     if args.dry_run:
@@ -713,7 +800,7 @@ def command_complete_post(args: argparse.Namespace) -> int:
 def command_gui(_: argparse.Namespace) -> int:
     try:
         import tkinter as tk
-        from tkinter import messagebox
+        from tkinter import filedialog, messagebox
         from tkinter import scrolledtext
     except ImportError as exc:
         raise SystemExit("Tkinter is not available in this Python environment. Use the CLI commands instead.") from exc
@@ -731,7 +818,7 @@ def command_gui(_: argparse.Namespace) -> int:
 
     hint_label = tk.Label(
         root,
-        text="Use Render or Post actions on the selected row. Running the script bare now opens this launcher.",
+        text="Select a queue slot, edit its final Markdown, or import a .md file from the external folder.",
         font=("Segoe UI", 8),
     )
     hint_label.pack(padx=12, pady=(0, 8), anchor="w")
@@ -762,12 +849,11 @@ def command_gui(_: argparse.Namespace) -> int:
     details_label = tk.Label(right_panel, textvariable=details_var, justify="left", anchor="w", font=("Segoe UI", 9))
     details_label.pack(fill="x", pady=(0, 8))
 
-    preview_label = tk.Label(right_panel, text="Ready-To-Paste Composer Body", font=("Segoe UI", 11, "bold"))
+    preview_label = tk.Label(right_panel, text="Editable Final Markdown", font=("Segoe UI", 11, "bold"))
     preview_label.pack(anchor="w", pady=(4, 6))
 
     preview_text = scrolledtext.ScrolledText(right_panel, wrap=tk.WORD, font=("Segoe UI", 9), height=24)
     preview_text.pack(fill="both", expand=True)
-    preview_text.configure(state="disabled")
 
     button_row = tk.Frame(root)
     button_row.pack(fill="x", padx=12, pady=(0, 12))
@@ -791,20 +877,18 @@ def command_gui(_: argparse.Namespace) -> int:
         post = selected_post()
         if post is None:
             details_var.set("Select a queued post to inspect or act on it.")
-            preview_text.configure(state="normal")
             preview_text.delete("1.0", tk.END)
-            preview_text.configure(state="disabled")
             return
+        editable_path = OUTPUT_DIR / f"{post.scheduled_date}-{post.slug}.md"
         details_var.set(
             f"Title: {post.title}\n"
             f"Date: {post.scheduled_date} | Intent: {post.audience_intent} | Visibility: {post.visibility}\n"
             f"Slug: {post.slug}\n"
+            f"Editable file: {editable_path}\n"
             f"Excerpt: {post.excerpt}"
         )
-        preview_text.configure(state="normal")
         preview_text.delete("1.0", tk.END)
-        preview_text.insert("1.0", build_composer_body(post))
-        preview_text.configure(state="disabled")
+        preview_text.insert("1.0", build_editable_markdown(post))
 
     def refresh_posts(select_slug: str | None = None) -> None:
         nonlocal posts_cache
@@ -829,17 +913,53 @@ def command_gui(_: argparse.Namespace) -> int:
         if post is None:
             messagebox.showinfo("Patreon Blog Tool", "Select a post first.")
             return
-        markdown_path = render_post(post)
+        markdown_path = save_edited_markdown(post, preview_text.get("1.0", tk.END))
+        save_queue(posts_cache)
         composer_path = render_composer_packet(post)
         messagebox.showinfo("Patreon Blog Tool", f"Rendered draft:\n{markdown_path}\n\nComposer packet:\n{composer_path}")
+
+    def save_markdown() -> None:
+        post = selected_post()
+        if post is None:
+            messagebox.showinfo("Patreon Blog Tool", "Select a post first.")
+            return
+        markdown_path = save_edited_markdown(post, preview_text.get("1.0", tk.END))
+        save_queue(posts_cache)
+        update_details()
+        messagebox.showinfo("Patreon Blog Tool", f"Saved editable Markdown:\n{markdown_path}")
+
+    def import_markdown() -> None:
+        post = selected_post()
+        if post is None:
+            messagebox.showinfo("Patreon Blog Tool", "Select the queue slot to replace first.")
+            return
+        EXTERNAL_DIR.mkdir(parents=True, exist_ok=True)
+        selected_path = filedialog.askopenfilename(
+            parent=root,
+            title="Import Markdown Post",
+            initialdir=str(EXTERNAL_DIR),
+            filetypes=[("Markdown files", "*.md"), ("All files", "*")],
+        )
+        if not selected_path:
+            return
+        try:
+            import_markdown_post(Path(selected_path), post)
+            save_queue(posts_cache)
+            markdown_path = render_post(post)
+        except (OSError, UnicodeError, ValueError) as exc:
+            messagebox.showerror("Patreon Blog Tool", str(exc))
+            return
+        refresh_posts(post.slug)
+        messagebox.showinfo("Patreon Blog Tool", f"Imported into the selected queue slot:\n{markdown_path}")
 
     def copy_title() -> None:
         post = selected_post()
         if post is None:
             messagebox.showinfo("Patreon Blog Tool", "Select a post first.")
             return
+        title, _ = parse_markdown_post(preview_text.get("1.0", tk.END), post.title)
         root.clipboard_clear()
-        root.clipboard_append(post.title)
+        root.clipboard_append(title)
         root.update()
         messagebox.showinfo("Patreon Blog Tool", "Copied title to clipboard.")
 
@@ -848,8 +968,9 @@ def command_gui(_: argparse.Namespace) -> int:
         if post is None:
             messagebox.showinfo("Patreon Blog Tool", "Select a post first.")
             return
+        _, body = parse_markdown_post(preview_text.get("1.0", tk.END), post.title)
         root.clipboard_clear()
-        root.clipboard_append(build_composer_body(post))
+        root.clipboard_append(body)
         root.update()
         messagebox.showinfo("Patreon Blog Tool", "Copied composer body to clipboard.")
 
@@ -858,6 +979,8 @@ def command_gui(_: argparse.Namespace) -> int:
         if post is None:
             messagebox.showinfo("Patreon Blog Tool", "Select a post first.")
             return
+        save_edited_markdown(post, preview_text.get("1.0", tk.END))
+        save_queue(posts_cache)
         root.clipboard_clear()
         root.clipboard_append(build_composer_packet(post))
         root.update()
@@ -887,6 +1010,8 @@ def command_gui(_: argparse.Namespace) -> int:
         if post is None:
             messagebox.showinfo("Patreon Blog Tool", "Select a post first.")
             return
+        save_edited_markdown(post, preview_text.get("1.0", tk.END))
+        save_queue(posts_cache)
         posting_config = load_posting_config()
         _, composer_path, clipboard_ok, compose_url = prepare_manual_post(post, posting_config, open_browser=True)
         messagebox.showinfo(
@@ -932,6 +1057,8 @@ def command_gui(_: argparse.Namespace) -> int:
     button_font = ("Segoe UI", 8)
 
     tk.Button(slow_button_row, text="Refresh", command=refresh_button_action, width=11, font=button_font).pack(side="left", padx=(0, 8))
+    tk.Button(slow_button_row, text="Import Markdown", command=import_markdown, width=15, font=button_font).pack(side="left", padx=(0, 8))
+    tk.Button(slow_button_row, text="Save Markdown", command=save_markdown, width=14, font=button_font).pack(side="left", padx=(0, 8))
     tk.Button(slow_button_row, text="Render", command=render_selected, width=11, font=button_font).pack(side="left", padx=(0, 8))
     tk.Button(slow_button_row, text="Copy Title", command=copy_title, width=11, font=button_font).pack(side="left", padx=(0, 8))
     tk.Button(slow_button_row, text="Copy Body", command=copy_body, width=11, font=button_font).pack(side="left", padx=(0, 8))
@@ -962,6 +1089,11 @@ def build_parser() -> argparse.ArgumentParser:
     render_parser = subparsers.add_parser("render", help="Render one or all Markdown drafts.")
     render_parser.add_argument("--slug", help="Render only the specified slug.")
     render_parser.set_defaults(handler=command_render)
+
+    import_parser = subparsers.add_parser("import-md", help="Import a Markdown file into a queue slot and render its editable draft.")
+    import_parser.add_argument("path", help="Markdown path; relative paths are resolved from docs/patreon/local_blog_tool/external.")
+    import_parser.add_argument("--replace-slug", help="Queue slot to replace. Defaults to the first queued post.")
+    import_parser.set_defaults(handler=command_import_markdown)
 
     visibility_parser = subparsers.add_parser("set-visibility", help="Change the current visibility for a post.")
     visibility_parser.add_argument("slug", help="Slug of the post to update.")

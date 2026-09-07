@@ -4,7 +4,7 @@
 
 The public introduction video for BiblionOCR is available here:
 
-https://www.youtube.com/watch?v=zrJQzivQwT4
+[Watch the BiblionOCR introduction on YouTube](https://www.youtube.com/watch?v=zrJQzivQwT4).
 
 Use this link when pointing GitHub visitors to the project's public-facing introduction.
 
@@ -41,6 +41,7 @@ If you are orienting yourself to the documentation set, start with these files i
 High-level purpose, philosophy, and long-term identity.
 
 Key documents:
+
 - [THE_BIBLION_PROJECT.md](vision/THE_BIBLION_PROJECT.md)
 
 ### `architecture/`
@@ -48,6 +49,7 @@ Key documents:
 System structure, module boundaries, and major runtime contracts.
 
 Key documents:
+
 - [PROJECT_ARCHITECTURE.md](architecture/PROJECT_ARCHITECTURE.md)
 - [PROJECT_CREATION_ARCHITECTURE.md](architecture/PROJECT_CREATION_ARCHITECTURE.md)
 
@@ -56,6 +58,7 @@ Key documents:
 Active engineering notebook, developer references, runtime notes, and implementation-facing support documents.
 
 Key documents:
+
 - [DEV_NOTEBOOK.md](development/DEV_NOTEBOOK.md)
 - [DESIGN_SPECIFICATION.md](development/DESIGN_SPECIFICATION.md)
 - [LOCAL_MASTER_SYNC_AFTER_PR.md](development/LOCAL_MASTER_SYNC_AFTER_PR.md)
@@ -75,6 +78,7 @@ Publication-facing writing and editorial support material.
 Contributor-facing and participation-oriented project material.
 
 Key documents:
+
 - [README.md](community/README.md)
 - [MEMBERSHIP.md](community/MEMBERSHIP.md)
 
@@ -87,9 +91,11 @@ Forward-looking planning, milestones, and future initiatives.
 Website planning, structure, and public presentation material.
 
 Key documents:
+
 - [README.md](website/README.md)
 
 Current prototype highlights:
+
 - React + Cytoscape demo under `docs/website/`
 - EventBus + EventRunner + EventGraphExecutor runtime path for demo traversal
 - traceable event logging, state inspection, and visited-node highlighting in the graph view

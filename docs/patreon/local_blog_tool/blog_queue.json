@@ -1,152 +1,241 @@
 [
   {
-    "scheduled_date": "2026-07-16",
-    "slug": "draft-2026-07-16",
-    "title": "Draft Patreon Post for 2026-07-16",
+    "scheduled_date": "2026-09-09",
+    "slug": "safer-startup-and-theme-system",
+    "title": "A Safer Startup and a Real Theme System",
     "audience_intent": "public",
     "visibility": "public",
-    "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
+    "excerpt": "BiblionOCR now handles missing local project data more gracefully and has a catalog-driven theme system with guarded editing instead of scattered stylesheet assumptions.",
     "tags": [
-      "draft",
-      "queue"
+      "user experience",
+      "themes",
+      "reliability",
+      "maintenance"
     ],
-    "call_to_action": "Replace this placeholder call to action with the real support ask for the next post.",
+    "call_to_action": "Support helps turn this foundational reliability work into a calmer, more consistent application for everyone who uses BiblionOCR.",
     "links": [],
     "sections": [
       {
-        "heading": "Draft Notes",
+        "heading": "Startup should fail gracefully",
         "paragraphs": [
-          "Decide whether this next post should be public or members only.",
-          "Turn the current week\u2019s concrete progress into a publishable narrative before this date arrives."
+          "A development checkout does not always contain a fully populated local project. BiblionOCR now tolerates missing local project data in startup paths that previously assumed those files were present, with regression coverage for launcher compatibility.",
+          "That sounds modest, but it removes a class of confusing first-run and clean-checkout failures. Reliability begins before the first project is opened."
+        ]
+      },
+      {
+        "heading": "Themes became managed resources",
+        "paragraphs": [
+          "The visual layer also moved from loosely related stylesheets toward an aligned theme catalog and manifest. A guarded editor provides a safer way to inspect and alter themes, while tests check catalog integrity and editor behavior.",
+          "The result is not merely more color choices. It is a maintainable ownership model for appearance, including the resources each theme depends on."
         ]
       }
     ],
     "pre_post_body": ""
   },
   {
-    "scheduled_date": "2026-07-17",
-    "slug": "draft-2026-07-17",
-    "title": "Draft Patreon Post for 2026-07-17",
-    "audience_intent": "public",
-    "visibility": "public",
-    "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
+    "scheduled_date": "2026-09-10",
+    "slug": "myserver-project-creation-workflow",
+    "title": "MyServer Now Treats Project Creation as a Workflow",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "MyServer's project-creation path now joins project structure, workflow definitions, source acquisition, database state, and preview behavior under a more explicit contract.",
     "tags": [
-      "draft",
-      "queue"
+      "MyServer",
+      "project creation",
+      "workflow",
+      "architecture"
     ],
-    "call_to_action": "Replace this placeholder call to action with the real support ask for the next post.",
-    "links": [],
+    "call_to_action": "Members make it possible to spend time on the less visible architectural work that keeps later OCR stages coherent.",
+    "links": [
+      {
+        "label": "Project creation architecture",
+        "path": "../../architecture/PROJECT_CREATION_ARCHITECTURE.md",
+        "note": "The maintained architecture document describes the project-creation contract."
+      }
+    ],
     "sections": [
       {
-        "heading": "Draft Notes",
+        "heading": "More than making folders",
         "paragraphs": [
-          "Decide whether this next post should be public or members only.",
-          "Turn the current week\u2019s concrete progress into a publishable narrative before this date arrives."
+          "Creating a BiblionOCR project now means more than copying a directory template. MyServer coordinates project metadata, canonical folder structure, workflow definitions, source selection, and persistent tracking so later modules inherit a coherent starting point.",
+          "The underlying project database and tracking code were aligned with that behavior, and the minimum project structure was tested as a contract rather than left as an assumption."
+        ]
+      },
+      {
+        "heading": "A visible source workflow",
+        "paragraphs": [
+          "Project creation also gained a clearer source-document path and PDF viewing support. The wizard and help material now explain what source is being acquired, where it belongs, and how it enters the processing workflow.",
+          "This is part of a larger architectural goal: every stage should know which artifact it owns, which artifact it received, and what it must hand to the next stage."
         ]
       }
     ],
     "pre_post_body": ""
   },
   {
-    "scheduled_date": "2026-07-18",
-    "slug": "draft-2026-07-18",
-    "title": "Draft Patreon Post for 2026-07-18",
+    "scheduled_date": "2026-09-11",
+    "slug": "threaded-pdf-tiff-source-processing",
+    "title": "From PDF Source to Page Images Without Freezing the Interface",
     "audience_intent": "public",
     "visibility": "public",
-    "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
+    "excerpt": "The source-document pipeline now separates PDF inspection from full TIFF extraction and performs long-running work without locking the main interface.",
     "tags": [
-      "draft",
-      "queue"
+      "PDF",
+      "TIFF",
+      "source processing",
+      "performance"
     ],
-    "call_to_action": "Replace this placeholder call to action with the real support ask for the next post.",
-    "links": [],
+    "call_to_action": "Share this update with anyone interested in practical OCR pipeline engineering and preservation-oriented source handling.",
+    "links": [
+      {
+        "label": "Project creation architecture",
+        "path": "../../architecture/PROJECT_CREATION_ARCHITECTURE.md",
+        "note": "This document records source-document responsibilities around project creation."
+      }
+    ],
     "sections": [
       {
-        "heading": "Draft Notes",
+        "heading": "Two jobs, two stages",
         "paragraphs": [
-          "Decide whether this next post should be public or members only.",
-          "Turn the current week\u2019s concrete progress into a publishable narrative before this date arrives."
+          "BiblionOCR now distinguishes the quick work needed to inspect a PDF from the heavier work needed to extract a complete set of TIFF page images. That keeps project setup responsive while preserving a deliberate path toward processing-ready source pages.",
+          "The shared source-document code handles PDF and TIFF inputs, while project creation and the PDF viewer expose progress and cancellation behavior around operations that may take time."
+        ]
+      },
+      {
+        "heading": "Why threading matters",
+        "paragraphs": [
+          "Large source documents should not make the application appear dead. Moving extraction work off the main UI thread allows the interface to keep responding and gives the user meaningful feedback while pages are prepared.",
+          "Focused tests now cover source selection, conversion behavior, progress reporting, cancellation, and the handoff into MyPixler."
         ]
       }
     ],
     "pre_post_body": ""
   },
   {
-    "scheduled_date": "2026-07-19",
-    "slug": "draft-2026-07-19",
-    "title": "Draft Patreon Post for 2026-07-19",
-    "audience_intent": "public",
-    "visibility": "public",
-    "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
+    "scheduled_date": "2026-09-12",
+    "slug": "keeping-modules-on-current-page",
+    "title": "Keeping Every Module on the Same Project Page",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "Current-page state, session persistence, MyExplorer filtering, and the MyPixler Page Workflow Wizard now work together around a shared page-level workflow.",
     "tags": [
-      "draft",
-      "queue"
+      "page workflow",
+      "MyPixler",
+      "MyExplorer",
+      "session state"
     ],
-    "call_to_action": "Replace this placeholder call to action with the real support ask for the next post.",
-    "links": [],
+    "call_to_action": "Member support funds the careful cross-module testing needed to make a multi-stage desktop workflow feel like one application.",
+    "links": [
+      {
+        "label": "Page Workflow Wizard architecture",
+        "path": "../../architecture/PAGE_WORKFLOW_WIZARD_ARCHITECTURE.md",
+        "note": "The architecture note describes ownership of the page-level workflow."
+      }
+    ],
     "sections": [
       {
-        "heading": "Draft Notes",
+        "heading": "One page, many modules",
         "paragraphs": [
-          "Decide whether this next post should be public or members only.",
-          "Turn the current week\u2019s concrete progress into a publishable narrative before this date arrives."
+          "OCR work moves through several specialized modules, but the person doing that work should not have to repeatedly rediscover the active page. Project tracking and session persistence now carry the current project page and its milestone context across module boundaries.",
+          "Reference images and reference text remain available without accidentally replacing the active project page. Image and text counterparts also retain matching page numbers when both exist."
+        ]
+      },
+      {
+        "heading": "MyPixler gained an explicit guide",
+        "paragraphs": [
+          "MyPixler now has a dedicated Page Workflow Wizard backed by the canonical page workflow definition. It presents the preprocessing stages as an intentional sequence rather than a collection of disconnected controls.",
+          "MyExplorer's filtering and picker behavior were aligned with the same model, and focused tests cover page state, workflow progression, source display, and handoffs."
         ]
       }
     ],
     "pre_post_body": ""
   },
   {
-    "scheduled_date": "2026-07-20",
-    "slug": "draft-2026-07-20",
-    "title": "Draft Patreon Post for 2026-07-20",
+    "scheduled_date": "2026-09-13",
+    "slug": "myscanner-product-one-not-release-one",
+    "title": "Why MyScanner Is Product 1, Not Release 1",
     "audience_intent": "public",
     "visibility": "public",
-    "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
+    "excerpt": "MyScanner has been designated as BiblionOCR's first standalone productization track, with an explicit boundary between strategic priority and release readiness.",
     "tags": [
-      "draft",
-      "queue"
+      "MyScanner",
+      "product strategy",
+      "open source",
+      "release planning"
     ],
-    "call_to_action": "Replace this placeholder call to action with the real support ask for the next post.",
-    "links": [],
+    "call_to_action": "Support the work needed to turn a promising scanner module into a tested, supportable standalone product without compromising the open-source BiblionOCR ecosystem.",
+    "links": [
+      {
+        "label": "Standalone release order",
+        "path": "../../development/STANDALONE_RELEASE_ORDER_2026-08-05.md",
+        "note": "The release-order document records the current productization decision and remaining gates."
+      }
+    ],
     "sections": [
       {
-        "heading": "Draft Notes",
+        "heading": "A priority, not a premature promise",
         "paragraphs": [
-          "Decide whether this next post should be public or members only.",
-          "Turn the current week\u2019s concrete progress into a publishable narrative before this date arrives."
+          "MyScanner is now the first active standalone productization track. That means its boundaries, dependencies, packaging needs, hardware behavior, licensing, and support model receive focused attention first.",
+          "It does not mean a supported binary is ready today. The project documentation now distinguishes Product 1 status from technical-preview and supported-release readiness so an internal priority cannot be mistaken for a public promise."
+        ]
+      },
+      {
+        "heading": "Two related tracks",
+        "paragraphs": [
+          "BiblionOCR remains an open-source ecosystem. Separately productized module binaries may help fund continued development, beginning with scanner technology, but that commercial boundary must be designed and reviewed rather than inferred after packaging.",
+          "Current blockers remain explicit: dependency and repository coupling, standalone build manifests, scanner-backend tests, hardware acceptance, and licensing review all have to be resolved before release."
         ]
       }
     ],
     "pre_post_body": ""
   },
   {
-    "scheduled_date": "2026-07-21",
-    "slug": "draft-2026-07-21",
-    "title": "Draft Patreon Post for 2026-07-21",
-    "audience_intent": "public",
-    "visibility": "public",
-    "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
+    "scheduled_date": "2026-09-14",
+    "slug": "guardrails-for-ai-assisted-development",
+    "title": "Building Guardrails for AI-Assisted Development",
+    "audience_intent": "members_only",
+    "visibility": "members_only",
+    "excerpt": "A new Developer workflow wizard, selective UI generator, Qt 6 strategy, PR evidence gate, and nomenclature guide turn project memory into enforceable practice.",
     "tags": [
-      "draft",
-      "queue"
+      "developer tooling",
+      "AI governance",
+      "quality assurance",
+      "Qt 6"
     ],
-    "call_to_action": "Replace this placeholder call to action with the real support ask for the next post.",
-    "links": [],
+    "call_to_action": "Members help sustain the engineering discipline behind visible features: tests, migration planning, review evidence, and maintainable project memory.",
+    "links": [
+      {
+        "label": "Developer workflow guide",
+        "path": "../../../Developer/README.md",
+        "note": "The Developer README explains the governed human workflow and mandatory evidence model."
+      },
+      {
+        "label": "BiblionOCR project nomenclature",
+        "path": "../../../Developer/documentation/BIBLIONOCR_NOMENCLATURE.md",
+        "note": "The nomenclature guide defines canonical names, recognized aliases, and ambiguity handling."
+      }
+    ],
     "sections": [
       {
-        "heading": "Draft Notes",
+        "heading": "The checklist became executable",
         "paragraphs": [
-          "Decide whether this next post should be public or members only.",
-          "Turn the current week\u2019s concrete progress into a publishable narrative before this date arrives."
+          "BiblionOCR now includes a Developer-only workflow wizard that guides a human contributor from scope and hypothesis through implementation, validation, risk review, and handoff. Nineteen evidence gates must be resolved before the wizard reports that a change is eligible for pull-request review.",
+          "The generated evidence is checked by repository automation. This does not replace human judgment; it makes the expected proof visible and harder to forget."
+        ]
+      },
+      {
+        "heading": "Reproducibility and migration",
+        "paragraphs": [
+          "UI and resource generation was centralized in a compare-before-replace tool, so unchanged generated files keep their timestamps and only real byte changes reach the worktree. A documented Qt 6 migration strategy provides a provisional PySide6 direction without forcing a premature framework conversion.",
+          "Finally, a project nomenclature guide now separates informal input from canonical committed output. It defines names and aliases while leaving semantic meaning to the design specification and implementation status to architectural evidence."
         ]
       }
     ],
     "pre_post_body": ""
   },
   {
-    "scheduled_date": "2026-07-22",
-    "slug": "draft-2026-07-22",
-    "title": "Draft Patreon Post for 2026-07-22",
+    "scheduled_date": "2026-09-15",
+    "slug": "draft-2026-09-15",
+    "title": "Draft Patreon Post for 2026-09-15",
     "audience_intent": "public",
     "visibility": "public",
     "excerpt": "Replace this placeholder with the next Patreon draft before the queue date arrives.",
