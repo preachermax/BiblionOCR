@@ -9,10 +9,13 @@ from pathlib import Path
 from unittest import mock
 
 from PyQt5 import QtCore as qtc
+from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
 from Core.myexplorer_picker import build_myexplorer_selection_command, run_myexplorer_selection
 from Core.workflow_wizard_actions import (
+    PAGE_WORKFLOW_WIZARD_ICON,
+    PROJECT_WORKFLOW_WIZARD_ICON,
     _ensure_module_menu_shortcuts,
     _explorer_get_save_file_name,
     install_myexplorer_method_aliases,
@@ -189,7 +192,193 @@ class MyExplorerPickerTests(unittest.TestCase):
         self.assertIn("proportions=(0.48,0.13,0.17)", compact_runtime_source)
         self.assertIn("available_width-assigned_width", compact_runtime_source)
 
+        expected_shortcuts = {
+            "actionSelect_Folder": "Ctrl+Return",
+            "actionOpen_Trash": "Ctrl+Shift+T",
+            "actionRestore_From_Trash": "Ctrl+Alt+T",
+            "actionRestore_From_Backup": "Ctrl+Alt+B",
+            "actionExit": "Ctrl+Q",
+            "actionBulk_Rename": "Ctrl+Shift+R",
+            "actionNew_folder": "Ctrl+Shift+N",
+            "actionCut": "Ctrl+X",
+            "actionCopy": "Ctrl+C",
+            "actionPaste": "Ctrl+V",
+            "actionDelete": "Del",
+            "actionMove": "Ctrl+Shift+M",
+            "actionUndo": "Ctrl+Z",
+            "actionRedo": "Ctrl+Shift+Z",
+        }
+
+        for action_name, shortcut in expected_shortcuts.items():
+            action = getattr(ui, action_name)
+            self.assertEqual(shortcut, action.shortcut().toString())
+            self.assertTrue(action.isShortcutVisibleInContextMenu())
+
+        edit_actions = [action.text() for action in ui.menuEdit.actions()]
+        self.assertEqual(
+            ["New folder", "Cut", "Copy", "Paste", "Delete", "Move", "Undo", "Redo"],
+            edit_actions,
+        )
+
         window.close()
+
+    def test_myexplorer_runtime_reuses_edit_actions_and_reverses_file_operations(self) -> None:
+        os.environ["BIBLION_GUI_ENV_SANITIZED"] = "1"
+        module_path = MAIN_UI_DIR / "MyExplorer.py"
+        spec = importlib.util.spec_from_file_location("test_myexplorer_runtime", module_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            window = module.MyFileBrowser(
+                start_dir=temporary_directory,
+                select_mode=True,
+                selection_kind="folder",
+            )
+            try:
+                self.assertEqual(
+                    [
+                        window.actionNew_folder,
+                        window.actionCut,
+                        window.actionCopy,
+                        window.actionPaste,
+                        window.actionDelete,
+                        window.actionMove,
+                        window.actionUndo,
+                        window.actionRedo,
+                    ],
+                    list(window._edit_actions()),
+                )
+                self.assertEqual(
+                    "Ctrl+Alt+W",
+                    window.actionPage_Workflow_Wizard.shortcut().toString(),
+                )
+                self.assertTrue(
+                    window.actionPage_Workflow_Wizard.isShortcutVisibleInContextMenu()
+                )
+
+                context_labels = []
+
+                def capture_context_menu(menu, *_args):
+                    context_labels.extend(
+                        action.text()
+                        for action in menu.actions()
+                        if not action.isSeparator()
+                    )
+
+                with mock.patch.object(
+                    module.QtWidgets.QMenu,
+                    "exec_",
+                    new=capture_context_menu,
+                ), mock.patch.object(
+                    module,
+                    "append_default_context_actions",
+                ):
+                    window.context_menu(module.QtCore.QPoint(-1, -1))
+
+                for label in (
+                    "New folder",
+                    "Cut",
+                    "Copy",
+                    "Paste",
+                    "Delete",
+                    "Move",
+                    "Undo",
+                    "Redo",
+                ):
+                    self.assertIn(label, context_labels)
+
+                created_path = os.path.join(temporary_directory, "created")
+                os.mkdir(created_path)
+                operation = {
+                    "kind": "create",
+                    "path": created_path,
+                    "stash": window._undo_stash_path(created_path),
+                }
+                window._record_file_operation(operation)
+                window.undo_file_operation()
+                self.assertFalse(os.path.exists(created_path))
+                self.assertTrue(window.actionRedo.isEnabled())
+
+                window.redo_file_operation()
+                self.assertTrue(os.path.isdir(created_path))
+                self.assertTrue(window.actionUndo.isEnabled())
+
+                moved_path = os.path.join(temporary_directory, "moved")
+                os.rename(created_path, moved_path)
+                window._record_file_operation({
+                    "kind": "move",
+                    "source": created_path,
+                    "destination": moved_path,
+                })
+                window.undo_file_operation()
+                self.assertTrue(os.path.isdir(created_path))
+                window.redo_file_operation()
+                self.assertTrue(os.path.isdir(moved_path))
+            finally:
+                window.close()
+
+    def test_myexplorer_copy_cut_paste_and_delete_are_undoable(self) -> None:
+        os.environ["BIBLION_GUI_ENV_SANITIZED"] = "1"
+        module_path = MAIN_UI_DIR / "MyExplorer.py"
+        spec = importlib.util.spec_from_file_location("test_myexplorer_file_actions", module_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            window = module.MyFileBrowser(
+                start_dir=temporary_directory,
+                select_mode=True,
+                selection_kind="folder",
+            )
+            source = os.path.join(temporary_directory, "source.txt")
+            Path(source).write_text("content", encoding="utf-8")
+            destination_directory = os.path.join(temporary_directory, "destination")
+            os.mkdir(destination_directory)
+            try:
+                with mock.patch.object(window, "_selected_existing_path", return_value=source), mock.patch.object(
+                    window, "_current_directory", return_value=destination_directory
+                ):
+                    window.copy_selected()
+                    window.paste_into_current_directory()
+
+                copied_path = os.path.join(destination_directory, "source.txt")
+                self.assertTrue(os.path.isfile(copied_path))
+                window.undo_file_operation()
+                self.assertFalse(os.path.exists(copied_path))
+                window.redo_file_operation()
+                self.assertTrue(os.path.isfile(copied_path))
+
+                with mock.patch.object(window, "_selected_existing_path", return_value=source), mock.patch.object(
+                    window, "_current_directory", return_value=destination_directory
+                ):
+                    window.cut_selected()
+                    window.paste_into_current_directory()
+
+                moved_path = os.path.join(destination_directory, "source (1).txt")
+                self.assertFalse(os.path.exists(source))
+                self.assertTrue(os.path.isfile(moved_path))
+                window.undo_file_operation()
+                self.assertTrue(os.path.isfile(source))
+
+                with mock.patch.object(window, "_selected_existing_path", return_value=source), mock.patch.object(
+                    module.QtWidgets.QMessageBox,
+                    "question",
+                    return_value=module.QtWidgets.QMessageBox.Yes,
+                ):
+                    window.delete_selected()
+
+                self.assertFalse(os.path.exists(source))
+                window.undo_file_operation()
+                self.assertTrue(os.path.isfile(source))
+                window.redo_file_operation()
+                self.assertFalse(os.path.exists(source))
+            finally:
+                window.close()
 
     def test_myexplorer_does_not_install_close_confirmation(self) -> None:
         explorer = qtw.QMainWindow()
@@ -213,6 +402,48 @@ class MyExplorerPickerTests(unittest.TestCase):
 
         explorer.close()
         other_module.close()
+
+    def test_workflow_wizard_actions_use_transparent_resource_icons(self) -> None:
+        import UI_Icons  # noqa: F401
+
+        icons_directory = HELPERS_DIR / "Icons"
+        for icon_name in ("stage.png", "wand.png", "wand2.png", "wizard-hat.png"):
+            image = qtg.QImage(str(icons_directory / icon_name))
+            self.assertFalse(image.isNull(), icon_name)
+            self.assertTrue(image.hasAlphaChannel(), icon_name)
+            self.assertEqual(0, image.pixelColor(0, 0).alpha(), icon_name)
+            alpha_image = image.convertToFormat(qtg.QImage.Format_Alpha8)
+            self.assertGreater(
+                max(alpha_image.constBits().asstring(alpha_image.byteCount())),
+                0,
+                icon_name,
+            )
+
+        window = qtw.QMainWindow()
+        window.menuFile = window.menuBar().addMenu("File")
+        window.actionProject_Workflow_Wizard = qtw.QAction(
+            "Project Workflow Wizard",
+            window,
+        )
+        with mock.patch(
+            "Core.workflow_wizard_actions._install_close_confirmation"
+        ):
+            install_workflow_wizard_menu_actions(
+                window,
+                "MyServer",
+                include_project_wizard=True,
+                include_page_wizard=True,
+            )
+
+        self.assertEqual(":/Icons/Icons/wand.png", PAGE_WORKFLOW_WIZARD_ICON)
+        self.assertEqual(":/Icons/Icons/wizard-hat.png", PROJECT_WORKFLOW_WIZARD_ICON)
+        self.assertFalse(window.actionPage_Workflow_Wizard.icon().isNull())
+        self.assertFalse(window.actionProject_Workflow_Wizard.icon().isNull())
+        self.assertNotEqual(
+            window.actionPage_Workflow_Wizard.icon().pixmap(32, 32).toImage(),
+            window.actionProject_Workflow_Wizard.icon().pixmap(32, 32).toImage(),
+        )
+        window.close()
 
     def test_non_modal_picker_returns_myexplorer_selection(self) -> None:
         selected_paths = []

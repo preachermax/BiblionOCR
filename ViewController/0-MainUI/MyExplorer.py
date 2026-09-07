@@ -25,6 +25,7 @@ if project_root not in sys.path:
 
 from gui_runtime_env import sanitize_current_process_and_reexec
 from SessionManager import SessionManager
+from Core.myexplorer_picker import run_myexplorer_selection
 from Core.workflow_wizard_actions import (
     append_default_context_actions,
     install_workflow_wizard_menu_actions,
@@ -231,6 +232,11 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         self.setupUi(self)
 
+        self._file_clipboard = None
+        self._undo_stack = []
+        self._redo_stack = []
+        self._undo_directory = QtCore.QTemporaryDir()
+
         if window_title:
             self.setWindowTitle(window_title)
 
@@ -240,6 +246,17 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             include_project_wizard=False,
             include_page_wizard=True,
         )
+
+        if isinstance(
+            getattr(self, "actionPage_Workflow_Wizard", None),
+            QtWidgets.QAction,
+        ):
+            self.actionPage_Workflow_Wizard.setShortcut(
+                QtGui.QKeySequence("Ctrl+Alt+W")
+            )
+            self.actionPage_Workflow_Wizard.setShortcutVisibleInContextMenu(
+                True
+            )
 
         self.open_page_workflow_wizard = (
             lambda _requested_module=None:
@@ -356,6 +373,23 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
                 self.close
             )
 
+        edit_action_handlers = {
+            "actionNew_folder": self.create_new_folder,
+            "actionCut": self.cut_selected,
+            "actionCopy": self.copy_selected,
+            "actionPaste": self.paste_into_current_directory,
+            "actionDelete": self.delete_selected,
+            "actionMove": self.move_selected,
+            "actionUndo": self.undo_file_operation,
+            "actionRedo": self.redo_file_operation,
+        }
+
+        for action_name, handler in edit_action_handlers.items():
+            action = getattr(self, action_name, None)
+
+            if action is not None:
+                action.triggered.connect(handler)
+
         # ---------------------------------------------------------
         # Bulk Rename
         # ---------------------------------------------------------
@@ -365,6 +399,16 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             )
 
         self.populate()
+
+        self.treeView.selectionModel().selectionChanged.connect(
+            self._update_edit_action_state
+        )
+
+        self.menuEdit.aboutToShow.connect(
+            self._update_edit_action_state
+        )
+
+        self._update_edit_action_state()
 
         self.project_status_controller = ProjectStatusController(
             self,
@@ -737,6 +781,332 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             return path
 
         return os.path.dirname(path)
+
+    def _selected_existing_path(self):
+        path = self._current_path()
+        return path if path and os.path.exists(path) else ""
+
+    def _is_root_path(self, path):
+        if not path:
+            return False
+
+        return os.path.abspath(path) == os.path.abspath(
+            self._resolve_root_directory()
+        )
+
+    def _update_edit_action_state(self, *_args):
+        selected_path = self._selected_existing_path()
+        current_directory = self._current_directory()
+        editable_selection = bool(
+            selected_path
+            and not self._is_root_path(selected_path)
+        )
+        clipboard_source = (
+            self._file_clipboard.get("source", "")
+            if self._file_clipboard
+            else ""
+        )
+
+        self.actionNew_folder.setEnabled(
+            bool(current_directory and os.path.isdir(current_directory))
+        )
+        self.actionCut.setEnabled(editable_selection)
+        self.actionCopy.setEnabled(bool(selected_path))
+        self.actionPaste.setEnabled(
+            bool(
+                current_directory
+                and os.path.isdir(current_directory)
+                and clipboard_source
+                and os.path.exists(clipboard_source)
+            )
+        )
+        self.actionDelete.setEnabled(editable_selection)
+        self.actionMove.setEnabled(editable_selection)
+        self.actionUndo.setEnabled(bool(self._undo_stack))
+        self.actionRedo.setEnabled(bool(self._redo_stack))
+
+    def _edit_actions(self):
+        return (
+            self.actionNew_folder,
+            self.actionCut,
+            self.actionCopy,
+            self.actionPaste,
+            self.actionDelete,
+            self.actionMove,
+            self.actionUndo,
+            self.actionRedo,
+        )
+
+    def _show_file_operation_error(self, title, error):
+        QtWidgets.QMessageBox.critical(
+            self,
+            title,
+            f"The file operation could not be completed:\n{error}"
+        )
+
+    def _record_file_operation(self, operation):
+        self._undo_stack.append(operation)
+        self._redo_stack.clear()
+        self._update_edit_action_state()
+
+    def _undo_stash_path(self, source_path):
+        return ExplorerTreeView._unique_destination_path(
+            self._undo_directory.path(),
+            os.path.basename(source_path),
+        )
+
+    @staticmethod
+    def _copy_path(source_path, destination_path):
+        if os.path.isdir(source_path):
+            shutil.copytree(source_path, destination_path)
+        else:
+            shutil.copy2(source_path, destination_path)
+
+    @staticmethod
+    def _ensure_move_is_safe(source_path, destination_directory):
+        if not os.path.isdir(source_path):
+            return
+
+        source_path = os.path.abspath(source_path)
+        destination_directory = os.path.abspath(destination_directory)
+
+        try:
+            if os.path.commonpath(
+                [source_path, destination_directory]
+            ) == source_path:
+                raise ValueError(
+                    "A folder cannot be copied or moved into itself."
+                )
+        except ValueError:
+            raise
+
+    def create_new_folder(self):
+        parent_directory = self._current_directory()
+
+        if not parent_directory:
+            return
+
+        folder_name, accepted = QtWidgets.QInputDialog.getText(
+            self,
+            "New Folder",
+            "Folder name:",
+        )
+
+        folder_name = folder_name.strip()
+
+        if not accepted or not folder_name:
+            return
+
+        if os.path.basename(folder_name) != folder_name:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "New Folder",
+                "Enter a folder name without path separators."
+            )
+            return
+
+        folder_path = os.path.join(parent_directory, folder_name)
+
+        try:
+            os.mkdir(folder_path)
+        except OSError as exc:
+            self._show_file_operation_error("New Folder", exc)
+            return
+
+        self._record_file_operation({
+            "kind": "create",
+            "path": folder_path,
+            "stash": self._undo_stash_path(folder_path),
+        })
+        self.statusbar.showMessage(f"Created folder: {folder_path}", 5000)
+
+    def cut_selected(self):
+        source_path = self._selected_existing_path()
+
+        if not source_path or self._is_root_path(source_path):
+            return
+
+        self._file_clipboard = {
+            "mode": "cut",
+            "source": source_path,
+        }
+        self.statusbar.showMessage(f"Cut: {source_path}", 5000)
+        self._update_edit_action_state()
+
+    def copy_selected(self):
+        source_path = self._selected_existing_path()
+
+        if not source_path:
+            return
+
+        self._file_clipboard = {
+            "mode": "copy",
+            "source": source_path,
+        }
+        self.statusbar.showMessage(f"Copied: {source_path}", 5000)
+        self._update_edit_action_state()
+
+    def paste_into_current_directory(self):
+        if not self._file_clipboard:
+            return
+
+        source_path = self._file_clipboard.get("source", "")
+        destination_directory = self._current_directory()
+
+        if not source_path or not os.path.exists(source_path) or not destination_directory:
+            self._update_edit_action_state()
+            return
+
+        try:
+            self._ensure_move_is_safe(source_path, destination_directory)
+            destination_path = ExplorerTreeView._unique_destination_path(
+                destination_directory,
+                os.path.basename(source_path),
+            )
+
+            if self._file_clipboard["mode"] == "cut":
+                shutil.move(source_path, destination_path)
+                operation = {
+                    "kind": "move",
+                    "source": source_path,
+                    "destination": destination_path,
+                }
+                self._file_clipboard = None
+            else:
+                self._copy_path(source_path, destination_path)
+                operation = {
+                    "kind": "create",
+                    "path": destination_path,
+                    "stash": self._undo_stash_path(destination_path),
+                }
+        except (OSError, ValueError) as exc:
+            self._show_file_operation_error("Paste", exc)
+            return
+
+        self._record_file_operation(operation)
+        self.statusbar.showMessage(f"Pasted to: {destination_path}", 5000)
+
+    def delete_selected(self):
+        source_path = self._selected_existing_path()
+
+        if not source_path or self._is_root_path(source_path):
+            return
+
+        answer = QtWidgets.QMessageBox.question(
+            self,
+            "Delete",
+            f"Delete this item? Undo remains available during this MyExplorer session.\n\n{source_path}",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No,
+        )
+
+        if answer != QtWidgets.QMessageBox.Yes:
+            return
+
+        stash_path = self._undo_stash_path(source_path)
+
+        try:
+            shutil.move(source_path, stash_path)
+        except OSError as exc:
+            self._show_file_operation_error("Delete", exc)
+            return
+
+        self._record_file_operation({
+            "kind": "delete",
+            "path": source_path,
+            "stash": stash_path,
+        })
+        self.statusbar.showMessage(f"Deleted: {source_path}", 5000)
+
+    def move_selected(self):
+        source_path = self._selected_existing_path()
+
+        if not source_path or self._is_root_path(source_path):
+            return
+
+        destination_directory = run_myexplorer_selection(
+            "Move To Folder",
+            self._current_directory(),
+            "folder",
+        )
+
+        if not destination_directory:
+            return
+
+        try:
+            self._ensure_move_is_safe(source_path, destination_directory)
+            destination_path = ExplorerTreeView._unique_destination_path(
+                destination_directory,
+                os.path.basename(source_path),
+            )
+            shutil.move(source_path, destination_path)
+        except (OSError, ValueError) as exc:
+            self._show_file_operation_error("Move", exc)
+            return
+
+        self._record_file_operation({
+            "kind": "move",
+            "source": source_path,
+            "destination": destination_path,
+        })
+        self.statusbar.showMessage(f"Moved to: {destination_path}", 5000)
+
+    @staticmethod
+    def _move_without_overwrite(source_path, destination_path):
+        if not os.path.exists(source_path):
+            raise FileNotFoundError(source_path)
+        if os.path.exists(destination_path):
+            raise FileExistsError(destination_path)
+
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        shutil.move(source_path, destination_path)
+
+    def _apply_history_operation(self, operation, undo):
+        kind = operation["kind"]
+
+        if kind == "move":
+            source_path = operation["destination"] if undo else operation["source"]
+            destination_path = operation["source"] if undo else operation["destination"]
+        elif kind == "delete":
+            source_path = operation["stash"] if undo else operation["path"]
+            destination_path = operation["path"] if undo else operation["stash"]
+        else:
+            source_path = operation["path"] if undo else operation["stash"]
+            destination_path = operation["stash"] if undo else operation["path"]
+
+        self._move_without_overwrite(source_path, destination_path)
+
+    def undo_file_operation(self):
+        if not self._undo_stack:
+            return
+
+        operation = self._undo_stack[-1]
+
+        try:
+            self._apply_history_operation(operation, undo=True)
+        except OSError as exc:
+            self._show_file_operation_error("Undo", exc)
+            return
+
+        self._redo_stack.append(self._undo_stack.pop())
+        self.statusbar.showMessage("File operation undone.", 5000)
+        self._update_edit_action_state()
+
+    def redo_file_operation(self):
+        if not self._redo_stack:
+            return
+
+        operation = self._redo_stack[-1]
+
+        try:
+            self._apply_history_operation(operation, undo=False)
+        except OSError as exc:
+            self._show_file_operation_error("Redo", exc)
+            return
+
+        self._undo_stack.append(self._redo_stack.pop())
+        self.statusbar.showMessage("File operation redone.", 5000)
+        self._update_edit_action_state()
 
     def _on_tree_double_clicked(self, _index):
         if self.select_mode:
@@ -1159,16 +1529,40 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             f"Copied to:\n{destination_path}"
         )
 
-    def context_menu(self):
-        menu = QtWidgets.QMenu()
+    def context_menu(self, position):
+        clicked_index = self.treeView.indexAt(position)
+
+        if clicked_index.isValid():
+            self.treeView.setCurrentIndex(clicked_index)
+
+        self._update_edit_action_state()
+
+        menu = QtWidgets.QMenu(self)
 
         open_action = menu.addAction(
             "Open with operating system"
         )
 
+        open_action.setEnabled(
+            bool(self._selected_existing_path())
+        )
+
         open_action.triggered.connect(
             self.open_file
         )
+
+        menu.addSeparator()
+
+        edit_actions = self._edit_actions()
+
+        for action in edit_actions[:6]:
+            menu.addAction(action)
+
+        menu.addSeparator()
+        menu.addAction(edit_actions[6])
+        menu.addAction(edit_actions[7])
+
+        menu.addSeparator()
 
         append_default_context_actions(
             menu,
@@ -1176,9 +1570,9 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             is_text_widget=False
         )
 
-        cursor = QtGui.QCursor()
-
-        menu.exec_(cursor.pos())
+        menu.exec_(
+            self.treeView.viewport().mapToGlobal(position)
+        )
 
     def open_file(self):
         index = self.treeView.currentIndex()

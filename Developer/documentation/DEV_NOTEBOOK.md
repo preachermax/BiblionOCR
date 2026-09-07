@@ -28,6 +28,28 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-07 MyExplorer, Patreon, And Workflow Icons
+
+* Scope summary: completed reversible MyExplorer file operations and shortcuts, added editable/importable Patreon Markdown with a seven-post queue, and installed transparent Page/Project Workflow Wizard icons through the shared action policy.
+* Intended commit groups:
+  * Patreon publishing tool, documentation, external source post, queue, generated posts, and focused tests.
+  * MyExplorer Designer source, generated UI, runtime file operations, context-menu behavior, shortcuts, and focused tests.
+  * shared workflow wizard icon policy, four transparent PNG assets, Qt resource source/generated module, and deterministic generated UI synchronization.
+* Explicit commit exclusions: `Model/Project/Data/json/ReaderSession.json` and `Model/Project/Data/json/Session.json` are runtime-local drift; `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg` is an unused source candidate.
+* Validation gates:
+  * Problems/lint: full-workspace Problems `1`, the pre-existing optional `edge_tts` import in unchanged `Developer/narration/generate_narration.py`; in-scope Problems `0`.
+  * whitespace/secrets: `git diff --check` passed; credential-term scan of intended source/content areas returned no findings.
+  * compile: every intended touched Python source, test, generated UI module, and generated resource module passed `.venv/bin/python -m py_compile`.
+  * focused tests: Patreon, MyExplorer, resource-generator, and page-workflow tests passed, `32 passed`.
+  * UI/resource lockstep: `.venv/bin/python Developer/update_ui_resources.py --check` reported `22 unchanged, 0 stale`.
+  * workflow policy: shared `install_workflow_wizard_menu_actions` assigns `wand.png` to Page Workflow Wizard and `wizard-hat.png` to Project Workflow Wizard for generated and dynamically created actions; focused Qt coverage passed.
+  * icon inspection: all four requested PNGs have alpha ranges `0..1`, transparent corner pixels, and non-empty visible bounds; visual inspection retained each foreground silhouette.
+  * manual/offscreen UI check: Qt instantiated existing and generated workflow actions with non-null distinct icons; MyExplorer runtime/context-menu behavior passed temporary-filesystem tests.
+  * launcher compatibility: `tests/test_launcher_entrypoint_compatibility.py` passed; all 12 canonical Linux launchers reached stable offscreen startup until the five-second bound with no traceback, missing import/file error, or crash.
+  * architecture-normalization lane: not applicable; these changes do not alter architecture status or specification contracts.
+* Unresolved blockers/risks: undo/redo history is intentionally session-local; operating-system trash behavior remains platform-dependent; Patreon generated posts still require editorial review before publication.
+* Next immediate action: stage by intent, review staged scope, commit, push `ubuntu_development`, fast-forward `master`, and verify remote parity while leaving explicit exclusions local.
+
 ### Session Handoff - 2026-09-07 Project Nomenclature
 
 * Scope summary: added a canonical contributor-facing nomenclature and ambiguity guide, then integrated it into the Developer workflow wizard, help, README, checklist, playbook, and synchronization tests.

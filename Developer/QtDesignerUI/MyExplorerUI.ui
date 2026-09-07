@@ -112,6 +112,11 @@
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
+    <property name="font">
+     <font>
+      <family>FROMVS</family>
+     </font>
+    </property>
     <property name="title">
      <string>File</string>
     </property>
@@ -129,7 +134,21 @@
     </property>
     <addaction name="actionBulk_Rename"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionNew_folder"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionDelete"/>
+    <addaction name="actionMove"/>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -144,6 +163,17 @@
    <property name="toolTip">
     <string>Use the current folder selection and return it to the calling workflow.</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Return</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
   </action>
   <action name="actionOpen_Trash">
    <property name="icon">
@@ -156,6 +186,17 @@
    <property name="toolTip">
     <string>Open the operating system trash location.</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Shift+T</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
   </action>
   <action name="actionRestore_From_Trash">
    <property name="icon">
@@ -168,6 +209,17 @@
    <property name="toolTip">
     <string>Restore a trashed item to its original folder or the current folder.</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Alt+T</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
   </action>
   <action name="actionRestore_From_Backup">
    <property name="icon">
@@ -180,11 +232,33 @@
    <property name="toolTip">
     <string>Copy a selected backup file or folder into the currently selected folder.</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Alt+B</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
   </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Q</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
   </action>
   <action name="actionBulk_Rename">
    <property name="icon">
@@ -194,6 +268,177 @@
    <property name="text">
     <string>Bulk Rename</string>
    </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Shift+R</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionNew_folder">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/folder-horizontal-open.png</normaloff>:/Icons/Icons/folder-horizontal-open.png</iconset>
+   </property>
+   <property name="text">
+    <string>New folder</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Shift+N</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/scissors.png</normaloff>:/Icons/Icons/scissors.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+X</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/document-copy.png</normaloff>:/Icons/Icons/document-copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+C</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/clipboard-paste.png</normaloff>:/Icons/Icons/clipboard-paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+V</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/trash.png</normaloff>:/Icons/Icons/trash.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Del</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionMove">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/document--arrow.png</normaloff>:/Icons/Icons/document--arrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Shift+M</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/undo.png</normaloff>:/Icons/Icons/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Z</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/redo.png</normaloff>:/Icons/Icons/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>FROMVS</family>
+    </font>
+   </property>
+  <property name="shortcut">
+   <string>Ctrl+Shift+Z</string>
+  </property>
+  <property name="shortcutVisibleInContextMenu">
+   <bool>true</bool>
+  </property>
   </action>
  </widget>
  <resources>

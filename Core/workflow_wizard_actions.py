@@ -14,6 +14,10 @@ from .myexplorer_picker import run_myexplorer_selection
 from .project_tracking import ProjectWorkflowTracker
 
 
+PAGE_WORKFLOW_WIZARD_ICON = ":/Icons/Icons/wand.png"
+PROJECT_WORKFLOW_WIZARD_ICON = ":/Icons/Icons/wizard-hat.png"
+
+
 @dataclass(frozen=True)
 class WorkflowStepSpec:
     label: str
@@ -1248,6 +1252,11 @@ def install_workflow_wizard_menu_actions(
         _attach_action_to_menu_only(window, target_menu, existing_project_action)
         setattr(window, project_action_name, existing_project_action)
 
+    if include_project_wizard:
+        project_action = getattr(window, project_action_name, None)
+        if isinstance(project_action, qtw.QAction):
+            project_action.setIcon(qtg.QIcon(PROJECT_WORKFLOW_WIZARD_ICON))
+
     if include_page_wizard and not isinstance(existing_page_action, qtw.QAction):
         page_action = qtw.QAction("Page Workflow Wizard", window)
         page_action.setObjectName(page_action_name)
@@ -1269,6 +1278,11 @@ def install_workflow_wizard_menu_actions(
         existing_page_action.setEnabled(True)
         _attach_action_to_menu_only(window, target_menu, existing_page_action)
         setattr(window, page_action_name, existing_page_action)
+
+    if include_page_wizard:
+        page_action = getattr(window, page_action_name, None)
+        if isinstance(page_action, qtw.QAction):
+            page_action.setIcon(qtg.QIcon(PAGE_WORKFLOW_WIZARD_ICON))
 
     if not include_page_wizard and isinstance(existing_page_action, qtw.QAction):
         _detach_action_from_all_menus(window, existing_page_action)

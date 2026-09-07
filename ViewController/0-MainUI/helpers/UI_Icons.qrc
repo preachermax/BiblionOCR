@@ -383,6 +383,9 @@
   </qresource>
   <qresource prefix="Icons/">
     <file>Icons/stage.png</file>
+    <file>Icons/wand.png</file>
+    <file>Icons/wand2.png</file>
+    <file>Icons/wizard-hat.png</file>
     <file>Icons/BiblionLexer2.png</file>
   </qresource>
 </RCC>
