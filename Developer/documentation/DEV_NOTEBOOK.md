@@ -28,6 +28,28 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-06 Help System Source Workflow Reflow
+
+* Scope summary: reflowed MyServer and MyPixler help to document the five-step project wizard, threaded PDF/TIFF preparation, project-local source/provenance storage, and shared source-reader behavior.
+* Touched files:
+  * `ViewController/0-MainUI/helpers/HelpSystem.py`
+  * `tests/test_help_system_content.py`
+  * `Developer/documentation/DEV_NOTEBOOK.md`
+* Validation gates:
+  * problems/lint: pass; full-workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass via `python3 -m py_compile ViewController/0-MainUI/helpers/HelpSystem.py`.
+  * focused tests: pass; `2 passed` for help contracts and `13 passed` for help/launcher integrations.
+  * full tests: pass; first-half files passed individually (`67 tests`) and second batch passed (`109 tests, 41 subtests`), totaling `176 tests, 41 subtests`.
+  * visual: pass; offscreen MyServer Help rendering is readable in the existing tabbed layout.
+  * UI lock-step: not applicable; no Designer source or generated UI module changed.
+  * whitespace: pass via `git diff --check`.
+* Commit exclusions:
+  * `Model/Project/Data/json/Session.json` and `Model/Project/Data/json/ReaderSession.json` remain uncommitted runtime state.
+* Unresolved blockers/risks:
+  * the combined first-half pytest process encountered the known mixed-PyQt5/PyQt6 native lifetime segfault; every file in that batch passed in a fresh process.
+* Next immediate action:
+  * await maintainer review or an explicit commit/sync request for this help-only change set.
+
 ### Session Handoff - 2026-09-06 Source Reader And Project Creation
 
 * Scope summary: completed PDF/multipage-TIFF source ingestion, project-local source and provenance storage, a Designer-backed five-step New Project wizard, and responsive threaded source-reader initialization with progress feedback.

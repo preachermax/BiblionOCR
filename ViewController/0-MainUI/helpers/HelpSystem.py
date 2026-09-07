@@ -227,22 +227,26 @@ See also: MyBoxerUI.py, MyGrounder.py, MyTrainer.py
         'description': '''Image Viewer and Processor
 
 MyPixler is a general-purpose image viewer and processor for the BiblionOCR pipeline.
-It provides image inspection, transformation, and analysis tools.
+It provides image inspection, transformation, and analysis tools alongside a shared
+read-only source-document reference view.
 
 FEATURES:
 • Display TIFF and standard image formats
 • Multi-page TIFF stack navigation
+• Display the active project's PDF or multipage TIFF source document
+• Dock, float, hide, and reopen the shared Source Document Viewer
+• Restore the active project source document at startup when available
 • Image transformation tools (rotate, crop, scale)
 • Histogram and analysis tools
 • Color space conversions
 • Real-time effects and filters
 
 PRIMARY WORKFLOW:
-1. Load image or TIFF stack
-2. Navigate pages
-3. Apply transformations as needed
-4. Export processed images
-5. Use for quality inspection
+1. Open an active project with a registered PDF or TIFF source
+2. Use Display Source Document to inspect the protected source beside working images
+3. Load a working image or TIFF stack for preprocessing
+4. Navigate pages and apply transformations as needed
+5. Export processed images and continue the page workflow
 
 KEY SHORTCUTS:
 • Ctrl+O: Open image
@@ -259,11 +263,17 @@ TOOLBAR:
 • Export button
 
 USES IN PIPELINE:
+• Compare working pages against the original PDF or multipage TIFF
 • Preview OCR results
 • Inspect document quality
 • Validate image processing
 • Check page alignment
 • Hand off page images into MyBoxer for line and ground-truth preprocessing
+
+SOURCE DOCUMENT NOTES:
+• The source reader is for reference; image-processing commands operate on working files
+• PDF and multipage TIFF sources use the same reader controls and project metadata
+• Source visibility can be toggled without unloading the active project
 
 See also: MyBoxer, MyGrounder
 ''',
@@ -273,6 +283,13 @@ LOADING IMAGES:
 1. File > Open or Ctrl+O
 2. Select image file
 3. Navigate pages with slider/buttons
+
+VIEWING THE PROJECT SOURCE:
+1. Open a project that has a registered PDF or multipage TIFF source
+2. Choose Display Source Document
+3. Navigate source pages with the reader page controls
+4. Use Fit Width or a fixed zoom level for comparison
+5. Dock, float, hide, or reopen the reader without changing the working image
 
 IMAGE VIEWING:
 • Pan: Click and drag
@@ -1283,9 +1300,12 @@ WORKFLOW ENTRY NOTES:
     image loading, OCR-adjacent workflows, and developer-mode entry points.
 
 FEATURES:
-    • Project creation and project-opening workflows
+    • Five-step project creation and project-opening workflows
+    • Optional PDF or multipage TIFF source-document registration
+    • Responsive source preparation with visible loading progress
+    • Shared docked or floating Source Document Viewer
     • Shared scanner workflow integration
-    • PDF/TIFF extraction and conversion dialogs
+    • PDF/TIFF extraction and conversion workflows
     • Launch points into downstream modules such as MyPixler, MyScanner, and MyBoxer
     • Session-backed path and workflow restore
     • Developer menu entry for Runtime Inspector / Developer Services
@@ -1293,13 +1313,16 @@ FEATURES:
 PRIMARY WORKFLOW:
 1. Open MyServer
     2. Create or open a project
-    3. Load or acquire source material
+    3. Load, register, or acquire source material
     4. Route work into the appropriate module or dialog
     5. Continue through the OCR and review pipeline
 
 KEY FUNCTIONS:
     • Create projects from the managed project structure
     • Open project folders rooted under the user Projects directory
+    • Copy PDF and TIFF sources into their type-specific project folders
+    • Preserve imported provenance files under their original filenames
+    • Detect source page counts and open the source reader without blocking the wizard
     • Launch and coordinate scanner acquisition workflows
     • Open images directly into MyPixler when editing is required
     • Hand off line and ground-truth preprocessing into MyBoxer instead of running that slice locally
@@ -1320,6 +1343,9 @@ USES IN PIPELINE:
 
     CURRENT NOTES:
     • Project creation logic is moving into the Core engine rather than staying in UI code.
+    • New Project uses RIS import, project details, project settings, milestones, and project folders.
+    • Large source documents are prepared in a worker thread; progress remains visible in the wizard.
+    • The Source Document Viewer supports PDF and multipage TIFF reference documents.
     • MyServer and MyScanner share the same scanner workflow services.
     • MyBoxer now owns the migrated Greek/Latin line preprocessing and box-preparation tasks.
     • The Runtime Inspector is available through the Developer menu when enabled.
@@ -1338,9 +1364,18 @@ STARTING MYSERVER:
 
     PROJECT CREATION:
     1. Start the new-project workflow
-    2. Review the normalized project name and provenance fields
-    3. Import RIS or other metadata only when useful
-    4. Confirm project creation into the user Projects area
+    2. Optionally import RIS, JSON, TXT, or CSV provenance metadata
+    3. Enter project details and optionally load a PDF or multipage TIFF source
+    4. Wait for source metadata and the first reader page while progress is displayed
+    5. Review project settings, milestones, and scoped project folders
+    6. Confirm project creation into the user Projects area
+
+    SOURCE DOCUMENT STORAGE:
+    • PDF: Model/Project/Images/MyServer/source_images/pdf_acq_src_image
+    • TIFF: Model/Project/Images/MyServer/source_images/tif_acq_src_image
+    • Imported provenance: Model/Project/Images/MyServer/source_images/provenance
+    • The copied provenance file keeps its original filename
+    • Display Source Document reopens the active project's registered source
 
     SCANNING AND IMAGE INTAKE:
     1. Start the shared scan workflow when acquiring new images
