@@ -65,6 +65,10 @@ A known failure must remain visible. Repair it before selecting Pass, or leave t
 
 UI changes must preserve the production Designer/generated/runtime lockstep even though Developer.py and developer_help.py themselves are hand-maintained exceptions.
 
+TERMINOLOGY STANDARD
+
+Consult Developer/documentation/BIBLIONOCR_NOMENCLATURE.md when a module, workflow, process, stage, state field, product, or generated artifact is named informally or ambiguously. Recognized aliases and misspellings help interpret intent, but committed code, UI text, help, tests, commits, and PR evidence must use the canonical term. Ask for clarification when different interpretations would materially change behavior or scope.
+
 PR SUBMISSION REQUIREMENTS
 
 1. Resolve every gate until the wizard reports PR ELIGIBLE.
@@ -136,6 +140,8 @@ OWNERSHIP
 Developer/Developer.py owns the wizard, workflow record, Copilot brief, and report generation.
 
 Developer/developer_help.py owns this help content and dialog. The developer UI is hand-maintained and intentionally exempt from the production Designer/generated UI lock-step rule.
+
+Developer/documentation/BIBLIONOCR_NOMENCLATURE.md owns preferred contributor-facing names and recognized aliases. Domain meanings remain governed by docs/development/DESIGN_SPECIFICATION.md, and implementation status remains governed by the architectural truth table.
 
 MAINTENANCE CONTRACT
 

@@ -10,6 +10,7 @@ Operational documents used during module development live in `Developer/document
 - [Development Routine Checklist](documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md)
 - [Development Routine Playbook](documentation/DEVELOPMENT_ROUTINE_PLAYBOOK.md)
 - [Development Notebook](documentation/DEV_NOTEBOOK.md)
+- [BiblionOCR Project Nomenclature](documentation/BIBLIONOCR_NOMENCLATURE.md)
 - [BiblionOCR Qt 6 Migration Strategy](documentation/BIBLIONOCR_QT6_MIGRATION_STRATEGY.md)
 
 ## Human Developer Workflow
@@ -29,6 +30,8 @@ Windows:
 ```
 
 The wizard preserves freedom over design, implementation, and Copilot collaboration. It requires developers to define the goal, anchor the investigation in evidence, state a falsifiable hypothesis, bound the change set, and choose the smallest appropriate validation.
+
+Before naming modules, workflows, state, products, or generated artifacts, consult the [BiblionOCR Project Nomenclature](documentation/BIBLIONOCR_NOMENCLATURE.md). Informal language and recognized misspellings may be interpreted during collaboration, but committed code, UI text, documentation, tests, commits, and PR evidence must use canonical terminology.
 
 ### Mandatory Pre-PR Requirements
 

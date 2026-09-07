@@ -18,6 +18,7 @@ from Developer.developer_help import DEVELOPER_HELP, DeveloperHelpDialog, get_ab
 
 
 ROOT = Path(__file__).resolve().parents[1]
+NOMENCLATURE_PATH = ROOT / "Developer" / "documentation" / "BIBLIONOCR_NOMENCLATURE.md"
 
 
 def _record() -> WorkflowRecord:
@@ -49,6 +50,7 @@ def test_copilot_brief_contains_design_and_validation_context():
     assert "## Local Hypothesis" in brief
     assert "The stale root is selected before project state loads" in brief
     assert "run the focused validation immediately after the first substantive edit" in brief
+    assert "BIBLIONOCR_NOMENCLATURE.md" in brief
     assert "Do not commit or push unless explicitly requested" in brief
 
 
@@ -125,6 +127,38 @@ def test_help_content_covers_workflow_copilot_and_maintenance():
     for gate in PR_GATE_DEFINITIONS:
         assert gate.label in DEVELOPER_HELP["requirements"]
     assert "See the repository LICENSE file" in get_about_html()
+
+
+def test_nomenclature_defines_canonical_terms_and_is_linked_from_developer_docs():
+    nomenclature = NOMENCLATURE_PATH.read_text(encoding="utf-8")
+    developer_readme = (ROOT / "Developer" / "README.md").read_text(encoding="utf-8")
+    checklist = (
+        ROOT / "Developer" / "documentation" / "DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md"
+    ).read_text(encoding="utf-8")
+
+    for required_term in (
+        "Input may be informal; committed output must use canonical terminology.",
+        "BiblionOCR",
+        "MyServer",
+        "MyScanner",
+        "BiblionScanner",
+        "Project Workflow Wizard",
+        "Page Workflow Wizard",
+        "current project page",
+        "UI lockstep",
+        "GitHub Copilot",
+        "ODS authority",
+        "CSV authority",
+        "active workflow definition",
+        "project root",
+        "repository root",
+        "PR ELIGIBLE",
+        "commit-worthy Developer content",
+    ):
+        assert required_term in nomenclature
+    assert "lock-tain" in nomenclature
+    assert "BIBLIONOCR_NOMENCLATURE.md" in developer_readme
+    assert "BIBLIONOCR_NOMENCLATURE.md" in checklist
 
 
 def test_wizard_exposes_production_style_help():

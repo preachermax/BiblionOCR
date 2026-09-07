@@ -28,6 +28,29 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-07 Project Nomenclature
+
+* Scope summary: added a canonical contributor-facing nomenclature and ambiguity guide, then integrated it into the Developer workflow wizard, help, README, checklist, playbook, and synchronization tests.
+* Intended commit scope:
+  * `Developer/Developer.py`
+  * `Developer/README.md`
+  * `Developer/developer_help.py`
+  * `Developer/documentation/BIBLIONOCR_NOMENCLATURE.md`
+  * `Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md`
+  * `Developer/documentation/DEVELOPMENT_ROUTINE_PLAYBOOK.md`
+  * `Developer/documentation/DEV_NOTEBOOK.md`
+  * `tests/test_developer_workflow_wizard.py`
+* Explicit commit exclusions: runtime `ReaderSession.json` and `Session.json` changes and the four untracked wizard icon candidates remain local and uncommitted.
+* Validation gates:
+  * Problems/lint: in-scope Problems `0`; full-workspace Problems `7`, all pre-existing MD032/MD034 findings in unchanged `docs/README.md`.
+  * compile: `Developer/Developer.py`, `Developer/developer_help.py`, and `tests/test_developer_workflow_wizard.py` passed `.venv/bin/python -m py_compile`.
+  * focused tests: `tests/test_developer_workflow_wizard.py` and `tests/test_update_ui_resources.py` passed, `11 passed`.
+  * whitespace: `git diff --check` passed.
+  * production UI lockstep, runtime smoke, launcher smoke, and manual UI checks: not applicable because this change modifies contributor documentation, Developer-only wizard guidance, and tests without changing production UI or runtime behavior.
+  * architecture-normalization lane: not applicable; nomenclature owns canonical names and aliases but does not alter architectural implementation-status claims.
+* Unresolved blockers/risks: the unchanged central documentation index retains seven pre-existing Markdown diagnostics; canonical terminology will require normal maintenance as project vocabulary evolves.
+* Next immediate action: resume the user-led aesthetic modifications after the nomenclature commit is synchronized.
+
 ### Session Handoff - 2026-09-07 MyScanner Product 1 Decision
 
 * Scope summary: designated MyScanner as BiblionOCR's first active productization track while retaining explicit technical-preview and supported-release gates; included the current Designer UI refinements and MyPixler canonical workflow-definition fix in the ensuing commit cycle.

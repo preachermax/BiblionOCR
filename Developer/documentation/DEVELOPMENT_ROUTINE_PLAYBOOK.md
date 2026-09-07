@@ -138,6 +138,9 @@ When behavior changes, update:
 1. Help text shown in UI/HelpSystem.
 2. Development notes/checklists used by maintainers.
 3. Any policy doc affected by architectural decisions.
+4. `Developer/documentation/BIBLIONOCR_NOMENCLATURE.md` when a canonical term, recurring alias, or ambiguity boundary changes.
+
+Treat informal wording as input to interpret, not wording to reproduce automatically. Use canonical nomenclature in committed artifacts, and ask for clarification only when different readings would materially alter the implementation.
 
 ## 9) Definition of Done
 

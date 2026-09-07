@@ -111,7 +111,7 @@ PR_GATE_DEFINITIONS = (
     GateDefinition(
         "documentation",
         "Behavior, help, and development documentation are synchronized",
-        "List updated documentation, or justify why the change has no documentation impact.",
+        "List updated documentation and confirm canonical nomenclature, or justify why the change has no documentation impact.",
         True,
     ),
     GateDefinition(
@@ -147,7 +147,9 @@ def build_copilot_brief(record: WorkflowRecord) -> str:
             "Act as a design and implementation partner. Inspect the concrete anchor first, state any changed "
             "assumptions, keep edits within the intended scope, preserve unrelated worktree changes, and run the "
             "focused validation immediately after the first substantive edit. Continue through implementation, "
-            "verification, and a concise handoff. Do not commit or push unless explicitly requested.",
+            "verification, and a concise handoff. Interpret informal wording through "
+            "Developer/documentation/BIBLIONOCR_NOMENCLATURE.md and use canonical terms in committed output. "
+            "Do not commit or push unless explicitly requested.",
         )
     ) + "\n"
 

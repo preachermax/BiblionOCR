@@ -21,6 +21,7 @@ Current collaboration protocol (2026-08-07):
 5. Commits and sync are performed only when the user explicitly requests commit/sync for that cycle.
 6. Human developers must launch `.venv/bin/python -m Developer.Developer` to guide scope, evidence, implementation, validation, and handoff while using Copilot as a design partner before opening a PR.
 7. `Developer/Developer.py` is a developer-only, hand-maintained interface and is exempt from the Designer/generated UI lock-step rule.
+8. Interpret informal or misspelled requests through `Developer/documentation/BIBLIONOCR_NOMENCLATURE.md`; use canonical terminology in committed code, UI text, documentation, tests, commits, and PR evidence.
 
 Current architecture-normalization protocol (2026-08-07):
 
@@ -54,6 +55,7 @@ git status --short
 5. If whitespace normalization is required, isolate it to a dedicated commit and state why.
 6. If the user excludes a module/file from scope, do not include it in default/handoff priority lists.
 7. When this checklist changes its development phases, validation gates, or handoff requirements, review and update `Developer/Developer.py` and `Developer/developer_help.py` in the same change set.
+8. Ask for terminology clarification only when plausible interpretations would materially change behavior, ownership, data, or scope.
 
 ## C) UI Lock-Step Rule
 
