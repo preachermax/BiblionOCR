@@ -1,10 +1,10 @@
 # Project Creation Architecture
 
-## Version 1.4 — ProjectFolderList Runtime Contract
+## Version 1.5 — Source Document And Provenance Contract
 
 **Status:** Active implementation contract
-**Scope:** MyServer, Core project engine, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation
-**Last updated:** 2026-07-04
+**Scope:** MyServer, Core project engine, source documents, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation
+**Last updated:** 2026-09-06
 
 ---
 
@@ -27,9 +27,11 @@ Temporary implementation note:
 
 * `MyServer.py` still contains local Core-style project creation classes.
 * Long-term target is to make `Core/engine.py` the single source of truth and reduce `MyServer.py` to UI/controller wiring.
-* The current `MyServer` entry path now uses a guided three-step modal dialog instead of chained text prompts.
+* The current `MyServer` entry path uses a guided five-step modal dialog instead of chained text prompts: RIS import, project details, project settings, milestones, and project folders.
 * New project dialogs should follow the same stacked-label, direct-action format already used by existing BiblionOCR custom dialogs.
 * The dialog supports optional loading of user-provided provenance files in `json`, `ris`, `txt`, or `csv` format to prefill required provenance fields before project creation starts.
+* The project-details step accepts an optional PDF or multipage TIFF source document. The selected path is displayed immediately, and source metadata plus the first reader page are prepared in a managed `QThread` with visible progress so large files do not block the wizard event loop.
+* `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui` is the editable wizard shell. `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py` must be regenerated from it and must not be edited independently.
 * The dialog now includes a dedicated folder-selection step that switches between scripture-specific and general folder pages based on the project type. The default selections are pre-populated so the end user can proceed with the default choices without changing anything.
 * The selected folder list is carried forward as `SelectedProjectFolders` in the project creation payload and used by `Core/engine.py` when generating the manifest and project structure.
 * The provenance file picker now opens from the user Projects root rather than defaulting to `Downloads`.
@@ -62,6 +64,17 @@ A valid project should include:
 ```
 
 The full `Model/Project/...` and `ViewController/...` directory tree is derived from `ProjectFolderList.txt`.
+
+Source-document placement is type-specific:
+
+```text
+Model/Project/Images/MyServer/source_images/
+├── pdf_acq_src_image/   # PDF sources
+├── tif_acq_src_image/   # .tif and .tiff sources
+└── provenance/          # imported RIS/JSON/TXT/CSV source metadata
+```
+
+The copied provenance file retains its original basename. Project metadata records the copied project-local provenance path rather than the external import path. Source-document discovery keeps the existing PDF-named helper APIs as compatibility wrappers while the shared implementation supports both PDF and TIFF.
 
 Manifest curation rules for new-project generation:
 
@@ -129,7 +142,7 @@ UI collection notes:
 * `project_name`, `project_purpose`, and `user_intent_summary` remain required before creation starts.
 * `creation_trigger` and `source_context` default to `MyServer_button` and `MyServer_UI` but may be overridden by a loaded RIS file.
 * `creator` is optional and is preserved when present in a loaded RIS file.
-* Current UI flow: RIS import step, then project details and review step.
+* Current UI flow: RIS import, project details, project settings, milestones, then project folders and final review.
 * Required fields should show in-dialog validation cues and block final submission until the payload is complete.
 * Imported provenance metadata should be preserved in the final project RIS payload under source-provenance fields when available.
 * Project name normalization should be visible inside the dialog before submission so the final folder name is not a surprise.

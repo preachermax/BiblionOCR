@@ -13,9 +13,11 @@ from Core.myexplorer_picker import run_myexplorer_selection
 from Core.project_database import build_project_field_definitions
 from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 try:
-    from helpers.pdf_viewer_dialog import PdfViewerDialog
+    from helpers.ProjectCreationWizardDialogUI import Ui_ProjectCreationWizardDialog
+    from helpers.pdf_viewer_dialog import PdfViewerDialog, SourceDocumentLoadWorker
 except ModuleNotFoundError:
-    from pdf_viewer_dialog import PdfViewerDialog
+    from ProjectCreationWizardDialogUI import Ui_ProjectCreationWizardDialog
+    from pdf_viewer_dialog import PdfViewerDialog, SourceDocumentLoadWorker
 
 
 class ProjectCreationWizardDialog(qtw.QDialog):
@@ -123,10 +125,17 @@ class ProjectCreationWizardDialog(qtw.QDialog):
     def __init__(self, projects_base_path, parent=None):
         super().__init__(parent)
         self.projects_base_path = projects_base_path
-        self.setWindowTitle("New Project")
+        self.ui = Ui_ProjectCreationWizardDialog()
+        self.ui.setupUi(self)
         self.setModal(True)
-        self.resize(640, 420)
-        self.setSizeGripEnabled(True)
+        self.page_title_label = self.ui.page_title_label
+        self.page_stack = self.ui.page_stack
+        self.back_button = self.ui.back_button
+        self.next_button = self.ui.next_button
+        self.cancel_button = self.ui.cancel_button
+        self.create_button = self.ui.create_button
+        self.source_load_status_label = self.ui.source_load_status_label
+        self.source_load_progress_bar = self.ui.source_load_progress_bar
         self._page_titles = [
             "Step 1 of 5: RIS import",
             "Step 2 of 5: Project details",
@@ -158,6 +167,9 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         self.project_db_table = None
         self.milestones_table = None
         self.handshake_table = None
+        self.source_document_viewer = None
+        self.source_load_thread = None
+        self.source_load_worker = None
         self._build_ui()
         self._update_page_state()
 
@@ -171,21 +183,6 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         return scroll
 
     def _build_ui(self):
-        layout = qtw.QVBoxLayout(self)
-        layout.setSpacing(10)
-
-        intro_label = qtw.QLabel(
-            "Create a new project from the current trimmed manifest. You can also load provenance from JSON, RIS, TXT, or CSV before creation starts."
-        )
-        intro_label.setWordWrap(True)
-        layout.addWidget(intro_label)
-
-        self.page_title_label = qtw.QLabel("")
-        layout.addWidget(self.page_title_label)
-
-        self.page_stack = qtw.QStackedWidget(self)
-        layout.addWidget(self.page_stack, 1)
-
         ris_page = qtw.QWidget()
         ris_layout = qtw.QVBoxLayout(ris_page)
         ris_layout.setSpacing(10)
@@ -274,14 +271,14 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         details_layout.addWidget(self.project_purpose_label)
         details_layout.addWidget(self.project_purpose_edit)
 
-        source_document_label = qtw.QLabel("Source image document (optional)")
+        source_document_label = qtw.QLabel("Source document (PDF or TIFF, optional)")
         details_layout.addWidget(source_document_label)
         source_document_row = qtw.QHBoxLayout()
         self.source_document_edit = qtw.QLineEdit()
         self.source_document_edit.setReadOnly(True)
-        self.source_document_edit.setPlaceholderText("No PDF source selected")
+        self.source_document_edit.setPlaceholderText("No PDF or TIFF source selected")
         source_document_row.addWidget(self.source_document_edit, 1)
-        self.source_document_button = qtw.QPushButton("Load Source Image")
+        self.source_document_button = qtw.QPushButton("Load Source Document")
         self.source_document_button.clicked.connect(self._browse_for_source_document)
         source_document_row.addWidget(self.source_document_button)
         self.view_source_document_button = qtw.QPushButton("View")
@@ -334,10 +331,12 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         page_model_layout.addWidget(qtw.QLabel("UI Font"), 3, 0)
         self.ui_font_combo = qtw.QFontComboBox()
+        self.ui_font_combo.setObjectName("ui_font_combo")
         page_model_layout.addWidget(self.ui_font_combo, 3, 1)
         self._configure_ui_font_selector()
 
         self.column_config_group = qtw.QGroupBox("Column language and name editor")
+        self.column_config_group.setObjectName("column_config_group")
         self.column_config_layout = qtw.QGridLayout(self.column_config_group)
         self.column_config_layout.addWidget(qtw.QLabel("Column"), 0, 0)
         self.column_config_layout.addWidget(qtw.QLabel("Column name"), 0, 1)
@@ -360,11 +359,11 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self.column_config_layout.addWidget(language_combo, row, 2)
             self._column_language_combos.append(language_combo)
 
-        page_model_layout.addWidget(self.column_config_group, 3, 0, 1, 2)
+        page_model_layout.addWidget(self.column_config_group, 4, 0, 1, 2)
 
         self.column_preview_label = qtw.QLabel("")
         self.column_preview_label.setWordWrap(True)
-        page_model_layout.addWidget(self.column_preview_label, 4, 0, 1, 2)
+        page_model_layout.addWidget(self.column_preview_label, 5, 0, 1, 2)
         details_layout.addWidget(page_model_group)
 
         self.user_intent_label = qtw.QLabel("User intent summary")
@@ -522,24 +521,10 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
         self.page_stack.addWidget(self._make_scroll_page(folder_selection_page))
 
-        button_row = qtw.QHBoxLayout()
-        self.back_button = qtw.QPushButton("Back")
         self.back_button.clicked.connect(self._go_back)
-        button_row.addWidget(self.back_button)
-
-        self.next_button = qtw.QPushButton("Next")
         self.next_button.clicked.connect(self._go_next)
-        button_row.addWidget(self.next_button)
-
-        button_row.addStretch(1)
-        self.cancel_button = qtw.QPushButton("Cancel")
         self.cancel_button.clicked.connect(self.reject)
-        button_row.addWidget(self.cancel_button)
-
-        self.create_button = qtw.QPushButton("Create Project")
         self.create_button.clicked.connect(self._attempt_accept)
-        button_row.addWidget(self.create_button)
-        layout.addLayout(button_row)
 
         self.project_name_edit.textChanged.connect(self._update_validation_state)
         self.project_purpose_edit.textChanged.connect(self._update_validation_state)
@@ -1221,16 +1206,20 @@ class ProjectCreationWizardDialog(qtw.QDialog):
             self.projects_base_path,
             "file",
         )
-        if path:
-            source_path = os.path.abspath(path)
-            try:
-                viewer = PdfViewerDialog(source_path, self)
-                self._set_detected_source_page_count(viewer.page_count)
-                viewer.exec_()
-            except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
-                qtw.QMessageBox.warning(self, "Source PDF", f"Could not display the source document.\n\n{exc}")
-                return
-            self.source_document_edit.setText(source_path)
+        if not path:
+            return
+
+        source_path = os.path.abspath(path)
+        if os.path.splitext(source_path)[1].lower() not in {".pdf", ".tif", ".tiff"}:
+            qtw.QMessageBox.warning(
+                self,
+                "Source Document",
+                "Select a PDF or multi-page TIFF source document.",
+            )
+            return
+
+        self.source_document_edit.setText(source_path)
+        self._view_selected_source_document()
 
     def _clear_source_document(self):
         self.source_document_edit.clear()
@@ -1247,13 +1236,102 @@ class ProjectCreationWizardDialog(qtw.QDialog):
     def _view_selected_source_document(self):
         source_path = self.source_document_edit.text().strip()
         if not source_path:
-            qtw.QMessageBox.information(self, "Source PDF", "Select a source document first.")
+            qtw.QMessageBox.information(self, "Source Document", "Select a source document first.")
             return
+        self._start_source_document_load(source_path)
+
+    def _start_source_document_load(self, source_path):
+        if self.source_load_thread is not None:
+            return False
+
+        self.source_load_progress_bar.setValue(0)
+        self.source_load_progress_bar.show()
+        self.source_load_status_label.setText("Preparing source document...")
+        self.source_load_status_label.show()
+        self._set_source_load_controls_enabled(False)
+
+        thread = qtc.QThread(self)
+        worker = SourceDocumentLoadWorker(source_path)
+        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.progress.connect(self._on_source_load_progress)
+        worker.loaded.connect(self._on_source_document_loaded)
+        worker.failed.connect(self._on_source_document_load_failed)
+        worker.loaded.connect(thread.quit)
+        worker.failed.connect(thread.quit)
+        worker.loaded.connect(worker.deleteLater)
+        worker.failed.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(self._on_source_load_thread_finished)
+        self.source_load_thread = thread
+        self.source_load_worker = worker
+        thread.start()
+        return True
+
+    def _set_source_load_controls_enabled(self, enabled):
+        self.source_document_button.setEnabled(enabled)
+        self.view_source_document_button.setEnabled(enabled)
+        self.clear_source_document_button.setEnabled(enabled)
+        self.cancel_button.setEnabled(enabled)
+
+    def _on_source_load_progress(self, value, message):
+        self.source_load_progress_bar.setValue(int(value))
+        self.source_load_status_label.setText(str(message))
+
+    def _on_source_document_loaded(self, source_path, page_count, image_path):
         try:
-            viewer = PdfViewerDialog(source_path, self)
-            viewer.exec_()
+            viewer = PdfViewerDialog(
+                source_path,
+                self,
+                preloaded_page_count=page_count,
+                preloaded_image_path=image_path,
+            )
+            self._set_detected_source_page_count(page_count)
+            viewer.setAttribute(qtc.Qt.WA_DeleteOnClose, True)
+            viewer.show()
+            self.source_document_viewer = viewer
+            self.source_load_progress_bar.setValue(100)
+            self.source_load_status_label.setText("Source document ready.")
         except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
-            qtw.QMessageBox.warning(self, "Source PDF", f"Could not display the source document.\n\n{exc}")
+            self._on_source_document_load_failed(str(exc))
+        finally:
+            try:
+                os.remove(image_path)
+            except OSError:
+                pass
+
+    def _on_source_document_load_failed(self, message):
+        self.source_load_status_label.setText("Source document could not be loaded.")
+        qtw.QMessageBox.warning(
+            self,
+            "Source Document",
+            f"Could not display the source document.\n\n{message}",
+        )
+
+    def _on_source_load_thread_finished(self):
+        self.source_load_thread = None
+        self.source_load_worker = None
+        self._set_source_load_controls_enabled(True)
+        qtc.QTimer.singleShot(1500, self._hide_source_load_progress)
+
+    def _hide_source_load_progress(self):
+        if self.source_load_thread is not None:
+            return
+        self.source_load_progress_bar.hide()
+        self.source_load_status_label.hide()
+
+    def reject(self):
+        if self.source_load_thread is not None:
+            self.source_load_status_label.setText("Wait for the source document to finish loading.")
+            return
+        super().reject()
+
+    def closeEvent(self, event):
+        if self.source_load_thread is not None:
+            self.source_load_status_label.setText("Wait for the source document to finish loading.")
+            event.ignore()
+            return
+        super().closeEvent(event)
 
     def _clear_ris(self):
         self.ris_path_edit.clear()

@@ -16,7 +16,11 @@ from .project_tracking import ProjectWorkflowTracker
 from .event_bus import normalize_event
 from .ris import capture_provenance as capture_ris_provenance
 from .ris import finalize_ris
-from .source_documents import copy_pdf_source_readonly, project_pdf_source_path
+from .source_documents import (
+    copy_provenance_file,
+    copy_source_document_readonly,
+    project_source_document_path,
+)
 
 
 PAGE_WORKFLOW_STAGES = (
@@ -79,6 +83,7 @@ class ProjectCreationEngine:
         "Model/Project/Images/MyServer/source_images/pdf_combined_src_images",
         "Model/Project/Images/MyServer/source_images/tif_acq_src_image",
         "Model/Project/Images/MyServer/source_images/tif_combined_src_images",
+        "Model/Project/Images/MyServer/source_images/provenance",
         "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
         "Model/Project/Images/MyScanner/scanned_images/tif_scan_src_image",
         *PAGE_WORKFLOW_FOLDERS,
@@ -186,7 +191,7 @@ class ProjectCreationEngine:
         filename = str(self.context.get("SourceImageDocumentName") or "").strip()
         if not filename:
             return ""
-        return project_pdf_source_path(
+        return project_source_document_path(
             os.path.join(self.base_path, self.context.get("project_name")),
             filename,
         )
@@ -240,6 +245,7 @@ class ProjectCreationEngine:
 
         self._create_project_structure(tmp)
         self._copy_source_image_document(tmp)
+        self._copy_source_provenance(tmp)
         self._initialize_project_databases(tmp)
         self._write_git_support_files(tmp)
 
@@ -252,8 +258,21 @@ class ProjectCreationEngine:
         source_path = str(self.context.get("SourceImageDocument") or "").strip()
         if not source_path:
             return ""
-        destination_path = copy_pdf_source_readonly(source_path, project_path)
+        destination_path = copy_source_document_readonly(source_path, project_path)
         self.context["SourceImageDocumentName"] = os.path.basename(destination_path)
+        return destination_path
+
+    def _copy_source_provenance(self, project_path):
+        provenance_path = str(self.context.get("source_provenance_path") or "").strip()
+        if not provenance_path:
+            return ""
+        destination_path = copy_provenance_file(provenance_path, project_path)
+        final_project_root = os.path.join(self.base_path, self.context.get("project_name"))
+        final_path = os.path.join(
+            final_project_root,
+            os.path.relpath(destination_path, project_path),
+        )
+        self.context["source_provenance_path"] = final_path
         return destination_path
 
     # -----------------------
@@ -819,7 +838,13 @@ class ProjectCreationEngine:
             "ProjectDatabase": self.context.get("ProjectDatabase") or self.context.get("project_database") or "",
             "ProjectType": self.context.get("ProjectType", "Scriptural"),
             "ScripturalSource": self.context.get("ScripturalSource", "both"),
-            "SourceType": "PDF" if source_document_path else self.context.get("SourceType", "Scan"),
+            "SourceType": (
+                "PDF"
+                if source_document_path.lower().endswith(".pdf")
+                else "TIFF"
+                if source_document_path
+                else self.context.get("SourceType", "Scan")
+            ),
             "SourceDocumentPath": source_document_path,
             "SourceDocumentDirectory": os.path.dirname(source_document_path) if source_document_path else "",
             "NumberPages": self.context.get("NumberPages", 0),

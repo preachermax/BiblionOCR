@@ -28,6 +28,32 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-06 Source Reader And Project Creation
+
+* Scope summary: completed PDF/multipage-TIFF source ingestion, project-local source and provenance storage, a Designer-backed five-step New Project wizard, and responsive threaded source-reader initialization with progress feedback.
+* Touched-file groups:
+  * `Core/engine.py` and `Core/source_documents.py` for transactional source/provenance copying and generic PDF/TIFF discovery.
+  * the three active `ProjectFolderList.txt` manifests for the project-local provenance folder.
+  * `ViewController/0-MainUI/MyServer.py`, `ViewController/0-MainUI/helpers/pdf_viewer_dialog.py`, and `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py` for source-reader integration and threaded preparation.
+  * `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui` and generated `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py` for the wizard shell and loading-progress controls.
+  * `ViewController/1-PreProcess/MyPixler.py`, `ViewController/1-PreProcess/MyGlypher.py`, and `ViewController/2-TrainTesseract/MyReader.py` for source-reader terminology and startup-session compatibility.
+  * `tests/test_pdf_source_workflow.py` and `docs/architecture/PROJECT_CREATION_ARCHITECTURE.md` for regression coverage and contract documentation.
+* Validation gates:
+  * problems/lint: pass; full-workspace Problems total `0` and in-scope Problems total `0`.
+  * compile: pass for every touched Python runtime, generated UI, and test file.
+  * UI lock-step: pass; temporary `pyuic5` regeneration matches the generated Python file byte-for-byte.
+  * tests: pass; source workflow `21 passed`; corrected policy/workflow set `45 passed`; split repository suite `65 passed` and `109 passed, 41 subtests passed`.
+  * manual UI checks: pass; maintainer confirmed RIS provenance deposit and OT/NT/both folder scoping, while offscreen inspection confirmed visible progress and clean separation between UI Font and the column editor.
+  * smoke: pass; canonical wizard preview instantiated successfully and all 14 Linux `run-my*.sh` launchers reached stable startup without traceback.
+  * whitespace: pass via `git diff --check`.
+* Commit exclusions:
+  * `Model/Project/Data/json/Session.json` is local Erasmus1519 runtime state and remains uncommitted.
+  * `Model/Project/Data/json/ReaderSession.json` was refreshed by launcher smoke testing and remains uncommitted runtime state.
+* Unresolved blockers/risks:
+  * native display confirmation of the final threaded progress interaction remains useful; automated Qt event-loop coverage verifies completion, progress, reader opening, and thread cleanup.
+* Next immediate action:
+  * stage intended files only, commit, push `ubuntu_development`, and verify local/remote revision parity.
+
 ### Session Path Correction - 2026-08-16
 
 * `Model/Project/Data/json` is the sole canonical session-file directory.

@@ -976,7 +976,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return ""
 
         source_file = str(getattr(self, "sourcefile", "") or "").strip()
-        if os.path.isfile(source_file) and os.path.splitext(source_file)[1].lower() == ".pdf":
+        if os.path.isfile(source_file) and os.path.splitext(source_file)[1].lower() in {".pdf", ".tif", ".tiff"}:
             absolute_source_file = os.path.abspath(source_file)
             try:
                 if os.path.commonpath((os.path.abspath(resolved_root), absolute_source_file)) == os.path.abspath(resolved_root):
@@ -992,7 +992,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             qtw.QMessageBox.information(
                 self,
                 "Display Source Document",
-                "The active project does not have a PDF source document.",
+                "The active project does not have a PDF or TIFF source document.",
             )
             return False
         return self._open_pdf_source(source_path, floating=False)
@@ -3063,14 +3063,14 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not project_root_path:
             qtw.QMessageBox.information(
                 self,
-                "Open PDF Source",
-                "Open or create a project before loading a PDF source document.",
+                "Open Source Document",
+                "Open or create a project before loading a PDF or TIFF source document.",
             )
             return ""
         try:
             return copy_pdf_source_readonly(source_path, project_root_path)
         except (OSError, ValueError) as exc:
-            qtw.QMessageBox.warning(self, "Open PDF Source", f"Could not save the PDF source document.\n\n{exc}")
+            qtw.QMessageBox.warning(self, "Open Source Document", f"Could not save the source document.\n\n{exc}")
             return ""
 
     @staticmethod
@@ -3140,7 +3140,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
             self.pdf_source_path = ""
             self.pdf_page_count = 0
-            qtw.QMessageBox.warning(self, "Open PDF Source", f"Could not display the PDF source document.\n\n{exc}")
+            qtw.QMessageBox.warning(self, "Open Source Document", f"Could not display the source document.\n\n{exc}")
             return False
         return True
 
@@ -3148,10 +3148,11 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         try:
             project_root_path = self._active_project_root_for_source()
             if not project_root_path:
-                raise ValueError("No active project is available for PDF metadata.")
+                raise ValueError("No active project is available for source metadata.")
             self.pdf_source_path = os.path.abspath(pdf_path)
+            source_type = "PDF" if self.pdf_source_path.lower().endswith(".pdf") else "TIFF"
             metadata_updates = {
-                "SourceType": "PDF",
+                "SourceType": source_type,
                 "SourceDocumentPath": self.pdf_source_path,
                 "SourceDocumentDirectory": os.path.dirname(self.pdf_source_path),
             }
@@ -3170,7 +3171,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             })
             self.view_source_document_action.setEnabled(True)
         except (OSError, ValueError, json.JSONDecodeError) as exc:
-            qtw.QMessageBox.warning(self, "PDF Source", f"Could not register the PDF source document.\n\n{exc}")
+            qtw.QMessageBox.warning(self, "Source Document", f"Could not register the source document.\n\n{exc}")
             return False
         return True
 

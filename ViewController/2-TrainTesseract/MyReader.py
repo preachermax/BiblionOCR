@@ -662,7 +662,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                         print(bookmarkdown,self.sourcebookmarkdown,self.greekbookmarkdown,self.latinbookmarkdown)
             f.close()
 
-            self.save_shared_session(**{
+            self.save_session_settings(**{
                 'self.bookabbr': self.bookabbr,
                 'self.sourcebookmarkdown': self.sourcebookmarkdown,
                 'self.greekbookmarkdown': self.greekbookmarkdown,
@@ -872,7 +872,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                     #json.dump(data, f, indent=2)
 
 
-                self.save_shared_session(**{
+                self.save_session_settings(**{
                     'self.imgpath': self.imgpath,
                     'self.imgdir': self.imgdir,
                 })
@@ -929,7 +929,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
         self.imgdir = os.path.dirname(imgfilename)
         self.ui.ImageLe.setText(filestr)
-        self.save_shared_session(**{
+        self.save_session_settings(**{
             'self.imgpath': self.imgpath,
             'self.imgdir': self.imgdir,
         })
@@ -1085,7 +1085,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
                 file.close()
 
-        self.save_shared_session(**{
+        self.save_session_settings(**{
             'self.txtpath': self.txtpath,
             'self.txtdir': self.txtdir,
         })

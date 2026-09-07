@@ -836,7 +836,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             qtw.QMessageBox.information(
                 self,
                 "Display Source Document",
-                "The active project does not have a PDF source document.",
+                "The active project does not have a PDF or TIFF source document.",
             )
             return False
         return self._open_pdf_source(source_path, floating=False)
@@ -923,8 +923,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.pdf_page_count = 0
             qtw.QMessageBox.warning(
                 self,
-                "Open PDF Source",
-                f"Could not display the PDF source document.\n\n{exc}",
+                "Open Source Document",
+                f"Could not display the source document.\n\n{exc}",
             )
             return False
         return True
@@ -1434,6 +1434,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 # Application Controllers
 
     # Workflow Controllers
+
     def actionextract_pdf(self):
         workflow_step = self._workflow_step_for_method("actionextract_pdf")
         workflow_source, complete_folder, _workflow_handshake = (

@@ -6,9 +6,91 @@ import subprocess
 import sys
 import tempfile
 
+from PIL import Image
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
+
+
+def _renderer_path():
+    return os.path.join(os.path.dirname(__file__), "qt_pdf_renderer.py")
+
+
+def _run_pdf_renderer(*arguments):
+    try:
+        return subprocess.run(
+            [sys.executable, _renderer_path(), *[str(argument) for argument in arguments]],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        detail = getattr(exc, "stderr", "") or str(exc)
+        if "PyQt6" in detail or "QtPdf" in detail:
+            detail = "QtPdf support requires PyQt6 6.10 or newer in the active Python environment."
+        raise RuntimeError(detail.strip()) from exc
+
+
+def _source_page_count(source_path):
+    extension = os.path.splitext(source_path)[1].lower()
+    if extension == ".pdf":
+        result = _run_pdf_renderer("metadata", source_path)
+        return int(json.loads(result.stdout).get("page_count", 0))
+    try:
+        with Image.open(source_path) as source_image:
+            return int(getattr(source_image, "n_frames", 1))
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"Could not read TIFF source document: {exc}") from exc
+
+
+def _render_source_page(source_path, page_index, render_width, output_path):
+    if os.path.splitext(source_path)[1].lower() == ".pdf":
+        _run_pdf_renderer("render", source_path, page_index, render_width, output_path)
+        return
+    try:
+        with Image.open(source_path) as source_image:
+            source_image.seek(page_index)
+            page_image = source_image.convert("RGBA")
+            if page_image.width != render_width:
+                render_height = max(1, round(page_image.height * render_width / page_image.width))
+                page_image = page_image.resize((render_width, render_height), Image.Resampling.LANCZOS)
+            page_image.save(output_path, format="PNG")
+    except (EOFError, OSError, ValueError) as exc:
+        raise ValueError(f"Could not render TIFF page {page_index + 1}: {exc}") from exc
+
+
+class SourceDocumentLoadWorker(qtc.QObject):
+    progress = qtc.pyqtSignal(int, str)
+    loaded = qtc.pyqtSignal(str, int, str)
+    failed = qtc.pyqtSignal(str)
+
+    def __init__(self, source_path, render_width=800):
+        super().__init__()
+        self.source_path = os.path.abspath(source_path)
+        self.render_width = max(200, int(render_width))
+
+    @qtc.pyqtSlot()
+    def run(self):
+        output_path = ""
+        try:
+            self.progress.emit(10, "Reading source document metadata...")
+            page_count = _source_page_count(self.source_path)
+            if page_count < 1:
+                raise ValueError("The source document contains no readable pages.")
+            self.progress.emit(45, f"Preparing page 1 of {page_count}...")
+            output_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            output_path = output_file.name
+            output_file.close()
+            _render_source_page(self.source_path, 0, self.render_width, output_path)
+            self.progress.emit(100, "Source document ready.")
+            self.loaded.emit(self.source_path, page_count, output_path)
+        except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            if output_path:
+                try:
+                    os.remove(output_path)
+                except OSError:
+                    pass
+            self.failed.emit(str(exc))
 
 
 class PdfViewerWidget(qtw.QWidget):
@@ -18,9 +100,12 @@ class PdfViewerWidget(qtw.QWidget):
 
     ZOOM_LEVELS = (25, 50, 75, 100, 125, 150, 175, 200)
 
-    def __init__(self, pdf_path, parent=None):
+    def __init__(self, pdf_path, parent=None, preloaded_page_count=None, preloaded_image_path=""):
         super().__init__(parent)
         self.pdf_path = os.path.abspath(pdf_path)
+        self.source_type = os.path.splitext(self.pdf_path)[1].lower()
+        if self.source_type not in {".pdf", ".tif", ".tiff"}:
+            raise ValueError("Source reader supports PDF and multi-page TIFF documents only.")
         self.page_count = 0
         self.page_index = 0
         self.zoom_percent = 100
@@ -130,32 +215,22 @@ class PdfViewerWidget(qtw.QWidget):
         self.scroll_area.setWidget(self.page_label)
         layout.addWidget(self.scroll_area, 1)
 
-        self._load_document()
+        if preloaded_page_count is None:
+            self._load_document()
+        else:
+            self._apply_loaded_page(int(preloaded_page_count), preloaded_image_path)
 
     @property
     def renderer_path(self):
-        return os.path.join(os.path.dirname(__file__), "qt_pdf_renderer.py")
+        return _renderer_path()
 
     def _run_renderer(self, *arguments):
-        try:
-            return subprocess.run(
-                [sys.executable, self.renderer_path, *[str(argument) for argument in arguments]],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except (OSError, subprocess.CalledProcessError) as exc:
-            detail = getattr(exc, "stderr", "") or str(exc)
-            if "PyQt6" in detail or "QtPdf" in detail:
-                detail = "QtPdf support requires PyQt6 6.10 or newer in the active Python environment."
-            raise RuntimeError(detail.strip()) from exc
+        return _run_pdf_renderer(*arguments)
 
     def _load_document(self):
-        result = self._run_renderer("metadata", self.pdf_path)
-        metadata = json.loads(result.stdout)
-        self.page_count = int(metadata.get("page_count", 0))
+        self.page_count = _source_page_count(self.pdf_path)
         if self.page_count < 1:
-            raise ValueError("The PDF contains no readable pages.")
+            raise ValueError("The source document contains no readable pages.")
 
         self.page_spin.blockSignals(True)
         self.page_spin.setRange(1, self.page_count)
@@ -164,6 +239,26 @@ class PdfViewerWidget(qtw.QWidget):
         self.page_count_label.setText(f"of {self.page_count}")
         self._render_page(0)
 
+    def _apply_loaded_page(self, page_count, image_path):
+        self.page_count = page_count
+        if self.page_count < 1:
+            raise ValueError("The source document contains no readable pages.")
+        pixmap = qtg.QPixmap(image_path)
+        if pixmap.isNull():
+            raise ValueError("The source reader returned an empty page image.")
+        self.page_spin.blockSignals(True)
+        self.page_spin.setRange(1, self.page_count)
+        self.page_spin.setValue(1)
+        self.page_spin.blockSignals(False)
+        self.page_count_label.setText(f"of {self.page_count}")
+        self.page_index = 0
+        self._rendered_pixmap = pixmap
+        self.page_label.setPixmap(self._rendered_pixmap)
+        self.page_label.setFixedSize(self._rendered_pixmap.size())
+        self.previous_button.setEnabled(False)
+        self.next_button.setEnabled(self.page_count > 1)
+        self._update_zoom_buttons()
+
     def _render_page(self, page_index):
         output_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         output_path = output_file.name
@@ -171,10 +266,10 @@ class PdfViewerWidget(qtw.QWidget):
         try:
             fit_width = max(200, self.scroll_area.viewport().width() - 4)
             render_width = fit_width if self.fit_width else max(200, round(800 * self.zoom_percent / 100))
-            self._run_renderer("render", self.pdf_path, page_index, render_width, output_path)
+            _render_source_page(self.pdf_path, page_index, render_width, output_path)
             pixmap = qtg.QPixmap(output_path)
             if pixmap.isNull():
-                raise ValueError("QtPdf returned an empty page image.")
+                raise ValueError("The source reader returned an empty page image.")
             self.page_index = page_index
             self._rendered_pixmap = pixmap
             self.page_label.setPixmap(self._rendered_pixmap)
@@ -250,13 +345,18 @@ class PdfViewerWidget(qtw.QWidget):
 
 
 class PdfViewerDialog(qtw.QDialog):
-    def __init__(self, pdf_path, parent=None):
+    def __init__(self, pdf_path, parent=None, preloaded_page_count=None, preloaded_image_path=""):
         super().__init__(parent)
-        self.viewer = PdfViewerWidget(pdf_path, self)
+        self.viewer = PdfViewerWidget(
+            pdf_path,
+            self,
+            preloaded_page_count=preloaded_page_count,
+            preloaded_image_path=preloaded_image_path,
+        )
         layout = qtw.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.viewer)
-        self.setWindowTitle(f"Source PDF - {os.path.basename(self.viewer.pdf_path)}")
+        self.setWindowTitle(f"Source Reader - {os.path.basename(self.viewer.pdf_path)}")
         self.resize(1000, 800)
         self.viewer.dock_toggle_button.hide()
         self.viewer.closeRequested.connect(self.close)
@@ -273,7 +373,7 @@ class PdfViewerDock(qtw.QDockWidget):
     viewerVisibilityChanged = qtc.pyqtSignal(bool)
 
     def __init__(self, pdf_path, parent=None, embedded_host=None):
-        super().__init__(f"Source PDF - {os.path.basename(pdf_path)}", parent)
+        super().__init__(f"Source Reader - {os.path.basename(pdf_path)}", parent)
         self.pdf_path = os.path.abspath(pdf_path)
         self._automatic_close = False
         self._embedded_host = embedded_host

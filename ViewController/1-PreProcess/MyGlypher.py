@@ -855,6 +855,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if self.qimage:
             self.ui.ZoomComboBox.currentTextChanged.disconnect(self.on_zoom)
             seltext = self.ui.ZoomComboBox.currentText()
+            if not seltext.strip():
+                seltext = "100 %"
+                self.ui.ZoomComboBox.setCurrentText(seltext)
             if self.ui.Zoomslider.isEnabled() == True:
                 print('Zoomslider is enabled')
             else :

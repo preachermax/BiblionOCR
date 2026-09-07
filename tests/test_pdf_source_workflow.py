@@ -12,10 +12,18 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
+from PIL import Image
 
 from Core.engine import ProjectCreationEngine
 from Core.project_database import create_project_database, load_project_database_record, project_metadata_database_path
-from Core.source_documents import copy_pdf_source_readonly, find_project_pdf_source, project_pdf_source_path
+from Core.source_documents import (
+    copy_pdf_source_readonly,
+    copy_source_document_readonly,
+    find_project_pdf_source,
+    find_project_source_document,
+    project_pdf_source_path,
+    project_source_document_path,
+)
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -56,6 +64,11 @@ painter.end()
 """
     environment = dict(os.environ, PDF_PATH=str(pdf_path), QT_QPA_PLATFORM="offscreen")
     subprocess.run([sys.executable, "-c", script], check=True, env=environment)
+
+
+def _create_test_tiff(tiff_path: Path) -> None:
+    pages = [Image.new("RGB", (80, 120), color) for color in ("white", "gray", "black")]
+    pages[0].save(tiff_path, save_all=True, append_images=pages[1:], format="TIFF")
 
 
 def test_qtpdf_renderer_reports_and_renders_pages(tmp_path) -> None:
@@ -126,6 +139,87 @@ def test_pdf_viewer_renders_and_navigates_pages(tmp_path) -> None:
     assert viewer.page_index == 0
     assert app is not None
     viewer.close()
+
+
+def test_source_reader_renders_and_navigates_multipage_tiff(tmp_path) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    tiff_path = tmp_path / "source.tif"
+    _create_test_tiff(tiff_path)
+
+    viewer = PdfViewerDialog(str(tiff_path))
+
+    assert viewer.page_count == 3
+    assert viewer.page_index == 0
+    assert viewer.page_label.pixmap() is not None
+    assert not viewer.page_label.pixmap().isNull()
+    viewer.next_page()
+    assert viewer.page_index == 1
+    assert viewer.page_spin.value() == 2
+    assert app is not None
+    viewer.close()
+
+
+def test_project_wizard_updates_source_path_before_showing_reader(tmp_path, monkeypatch) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    source_path = tmp_path / "source.tif"
+    _create_test_tiff(source_path)
+    observed_paths = []
+
+    class FakeReader:
+        page_count = 3
+
+        def __init__(self, _source_path, parent, **_kwargs):
+            observed_paths.append(parent.source_document_edit.text())
+
+        def setAttribute(self, *_args):
+            return None
+
+        def show(self):
+            return None
+
+    dialog = ProjectCreationWizardDialog(str(tmp_path))
+    monkeypatch.setattr(
+        "project_creation_wizard_dialog.run_myexplorer_selection",
+        lambda *_args: str(source_path),
+    )
+    monkeypatch.setattr("project_creation_wizard_dialog.PdfViewerDialog", FakeReader)
+
+    dialog._browse_for_source_document()
+
+    deadline = qtc.QDeadlineTimer(5000)
+    while dialog.source_load_thread is not None and not deadline.hasExpired():
+        app.processEvents(qtc.QEventLoop.AllEvents, 50)
+
+    assert dialog.source_document_edit.text() == str(source_path)
+    assert observed_paths == [str(source_path)]
+    assert dialog.source_pages_combo.currentText() == "3"
+    assert dialog.source_load_progress_bar.value() == 100
+    assert app is not None
+    dialog.close()
+
+
+def test_project_wizard_rejects_unsupported_source_document(tmp_path, monkeypatch) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    source_path = tmp_path / "source.png"
+    source_path.write_bytes(b"not a source document")
+    warnings = []
+    dialog = ProjectCreationWizardDialog(str(tmp_path))
+    monkeypatch.setattr(
+        "project_creation_wizard_dialog.run_myexplorer_selection",
+        lambda *_args: str(source_path),
+    )
+    monkeypatch.setattr(
+        qtw.QMessageBox,
+        "warning",
+        lambda _parent, title, message: warnings.append((title, message)),
+    )
+
+    dialog._browse_for_source_document()
+
+    assert dialog.source_document_edit.text() == ""
+    assert warnings == [("Source Document", "Select a PDF or multi-page TIFF source document.")]
+    assert app is not None
+    dialog.close()
 
 
 def test_pdf_viewer_toolbar_tools_fit_at_narrow_docked_width(tmp_path) -> None:
@@ -306,6 +400,20 @@ def test_pdf_source_is_copied_to_project_as_read_only(tmp_path) -> None:
     assert destination.stat().st_mode & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH) == 0
 
 
+def test_tiff_source_is_copied_to_tiff_source_folder_as_read_only(tmp_path) -> None:
+    source_path = tmp_path / "source.tif"
+    _create_test_tiff(source_path)
+    project_root = tmp_path / "Project"
+
+    destination = Path(copy_source_document_readonly(str(source_path), str(project_root)))
+
+    assert destination == Path(project_source_document_path(str(project_root), source_path.name))
+    assert destination.parent.name == "tif_acq_src_image"
+    assert destination.read_bytes() == source_path.read_bytes()
+    assert destination.stat().st_mode & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH) == 0
+    assert find_project_source_document(str(project_root)) == str(destination)
+
+
 def test_project_pdf_source_is_resolved_from_canonical_directory(tmp_path) -> None:
     project_root = tmp_path / "Project"
     first_path = Path(project_pdf_source_path(str(project_root), "b-source.pdf"))
@@ -390,6 +498,64 @@ def test_engine_persists_protected_source_location_in_metadata_mirrors(tmp_path)
             assert (tmp_path / "Project" / "Model" / "Project" / "Images" / stage / "Source" / section).is_dir()
 
 
+def test_engine_persists_tiff_source_type_and_location(tmp_path) -> None:
+    source_path = tmp_path / "source.tiff"
+    _create_test_tiff(source_path)
+    engine = ProjectCreationEngine(str(tmp_path), _DummyEventBus())
+
+    result = engine.create_project({
+        "project_name": "TiffProject",
+        "project_purpose": "OCR",
+        "creation_trigger": "New project wizard",
+        "source_context": "Selected TIFF source",
+        "user_intent_summary": "Test protected TIFF source persistence.",
+        "SourceImageDocument": str(source_path),
+        "NumberPages": 3,
+        "NumberColumns": 1,
+    })
+
+    assert result["status"] == "ok"
+    protected_path = project_source_document_path(str(tmp_path / "TiffProject"), source_path.name)
+    record = load_project_database_record(project_metadata_database_path(str(tmp_path / "TiffProject")))
+    assert result["source_document_path"] == protected_path
+    assert record["SourceDocumentPath"] == protected_path
+    assert record["SourceType"] == "TIFF"
+
+
+def test_engine_copies_loaded_ris_to_project_provenance_folder(tmp_path) -> None:
+    provenance_path = tmp_path / "Original Export.ris"
+    provenance_text = "TY  - BOOK\nTI  - Test source\nER  -\n"
+    provenance_path.write_text(provenance_text, encoding="utf-8")
+    engine = ProjectCreationEngine(str(tmp_path), _DummyEventBus())
+
+    result = engine.create_project({
+        "project_name": "RisProject",
+        "project_purpose": "OCR",
+        "creation_trigger": "New project wizard",
+        "source_context": "Loaded RIS provenance",
+        "user_intent_summary": "Test provenance preservation.",
+        "source_provenance_path": str(provenance_path),
+        "NumberPages": 1,
+        "NumberColumns": 1,
+    })
+
+    assert result["status"] == "ok"
+    copied_path = (
+        tmp_path
+        / "RisProject"
+        / "Model"
+        / "Project"
+        / "Images"
+        / "MyServer"
+        / "source_images"
+        / "provenance"
+        / provenance_path.name
+    )
+    assert copied_path.read_text(encoding="utf-8") == provenance_text
+    record = load_project_database_record(project_metadata_database_path(str(tmp_path / "RisProject")))
+    assert record["ProvenancePath"] == str(copied_path)
+
+
 def test_project_wizard_includes_selected_source_document(tmp_path) -> None:
     app = qtw.QApplication.instance() or qtw.QApplication([])
     source_path = tmp_path / "source.pdf"
@@ -401,6 +567,36 @@ def test_project_wizard_includes_selected_source_document(tmp_path) -> None:
 
     assert payload["SourceImageDocument"] == str(source_path)
     assert app is not None
+    dialog.close()
+
+
+def test_project_wizard_uses_generated_designer_ui(tmp_path) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+
+    dialog = ProjectCreationWizardDialog(str(tmp_path))
+
+    assert dialog.ui.page_stack is dialog.page_stack
+    assert dialog.ui.back_button is dialog.back_button
+    assert dialog.ui.next_button is dialog.next_button
+    assert dialog.ui.create_button is dialog.create_button
+    assert dialog.ui.source_load_status_label is dialog.source_load_status_label
+    assert dialog.ui.source_load_progress_bar is dialog.source_load_progress_bar
+    assert dialog.page_stack.count() == 5
+    assert app is not None
+    dialog.close()
+
+
+def test_project_wizard_font_selector_does_not_overlap_column_editor(tmp_path) -> None:
+    app = qtw.QApplication.instance() or qtw.QApplication([])
+    dialog = ProjectCreationWizardDialog(str(tmp_path))
+    dialog.page_stack.setCurrentIndex(1)
+    dialog.show()
+    app.processEvents()
+
+    font_rect = dialog.ui_font_combo.geometry()
+    column_editor_rect = dialog.column_config_group.geometry()
+
+    assert font_rect.bottom() < column_editor_rect.top()
     dialog.close()
 
 
@@ -418,6 +614,7 @@ def test_project_wizard_resolves_provenance_pdf_and_sets_page_baselines(tmp_path
     project_payload = dialog.get_payload()
 
     assert dialog.source_document_edit.text() == str(pdf_path)
+    assert project_payload["source_provenance_path"] == str(provenance_path)
     assert project_payload["SourceImageDocument"] == str(pdf_path)
     assert project_payload["NumberPages"] == 2
     assert project_payload["NumberColumns"] == 2

@@ -188,6 +188,7 @@ Model/Project/Images/MyServer/source_images/pdf_acq_src_image
 Model/Project/Images/MyServer/source_images/pdf_combined_src_images
 Model/Project/Images/MyServer/source_images/tif_acq_src_image
 Model/Project/Images/MyServer/source_images/tif_combined_src_images
+Model/Project/Images/MyServer/source_images/provenance
 Model/Project/Images/MyTrainer/Complete
 Model/Project/Images/MyTrainer/Source
 Model/Project/Images/MyTrainer/Workflow
