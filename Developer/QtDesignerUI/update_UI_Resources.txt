@@ -21,7 +21,8 @@ pyuic5 -x Developer/QtDesignerUI/MyVersifierUI.ui -o ViewController/3-Process/My
 pyuic5 -x Developer/QtDesignerUI/MyWriterUI.ui -o ViewController/4-PostProcess/MyWriterUI.py --resource-suffix=""
 pyuic5 -x Developer/QtDesignerUI/PageVerseCrossReferenceUI.ui -o ViewController/utilities/0-MainUI/helpers/PageVerseCrossReferenceUI.py --resource-suffix=""
 pyuic5 -x Developer/QtDesignerUI/VersifyTextUI.ui -o ViewController/utilities/0-MainUI/helpers/VersifyTextUI.py --resource-suffix=""
-
+pyuic5 -x Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui -o ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py --resource-suffix=""
+pyuic5 -x Developer/QtDesignerUI/MyPixlerPageWorkflowWizardUI.ui -o ViewController/1-PreProcess/MyPixlerPageWorkflowWizardUI.py --resource-suffix=""
 # Windows (run from repository root)
 pyuic5 -x Developer/QtDesignerUI/MainUI.ui -o ViewController/0-MainUI/helpers/MainUI.py --resource-suffix=""
 pyuic5 -x Developer/QtDesignerUI/MyBoxerUI.ui -o ViewController/1-PreProcess/MyBoxerUI.py --resource-suffix=""

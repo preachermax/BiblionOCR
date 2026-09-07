@@ -54,6 +54,20 @@ def _load_mypixler_module():
     return module
 
 
+def test_mypixler_prefers_installed_workflow_definition_over_project_snapshot(tmp_path) -> None:
+    mypixler = _load_mypixler_module()
+    project_workflow = tmp_path / "Model" / "Project" / "Data" / "csv"
+    project_workflow.mkdir(parents=True)
+    (project_workflow / "page_workflow.csv").write_text("stale project snapshot\n", encoding="utf-8")
+
+    owner = type("WorkflowOwner", (), {})()
+    owner.current_project_root = str(tmp_path)
+    owner.projecthome = str(ROOT_DIR)
+    owner._shared_active_project_root = lambda: str(tmp_path)
+
+    assert mypixler.PixlerMain._workflow_definition_root(owner) == str(ROOT_DIR)
+
+
 class _DummyEventBus:
     def emit(self, _event):
         return None

@@ -2,6 +2,39 @@
 
 Date: 2026-08-05
 
+Status update: 2026-09-07
+
+## Current Product Decision
+
+MyScanner is BiblionOCR's first active productization track, provisionally named **BiblionScanner**.
+
+This designation changes how MyScanner work is planned and reviewed, but it is not a declaration that a public or commercial binary is ready. MyScanner remains under active development and must not be prematurely frozen while its standalone boundary is being established.
+
+Readiness stages:
+
+1. **Product 1 - active now:** manage MyScanner against an explicit product boundary, release gates, and Windows/Linux acceptance criteria.
+2. **Technical preview:** permit selected-user preview builds only after repository coupling, packaging, state-path, dependency, and scanner-backend test gates pass.
+3. **Supported public/commercial release:** require licensing review, attribution bundle, signed/reproducible installers, hardware validation, user documentation, and a defined support policy.
+
+Immediate product boundary:
+
+- MyScanner UI and generated Designer pair
+- `Core/Scanner` acquisition API and backends
+- scan workflow and scan-session behavior
+- project/source-document services required to produce project scan images and PDFs
+- required dialogs, shared visual resources, and narrowly scoped project-status integration
+
+Current blockers to a self-contained technical preview:
+
+- MyScanner imports and instantiates MyPixler, MyExplorer, MyBoxer, MyWriter, and MyVersifier directly; unrelated modules must become optional integrations behind a stable launch or service boundary.
+- runtime state and default data paths still assume the BiblionOCR repository layout rather than platform user-data locations.
+- no standalone package/binary build manifest or Scanner-specific dependency manifest exists.
+- scanner backend selection, discovery, cancellation, failure, and output contracts lack dedicated automated tests.
+- Windows and Linux hardware acceptance matrices and installation/troubleshooting instructions are not complete.
+- Qt/PyQt binary distribution rights, dependency provenance, required notices, and the final commercial licensing model remain release gates.
+
+Next productization action: inventory every direct MyScanner dependency as `required core`, `optional integration`, or `remove`, then use that inventory to define the standalone repository/package boundary before introducing build tooling.
+
 ## Summary
 
 The strongest early stand-alone release candidates are:
@@ -26,7 +59,7 @@ That story is easier to explain to outside supporters than releasing the more sp
 
 ### MyScanner
 
-MyScanner is an excellent first-release candidate because it has immediate practical value and a clear demonstration path.
+MyScanner is the selected first-release productization track because it has immediate practical value and a clear demonstration path.
 
 Strengths:
 

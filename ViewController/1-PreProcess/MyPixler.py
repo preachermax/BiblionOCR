@@ -1143,7 +1143,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def _workflow_definition_root(self):
         active_root = self.current_project_root or self._shared_active_project_root()
-        for candidate in (active_root, self.projecthome, project_root):
+        for candidate in (self.projecthome, project_root, active_root):
             if not candidate:
                 continue
             workflow_csv = os.path.join(candidate, WORKFLOW_DIRECTORY, PAGE_WORKFLOW_FILENAME)

@@ -28,6 +28,35 @@ Use this template for every pause, stop, or VS Code close event.
 4. MyLexer is a required placeholder and remains intentionally out of scope until the user audit explicitly reaches it.
 5. For every cycle, report full-workspace Problems totals and in-scope totals separately before clean claims.
 
+### Session Handoff - 2026-09-07 MyScanner Product 1 Decision
+
+* Scope summary: designated MyScanner as BiblionOCR's first active productization track while retaining explicit technical-preview and supported-release gates; included the current Designer UI refinements and MyPixler canonical workflow-definition fix in the ensuing commit cycle.
+* Decision record: `docs/development/STANDALONE_RELEASE_ORDER_2026-08-05.md` now distinguishes Product 1 status from distribution readiness, defines the initial standalone boundary, and lists current blockers.
+* Development posture: continue MyScanner debugging and boundary work; do not freeze it or represent it as a release-ready binary.
+* Intended commit scope:
+  * `Developer/QtDesignerUI/MyPixlerPageWorkflowWizardUI.ui`
+  * `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui`
+  * `Developer/QtDesignerUI/update_UI_Resources.txt`
+  * `Developer/documentation/DEV_NOTEBOOK.md`
+  * `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py`
+  * `ViewController/1-PreProcess/MyPixler.py`
+  * `ViewController/1-PreProcess/MyPixlerPageWorkflowWizardUI.py`
+  * `docs/development/STANDALONE_RELEASE_ORDER_2026-08-05.md`
+  * `tests/test_pdf_source_workflow.py`
+* Explicit commit exclusions: `Model/Project/Data/json/ReaderSession.json` and `Model/Project/Data/json/Session.json` remain runtime state.
+* Validation gates:
+  * documentation consistency: existing ecosystem architecture and Scanner licensing handout already identify MyScanner/BiblionScanner as the first commercial track.
+  * UI lockstep: fresh `pyuic5` output matches both touched generated modules byte-for-byte.
+  * UI semantic audit: no widgets were added or removed; intentional changes cover button fonts/icons, scroll-page geometry, text-height constraints, and MyPixler wizard navigation sizing.
+  * compile: all four touched Python files pass `py_compile`.
+  * focused tests: MyPixler wizard `2 passed`; complete PDF/source workflow `29 passed`.
+  * full tests: all `30` test files passed in isolated processes; `190 passed` plus `41 subtests passed`.
+  * launcher smoke: all `14` Linux `run-my*.sh` launchers reached stable offscreen startup without an early traceback.
+  * Problems: hand-written touched Python reports `0`; fresh generated `MyPixlerPageWorkflowWizardUI.py` reports `9` Pylance PyQt5 enum type-stub diagnostics while remaining byte-identical to `pyuic5` output and runtime-valid.
+  * whitespace: `git diff --check` passed.
+* Unresolved blockers/risks: direct imports of other application modules, repository-relative state/data paths, absent standalone build/dependency manifests, missing scanner-backend contract tests, hardware acceptance coverage, and Qt/PyQt licensing review.
+* Next immediate action: commit and sync this change set, then resume manual module review before inventorying MyScanner dependencies.
+
 ### Session Handoff - 2026-09-06 Final Source Workflow And MyPixler Wizard Commit
 
 * Scope summary: finalized project source acquisition, two-stage PDF extraction, threaded source readers, workflow milestone tracking, Designer-owned project/MyPixler wizards, MyPixler preprocessing ownership, and obsolete PNG workflow cleanup.
