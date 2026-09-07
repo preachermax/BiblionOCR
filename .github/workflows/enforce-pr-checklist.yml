@@ -25,7 +25,8 @@ jobs:
             }
 
             const owner = "preachermax";
-            const isAgentManaged = actor.toLowerCase() === owner.toLowerCase();
+            const wizardGatePassed = /^Developer Wizard Gate:\s*PASS\s*$/mi.test(body);
+            const isAgentManaged = actor.toLowerCase() === owner.toLowerCase() && !wizardGatePassed;
 
             const required = isAgentManaged
               ? [
@@ -36,8 +37,10 @@ jobs:
                   "Workflow wizard policy gates were verified for affected modules.",
                 ]
               : [
+                  "I completed the Developer Workflow Wizard and resolved every mandatory pre-PR gate.",
+                  "The wizard reported PR ELIGIBLE, and I included its evidence summary below.",
                   "I am submitting a pull request only (no direct commit/resync operations on protected branches).",
-                  "I request agent review first, then repository owner/maintainer review and approval.",
+                  "I request Copilot/agent review first, then repository owner/maintainer review and approval.",
                 ];
 
             const missing = required.filter((label) => {
@@ -56,6 +59,23 @@ jobs:
                 ].join("\n")
               );
               return;
+            }
+
+            if (!isAgentManaged) {
+              const gateVersion = /^Developer Wizard Gate Version:\s*1\s*$/mi.test(body);
+              const evidenceLines = body.match(/^- \*\*(?:PASS|NOT APPLICABLE) - .+:\*\* .+$/gm) || [];
+              const minimumGateEvidenceCount = 19;
+              if (!wizardGatePassed || !gateVersion || evidenceLines.length < minimumGateEvidenceCount) {
+                core.setFailed(
+                  [
+                    "Developer PR is missing a valid Developer Workflow Wizard attestation.",
+                    "Run .venv/bin/python -m Developer.Developer, satisfy every pre-PR gate, and paste the generated Developer Wizard Evidence block.",
+                    "Required lines: Developer Wizard Gate: PASS and Developer Wizard Gate Version: 1.",
+                    `Expected at least ${minimumGateEvidenceCount} generated gate-evidence rows; found ${evidenceLines.length}.`,
+                  ].join("\n")
+                );
+                return;
+              }
             }
 
             core.info(`All required confirmations are present for ${isAgentManaged ? "agent-managed" : "developer PR-only"} path.`);

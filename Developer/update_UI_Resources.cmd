@@ -1,33 +1,15 @@
 @echo off
 setlocal
 
-REM Run this script from the repository root.
-if not exist "Developer\QtDesignerUI" (
-  echo Error: run from the BiblionOCR repository root.
-  exit /b 1
+if exist "%~dp0..\.venv\Scripts\python.exe" (
+  "%~dp0..\.venv\Scripts\python.exe" "%~dp0update_ui_resources.py" %*
+) else (
+  where py >nul 2>nul
+  if errorlevel 1 (
+    python "%~dp0update_ui_resources.py" %*
+  ) else (
+    py -3 "%~dp0update_ui_resources.py" %*
+  )
 )
-
-pyuic5 -x Developer/QtDesignerUI/MainUI.ui -o ViewController/0-MainUI/helpers/MainUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyBoxerUI.ui -o ViewController/1-PreProcess/MyBoxerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyExplorerUI.ui -o ViewController/0-MainUI/MyExplorerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyGlypherUI.ui -o ViewController/1-PreProcess/MyGlypherUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyGrounderUI.ui -o ViewController/2-TrainTesseract/MyGrounderUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyLauncherUI.ui -o ViewController/archives/MyLauncherUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyLexerUI.ui -o ViewController/3-Process/MyLexerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MorphologyDialogUI.ui -o ViewController/0-MainUI/helpers/MorphologyDialogUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyPixlerGVUI.ui -o ViewController/archives/moved_candidates/0-MainUI/MyPixlerGVUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyPixlerUI.ui -o ViewController/1-PreProcess/MyPixlerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyReaderUI.ui -o ViewController/2-TrainTesseract/MyReaderUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyResolverUI.ui -o ViewController/3-Process/MyResolverUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyScannerUI.ui -o ViewController/0-MainUI/MyScannerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyServerUI.ui -o ViewController/0-MainUI/MyServerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyTrainerUI.ui -o ViewController/2-TrainTesseract/MyTrainerUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyVersifierUI.ui -o ViewController/3-Process/MyVersifierUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/MyWriterUI.ui -o ViewController/4-PostProcess/MyWriterUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/PageVerseCrossReferenceUI.ui -o ViewController/utilities/0-MainUI/helpers/PageVerseCrossReferenceUI.py --resource-suffix=""
-pyuic5 -x Developer/QtDesignerUI/VersifyTextUI.ui -o ViewController/utilities/0-MainUI/helpers/VersifyTextUI.py --resource-suffix=""
-
-pyrcc5 ViewController/0-MainUI/helpers/UI_Icons.qrc -o ViewController/0-MainUI/helpers/UI_Icons.py
-
-echo UI .py and resource files updated successfully.
-endlocal
+set exit_code=%errorlevel%
+endlocal & exit /b %exit_code%

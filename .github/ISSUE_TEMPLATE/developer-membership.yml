@@ -60,7 +60,7 @@ body:
           required: true
         - label: I will contribute through pull requests and accept maintainer review on protected areas.
           required: true
-        - label: I will use Developer/documentation/DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md before opening pull requests.
+        - label: I will complete the Developer Workflow Wizard and its mandatory evidence gates before opening pull requests.
           required: true
         - label: I have read CONTRIBUTING.md and understand the repository review model.
           required: true

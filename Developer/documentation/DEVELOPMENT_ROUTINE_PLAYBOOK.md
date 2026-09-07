@@ -4,9 +4,11 @@ This document captures the practical development routine we have been using so c
 
 ## 0) Execution Ownership
 
-1. Checklist execution is agent-owned.
-2. The user should not need to manually drive checklist steps.
-3. When manual validation is unavoidable (for example visual UI behavior), the agent requests only minimal confirmation and records outcomes in a handoff checkpoint.
+1. Coding agents execute the checklist directly for agent-managed changes.
+2. Human developers execute the same standards through `.venv/bin/python -m Developer.Developer`; they do not manually duplicate the checklist document.
+3. The wizard permits independent design and implementation choices, but every pre-PR gate requires evidence or an allowed not-applicable justification.
+4. A human-developer PR is eligible for review only after the wizard reports `PR ELIGIBLE` and the generated PR evidence passes repository enforcement.
+5. When manual validation is unavoidable, the responsible developer or agent records the observed outcome in the workflow report and handoff checkpoint.
 
 ## 0b) User-Guided Audit Mode (Current)
 

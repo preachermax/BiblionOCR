@@ -57,6 +57,21 @@ Use this template for every pause, stop, or VS Code close event.
 * Unresolved blockers/risks: direct imports of other application modules, repository-relative state/data paths, absent standalone build/dependency manifests, missing scanner-backend contract tests, hardware acceptance coverage, and Qt/PyQt licensing review.
 * Next immediate action: commit and sync this change set, then resume manual module review before inventorying MyScanner dependencies.
 
+### Session Handoff - 2026-09-07 Generated MyPixler UI Diagnostics
+
+* Scope summary: cleared nine Pylance `reportAttributeAccessIssue` false positives emitted for valid legacy PyQt5 enum aliases in generated MyPixler wizard UI code and centralized UI/resource regeneration.
+* Implementation: `Developer/update_ui_resources.py` generates every target in temporary storage, restores declared analysis prefixes, compares bytes, and atomically replaces only changed outputs. Linux and Windows wrappers delegate to it; `--check` reports drift without writing.
+* Validation gates:
+  * Problems: full-workspace `0`; in-scope `0`.
+  * generated lockstep: removing the documented first-line analysis directive leaves byte-identical fresh `pyuic5` output.
+  * compile: generated module passes `py_compile`.
+  * focused wizard tests: `2 passed`.
+  * generator tests: `3 passed`, covering unchanged timestamp preservation, changed-target replacement, and no-write stale detection.
+  * repository check mode: `6 unchanged`, `16 stale`, `0 updated`; stale outputs were reported but deliberately not regenerated as part of this scoped change.
+  * whitespace: `git diff --check` passed before the final documentation update.
+* Explicit exclusions: runtime session JSON and four untracked icon files remain untouched.
+* Next immediate action: continue manual MyPixler review; commit/sync only when explicitly requested.
+
 ### Session Handoff - 2026-09-06 Final Source Workflow And MyPixler Wizard Commit
 
 * Scope summary: finalized project source acquisition, two-stage PDF extraction, threaded source readers, workflow milestone tracking, Designer-owned project/MyPixler wizards, MyPixler preprocessing ownership, and obsolete PNG workflow cleanup.
