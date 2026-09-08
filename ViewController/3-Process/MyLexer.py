@@ -54,6 +54,7 @@ from PyQt5.QtWidgets import  QSpinBox, QRubberBand, QWidget, QHBoxLayout, QSizeG
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt, QObject, QThread, pyqtSignal
 from SessionManager import SessionManager
 from Stylesheets import apply_theme
+from pixler_handoff import launch_pixler_handoff
 from project_status_controller import ProjectStatusController
 from tesseract_wordlist_helper import show_word_count_dialog
 from Core.workflow_wizard_actions import (
@@ -251,6 +252,8 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.OpenImageFilebutton.clicked.connect(self.open_image_with_myexplorer)
         if hasattr(self.ui, 'MyPixlerbutton'):
             self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
+        if hasattr(self.ui, 'action_Pixler'):
+            self.ui.action_Pixler.triggered.connect(self.OpenWithMyPixler)
         #self.ui.CharBoxImagebutton.clicked.connect(self.loadcharboximage)
         #self.ui.WordBoxImagebutton.clicked.connect(self.loadwordboximage)
 
@@ -2084,9 +2087,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         newapp.exec_()'''
 
     def OpenWithMyPixler(self):
-        script = os.path.join(project_root, 'ViewController', '1-PreProcess', 'MyPixler.py')
-        print(f'Launching: {sys.executable} {script}')
-        subprocess.Popen([sys.executable, script])
+        return launch_pixler_handoff(self, "MyLexer", self.imgpath)
 
     def OpenWithMyWriter(self):
         script = os.path.join(project_root, 'ViewController', '4-PostProcess', 'MyWriter.py')

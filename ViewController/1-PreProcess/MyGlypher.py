@@ -28,6 +28,7 @@ from pathlib import Path
 from HelpSystem import add_help_menu
 from Stylesheets import apply_theme
 from SessionManager import SessionManager
+from pixler_handoff import launch_pixler_handoff
 from project_status_controller import ProjectStatusController
 from Core.workflow_wizard_actions import (
     append_default_context_actions,
@@ -1225,9 +1226,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         newapp.exec_()'''
 
     def OpenWithMyPixler(self):
-        script = os.path.join(self.projecthome, 'ViewController', '1-PreProcess', 'MyPixler.py')
-        print(f'Launching: {sys.executable} {script}')
-        subprocess.Popen([sys.executable, script])
+        return launch_pixler_handoff(self, "MyGlypher", self.imgpath)
 
     def OpenWithMyWriter(self):
         script = os.path.join(self.projecthome, 'ViewController', '4-PostProcess', 'MyWriter.py')

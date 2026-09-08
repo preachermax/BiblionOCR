@@ -16,6 +16,7 @@ class _DummyEventBus:
 class ProjectStructureMinimumTests(unittest.TestCase):
     def test_project_creation_uses_current_myserver_source_layout(self) -> None:
         default_folders = set(ProjectCreationEngine.DEFAULT_PROJECT_FOLDERS)
+        required_templates = set(ProjectCreationEngine.REQUIRED_TEMPLATE_FILES)
 
         self.assertIn(
             "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
@@ -25,6 +26,13 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             path.startswith("Model/Project/Images/MyServer/Source")
             for path in default_folders
         ))
+        self.assertEqual(
+            {
+                "ViewController/0-MainUI/helpers/HelpSystem.py",
+                "ViewController/0-MainUI/helpers/SessionManager.py",
+            },
+            required_templates,
+        )
 
     def test_project_folder_manifests_are_synchronized_and_complete(self) -> None:
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -63,6 +71,25 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                 with open(manifest_path, "r", encoding="utf-8-sig") as handle:
                     entries = {line.strip() for line in handle if line.strip()}
                 self.assertTrue(set(ProjectCreationEngine.REQUIRED_THEME_ENTRIES).issubset(entries))
+
+    def test_active_project_manifest_file_sources_exist(self) -> None:
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        engine = ProjectCreationEngine(repo_root, _DummyEventBus())
+        for filename in ("ScriptureProjectFolderList.txt", "GeneralProjectFolderList.txt"):
+            manifest_path = os.path.join(repo_root, "ViewController", filename)
+            with open(manifest_path, "r", encoding="utf-8-sig") as handle:
+                entries = [line.strip() for line in handle if line.strip()]
+
+            with self.subTest(filename=filename, check="duplicates"):
+                self.assertEqual(len(entries), len(set(entries)))
+
+            for entry in entries:
+                normalized = engine._normalize_structure_entry(entry, manifest_path)
+                if not normalized or not engine._is_file_structure_entry(normalized, manifest_path):
+                    continue
+                source, _destination = engine._split_structure_copy_entry(normalized)
+                with self.subTest(filename=filename, source=source):
+                    self.assertTrue(os.path.isfile(os.path.join(repo_root, source)))
 
     def test_scripture_manifests_include_default_source_page_sections(self) -> None:
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -252,9 +279,70 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             self.assertTrue(
                 os.path.isfile(os.path.join(project_root, "ViewController", "0-MainUI", "MyServer.py"))
             )
+            myserver_path = os.path.join(project_root, "ViewController", "0-MainUI", "MyServer.py")
+            with open(myserver_path, "r", encoding="utf-8") as handle:
+                myserver_source = handle.read()
+            self.assertIn("class MainWindow", myserver_source)
+            self.assertGreater(len(myserver_source), 1000)
             self.assertTrue(
                 os.path.isfile(os.path.join(project_root, "ViewController", "3-Process", "MyLexer.py"))
             )
+            module_pairs = {
+                "0-MainUI": ("MyExplorer", "MyLauncher", "MyScanner", "MyServer"),
+                "1-PreProcess": (
+                    "MyBoxer",
+                    "MyGlypher",
+                    "MyPixler",
+                    "MyPixlerPageWorkflowWizard",
+                ),
+                "2-TrainTesseract": ("MyGrounder", "MyReader", "MyTrainer"),
+                "3-Process": ("MyLexer", "MyResolver", "MyVersifier"),
+                "4-PostProcess": ("MyWriter",),
+            }
+            for stage, modules in module_pairs.items():
+                for module in modules:
+                    with self.subTest(stage=stage, module=module):
+                        self.assertTrue(
+                            os.path.isfile(
+                                os.path.join(project_root, "ViewController", stage, f"{module}.py")
+                            )
+                        )
+                        self.assertTrue(
+                            os.path.isfile(
+                                os.path.join(project_root, "ViewController", stage, f"{module}UI.py")
+                            )
+                        )
+                        self.assertFalse(
+                            os.path.exists(
+                                os.path.join(
+                                    project_root,
+                                    "ViewController",
+                                    stage,
+                                    "helpers",
+                                    f"{module}UI.py",
+                                )
+                            )
+                        )
+
+    def test_missing_template_sources_fail_instead_of_creating_empty_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            engine = ProjectCreationEngine(tmpdir, _DummyEventBus())
+            project_root = os.path.join(tmpdir, "project")
+            os.makedirs(project_root, exist_ok=True)
+
+            for entry in (
+                "ViewController/MissingTemplate.py",
+                "Core/MissingTemplate.py => ViewController/MissingTemplate.py",
+            ):
+                with self.subTest(entry=entry):
+                    with self.assertRaisesRegex(FileNotFoundError, "MissingTemplate.py"):
+                        engine._create_file_from_template(project_root, entry)
+
+                    self.assertFalse(
+                        os.path.exists(
+                            os.path.join(project_root, "ViewController", "MissingTemplate.py")
+                        )
+                    )
 
     def test_scripture_manifest_keeps_process_modules(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

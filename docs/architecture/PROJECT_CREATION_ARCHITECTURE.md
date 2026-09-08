@@ -1,10 +1,10 @@
 # Project Creation Architecture
 
-## Version 1.5 — Source Document And Provenance Contract
+## Version 1.6 — Template Integrity And Distribution Contract
 
 **Status:** Active implementation contract
-**Scope:** MyServer, Core project engine, source documents, RIS generation, event emission, local Git project creation, ProjectFolderList structure generation
-**Last updated:** 2026-09-06
+**Scope:** MyServer, Core project engine, source documents, RIS generation, event emission, local Git project creation, project manifests, and packaged template distribution
+**Last updated:** 2026-09-07
 
 ---
 
@@ -18,15 +18,15 @@ Current rules:
 * Windows target: `C:/Users/Max/Projects`.
 * Runtime expression: `os.path.join(os.path.expanduser("~"), "Projects")`.
 * Each project must be initialized as a local Git repository.
-* Project folder structure should be generated from `ProjectFolderList.txt`.
-* File entries in `ProjectFolderList.txt` are treated as parent-directory requirements.
+* MyServer supplies `ViewController/ScriptureProjectFolderList.txt` as the authoritative runtime manifest.
+* Project folder structure and copied runtime files are generated from that manifest.
+* Missing file sources abort project creation; the engine must not create empty file placeholders.
 * Empty directories receive `.gitkeep` placeholders so Git can track them.
 * The curated manifest must stay project-safe: new projects should include runtime JSON data, the `Model/Project/Data/esword` tree reserved for future MyWriter generation/update workflows, and minimal workflow/training scaffolding, but should not expand broad `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, or deep historical training payloads by default.
 
-Temporary implementation note:
+Current implementation note:
 
-* `MyServer.py` still contains local Core-style project creation classes.
-* Long-term target is to make `Core/engine.py` the single source of truth and reduce `MyServer.py` to UI/controller wiring.
+* `Core/engine.py` is the project creation implementation; `MyServer.py` owns UI/controller wiring and dispatches work through `ProjectCreationWorker`.
 * The current `MyServer` entry path uses a guided five-step modal dialog instead of chained text prompts: RIS import, project details, project settings, milestones, and project folders.
 * New project dialogs should follow the same stacked-label, direct-action format already used by existing BiblionOCR custom dialogs.
 * The dialog supports optional loading of user-provided provenance files in `json`, `ris`, `txt`, or `csv` format to prefill required provenance fields before project creation starts.
@@ -65,6 +65,8 @@ A valid project should include:
 
 The full `Model/Project/...` and `ViewController/...` directory tree is derived from `ProjectFolderList.txt`.
 
+Project creation does not clone `origin/master`. The wizard first collects the project payload, then the engine creates a temporary tree by copying manifest-selected sources from the currently running BiblionOCR checkout. It applies project configuration, creates databases and support files, renames the completed temporary tree into place, and finally initializes a new local Git repository.
+
 Source-document placement is type-specific:
 
 ```text
@@ -85,6 +87,9 @@ Manifest curation rules for new-project generation:
 * That subtree includes the workflow folders needed by the staged OCR pipeline (`MyBoxer`, `MyGlypher`, `MyGrounder`, `MyLexer`, `MyReader`, `MyResolver`, `MyVersifier`, and `MyWriter`).
 * Scripture manifests may use `Model/NT_BookFolders => <destination>` mappings so NT book-folder trees are installed into selected `Complete` and `Workflow` destinations by default while remaining individually selectable in the project wizard.
 * Exclude heavy data trees such as `Model/Project/Data/SQLite`, `Model/Project/Data/csv`, and deep training support payloads unless there is an explicit one-off regeneration case.
+* Place each generated `My*UI.py` beside its `My*.py` controller in the owning stage; do not place stage UI modules under `helpers`.
+* Every entry classified as a file must resolve to an existing source before project creation begins.
+* `ScriptureProjectFolderList.txt` and `GeneralProjectFolderList.txt` must contain no duplicate entries.
 
 Current workspace cleanup status:
 
@@ -109,10 +114,11 @@ Current workspace cleanup status:
 Folder list search order:
 
 1. explicit `folder_list_path`
-2. `ProjectFolderList.txt` under current working directory
-3. `ViewController/0-MainUI/ProjectFolderList.txt` under current working directory
-4. `ProjectFolderList.txt` under repository root
-5. `ViewController/0-MainUI/ProjectFolderList.txt` under repository root
+2. `ViewController/ScriptureProjectFolderList.txt` under current working directory
+3. legacy `ViewController/0-MainUI/helpers/ScriptureProjectFolderList.txt` under current working directory
+4. `ViewController/ScriptureProjectFolderList.txt` under repository root
+5. legacy `ViewController/0-MainUI/helpers/ScriptureProjectFolderList.txt` under repository root
+6. generic `ProjectFolderList.txt` and `ViewController/0-MainUI/ProjectFolderList.txt` fallbacks
 
 ---
 
@@ -214,13 +220,21 @@ Required commands during project creation:
 
 ```text
 git init
-git branch -M main
+git symbolic-ref HEAD refs/heads/main
 ```
 
 The engine writes:
 
 * `README.md`
 * `.gitignore`
+
+The engine does not clone, fetch, or configure `origin`; it does not stage files, create an initial commit, or push the generated project. Git must currently be installed on the host for project creation to complete.
+
+### Standalone Binary Template Contract
+
+Development builds may use the current checkout as the physical template source. A standalone release must instead use a versioned, validated template bundle embedded in or installed with that release. The generated project metadata should record the application release, template version, and source commit used to build the bundle.
+
+Standalone project creation must remain deterministic and offline-capable. It must not clone `origin/master` at runtime because that would couple project contents to network availability and to repository changes newer than the installed application. Git initialization should become optional for packaged distributions or be provided without requiring a separately installed Git executable.
 
 ---
 
@@ -257,15 +271,18 @@ For each new project creation test:
 * [ ] `Model/Project/Images/Workflow/pixler/pixler_pages_cropped` exists.
 * [ ] `ViewController/0-MainUI` exists.
 * [ ] Empty directories contain `.gitkeep` where needed.
+* [ ] Every manifest file source exists and duplicate entries are rejected.
+* [ ] Every staged controller and generated UI module occupies its canonical adjacent location.
+* [ ] `.github/workflows/validate-project-manifests.yml` passes for manifest, engine, ViewController, and project-structure test changes.
 
 ---
 
 ## 10. Next Implementation Steps
 
-1. Add per-step validation cues and field-level feedback inside the new project dialog.
-2. Remove duplicate project engine logic from `MyServer.py`.
-3. Add registry writing to Core or define a Core registry event consumed by MyServer.
-4. Add rollback cleanup to Core project creation failures.
+1. Introduce development and packaged template providers behind the engine's template-source boundary.
+2. Add release-time template bundle generation, version metadata, and hash verification.
+3. Decide whether packaged releases make Git optional or provide an embedded Git implementation.
+4. Add per-step validation cues and field-level feedback inside the new project dialog.
 5. Add SQLite event loading and replay.
 
 ---

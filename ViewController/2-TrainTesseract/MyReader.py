@@ -63,6 +63,10 @@ add_help_menu = _load_module_from_path(
     "viewcontroller_helpers_helpsystem_reader",
     os.path.join(_HELPERS_DIR, "HelpSystem.py"),
 ).add_help_menu
+launch_pixler_handoff = _load_module_from_path(
+    "viewcontroller_helpers_pixler_handoff_reader",
+    os.path.join(_HELPERS_DIR, "pixler_handoff.py"),
+).launch_pixler_handoff
 # PyQt5 imports
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
@@ -1492,7 +1496,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         os.system(lo_cmd)
 
     def OpenWithMyPixler(self):
-        self._launch_module("MyPixler.py")
+        return launch_pixler_handoff(self, "MyReader", self.imgpath)
 
     def OpenWithMyScanner(self):
         self._launch_module("MyScanner.py")

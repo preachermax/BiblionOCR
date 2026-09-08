@@ -73,6 +73,7 @@ from PreProcess import PreProcess as pp
 #from MultiPreProcess import MultiPreProcess as mpp
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
+from pixler_handoff import launch_pixler_handoff
 from project_status_controller import ProjectStatusController
 from print_menu_support import install_print_menu_support, image_target, document_target
 from project_column_settings import update_project_columns, project_metadata_db_path
@@ -1614,16 +1615,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
 
     def OpenWithMyPixler(self):
-
-        # Uncomment below to open My Pixler in a dependent window => disables MyScanner until closed
-
-        #mw_cmd = "python3 ViewController/0-MainUI/MyPixler.py"
-        #print(mw_cmd)
-        #os.system(mw_cmd)
-
-        # Open MyPixler in an independent window => allows both windows remain open and to function independently
-        self.pixlermain = pixler.PixlerMain()
-        self.pixlermain.show()
+        return launch_pixler_handoff(self, "MyScanner", self.imgpath)
 
     def OpenWithMyVersifier(self):
         self.versifiermain = versifier.Ui_MainWindow()

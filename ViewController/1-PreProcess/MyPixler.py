@@ -262,6 +262,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.refimgpath = None
         self.subprocess_mode = False
         self.subprocess_return_path = ""
+        self.subprocess_caller = ""
 
         self.refimgdir = ""
         self.imagedir = ""
@@ -303,7 +304,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.eraser_tip_shape = "circle"
         self._last_crop_origin = qtc.QPoint(0, 0)
         self.rubberBand = None
-        self.return_to_server_button = None
+        self.return_button = None
         self.crop_prompt_dialog = None
         self.crop_selection_ready = False
         self.crop_drawing_active = False
@@ -318,20 +319,22 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.pdf_viewer_dialog = None
 
         # -------------------------
-        # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ARGUMENT HANDLING (MyServer ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ MyPixler)
+        # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ARGUMENT HANDLING (calling module ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ MyPixler)
         # -------------------------
         import sys
 
         if launch_args is not None:
-            parsed_imgpath, subprocess_mode, return_path = self._parse_launch_arguments(launch_args)
+            parsed_imgpath, subprocess_mode, return_path, caller = self._parse_launch_arguments(launch_args)
             self.subprocess_mode = subprocess_mode
             self.subprocess_return_path = return_path
+            self.subprocess_caller = caller
             if parsed_imgpath:
                 imgpath = parsed_imgpath
         elif imgpath is None and len(sys.argv) > 1:
-            imgpath, subprocess_mode, return_path = self._parse_launch_arguments(sys.argv[1:])
+            imgpath, subprocess_mode, return_path, caller = self._parse_launch_arguments(sys.argv[1:])
             self.subprocess_mode = subprocess_mode
             self.subprocess_return_path = return_path
+            self.subprocess_caller = caller
 
         if not imgpath:
             shared_page = self.shared_session_manager.get_active_project_page_state()
@@ -404,15 +407,17 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         )
 
         if launch_args is not None:
-            parsed_imgpath, subprocess_mode, return_path = self._parse_launch_arguments(launch_args)
+            parsed_imgpath, subprocess_mode, return_path, caller = self._parse_launch_arguments(launch_args)
+            self.subprocess_caller = caller
         # -------------------------
         # Phase 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DEFERRED STARTUP (CRITICAL)
             if parsed_imgpath:
                 imgpath = parsed_imgpath
         elif imgpath is None and len(sys.argv) > 1:
-            imgpath, subprocess_mode, return_path = self._parse_launch_arguments(sys.argv[1:])
+            imgpath, subprocess_mode, return_path, caller = self._parse_launch_arguments(sys.argv[1:])
             self.subprocess_mode = subprocess_mode
             self.subprocess_return_path = return_path
+            self.subprocess_caller = caller
         # -------------------------
         if self._startup_load:
             def _startup():
@@ -439,6 +444,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         imgpath = None
         subprocess_mode = False
         return_path = ""
+        caller = ""
 
         index = 0
         while index < len(argv):
@@ -452,6 +458,10 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 subprocess_mode = True
                 index += 2
                 continue
+            if token == "--caller" and index + 1 < len(argv):
+                caller = str(argv[index + 1]).strip()
+                index += 2
+                continue
             if token.startswith("--"):
                 index += 1
                 continue
@@ -459,7 +469,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 imgpath = token
             index += 1
 
-        return imgpath, subprocess_mode, return_path
+        return imgpath, subprocess_mode, return_path, caller
 
     @qtc.pyqtSlot(str)
     def append_text(self,text):
@@ -1261,17 +1271,17 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if not self.subprocess_mode or not self.subprocess_return_path:
             return
 
-        self.return_to_server_button = qtw.QPushButton("Return Crop to MyServer")
-        self.return_to_server_button.setEnabled(False)
-        self.return_to_server_button.setFixedHeight(24)
-        self.return_to_server_button.setStyleSheet(
+        self.return_button = qtw.QPushButton("Return")
+        self.return_button.setEnabled(False)
+        self.return_button.setFixedHeight(24)
+        self.return_button.setStyleSheet(
             "QPushButton { background-color: #4a4a4a; color: white; border: 1px solid #2d2d2d; padding: 2px 8px; }"
             "QPushButton:hover { background-color: #5a5a5a; }"
             "QPushButton:pressed { background-color: #3b3b3b; }"
         )
-        self.return_to_server_button.setToolTip(self.subprocess_return_path)
-        self.return_to_server_button.clicked.connect(self.returnCropToMyServer)
-        self.statusBar().addPermanentWidget(self.return_to_server_button)
+        self.return_button.setToolTip(self.subprocess_return_path)
+        self.return_button.clicked.connect(self.returnToCaller)
+        self.statusBar().addPermanentWidget(self.return_button)
 
         self.statusBar().showMessage(
             f"Subprocess return ready: {self.subprocess_return_path}"
@@ -2875,7 +2885,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self._copy_qimage_resolution(source, canvas)
         return canvas
 
-    def returnCropToMyServer(self):
+    def returnToCaller(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
             print("[CROP] No subprocess return path available")
             return
@@ -2890,12 +2900,16 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
         payload = self._normalize_return_geometry(payload)
         self._save_qimage_as_tiff(payload, self.subprocess_return_path)
-        print(f"[CROP] Returned cropped result to MyServer: {self.subprocess_return_path}")
+        caller = self.subprocess_caller or "calling module"
+        print(f"[CROP] Returned edited result to {caller}: {self.subprocess_return_path}")
 
-        if self.return_to_server_button is not None:
-            self.return_to_server_button.setEnabled(False)
+        if self.return_button is not None:
+            self.return_button.setEnabled(False)
 
         qtc.QTimer.singleShot(100, self.close)
+
+    def returnCropToMyServer(self):
+        self.returnToCaller()
 
     def changed_Image(self):
         self.ImagechangesSaved = False
@@ -3308,9 +3322,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.imagedir = os.path.dirname(self.refimgpath)
             self.ui.ImageLE.setText(os.path.basename(self.refimgpath))
 
-        if self.subprocess_mode and self.subprocess_return_path and self.return_to_server_button is not None:
-            self.return_to_server_button.setEnabled(True)
-            self.statusBar().showMessage("Result ready. Press Return Crop to MyServer.")
+        if self.subprocess_mode and self.subprocess_return_path and self.return_button is not None:
+            self.return_button.setEnabled(True)
+            self.statusBar().showMessage("Result ready. Press Return.")
 
         self.ui.Image.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
         self.ui.Image.setPixmap(self.imagepixmap)

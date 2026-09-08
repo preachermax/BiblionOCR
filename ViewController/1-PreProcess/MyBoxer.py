@@ -106,6 +106,7 @@ except ModuleNotFoundError:
     pp = _MissingPreProcessModule()
 from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
+from pixler_handoff import launch_pixler_handoff
 from project_status_controller import ProjectStatusController
 #from ProjectBrowserUI import Ui_Explorer
 #from ProjectBrowser import MyFileBrowser
@@ -840,9 +841,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):  # pyright: ignore[report
         newapp.exec_()'''
 
     def OpenWithMyPixler(self):
-        script = os.path.join(self.projecthome, 'ViewController', '1-PreProcess', 'MyPixler.py')
-        print(f'Launching: {sys.executable} {script}')
-        subprocess.Popen([sys.executable, script])
+        return launch_pixler_handoff(self, "MyBoxer", self.imgpath)
 
     def OpenWithMyWriter(self):
         script = os.path.join(self.projecthome, 'ViewController', '4-PostProcess', 'MyWriter.py')

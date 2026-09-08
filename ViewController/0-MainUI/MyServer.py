@@ -30,6 +30,21 @@ training_dir = os.path.join(viewcontroller_dir, "2-TrainTesseract")
 process_dir = os.path.join(viewcontroller_dir, "3-Process")
 postprocess_dir = os.path.join(viewcontroller_dir, "4-PostProcess")
 
+RUNTIME_MODULE_PATHS = {
+    "MyScanner.py": os.path.join(script_dir, "MyScanner.py"),
+    "MyExplorer.py": os.path.join(script_dir, "MyExplorer.py"),
+    "MyBoxer.py": os.path.join(preprocess_dir, "MyBoxer.py"),
+    "MyGlypher.py": os.path.join(preprocess_dir, "MyGlypher.py"),
+    "MyPixler.py": os.path.join(preprocess_dir, "MyPixler.py"),
+    "MyGrounder.py": os.path.join(training_dir, "MyGrounder.py"),
+    "MyReader.py": os.path.join(training_dir, "MyReader.py"),
+    "MyTrainer.py": os.path.join(training_dir, "MyTrainer.py"),
+    "MyLexer.py": os.path.join(process_dir, "MyLexer.py"),
+    "MyResolver.py": os.path.join(process_dir, "MyResolver.py"),
+    "MyVersifier.py": os.path.join(process_dir, "MyVersifier.py"),
+    "MyWriter.py": os.path.join(postprocess_dir, "MyWriter.py"),
+}
+
 # Define directories
 model_dir = os.path.join(project_root, "Model")
 data_dir = os.path.join(model_dir, "Data")
@@ -112,6 +127,7 @@ from helpers.Dialogs.ThemeEditorDialog import (
     load_theme_preferences,
     save_theme_preferences,
 )
+from helpers.ProjectTrackingDialog import ProjectTrackingDialog
 from helpers.Stylesheets import load_project_theme, save_project_theme
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_database import project_metadata_database_path, update_project_database_values
@@ -488,20 +504,24 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Menu Modules
         self.ui.actionImageScanner.triggered.connect(self.actionScanNetwork)
         self.ui.actionImageScanner_tb.triggered.connect(self.actionScanNetwork)
-
         self.ui.actionMyExplorer.triggered.connect(self.OpenWithMyExplorer)
-        self.ui.actionMyBoxer.triggered.connect(lambda: self.open_module("MyBoxer"))
-        self.ui.actionMyGlypher.triggered.connect(lambda: self.open_module("MyGlypher"))
-        self.ui.actionMyVersifier.triggered.connect(lambda: self.open_module("MyVersifier"))
-        self.ui.actionMyResolver.triggered.connect(lambda: self.open_module("MyResolver"))
-        self.ui.actionMyLexer.triggered.connect(lambda: self.open_module("MyLexer"))
-        self.ui.actionMyGrounder.triggered.connect(lambda: self.open_module("MyGrounder"))
-        self.ui.actionMyTrainer.triggered.connect(lambda: self.open_module("MyTrainer"))
+        self.ui.actionMyPixler.triggered.connect(self.OpenWithMyPixler)
+        self.ui.actionMyBoxer.triggered.connect(self.OpenWithMyBoxer)
+        self.ui.actionMyGlypher.triggered.connect(self.OpenWithMyGlypher)
+        self.ui.actionMyScanner.triggered.connect(self.OpenWithMyScanner)
+        self.ui.actionMyVersifier.triggered.connect(self.OpenWithMyVersifier)
+        self.ui.actionMyResolver.triggered.connect(self.OpenWithMyResolver)
+        self.ui.actionMyLexer.triggered.connect(self.OpenWithMyLexer)
+        self.ui.actionMyWriter.triggered.connect(self.OpenWithMyWriter)
+        self.ui.actionMyReader.triggered.connect(self.OpenWithMyReader)
+        self.ui.actionMyGrounder.triggered.connect(self.OpenWithMyGrounder)
+        self.ui.actionMyTrainer.triggered.connect(self.OpenWithMyTrainer)
+        self.ui.actionStage_Workflow.triggered.connect(self.open_stage_workflow_dialog)
 
         # Button Modules
-        self.ui.MyWriterbutton.clicked.connect(lambda: self.open_module("MyWriter"))
+        self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
-
+        self.ui.pushButton.clicked.connect(self.open_stage_workflow_dialog)
         # -------------------------
         # Misc UI
         # -------------------------
@@ -570,7 +590,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.project_engine = CoreProjectCreationEngine(
             base_path=os.path.join(os.path.expanduser("~"), "Projects"),
             event_bus=self.event_bus,
-            folder_list_path=os.path.join(script_dir, "ProjectFolderList.txt")
+            folder_list_path=os.path.abspath(
+                os.path.join(script_dir, os.pardir, "ScriptureProjectFolderList.txt")
+            )
         )
 
         # optional: hook events
@@ -1262,6 +1284,30 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             getattr(self, "txtdir", ""),
         )
         self._open_project_settings_dialog_for_root(project_root)
+
+    def open_stage_workflow_dialog(self):
+        project_root = self.workflow_tracker.resolve_project_root(
+            self._shared_active_project_root(),
+            self.current_project_root,
+            getattr(self, "imgpath", ""),
+            getattr(self, "imgdir", ""),
+            getattr(self, "txtpath", ""),
+            getattr(self, "txtdir", ""),
+        )
+        if not project_root:
+            qtw.QMessageBox.information(
+                self,
+                "Stage Workflow",
+                "Open or create a project first so its workflow can be staged.",
+            )
+            return None
+
+        self._set_current_project(project_root)
+        self.workflow_tracker.ensure_tracking_state(project_root)
+        dialog = ProjectTrackingDialog(self.workflow_tracker, project_root, "MyServer", self)
+        dialog.exec_()
+        self._refresh_project_status(project_root)
+        return project_root
 
     def open_theme_editor_dialog(self):
         project_root = self._shared_active_project_root() or self.current_project_root
@@ -3477,7 +3523,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         })
 
     def run_child_module(self, filename, *args):
-        module_path = os.path.abspath(os.path.join(script_dir, filename))
+        if os.path.isabs(filename):
+            module_path = os.path.normpath(filename)
+        else:
+            normalized_name = filename if filename.endswith('.py') else f'{filename}.py'
+            module_path = RUNTIME_MODULE_PATHS.get(
+                normalized_name,
+                os.path.join(script_dir, normalized_name),
+            )
+        module_path = os.path.abspath(module_path)
         cmd = [sys.executable, module_path]
 
         if args and args[0]:
@@ -3680,6 +3734,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             '--subprocess-mode',
             '--return-path',
             self.pixler_return_path,
+            '--caller',
+            'MyServer',
+            source_path,
         ]
 
         print(f"[CMD] {cmd}")

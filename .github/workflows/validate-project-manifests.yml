@@ -1,0 +1,35 @@
+name: Validate Project Manifests
+
+on:
+  push:
+    paths:
+      - "Core/engine.py"
+      - "ViewController/**"
+      - "tests/test_project_structure_minimum.py"
+      - ".github/workflows/validate-project-manifests.yml"
+  pull_request:
+    paths:
+      - "Core/engine.py"
+      - "ViewController/**"
+      - "tests/test_project_structure_minimum.py"
+      - ".github/workflows/validate-project-manifests.yml"
+
+jobs:
+  validate-project-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test runner
+        run: python -m pip install pytest
+
+      - name: Validate manifests and generated project layout
+        env:
+          BIBLION_GUI_ENV_SANITIZED: "1"
+        run: python -m pytest -q tests/test_project_structure_minimum.py

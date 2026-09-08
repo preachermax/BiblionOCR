@@ -53,6 +53,10 @@ GENERATED_FILES = (
     GeneratedFile("pyrcc5", "ViewController/0-MainUI/helpers/UI_Icons.qrc", "ViewController/0-MainUI/helpers/UI_Icons.py"),
 )
 
+RETIRED_GENERATED_TARGETS = (
+    "ViewController/0-MainUI/MyPixlerUI.py",
+)
+
 
 def _command(item: GeneratedFile, temporary_target: Path) -> list[str]:
     if item.tool == "pyuic5":
@@ -102,6 +106,15 @@ def _replace_if_changed(target: Path, content: bytes, check_only: bool) -> str:
     return "updated"
 
 
+def _remove_retired_target(target: Path, check_only: bool) -> str:
+    if not target.exists():
+        return "absent"
+    if check_only:
+        return "stale"
+    target.unlink()
+    return "removed"
+
+
 def _validate_prerequisites() -> None:
     required_modules = {
         "pyuic5": "PyQt5.uic.pyuic",
@@ -121,7 +134,7 @@ def _validate_prerequisites() -> None:
 
 def update_generated_files(check_only: bool = False) -> int:
     _validate_prerequisites()
-    counts = {"updated": 0, "unchanged": 0, "stale": 0}
+    counts = {"updated": 0, "unchanged": 0, "removed": 0, "absent": 0, "stale": 0}
 
     with tempfile.TemporaryDirectory(prefix="biblion-ui-") as temporary_directory:
         temporary_root = Path(temporary_directory)
@@ -133,9 +146,15 @@ def update_generated_files(check_only: bool = False) -> int:
             counts[status] += 1
             print(f"{status.upper():9} {item.target}")
 
+        for retired_target in RETIRED_GENERATED_TARGETS:
+            target = REPOSITORY_ROOT / retired_target
+            status = _remove_retired_target(target, check_only)
+            counts[status] += 1
+            print(f"{status.upper():9} {retired_target}")
+
     print(
         f"Summary: {counts['updated']} updated, {counts['unchanged']} unchanged, "
-        f"{counts['stale']} stale"
+        f"{counts['removed']} removed, {counts['absent']} absent, {counts['stale']} stale"
     )
     return 1 if counts["stale"] else 0
 

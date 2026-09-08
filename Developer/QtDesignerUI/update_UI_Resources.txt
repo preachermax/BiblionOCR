@@ -19,3 +19,8 @@ Check for stale generated files without updating them:
 
 The generator also restores declared generated-file analysis directives, including the
 MyPixler page-workflow wizard's narrow Pyright compatibility directive.
+
+Retired generated targets are removed during updates and reported as stale by `--check`.
+MyPixler's canonical generated target is:
+
+	ViewController/1-PreProcess/MyPixlerUI.py

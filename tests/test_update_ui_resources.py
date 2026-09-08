@@ -52,3 +52,28 @@ def test_check_only_reports_stale_without_writing(tmp_path) -> None:
 
     assert status == "stale"
     assert target.read_bytes() == b"old content\n"
+
+
+def test_mypixler_ui_uses_canonical_preprocess_target() -> None:
+    generator = _load_generator_module()
+    mappings = {
+        item.source: item.target
+        for item in generator.GENERATED_FILES
+    }
+
+    assert mappings["Developer/QtDesignerUI/MyPixlerUI.ui"] == (
+        "ViewController/1-PreProcess/MyPixlerUI.py"
+    )
+    assert "ViewController/0-MainUI/MyPixlerUI.py" in generator.RETIRED_GENERATED_TARGETS
+
+
+def test_retired_generated_target_is_removed_or_reported(tmp_path) -> None:
+    generator = _load_generator_module()
+    retired_target = tmp_path / "MyPixlerUI.py"
+    retired_target.write_text("stale", encoding="utf-8")
+
+    assert generator._remove_retired_target(retired_target, check_only=True) == "stale"
+    assert retired_target.exists()
+    assert generator._remove_retired_target(retired_target, check_only=False) == "removed"
+    assert not retired_target.exists()
+    assert generator._remove_retired_target(retired_target, check_only=False) == "absent"

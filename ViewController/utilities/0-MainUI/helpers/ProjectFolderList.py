@@ -79,24 +79,15 @@ PAGE_WORKFLOW_STAGES = {
     "26_tif_back_src_pages_cleaned",
 }
 
-# Manifest copy overrides use the form:
-#   source_template => generated_project_destination
-# New projects must receive the project-safe MyServer bundle from Core/, not
-# the source BiblionOCR MyServer bundle from ViewController/0-MainUI/helpers/.
+# MyServer is copied from the live runtime tree and customized by Core.engine
+# after the project structure is created.
 PROJECT_MANIFEST_TEMPLATE_OVERRIDES = {
-    "Core/MyServer.py => ViewController/0-MainUI/MyServer.py",
-    "Core/MyServerUI.py => ViewController/0-MainUI/helpers/MyServerUI.py",
-    "Core/MyServerUI.ui => Developer/QtDesignerUI/MyServerUI.ui",
-}
-
-# These are the source BiblionOCR MyServer files that must not be copied into
-# generated projects. Core/MyServer* files are intentionally NOT listed here;
-# they are the replacement template sources used by the overrides above.
-OMITTED_SOURCE_MYSERVER_REFERENCES = {
     "ViewController/0-MainUI/MyServer.py",
-    "ViewController/0-MainUI/helpers/MyServerUI.py",
+    "ViewController/0-MainUI/MyServerUI.py",
     "Developer/QtDesignerUI/MyServerUI.ui",
 }
+
+OMITTED_SOURCE_MYSERVER_REFERENCES = set()
 
 STATIC_EXTERNAL_FOLDERS = {
     "/.fonts",
@@ -262,34 +253,36 @@ REQUIRED_VIEWCONTROLLER_REFERENCES = {
     "ViewController/0-MainUI/helpers/ocr_preprocess_tool.py",
     "ViewController/0-MainUI/helpers/NormalizeVerseText.py",
     "ViewController/0-MainUI/helpers/NormalizeRefText.py",
-    "ViewController/4-PostProcess/helpers/MyWriterUI.py",
+    "ViewController/4-PostProcess/MyWriterUI.py",
     "ViewController/4-PostProcess/MyWriter.py",
-    "ViewController/3-Process/helpers/MyVersifierUI.py",
+    "ViewController/3-Process/MyVersifierUI.py",
     "ViewController/3-Process/MyVersifier.py",
-    "ViewController/2-TrainTesseract/helpers/MyTrainerUI.py",
+    "ViewController/2-TrainTesseract/MyTrainerUI.py",
     "ViewController/2-TrainTesseract/MyTrainer.py",
 
     "ViewController/0-MainUI/MyScanner.py",
-    "ViewController/3-Process/helpers/MyResolverUI.py",
+    "ViewController/0-MainUI/MyScannerUI.py",
+    "ViewController/3-Process/MyResolverUI.py",
     "ViewController/3-Process/MyResolver.py",
-    "ViewController/2-TrainTesseract/helpers/MyReaderUI.py",
-    "ViewController/0-MainUI/helpers/MyScannerUI.py",
+    "ViewController/2-TrainTesseract/MyReaderUI.py",
     "ViewController/0-MainUI/helpers/MyScannerWin.py",
     *PROJECT_MANIFEST_TEMPLATE_OVERRIDES,
     "ViewController/2-TrainTesseract/MyReader.py",
-    "ViewController/1-PreProcess/helpers/MyPixlerUI.py",
+    "ViewController/1-PreProcess/MyPixlerPageWorkflowWizard.py",
+    "ViewController/1-PreProcess/MyPixlerPageWorkflowWizardUI.py",
+    "ViewController/1-PreProcess/MyPixlerUI.py",
     "ViewController/1-PreProcess/MyPixler.py",
-    "ViewController/3-Process/helpers/MyLexerUI.py",
+    "ViewController/3-Process/MyLexerUI.py",
     "ViecMyLexer.py",
-    "ViewController/0-MainUI/helpers/MyLauncherUI.py",
+    "ViewController/0-MainUI/MyLauncherUI.py",
     "ViewController/0-MainUI/MyLauncher.py",
-    "ViewController/2-TrainTesseract/helpers/MyGrounderUI.py",
+    "ViewController/2-TrainTesseract/MyGrounderUI.py",
     "ViewController/2-TrainTesseract/MyGrounder.py",
-    "ViewController/1-PreProcess/helpers/MyGlypherUI.py",
+    "ViewController/1-PreProcess/MyGlypherUI.py",
     "ViewController/1-PreProcess/MyGlypher.py",
-    "ViewController/0-MainUI/helpers/MyExplorerUI.py",
+    "ViewController/0-MainUI/MyExplorerUI.py",
     "ViewController/0-MainUI/MyExplorer.py",
-    "ViewController/1-PreProcess/helpers/MyBoxerUI.py",
+    "ViewController/1-PreProcess/MyBoxerUI.py",
     "ViewController/1-PreProcess/MyBoxer.py",
     "ViewController/0-MainUI/helpers/MainUI.py",
     "ViewController/0-MainUI/helpers/mainfind.py",
@@ -460,6 +453,11 @@ class ProjectFolderListBuilder:
         )
         cleaned.difference_update(OMITTED_SOURCE_MYSERVER_REFERENCES)
         cleaned.update(PROJECT_MANIFEST_TEMPLATE_OVERRIDES)
+        cleaned = {
+            entry
+            for entry in cleaned
+            if not self._is_file_reference(entry) or self._manifest_source_exists(entry)
+        }
         self._assert_no_deprecated_model_references(cleaned)
         return sorted(cleaned, key=self.sort_key)
 
@@ -781,6 +779,10 @@ class ProjectFolderListBuilder:
             return False
 
         return False
+
+    def _manifest_source_exists(self, path: str) -> bool:
+        source_path, _destination_path = self._split_manifest_copy_entry(path)
+        return (self.project_root / Path(source_path)).is_file()
 
     def _collect_session_json_folders(self) -> Set[str]:
         folders: Set[str] = set()

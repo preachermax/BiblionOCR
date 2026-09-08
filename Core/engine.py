@@ -129,8 +129,8 @@ class ProjectCreationEngine:
     ]
 
     REQUIRED_TEMPLATE_FILES = [
-        "ViewController/0-MainUI/HelpSystem.py",
-        "ViewController/0-MainUI/SessionManager.py",
+        "ViewController/0-MainUI/helpers/HelpSystem.py",
+        "ViewController/0-MainUI/helpers/SessionManager.py",
     ]
 
     REQUIRED_THEME_ENTRIES = [
@@ -733,9 +733,9 @@ class ProjectCreationEngine:
             )
             return copied_size
 
-        with open(destination_file, "w", encoding="utf-8"):
-            pass
-        return 0
+        raise FileNotFoundError(
+            f"Project template source does not exist: {source_entry}"
+        )
 
     # -----------------------
     def _calculate_total_structure_bytes(self, repo_root, relative_file_paths):
@@ -948,9 +948,9 @@ class ProjectCreationEngine:
             f.write("Generated the project folder structure from ProjectFolderList.txt.\n\n")
             f.write("## Notes\n\n")
             f.write("* Directory entries were created directly.\n")
-            f.write("* File entries were copied from the repository template when available.\n")
+            f.write("* File entries were copied from the repository template.\n")
             f.write("* Manifest entries in `source => destination` form were copied from source to destination.\n")
-            f.write("* Missing file templates were created as empty placeholders.\n")
+            f.write("* Missing file templates abort project creation; empty file placeholders are not permitted.\n")
             f.write("* Empty directories were given `.gitkeep` placeholders.\n\n")
 
             f.write("## Folder Count\n\n")

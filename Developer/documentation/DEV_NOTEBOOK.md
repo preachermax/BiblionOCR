@@ -20,6 +20,17 @@ Use this template for every pause, stop, or VS Code close event.
 * Next immediate action:
   * single next step
 
+### Session Handoff - 2026-09-07 MyServer, MyPixler, And Project Manifest Integrity
+
+* Scope summary: wired and smoke-tested MyServer module controls, generalized caller-neutral MyPixler image round trips, enforced the canonical MyPixler generated UI, repaired generated project placement, and added continuous manifest integrity checks.
+* Project creation truth: the wizard payload is collected before generation; `Core/engine.py` copies a manifest-selected snapshot from the current checkout, configures files and databases, then runs `git init` and sets `HEAD` to `main`. It does not clone or configure `origin/master`, commit, or push.
+* Runtime manifest: MyServer now passes `ViewController/ScriptureProjectFolderList.txt`, matching the curated manifest validated by project-structure tests and CI.
+* Integrity gates: missing template files abort creation, duplicate and missing-source entries fail tests, controller/UI adjacency is asserted, and `.github/workflows/validate-project-manifests.yml` runs the complete structure suite for relevant changes.
+* Standalone direction: development builds continue using the live checkout; release binaries require a versioned, hash-verified packaged template provider and must not depend on cloning `origin/master` at runtime.
+* Commit exclusions: runtime-local `Model/Project/Data/json/ReaderSession.json`, runtime-local `Model/Project/Data/json/Session.json`, and untracked `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg` are not part of this change set.
+* Validation: full-workspace and in-scope Problems both report zero; 26 focused tests and 423 subtests pass; UI resource generation reports zero stale files; changed Python files compile; `git diff --check` passes; and MyServer remains stable through a bounded 10-second offscreen startup smoke.
+* Commit/sync: authorized for the complete implementation set; stage review, commit, push, and upstream parity confirmation follow this handoff update.
+
 ## Collaboration Protocol Snapshot (2026-08-07)
 
 1. User will run an extensive manual audit in module order.
@@ -52,7 +63,8 @@ Use this template for every pause, stop, or VS Code close event.
   * manual/offscreen UI checks: MyPixler's actual `QToolButton` reports `ToolButtonIconOnly`, the action retains `Stage Source PDF`, and `stage.png` renders; MyExplorer's Page Workflow Wizard renders a non-null `wand.png` pixmap through the root compatibility shim.
   * icon validation: `stage.png` is 536x373 RGBA with transparent corners and non-empty foreground; its same-sized GIMP source is retained as `stage.xcf`.
   * launcher smoke: all 12 canonical Linux launchers reached stable five-second offscreen startup without traceback, missing import/file error, or crash.
-* Unresolved blockers/risks: the obsolete `ViewController/0-MainUI/MyPixlerUI.py` remains tracked for compatibility, but MyPixler now explicitly loads its canonical adjacent generated module; mixed PyQt5/PyQt6 PDF tests remain unsafe in one process.
+* MyPixler UI path correction: removed the obsolete `ViewController/0-MainUI/MyPixlerUI.py`; MyPixler explicitly loads `ViewController/1-PreProcess/MyPixlerUI.py`. The canonical generator now removes that retired duplicate during updates and reports it as stale in `--check` mode if it reappears.
+* Unresolved blocker/risk: mixed PyQt5/PyQt6 PDF tests remain unsafe in one process.
 * Next immediate action: stage the intended files, verify exclusions and staged diff, commit, synchronize `ubuntu_development` and `master`, and confirm remote parity.
 
 ### Session Handoff - 2026-09-07 MyExplorer, Patreon, And Workflow Icons
