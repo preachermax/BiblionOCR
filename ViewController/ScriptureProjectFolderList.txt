@@ -72,6 +72,8 @@ Model/Project/Images/Complete/Source/BackMatter
 Model/Project/Images/Scanned
 Model/Project/Images/MyServer/source_images
 Model/Project/Images/MyServer/source_images/pdf_acq_src_image
+Model/Project/Images/MyPixler/SourceStaged/Complete/pdf_staged_src_image
+Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image
 Model/Project/Images/MyServer/source_images/pdf_combined_src_images
 Model/Project/Images/MyServer/source_images/tif_acq_src_image
 Model/Project/Images/MyServer/source_images/tif_combined_src_images
@@ -332,8 +334,11 @@ ViewController/0-MainUI/helpers/ProjectFolderList.txt
 Developer/ViewController/SeparatedDevFiles/0-MainUI/pyTesseractTrainer-1.03.py
 ViewController/0-MainUI/helpers/Qt5SelectRegion.py
 ViewController/0-MainUI/helpers/QtCropImage.py
+ViewController/0-MainUI/helpers/qt_pdf_renderer.py
 ViewController/0-MainUI/helpers/ScanWorkflow.py
 ViewController/0-MainUI/helpers/SessionManager.py
+ViewController/0-MainUI/helpers/source_reader.py
+ViewController/0-MainUI/helpers/SourceReaderUI.py
 Developer/ViewController/SeparatedDevFiles/0-MainUI/sqlite3-mysql.txt
 ViewController/0-MainUI/helpers/SqliteHelper.py
 ViewController/0-MainUI/helpers/tif_greek_lines_stageDialog.py

@@ -22,6 +22,14 @@ class ProjectStructureMinimumTests(unittest.TestCase):
             "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
             default_folders,
         )
+        self.assertIn(
+            "Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image",
+            default_folders,
+        )
+        self.assertIn(
+            "Model/Project/Images/MyPixler/SourceStaged/Complete/pdf_staged_src_image",
+            default_folders,
+        )
         self.assertFalse(any(
             path.startswith("Model/Project/Images/MyServer/Source")
             for path in default_folders
@@ -124,6 +132,8 @@ class ProjectStructureMinimumTests(unittest.TestCase):
                 "Model/Project/Images/MyTrainer",
                 "Model/Project/Images/MyServer/source_images/pdf_acq_src_image",
                 "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
+                "Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image",
+                "Model/Project/Images/MyPixler/SourceStaged/Complete/pdf_staged_src_image",
                 "Model/Project/Images/MyPixler/VerseSections/Workflow/1_pdf_front_src_pages_staged",
                 "Model/Project/Images/MyPixler/VerseSections/Complete/26_tif_back_src_pages_cleaned",
                 "Model/Project/Text/MyServer/Reference",

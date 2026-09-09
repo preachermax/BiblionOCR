@@ -14,10 +14,10 @@ from Core.project_database import build_project_field_definitions
 from Core.project_tracking import MODULE_SEQUENCE, ProjectWorkflowTracker
 try:
     from helpers.ProjectCreationWizardDialogUI import Ui_ProjectCreationWizardDialog
-    from helpers.pdf_viewer_dialog import PdfViewerDialog, SourceDocumentLoadWorker
+    from helpers.source_reader import SourceReaderDialog, SourceDocumentLoadWorker
 except ModuleNotFoundError:
     from ProjectCreationWizardDialogUI import Ui_ProjectCreationWizardDialog
-    from pdf_viewer_dialog import PdfViewerDialog, SourceDocumentLoadWorker
+    from source_reader import SourceReaderDialog, SourceDocumentLoadWorker
 
 
 class ProjectCreationWizardDialog(qtw.QDialog):
@@ -1067,7 +1067,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
 
     def _on_source_document_loaded(self, source_path, page_count, image_path):
         try:
-            viewer = PdfViewerDialog(
+            viewer = SourceReaderDialog(
                 source_path,
                 self,
                 preloaded_page_count=page_count,
@@ -1177,7 +1177,7 @@ class ProjectCreationWizardDialog(qtw.QDialog):
         if cited_source_path and not self.source_document_edit.text().strip():
             self.source_document_edit.setText(cited_source_path)
             try:
-                viewer = PdfViewerDialog(cited_source_path, self)
+                viewer = SourceReaderDialog(cited_source_path, self)
                 self._set_detected_source_page_count(viewer.page_count)
                 viewer.deleteLater()
             except (RuntimeError, ValueError, json.JSONDecodeError):

@@ -151,7 +151,10 @@ def advance_page_workflow_files(
             f"Workflow step {step.sequence} produced no files in {complete_destination}"
         )
     _copy_directory_contents(complete_destination, workflow_handshake)
-    _clear_directory_contents(workflow_source)
+    if os.path.normcase(os.path.abspath(workflow_source)) != os.path.normcase(
+        os.path.abspath(complete_destination)
+    ):
+        _clear_directory_contents(workflow_source)
     return workflow_source, complete_destination, workflow_handshake
 
 

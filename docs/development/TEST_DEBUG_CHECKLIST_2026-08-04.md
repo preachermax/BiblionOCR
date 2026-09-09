@@ -322,6 +322,26 @@ Goal: test the highest-risk user-visible operations, not just startup.
 - Open project images.
 - Verify preview and cropping flows.
 - Confirm no crash when workflow/session files are sparse or newly created.
+- Open `MyServer` and `MyPixler` against the same project and stage a source PDF from MyServer.
+- Confirm MyPixler can split the staged source into front matter, middle matter, verse, and back matter while the source reader remains usable.
+- From the reader toolbar, open a different multipage PDF and a multipage TIFF; confirm each replaces the displayed reference without changing the active project's registered source.
+- Attempt to open a one-page PDF, one-page TIFF, and another image format; confirm each is rejected.
+- Start middle-matter book extraction and confirm MyServer's book combo follows the book displayed by MyPixler.
+- Select a later book manually in MyServer and confirm the next resumed MyPixler book extraction uses that canonical BookMarkdown position.
+- For a sparse middle-matter source:
+  - skip an early book with `Yes` to mark its pages intentionally absent;
+  - extract the first available annotation page into a later book and confirm its default begins at the first unconsumed source page;
+  - skip remaining books with `Yes` and confirm the workflow completes without creating pages in those folders.
+- Use `Cancel` from the skip confirmation and confirm the current book and range remain selected.
+- Confirm every accepted extraction and confirmed skip changes its displayed status from `pending` to `complete`; no `skipped` or `extracted` status is displayed or persisted.
+- After each completion, confirm the active dialog label and project progress bar update before the next dialog opens.
+- During section, per-book, individual-page, and PDF-for-TIFF extraction, confirm a temporary non-modal progress indicator appears and closes after success or failure.
+- Reopen extraction and confirm complete section steps and complete book dialogs are omitted.
+- Complete every milestone in a section or book-extraction loop, invoke it again with its source unavailable, and confirm no dialog opens. Confirm the completion report lists every completed `Sequence - MilestoneName` and directs the operator to `MyServer > Project Settings > Milestone Settings`.
+- In MyServer, uncheck the completed milestone. Reopen extraction and confirm the affected dialogs reappear as `pending`, including a usable recovered source for middle/verse book extraction.
+- For an incomplete source manuscript, extract all available pages and explicitly skip known-absent remaining books; confirm no out-of-range extraction is attempted for skipped books.
+- Reopen the project and confirm per-book ranges, statuses, overrides, and active book selection are restored.
+- Choose `File > MyExplorer` in MyPixler and confirm MyExplorer opens at the active project.
 
 ### 15. MyResolver and MyVersifier
 

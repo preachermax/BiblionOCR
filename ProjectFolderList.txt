@@ -184,6 +184,8 @@ Model/Project/Images/MyReader/Source
 Model/Project/Images/MyReader/Workflow
 Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image
 Model/Project/Images/MyScanner/scanned_images/tif_scan_src_image
+Model/Project/Images/MyPixler/SourceStaged/Complete/pdf_staged_src_image
+Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image
 Model/Project/Images/MyServer/source_images/pdf_acq_src_image
 Model/Project/Images/MyServer/source_images/pdf_combined_src_images
 Model/Project/Images/MyServer/source_images/tif_acq_src_image
@@ -347,9 +349,12 @@ ViewController/0-MainUI/helpers/project_status_controller.py
 ViewController/0-MainUI/helpers/ProjectFolderList.txt
 ViewController/0-MainUI/helpers/ProjectTrackingDialog.py
 ViewController/0-MainUI/helpers/QUICK_REFERENCE.md
+ViewController/0-MainUI/helpers/qt_pdf_renderer.py
 ViewController/0-MainUI/helpers/README_HELP_SYSTEM.md
 ViewController/0-MainUI/helpers/RenameFiles.py
 ViewController/0-MainUI/helpers/SessionManager.py
+ViewController/0-MainUI/helpers/source_reader.py
+ViewController/0-MainUI/helpers/SourceReaderUI.py
 ViewController/0-MainUI/helpers/SqliteHelper.py
 ViewController/0-MainUI/helpers/SqliteMain.py
 ViewController/0-MainUI/helpers/StageLineImages2GroundTruth.py

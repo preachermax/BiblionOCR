@@ -43,6 +43,8 @@ GENERATED_FILES = (
     GeneratedFile("pyuic5", "Developer/QtDesignerUI/MyWriterUI.ui", "ViewController/4-PostProcess/MyWriterUI.py"),
     GeneratedFile("pyuic5", "Developer/QtDesignerUI/PageVerseCrossReferenceUI.ui", "ViewController/utilities/0-MainUI/helpers/PageVerseCrossReferenceUI.py"),
     GeneratedFile("pyuic5", "Developer/QtDesignerUI/VersifyTextUI.ui", "ViewController/utilities/0-MainUI/helpers/VersifyTextUI.py"),
+    GeneratedFile("pyuic5", "Developer/QtDesignerUI/SourceReader.ui", "ViewController/0-MainUI/helpers/SourceReaderUI.py"),
+    GeneratedFile("pyuic5", "Developer/QtDesignerUI/StageDialog.ui", "ViewController/0-MainUI/helpers/Dialogs/StageDialog.py"),
     GeneratedFile("pyuic5", "Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui", "ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py"),
     GeneratedFile(
         "pyuic5",

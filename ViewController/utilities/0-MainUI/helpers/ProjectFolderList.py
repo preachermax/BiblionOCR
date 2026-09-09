@@ -131,6 +131,8 @@ STATIC_PROJECT_FOLDERS = {
     "Model/Project/Images/MyServer/source_images/tif_combined_src_images",
     "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
     "Model/Project/Images/MyScanner/scanned_images/tif_scan_src_image",
+    "Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image",
+    "Model/Project/Images/MyPixler/SourceStaged/Complete/pdf_staged_src_image",
     "Model/Project/Images/Complete/Greek",
     "Model/Project/Images/Complete/Latin",
     "Model/Project/Images/Complete/Source",

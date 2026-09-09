@@ -86,6 +86,8 @@ class ProjectCreationEngine:
         "Model/Project/Images/MyServer/source_images/provenance",
         "Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image",
         "Model/Project/Images/MyScanner/scanned_images/tif_scan_src_image",
+        "Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image",
+        "Model/Project/Images/MyPixler/SourceStaged/Complete/pdf_staged_src_image",
         *PAGE_WORKFLOW_FOLDERS,
         "Model/Project/Images/MyBoxer/Source",
         "Model/Project/Images/MyBoxer/Workflow",

@@ -20,6 +20,50 @@ Use this template for every pause, stop, or VS Code close event.
 * Next immediate action:
   * single next step
 
+### Session Handoff - 2026-09-09 MyPixler PDF Handshake Pre-Manual Audit
+
+* Scope summary: implemented and documented the MyServer-to-MyPixler PDF staging handshake, section extraction, canonical BookMarkdown synchronization, per-book middle/verse extraction, and sparse or incomplete manuscript skip behavior.
+* Follow-up behavior: wired MyPixler's existing `File > MyExplorer` action; normalized extraction statuses to `pending` and `complete`; made successful extraction and confirmed Skip complete their milestones; omitted complete dialogs; and restored complete dialogs as pending with predecessor-source recovery after MyServer unchecks a milestone.
+* Live-test repair: SSHV in Erasmus1516 wrote its verse section PDF to the saved parent Workflow folder while the workflow row required a `_book_40_Matthew` Complete child. Section completion now advances from the dialog's actual destination, and status remains pending unless the canonical handoff and milestone update both succeed.
+* Retry-state repair: Erasmus1516 retained full-list `section_index=2` while completed front/middle steps were filtered out. Active section restoration now uses the saved workflow sequence, so the retry opens SSHV rather than shifting to SSHB.
+* Completion-loop repair: every section and aggregate book extraction invocation now reads live milestone state before source lookup. Complete dialogs are omitted; an all-complete loop reports every `Sequence - MilestoneName` and identifies MyServer Project Settings as the re-enable point. Successful extraction and confirmed Skip refresh and repaint progress before the loop advances.
+* Source-reader and extraction feedback: the shared reader now opens other reference documents in place, accepts only PDF/TIFF files containing at least two pages, remains non-modal in docked/floating/standalone use, and does not register browsed references as the MyServer project source. All MyPixler PDF extraction paths display a temporary non-modal busy indicator and remove it after success or failure.
+* Source Reader UI realignment: `Developer/QtDesignerUI/SourceReader.ui` now owns the visual layout, `ViewController/0-MainUI/helpers/SourceReaderUI.py` is generated and tracked by the UI resource updater, and `ViewController/0-MainUI/helpers/source_reader.py` retains behavior only. Active classes, APIs, labels, and tests use Source Reader terminology.
+* Intended implementation and documentation scope:
+  * `Core/book_metadata.py`
+  * `Core/engine.py`
+  * `Core/page_workflow.py`
+  * `Core/source_documents.py`
+  * `Developer/QtDesignerUI/ExtractDialog.ui`
+  * `Developer/QtDesignerUI/StageDialog.ui`
+  * `ViewController/0-MainUI/MyServer.py`
+  * `ViewController/0-MainUI/helpers/Dialogs/ExtractDialog.py`
+  * `ViewController/0-MainUI/helpers/Dialogs/StageDialog.py`
+  * `ViewController/0-MainUI/helpers/HelpSystem.py`
+  * `ViewController/1-PreProcess/MyPixler.py`
+  * `docs/architecture/PAGE_WORKFLOW_WIZARD_ARCHITECTURE.md`
+  * `docs/development/TEST_DEBUG_CHECKLIST_2026-08-04.md`
+  * `tests/test_book_metadata.py`
+  * `tests/test_page_workflow.py`
+  * `tests/test_pdf_source_workflow.py`
+  * this handoff entry.
+* Related workflow-authority and project-manifest files are already modified in the dirty tree and require manual scope review before any future staging: `ProjectWorkflow.ods`, exported workflow CSV files, project folder lists, project-structure tests, and the folder-list utility.
+* Explicit commit exclusions: `Model/Project/Data/json/ReaderSession.json` and `Model/Project/Data/json/Session.json` are runtime-local state; `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg` is unrelated to this workflow.
+* Validation gates:
+  * problems/lint: full-workspace Problems `0`; in-scope Problems `0`; repository-wide `git diff --check` passed.
+  * compile: all Python files in the intended implementation, dialog, help, and test scope passed `.venv/bin/python -m py_compile`.
+  * automated tests: `91 passed, 431 subtests passed` across MyExplorer wiring, Designer-backed Source Reader layout and packaging, source-document browsing and multipage validation, non-modal extraction indicators, complete-only extraction status, all-complete Sequence/MilestoneName reporting before source lookup, immediate progress repaint, milestone re-entry, destination-path handoff, sequence-based retry restoration, BookMarkdown, page workflow, PDF handshake, Help content, MyServer image threading, and project-structure suites.
+  * UI lockstep: `.venv/bin/python Developer/update_ui_resources.py --check` reported `24 unchanged, 0 stale`; the retired `ViewController/0-MainUI/MyPixlerUI.py` remains intentionally absent.
+  * startup smoke: MyServer and MyPixler each remained stable through bounded eight-second offscreen startup with no traceback, missing import, or missing UI-file error.
+  * security/content scan: no credential or private-key pattern was found in the intended source, test, or documentation scope.
+  * manual UI checks: pending maintainer live audit using MyServer and MyPixler against the same active project.
+* Content and licensing: implementation and documentation are original project work; no third-party content or new external asset is introduced by this workflow change set.
+* Commit/sync: authorized on 2026-09-09 for the documented workflow and Source Reader change set. Synchronize `ubuntu_development` and `master` only after staged-snapshot validation passes.
+* Deferred debug change set: keep `Model/Project/Data/json/ReaderSession.json`, `Model/Project/Data/json/Session.json`, and the unused, unprovenanced `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg` unstaged for separate review.
+* Residual risk: any further live-debug adjustments discovered in MyServer/MyPixler are intentionally deferred to the next change set; automated behavior, offscreen UI, and startup coverage remain the acceptance evidence for this commit.
+* Repository state: HEAD remains `e5b54c54375e6caa96bb9e24ace0078b5003cee6`; no files were staged or committed during this validation pass.
+* Next immediate action: run final checklist validation, stage only the documented implementation set, commit it, synchronize both maintained branches, and verify remote parity.
+
 ### Session Handoff - 2026-09-07 MyServer, MyPixler, And Project Manifest Integrity
 
 * Scope summary: wired and smoke-tested MyServer module controls, generalized caller-neutral MyPixler image round trips, enforced the canonical MyPixler generated UI, repaired generated project placement, and added continuous manifest integrity checks.
@@ -58,7 +102,7 @@ Use this template for every pause, stop, or VS Code close event.
   * Problems/lint: full-workspace Problems `0`; in-scope Problems `0`.
   * compile: `UI_Icons.py`, MyPixler runtime/generated UI, and both touched test files passed `.venv/bin/python -m py_compile`.
   * focused tests in isolated processes: MyPixler toolbar/import tests `2 passed`; MyExplorer tests `16 passed`; page workflow tests `7 passed`; resource generator tests `3 passed`.
-  * broad test note: the combined Qt batch reached 29 passing tests before the known mixed-PyQt5/PyQt6 native-lifetime segfault in an unrelated PDF viewer test; all changed lanes pass in fresh processes.
+  * broad test note: the combined Qt batch reached 29 passing tests before the known mixed-PyQt5/PyQt6 native-lifetime segfault in an unrelated Source Reader test; all changed lanes pass in fresh processes.
   * UI/resource lockstep: `.venv/bin/python Developer/update_ui_resources.py --check` reported `22 unchanged, 0 stale`.
   * manual/offscreen UI checks: MyPixler's actual `QToolButton` reports `ToolButtonIconOnly`, the action retains `Stage Source PDF`, and `stage.png` renders; MyExplorer's Page Workflow Wizard renders a non-null `wand.png` pixmap through the root compatibility shim.
   * icon validation: `stage.png` is 536x373 RGBA with transparent corners and non-empty foreground; its same-sized GIMP source is retained as `stage.xcf`.
@@ -180,7 +224,7 @@ Use this template for every pause, stop, or VS Code close event.
   * `ViewController/0-MainUI/helpers/Dialogs/pdf4tifDialog.py`
   * `ViewController/0-MainUI/helpers/HelpSystem.py`
   * `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py`
-  * `ViewController/0-MainUI/helpers/pdf_viewer_dialog.py`
+  * `ViewController/0-MainUI/helpers/source_reader.py`
   * `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py`
   * `ViewController/1-PreProcess/MyBoxer.py`
   * `ViewController/1-PreProcess/MyPixler.py`
@@ -226,7 +270,7 @@ Use this template for every pause, stop, or VS Code close event.
 * PNG policy:
   * PNG conversion and resize commands were removed from the active MyPixler UI and the obsolete MyServer/MyPixler inventory and legacy workflow rows.
   * Temporary QtPdf render files, the in-memory Qt/OpenCV bridge, icons, and test fixtures remain because they are implementation dependencies rather than project workflow artifacts.
-* Threading contract: `PdfViewerDock.documentLoaded` and `loadFailed` are emitted only after worker-thread cleanup, so MyServer/MyPixler can consume or close a ready reader without a modal race.
+* Threading contract: `SourceReaderDock.documentLoaded` and `loadFailed` are emitted only after worker-thread cleanup, so MyServer/MyPixler can consume or close a ready reader without a modal race.
 * Validation gates:
   * problems/lint: pass; all affected files report `0` Problems.
   * source workflow: pass; `27 passed` before the final explicit subrange/UI ownership additions.
@@ -288,7 +332,7 @@ Use this template for every pause, stop, or VS Code close event.
 
 * Scope summary: made the shared source reader open at Fit to Width, expand a non-maximized parent window while docked, and restore its original geometry when floated, undocked, closed, or replaced.
 * Touched files:
-  * `ViewController/0-MainUI/helpers/pdf_viewer_dialog.py`
+  * `ViewController/0-MainUI/helpers/source_reader.py`
   * `ViewController/0-MainUI/helpers/HelpSystem.py`
   * `tests/test_pdf_source_workflow.py`
   * `tests/test_help_system_content.py`
@@ -334,7 +378,7 @@ Use this template for every pause, stop, or VS Code close event.
 * Touched-file groups:
   * `Core/engine.py` and `Core/source_documents.py` for transactional source/provenance copying and generic PDF/TIFF discovery.
   * the three active `ProjectFolderList.txt` manifests for the project-local provenance folder.
-  * `ViewController/0-MainUI/MyServer.py`, `ViewController/0-MainUI/helpers/pdf_viewer_dialog.py`, and `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py` for source-reader integration and threaded preparation.
+  * `ViewController/0-MainUI/MyServer.py`, `ViewController/0-MainUI/helpers/source_reader.py`, and `ViewController/0-MainUI/helpers/project_creation_wizard_dialog.py` for Source Reader integration and threaded preparation.
   * `Developer/QtDesignerUI/ProjectCreationWizardDialogUI.ui` and generated `ViewController/0-MainUI/helpers/ProjectCreationWizardDialogUI.py` for the wizard shell and loading-progress controls.
   * `ViewController/1-PreProcess/MyPixler.py`, `ViewController/1-PreProcess/MyGlypher.py`, and `ViewController/2-TrainTesseract/MyReader.py` for source-reader terminology and startup-session compatibility.
   * `tests/test_pdf_source_workflow.py` and `docs/architecture/PROJECT_CREATION_ARCHITECTURE.md` for regression coverage and contract documentation.
@@ -2231,23 +2275,23 @@ Next immediate action:
 
 ---
 
-## Session Handoff (2026-08-17) - MyServer Dockable Source PDF Viewer
+## Session Handoff (2026-08-17) - MyServer Dockable Source Reader
 
 Scope summary:
 
-* Made the source PDF viewer scrollable and zoomable by slider, reusable as a standalone dialog, and dockable/floating on the left side of MyServer with explicit hide, dock/undock, and confirmed manual-close behavior.
+* Made the Source Reader scrollable and zoomable by slider, reusable as a standalone dialog, and dockable/floating on the left side of MyServer with explicit hide, dock/undock, and confirmed manual-close behavior.
 
 Touched-file list from git status --short (in-scope):
 
 * M ViewController/0-MainUI/MyServer.py
-* ?? ViewController/0-MainUI/helpers/pdf_viewer_dialog.py
+* ?? ViewController/0-MainUI/helpers/source_reader.py
 * ?? tests/test_pdf_source_workflow.py
 * M Developer/documentation/DEV_NOTEBOOK.md
 
 Validation status by gate:
 
 * problems/lint: full workspace 0; in-scope 0
-* compile: MyServer.py, pdf_viewer_dialog.py, and test_pdf_source_workflow.py passed py_compile
+* compile: MyServer.py, source_reader.py, and test_pdf_source_workflow.py passed py_compile
 * focused tests: PDF source workflow, project structure, and project settings passed (16 tests, 42 subtests)
 * behavior tests: oversized-page scrolling, 25-200% slider zoom, left docking, floating, hiding, and Yes/No manual-close confirmation passed offscreen
 * startup smoke: MyServer remained open after complete offscreen initialization with no traceback
@@ -2362,28 +2406,28 @@ Next immediate action:
 
 ---
 
-## Session Handoff (2026-08-18) - MyServer Embedded Source PDF Viewer
+## Session Handoff (2026-08-18) - MyServer Embedded Source Reader
 
 Scope summary:
 
-* Moved the docked source PDF viewer inside MyServer's normal left image panel while preserving user-controlled show, hide, undock, redock, and confirmed close behavior.
+* Moved the docked Source Reader inside MyServer's normal left image panel while preserving user-controlled show, hide, undock, redock, and confirmed close behavior.
 
 Touched-file list from git status --short (in-scope):
 
 * M Developer/QtDesignerUI/MyServerUI.ui
 * M ViewController/0-MainUI/MyServerUI.py
 * M ViewController/0-MainUI/MyServer.py
-* ?? ViewController/0-MainUI/helpers/pdf_viewer_dialog.py
+* ?? ViewController/0-MainUI/helpers/source_reader.py
 * ?? tests/test_pdf_source_workflow.py
 * M Developer/documentation/DEV_NOTEBOOK.md
 
 Behavior changed:
 
-* The Designer source now owns a hidden `sourcePdfViewerHost` over the existing MyServer left image viewport.
+* The Designer source now owns a hidden `sourceReaderHost` over the existing MyServer left image viewport.
 * Opening the source document from the View menu embeds the viewer in that host instead of adding a separate dock beside the left panel.
 * The viewer toolbar can hide the embedded panel, undock it into a floating window, redock it into the left panel, or close it after confirmation.
 * The View menu visibility action remains synchronized in embedded and floating states.
-* Standalone `PdfViewerDialog` and non-embedded `PdfViewerDock` consumers retain their existing behavior.
+* Standalone `SourceReaderDialog` and non-embedded `SourceReaderDock` consumers retain their existing behavior.
 * MyLexer remains untouched.
 
 Validation status by gate:
@@ -2565,7 +2609,7 @@ Next immediate action:
 
 Scope summary:
 
-* Documented a living, evidence-gated path for integrating the Jetson Nano into BiblionOCR project/page workflows, improved transparent toolbar-icon visibility in Tigers and Tide, and compacted the docked PDF viewer toolset into two complete top rows.
+* Documented a living, evidence-gated path for integrating the Jetson Nano into BiblionOCR project/page workflows, improved transparent toolbar-icon visibility in Tigers and Tide, and compacted the docked Source Reader toolset into two complete top rows.
 
 Files changed (in-scope):
 
@@ -2577,7 +2621,7 @@ Files changed (in-scope):
 * M ViewController/0-MainUI/helpers/Stylesheets/dark_blue.qss
 * M ViewController/0-MainUI/helpers/Stylesheets/tigers.qss
 * M ViewController/0-MainUI/helpers/Stylesheets/tide.qss
-* M ViewController/0-MainUI/helpers/pdf_viewer_dialog.py
+* M ViewController/0-MainUI/helpers/source_reader.py
 * M tests/test_theme_catalog.py
 * M tests/test_pdf_source_workflow.py
 * M docs/architecture/nano/README.md
@@ -2590,7 +2634,7 @@ Behavior changed:
 * Tigers tool buttons use the theme's light gray surface with dark text, and its top-menu hover now uses white text against the navy menu bar for stronger visibility.
 * Tide tool buttons use the theme's midpoint light gray `#D0D0D0` with dark text, reducing the previous `#F2F2F2` backlight while preserving transparent icon detail. Dark retains its established medium-gray surface with white text.
 * Theme artifacts regenerate from explicit tool-button background/text tokens in the canonical schema and remain synchronized between root and source QSS copies.
-* The PDF viewer now places navigation/window controls on one compact top row and zoom controls on a second top row, reduces inherited toolbar font size by one point, removes excess margins, and allows the zoom slider to contract to 72 pixels.
+* The Source Reader now places navigation/window controls on one compact top row and zoom controls on a second top row, reduces inherited toolbar font size by one point, removes excess margins, and allows the zoom slider to contract to 72 pixels.
 * The Nano study defines managed job requests/results, source residency, project page-count updates, section-aware page work, provenance, deterministic fallback, benchmark admission gates, phased implementation, update triggers, and a dated evidence ledger.
 
 Workflow sequence delta from inferred baseline:

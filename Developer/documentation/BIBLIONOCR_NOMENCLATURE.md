@@ -116,7 +116,7 @@ Use the exact `My...` name when identifying an application module. A module supp
 
 | Canonical term | Meaning | Notes |
 | --- | --- | --- |
-| **source document** | The active project's original PDF or multipage TIFF acquisition source. | It may be displayed by MyPixler's shared source viewer without becoming a mutable output. |
+| **source document** | The active project's original PDF or multipage TIFF acquisition source. | It may be displayed by MyPixler's shared Source Reader without becoming a mutable output. |
 | **source image** | An image acquired or derived as input to page processing. | Use provenance to distinguish original acquisition from a derived image. |
 | **reference image** | An image displayed for comparison or consultation. | Must not become `CurrentProjectPage` merely by being viewed. |
 | **reference text** | Text displayed for comparison, reading, or correction context. | Distinguish from editable/output text. |

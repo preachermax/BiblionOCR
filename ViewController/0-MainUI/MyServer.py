@@ -118,8 +118,9 @@ import qimage2ndarray
 from queue import Queue
 from helpers.ext import mainfind
 from helpers.HelpSystem import add_help_menu
-from helpers.pdf_viewer_dialog import PdfViewerDock
+from helpers.source_reader import SourceReaderDock
 from helpers.Dialogs.ProjectSettingsDialog import ProjectSettingsDialog
+from helpers.Dialogs.StageDialog import Ui_StageDialog
 from helpers.Dialogs.ThemeEditorDialog import (
     ThemePreferences,
     ThemeEditorDialog,
@@ -129,6 +130,7 @@ from helpers.Dialogs.ThemeEditorDialog import (
 )
 from helpers.ProjectTrackingDialog import ProjectTrackingDialog
 from helpers.Stylesheets import load_project_theme, save_project_theme
+from Core.book_metadata import book_session_values, find_book_reference, load_book_references
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
 from Core.project_database import project_metadata_database_path, update_project_database_values
 from Core.project_tracking import ProjectWorkflowTracker
@@ -136,6 +138,8 @@ from Core.source_documents import (  # pyright: ignore[reportMissingImports]
     combine_project_source_pdfs,
     copy_pdf_source_readonly,
     find_project_pdf_source,
+    project_staged_pdf_workflow_directory,
+    stage_combined_project_pdf,
 )
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
@@ -335,13 +339,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.pixler_return_path = ""
         self.pending_pixler_source_path = ""
         self._pixler_return_poll_timer = None
+        self._book_context_poll_timer = None
+        self._last_synced_book_markdown = ""
         self.pixler_return_prompt_dialog = None
         self.current_project_page = 1
         self.current_project_milestone = ""
         self.current_page_milestone = ""
         self.pdf_source_path = ""
         self.pdf_page_count = 0
-        self.pdf_viewer_dialog = None
+        self.source_reader = None
         self.sourcefolder = ""
 
         # self.networkScanner = NetworkScanner()
@@ -416,15 +422,15 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionCombineSourcePages.triggered.connect(self.actionCombineSourcePages)
         if hasattr(self.ui, "actionOpen_Project"):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
-        self.view_source_document_action = qtw.QAction("Display Source Document", self)
+        self.view_source_document_action = qtw.QAction("Open Source Reader", self)
         self.view_source_document_action.setEnabled(False)
         self.view_source_document_action.triggered.connect(self.view_source_document)
         self.ui.menuView.addAction(self.view_source_document_action)
-        self.source_viewer_visibility_action = qtw.QAction("Show Source Document Viewer", self)
-        self.source_viewer_visibility_action.setCheckable(True)
-        self.source_viewer_visibility_action.setEnabled(False)
-        self.source_viewer_visibility_action.triggered.connect(self._set_pdf_viewer_visibility)
-        self.ui.menuView.addAction(self.source_viewer_visibility_action)
+        self.source_reader_visibility_action = qtw.QAction("Show Source Reader", self)
+        self.source_reader_visibility_action.setCheckable(True)
+        self.source_reader_visibility_action.setEnabled(False)
+        self.source_reader_visibility_action.triggered.connect(self._set_source_reader_visibility)
+        self.ui.menuView.addAction(self.source_reader_visibility_action)
 
         self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
         self.ui.actionOpen_Text.triggered.connect(self.open_text_with_myexplorer)
@@ -516,12 +522,12 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMyReader.triggered.connect(self.OpenWithMyReader)
         self.ui.actionMyGrounder.triggered.connect(self.OpenWithMyGrounder)
         self.ui.actionMyTrainer.triggered.connect(self.OpenWithMyTrainer)
-        self.ui.actionStage_Workflow.triggered.connect(self.open_stage_workflow_dialog)
+        self.ui.actionStage_Workflow.triggered.connect(self.actionStageSourcePages)
 
         # Button Modules
         self.ui.MyWriterbutton.clicked.connect(self.OpenWithMyWriter)
         self.ui.MyPixlerbutton.clicked.connect(self.OpenWithMyPixler)
-        self.ui.pushButton.clicked.connect(self.open_stage_workflow_dialog)
+        self.ui.pushButton.clicked.connect(self.actionStageSourcePages)
         # -------------------------
         # Misc UI
         # -------------------------
@@ -562,6 +568,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Session Restore
         # -------------------------
         self.get_session_settings()
+        self._sync_book_combo_from_project_session()
         self._apply_closed_loop_defaults()
         self.OpenChrReference()
 
@@ -580,6 +587,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.raise_()
         self.activateWindow()
         qtc.QTimer.singleShot(0, self._restore_session_content)
+        self._start_book_context_monitor()
         qtc.QTimer.singleShot(0, self._ensure_main_window_visible)
 
         self.on_lang_select()
@@ -907,7 +915,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         return super().eventFilter(watched, event)
 
     def closeEvent(self, event):
-        self._close_pdf_viewer_automatically()
+        self._close_source_reader_automatically()
         self._pending_tiff_load_path = ""
         for thread in (self._thread, self._image_thread):
             if thread is not None and thread.isRunning():
@@ -979,9 +987,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             return None
 
         resolved_root = self.workflow_tracker.resolve_project_root(project_root) or os.path.abspath(os.path.normpath(project_root))
-        viewer = self.pdf_viewer_dialog
+        viewer = self.source_reader
         if viewer is not None and not self._path_is_within(viewer.pdf_path, resolved_root):
-            self._close_pdf_viewer_automatically()
+            self._close_source_reader_automatically()
         self.current_project_root = resolved_root
         self.session_manager.set_active_project(resolved_root)
         self._apply_project_theme(load_project_theme(resolved_root))
@@ -1010,7 +1018,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not source_path:
             qtw.QMessageBox.information(
                 self,
-                "Display Source Document",
+                "Open Source Reader",
                 "The active project does not have a PDF or TIFF source document.",
             )
             return False
@@ -1018,9 +1026,9 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def _open_project_source_pdf_on_startup(self):
         qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
-        viewer = self.pdf_viewer_dialog
+        viewer = self.source_reader
         if viewer is not None:
-            viewer.show_viewer()
+            viewer.show_reader()
             return True
 
         source_path = self._project_source_pdf()
@@ -1664,53 +1672,88 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # Closing file
         f.close()
 
-    def selectBookCombo(self):
-        oldbookabbr = self.bookabbr
-        self.bookabbr = self.ui.bookComboBox.currentText()
+    def _active_project_session_manager(self):
+        active_root = self._shared_active_project_root() or self.current_project_root
+        if not active_root:
+            return None
+        return SessionManager(
+            os.path.join(active_root, "Model", "Project", "Data", "json")
+        )
 
-        if self.ui.bookComboBox.currentText() != oldbookabbr:
+    def _apply_book_reference(self, reference, *, persist=False):
+        values = book_session_values(reference)
+        self.bookabbr = values["self.bookabbr"]
+        self.bookmarkdown = values["self.bookmarkdown"]
+        self.sourcebookmarkdown = values["self.sourcebookmarkdown"]
+        self.greekbookmarkdown = values["self.greekbookmarkdown"]
+        self.latinbookmarkdown = values["self.latinbookmarkdown"]
+        self._last_synced_book_markdown = self.bookmarkdown
 
-            # jsonfile = 'Model/Data/json/BooksFolderList.json'
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "BooksFolderList.json")
-
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                for BookAbbr in data:
-                    if BookAbbr['BookAbbr'] == self.bookabbr:
-                        bookmarkdown = BookAbbr['BookMarkdown']
-                        self.sourcebookmarkdown = 'source' + bookmarkdown
-                        self.greekbookmarkdown = 'greek' + bookmarkdown
-                        self.latinbookmarkdown = 'latin' + bookmarkdown
-            f.close()
-
-            #jsonfile = 'Model/Data/json/Session.json'
-            jsonfile = os.path.join(project_root, "Model", "Project", "Data", "json", "Session.json")
-
-            with open(jsonfile, 'r') as f:
-                data = json.load(f)
-                bookabbr_key = r"self.bookabbr"
-                source_book_markdown_key = r"self.sourcebookmarkdown"
-                greek_book_markdown_key = r"self.greekbookmarkdown"
-                latin_book_markdown_key = r"self.latinbookmarkdown"
-
-                for Setting in data:
-                    if Setting['Setting'] == bookabbr_key:
-                        Setting['CurrentValue'] = self.bookabbr
-                    elif Setting['Setting'] == source_book_markdown_key:
-                        Setting['CurrentValue'] = self.sourcebookmarkdown
-                    elif Setting['Setting'] == greek_book_markdown_key:
-                        Setting['CurrentValue'] = self.greekbookmarkdown
-                    elif Setting['Setting'] == latin_book_markdown_key:
-                        Setting['CurrentValue'] = self.latinbookmarkdown
-                    print(Setting['CurrentValue'])
-            f.close()
-
-            os.remove(jsonfile)
-            with open(jsonfile, 'w') as f:
-                json.dump(data, f, indent=4)
-            f.close()
-
+        blocker = qtc.QSignalBlocker(self.ui.bookComboBox)
         self.ui.bookComboBox.setCurrentText(self.bookabbr)
+        del blocker
+
+        if not persist:
+            return
+        self.session_manager.update("Session.json", values)
+        project_session = self._active_project_session_manager()
+        if project_session is None:
+            return
+        project_session.update("Session.json", values)
+        extraction_state = project_session.values(
+            "PixlerSession.json", ["self.pdf_extraction_state"]
+        ).get("self.pdf_extraction_state")
+        if not isinstance(extraction_state, dict):
+            return
+        references = load_book_references(project_root)
+        selected_index = next(
+            (
+                index
+                for index, item in enumerate(references)
+                if item.get("BookAbbr") == self.bookabbr
+            ),
+            0,
+        )
+        for workflow_state in extraction_state.get("book_extractions", {}).values():
+            if isinstance(workflow_state, dict):
+                workflow_state["book_index"] = selected_index
+        project_session.update(
+            "PixlerSession.json",
+            {"self.pdf_extraction_state": extraction_state},
+        )
+
+    def _sync_book_combo_from_project_session(self):
+        project_session = self._active_project_session_manager()
+        project_values = project_session.values("Session.json") if project_session else {}
+        candidate = (
+            project_values.get("self.bookmarkdown")
+            or project_values.get("self.current_book_folder")
+            or project_values.get("self.bookabbr")
+            or getattr(self, "bookmarkdown", "")
+            or getattr(self, "bookabbr", "")
+            or "Mat"
+        )
+        reference = find_book_reference(project_root, candidate)
+        if reference is None:
+            reference = find_book_reference(project_root, "Mat")
+        if reference is None:
+            return
+        markdown = str(reference.get("BookMarkdown", ""))
+        if markdown != self._last_synced_book_markdown:
+            self._apply_book_reference(reference)
+
+    def _start_book_context_monitor(self):
+        if self._book_context_poll_timer is None:
+            self._book_context_poll_timer = qtc.QTimer(self)
+            self._book_context_poll_timer.timeout.connect(
+                self._sync_book_combo_from_project_session
+            )
+        self._book_context_poll_timer.start(500)
+
+    def selectBookCombo(self, *_args):
+        reference = find_book_reference(project_root, self.ui.bookComboBox.currentText())
+        if reference is not None:
+            self._apply_book_reference(reference, persist=True)
 
     def actiondeskew_mono(self):
         print("deskewing monochrome tiff and png files")
@@ -2477,6 +2520,149 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage(f"Combined source PDF: {combined_path}", 5000)
         return combined_path
 
+    def actionStageSourcePages(self):
+        project_root_path = self._active_project_root_for_source()
+        if not project_root_path:
+            qtw.QMessageBox.information(
+                self,
+                "Stage Source Pages",
+                "Open or create a project before staging source pages.",
+            )
+            return ""
+
+        default_source = os.path.join(
+            project_root_path,
+            "Model",
+            "Project",
+            "Images",
+            "MyServer",
+            "source_images",
+            "pdf_combined_src_images",
+        )
+        default_destination = project_staged_pdf_workflow_directory(project_root_path)
+        dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
+        ui = Ui_StageDialog()
+        ui.setupUi(dialog)
+        dialog.setWindowTitle("Stage source PDF for MyPixler")
+        ui.SourceLabel.setText("Combined PDF source")
+        ui.SourceLineEdit.setText(default_source)
+        ui.DestinationLineEdit.setText(default_destination)
+        staged_path = ""
+
+        def select_source():
+            selected = qtw.QFileDialog.getOpenFileName(
+                self,
+                "Select combined source PDF",
+                ui.SourceLineEdit.text(),
+                "PDF files (*.pdf)",
+            )[0]
+            if selected:
+                ui.SourceLineEdit.setText(selected)
+
+        def select_destination():
+            selected = qtw.QFileDialog.getExistingDirectory(
+                self,
+                "Select MyPixler staging folder",
+                ui.DestinationLineEdit.text(),
+            )
+            if selected:
+                ui.DestinationLineEdit.setText(selected)
+
+        def set_defaults_enabled(checked):
+            ui.SourceButton.setEnabled(not checked)
+            ui.DestinationButton.setEnabled(not checked)
+            if checked:
+                ui.SourceLineEdit.setText(default_source)
+                ui.DestinationLineEdit.setText(default_destination)
+
+        def perform_stage():
+            nonlocal staged_path
+            if staged_path:
+                dialog.accept()
+                return
+            ui.buttonBox.setEnabled(False)
+            ui.ProgressBar.setValue(10)
+            ui.StatusLabel.setText("Combining project source PDFs...")
+            qtw.QApplication.processEvents()
+            combined_path = (
+                self.actionCombineSourcePages()
+                if ui.defaultsrcBox.isChecked()
+                else ui.SourceLineEdit.text()
+            )
+            if not combined_path:
+                ui.StatusLabel.setText("Source PDF staging was not completed.")
+                ui.buttonBox.setEnabled(True)
+                return
+            ui.SourceLineEdit.setText(combined_path)
+            ui.ProgressBar.setValue(60)
+            ui.StatusLabel.setText("Copying the combined PDF into MyPixler...")
+            qtw.QApplication.processEvents()
+            destination_path = os.path.join(
+                ui.DestinationLineEdit.text(),
+                os.path.basename(combined_path),
+            )
+            if os.path.exists(destination_path):
+                if not ui.OverrideCheckBox.isChecked():
+                    qtw.QMessageBox.warning(
+                        dialog,
+                        "Stage Source Pages",
+                        f"The staged PDF already exists:\n{destination_path}",
+                    )
+                    ui.StatusLabel.setText("Staging paused; overwrite is disabled.")
+                    ui.buttonBox.setEnabled(True)
+                    return
+                response = qtw.QMessageBox.warning(
+                    dialog,
+                    "Overwrite Staged PDF",
+                    f"Replace the existing staged PDF?\n\n{destination_path}",
+                    qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+                    qtw.QMessageBox.No,
+                )
+                if response != qtw.QMessageBox.Yes:
+                    ui.StatusLabel.setText("Staging cancelled; the existing PDF was preserved.")
+                    ui.buttonBox.setEnabled(True)
+                    return
+            try:
+                staged_path = stage_combined_project_pdf(
+                    project_root_path,
+                    combined_path,
+                    destination_dir=ui.DestinationLineEdit.text(),
+                )
+            except (OSError, ValueError) as exc:
+                qtw.QMessageBox.warning(
+                    dialog,
+                    "Stage Source Pages",
+                    f"Could not stage the combined project source.\n\n{exc}",
+                )
+                ui.StatusLabel.setText("Source PDF staging failed.")
+                ui.buttonBox.setEnabled(True)
+                return
+
+            self._record_project_milestone(
+                "combined_src_images_staged",
+                staged_path,
+                details={"source": "combined_source_pdf"},
+            )
+            ui.ProgressBar.setValue(100)
+            ui.StatusLabel.setText(f"Source PDF staged in MyPixler:\n{staged_path}")
+            ui.buttonBox.button(qtw.QDialogButtonBox.Ok).setText("Close")
+            ui.buttonBox.button(qtw.QDialogButtonBox.Cancel).hide()
+            ui.buttonBox.setEnabled(True)
+            self.statusBar().showMessage(f"Staged source PDF for MyPixler: {staged_path}", 5000)
+
+        ui.defaultsrcBox.toggled.connect(set_defaults_enabled)
+        ui.SourceButton.clicked.connect(select_source)
+        ui.DestinationButton.clicked.connect(select_destination)
+        ui.buttonBox.accepted.disconnect(dialog.accept)
+        ui.buttonBox.accepted.connect(perform_stage)
+        result = dialog.exec_()
+        if result == qtw.QDialog.Accepted and not staged_path:
+            perform_stage()
+        return staged_path
+
+    def run_page_workflow_stage(self, _stage_key):
+        return self.actionStageSourcePages()
+
     def _ingest_pdf_source(self, source_path):
         project_root_path = self._active_project_root_for_source()
         if not project_root_path:
@@ -2499,52 +2685,55 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         except ValueError:
             return False
 
-    def _sync_pdf_viewer_visibility_action(self, visible):
-        action = getattr(self, "source_viewer_visibility_action", None)
+    def _sync_source_reader_visibility_action(self, visible):
+        action = getattr(self, "source_reader_visibility_action", None)
         if action is None:
             return
         action.blockSignals(True)
         action.setChecked(bool(visible))
         action.blockSignals(False)
 
-    def _set_pdf_viewer_visibility(self, visible):
-        viewer = self.pdf_viewer_dialog
+    def _set_source_reader_visibility(self, visible):
+        viewer = self.source_reader
         if viewer is None:
             if visible:
                 self.view_source_document()
             return
-        viewer.set_viewer_visible(bool(visible))
-        if visible and viewer.is_viewer_floating():
+        viewer.set_reader_visible(bool(visible))
+        if visible and viewer.is_reader_floating():
             viewer.raise_()
             viewer.activateWindow()
 
-    def _float_pdf_viewer(self):
-        viewer = self.pdf_viewer_dialog
+    def _float_source_reader(self):
+        viewer = self.source_reader
         if viewer is None:
             return
-        viewer.float_viewer()
+        viewer.float_reader()
 
-    def _close_pdf_viewer_automatically(self):
-        viewer = self.pdf_viewer_dialog
+    def _close_source_reader_automatically(self):
+        viewer = self.source_reader
         if viewer is None:
             return
-        self.pdf_viewer_dialog = None
+        self.source_reader = None
         viewer.close_automatically()
-        self._sync_pdf_viewer_visibility_action(False)
-        self.source_viewer_visibility_action.setEnabled(False)
+        self._sync_source_reader_visibility_action(False)
+        self.source_reader_visibility_action.setEnabled(False)
 
-    def _on_pdf_viewer_destroyed(self, closed_viewer):
-        if self.pdf_viewer_dialog is not closed_viewer:
+    def _on_source_reader_destroyed(self, closed_viewer):
+        if self.source_reader is not closed_viewer:
             return
-        self.pdf_viewer_dialog = None
-        self._sync_pdf_viewer_visibility_action(False)
-        self.source_viewer_visibility_action.setEnabled(False)
+        self.source_reader = None
+        self._sync_source_reader_visibility_action(False)
+        try:
+            self.source_reader_visibility_action.setEnabled(False)
+        except RuntimeError:
+            pass
 
     def _on_pdf_source_loaded(self, viewer, pdf_path, page_count):
-        if self.pdf_viewer_dialog is not viewer:
+        if self.source_reader is not viewer:
             return
         if not self._register_pdf_source(pdf_path, page_count):
-            self._close_pdf_viewer_automatically()
+            self._close_source_reader_automatically()
             return
         self.statusBar().showMessage(
             f"Source document ready: {page_count} page{'s' if page_count != 1 else ''}",
@@ -2552,7 +2741,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
 
     def _on_pdf_source_load_failed(self, viewer, message):
-        if self.pdf_viewer_dialog is not viewer:
+        if self.source_reader is not viewer:
             return
         self.pdf_source_path = ""
         self.pdf_page_count = 0
@@ -2561,17 +2750,17 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             "Open Source Document",
             f"Could not display the source document.\n\n{message}",
         )
-        self._close_pdf_viewer_automatically()
+        self._close_source_reader_automatically()
 
     def _open_pdf_source(self, pdf_path, floating=True):
         try:
-            viewer = PdfViewerDock(pdf_path, self)
-            self._close_pdf_viewer_automatically()
-            self.pdf_viewer_dialog = viewer
+            viewer = SourceReaderDock(pdf_path, self)
+            self._close_source_reader_automatically()
+            self.source_reader = viewer
             self.pdf_source_path = os.path.abspath(pdf_path)
             self.pdf_page_count = 0
             self.addDockWidget(qtc.Qt.LeftDockWidgetArea, viewer)
-            viewer.viewerVisibilityChanged.connect(self._sync_pdf_viewer_visibility_action)
+            viewer.readerVisibilityChanged.connect(self._sync_source_reader_visibility_action)
             viewer.documentLoaded.connect(
                 lambda loaded_path, page_count, active_viewer=viewer: self._on_pdf_source_loaded(
                     active_viewer,
@@ -2586,13 +2775,13 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
                 )
             )
             viewer.destroyed.connect(
-                lambda _object=None, closed_viewer=viewer: self._on_pdf_viewer_destroyed(closed_viewer)
+                lambda _object=None, closed_viewer=viewer: self._on_source_reader_destroyed(closed_viewer)
             )
-            self.source_viewer_visibility_action.setEnabled(True)
-            viewer.show_viewer()
+            self.source_reader_visibility_action.setEnabled(True)
+            viewer.show_reader()
             self.resizeDocks([viewer], [420], qtc.Qt.Horizontal)
             if floating:
-                self._float_pdf_viewer()
+                self._float_source_reader()
         except (RuntimeError, ValueError) as exc:
             self.pdf_source_path = ""
             self.pdf_page_count = 0
@@ -2632,7 +2821,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         return True
 
     def showImage(self,imgfilename):
-        self._float_pdf_viewer()
+        self._float_source_reader()
         if os.path.splitext(str(imgfilename))[1].lower() == ".pdf":
             saved_pdf_path = self._ingest_pdf_source(imgfilename)
             if not saved_pdf_path or not self._open_pdf_source(saved_pdf_path, floating=True):
@@ -2953,7 +3142,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         if not txtfilename:
             return
 
-        self._float_pdf_viewer()
+        self._float_source_reader()
 
         from PyQt5 import QtCore as qtc
 

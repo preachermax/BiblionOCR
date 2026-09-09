@@ -181,7 +181,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="sourcePdfViewerHost" native="true">
+  <widget class="QWidget" name="sourceReaderHost" native="true">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -193,7 +193,7 @@
     <property name="visible">
      <bool>false</bool>
     </property>
-    <layout class="QVBoxLayout" name="sourcePdfViewerLayout">
+    <layout class="QVBoxLayout" name="sourceReaderLayout">
      <property name="leftMargin">
       <number>0</number>
      </property>

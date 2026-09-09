@@ -5,6 +5,9 @@
 import importlib.util
 import sys
 import os
+import subprocess
+import tempfile
+from dataclasses import replace
 
 _LOCAL_MODULE_DIR = os.path.abspath(os.path.dirname(__file__))
 _LEGACY_MAINUI_DIR = os.path.abspath(os.path.join(_LOCAL_MODULE_DIR, "..", "0-MainUI"))
@@ -54,8 +57,14 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 
-from HelpSystem import add_help_menu
-from pdf_viewer_dialog import PdfViewerDock
+from HelpSystem import add_help_menu, show_help
+from source_reader import SourceReaderDock
+from Core.book_metadata import (
+    book_session_values,
+    find_book_reference,
+    load_book_references,
+    normalize_book_folder,
+)
 from Core.page_workflow import (
     PAGE_WORKFLOW_FILENAME,
     WORKFLOW_DIRECTORY,
@@ -66,10 +75,15 @@ from Core.page_workflow import (
 )
 from Core.project_tracking import ProjectWorkflowTracker
 from Core.source_documents import (
+    SUPPORTED_SOURCE_EXTENSIONS,
+    complete_project_staged_pdf_handoff,
     convert_pdf_pages_to_tiff,
     extract_pdf_page_range,
     extract_pdf_pages,
+    extract_pdf_source_pages,
     find_project_pdf_source,
+    project_staged_pdf_complete_directory,
+    project_staged_pdf_workflow_directory,
 )
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
@@ -104,6 +118,7 @@ from MyPixlerPageWorkflowWizard import MyPixlerPageWorkflowWizardDialog
 
 # Dialog Imports
 from Dialogs.ExtractDialog import Ui_ExtractDialog
+from Dialogs.StageDialog import Ui_StageDialog
 from Dialogs.pdf4tifDialog import Ui_pdf4tifDialog
 from Dialogs.pdf2tifDialog import Ui_pdf2tifDialog
 from Dialogs.tif2monoDialog import Ui_tif2monoDialog
@@ -316,7 +331,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self._active_project_sync_timer = None
         self.pdf_source_path = ""
         self.pdf_page_count = 0
-        self.pdf_viewer_dialog = None
+        self.source_reader = None
 
         # -------------------------
         # Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ARGUMENT HANDLING (calling module ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ MyPixler)
@@ -678,26 +693,41 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionRotateRefImg_90_CW.triggered.connect(self.rotateRefImg90CW)
         self.ui.actionRotateRefImg_90_CCW.triggered.connect(self.rotateRefImg90CCW)
 
+    def initWorkflowActions(self):
+        workflow_actions = (
+            ("actionStage_pdf", self.actionstage_pdf),
+            ("actionExtract_pdf", self.actionextract_pdf),
+            ("actionpdf_For_tiff", self.actionpdf_for_tiff),
+            ("actionpdf_To_tiff", self.actionpdf_to_tiff),
+            ("actiontiff_indexed", self.actiontiff_to_mono),
+            ("actionDeskew_indexed", self.actiondeskew_mono),
+            ("actionManually_Crop_Language_Pages", self.actionCropImage),
+            ("actionAuto_Crop", self.actionCrop_Languages),
+            ("actionDeskew_Greek_tiff", self.actionDeskew_Greek_tiff),
+            ("actionDeskew_Latin_tiff", self.actionDeskew_Latin_tiff),
+        )
+        for action_name, callback in workflow_actions:
+            getattr(self.ui, action_name).triggered.connect(callback)
+
     def initMenubar(self):
 
         # File menu Signals(Slots)
+        self.ui.actionMyExplorer.triggered.connect(self.open_myexplorer)
         self.ui.actionOpen_Reference_Image.triggered.connect(self.loadRefImg)
         self.ui.actionSave_Image.triggered.connect(self.save_image_with_myexplorer)
         self.ui.actionSave_As_Image.triggered.connect(self.save_image_as_with_myexplorer)
         self.ui.actionOverwrite_Reference_Image.triggered.connect(self.OverwriteRefImg)
         self.ui.actionImport_Current_Image.triggered.connect(self.importRefImg)
         self.ui.actionLanguage_Morphology.triggered.connect(self.openMorphologyDialog)
-        if hasattr(self.ui, "actionStage_pdf"):
-            self.ui.actionStage_pdf.triggered.connect(self.actionstage_pdf)
-        self.view_source_document_action = qtw.QAction("Display Source Document", self)
+        self.view_source_document_action = qtw.QAction("Open Source Reader", self)
         self.view_source_document_action.setEnabled(bool(self._project_source_pdf()))
         self.view_source_document_action.triggered.connect(self._view_source_document_triggered)
         self.ui.menuView.addAction(self.view_source_document_action)
-        self.source_viewer_visibility_action = qtw.QAction("Show Source Document Viewer", self)
-        self.source_viewer_visibility_action.setCheckable(True)
-        self.source_viewer_visibility_action.setEnabled(False)
-        self.source_viewer_visibility_action.triggered.connect(self._set_pdf_viewer_visibility)
-        self.ui.menuView.addAction(self.source_viewer_visibility_action)
+        self.source_reader_visibility_action = qtw.QAction("Show Source Reader", self)
+        self.source_reader_visibility_action.setCheckable(True)
+        self.source_reader_visibility_action.setEnabled(False)
+        self.source_reader_visibility_action.triggered.connect(self._set_source_reader_visibility)
+        self.ui.menuView.addAction(self.source_reader_visibility_action)
         #self.ui.actionExport_Image.triggered.connect()
 
         # Edit Menu Signals(Slots)
@@ -705,12 +735,41 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionFillBackground.triggered.connect(self.choose_fill_background_color)
         self.ui.actionFillForeground.triggered.connect(self.choose_fill_foreground_color)
 
+    def open_myexplorer(self):
+        explorer_path = os.path.join(
+            project_root,
+            "ViewController",
+            "0-MainUI",
+            "MyExplorer.py",
+        )
+        if not os.path.isfile(explorer_path):
+            qtw.QMessageBox.warning(
+                self,
+                "Open MyExplorer",
+                f"MyExplorer is not available at:\n{explorer_path}",
+            )
+            return None
+        active_root = self.current_project_root or self._shared_active_project_root()
+        command = [sys.executable, explorer_path]
+        if active_root:
+            command.append(active_root)
+        try:
+            return subprocess.Popen(command)
+        except OSError as exc:
+            qtw.QMessageBox.warning(
+                self,
+                "Open MyExplorer",
+                f"MyExplorer could not be opened.\n\n{exc}",
+            )
+            return None
+
     def initUI(self):
 
         self.get_session_settings()
 
         self.initMenubar()
         self.initToolbar()
+        self.initWorkflowActions()
 
         # -------------------------
         # Ref Image
@@ -838,9 +897,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if not shared_root or shared_root == self.current_project_root:
             return
 
-        viewer = self.pdf_viewer_dialog
+        viewer = self.source_reader
         if viewer is not None and not self._path_is_within(viewer.pdf_path, shared_root):
-            self._close_pdf_viewer_automatically()
+            self._close_source_reader_automatically()
         self.current_project_root = shared_root
         self.view_source_document_action.setEnabled(bool(self._project_source_pdf(shared_root)))
         self._refresh_project_status(shared_root)
@@ -856,7 +915,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         if not source_path:
             qtw.QMessageBox.information(
                 self,
-                "Display Source Document",
+                "Open Source Reader",
                 "The active project does not have a PDF or TIFF source document.",
             )
             return False
@@ -864,9 +923,9 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
 
     def _open_project_source_pdf_on_startup(self):
         qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
-        viewer = self.pdf_viewer_dialog
+        viewer = self.source_reader
         if viewer is not None:
-            viewer.show_viewer()
+            viewer.show_reader()
             return True
 
         source_path = self._project_source_pdf()
@@ -884,8 +943,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         except ValueError:
             return False
 
-    def _sync_pdf_viewer_visibility_action(self, visible):
-        action = getattr(self, "source_viewer_visibility_action", None)
+    def _sync_source_reader_visibility_action(self, visible):
+        action = getattr(self, "source_reader_visibility_action", None)
         if action is None:
             return
         try:
@@ -895,35 +954,38 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         except RuntimeError:
             return
 
-    def _set_pdf_viewer_visibility(self, visible):
-        viewer = self.pdf_viewer_dialog
+    def _set_source_reader_visibility(self, visible):
+        viewer = self.source_reader
         if viewer is None:
             if visible:
                 self.view_source_document()
             return
-        viewer.set_viewer_visible(bool(visible))
-        if visible and viewer.is_viewer_floating():
+        viewer.set_reader_visible(bool(visible))
+        if visible and viewer.is_reader_floating():
             viewer.raise_()
             viewer.activateWindow()
 
-    def _close_pdf_viewer_automatically(self):
-        viewer = self.pdf_viewer_dialog
+    def _close_source_reader_automatically(self):
+        viewer = self.source_reader
         if viewer is None:
             return
-        self.pdf_viewer_dialog = None
+        self.source_reader = None
         viewer.close_automatically()
-        self._sync_pdf_viewer_visibility_action(False)
-        self.source_viewer_visibility_action.setEnabled(False)
+        self._sync_source_reader_visibility_action(False)
+        self.source_reader_visibility_action.setEnabled(False)
 
-    def _on_pdf_viewer_destroyed(self, closed_viewer):
-        if self.pdf_viewer_dialog is not closed_viewer:
+    def _on_source_reader_destroyed(self, closed_viewer):
+        if self.source_reader is not closed_viewer:
             return
-        self.pdf_viewer_dialog = None
-        self._sync_pdf_viewer_visibility_action(False)
-        self.source_viewer_visibility_action.setEnabled(False)
+        self.source_reader = None
+        self._sync_source_reader_visibility_action(False)
+        try:
+            self.source_reader_visibility_action.setEnabled(False)
+        except RuntimeError:
+            pass
 
     def _on_pdf_source_loaded(self, viewer, pdf_path, page_count):
-        if self.pdf_viewer_dialog is not viewer:
+        if self.source_reader is not viewer:
             return
         self.pdf_source_path = os.path.abspath(pdf_path)
         self.pdf_page_count = int(page_count)
@@ -933,7 +995,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         )
 
     def _on_pdf_source_load_failed(self, viewer, message):
-        if self.pdf_viewer_dialog is not viewer:
+        if self.source_reader is not viewer:
             return
         self.pdf_source_path = ""
         self.pdf_page_count = 0
@@ -942,17 +1004,17 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             "Open Source Document",
             f"Could not display the source document.\n\n{message}",
         )
-        self._close_pdf_viewer_automatically()
+        self._close_source_reader_automatically()
 
     def _open_pdf_source(self, pdf_path, floating=True):
         try:
-            viewer = PdfViewerDock(pdf_path, self)
-            self._close_pdf_viewer_automatically()
-            self.pdf_viewer_dialog = viewer
+            viewer = SourceReaderDock(pdf_path, self)
+            self._close_source_reader_automatically()
+            self.source_reader = viewer
             self.pdf_source_path = os.path.abspath(pdf_path)
             self.pdf_page_count = 0
             self.addDockWidget(qtc.Qt.DockWidgetArea.LeftDockWidgetArea, viewer)
-            viewer.viewerVisibilityChanged.connect(self._sync_pdf_viewer_visibility_action)
+            viewer.readerVisibilityChanged.connect(self._sync_source_reader_visibility_action)
             viewer.documentLoaded.connect(
                 lambda loaded_path, page_count, active_viewer=viewer: self._on_pdf_source_loaded(
                     active_viewer,
@@ -967,13 +1029,13 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 )
             )
             viewer.destroyed.connect(
-                lambda _object=None, closed_viewer=viewer: self._on_pdf_viewer_destroyed(closed_viewer)
+                lambda _object=None, closed_viewer=viewer: self._on_source_reader_destroyed(closed_viewer)
             )
-            self.source_viewer_visibility_action.setEnabled(True)
-            viewer.show_viewer()
+            self.source_reader_visibility_action.setEnabled(True)
+            viewer.show_reader()
             self.resizeDocks([viewer], [420], qtc.Qt.Horizontal)
             if floating:
-                viewer.float_viewer()
+                viewer.float_reader()
         except (RuntimeError, ValueError) as exc:
             self.pdf_source_path = ""
             self.pdf_page_count = 0
@@ -1171,18 +1233,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     def _workflow_step_for_method(self, method_name):
         active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
         context = self.workflow_tracker._load_project_context(active_root)
-        page_number = max(
-            1,
-            int(context.get("CurrentProjectPage", getattr(self, "current_project_page", 1)) or 1),
-        )
         page_section = context.get("CurrentSourceSection", "Front Matter")
-        state = self.workflow_tracker.load_tracking_state(active_root)
-        page_state = state.get("page_milestones", {}).get(str(page_number), {})
-        completed = {
-            key
-            for key, value in page_state.items()
-            if isinstance(value, dict) and value.get("complete")
-        } if isinstance(page_state, dict) else set()
+        completed = self._completed_page_milestones(active_root, context)
         step = select_page_workflow_step(
             self._workflow_definition_root(),
             "MyPixler",
@@ -1196,6 +1248,106 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 7000,
             )
         return step
+
+    def _completed_page_milestones(self, active_root, context=None):
+        context = context or self.workflow_tracker._load_project_context(active_root)
+        page_number = max(
+            1,
+            int(context.get("CurrentProjectPage", getattr(self, "current_project_page", 1)) or 1),
+        )
+        state = self.workflow_tracker.load_tracking_state(active_root)
+        page_state = state.get("page_milestones", {}).get(str(page_number), {})
+        return {
+            key
+            for key, value in page_state.items()
+            if isinstance(value, dict) and value.get("complete")
+        } if isinstance(page_state, dict) else set()
+
+    def _pending_dialog_workflow_steps(self, method_name, active_root):
+        completed = self._completed_page_milestones(active_root)
+        return [
+            step
+            for step in self._workflow_steps_for_method(method_name)
+            if step.milestone_name not in completed
+        ]
+
+    def _dialog_workflow_completion(self, method_name, active_root):
+        steps = self._workflow_steps_for_method(method_name)
+        pending_steps = self._pending_dialog_workflow_steps(method_name, active_root)
+        pending_names = {step.milestone_name for step in pending_steps}
+        completed_steps = [
+            step for step in steps if step.milestone_name not in pending_names
+        ]
+        return steps, completed_steps, pending_steps
+
+    @staticmethod
+    def _completed_step_report(completed_steps):
+        return "\n".join(
+            f"{step.sequence} - {step.milestone_name}"
+            for step in completed_steps
+        )
+
+    def _report_completed_dialog_loop(self, title, completed_steps):
+        completed_report = PixlerMain._completed_step_report(completed_steps)
+        message = (
+            "This extraction function is complete.\n\n"
+            "Completed milestones:\n"
+            f"{completed_report}\n\n"
+            "To re-enable a dialog, open MyServer > Project Settings > "
+            "Milestone Settings and uncheck Complete for its milestone."
+        )
+        self.statusBar().showMessage(
+            f"{title} is complete: "
+            + ", ".join(step.sequence for step in completed_steps),
+            10000,
+        )
+        qtw.QMessageBox.information(self, title, message)
+
+    def _refresh_extract_completion_progress(self, active_root, ui=None, label="Complete"):
+        refresh_status = getattr(self, "_refresh_project_status", None)
+        if callable(refresh_status):
+            refresh_status(active_root)
+        if ui is not None:
+            ui.ProgressLabel.setText(label)
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+
+    def _show_extraction_progress(self, parent, label):
+        progress = qtw.QProgressDialog(label, "", 0, 0, parent)
+        progress.setWindowTitle("Extracting")
+        progress.setCancelButton(None)
+        progress.setAutoClose(False)
+        progress.setAutoReset(False)
+        progress.setMinimumDuration(0)
+        progress.setWindowModality(qtc.Qt.NonModal)
+        progress.setAttribute(qtc.Qt.WA_DeleteOnClose, True)
+        progress.show()
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+        return progress
+
+    @staticmethod
+    def _close_extraction_progress(progress):
+        if progress is None:
+            return
+        progress.close()
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+
+    def _workflow_steps_for_method(self, method_name):
+        steps, _notes = load_page_workflow(self._workflow_definition_root())
+        section_order = {
+            "FrontSection": 0,
+            "MiddleSections": 1,
+            "VerseSections": 2,
+            "BackSection": 3,
+        }
+        matching_steps = [
+            step
+            for step in steps
+            if step.module == "MyPixler" and step.method == method_name
+        ]
+        return sorted(
+            matching_steps,
+            key=lambda step: section_order.get(step.page_section, len(section_order)),
+        )
 
     def _workflow_step_paths(self, step):
         active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
@@ -1212,6 +1364,19 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         for name in sorted(os.listdir(workflow_dir)):
             candidate = os.path.join(workflow_dir, name)
             if os.path.isfile(candidate):
+                return candidate
+        return ""
+
+    @staticmethod
+    def _first_workflow_source_document(workflow_dir):
+        if not workflow_dir or not os.path.isdir(workflow_dir):
+            return ""
+        for name in sorted(os.listdir(workflow_dir)):
+            candidate = os.path.join(workflow_dir, name)
+            if (
+                os.path.isfile(candidate)
+                and os.path.splitext(name)[1].lower() in SUPPORTED_SOURCE_EXTENSIONS
+            ):
                 return candidate
         return ""
 
@@ -1235,37 +1400,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             page_milestone=step.milestone_name,
         )
         self._refresh_project_status(active_root)
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
 
-    # Page workflow: Sequence SSHF; MilestoneName src_pages_front_matter_staged.
-    # Page workflow: Sequence SSHM; MilestoneName src_pages_middle_matter_staged.
-    # Page workflow: Sequence SSHV; MilestoneName src_pages_verses_staged.
-    # Page workflow: Sequence SSHB; MilestoneName src_pages_back_matter_staged.
-    def actionstage_pdf(self):
-        step = self._workflow_step_for_method("actionstage_pdf")
-        if step is None:
-            return
-        workflow_source, complete_destination, workflow_handshake = self._workflow_step_paths(step)
-        if not os.path.isdir(workflow_source) or not os.listdir(workflow_source):
-            qtw.QMessageBox.warning(
-                self,
-                "Stage Source PDF",
-                f"No source PDF is staged in:\n{workflow_source}",
-            )
-            return
-        response = qtw.QMessageBox.question(
-            self,
-            "Stage Source PDF",
-            f"Stage {step.page_section} source files into the MyPixler page workflow?",
-            qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
-            qtw.QMessageBox.Yes,
-        )
-        if response != qtw.QMessageBox.Yes:
-            return
-        self._finish_page_workflow_step(
-            step,
-            details={"source": "actionstage_pdf"},
-            stage_source=True,
-        )
 
     def _init_subprocess_return_controls(self):
         if not self.subprocess_mode or not self.subprocess_return_path:
@@ -1489,11 +1625,121 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 event.ignore()
 
         if event.isAccepted():
-            self._close_pdf_viewer_automatically()
+            self._close_source_reader_automatically()
 
 # Application Controllers
 
     # Workflow Controllers
+
+    # Page workflow: Sequence SSHF; MilestoneName src_pages_front_matter_staged.
+    # Page workflow: Sequence SSHM; MilestoneName src_pages_middle_matter_staged.
+    # Page workflow: Sequence SSHV; MilestoneName src_pages_verses_staged.
+    # Page workflow: Sequence SSHB; MilestoneName src_pages_back_matter_staged.
+    def actionstage_pdf(self):
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        workflow_step = self._workflow_step_for_method("actionstage_pdf")
+        step_paths = self._workflow_step_paths(workflow_step) if workflow_step else ("", "", "")
+        section_source = step_paths[0]
+        stage_section = bool(self._first_workflow_source_document(section_source))
+        source_dir = (
+            section_source
+            if stage_section
+            else project_staged_pdf_workflow_directory(active_root)
+        )
+        destination_dir = (
+            step_paths[1]
+            if stage_section
+            else project_staged_pdf_complete_directory(active_root)
+        )
+        dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
+        ui = Ui_StageDialog()
+        ui.setupUi(dialog)
+        ui.SourceLineEdit.setText(source_dir)
+        ui.DestinationLineEdit.setText(destination_dir)
+
+        def select_directory(line_edit, title):
+            selected = qtw.QFileDialog.getExistingDirectory(self, title, line_edit.text())
+            if selected:
+                line_edit.setText(selected)
+
+        def set_defaults_enabled(checked):
+            ui.SourceButton.setEnabled(not checked)
+            ui.DestinationButton.setEnabled(not checked)
+            if checked:
+                ui.SourceLineEdit.setText(source_dir)
+                ui.DestinationLineEdit.setText(destination_dir)
+
+        ui.defaultsrcBox.toggled.connect(set_defaults_enabled)
+        ui.SourceButton.clicked.connect(
+            lambda: select_directory(ui.SourceLineEdit, "Select staged PDF source folder")
+        )
+        ui.DestinationButton.clicked.connect(
+            lambda: select_directory(ui.DestinationLineEdit, "Select staged PDF destination folder")
+        )
+        if dialog.exec_() != qtw.QDialog.Accepted:
+            return
+
+        try:
+            if stage_section:
+                source_path = self._first_workflow_source_document(ui.SourceLineEdit.text())
+                if not source_path:
+                    raise ValueError(f"No staged section PDF exists in: {ui.SourceLineEdit.text()}")
+                destination_path = os.path.join(
+                    ui.DestinationLineEdit.text(),
+                    os.path.basename(source_path),
+                )
+                if os.path.exists(destination_path) and not ui.OverrideCheckBox.isChecked():
+                    raise FileExistsError(f"Staged section PDF already exists: {destination_path}")
+                if os.path.exists(destination_path) and ui.OverrideCheckBox.isChecked():
+                    if not self._confirm_extract_overwrite(
+                        dialog,
+                        ui.DestinationLineEdit.text(),
+                    ):
+                        return
+                if ui.defaultsrcBox.isChecked():
+                    self._finish_page_workflow_step(
+                        workflow_step,
+                        details={"source": "actionstage_pdf"},
+                        stage_source=True,
+                    )
+                else:
+                    selected_step = replace(
+                        workflow_step,
+                        workflow_source=os.path.relpath(ui.SourceLineEdit.text(), active_root),
+                        complete_destination=os.path.relpath(ui.DestinationLineEdit.text(), active_root),
+                    )
+                    self._finish_page_workflow_step(
+                        selected_step,
+                        details={"source": "actionstage_pdf_override"},
+                        stage_source=True,
+                    )
+                staged_path = destination_path
+            else:
+                selected_destination = ui.DestinationLineEdit.text()
+                destination_has_files = (
+                    os.path.isdir(selected_destination)
+                    and bool(os.listdir(selected_destination))
+                )
+                if (
+                    ui.OverrideCheckBox.isChecked()
+                    and destination_has_files
+                    and not self._confirm_extract_overwrite(dialog, selected_destination)
+                ):
+                    return
+                staged_path = complete_project_staged_pdf_handoff(
+                    active_root,
+                    source_dir=ui.SourceLineEdit.text(),
+                    destination_dir=ui.DestinationLineEdit.text(),
+                    override=ui.OverrideCheckBox.isChecked(),
+                )
+        except (OSError, ValueError) as exc:
+            qtw.QMessageBox.warning(
+                self,
+                "Stage Source Document",
+                f"The staged MyServer PDF could not be accepted into MyPixler.\n\n{exc}",
+            )
+            return
+        self.statusBar().showMessage(f"Staged source PDF accepted: {staged_path}", 5000)
 
     # Page workflow: Sequence ES2F; MilestoneName src_pages_front_matter_extracted.
     # Page workflow: Sequence ES2M; MilestoneName src_pages_middle_matter_extracted.
@@ -1503,93 +1749,987 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     # Page workflow: Sequence ES2B; MilestoneName src_pages_back_matter_extracted.
     def actionextract_pdf(self):
         workflow_step = self._workflow_step_for_method("actionextract_pdf")
-        workflow_source, complete_folder, _workflow_handshake = (
-            self._workflow_step_paths(workflow_step) if workflow_step else ("", "", "")
+        if workflow_step:
+            workflow_source, _complete_folder, _workflow_handshake = self._workflow_step_paths(workflow_step)
+            if workflow_step.sequence in {"EM2B", "EV2B"}:
+                return self.actionextract_book_pages(workflow_step)
+            if self._first_workflow_source_document(workflow_source):
+                return self.actionextract_staged_pdf_pages(workflow_step)
+        return self._extract_source_pdf_sections()
+
+    @staticmethod
+    def _run_non_modal_dialog(dialog):
+        dialog.setWindowModality(qtc.Qt.NonModal)
+        dialog.setModal(False)
+        event_loop = qtc.QEventLoop(dialog)
+        dialog.finished.connect(event_loop.quit)
+        dialog.show()
+        dialog.raise_()
+        dialog.activateWindow()
+        event_loop.exec_()
+        return dialog.result()
+
+    @staticmethod
+    def _extract_dialog_state_manager(active_root):
+        return SessionManager(
+            os.path.join(active_root, "Model", "Project", "Data", "json")
         )
-        workflow_folder = complete_folder
-        print("extracting pdf pages from source pdf")
 
-        def accept():
-        #if self.pdfxDialog.Accepted:
-            # Empty default Workflow folder
-            print('Workflow Folder:'+ workflow_folder,'Complete Folder:'+ complete_folder)
-            for filename in os.listdir(workflow_folder):
-                file_path = os.path.join(workflow_folder, filename)
-                #print('File Name:'+filename, 'File Path:'+file_path)
-                try:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (file_path, e))
+    def _load_extract_dialog_state(self, active_root):
+        value = self._extract_dialog_state_manager(active_root).values(
+            "PixlerSession.json",
+            ["self.pdf_extraction_state"],
+        ).get("self.pdf_extraction_state")
+        return value if isinstance(value, dict) else {}
 
-            self.sourcefile = self.pdfx_ui.SourceLineEdit.text()
-            self.firstpage = self.pdfx_ui.FirstPageLineEdit.text()
-            self.lastpage = self.pdfx_ui.LastPageLineEdit.text()
+    def _save_extract_dialog_state(self, active_root, state):
+        self._extract_dialog_state_manager(active_root).update(
+            "PixlerSession.json",
+            {"self.pdf_extraction_state": state},
+        )
 
+    @staticmethod
+    def _confirm_extract_overwrite(parent, destination, preserved_paths=()):
+        preserved = {
+            os.path.normcase(os.path.abspath(path)) for path in preserved_paths
+        }
+        existing = [
+            os.path.join(destination, name)
+            for name in os.listdir(destination)
+        ] if os.path.isdir(destination) else []
+        replaceable = [
+            path for path in existing
+            if os.path.normcase(os.path.abspath(path)) not in preserved
+        ]
+        if not replaceable:
+            return True
+        response = qtw.QMessageBox.warning(
+            parent,
+            "Overwrite Existing Extraction",
+            f"{len(replaceable)} existing item(s) in the destination will be replaced. Continue?",
+            qtw.QMessageBox.Yes | qtw.QMessageBox.No,
+            qtw.QMessageBox.No,
+        )
+        return response == qtw.QMessageBox.Yes
+
+    def _install_extract_context_menu(self, dialog, ui, skip_result, skip_callback=None):
+        def show_context_menu(position):
+            menu = qtw.QMenu(dialog)
+            focused = qtw.QApplication.focusWidget()
+            undo_action = menu.addAction("Undo")
+            redo_action = menu.addAction("Redo")
+            undo_action.setEnabled(isinstance(focused, qtw.QLineEdit) and focused.isUndoAvailable())
+            redo_action.setEnabled(isinstance(focused, qtw.QLineEdit) and focused.isRedoAvailable())
+            menu.addSeparator()
+            skip_action = menu.addAction("Skip")
+            override_action = menu.addAction("Milestone override")
+            override_action.setCheckable(True)
+            override_action.setChecked(ui.MilestoneOverrideCheckBox.isChecked())
+            selected = menu.exec_(dialog.mapToGlobal(position))
+            if selected == undo_action and isinstance(focused, qtw.QLineEdit):
+                focused.undo()
+            elif selected == redo_action and isinstance(focused, qtw.QLineEdit):
+                focused.redo()
+            elif selected == skip_action:
+                if skip_callback is None:
+                    dialog.done(skip_result)
+                else:
+                    skip_callback()
+            elif selected == override_action:
+                ui.MilestoneOverrideCheckBox.setChecked(override_action.isChecked())
+
+        dialog.customContextMenuRequested.connect(show_context_menu)
+
+    def _record_extract_skip_override(self, active_root, step):
+        page_number = self._page_number_from_path(
+            getattr(self, "refimgpath", ""),
+            fallback=getattr(self, "current_project_page", 1),
+        )
+        self.workflow_tracker.record_page_milestone(
+            active_root,
+            page_number,
+            step.milestone_name,
+            module_name="MyPixler",
+            details={"source": "extract_dialog_skip", "override": True},
+        )
+        self._sync_project_page_state(
+            active_root,
+            page_milestone=step.milestone_name,
+        )
+        self._refresh_project_status(active_root)
+        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
+
+    @staticmethod
+    def _book_stage_root(path):
+        normalized_path = os.path.abspath(path)
+        if os.path.basename(normalized_path).lstrip("_").startswith("book_"):
+            return os.path.dirname(normalized_path)
+        return normalized_path
+
+    @classmethod
+    def _book_stage_directories(cls, configured_path, reference_root=None):
+        stage_root = cls._book_stage_root(configured_path)
+        if not os.path.isdir(stage_root):
+            return []
+        directories = [
+            os.path.join(stage_root, name)
+            for name in os.listdir(stage_root)
+            if name.startswith("book_")
+            and os.path.isdir(os.path.join(stage_root, name))
+        ]
+        if not reference_root:
+            return sorted(directories)
+        reference_order = {
+            normalize_book_folder(item.get("BookMarkdown")): index
+            for index, item in enumerate(load_book_references(reference_root))
+        }
+        return sorted(
+            directories,
+            key=lambda path: (
+                reference_order.get(os.path.basename(path), len(reference_order)),
+                os.path.basename(path),
+            ),
+        )
+
+    def _sync_extraction_book_session(self, active_root, book_folder):
+        reference = find_book_reference(active_root, book_folder)
+        if reference is None:
+            reference = find_book_reference(self.projecthome, book_folder)
+        if reference is None:
+            return {}
+        values = book_session_values(reference)
+        PixlerMain._extract_dialog_state_manager(active_root).update("Session.json", values)
+        return values
+
+    def _book_extraction_source(self, active_root, workflow_step, workflow_source):
+        if PixlerMain._first_workflow_source_document(workflow_source):
+            return workflow_source
+        source_root = self._book_stage_root(workflow_source)
+        for candidate in self._workflow_steps_for_method("actionextract_pdf"):
+            if candidate.sequence == workflow_step.sequence:
+                continue
+            candidate_handshake = resolve_page_workflow_path(
+                active_root,
+                candidate.workflow_handshake,
+            )
+            if os.path.normcase(self._book_stage_root(candidate_handshake)) != os.path.normcase(source_root):
+                continue
+            candidate_complete = resolve_page_workflow_path(
+                active_root,
+                candidate.complete_destination,
+            )
+            if PixlerMain._first_workflow_source_document(candidate_complete):
+                return candidate_complete
+        return workflow_source
+
+    @staticmethod
+    def _last_extracted_book_page(book_destinations, book_states, current_index):
+        for previous_index in range(current_index - 1, -1, -1):
+            previous_name = os.path.basename(book_destinations[previous_index])
+            previous_state = book_states.get(previous_name, {})
+            if previous_state.get("completion_source") != "extraction":
+                continue
             try:
-                extracted_path = extract_pdf_page_range(
-                    self.pdfx_ui.SourceLineEdit.text(),
-                    self.pdfx_ui.DestinationLineEdit.text(),
-                    self.pdfx_ui.FirstPageLineEdit.text(),
-                    self.pdfx_ui.LastPageLineEdit.text(),
+                return max(int(previous_state.get("last_page", 0) or 0), 0)
+            except (TypeError, ValueError):
+                return 0
+        return 0
+
+    @staticmethod
+    def _normalize_extract_status(saved):
+        status = str(saved.get("status", "pending") or "pending").lower()
+        if status == "extracted":
+            saved["status"] = "complete"
+            saved.setdefault("completion_source", "extraction")
+        elif status == "skipped":
+            saved["status"] = "complete"
+            saved.setdefault("completion_source", "skip")
+        elif status != "complete":
+            saved["status"] = "pending"
+            saved.pop("completion_source", None)
+        return saved["status"]
+
+    def actionextract_book_pages(self, workflow_step):
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        completed_milestones = (
+            self._completed_page_milestones(active_root)
+            if hasattr(self, "_completed_page_milestones")
+            else set()
+        )
+        if workflow_step.milestone_name in completed_milestones:
+            PixlerMain._report_completed_dialog_loop(
+                self,
+                f"{workflow_step.page_section} Book Extraction",
+                [workflow_step],
+            )
+            return []
+        workflow_source, complete_folder, workflow_handshake = self._workflow_step_paths(workflow_step)
+        extraction_source = PixlerMain._book_extraction_source(
+            self,
+            active_root,
+            workflow_step,
+            workflow_source,
+        )
+        if not PixlerMain._first_workflow_source_document(extraction_source):
+            qtw.QMessageBox.warning(
+                self,
+                "Extract Book Pages",
+                "No PDF source is available for this book-extraction step or its predecessor.",
+            )
+            return []
+        book_destinations = self._book_stage_directories(
+            complete_folder,
+            reference_root=active_root,
+        )
+        if not book_destinations:
+            book_destinations = self._book_stage_directories(
+                complete_folder,
+                reference_root=self.projecthome,
+            )
+        if not book_destinations:
+            qtw.QMessageBox.warning(
+                self,
+                "Extract Book Pages",
+                f"No generated book folders are available in:\n{self._book_stage_root(complete_folder)}",
+            )
+            return []
+
+        state = self._load_extract_dialog_state(active_root)
+        workflow_states = state.setdefault("book_extractions", {})
+        workflow_state = workflow_states.setdefault(workflow_step.sequence, {})
+        book_states = workflow_state.setdefault("books", {})
+        for saved_state in book_states.values():
+            if isinstance(saved_state, dict):
+                PixlerMain._normalize_extract_status(saved_state)
+        all_books_were_complete = bool(book_destinations) and all(
+            book_states.get(os.path.basename(path), {}).get("status") == "complete"
+            for path in book_destinations
+        )
+        if workflow_state.get("milestone_complete") or all_books_were_complete:
+            for saved_state in book_states.values():
+                if isinstance(saved_state, dict):
+                    saved_state["status"] = "pending"
+                    saved_state["milestone_override"] = False
+                    saved_state.pop("completion_source", None)
+            workflow_state["milestone_complete"] = False
+
+        pending_indices = [
+            index
+            for index, path in enumerate(book_destinations)
+            if book_states.get(os.path.basename(path), {}).get("status") != "complete"
+        ]
+        if not pending_indices:
+            return []
+        requested_index = min(
+            max(int(workflow_state.get("book_index", 0) or 0), 0),
+            len(book_destinations) - 1,
+        )
+        current_position = next(
+            (
+                position
+                for position, book_index in enumerate(pending_indices)
+                if book_index >= requested_index
+            ),
+            0,
+        )
+        previous_result = qtw.QDialog.Accepted + 1
+        next_result = previous_result + 1
+        skip_result = next_result + 1
+        dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
+        ui = Ui_ExtractDialog()
+        ui.setupUi(dialog)
+        self._install_extract_context_menu(dialog, ui, skip_result)
+        ui.HelpButton.clicked.connect(lambda: show_help(dialog, "MyPixler"))
+        ui.PreviousButton.clicked.connect(lambda: dialog.done(previous_result))
+        ui.NextButton.clicked.connect(lambda: dialog.done(next_result))
+        ui.SkipButton.clicked.connect(lambda: dialog.done(skip_result))
+        ui.buttonBox.button(qtw.QDialogButtonBox.Ok).setText("Extract Book")
+        ui.SourceLineEdit.setText(extraction_source)
+        ui.SourceButton.setEnabled(False)
+        ui.defaultsrcBox.hide()
+        ui.MakeDefaultCheckBox.hide()
+        extracted_paths = []
+
+        while True:
+            current_index = pending_indices[current_position]
+            destination = book_destinations[current_index]
+            book_name = os.path.basename(destination)
+            book_reference = find_book_reference(active_root, book_name)
+            if book_reference is None:
+                book_reference = find_book_reference(self.projecthome, book_name)
+            book_markdown = (
+                str(book_reference.get("BookMarkdown", ""))
+                if book_reference is not None
+                else f"_{book_name}"
+            )
+            PixlerMain._sync_extraction_book_session(self, active_root, book_name)
+            saved = book_states.setdefault(book_name, {})
+            prior_end = PixlerMain._last_extracted_book_page(
+                book_destinations,
+                book_states,
+                current_index,
+            )
+            dialog.setWindowTitle(f"Extract {workflow_step.page_section}: {book_name}")
+            saved_source = str(saved.get("source", extraction_source))
+            if not PixlerMain._first_workflow_source_document(saved_source):
+                saved_source = extraction_source
+            ui.SourceLineEdit.setText(saved_source)
+            ui.DestinationLineEdit.setText(str(saved.get("destination", destination)))
+            ui.FirstPageLineEdit.setText(str(saved.get("first_page", prior_end + 1)))
+            ui.LastPageLineEdit.setText(str(saved.get("last_page", prior_end + 1)))
+            ui.MilestoneOverrideCheckBox.setChecked(bool(saved.get("milestone_override", False)))
+            ui.ProgressLabel.setText(
+                f"Book {current_index + 1} of {len(book_destinations)}: {book_name}"
+                f" ({book_markdown})"
+                f" | {saved.get('status', 'pending')}"
+            )
+            ui.PreviousButton.setEnabled(current_position > 0)
+            ui.NextButton.setEnabled(current_position < len(pending_indices) - 1)
+            result = self._run_non_modal_dialog(dialog)
+            saved.update({
+                "source": ui.SourceLineEdit.text(),
+                "destination": ui.DestinationLineEdit.text(),
+                "first_page": ui.FirstPageLineEdit.text(),
+                "last_page": ui.LastPageLineEdit.text(),
+                "milestone_override": ui.MilestoneOverrideCheckBox.isChecked(),
+            })
+            workflow_state["book_index"] = current_index
+            self._save_extract_dialog_state(active_root, state)
+
+            if result == qtw.QDialog.Rejected:
+                return extracted_paths
+            if result == previous_result:
+                current_position = max(0, current_position - 1)
+                continue
+            if result == next_result:
+                current_position = min(len(pending_indices) - 1, current_position + 1)
+                continue
+            if result == skip_result:
+                response = qtw.QMessageBox.question(
+                    dialog,
+                    "Complete Book Without Extraction",
+                    "Mark this book complete without extracting pages?",
+                    qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
+                    qtw.QMessageBox.Cancel,
+                )
+                if response == qtw.QMessageBox.Cancel:
+                    continue
+                saved["milestone_override"] = True
+                saved["status"] = "complete"
+                saved["completion_source"] = "skip"
+                self._save_extract_dialog_state(active_root, state)
+            else:
+                destination_path = ui.DestinationLineEdit.text()
+                os.makedirs(destination_path, exist_ok=True)
+                if not self._confirm_extract_overwrite(dialog, destination_path):
+                    continue
+                progress = PixlerMain._show_extraction_progress(
+                    self,
+                    dialog,
+                    f"Extracting pages for {book_name}...",
+                )
+                try:
+                    for name in os.listdir(destination_path):
+                        path = os.path.join(destination_path, name)
+                        if os.path.isdir(path) and not os.path.islink(path):
+                            shutil.rmtree(path)
+                        else:
+                            os.remove(path)
+                    book_paths = extract_pdf_source_pages(
+                        ui.SourceLineEdit.text(),
+                        destination_path,
+                        ui.FirstPageLineEdit.text(),
+                        ui.LastPageLineEdit.text(),
+                    )
+                except (OSError, ValueError) as exc:
+                    qtw.QMessageBox.warning(
+                        dialog,
+                        "Extract Book Pages",
+                        f"Could not extract pages for {book_name}.\n\n{exc}",
+                    )
+                    continue
+                finally:
+                    PixlerMain._close_extraction_progress(progress)
+                extracted_paths.extend(book_paths)
+                saved["status"] = "complete"
+                saved["completion_source"] = "extraction"
+                self._save_extract_dialog_state(active_root, state)
+
+            current_position += 1
+            if current_position >= len(pending_indices):
+                break
+
+        incomplete_books = [
+            os.path.basename(path)
+            for path in book_destinations
+            for book_state in (book_states.get(os.path.basename(path), {}),)
+            if book_state.get("status") != "complete"
+        ]
+        if incomplete_books:
+            workflow_state["book_index"] = next(
+                (
+                    index
+                    for index, path in enumerate(book_destinations)
+                    if os.path.basename(path) in incomplete_books
+                ),
+                0,
+            )
+            self._save_extract_dialog_state(active_root, state)
+            self.statusBar().showMessage(
+                f"Book extraction paused with {len(incomplete_books)} book(s) pending.",
+                7000,
+            )
+            return extracted_paths
+
+        source_root = self._book_stage_root(workflow_source)
+        complete_root = self._book_stage_root(complete_folder)
+        handshake_root = self._book_stage_root(workflow_handshake)
+        aggregate_step = replace(
+            workflow_step,
+            workflow_source=os.path.relpath(source_root, active_root),
+            complete_destination=os.path.relpath(complete_root, active_root),
+            workflow_handshake=os.path.relpath(handshake_root, active_root),
+        )
+        if extracted_paths:
+            self._finish_page_workflow_step(
+                aggregate_step,
+                details={
+                    "source": "actionextract_book_pages",
+                    "book_count": len(book_destinations),
+                    "page_count": len(extracted_paths),
+                },
+            )
+        else:
+            self._record_extract_skip_override(active_root, workflow_step)
+        workflow_state["milestone_complete"] = True
+        workflow_state["book_index"] = 0
+        self._save_extract_dialog_state(active_root, state)
+        self.statusBar().showMessage(
+            f"Extracted {len(extracted_paths)} pages into {len(book_destinations)} book folders.",
+            7000,
+        )
+        return extracted_paths
+
+    def _extract_source_pdf_sections(self):
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        configured_steps, completed_steps, stage_steps = (
+            PixlerMain._dialog_workflow_completion(
+                self,
+                "actionstage_pdf",
+                active_root,
+            )
+        )
+        if len(configured_steps) < 4:
+            qtw.QMessageBox.warning(
+                self,
+                "Extract Source PDF",
+                "The page workflow does not define all four source sections.",
+            )
+            return []
+        if not stage_steps:
+            PixlerMain._report_completed_dialog_loop(
+                self,
+                "Source Section Extraction",
+                completed_steps,
+            )
+            return []
+
+        source_file = self._first_workflow_source_document(
+            project_staged_pdf_complete_directory(active_root)
+        )
+        if not source_file:
+            qtw.QMessageBox.warning(
+                self,
+                "Extract Source PDF",
+                "Stage the MyServer source PDF into MyPixler before extracting its sections.",
+            )
+            return []
+
+        context = self.workflow_tracker._load_project_context(active_root)
+        total_pages = max(1, int(context.get("NumberPages", 1) or 1))
+        ranges = {
+            str(section.get("key", "")): (
+                section.get("start_page"),
+                section.get("end_page"),
+            )
+            for section in context.get("SourcePageSections", [])
+            if isinstance(section, dict)
+        }
+        section_range_keys = {
+            "FrontSection": "front_matter",
+            "MiddleSections": "scripture",
+            "VerseSections": "scripture",
+            "BackSection": "back_matter",
+        }
+        steps = stage_steps
+        state = self._load_extract_dialog_state(active_root)
+        section_states = state.setdefault("sections", {})
+        extracted_paths = []
+        configured_index = min(
+            max(int(state.get("section_index", 0) or 0), 0),
+            len(configured_steps) - 1,
+        )
+        saved_sequence = str(
+            state.get("section_sequence")
+            or configured_steps[configured_index].sequence
+        )
+        current_index = next(
+            (
+                index
+                for index, pending_step in enumerate(steps)
+                if pending_step.sequence == saved_sequence
+            ),
+            0,
+        )
+        previous_result = qtw.QDialog.Accepted + 1
+        next_result = previous_result + 1
+        skip_result = next_result + 1
+        dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
+        ui = Ui_ExtractDialog()
+        ui.setupUi(dialog)
+        self._install_extract_context_menu(dialog, ui, skip_result)
+        ui.HelpButton.clicked.connect(lambda: show_help(dialog, "MyPixler"))
+        ui.PreviousButton.clicked.connect(lambda: dialog.done(previous_result))
+        ui.NextButton.clicked.connect(lambda: dialog.done(next_result))
+        ui.SkipButton.clicked.connect(lambda: dialog.done(skip_result))
+        ok_button = ui.buttonBox.button(qtw.QDialogButtonBox.Ok)
+        ok_button.setText("Extract")
+        if completed_steps:
+            completed_report = PixlerMain._completed_step_report(completed_steps)
+            ui.ProgressLabel.setToolTip(
+                "Completed dialogs omitted from this loop:\n"
+                f"{completed_report}\n\n"
+                "Uncheck Complete in MyServer > Project Settings > "
+                "Milestone Settings to restore one."
+            )
+            self.statusBar().showMessage(
+                "Completed extraction dialogs skipped: "
+                + ", ".join(
+                    f"{step.sequence} - {step.milestone_name}"
+                    for step in completed_steps
+                ),
+                10000,
+            )
+        current_defaults = {}
+
+        def set_defaults_enabled(checked):
+            ui.SourceButton.setEnabled(not checked)
+            ui.DestinationButton.setEnabled(not checked)
+            ui.MakeDefaultCheckBox.setEnabled(not checked)
+            if checked:
+                ui.MakeDefaultCheckBox.setChecked(False)
+                if current_defaults:
+                    ui.SourceLineEdit.setText(current_defaults["source"])
+                    ui.DestinationLineEdit.setText(current_defaults["destination"])
+                    ui.FirstPageLineEdit.setText(current_defaults["first_page"])
+                    ui.LastPageLineEdit.setText(current_defaults["last_page"])
+
+        def select_source():
+            selected = qtw.QFileDialog.getOpenFileName(
+                self if isinstance(self, qtw.QWidget) else None,
+                "Select PDF source file",
+                ui.SourceLineEdit.text(),
+                "PDF files (*.pdf)",
+            )[0]
+            if selected:
+                ui.SourceLineEdit.setText(selected)
+
+        def select_destination():
+            selected = qtw.QFileDialog.getExistingDirectory(
+                self if isinstance(self, qtw.QWidget) else None,
+                "Select section staging folder",
+                ui.DestinationLineEdit.text(),
+            )
+            if selected:
+                ui.DestinationLineEdit.setText(selected)
+
+        ui.defaultsrcBox.toggled.connect(set_defaults_enabled)
+        ui.SourceButton.clicked.connect(select_source)
+        ui.DestinationButton.clicked.connect(select_destination)
+        def mark_custom_value(_text):
+            ui.defaultsrcBox.setChecked(False)
+            ui.MakeDefaultCheckBox.setEnabled(True)
+
+        ui.SourceLineEdit.textEdited.connect(mark_custom_value)
+        ui.DestinationLineEdit.textEdited.connect(mark_custom_value)
+        ui.FirstPageLineEdit.textEdited.connect(mark_custom_value)
+        ui.LastPageLineEdit.textEdited.connect(mark_custom_value)
+
+        while True:
+            step = steps[current_index]
+            destination = resolve_page_workflow_path(active_root, step.workflow_source)
+            default_first, default_last = ranges.get(
+                section_range_keys.get(step.page_section, ""),
+                (None, None),
+            )
+            saved = section_states.get(step.sequence, {})
+            PixlerMain._normalize_extract_status(saved)
+            saved["status"] = "pending"
+            saved.pop("completion_source", None)
+            defaults = saved.get("defaults", {}) if isinstance(saved, dict) else {}
+            current_defaults.clear()
+            current_defaults.update({
+                "source": str(defaults.get("source", source_file)),
+                "destination": str(defaults.get("destination", destination)),
+                "first_page": str(defaults.get("first_page", default_first or 1)),
+                "last_page": str(defaults.get("last_page", default_last or total_pages)),
+            })
+            dialog.setWindowTitle(f"Extract {step.page_section} source pages")
+            ui.SourceLineEdit.setText(str(saved.get("source", current_defaults["source"])))
+            ui.DestinationLineEdit.setText(str(saved.get("destination", current_defaults["destination"])))
+            ui.FirstPageLineEdit.setText(str(saved.get("first_page", current_defaults["first_page"])))
+            ui.LastPageLineEdit.setText(str(saved.get("last_page", current_defaults["last_page"])))
+            ui.defaultsrcBox.setChecked(bool(saved.get("use_default", True)))
+            ui.MilestoneOverrideCheckBox.setChecked(bool(saved.get("milestone_override", False)))
+            ui.ProgressLabel.setText(
+                f"Section {current_index + 1} of {len(steps)}: {step.page_section}"
+                f" | {saved.get('status', 'pending')}"
+            )
+            ui.PreviousButton.setEnabled(current_index > 0)
+            ui.NextButton.setEnabled(current_index < len(steps) - 1)
+            result = self._run_non_modal_dialog(dialog)
+            current_state = section_states.setdefault(step.sequence, {})
+            current_state.update({
+                "source": ui.SourceLineEdit.text(),
+                "destination": ui.DestinationLineEdit.text(),
+                "first_page": ui.FirstPageLineEdit.text(),
+                "last_page": ui.LastPageLineEdit.text(),
+                "use_default": ui.defaultsrcBox.isChecked(),
+                "milestone_override": ui.MilestoneOverrideCheckBox.isChecked(),
+            })
+            if ui.MakeDefaultCheckBox.isChecked():
+                current_state["defaults"] = {
+                    "source": ui.SourceLineEdit.text(),
+                    "destination": ui.DestinationLineEdit.text(),
+                    "first_page": ui.FirstPageLineEdit.text(),
+                    "last_page": ui.LastPageLineEdit.text(),
+                }
+            state["section_index"] = configured_steps.index(step)
+            state["section_sequence"] = step.sequence
+            self._save_extract_dialog_state(active_root, state)
+
+            if result == qtw.QDialog.Rejected:
+                return extracted_paths
+            if result == previous_result:
+                current_index = max(0, current_index - 1)
+                continue
+            if result == next_result:
+                current_index = min(len(steps) - 1, current_index + 1)
+                continue
+            if result == skip_result:
+                response = qtw.QMessageBox.question(
+                    dialog,
+                    "Complete Section Without Extraction",
+                    "Mark this section complete without extracting pages?",
+                    qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
+                    qtw.QMessageBox.Cancel,
+                )
+                if response == qtw.QMessageBox.Cancel:
+                    continue
+                current_state["milestone_override"] = True
+                current_state["status"] = "complete"
+                current_state["completion_source"] = "skip"
+                self._record_extract_skip_override(active_root, step)
+                self._save_extract_dialog_state(active_root, state)
+                PixlerMain._refresh_extract_completion_progress(
+                    self,
+                    active_root,
+                    ui,
+                    f"{step.sequence} - {step.milestone_name} | complete",
+                )
+                current_index += 1
+                if current_index >= len(steps):
+                    break
+                continue
+
+            destination_path = ui.DestinationLineEdit.text()
+            os.makedirs(destination_path, exist_ok=True)
+            if not self._confirm_extract_overwrite(dialog, destination_path):
+                continue
+            progress = PixlerMain._show_extraction_progress(
+                self,
+                dialog,
+                f"Extracting {step.page_section} source pages...",
+            )
+            try:
+                for name in os.listdir(destination_path):
+                    path = os.path.join(destination_path, name)
+                    if os.path.isdir(path) and not os.path.islink(path):
+                        shutil.rmtree(path)
+                    else:
+                        os.remove(path)
+                extracted_paths.append(
+                    extract_pdf_page_range(
+                        ui.SourceLineEdit.text(),
+                        destination_path,
+                        ui.FirstPageLineEdit.text(),
+                        ui.LastPageLineEdit.text(),
+                    )
                 )
             except (OSError, ValueError) as exc:
                 qtw.QMessageBox.warning(
-                    self.pdfxDialog,
+                    dialog,
                     "Extract PDF Pages",
-                    f"Could not extract the selected PDF pages.\n\n{exc}",
+                    f"Could not extract the selected {step.page_section} pages.\n\n{exc}",
                 )
-                return
+                return extracted_paths
+            finally:
+                PixlerMain._close_extraction_progress(progress)
 
-            print(f"pdf page extraction complete: {extracted_path}")
-
-            base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
-
-            source = self.sourcefile
-
-            if source:
-                source = os.path.normpath(source)
-
-            SessionManager(base).update('Session.json', {
-                'self.sourcefile': source or "",
-                'self.firstpage': self.firstpage,
-                'self.lastpage': self.lastpage,
-            })
-            if workflow_step:
+            completion_step = replace(
+                step,
+                workflow_source=os.path.relpath(destination_path, active_root),
+            )
+            try:
                 self._finish_page_workflow_step(
-                    workflow_step,
-                    details={"source": "actionextract_pdf"},
+                    completion_step,
+                    details={"source": "extract_source_pdf_section"},
+                    stage_source=True,
                 )
+            except (OSError, ValueError) as exc:
+                current_state["status"] = "pending"
+                current_state.pop("completion_source", None)
+                self._save_extract_dialog_state(active_root, state)
+                extracted_paths.pop()
+                qtw.QMessageBox.warning(
+                    dialog,
+                    "Complete Section Extraction",
+                    f"The section PDF was created, but its workflow handoff could not be completed.\n\n{exc}",
+                )
+                return extracted_paths
+            current_state["status"] = "complete"
+            current_state["completion_source"] = "extraction"
+            self._save_extract_dialog_state(active_root, state)
+            PixlerMain._refresh_extract_completion_progress(
+                self,
+                active_root,
+                ui,
+                f"{step.sequence} - {step.milestone_name} | complete",
+            )
+            complete_destination = resolve_page_workflow_path(
+                active_root,
+                step.complete_destination,
+            )
+            extracted_paths[-1] = os.path.join(
+                complete_destination,
+                os.path.basename(extracted_paths[-1]),
+            )
+            current_index += 1
+            if current_index >= len(steps):
+                break
 
-        def reject():
-            pass
+        state["section_index"] = 0
+        state["section_sequence"] = configured_steps[0].sequence
+        self._save_extract_dialog_state(active_root, state)
 
-        self.pdfxDialog = qtw.QDialog()
-        self.pdfx_ui = Ui_ExtractDialog()
-        self.pdfx_ui.setupUi(self.pdfxDialog)
-        self.pdfxDialog.show()
-        def setdefault():
-            if self.pdfx_ui.defaultsrcBox.isChecked():
-                self.pdfx_ui.SourceButton.setEnabled(False)
-                self.pdfx_ui.DestinationButton.setEnabled(False)
-            else:
-                self.pdfx_ui.SourceButton.setEnabled(True)
-                self.pdfx_ui.DestinationButton.setEnabled(True)
+        self.statusBar().showMessage(
+            f"Extracted source PDF into {len(extracted_paths)} section staging folders.",
+            5000,
+        )
+        return extracted_paths
 
-        self.pdfx_ui.defaultsrcBox.stateChanged.connect(setdefault)
-        self.pdfx_ui.SourceButton.clicked.connect(self.OpenPdfFileDialog)
-        self.pdfx_ui.DestinationButton.clicked.connect(self.DestPdfFileDialog)
-        self.pdfx_ui.buttonBox.accepted.connect(accept)
-        self.pdfx_ui.buttonBox.rejected.connect(reject)
+    def actionextract_staged_pdf_pages(self, workflow_step=None):
+        workflow_step = workflow_step or self._workflow_step_for_method("actionextract_pdf")
+        if workflow_step is None:
+            return []
+        workflow_source, complete_folder, _workflow_handshake = self._workflow_step_paths(workflow_step)
+        source_file = self._first_workflow_source_document(workflow_source)
+        if not source_file:
+            qtw.QMessageBox.warning(
+                self,
+                "Extract Staged Section PDF",
+                f"No staged section PDF is available in:\n{workflow_source}",
+            )
+            return []
 
-        if self.pdfx_ui.defaultsrcBox.isChecked():
-            source_file = self._first_workflow_file(workflow_source)
-            self.pdfx_ui.SourceLineEdit.setText(source_file or workflow_source)
-            self.pdfx_ui.DestinationLineEdit.setText(complete_folder)
+        dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
+        ui = Ui_ExtractDialog()
+        ui.setupUi(dialog)
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        state = self._load_extract_dialog_state(active_root)
+        section_states = state.setdefault("single_page_sections", {})
+        saved = section_states.get(workflow_step.sequence, {})
+        PixlerMain._normalize_extract_status(saved)
+        saved["status"] = "pending"
+        saved.pop("completion_source", None)
+        defaults = saved.get("defaults", {}) if isinstance(saved, dict) else {}
+        current_defaults = {
+            "source": str(defaults.get("source", source_file)),
+            "destination": str(defaults.get("destination", complete_folder)),
+            "first_page": str(defaults.get("first_page", "1")),
+            "last_page": str(defaults.get("last_page", "")),
+        }
+        dialog.setWindowTitle(f"Extract {workflow_step.page_section} into single-page PDFs")
+        ui.SourceLineEdit.setText(str(saved.get("source", current_defaults["source"])))
+        ui.DestinationLineEdit.setText(str(saved.get("destination", current_defaults["destination"])))
+        ui.FirstPageLineEdit.setText(str(saved.get("first_page", current_defaults["first_page"])))
+        ui.LastPageLineEdit.setText(str(saved.get("last_page", current_defaults["last_page"])))
+        ui.LastPageLineEdit.setPlaceholderText("Final page")
+        ui.PreviousButton.hide()
+        ui.NextButton.hide()
+        ui.ProgressLabel.setText(f"Extracting staged {workflow_step.page_section} PDF")
+        ui.HelpButton.clicked.connect(lambda: show_help(dialog, "MyPixler"))
 
-        rsp = self.pdfxDialog.exec_()
+        def skip_extraction():
+            response = qtw.QMessageBox.question(
+                dialog,
+                "Complete Page Extraction Without Output",
+                "Mark this extraction complete without creating pages?",
+                qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
+                qtw.QMessageBox.Cancel,
+            )
+            if response == qtw.QMessageBox.Cancel:
+                return
+            saved["status"] = "complete"
+            saved["completion_source"] = "skip"
+            saved["milestone_override"] = True
+            self._record_extract_skip_override(active_root, workflow_step)
+            ui.MilestoneOverrideCheckBox.setChecked(True)
+            dialog.reject()
+
+        ui.SkipButton.clicked.connect(skip_extraction)
+        self._install_extract_context_menu(
+            dialog,
+            ui,
+            qtw.QDialog.Rejected,
+            skip_callback=skip_extraction,
+        )
+
+        def set_defaults_enabled(checked):
+            ui.SourceButton.setEnabled(not checked)
+            ui.DestinationButton.setEnabled(not checked)
+            ui.MakeDefaultCheckBox.setEnabled(not checked)
+            if checked:
+                ui.MakeDefaultCheckBox.setChecked(False)
+                ui.SourceLineEdit.setText(current_defaults["source"])
+                ui.DestinationLineEdit.setText(current_defaults["destination"])
+                ui.FirstPageLineEdit.setText(current_defaults["first_page"])
+                ui.LastPageLineEdit.setText(current_defaults["last_page"])
+
+        def select_source():
+            selected = qtw.QFileDialog.getOpenFileName(
+                self if isinstance(self, qtw.QWidget) else None,
+                "Select staged section PDF",
+                ui.SourceLineEdit.text(),
+                "PDF files (*.pdf)",
+            )[0]
+            if selected:
+                ui.SourceLineEdit.setText(selected)
+
+        def select_destination():
+            selected = qtw.QFileDialog.getExistingDirectory(
+                self if isinstance(self, qtw.QWidget) else None,
+                "Select single-page PDF destination",
+                ui.DestinationLineEdit.text(),
+            )
+            if selected:
+                ui.DestinationLineEdit.setText(selected)
+
+        ui.defaultsrcBox.toggled.connect(set_defaults_enabled)
+        ui.SourceButton.clicked.connect(select_source)
+        ui.DestinationButton.clicked.connect(select_destination)
+        ui.defaultsrcBox.setChecked(bool(saved.get("use_default", True)))
+        ui.MilestoneOverrideCheckBox.setChecked(bool(saved.get("milestone_override", False)))
+        def mark_custom_value(_text):
+            ui.defaultsrcBox.setChecked(False)
+            ui.MakeDefaultCheckBox.setEnabled(True)
+
+        ui.SourceLineEdit.textEdited.connect(mark_custom_value)
+        ui.DestinationLineEdit.textEdited.connect(mark_custom_value)
+        ui.FirstPageLineEdit.textEdited.connect(mark_custom_value)
+        ui.LastPageLineEdit.textEdited.connect(mark_custom_value)
+        result = self._run_non_modal_dialog(dialog)
+        saved.update({
+            "source": ui.SourceLineEdit.text(),
+            "destination": ui.DestinationLineEdit.text(),
+            "first_page": ui.FirstPageLineEdit.text(),
+            "last_page": ui.LastPageLineEdit.text(),
+            "milestone_override": ui.MilestoneOverrideCheckBox.isChecked(),
+            "use_default": ui.defaultsrcBox.isChecked(),
+        })
+        if ui.MakeDefaultCheckBox.isChecked():
+            saved["defaults"] = {
+                "source": ui.SourceLineEdit.text(),
+                "destination": ui.DestinationLineEdit.text(),
+                "first_page": ui.FirstPageLineEdit.text(),
+                "last_page": ui.LastPageLineEdit.text(),
+            }
+        section_states[workflow_step.sequence] = saved
+        self._save_extract_dialog_state(active_root, state)
+        if result != qtw.QDialog.Accepted:
+            return []
+
+        progress = PixlerMain._show_extraction_progress(
+            self,
+            dialog,
+            f"Extracting {workflow_step.page_section} into individual pages...",
+        )
+        try:
+            destination_dir = os.path.abspath(ui.DestinationLineEdit.text())
+            source_path = os.path.abspath(ui.SourceLineEdit.text())
+            source_in_destination = os.path.dirname(source_path) == destination_dir
+            extraction_dir = destination_dir
+            temporary_dir = None
+            if source_in_destination:
+                temporary_dir = tempfile.TemporaryDirectory()
+                extraction_dir = temporary_dir.name
+            os.makedirs(destination_dir, exist_ok=True)
+            if not self._confirm_extract_overwrite(
+                dialog,
+                destination_dir,
+                preserved_paths=(source_path,) if source_in_destination else (),
+            ):
+                if temporary_dir is not None:
+                    temporary_dir.cleanup()
+                return []
+            for name in os.listdir(destination_dir):
+                path = os.path.join(destination_dir, name)
+                if source_in_destination and os.path.normcase(os.path.abspath(path)) == os.path.normcase(source_path):
+                    continue
+                if os.path.isdir(path) and not os.path.islink(path):
+                    shutil.rmtree(path)
+                else:
+                    os.remove(path)
+            extracted_paths = extract_pdf_pages(
+                source_path,
+                extraction_dir,
+                ui.FirstPageLineEdit.text() or 1,
+                ui.LastPageLineEdit.text() or None,
+            )
+            if temporary_dir is not None:
+                os.remove(source_path)
+                moved_paths = []
+                for extracted_path in extracted_paths:
+                    destination_path = os.path.join(destination_dir, os.path.basename(extracted_path))
+                    shutil.move(extracted_path, destination_path)
+                    moved_paths.append(destination_path)
+                extracted_paths = moved_paths
+                temporary_dir.cleanup()
+            self._finish_page_workflow_step(
+                workflow_step,
+                details={
+                    "source": "actionextract_staged_pdf_pages",
+                    "page_count": len(extracted_paths),
+                },
+            )
+            saved["status"] = "complete"
+            saved["completion_source"] = "extraction"
+            self._save_extract_dialog_state(active_root, state)
+        except (OSError, ValueError) as exc:
+            qtw.QMessageBox.warning(
+                dialog,
+                "Extract Staged Section PDF",
+                f"Could not extract the staged section PDF.\n\n{exc}",
+            )
+            return []
+        finally:
+            PixlerMain._close_extraction_progress(progress)
+
+        self.statusBar().showMessage(
+            f"Extracted {len(extracted_paths)} single-page PDFs for {workflow_step.page_section}.",
+            5000,
+        )
+        return extracted_paths
 
     # Page workflow: Sequence EF4T; MilestoneName front_matter_pages_extracted_for_tif.
     # Page workflow: Sequence EB4T; MilestoneName middle_matter_pages_extracted_for_tif.
@@ -1621,6 +2761,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             source_file_path = self.pdf4tif_ui.SourceLineEdit.text().strip()
             if os.path.isdir(source_file_path):
                 source_file_path = self._first_workflow_file(source_file_path)
+            progress = PixlerMain._show_extraction_progress(
+                self,
+                self.pdf4tifDialog,
+                "Extracting PDF pages for TIFF conversion...",
+            )
             try:
                 extracted_paths = extract_pdf_pages(
                     source_file_path,
@@ -1635,6 +2780,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     f"Could not extract the section PDF into individual pages.\n\n{exc}",
                 )
                 return
+            finally:
+                PixlerMain._close_extraction_progress(progress)
             print(f"pdf pages for tif extraction complete: {len(extracted_paths)} pages")
             if workflow_step:
                 self._finish_page_workflow_step(

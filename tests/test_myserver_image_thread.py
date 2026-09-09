@@ -135,7 +135,7 @@ def test_myserver_opens_project_source_pdf_docked_on_startup(tmp_path) -> None:
     pdf_path.write_bytes(b"%PDF-1.4\n")
     open_calls = []
     probe = SimpleNamespace(
-        pdf_viewer_dialog=None,
+        source_reader=None,
         _project_source_pdf=lambda: str(pdf_path),
         _open_pdf_source=lambda path, floating: open_calls.append((path, floating)) or True,
     )

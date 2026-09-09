@@ -53,6 +53,24 @@ COMBINED_PDF_SOURCE_RELATIVE_DIR = os.path.join(
     "source_images",
     "pdf_combined_src_images",
 )
+STAGED_PDF_WORKFLOW_RELATIVE_DIR = os.path.join(
+    "Model",
+    "Project",
+    "Images",
+    "MyPixler",
+    "SourceStaged",
+    "Workflow",
+    "pdf_staged_src_image",
+)
+STAGED_PDF_COMPLETE_RELATIVE_DIR = os.path.join(
+    "Model",
+    "Project",
+    "Images",
+    "MyPixler",
+    "SourceStaged",
+    "Complete",
+    "pdf_staged_src_image",
+)
 PROVENANCE_RELATIVE_DIR = os.path.join(
     "Model",
     "Project",
@@ -231,6 +249,95 @@ def combine_project_source_pdfs(project_root: str, filename: str = "combined_sou
     return destination_path
 
 
+def stage_combined_project_pdf(
+    project_root: str,
+    source_path: str,
+    destination_dir: str | None = None,
+) -> str:
+    normalized_project_root = os.path.abspath(project_root)
+    normalized_source_path = os.path.abspath(str(source_path or "").strip())
+    combined_source_dir = os.path.join(normalized_project_root, COMBINED_PDF_SOURCE_RELATIVE_DIR)
+    if not os.path.isfile(normalized_source_path):
+        raise ValueError("Combined project PDF does not exist")
+    if os.path.splitext(normalized_source_path)[1].lower() != ".pdf":
+        raise ValueError("Combined project source must be a PDF file")
+    if os.path.commonpath((normalized_source_path, combined_source_dir)) != combined_source_dir:
+        raise ValueError("PDF must be staged from the project's combined source folder")
+
+    normalized_destination_dir = os.path.abspath(
+        str(destination_dir or os.path.join(
+            normalized_project_root,
+            STAGED_PDF_WORKFLOW_RELATIVE_DIR,
+        )).strip()
+    )
+    os.makedirs(normalized_destination_dir, exist_ok=True)
+    destination_path = os.path.join(normalized_destination_dir, os.path.basename(normalized_source_path))
+    shutil.copy2(normalized_source_path, destination_path)
+    return destination_path
+
+
+def find_project_staged_pdf(project_root: str) -> str:
+    normalized_project_root = os.path.abspath(project_root)
+    for relative_dir in (
+        STAGED_PDF_WORKFLOW_RELATIVE_DIR,
+        STAGED_PDF_COMPLETE_RELATIVE_DIR,
+    ):
+        staged_source_dir = os.path.join(normalized_project_root, relative_dir)
+        if not os.path.isdir(staged_source_dir):
+            continue
+        staged_sources = sorted(
+            os.path.join(staged_source_dir, entry)
+            for entry in os.listdir(staged_source_dir)
+            if entry.lower().endswith(".pdf")
+            and os.path.isfile(os.path.join(staged_source_dir, entry))
+        )
+        if staged_sources:
+            return staged_sources[0]
+    return ""
+
+
+def project_staged_pdf_workflow_directory(project_root: str) -> str:
+    return os.path.join(os.path.abspath(project_root), STAGED_PDF_WORKFLOW_RELATIVE_DIR)
+
+
+def project_staged_pdf_complete_directory(project_root: str) -> str:
+    return os.path.join(os.path.abspath(project_root), STAGED_PDF_COMPLETE_RELATIVE_DIR)
+
+
+def complete_project_staged_pdf_handoff(
+    project_root: str,
+    source_dir: str | None = None,
+    destination_dir: str | None = None,
+    override: bool = True,
+) -> str:
+    normalized_project_root = os.path.abspath(project_root)
+    workflow_dir = os.path.abspath(
+        str(source_dir or project_staged_pdf_workflow_directory(normalized_project_root)).strip()
+    )
+    complete_dir = os.path.abspath(
+        str(destination_dir or project_staged_pdf_complete_directory(normalized_project_root)).strip()
+    )
+    workflow_sources = sorted(
+        os.path.join(workflow_dir, entry)
+        for entry in os.listdir(workflow_dir)
+        if entry.lower().endswith(".pdf")
+        and os.path.isfile(os.path.join(workflow_dir, entry))
+    ) if os.path.isdir(workflow_dir) else []
+    if not workflow_sources:
+        if source_dir is not None:
+            raise ValueError(f"No staged PDF exists in: {workflow_dir}")
+        return find_project_staged_pdf(normalized_project_root)
+
+    source_path = workflow_sources[0]
+    os.makedirs(complete_dir, exist_ok=True)
+    complete_path = os.path.join(complete_dir, os.path.basename(source_path))
+    if os.path.exists(complete_path) and not override:
+        raise FileExistsError(f"Staged PDF already exists: {complete_path}")
+    shutil.copy2(source_path, complete_path)
+    os.remove(source_path)
+    return complete_path
+
+
 def extract_pdf_page_range(
     source_path: str,
     destination_dir: str,
@@ -301,6 +408,54 @@ def extract_pdf_pages(
         )
         writer = PdfWriter()
         writer.add_page(reader.pages[page_number - 1])
+        with open(destination_path, "wb") as destination_file:
+            writer.write(destination_file)
+        output_paths.append(destination_path)
+    return output_paths
+def extract_pdf_source_pages(
+    source: str,
+    destination_dir: str,
+    first_page: int = 1,
+    last_page: int | None = None,
+) -> list[str]:
+    normalized_source = os.path.abspath(str(source or "").strip())
+    if os.path.isfile(normalized_source):
+        source_paths = [normalized_source]
+    elif os.path.isdir(normalized_source):
+        source_paths = sorted(
+            os.path.join(normalized_source, filename)
+            for filename in os.listdir(normalized_source)
+            if filename.lower().endswith(".pdf")
+            and os.path.isfile(os.path.join(normalized_source, filename))
+        )
+    else:
+        raise ValueError("PDF source file or folder does not exist")
+    if not source_paths:
+        raise ValueError("PDF source folder contains no PDF files")
+
+    pages = []
+    for source_path in source_paths:
+        reader = PdfReader(source_path)
+        pages.extend((source_path, page_index, page) for page_index, page in enumerate(reader.pages))
+
+    first_page_number = int(first_page)
+    final_page = len(pages) if last_page is None else int(last_page)
+    if first_page_number < 1 or final_page < first_page_number or final_page > len(pages):
+        raise ValueError(f"Page range must be between 1 and {len(pages)}")
+
+    normalized_destination_dir = os.path.abspath(str(destination_dir or "").strip())
+    os.makedirs(normalized_destination_dir, exist_ok=True)
+    output_paths = []
+    for page_number in range(first_page_number, final_page + 1):
+        source_path, source_page_index, page = pages[page_number - 1]
+        source_stem = os.path.splitext(os.path.basename(source_path))[0]
+        if len(source_paths) > 1 and len(PdfReader(source_path).pages) == 1:
+            output_name = f"{source_stem}.pdf"
+        else:
+            output_name = f"{source_stem}_Page_{source_page_index + 1:03d}.pdf"
+        destination_path = os.path.join(normalized_destination_dir, output_name)
+        writer = PdfWriter()
+        writer.add_page(page)
         with open(destination_path, "wb") as destination_file:
             writer.write(destination_file)
         output_paths.append(destination_path)

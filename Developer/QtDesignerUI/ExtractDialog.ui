@@ -2,15 +2,18 @@
 <ui version="4.0">
  <class>ExtractDialog</class>
  <widget class="QDialog" name="ExtractDialog">
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
+  </property>
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+    <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>484</width>
-    <height>294</height>
+    <width>620</width>
+    <height>350</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,9 +22,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>210</y>
-     <width>171</width>
+    <x>420</x>
+    <y>300</y>
+    <width>181</width>
      <height>32</height>
     </rect>
    </property>
@@ -185,6 +188,35 @@
    <property name="checked">
     <bool>true</bool>
    </property>
+  </widget>
+  <widget class="QCheckBox" name="MakeDefaultCheckBox">
+   <property name="enabled"><bool>false</bool></property>
+   <property name="geometry"><rect><x>330</x><y>80</y><width>181</width><height>23</height></rect></property>
+   <property name="text"><string>Make this the default</string></property>
+  </widget>
+  <widget class="QCheckBox" name="MilestoneOverrideCheckBox">
+   <property name="geometry"><rect><x>330</x><y>105</y><width>181</width><height>23</height></rect></property>
+   <property name="text"><string>Milestone override</string></property>
+  </widget>
+  <widget class="QLabel" name="ProgressLabel">
+   <property name="geometry"><rect><x>20</x><y>210</y><width>581</width><height>20</height></rect></property>
+   <property name="text"><string>Section extraction progress</string></property>
+  </widget>
+  <widget class="QPushButton" name="PreviousButton">
+   <property name="geometry"><rect><x>20</x><y>250</y><width>100</width><height>32</height></rect></property>
+   <property name="text"><string>Previous</string></property>
+  </widget>
+  <widget class="QPushButton" name="NextButton">
+   <property name="geometry"><rect><x>130</x><y>250</y><width>100</width><height>32</height></rect></property>
+   <property name="text"><string>Next</string></property>
+  </widget>
+  <widget class="QPushButton" name="SkipButton">
+   <property name="geometry"><rect><x>240</x><y>250</y><width>100</width><height>32</height></rect></property>
+   <property name="text"><string>Skip</string></property>
+  </widget>
+  <widget class="QPushButton" name="HelpButton">
+   <property name="geometry"><rect><x>350</x><y>250</y><width>100</width><height>32</height></rect></property>
+   <property name="text"><string>Help</string></property>
   </widget>
  </widget>
  <resources>

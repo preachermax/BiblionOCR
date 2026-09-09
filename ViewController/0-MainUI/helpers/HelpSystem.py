@@ -234,7 +234,8 @@ FEATURES:
 • Display TIFF and standard image formats
 • Multi-page TIFF stack navigation
 • Display the active project's PDF or multipage TIFF source document
-• Dock, float, hide, and reopen the shared Source Document Viewer
+• Open other multipage PDF or TIFF reference documents from the reader toolbar
+• Dock, float, hide, and reopen the shared Source Reader
 • Restore the active project source document at startup when available
 • Open source pages at Fit to Width and expand the main window while docked
 • Image transformation tools (rotate, crop, scale)
@@ -246,9 +247,28 @@ PRIMARY WORKFLOW:
 1. Open an active project with a registered PDF or TIFF source
 2. Open Page Workflow Wizard to view the ordered steps for the active source section
 3. Run the first incomplete sequence; later steps remain locked until it completes
-4. Use Display Source Document to inspect the protected source beside working images
+4. Use Open Source Reader to inspect the protected source beside working images
 5. Complete each dialog or preview to update the page milestone and advance progress
 6. Export processed images and continue to the next module workflow
+
+PDF SECTION EXTRACTION:
+• The extraction dialog is non-modal, so the Source Reader remains usable
+• A temporary non-modal progress indicator is displayed while each extraction runs
+• Previous and Next review section ranges without extracting them
+• Extract writes the current range and advances to the following section
+• Middle-matter and verse “to books” steps iterate through every generated book folder
+• Each book remembers its source range and writes individual PDF pages into that book folder
+• Sparse middle matter and incomplete manuscripts may intentionally omit book pages
+• Skipped books do not consume source pages when the next book range is calculated
+• Extraction status is either pending or complete
+• A successful extraction or confirmed Skip marks the dialog and milestone complete
+• Cancel returns to the current book without advancing its range
+• Complete dialogs are omitted until their milestone is unchecked in MyServer
+• Unchecked milestones restore their dialogs as pending and recover book source pages
+• MyServer follows MyPixler's active canonical BookMarkdown selection
+• Changed values are saved in the project session; Make this the default reuses them
+• Existing destination files are replaced only after an overwrite warning is accepted
+• Right-click the dialog for Undo, Redo, Skip, and Milestone override
 
 KEY SHORTCUTS:
 • Ctrl+O: Open image
@@ -274,7 +294,8 @@ USES IN PIPELINE:
 
 SOURCE DOCUMENT NOTES:
 • The source reader is for reference; image-processing commands operate on working files
-• PDF and multipage TIFF sources use the same reader controls and project metadata
+• Only PDF and TIFF documents containing at least two pages can be opened in the reader
+• Opening another reference document does not replace the active project's registered source
 • Source visibility can be toggled without unloading the active project
 • Undocking or closing the source reader restores the main window's original size
 
@@ -289,10 +310,11 @@ LOADING IMAGES:
 
 VIEWING THE PROJECT SOURCE:
 1. Open a project that has a registered PDF or multipage TIFF source
-2. Choose Display Source Document
+2. Choose Open Source Reader
 3. Navigate source pages with the reader page controls
-4. Use Fit Width or a fixed zoom level for comparison
-5. Dock, float, hide, or reopen the reader without changing the working image
+4. Use the Open button to inspect another multipage PDF or TIFF reference document
+5. Use Fit Width or a fixed zoom level for comparison
+6. Dock, float, hide, or reopen the reader without changing the working image or project source
 
 IMAGE VIEWING:
 • Pan: Click and drag
@@ -1306,7 +1328,7 @@ FEATURES:
     • Five-step project creation and project-opening workflows
     • Optional PDF or multipage TIFF source-document registration
     • Responsive source preparation with visible loading progress
-    • Shared docked or floating Source Document Viewer
+    • Shared docked or floating Source Reader
     • Automatic Fit to Width display and reversible three-panel window sizing
     • Shared scanner workflow integration
     • PDF/TIFF extraction and conversion workflows
@@ -1331,6 +1353,7 @@ KEY FUNCTIONS:
     • Open images directly into MyPixler when editing is required
     • Hand off line and ground-truth preprocessing into MyBoxer instead of running that slice locally
     • Persist session state rather than rewriting ad hoc local settings
+    • Stage the combined source into MyPixler through a confirmation dialog with visible progress
 
 CONFIGURATION:
     • Active project path
@@ -1349,7 +1372,7 @@ USES IN PIPELINE:
     • Project creation logic is moving into the Core engine rather than staying in UI code.
     • New Project uses RIS import, project details, project settings, milestones, and project folders.
     • Large source documents are prepared in a worker thread; progress remains visible in the wizard.
-    • The Source Document Viewer supports PDF and multipage TIFF reference documents.
+    • The Source Reader supports PDF and multipage TIFF reference documents.
     • Docking expands the main window for all three panels; undocking or closing restores its prior size.
     • MyServer and MyScanner share the same scanner workflow services.
     • MyBoxer now owns the migrated Greek/Latin line preprocessing and box-preparation tasks.
@@ -1380,7 +1403,7 @@ STARTING MYSERVER:
     • TIFF: Model/Project/Images/MyServer/source_images/tif_acq_src_image
     • Imported provenance: Model/Project/Images/MyServer/source_images/provenance
     • The copied provenance file keeps its original filename
-    • Display Source Document reopens the active project's registered source
+    • Open Source Reader reopens the active project's registered source
 
     SCANNING AND IMAGE INTAKE:
     1. Start the shared scan workflow when acquiring new images

@@ -11,6 +11,30 @@ from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
+try:
+    from .SourceReaderUI import Ui_SourceReader
+except ImportError:
+    from SourceReaderUI import Ui_SourceReader
+
+
+SOURCE_DOCUMENT_EXTENSIONS = {".pdf", ".tif", ".tiff"}
+SOURCE_DOCUMENT_FILTER = "Multi-page source documents (*.pdf *.tif *.tiff)"
+
+
+def _validate_source_document_type(source_path):
+    if os.path.splitext(str(source_path))[1].lower() not in SOURCE_DOCUMENT_EXTENSIONS:
+        raise ValueError("Source reader supports multi-page PDF and TIFF documents only.")
+
+
+def _choose_source_document(parent, current_path=""):
+    start_directory = os.path.dirname(os.path.abspath(current_path)) if current_path else ""
+    return qtw.QFileDialog.getOpenFileName(
+        parent,
+        "Open Multi-page Source Document",
+        start_directory,
+        SOURCE_DOCUMENT_FILTER,
+    )[0]
+
 
 def _renderer_path():
     return os.path.join(os.path.dirname(__file__), "qt_pdf_renderer.py")
@@ -73,10 +97,13 @@ class SourceDocumentLoadWorker(qtc.QObject):
     def run(self):
         output_path = ""
         try:
+            _validate_source_document_type(self.source_path)
             self.progress.emit(10, "Reading source document metadata...")
             page_count = _source_page_count(self.source_path)
-            if page_count < 1:
-                raise ValueError("The source document contains no readable pages.")
+            if page_count < 2:
+                raise ValueError(
+                    "Source reader requires a multi-page document containing at least two pages."
+                )
             self.progress.emit(45, f"Preparing page 1 of {page_count}...")
             output_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
             output_path = output_file.name
@@ -93,10 +120,11 @@ class SourceDocumentLoadWorker(qtc.QObject):
             self.failed.emit(str(exc))
 
 
-class PdfViewerWidget(qtw.QWidget):
+class SourceReaderWidget(qtw.QWidget):
     closeRequested = qtc.pyqtSignal()
     hideRequested = qtc.pyqtSignal()
     dockToggleRequested = qtc.pyqtSignal()
+    openRequested = qtc.pyqtSignal()
 
     ZOOM_LEVELS = (25, 50, 75, 100, 125, 150, 175, 200)
 
@@ -104,116 +132,66 @@ class PdfViewerWidget(qtw.QWidget):
         super().__init__(parent)
         self.pdf_path = os.path.abspath(pdf_path)
         self.source_type = os.path.splitext(self.pdf_path)[1].lower()
-        if self.source_type not in {".pdf", ".tif", ".tiff"}:
-            raise ValueError("Source reader supports PDF and multi-page TIFF documents only.")
+        _validate_source_document_type(self.pdf_path)
         self.page_count = 0
         self.page_index = 0
         self.zoom_percent = 100
         self.fit_width = True
         self._rendered_pixmap = qtg.QPixmap()
+        self.source_reader_ui = Ui_SourceReader()
+        self.source_reader_ui.setupUi(self)
+        for name in (
+            "toolbar_widget",
+            "previous_button",
+            "next_button",
+            "page_spin",
+            "page_count_label",
+            "open_button",
+            "zoom_out_button",
+            "zoom_combo",
+            "zoom_slider",
+            "zoom_in_button",
+            "fit_width_button",
+            "dock_toggle_button",
+            "hide_button",
+            "close_button",
+            "scroll_area",
+            "page_label",
+        ):
+            setattr(self, name, getattr(self.source_reader_ui, name))
 
-        layout = qtw.QVBoxLayout(self)
-        layout.setContentsMargins(4, 4, 4, 4)
-        layout.setSpacing(4)
-
-        self.toolbar_widget = qtw.QWidget(self)
         toolbar_font = self.toolbar_widget.font()
         if toolbar_font.pointSizeF() > 0:
             toolbar_font.setPointSizeF(max(8.0, toolbar_font.pointSizeF() - 1.0))
         self.toolbar_widget.setFont(toolbar_font)
-        toolbar = qtw.QGridLayout(self.toolbar_widget)
-        toolbar.setContentsMargins(0, 0, 0, 2)
-        toolbar.setHorizontalSpacing(3)
-        toolbar.setVerticalSpacing(2)
-        toolbar.setColumnStretch(5, 1)
-
-        self.previous_button = qtw.QToolButton(self)
-        self.previous_button.setArrowType(qtc.Qt.LeftArrow)
-        self.previous_button.setToolTip("Previous page")
         self.previous_button.clicked.connect(self.previous_page)
-        toolbar.addWidget(self.previous_button, 0, 0)
-
-        self.next_button = qtw.QToolButton(self)
-        self.next_button.setArrowType(qtc.Qt.RightArrow)
-        self.next_button.setToolTip("Next page")
         self.next_button.clicked.connect(self.next_page)
-        toolbar.addWidget(self.next_button, 0, 1)
-
-        toolbar.addWidget(qtw.QLabel("Page", self), 0, 2)
-        self.page_spin = qtw.QSpinBox(self)
-        self.page_spin.setMinimum(1)
-        self.page_spin.setMaximumWidth(58)
         self.page_spin.valueChanged.connect(self._select_page)
-        toolbar.addWidget(self.page_spin, 0, 3)
-
-        self.page_count_label = qtw.QLabel("of 0", self)
-        toolbar.addWidget(self.page_count_label, 0, 4)
-
-        self.zoom_out_button = qtw.QToolButton(self)
-        self.zoom_out_button.setText("-")
-        self.zoom_out_button.setToolTip("Zoom out")
+        self.open_button.setIcon(self.style().standardIcon(qtw.QStyle.SP_DialogOpenButton))
+        self.open_button.clicked.connect(self.openRequested)
         self.zoom_out_button.clicked.connect(self.zoom_out)
-        toolbar.addWidget(self.zoom_out_button, 1, 0)
-
-        self.zoom_combo = qtw.QComboBox(self)
         self.zoom_combo.addItems([f"{level}%" for level in self.ZOOM_LEVELS])
         self.zoom_combo.setCurrentText("100%")
-        self.zoom_combo.setMaximumWidth(72)
-        self.zoom_combo.setToolTip("Zoom level")
         self.zoom_combo.currentTextChanged.connect(self._select_zoom)
-        toolbar.addWidget(self.zoom_combo, 1, 1)
-
-        self.zoom_slider = qtw.QSlider(qtc.Qt.Horizontal, self)
         self.zoom_slider.setRange(self.ZOOM_LEVELS[0], self.ZOOM_LEVELS[-1])
         self.zoom_slider.setSingleStep(5)
         self.zoom_slider.setPageStep(25)
         self.zoom_slider.setValue(self.zoom_percent)
-        self.zoom_slider.setMinimumWidth(72)
         self.zoom_slider.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Fixed)
-        self.zoom_slider.setToolTip("Zoom level")
         self.zoom_slider.valueChanged.connect(self._select_slider_zoom)
-        toolbar.addWidget(self.zoom_slider, 1, 2, 1, 4)
-
-        self.zoom_in_button = qtw.QToolButton(self)
-        self.zoom_in_button.setText("+")
-        self.zoom_in_button.setToolTip("Zoom in")
         self.zoom_in_button.clicked.connect(self.zoom_in)
-        toolbar.addWidget(self.zoom_in_button, 1, 6)
-
-        self.fit_width_button = qtw.QToolButton(self)
-        self.fit_width_button.setText("Fit Width")
-        self.fit_width_button.setToolTip("Fit the page to the viewer width")
         self.fit_width_button.clicked.connect(self.fit_to_width)
-        toolbar.addWidget(self.fit_width_button, 1, 7, 1, 3)
-
-        self.dock_toggle_button = qtw.QToolButton(self)
         self.dock_toggle_button.setIcon(self.style().standardIcon(qtw.QStyle.SP_TitleBarNormalButton))
-        self.dock_toggle_button.setToolTip("Dock or undock source viewer")
         self.dock_toggle_button.clicked.connect(self.dockToggleRequested)
-        toolbar.addWidget(self.dock_toggle_button, 0, 7)
-
-        self.hide_button = qtw.QToolButton(self)
         self.hide_button.setIcon(self.style().standardIcon(qtw.QStyle.SP_TitleBarMinButton))
-        self.hide_button.setToolTip("Hide source viewer")
         self.hide_button.clicked.connect(self.hideRequested)
-        toolbar.addWidget(self.hide_button, 0, 8)
-
-        self.close_button = qtw.QToolButton(self)
         self.close_button.setIcon(self.style().standardIcon(qtw.QStyle.SP_DialogCloseButton))
-        self.close_button.setToolTip("Close source viewer")
         self.close_button.clicked.connect(self.closeRequested)
-        toolbar.addWidget(self.close_button, 0, 9)
-        layout.addWidget(self.toolbar_widget)
-
-        self.scroll_area = qtw.QScrollArea(self)
-        self.scroll_area.setWidgetResizable(False)
-        self.scroll_area.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
-        self.page_label = qtw.QLabel(self.scroll_area)
-        self.page_label.setAlignment(qtc.Qt.AlignLeft | qtc.Qt.AlignTop)
         self.page_label.setBackgroundRole(qtg.QPalette.Base)
-        self.page_label.setSizePolicy(qtw.QSizePolicy.Ignored, qtw.QSizePolicy.Ignored)
+        scroll_contents = self.scroll_area.takeWidget()
+        self.page_label.setParent(self.scroll_area)
         self.scroll_area.setWidget(self.page_label)
-        layout.addWidget(self.scroll_area, 1)
+        scroll_contents.deleteLater()
 
         if preloaded_page_count is None:
             self._load_document()
@@ -230,8 +208,10 @@ class PdfViewerWidget(qtw.QWidget):
 
     def _load_document(self):
         self.page_count = _source_page_count(self.pdf_path)
-        if self.page_count < 1:
-            raise ValueError("The source document contains no readable pages.")
+        if self.page_count < 2:
+            raise ValueError(
+                "Source reader requires a multi-page document containing at least two pages."
+            )
 
         self.page_spin.blockSignals(True)
         self.page_spin.setRange(1, self.page_count)
@@ -242,8 +222,10 @@ class PdfViewerWidget(qtw.QWidget):
 
     def _apply_loaded_page(self, page_count, image_path):
         self.page_count = page_count
-        if self.page_count < 1:
-            raise ValueError("The source document contains no readable pages.")
+        if self.page_count < 2:
+            raise ValueError(
+                "Source reader requires a multi-page document containing at least two pages."
+            )
         pixmap = qtg.QPixmap(image_path)
         if pixmap.isNull():
             raise ValueError("The source reader returned an empty page image.")
@@ -350,14 +332,17 @@ class PdfViewerWidget(qtw.QWidget):
         if self._rendered_pixmap.isNull():
             return
         self.fit_width = True
-        render_width = max(200, self.scroll_area.viewport().width() - 4)
-        if self._rendered_pixmap.width() != render_width:
+        for _attempt in range(2):
+            render_width = max(200, self.scroll_area.viewport().width() - 4)
+            if self._rendered_pixmap.width() == render_width:
+                break
             self._rendered_pixmap = self._rendered_pixmap.scaledToWidth(
                 render_width,
                 qtc.Qt.SmoothTransformation,
             )
             self.page_label.setPixmap(self._rendered_pixmap)
             self.page_label.setFixedSize(self._rendered_pixmap.size())
+            qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 10)
         self._update_zoom_buttons()
 
     def _update_zoom_buttons(self):
@@ -366,10 +351,12 @@ class PdfViewerWidget(qtw.QWidget):
         self.zoom_in_button.setEnabled(self.fit_width or effective_zoom < self.ZOOM_LEVELS[-1])
 
 
-class PdfViewerDialog(qtw.QDialog):
+class SourceReaderDialog(qtw.QDialog):
     def __init__(self, pdf_path, parent=None, preloaded_page_count=None, preloaded_image_path=""):
         super().__init__(parent)
-        self.viewer = PdfViewerWidget(
+        self.setModal(False)
+        self.setWindowModality(qtc.Qt.NonModal)
+        self.viewer = SourceReaderWidget(
             pdf_path,
             self,
             preloaded_page_count=preloaded_page_count,
@@ -381,8 +368,28 @@ class PdfViewerDialog(qtw.QDialog):
         self.setWindowTitle(f"Source Reader - {os.path.basename(self.viewer.pdf_path)}")
         self.resize(1000, 800)
         self.viewer.dock_toggle_button.hide()
+        self.viewer.openRequested.connect(self._open_another_document)
         self.viewer.closeRequested.connect(self.close)
         self.viewer.hideRequested.connect(self.hide)
+
+    def _open_another_document(self):
+        source_path = _choose_source_document(self, self.viewer.pdf_path)
+        if not source_path:
+            return
+        try:
+            replacement = SourceReaderWidget(source_path, self)
+        except (RuntimeError, ValueError) as exc:
+            qtw.QMessageBox.warning(self, "Open Source Document", str(exc))
+            return
+        replacement.dock_toggle_button.hide()
+        replacement.openRequested.connect(self._open_another_document)
+        replacement.closeRequested.connect(self.close)
+        replacement.hideRequested.connect(self.hide)
+        previous = self.viewer
+        self.layout().replaceWidget(previous, replacement)
+        self.viewer = replacement
+        self.setWindowTitle(f"Source Reader - {os.path.basename(source_path)}")
+        previous.deleteLater()
 
     def __getattr__(self, name):
         viewer = self.__dict__.get("viewer")
@@ -391,10 +398,11 @@ class PdfViewerDialog(qtw.QDialog):
         raise AttributeError(name)
 
 
-class PdfViewerDock(qtw.QDockWidget):
-    viewerVisibilityChanged = qtc.pyqtSignal(bool)
+class SourceReaderDock(qtw.QDockWidget):
+    readerVisibilityChanged = qtc.pyqtSignal(bool)
     loadProgress = qtc.pyqtSignal(int, str)
     documentLoaded = qtc.pyqtSignal(str, int)
+    documentReplaced = qtc.pyqtSignal(str, int)
     loadFailed = qtc.pyqtSignal(str)
     DOCK_PANEL_WIDTH = 420
 
@@ -411,6 +419,7 @@ class PdfViewerDock(qtw.QDockWidget):
         self._source_load_worker = None
         self._pending_load_result = None
         self._pending_load_error = None
+        self._loading_replacement = False
         self._pending_close_after_load = False
         self.viewer = None
         self._loading_widget = qtw.QWidget(self)
@@ -446,15 +455,15 @@ class PdfViewerDock(qtw.QDockWidget):
     def is_loading(self):
         return self._source_load_thread is not None
 
-    def is_viewer_visible(self):
+    def is_reader_visible(self):
         if self._embedded:
             return self._embedded_host.isVisible()
         return self.isVisible()
 
-    def is_viewer_floating(self):
+    def is_reader_floating(self):
         return not self._embedded and self.isFloating()
 
-    def set_viewer_visible(self, visible):
+    def set_reader_visible(self, visible):
         if self._embedded:
             self._embedded_host.setVisible(bool(visible))
             if visible and self.viewer is not None:
@@ -464,16 +473,16 @@ class PdfViewerDock(qtw.QDockWidget):
                 self.viewer.hide()
         else:
             self.setVisible(bool(visible))
-        self.viewerVisibilityChanged.emit(bool(visible))
+        self.readerVisibilityChanged.emit(bool(visible))
 
-    def show_viewer(self):
-        self.set_viewer_visible(True)
+    def show_reader(self):
+        self.set_reader_visible(True)
         self._start_source_load()
-        if not self.is_viewer_floating():
+        if not self.is_reader_floating():
             self._expand_parent_window()
 
-    def hide_viewer(self):
-        self.set_viewer_visible(False)
+    def hide_reader(self):
+        self.set_reader_visible(False)
 
     def dock_in_host(self, visible=True):
         if self._embedded_host is None:
@@ -486,9 +495,9 @@ class PdfViewerDock(qtw.QDockWidget):
         content_widget.setParent(self._embedded_host)
         self._embedded_host.layout().addWidget(content_widget)
         self._sync_dock_button(False)
-        self.set_viewer_visible(visible)
+        self.set_reader_visible(visible)
 
-    def float_viewer(self):
+    def float_reader(self):
         if self._embedded:
             was_visible = self._embedded_host.isVisible()
             content_widget = self.viewer or self._loading_widget
@@ -508,11 +517,11 @@ class PdfViewerDock(qtw.QDockWidget):
             self.raise_()
             self.activateWindow()
         self._sync_dock_button(True)
-        self.viewerVisibilityChanged.emit(was_visible)
+        self.readerVisibilityChanged.emit(was_visible)
 
     def toggle_floating(self):
         if self._embedded:
-            self.float_viewer()
+            self.float_reader()
         elif self._embedded_host is not None:
             self.dock_in_host(self.isVisible())
         else:
@@ -528,19 +537,29 @@ class PdfViewerDock(qtw.QDockWidget):
 
     def _relay_dock_visibility(self, visible):
         if not self._embedded:
-            self.viewerVisibilityChanged.emit(visible)
+            self.readerVisibilityChanged.emit(visible)
 
     def _sync_dock_button(self, floating):
         if self.viewer is None:
             return
         action = "Dock" if floating else "Undock"
-        self.viewer.dock_toggle_button.setToolTip(f"{action} source viewer")
+        self.viewer.dock_toggle_button.setToolTip(f"{action} Source Reader")
 
-    def _start_source_load(self):
-        if self.viewer is not None or self._source_load_thread is not None:
+    def _start_source_load(self, source_path=None, replacement=False):
+        if self._source_load_thread is not None:
             return
+        if self.viewer is not None and not replacement:
+            return
+        source_path = os.path.abspath(source_path or self.pdf_path)
+        _validate_source_document_type(source_path)
+        self._loading_replacement = bool(replacement)
+        if self.viewer is not None:
+            self.viewer.open_button.setEnabled(False)
+        self._loading_progress.setValue(0)
+        self._loading_progress.show()
+        self._loading_label.setText("Preparing source document...")
         thread = qtc.QThread(self)
-        worker = SourceDocumentLoadWorker(self.pdf_path)
+        worker = SourceDocumentLoadWorker(source_path)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.progress.connect(self._on_source_load_progress)
@@ -564,26 +583,39 @@ class PdfViewerDock(qtw.QDockWidget):
     def _on_source_document_loaded(self, source_path, page_count, image_path):
         try:
             self._loading_progress.setValue(100)
-            viewer = PdfViewerWidget(
+            viewer = SourceReaderWidget(
                 source_path,
                 self,
                 preloaded_page_count=page_count,
                 preloaded_image_path=image_path,
             )
             viewer.closeRequested.connect(self.close)
-            viewer.hideRequested.connect(self.hide_viewer)
+            viewer.hideRequested.connect(self.hide_reader)
             viewer.dockToggleRequested.connect(self.toggle_floating)
+            viewer.openRequested.connect(self._open_another_document)
+            previous_viewer = self.viewer
             self.viewer = viewer
             if self._embedded:
-                self._embedded_host.layout().removeWidget(self._loading_widget)
+                if previous_viewer is not None:
+                    self._embedded_host.layout().removeWidget(previous_viewer)
+                else:
+                    self._embedded_host.layout().removeWidget(self._loading_widget)
                 viewer.setParent(self._embedded_host)
                 self._embedded_host.layout().addWidget(viewer)
                 if self._embedded_host.isVisible():
                     viewer.show()
             else:
                 self.setWidget(viewer)
+            if previous_viewer is not None:
+                previous_viewer.deleteLater()
+            self.pdf_path = os.path.abspath(source_path)
+            self.setWindowTitle(f"Source Reader - {os.path.basename(source_path)}")
             self._sync_dock_button(self.isFloating())
-            self._pending_load_result = (source_path, int(page_count))
+            self._pending_load_result = (
+                source_path,
+                int(page_count),
+                self._loading_replacement,
+            )
         except (RuntimeError, ValueError) as exc:
             self._on_source_document_load_failed(str(exc))
         finally:
@@ -593,24 +625,43 @@ class PdfViewerDock(qtw.QDockWidget):
                 pass
 
     def _on_source_document_load_failed(self, message):
-        self._loading_label.setText("Source document could not be loaded.")
-        self._loading_progress.hide()
-        self._pending_load_error = str(message)
+        if self._loading_replacement and self.viewer is not None:
+            self.viewer.open_button.setEnabled(True)
+            qtw.QMessageBox.warning(self, "Open Source Document", str(message))
+            self._pending_load_error = ""
+        else:
+            self._loading_label.setText("Source document could not be loaded.")
+            self._loading_progress.hide()
+            self._pending_load_error = str(message)
 
     def _on_source_load_thread_finished(self):
         self._source_load_thread = None
         self._source_load_worker = None
-        if self._pending_load_error is not None:
+        if self._pending_load_error:
             message = self._pending_load_error
             self._pending_load_error = None
             self.loadFailed.emit(message)
         elif self._pending_load_result is not None:
-            source_path, page_count = self._pending_load_result
+            source_path, page_count, replacement = self._pending_load_result
             self._pending_load_result = None
-            self.documentLoaded.emit(source_path, page_count)
+            if replacement:
+                self.documentReplaced.emit(source_path, page_count)
+            else:
+                self.documentLoaded.emit(source_path, page_count)
+        self._pending_load_error = None
+        self._loading_replacement = False
         if self._pending_close_after_load:
             self._pending_close_after_load = False
             qtc.QTimer.singleShot(0, self.close)
+
+    def _open_another_document(self):
+        source_path = _choose_source_document(self, self.pdf_path)
+        if not source_path:
+            return
+        try:
+            self._start_source_load(source_path, replacement=True)
+        except ValueError as exc:
+            qtw.QMessageBox.warning(self, "Open Source Document", str(exc))
 
     def _on_top_level_changed(self, floating):
         self._sync_dock_button(floating)
@@ -668,8 +719,8 @@ class PdfViewerDock(qtw.QDockWidget):
         if not self._automatic_close:
             answer = qtw.QMessageBox.question(
                 self,
-                "Close Source Viewer",
-                "Are you sure you want to close the source document viewer?",
+                "Close Source Reader",
+                "Are you sure you want to close the Source Reader?",
                 qtw.QMessageBox.Yes | qtw.QMessageBox.No,
                 qtw.QMessageBox.No,
             )
@@ -684,5 +735,5 @@ class PdfViewerDock(qtw.QDockWidget):
             content_widget.setParent(self)
             self.setWidget(content_widget)
             self._embedded = False
-            self.viewerVisibilityChanged.emit(False)
+            self.readerVisibilityChanged.emit(False)
         event.accept()

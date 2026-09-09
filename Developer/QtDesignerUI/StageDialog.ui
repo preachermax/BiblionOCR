@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>StageDialog</class>
+ <widget class="QDialog" name="StageDialog">
+  <property name="windowModality"><enum>Qt::ApplicationModal</enum></property>
+    <property name="geometry"><rect><x>0</x><y>0</y><width>620</width><height>300</height></rect></property>
+  <property name="windowTitle"><string>Stage source PDF</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item><widget class="QCheckBox" name="defaultsrcBox"><property name="text"><string>Use workflow defaults</string></property><property name="checked"><bool>true</bool></property></widget></item>
+   <item><widget class="QLabel" name="SourceLabel"><property name="text"><string>Source folder</string></property></widget></item>
+   <item><layout class="QHBoxLayout" name="sourceLayout"><item><widget class="QLineEdit" name="SourceLineEdit"/></item><item><widget class="QPushButton" name="SourceButton"><property name="enabled"><bool>false</bool></property><property name="text"><string>Select source</string></property></widget></item></layout></item>
+   <item><widget class="QLabel" name="DestinationLabel"><property name="text"><string>Destination folder</string></property></widget></item>
+   <item><layout class="QHBoxLayout" name="destinationLayout"><item><widget class="QLineEdit" name="DestinationLineEdit"/></item><item><widget class="QPushButton" name="DestinationButton"><property name="enabled"><bool>false</bool></property><property name="text"><string>Select destination</string></property></widget></item></layout></item>
+   <item><widget class="QCheckBox" name="OverrideCheckBox"><property name="text"><string>Overwrite an existing staged PDF</string></property><property name="checked"><bool>true</bool></property></widget></item>
+    <item><widget class="QLabel" name="StatusLabel"><property name="text"><string>Ready to stage source PDF</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+    <item><widget class="QProgressBar" name="ProgressBar"><property name="value"><number>0</number></property><property name="format"><string>%p%</string></property></widget></item>
+   <item><widget class="QDialogButtonBox" name="buttonBox"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="standardButtons"><set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set></property></widget></item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection><sender>buttonBox</sender><signal>accepted()</signal><receiver>StageDialog</receiver><slot>accept()</slot><hints/></connection>
+  <connection><sender>buttonBox</sender><signal>rejected()</signal><receiver>StageDialog</receiver><slot>reject()</slot><hints/></connection>
+ </connections>
+</ui>

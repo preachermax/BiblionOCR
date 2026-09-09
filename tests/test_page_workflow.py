@@ -209,6 +209,32 @@ class PageWorkflowWorkbookTests(unittest.TestCase):
             self.assertTrue(os.path.isfile(os.path.join(complete, "page-1.tif")))
             self.assertTrue(os.path.isfile(os.path.join(handshake, "page-1.tif")))
 
+    def test_processed_transition_preserves_shared_source_and_complete_folder(self) -> None:
+        with tempfile.TemporaryDirectory() as project_root:
+            step = PageWorkflowStep(
+                sequence="ES2V",
+                description="extract verse pages",
+                milestone_name="src_pages_verses_extracted",
+                page_section="VerseSections",
+                module="MyPixler",
+                ui_trigger="actionExtract_pdf.triggered",
+                method="actionextract_pdf",
+                dialog_ui="ExtractDialog",
+                notes="",
+                workflow_source="workflow/shared",
+                complete_destination="workflow/shared",
+                workflow_handshake="workflow/next",
+            )
+            shared = resolve_page_workflow_path(project_root, step.workflow_source)
+            os.makedirs(shared, exist_ok=True)
+            with open(os.path.join(shared, "page-001.pdf"), "wb") as handle:
+                handle.write(b"pdf")
+
+            advance_page_workflow_files(project_root, step)
+
+            self.assertTrue(os.path.isfile(os.path.join(shared, "page-001.pdf")))
+            self.assertTrue(os.path.isfile(os.path.join(project_root, "workflow/next/page-001.pdf")))
+
 
 if __name__ == "__main__":
     unittest.main()

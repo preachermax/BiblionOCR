@@ -1,15 +1,16 @@
-MilestoneNum,MilestoneName,Language,ProjectProgress%,Override,Module,InputFolder,OutputFolder
-1,src_pages_acquired,Greek,7.14%,Y,MyServer,,Model/Project/Images/MyServer/source_images/pdf_acq_src_image
-2,src_pages_scanned,Greek,7.14%,Y,MyScanner,,Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image
-3,src_pages_combined,Greek,7.14%,Y,MyServer,Model/Project/Images/MyServer/source_images/pdf_acq_src_image + Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image,Model/Project/Images/MyServer/source_images/pdf_combined_src_images
-4,pixler_pages_complete,Greek,7.14%,N,MyPixler
-5,boxer_pages_complete,Greek,7.14%,N,MyBoxer
-6,glypher_pages_complete,Greek,7.14%,N,MyGlypher
-7,project_font_installed,Greek,7.14%,Y,MyGlypher
-8,versifier_pages_complete,Greek,7.14%,N,MyVersifier
-9,resolver_pages_complete,Greek,7.14%,Y,MyResolver
-10,lexer_pages_complete,Greek,7.14%,N,MyLexer
-11,reader_pages_complete,Greek,7.14%,Y,MyReader
-12,grounder_pages_complete,Greek,7.14%,N,MyGrounder
-13,trainer_pages_complete,Greek,7.14%,N,MyTrainer
-14,writer_pages_complete,Greek,7.14%,Y,MyWriter
+MilestoneNum,MilestoneName,Language,ProjectProgress%,Override,Module,InputFolder,OutputFolder,Notes
+1,src_pages_acquired,Greek,6.67%,Y,MyServer,,Model/Project/Images/MyServer/source_images/pdf_acq_src_image,Source image acquired from a local folder using MyExplorer
+2,src_pages_scanned,Greek,6.67%,Y,MyScanner,,Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image,Source image scanned into pdf files(file) using MyScanner
+3,src_pages_combined,Greek,6.67%,Y,MyServer,Model/Project/Images/MyServer/source_images/pdf_acq_src_image + Model/Project/Images/MyScanner/scanned_images/pdf_scan_src_image,Model/Project/Images/MyServer/source_images/pdf_combined_src_images,A new method(actionCombineSourceImages) is needed to combine the pdf_acq_src_image contents with the pdf_scan_src_image contents into a single multi-page pdf file.
+4,combined_src_images_staged,Greek,6.67%,,MyServer,Model/Project/Images/MyServer/source_images/pdf_combined_src_images,Model/Project/Images/MyPixler/SourceStaged/Workflow/pdf_staged_src_image,
+5,pixler_pages_complete,Greek,6.67%,N,MyPixler,,,
+6,boxer_pages_complete,Greek,6.67%,N,MyBoxer,,,
+7,glypher_pages_complete,Greek,6.67%,N,MyGlypher,,,
+8,project_font_installed,Greek,6.67%,Y,MyGlypher,,,
+9,versifier_pages_complete,Greek,6.67%,N,MyVersifier,,,
+10,resolver_pages_complete,Greek,6.67%,Y,MyResolver,,,
+11,lexer_pages_complete,Greek,6.67%,N,MyLexer,,,
+12,reader_pages_complete,Greek,6.67%,Y,MyReader,,,
+13,grounder_pages_complete,Greek,6.67%,N,MyGrounder,,,
+14,trainer_pages_complete,Greek,6.67%,N,MyTrainer,,,
+15,writer_pages_complete,Greek,6.67%,Y,MyWriter,,,
