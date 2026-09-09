@@ -286,7 +286,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         )
 
         self.treeView.setSelectionMode(
-            QtWidgets.QAbstractItemView.SingleSelection
+            QtWidgets.QAbstractItemView.ExtendedSelection
         )
 
         self.treeView.setDragDropMode(
@@ -297,8 +297,43 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView.setAcceptDrops(True)
 
         self.treeView.customContextMenuRequested.connect(
-            self.context_menu
+            lambda position: self.context_menu(position, self.treeView)
         )
+
+        for content_view in (self.detailsView, self.itemsView):
+            content_view.setSelectionMode(
+                QtWidgets.QAbstractItemView.ExtendedSelection
+            )
+            content_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            content_view.customContextMenuRequested.connect(
+                lambda position, view=content_view: self.context_menu(position, view)
+            )
+            content_view.doubleClicked.connect(self._on_content_double_clicked)
+
+        self.detailsView.setRootIsDecorated(False)
+        self.detailsView.setItemsExpandable(False)
+        self.itemsView.setResizeMode(QtWidgets.QListView.Adjust)
+        self.itemsView.setUniformItemSizes(True)
+
+        self._view_mode_group = QtWidgets.QActionGroup(self)
+        self._view_mode_group.setExclusive(True)
+        for action in (
+            self.actionSimple_List,
+            self.actionDetails,
+            self.actionIcons,
+        ):
+            self._view_mode_group.addAction(action)
+
+        self.actionSimple_List.triggered.connect(
+            lambda: self._set_content_view_mode("list")
+        )
+        self.actionDetails.triggered.connect(
+            lambda: self._set_content_view_mode("details")
+        )
+        self.actionIcons.triggered.connect(
+            lambda: self._set_content_view_mode("icons")
+        )
+        self.actionOpen.triggered.connect(self.open_file)
 
         self.exclude_empty_checkbox.toggled.connect(
             self._toggle_empty_folder_filter
@@ -401,7 +436,27 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.populate()
 
         self.treeView.selectionModel().selectionChanged.connect(
+            self._on_folder_selection_changed
+        )
+
+        self.treeView.selectionModel().selectionChanged.connect(
             self._update_edit_action_state
+        )
+
+        self.detailsView.selectionModel().selectionChanged.connect(
+            self._update_edit_action_state
+        )
+
+        self.detailsView.selectionModel().selectionChanged.connect(
+            lambda *_args: self._update_relative_path(self.detailsView)
+        )
+
+        self.itemsView.selectionModel().selectionChanged.connect(
+            self._update_edit_action_state
+        )
+
+        self.itemsView.selectionModel().selectionChanged.connect(
+            lambda *_args: self._update_relative_path(self.itemsView)
         )
 
         self.menuEdit.aboutToShow.connect(
@@ -409,6 +464,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         )
 
         self._update_edit_action_state()
+        self._set_content_view_mode("details")
 
         self.project_status_controller = ProjectStatusController(
             self,
@@ -570,9 +626,13 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         dir_path = self._resolve_initial_directory()
         root_dir = self._resolve_root_directory()
 
-        self.model = QtWidgets.QFileSystemModel()
-        self.model.setRootPath(root_dir)
-        self.model.setReadOnly(False)
+        self.folder_model = QtWidgets.QFileSystemModel()
+        self.folder_model.setFilter(
+            QtCore.QDir.AllDirs | QtCore.QDir.NoDotAndDotDot
+        )
+        self.folder_model.setRootPath(root_dir)
+        self.folder_model.setReadOnly(False)
+        self.model = self.folder_model
 
         self.model.directoryLoaded.connect(
             lambda _path:
@@ -585,7 +645,7 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.proxy_model = EmptyFolderFilterProxyModel(self)
 
         self.proxy_model.setSourceModel(
-            self.model
+            self.folder_model
         )
 
         self.proxy_model.setExcludeEmptyDirs(
@@ -595,6 +655,18 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.treeView.setModel(
             self.proxy_model
         )
+
+        for column in range(1, 4):
+            self.treeView.hideColumn(column)
+
+        self.content_model = QtWidgets.QFileSystemModel()
+        self.content_model.setFilter(
+            QtCore.QDir.AllEntries | QtCore.QDir.NoDotAndDotDot
+        )
+        self.content_model.setRootPath(root_dir)
+        self.content_model.setReadOnly(False)
+        self.detailsView.setModel(self.content_model)
+        self.itemsView.setModel(self.content_model)
 
         root_index = self.model.index(root_dir)
 
@@ -647,10 +719,15 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             QtCore.Qt.AscendingOrder
         )
 
-        self.model.sort(
+        self.folder_model.sort(
             0,
             QtCore.Qt.AscendingOrder
         )
+
+        self.detailsView.setSortingEnabled(True)
+        self.detailsView.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        self.content_model.sort(0, QtCore.Qt.AscendingOrder)
+        self._show_directory(dir_path)
 
         QtCore.QTimer.singleShot(
             0,
@@ -661,10 +738,17 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         if (
             not getattr(self, "treeView", None)
             or self.treeView.model() is None
+            or self.detailsView.model() is None
         ):
             return
 
-        header = self.treeView.header()
+        self.treeView.header().setStretchLastSection(True)
+        self.treeView.setColumnWidth(
+            0,
+            max(1, self.treeView.viewport().width())
+        )
+
+        header = self.detailsView.header()
         header.setStretchLastSection(False)
 
         for column in range(4):
@@ -673,11 +757,11 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
                 QtWidgets.QHeaderView.Fixed
             )
 
-        available_width = self.treeView.viewport().width()
+        available_width = self.detailsView.viewport().width()
 
-        if not self.treeView.verticalScrollBar().isVisible():
+        if not self.detailsView.verticalScrollBar().isVisible():
             available_width -= (
-                self.treeView.style().pixelMetric(
+                self.detailsView.style().pixelMetric(
                     QtWidgets.QStyle.PM_ScrollBarExtent
                 )
             )
@@ -701,14 +785,14 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
                 int(available_width * proportion)
             )
 
-            self.treeView.setColumnWidth(
+            self.detailsView.setColumnWidth(
                 column,
                 width
             )
 
             assigned_width += width
 
-        self.treeView.setColumnWidth(
+        self.detailsView.setColumnWidth(
             3,
             max(
                 1,
@@ -760,31 +844,135 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
                 pass
 
     def _current_path(self):
-        index = self.treeView.currentIndex()
+        paths = self._selected_existing_paths()
+        return paths[0] if paths else ""
 
+    def _active_browser_view(self):
+        focused = QtWidgets.QApplication.focusWidget()
+        for view in (self.detailsView, self.itemsView, self.treeView):
+            if focused is view or (focused is not None and view.isAncestorOf(focused)):
+                return view
+        if self.contentStack.currentWidget() is self.detailsPage:
+            return self.detailsView
+        return self.itemsView
+
+    def _path_for_index(self, view, index):
         if not index.isValid():
             return ""
 
-        if hasattr(self.proxy_model, "mapToSource"):
+        if view is self.treeView:
             source_index = self.proxy_model.mapToSource(index)
-            return self.model.filePath(source_index)
+            return self.folder_model.filePath(source_index)
 
-        return self.model.filePath(index)
+        return self.content_model.filePath(index)
 
-    def _current_directory(self):
-        path = self._current_path()
+    def _selected_existing_paths(self, view=None):
+        view = view or self._active_browser_view()
+        selection_model = view.selectionModel()
+        indexes = selection_model.selectedRows(0) if selection_model else []
 
-        if not path:
-            return ""
+        if not indexes and view.currentIndex().isValid():
+            indexes = [view.currentIndex()]
 
-        if os.path.isdir(path):
-            return path
-
-        return os.path.dirname(path)
+        paths = []
+        for index in indexes:
+            path = self._path_for_index(view, index)
+            if path and os.path.exists(path) and path not in paths:
+                paths.append(path)
+        return paths
 
     def _selected_existing_path(self):
-        path = self._current_path()
-        return path if path and os.path.exists(path) else ""
+        paths = self._selected_existing_paths()
+        return paths[0] if paths else ""
+
+    def _operation_selected_paths(self):
+        paths = self._selected_existing_paths()
+        primary_path = self._selected_existing_path()
+        if primary_path and primary_path not in paths:
+            paths.insert(0, primary_path)
+        return paths
+
+    def _update_relative_path(self, view=None, path=""):
+        selected_path = path
+        if not selected_path and view is not None:
+            selected_paths = self._selected_existing_paths(view)
+            selected_path = selected_paths[0] if selected_paths else ""
+
+        root_directory = os.path.abspath(self._resolve_root_directory())
+        if selected_path:
+            selected_path = os.path.abspath(selected_path)
+            try:
+                if os.path.commonpath((selected_path, root_directory)) == root_directory:
+                    selected_path = os.path.relpath(selected_path, root_directory)
+            except ValueError:
+                selected_path = ""
+
+        self.relativePathLineEdit.setText(selected_path)
+
+    def _show_directory(self, directory):
+        if not directory or not os.path.isdir(directory):
+            return
+
+        directory = os.path.abspath(directory)
+        self.current_directory_path = directory
+        root_index = self.content_model.index(directory)
+        self.detailsView.setRootIndex(root_index)
+        self.itemsView.setRootIndex(root_index)
+        self.statusbar.showMessage(directory)
+        self._update_relative_path(path=directory)
+
+    def _on_folder_selection_changed(self, *_args):
+        index = self.treeView.currentIndex()
+        path = self._path_for_index(self.treeView, index)
+        if os.path.isdir(path):
+            self._show_directory(path)
+
+    def _set_content_view_mode(self, mode):
+        if mode == "details":
+            self.contentStack.setCurrentWidget(self.detailsPage)
+            self.actionDetails.setChecked(True)
+            return
+
+        self.contentStack.setCurrentWidget(self.itemsPage)
+        if mode == "icons":
+            self.itemsView.setViewMode(QtWidgets.QListView.IconMode)
+            self.itemsView.setIconSize(QtCore.QSize(48, 48))
+            self.itemsView.setGridSize(QtCore.QSize(112, 84))
+            self.actionIcons.setChecked(True)
+        else:
+            self.itemsView.setViewMode(QtWidgets.QListView.ListMode)
+            self.itemsView.setIconSize(QtCore.QSize(20, 20))
+            self.itemsView.setGridSize(QtCore.QSize())
+            self.actionSimple_List.setChecked(True)
+
+    def _select_folder_in_tree(self, directory):
+        source_index = self.folder_model.index(directory)
+        if not source_index.isValid():
+            return
+        proxy_index = self.proxy_model.mapFromSource(source_index)
+        if proxy_index.isValid():
+            self.treeView.setCurrentIndex(proxy_index)
+            self.treeView.scrollTo(proxy_index)
+
+    def _on_content_double_clicked(self, index):
+        view = self.sender()
+        path = self._path_for_index(view, index)
+        if os.path.isdir(path):
+            self._show_directory(path)
+            self._select_folder_in_tree(path)
+        elif path:
+            if self.select_mode and self.allow_file_selection:
+                self.select_current_selection("file")
+            else:
+                self._open_path(path)
+
+    def _current_directory(self):
+        view = self._active_browser_view()
+        if view is self.treeView:
+            path = self._current_path()
+            if os.path.isdir(path):
+                return path
+        return getattr(self, "current_directory_path", "")
 
     def _is_root_path(self, path):
         if not path:
@@ -795,29 +983,25 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         )
 
     def _update_edit_action_state(self, *_args):
-        selected_path = self._selected_existing_path()
+        selected_paths = self._selected_existing_paths()
         current_directory = self._current_directory()
-        editable_selection = bool(
-            selected_path
-            and not self._is_root_path(selected_path)
+        editable_selection = bool(selected_paths) and all(
+            not self._is_root_path(path) for path in selected_paths
         )
-        clipboard_source = (
-            self._file_clipboard.get("source", "")
-            if self._file_clipboard
-            else ""
-        )
+        clipboard_sources = self._clipboard_sources()
 
         self.actionNew_folder.setEnabled(
             bool(current_directory and os.path.isdir(current_directory))
         )
         self.actionCut.setEnabled(editable_selection)
-        self.actionCopy.setEnabled(bool(selected_path))
+        self.actionCopy.setEnabled(bool(selected_paths))
+        self.actionOpen.setEnabled(bool(selected_paths))
         self.actionPaste.setEnabled(
             bool(
                 current_directory
                 and os.path.isdir(current_directory)
-                and clipboard_source
-                and os.path.exists(clipboard_source)
+                and clipboard_sources
+                and all(os.path.exists(path) for path in clipboard_sources)
             )
         )
         self.actionDelete.setEnabled(editable_selection)
@@ -836,6 +1020,14 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             self.actionUndo,
             self.actionRedo,
         )
+
+    def _clipboard_sources(self):
+        if not self._file_clipboard:
+            return []
+        if "sources" in self._file_clipboard:
+            return list(self._file_clipboard["sources"])
+        source = self._file_clipboard.get("source", "")
+        return [source] if source else []
 
     def _show_file_operation_error(self, title, error):
         QtWidgets.QMessageBox.critical(
@@ -921,81 +1113,92 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.statusbar.showMessage(f"Created folder: {folder_path}", 5000)
 
     def cut_selected(self):
-        source_path = self._selected_existing_path()
-
-        if not source_path or self._is_root_path(source_path):
+        source_paths = [
+            path for path in self._operation_selected_paths()
+            if not self._is_root_path(path)
+        ]
+        if not source_paths:
             return
 
         self._file_clipboard = {
             "mode": "cut",
-            "source": source_path,
+            "sources": source_paths,
         }
-        self.statusbar.showMessage(f"Cut: {source_path}", 5000)
+        self.statusbar.showMessage(f"Cut {len(source_paths)} item(s).", 5000)
         self._update_edit_action_state()
 
     def copy_selected(self):
-        source_path = self._selected_existing_path()
-
-        if not source_path:
+        source_paths = self._operation_selected_paths()
+        if not source_paths:
             return
 
         self._file_clipboard = {
             "mode": "copy",
-            "source": source_path,
+            "sources": source_paths,
         }
-        self.statusbar.showMessage(f"Copied: {source_path}", 5000)
+        self.statusbar.showMessage(f"Copied {len(source_paths)} item(s).", 5000)
         self._update_edit_action_state()
 
     def paste_into_current_directory(self):
         if not self._file_clipboard:
             return
 
-        source_path = self._file_clipboard.get("source", "")
+        source_paths = self._clipboard_sources()
         destination_directory = self._current_directory()
 
-        if not source_path or not os.path.exists(source_path) or not destination_directory:
+        if not source_paths or not destination_directory:
             self._update_edit_action_state()
             return
 
+        operations = []
         try:
-            self._ensure_move_is_safe(source_path, destination_directory)
-            destination_path = ExplorerTreeView._unique_destination_path(
-                destination_directory,
-                os.path.basename(source_path),
-            )
+            for source_path in source_paths:
+                if not os.path.exists(source_path):
+                    continue
+                self._ensure_move_is_safe(source_path, destination_directory)
+                destination_path = ExplorerTreeView._unique_destination_path(
+                    destination_directory,
+                    os.path.basename(source_path),
+                )
 
-            if self._file_clipboard["mode"] == "cut":
-                shutil.move(source_path, destination_path)
-                operation = {
-                    "kind": "move",
-                    "source": source_path,
-                    "destination": destination_path,
-                }
-                self._file_clipboard = None
-            else:
-                self._copy_path(source_path, destination_path)
-                operation = {
-                    "kind": "create",
-                    "path": destination_path,
-                    "stash": self._undo_stash_path(destination_path),
-                }
+                if self._file_clipboard["mode"] == "cut":
+                    shutil.move(source_path, destination_path)
+                    operations.append({
+                        "kind": "move",
+                        "source": source_path,
+                        "destination": destination_path,
+                    })
+                else:
+                    self._copy_path(source_path, destination_path)
+                    operations.append({
+                        "kind": "create",
+                        "path": destination_path,
+                        "stash": self._undo_stash_path(destination_path),
+                    })
         except (OSError, ValueError) as exc:
             self._show_file_operation_error("Paste", exc)
             return
 
-        self._record_file_operation(operation)
-        self.statusbar.showMessage(f"Pasted to: {destination_path}", 5000)
+        if self._file_clipboard["mode"] == "cut":
+            self._file_clipboard = None
+        if operations:
+            self._record_file_operation({"kind": "batch", "operations": operations})
+            self.statusbar.showMessage(
+                f"Pasted {len(operations)} item(s) to: {destination_directory}", 5000
+            )
 
     def delete_selected(self):
-        source_path = self._selected_existing_path()
-
-        if not source_path or self._is_root_path(source_path):
+        source_paths = [
+            path for path in self._operation_selected_paths()
+            if not self._is_root_path(path)
+        ]
+        if not source_paths:
             return
 
         answer = QtWidgets.QMessageBox.question(
             self,
             "Delete",
-            f"Delete this item? Undo remains available during this MyExplorer session.\n\n{source_path}",
+            f"Delete {len(source_paths)} selected item(s)? Undo remains available during this MyExplorer session.",
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
             QtWidgets.QMessageBox.No,
         )
@@ -1003,25 +1206,29 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         if answer != QtWidgets.QMessageBox.Yes:
             return
 
-        stash_path = self._undo_stash_path(source_path)
-
+        operations = []
         try:
-            shutil.move(source_path, stash_path)
+            for source_path in source_paths:
+                stash_path = self._undo_stash_path(source_path)
+                shutil.move(source_path, stash_path)
+                operations.append({
+                    "kind": "delete",
+                    "path": source_path,
+                    "stash": stash_path,
+                })
         except OSError as exc:
             self._show_file_operation_error("Delete", exc)
             return
 
-        self._record_file_operation({
-            "kind": "delete",
-            "path": source_path,
-            "stash": stash_path,
-        })
-        self.statusbar.showMessage(f"Deleted: {source_path}", 5000)
+        self._record_file_operation({"kind": "batch", "operations": operations})
+        self.statusbar.showMessage(f"Deleted {len(operations)} item(s).", 5000)
 
     def move_selected(self):
-        source_path = self._selected_existing_path()
-
-        if not source_path or self._is_root_path(source_path):
+        source_paths = [
+            path for path in self._operation_selected_paths()
+            if not self._is_root_path(path)
+        ]
+        if not source_paths:
             return
 
         destination_directory = run_myexplorer_selection(
@@ -1033,23 +1240,28 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         if not destination_directory:
             return
 
+        operations = []
         try:
-            self._ensure_move_is_safe(source_path, destination_directory)
-            destination_path = ExplorerTreeView._unique_destination_path(
-                destination_directory,
-                os.path.basename(source_path),
-            )
-            shutil.move(source_path, destination_path)
+            for source_path in source_paths:
+                self._ensure_move_is_safe(source_path, destination_directory)
+                destination_path = ExplorerTreeView._unique_destination_path(
+                    destination_directory,
+                    os.path.basename(source_path),
+                )
+                shutil.move(source_path, destination_path)
+                operations.append({
+                    "kind": "move",
+                    "source": source_path,
+                    "destination": destination_path,
+                })
         except (OSError, ValueError) as exc:
             self._show_file_operation_error("Move", exc)
             return
 
-        self._record_file_operation({
-            "kind": "move",
-            "source": source_path,
-            "destination": destination_path,
-        })
-        self.statusbar.showMessage(f"Moved to: {destination_path}", 5000)
+        self._record_file_operation({"kind": "batch", "operations": operations})
+        self.statusbar.showMessage(
+            f"Moved {len(operations)} item(s) to: {destination_directory}", 5000
+        )
 
     @staticmethod
     def _move_without_overwrite(source_path, destination_path):
@@ -1063,6 +1275,12 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
     def _apply_history_operation(self, operation, undo):
         kind = operation["kind"]
+
+        if kind == "batch":
+            items = operation["operations"]
+            for item in reversed(items) if undo else items:
+                self._apply_history_operation(item, undo)
+            return
 
         if kind == "move":
             source_path = operation["destination"] if undo else operation["source"]
@@ -1109,9 +1327,12 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self._update_edit_action_state()
 
     def _on_tree_double_clicked(self, _index):
-        if self.select_mode:
+        path = self._path_for_index(self.treeView, _index)
+        if os.path.isdir(path):
+            self._show_directory(path)
+        if self.select_mode and self.allow_folder_selection:
             self.select_current_selection(
-                self.selection_kind
+                "folder"
             )
 
     def _write_selection_output(self, selected_path):
@@ -1529,11 +1750,13 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
             f"Copied to:\n{destination_path}"
         )
 
-    def context_menu(self, position):
-        clicked_index = self.treeView.indexAt(position)
+    def context_menu(self, position, view=None):
+        view = view or self.treeView
+        clicked_index = view.indexAt(position)
 
         if clicked_index.isValid():
-            self.treeView.setCurrentIndex(clicked_index)
+            view.setCurrentIndex(clicked_index)
+            view.setFocus()
 
         self._update_edit_action_state()
 
@@ -1566,33 +1789,23 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         append_default_context_actions(
             menu,
-            self.treeView,
+            view,
             is_text_widget=False
         )
 
         menu.exec_(
-            self.treeView.viewport().mapToGlobal(position)
+            view.viewport().mapToGlobal(position)
         )
 
     def open_file(self):
-        index = self.treeView.currentIndex()
+        for file_path in self._selected_existing_paths():
+            if os.path.isdir(file_path):
+                self._show_directory(file_path)
+                self._select_folder_in_tree(file_path)
+            else:
+                self._open_path(file_path)
 
-        if not index.isValid():
-            return
-
-        if hasattr(self.proxy_model, "mapToSource"):
-            source_index = self.proxy_model.mapToSource(
-                index
-            )
-
-            file_path = self.model.filePath(
-                source_index
-            )
-
-        else:
-            file_path = self.model.filePath(
-                index
-            )
+    def _open_path(self, file_path):
 
         if sys.platform.startswith("win"):
             os.startfile(file_path)

@@ -75,10 +75,14 @@ from SessionManager import SessionManager
 from LocalFileDrop import LocalFileDropMixin
 from pixler_handoff import launch_pixler_handoff
 from project_status_controller import ProjectStatusController
+from helpers.document_assembly import start_image_folder_assembly
 from print_menu_support import install_print_menu_support, image_target, document_target
 from project_column_settings import update_project_columns, project_metadata_db_path
 from Core.project_database import load_project_database_record
-from Core.source_documents import convert_scan_to_project_pdf, project_scan_image_directory
+from Core.source_documents import (
+    convert_scan_to_project_pdf,
+    project_scan_image_directory,
+)
 from Core.workflow_wizard_actions import (
     install_workflow_wizard_menu_actions,
     open_default_module_page_workflow_wizard,
@@ -258,6 +262,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
             )
 
         self.ui.actionOpen_Image.triggered.connect(self.open_image_with_myexplorer)
+        self.ui.actionAssembleImageFolder.triggered.connect(self.actionAssembleImageFolder)
         self.ui.actionPixler_Image_Editor.triggered.connect(self.OpenWithMyPixler)
         self.ui.actionVersifier.triggered.connect(self.OpenWithMyVersifier)
         self.ui.actionBoxer.triggered.connect(self.OpenWithMyBoxer)
@@ -735,6 +740,54 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         request['destination_folder'] = project_scan_image_directory(project_root_path)
         self._persist_scan_request(request)
         return self._start_scan_workflow(request)
+
+    def actionAssembleImageFolder(self):
+        project_root_path = self.project_status_controller.resolve_project_root()
+        if not project_root_path:
+            qtw.QMessageBox.information(
+                self,
+                "Assemble Image Folder",
+                "Open or create a project before assembling scanned images.",
+            )
+            return ""
+
+        source_dir = qtw.QFileDialog.getExistingDirectory(
+            self,
+            "Select Sequential Image Folder",
+            project_scan_image_directory(project_root_path),
+        )
+        if not source_dir:
+            return ""
+
+        destination_path, selected_filter = qtw.QFileDialog.getSaveFileName(
+            self,
+            "Save Multipage Document",
+            os.path.join(source_dir, "assembled_pages.pdf"),
+            "PDF document (*.pdf);;Monochrome TIFF (*.tif)",
+        )
+        if not destination_path:
+            return ""
+        if not os.path.splitext(destination_path)[1]:
+            destination_path += ".tif" if "TIFF" in selected_filter else ".pdf"
+
+        def on_finished(assembled_path):
+            self.statusBar().showMessage(
+                f"Assembled source document: {assembled_path}",
+                5000,
+            )
+
+        def on_failed(message):
+            qtw.QMessageBox.warning(self, "Assemble Image Folder", message)
+
+        if not start_image_folder_assembly(
+            self,
+            source_dir,
+            destination_path,
+            on_finished,
+            on_failed,
+        ):
+            return ""
+        return destination_path
 
     def set_columns_per_page(self):
         project_root = self.project_status_controller.resolve_project_root()

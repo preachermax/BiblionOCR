@@ -555,6 +555,7 @@ FEATURES:
 • Backend selection through Core Scanner services
 • AirScan / eSCL, WIA, TWAIN, and SANE support surfaces
 • Threaded scan execution with saved TIFF output
+• Sequential image-folder assembly into multipage PDF or monochrome TIFF
 • ADF handoff from MyServer into MyScanner when needed
 • Session-backed destination, backend, DPI, and mode restore
 
@@ -626,6 +627,13 @@ BATCH SCANNING:
 2. Confirm the destination and numbering behavior
 3. Acquire pages in sequence
 4. Review the saved TIFF results before downstream processing
+
+ASSEMBLING SAVED PAGES:
+1. Choose File > Assemble Image Folder
+2. Select a folder containing sequentially named image files
+3. Save the result as a multipage PDF or monochrome multipage TIFF
+4. Pages are ordered naturally, so page_2 precedes page_10
+5. Assembly runs in the background while the interface remains responsive
 
 IMAGE QUALITY:
 • Use a first scan as the quality check
@@ -1164,100 +1172,80 @@ MyExplorer provides file and folder navigation for the BiblionOCR project,
 with integrated project organization and batch operations.
 
 FEATURES:
-• Directory tree navigation
-• File preview
-• Batch file operations
-• Search functionality
+• Folder-only project tree on the left
+• Selected-folder contents on the right
+• List, Details, and Icons content views
+• Multiple selection in either pane
+• Reversible copy, cut, move, and delete operations
 • Drag-and-drop support
-• Project organization
+• Project-root and workflow-aware file selection
 
 PRIMARY WORKFLOW:
-1. Browse project folders
-2. Select files to process
-3. Execute batch operations
-4. Organize project structure
-5. Archive or clean up
+1. Select or expand a project folder in the left pane
+2. Review that folder's files and folders in the right pane
+3. Choose List, Details, or Icons from View
+4. Select one or more items in either pane
+5. Use the toolbar, Edit menu, or context menu to organize them
 
 KEY SHORTCUTS:
-• Ctrl+F: Find file
-• F5: Refresh
 • Delete: Delete file
 • Ctrl+X: Cut
 • Ctrl+C: Copy
 • Ctrl+V: Paste
+• Ctrl+Shift+M: Move
+• Ctrl+Z: Undo
+• Ctrl+Shift+Z: Redo
 
 TOOLBAR:
-• Navigation buttons
-• Search bar
-• View options
-• New folder button
+• Open and New Folder
+• Cut, Copy, Paste, Delete, and Move
+• Undo and Redo
 
 USES IN PIPELINE:
 • File organization
-• Batch processing launcher
 • Project structure management
-• Quick access to resources
+• Workflow file and folder selection
+• Quick access to project resources
 
 See also: MyScanner, MyPixler
 ''',
         'usage': '''EXPLORER USAGE GUIDE
 
 NAVIGATION:
-1. Folder tree on left shows structure
-2. Main panel shows folder contents
-3. Double-click folder to open
-4. Up button goes to parent
+1. The left pane shows folders only within the active project boundary
+2. Highlighting a folder displays its immediate contents in the right pane
+3. Expand folders in the left pane without mixing files into the hierarchy
+4. Double-click a folder in either pane to select and open it
 
 VIEWING FILES:
-• List view: Detailed file info
-• Icon view: Thumbnails
-• Compact view: Minimal display
+• List: compact names and file-type icons
+• Details: Name, Size, Type, and Date Modified columns
+• Icons: larger visual file and folder icons
 • Change via View menu
 
-SEARCHING:
-1. Ctrl+F opens search
-2. Enter filename or pattern
-3. Results show matching files
-4. Click to open/select
-
-SELECTING FILES:
-• Click: Select single file
-• Ctrl+Click: Multiple files
+SELECTING ITEMS:
+• Click: select one file or folder
+• Ctrl+Click: select multiple individual items
 • Ctrl+A: Select all
-• Shift+Click: Range select
+• Shift+Click: select a range
+• Double-click a file: open it with the operating system's associated application
+• In picker mode, double-click a permitted file or use Select File/Select Folder
 
 BATCH OPERATIONS:
-1. Select files to process
-2. Right-click context menu
-3. Choose operation:
-   - Copy to folder
-   - Move to folder
-   - Delete files
-   - Change permissions
-   - Launch tool on files
+1. Select files or folders in either pane
+2. Use Cut, Copy, Delete, or Move from the toolbar
+3. Select a destination folder before Paste, or choose one when moving
+4. Use Undo or Redo for operations performed during the current session
 
 DRAG AND DROP:
-• Drag files between folders
-• Drop on applications
-• Drag to external tools
+• Drop external files or folders onto a folder in the left tree
+• Name collisions receive a safe numbered filename
 
 CREATING STRUCTURE:
-1. Right-click in folder
-2. New > Folder
+1. Select the parent folder
+2. Choose New Folder from the toolbar or Edit menu
 3. Enter folder name
-4. Create complete
-
-ARCHIVING:
-1. Select files/folders
-2. Right-click > Archive
-3. Choose format (zip, tar)
-4. Set output location
-5. Create archive
-
-PROJECT TEMPLATES:
-• Tools > Create Project Template
-• Save folder structure
-• Reuse for new projects
+4. The new folder appears in the project tree and content pane
 '''
     },
 
@@ -1331,6 +1319,7 @@ FEATURES:
     • Shared docked or floating Source Reader
     • Automatic Fit to Width display and reversible three-panel window sizing
     • Shared scanner workflow integration
+    • Sequential image-folder assembly into multipage PDF or monochrome TIFF
     • PDF/TIFF extraction and conversion workflows
     • Launch points into downstream modules such as MyPixler, MyScanner, and MyBoxer
     • Session-backed path and workflow restore
@@ -1410,6 +1399,13 @@ STARTING MYSERVER:
     2. Use flatbed scanning locally in MyServer
     3. Allow feeder/ADF-oriented handoff into MyScanner when prompted
     4. Review the saved TIFF result and continue processing
+
+    ASSEMBLING SAVED PAGES:
+    1. Choose Pre-Process > Source > Assemble Image Folder
+    2. Select a folder containing sequentially named image files
+    3. Save a 300 DPI multipage PDF or bilevel Group 4 TIFF
+    4. Natural filename ordering keeps page_2 before page_10
+    5. Assembly runs in the background while MyServer remains responsive
 
     MODULE ROUTING:
     1. Use MyPixler for image editing and review

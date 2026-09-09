@@ -380,6 +380,182 @@ class MyExplorerPickerTests(unittest.TestCase):
             finally:
                 window.close()
 
+    def test_myexplorer_two_pane_views_and_toolbar_are_designer_owned(self) -> None:
+        module_path = MAIN_UI_DIR / "MyExplorerUI.py"
+        spec = importlib.util.spec_from_file_location("test_myexplorer_two_pane_ui", module_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        window = qtw.QMainWindow()
+        ui = module.Ui_Explorer()
+        ui.setupUi(window)
+        try:
+            self.assertIsInstance(ui.browserSplitter, qtw.QSplitter)
+            self.assertIsInstance(ui.treeView, qtw.QTreeView)
+            self.assertIsInstance(ui.detailsView, qtw.QTreeView)
+            self.assertIsInstance(ui.itemsView, qtw.QListView)
+            self.assertIsInstance(ui.relativePathLineEdit, qtw.QLineEdit)
+            self.assertTrue(ui.relativePathLineEdit.isReadOnly())
+            self.assertEqual(2, ui.contentStack.count())
+            self.assertEqual(
+                ["List", "Details", "Icons"],
+                [action.text() for action in ui.menuView.actions()],
+            )
+            toolbar_actions = [
+                action.text()
+                for action in ui.fileToolBar.actions()
+                if not action.isSeparator()
+            ]
+            self.assertEqual(
+                ["Open", "New folder", "Cut", "Copy", "Paste", "Delete", "Move", "Undo", "Redo"],
+                toolbar_actions,
+            )
+        finally:
+            window.close()
+
+    def test_myexplorer_two_pane_navigation_and_multi_item_operations(self) -> None:
+        os.environ["BIBLION_GUI_ENV_SANITIZED"] = "1"
+        module_path = MAIN_UI_DIR / "MyExplorer.py"
+        spec = importlib.util.spec_from_file_location("test_myexplorer_two_pane_runtime", module_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            folder = Path(temporary_directory) / "folder"
+            destination = Path(temporary_directory) / "destination"
+            folder.mkdir()
+            destination.mkdir()
+            first_file = Path(temporary_directory) / "first.txt"
+            second_file = Path(temporary_directory) / "second.txt"
+            first_file.write_text("first", encoding="utf-8")
+            second_file.write_text("second", encoding="utf-8")
+
+            window = module.MyFileBrowser(
+                start_dir=temporary_directory,
+                select_mode=True,
+                selection_kind="folder",
+            )
+            try:
+                for _ in range(10):
+                    self.application.processEvents(qtc.QEventLoop.AllEvents, 20)
+
+                self.assertEqual(
+                    qtc.QDir.AllDirs | qtc.QDir.NoDotAndDotDot,
+                    window.folder_model.filter(),
+                )
+                self.assertEqual(
+                    qtw.QAbstractItemView.ExtendedSelection,
+                    window.treeView.selectionMode(),
+                )
+                self.assertEqual(
+                    qtw.QAbstractItemView.ExtendedSelection,
+                    window.detailsView.selectionMode(),
+                )
+                self.assertEqual(".", window.relativePathLineEdit.text())
+
+                window._set_content_view_mode("list")
+                self.assertIs(window.itemsPage, window.contentStack.currentWidget())
+                self.assertEqual(qtw.QListView.ListMode, window.itemsView.viewMode())
+                window._set_content_view_mode("icons")
+                self.assertEqual(qtw.QListView.IconMode, window.itemsView.viewMode())
+                window._set_content_view_mode("details")
+                self.assertIs(window.detailsPage, window.contentStack.currentWidget())
+
+                first_index = window.content_model.index(str(first_file))
+                second_index = window.content_model.index(str(second_file))
+                selection = window.detailsView.selectionModel()
+                window.detailsView.setCurrentIndex(first_index)
+                selection.select(
+                    first_index,
+                    qtc.QItemSelectionModel.Select | qtc.QItemSelectionModel.Rows,
+                )
+                selection.select(
+                    second_index,
+                    qtc.QItemSelectionModel.Select | qtc.QItemSelectionModel.Rows,
+                )
+                window.detailsView.setFocus()
+                window._update_relative_path(window.detailsView)
+                self.assertEqual("first.txt", window.relativePathLineEdit.text())
+                self.assertEqual(
+                    {str(first_file), str(second_file)},
+                    set(window._selected_existing_paths(window.detailsView)),
+                )
+
+                window.copy_selected()
+                with mock.patch.object(window, "_current_directory", return_value=str(destination)):
+                    window.paste_into_current_directory()
+                self.assertTrue((destination / "first.txt").is_file())
+                self.assertTrue((destination / "second.txt").is_file())
+                window.undo_file_operation()
+                self.assertFalse((destination / "first.txt").exists())
+                self.assertFalse((destination / "second.txt").exists())
+
+                with mock.patch.object(
+                    window,
+                    "_operation_selected_paths",
+                    return_value=[str(first_file), str(second_file)],
+                ), mock.patch.object(
+                    window,
+                    "_current_directory",
+                    return_value=str(destination),
+                ):
+                    window.cut_selected()
+                    window.paste_into_current_directory()
+                self.assertFalse(first_file.exists())
+                self.assertFalse(second_file.exists())
+                self.assertTrue((destination / "first.txt").is_file())
+                self.assertTrue((destination / "second.txt").is_file())
+                window.undo_file_operation()
+                self.assertTrue(first_file.is_file())
+                self.assertTrue(second_file.is_file())
+
+                with mock.patch.object(
+                    window,
+                    "_operation_selected_paths",
+                    return_value=[str(first_file), str(second_file)],
+                ), mock.patch.object(
+                    module,
+                    "run_myexplorer_selection",
+                    return_value=str(destination),
+                ):
+                    window.move_selected()
+                self.assertTrue((destination / "first.txt").is_file())
+                self.assertTrue((destination / "second.txt").is_file())
+                window.undo_file_operation()
+                self.assertTrue(first_file.is_file())
+                self.assertTrue(second_file.is_file())
+
+                with mock.patch.object(
+                    window,
+                    "_operation_selected_paths",
+                    return_value=[str(first_file), str(second_file)],
+                ), mock.patch.object(
+                    module.QtWidgets.QMessageBox,
+                    "question",
+                    return_value=module.QtWidgets.QMessageBox.Yes,
+                ):
+                    window.delete_selected()
+                self.assertFalse(first_file.exists())
+                self.assertFalse(second_file.exists())
+                window.undo_file_operation()
+                self.assertTrue(first_file.is_file())
+                self.assertTrue(second_file.is_file())
+
+                folder_index = window.content_model.index(str(folder))
+                window.detailsView.doubleClicked.emit(folder_index)
+                self.assertEqual(str(folder), window.current_directory_path)
+
+                window._show_directory(temporary_directory)
+                with mock.patch.object(window, "_open_path") as open_path:
+                    window.detailsView.doubleClicked.emit(first_index)
+                    open_path.assert_called_once_with(str(first_file))
+            finally:
+                window.close()
+
     def test_myexplorer_does_not_install_close_confirmation(self) -> None:
         explorer = qtw.QMainWindow()
         other_module = qtw.QMainWindow()

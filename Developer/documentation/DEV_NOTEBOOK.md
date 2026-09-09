@@ -20,6 +20,45 @@ Use this template for every pause, stop, or VS Code close event.
 * Next immediate action:
   * single next step
 
+### Session Handoff - 2026-09-09 MyExplorer And Source Assembly
+
+* Scope summary: redesigned MyExplorer as a conventional BiblionOCR-aware two-pane browser with a folder-only navigation tree, relative-path field, selected-folder content pane, List/Details/Icons modes, multi-selection, toolbar file operations, and conventional folder/file double-click behavior; added shared MyServer/MyScanner image-folder assembly.
+* UI ownership: `Developer/QtDesignerUI/MyExplorerUI.ui` owns the splitter, content views, View menu, actions, and file toolbar; `ViewController/0-MainUI/MyExplorerUI.py` is generated; `ViewController/0-MainUI/MyExplorer.py` owns models, navigation, selection, operations, and undo/redo behavior.
+* Navigation behavior: highlighting a left-tree folder displays its immediate contents on the right; the read-only path field reports the current selection relative to the active browser root; the left pane displays only folder names; right-pane folder double-click selects and opens the folder; right-pane file double-click opens it through the operating system or accepts it in file-picker mode.
+* Operation behavior: either pane supports extended selection. Cut, Copy, Paste, Delete, and Move accept multiple selected paths; each multi-item change is stored as one reversible batch history record. Existing context menus, workflow actions, picker modes, project-root boundaries, and empty-folder filtering remain intact.
+* View behavior: Details displays Name, Size, Type, and Date Modified; List and Icons reuse the same unfiltered content model with compact or enlarged presentation. The View actions form an exclusive mode group.
+* Document assembly: `Core/source_documents.py` naturally orders supported images, flattens multiframe inputs, and writes either a 300 DPI RGB multipage PDF or a bilevel Group 4 multipage TIFF. MyServer exposes the command under `Pre-Process > Source`; MyScanner exposes it under `File`. `helpers/document_assembly.py` runs the work in a retained `QThread`, presents non-modal busy feedback, prevents duplicate jobs, and restores the action during cleanup. This explicit save command does not alter the existing combined-source milestone workflow.
+* Remote execution boundary: the worker accepts an alternate assembler callable, providing a stable future insertion point for network dispatch to the available Jetson Nano. No remote transport, credentials, endpoint assumptions, or shared-filesystem contract were introduced in this change set.
+* Intended change-set scope:
+  * `Core/source_documents.py`
+  * `Developer/QtDesignerUI/MyExplorerUI.ui`
+  * `Developer/QtDesignerUI/MyScannerUI.ui`
+  * `Developer/QtDesignerUI/MyServerUI.ui`
+  * `ViewController/0-MainUI/MyExplorerUI.py`
+  * `ViewController/0-MainUI/MyExplorer.py`
+  * `ViewController/0-MainUI/MyScannerUI.py`
+  * `ViewController/0-MainUI/MyScanner.py`
+  * `ViewController/0-MainUI/MyServerUI.py`
+  * `ViewController/0-MainUI/MyServer.py`
+  * `ViewController/0-MainUI/helpers/HelpSystem.py`
+  * `ViewController/0-MainUI/helpers/document_assembly.py`
+  * `tests/test_document_assembly_thread.py`
+  * `tests/test_myexplorer_picker.py`
+  * `tests/test_pdf_source_workflow.py`
+  * this handoff entry.
+* Validation gates:
+  * automated tests: `26 passed` across the complete Help and MyExplorer suites, focused threaded image assembly and project-PDF combination tests, and the MyServer control-wiring suite. Coverage includes relative paths, pane ownership, all view modes, multi-selection, reversible multi-item copy/cut/move/delete, folder navigation, file opening, off-UI-thread execution and cleanup, natural image ordering, PDF page count, bilevel TIFF frames, and generated-action wiring.
+  * full repository tests: all 38 test files passed in isolated processes, totaling `266 passed, 434 subtests passed`. A monolithic run exposed pre-existing shared Qt resource-state failures and later segfaulted while a Source Reader worker invoked the PyQt6 renderer; both resource tests and the test at the stall boundary passed independently.
+  * UI lockstep: `.venv/bin/python Developer/update_ui_resources.py --check` reported `24 unchanged, 0 stale`; the retired `ViewController/0-MainUI/MyPixlerUI.py` remains intentionally absent.
+  * compile/problems: all changed Python files passed `.venv/bin/python -m py_compile`; full-workspace Problems reported one pre-existing out-of-scope final-newline warning in `CONTENT_POLICY.md`; in-scope Problems were zero; `git diff --check` passed.
+  * launcher smoke: 13 canonical launchers remained stable for eight seconds with no traceback. MyGrounder remained running but reported an out-of-scope `IndexError` while restoring local `README.md` as a project page from runtime session state.
+  * security/content: no credential or private-key pattern was found in the intended scope; all implementation, tests, UI definitions, and documentation are original project work with no new external asset or dependency.
+  * manual UI checks: normal-backend MyExplorer remained running without a startup traceback. GNOME did not expose its top-level window to `xwininfo`, and a separate direct widget-capture process aborted with `std::bad_alloc`; visual capture is therefore inconclusive and no offscreen screenshot is claimed as visual evidence.
+* Explicit exclusions: runtime-local `Model/Project/Data/json/ReaderSession.json`, runtime-local `Model/Project/Data/json/Session.json`, and unrelated untracked `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg` remain outside this change set.
+* Content and licensing: implementation, tests, and documentation are original project work; no dependency, third-party content, or external asset was added.
+* Commit/sync: explicitly authorized on 2026-09-09. Stage only the documented implementation set, validate the staged snapshot, commit on `ubuntu_development`, then advance local/remote `master` and both remote maintained branches to the same commit.
+* Next immediate action: perform staged-snapshot validation, commit, synchronize both maintained branches, and verify exact revision parity.
+
 ### Session Handoff - 2026-09-09 MyPixler PDF Handshake Pre-Manual Audit
 
 * Scope summary: implemented and documented the MyServer-to-MyPixler PDF staging handshake, section extraction, canonical BookMarkdown synchronization, per-book middle/verse extraction, and sparse or incomplete manuscript skip behavior.

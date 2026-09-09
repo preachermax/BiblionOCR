@@ -1413,6 +1413,7 @@
     <addaction name="actionProject_Browser"/>
     <addaction name="actionSet_Columns_Per_Page"/>
     <addaction name="actionImageScanner"/>
+    <addaction name="actionAssembleImageFolder"/>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Text"/>
     <addaction name="actionSave_Image"/>
@@ -2577,6 +2578,14 @@
   <action name="actionSet_Columns_Per_Page">
    <property name="text">
     <string>Set Columns Per Page</string>
+   </property>
+  </action>
+  <action name="actionAssembleImageFolder">
+   <property name="text">
+    <string>Assemble Image Folder...</string>
+   </property>
+   <property name="toolTip">
+    <string>Combine sequential images into a multipage PDF or monochrome TIFF</string>
    </property>
   </action>
  </widget>

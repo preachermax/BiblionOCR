@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -79,6 +80,16 @@ PROVENANCE_RELATIVE_DIR = os.path.join(
     "source_images",
     "provenance",
 )
+
+IMAGE_SOURCE_EXTENSIONS = {
+    ".bmp",
+    ".gif",
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".tif",
+    ".tiff",
+}
 SUPPORTED_SOURCE_EXTENSIONS = {".pdf", ".tif", ".tiff"}
 LEGACY_PDF_SOURCE_RELATIVE_DIRS = (
     os.path.join("Model", "Project", "Images", "MyServer", "Source", "pdf"),
@@ -177,6 +188,76 @@ def copy_provenance_file(source_path: str, project_root: str) -> str:
 
 def project_scan_image_directory(project_root: str) -> str:
     return os.path.join(os.path.abspath(project_root), SCANNED_TIFF_SOURCE_RELATIVE_DIR)
+
+
+def assemble_image_folder(source_dir: str, destination_path: str) -> str:
+    normalized_source_dir = os.path.abspath(str(source_dir or "").strip())
+    normalized_destination = os.path.abspath(str(destination_path or "").strip())
+    if not os.path.isdir(normalized_source_dir):
+        raise ValueError("Image source folder does not exist")
+
+    destination_extension = os.path.splitext(normalized_destination)[1].lower()
+    if destination_extension not in {".pdf", ".tif", ".tiff"}:
+        raise ValueError("Destination must be a PDF or TIFF file")
+
+    def natural_key(path):
+        return [
+            int(part) if part.isdigit() else part.casefold()
+            for part in re.split(r"(\d+)", os.path.basename(path))
+        ]
+
+    source_paths = sorted(
+        (
+            os.path.join(normalized_source_dir, entry)
+            for entry in os.listdir(normalized_source_dir)
+            if os.path.splitext(entry)[1].lower() in IMAGE_SOURCE_EXTENSIONS
+            and os.path.isfile(os.path.join(normalized_source_dir, entry))
+            and os.path.abspath(os.path.join(normalized_source_dir, entry))
+            != normalized_destination
+        ),
+        key=natural_key,
+    )
+    if not source_paths:
+        raise ValueError("Image source folder contains no supported image files")
+
+    pages = []
+    try:
+        for source_path in source_paths:
+            with Image.open(source_path) as source_image:
+                frame_count = int(getattr(source_image, "n_frames", 1) or 1)
+                for frame_index in range(frame_count):
+                    source_image.seek(frame_index)
+                    if destination_extension == ".pdf":
+                        pages.append(source_image.convert("RGB").copy())
+                    else:
+                        pages.append(source_image.convert("1").copy())
+
+        if not pages:
+            raise ValueError("Image source folder contains no readable pages")
+
+        os.makedirs(os.path.dirname(normalized_destination), exist_ok=True)
+        if destination_extension == ".pdf":
+            pages[0].save(
+                normalized_destination,
+                format="PDF",
+                save_all=True,
+                append_images=pages[1:],
+                resolution=300.0,
+            )
+        else:
+            pages[0].save(
+                normalized_destination,
+                format="TIFF",
+                save_all=True,
+                append_images=pages[1:],
+                compression="group4",
+                dpi=(300, 300),
+            )
+    finally:
+        for page in pages:
+            page.close()
+
+    return normalized_destination
 
 
 def convert_scan_to_project_pdf(scan_path: str, project_root: str) -> str:

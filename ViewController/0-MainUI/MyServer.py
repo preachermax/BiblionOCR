@@ -129,6 +129,7 @@ from helpers.Dialogs.ThemeEditorDialog import (
     save_theme_preferences,
 )
 from helpers.ProjectTrackingDialog import ProjectTrackingDialog
+from helpers.document_assembly import start_image_folder_assembly
 from helpers.Stylesheets import load_project_theme, save_project_theme
 from Core.book_metadata import book_session_values, find_book_reference, load_book_references
 from Core.engine import ProjectCreationEngine as CoreProjectCreationEngine
@@ -419,6 +420,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         # -------------------------
         self.ui.actionNewProject.setText("New Project")
         self.ui.actionNewProject.triggered.connect(self.on_new_project_clicked)
+        self.ui.actionAssembleImageFolder.triggered.connect(self.actionAssembleImageFolder)
         self.ui.actionCombineSourcePages.triggered.connect(self.actionCombineSourcePages)
         if hasattr(self.ui, "actionOpen_Project"):
             self.ui.actionOpen_Project.triggered.connect(self.on_open_project_clicked)
@@ -2519,6 +2521,54 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         )
         self.statusBar().showMessage(f"Combined source PDF: {combined_path}", 5000)
         return combined_path
+
+    def actionAssembleImageFolder(self):
+        project_root_path = self._active_project_root_for_source()
+        if not project_root_path:
+            qtw.QMessageBox.information(
+                self,
+                "Assemble Image Folder",
+                "Open or create a project before assembling source images.",
+            )
+            return ""
+
+        source_dir = qtw.QFileDialog.getExistingDirectory(
+            self,
+            "Select Sequential Image Folder",
+            project_root_path,
+        )
+        if not source_dir:
+            return ""
+
+        destination_path, selected_filter = qtw.QFileDialog.getSaveFileName(
+            self,
+            "Save Multipage Document",
+            os.path.join(source_dir, "assembled_pages.pdf"),
+            "PDF document (*.pdf);;Monochrome TIFF (*.tif)",
+        )
+        if not destination_path:
+            return ""
+        if not os.path.splitext(destination_path)[1]:
+            destination_path += ".tif" if "TIFF" in selected_filter else ".pdf"
+
+        def on_finished(assembled_path):
+            self.statusBar().showMessage(
+                f"Assembled source document: {assembled_path}",
+                5000,
+            )
+
+        def on_failed(message):
+            qtw.QMessageBox.warning(self, "Assemble Image Folder", message)
+
+        if not start_image_folder_assembly(
+            self,
+            source_dir,
+            destination_path,
+            on_finished,
+            on_failed,
+        ):
+            return ""
+        return destination_path
 
     def actionStageSourcePages(self):
         project_root_path = self._active_project_root_for_source()

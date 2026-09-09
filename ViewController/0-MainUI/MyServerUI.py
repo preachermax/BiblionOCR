@@ -839,6 +839,8 @@ class Ui_MainUI(object):
         self.actionStage_Workflow.setObjectName("actionStage_Workflow")
         self.actionCombineSourcePages = QtWidgets.QAction(MainUI)
         self.actionCombineSourcePages.setObjectName("actionCombineSourcePages")
+        self.actionAssembleImageFolder = QtWidgets.QAction(MainUI)
+        self.actionAssembleImageFolder.setObjectName("actionAssembleImageFolder")
         self.menuTraining.addAction(self.actionMyVersifier)
         self.menuTraining.addAction(self.actionMyResolver)
         self.menuTraining.addAction(self.actionMyGrounder)
@@ -878,6 +880,7 @@ class Ui_MainUI(object):
         self.menuGround_Truth_2.addAction(self.actionMyTrainer)
         self.menuSource.addAction(self.actionImageScanner_tb)
         self.menuSource.addAction(self.actionMyExplorer)
+        self.menuSource.addAction(self.actionAssembleImageFolder)
         self.menuSource.addAction(self.actionCombineSourcePages)
         self.menuSource.addAction(self.actionStage_Workflow)
         self.menuLanguages_2.addAction(self.actionHebrew_6)
@@ -1162,6 +1165,8 @@ class Ui_MainUI(object):
         self.actionStage_Workflow.setText(_translate("MainUI", "Stage Workflow"))
         self.actionCombineSourcePages.setText(_translate("MainUI", "Combine Source Pages"))
         self.actionCombineSourcePages.setToolTip(_translate("MainUI", "Combine acquired and scanned PDF source pages"))
+        self.actionAssembleImageFolder.setText(_translate("MainUI", "Assemble Image Folder..."))
+        self.actionAssembleImageFolder.setToolTip(_translate("MainUI", "Combine sequential images into a multipage PDF or monochrome TIFF"))
 import UI_Icons
 
 

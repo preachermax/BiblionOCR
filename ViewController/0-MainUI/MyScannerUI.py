@@ -956,6 +956,8 @@ class Ui_Scanner(object):
         self.actionScanImage.setObjectName("actionScanImage")
         self.actionSet_Columns_Per_Page = QtWidgets.QAction(Scanner)
         self.actionSet_Columns_Per_Page.setObjectName("actionSet_Columns_Per_Page")
+        self.actionAssembleImageFolder = QtWidgets.QAction(Scanner)
+        self.actionAssembleImageFolder.setObjectName("actionAssembleImageFolder")
         self.menuSelect_Language.addAction(self.actionGreek_2)
         self.menuSelect_Language.addAction(self.actionHebrew_4)
         self.menuSelect_Language.addAction(self.actionLatin_2)
@@ -966,6 +968,7 @@ class Ui_Scanner(object):
         self.menuFile.addAction(self.actionProject_Browser)
         self.menuFile.addAction(self.actionSet_Columns_Per_Page)
         self.menuFile.addAction(self.actionImageScanner)
+        self.menuFile.addAction(self.actionAssembleImageFolder)
         self.menuFile.addAction(self.actionOpen_Image)
         self.menuFile.addAction(self.actionOpen_Text)
         self.menuFile.addAction(self.actionSave_Image)
@@ -1283,6 +1286,8 @@ class Ui_Scanner(object):
         self.actionImageScanner_tb.setText(_translate("Scanner", "Scan Image"))
         self.actionScanImage.setText(_translate("Scanner", "Scan Image"))
         self.actionSet_Columns_Per_Page.setText(_translate("Scanner", "Set Columns Per Page"))
+        self.actionAssembleImageFolder.setText(_translate("Scanner", "Assemble Image Folder..."))
+        self.actionAssembleImageFolder.setToolTip(_translate("Scanner", "Combine sequential images into a multipage PDF or monochrome TIFF"))
 import UI_Icons
 
 

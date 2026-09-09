@@ -1483,6 +1483,7 @@
      </property>
      <addaction name="actionImageScanner_tb"/>
      <addaction name="actionMyExplorer"/>
+    <addaction name="actionAssembleImageFolder"/>
     <addaction name="actionCombineSourcePages"/>
      <addaction name="actionStage_Workflow"/>
     </widget>
@@ -2331,6 +2332,14 @@
    </property>
    <property name="toolTip">
     <string>Combine acquired and scanned PDF source pages</string>
+   </property>
+  </action>
+  <action name="actionAssembleImageFolder">
+   <property name="text">
+    <string>Assemble Image Folder...</string>
+   </property>
+   <property name="toolTip">
+    <string>Combine sequential images into a multipage PDF or monochrome TIFF</string>
    </property>
   </action>
  </widget>

@@ -22,6 +22,7 @@ from Core.engine import ProjectCreationEngine
 from Core.page_workflow import PageWorkflowStep, advance_page_workflow_files
 from Core.project_database import create_project_database, load_project_database_record, project_metadata_database_path
 from Core.source_documents import (
+    assemble_image_folder,
     combine_project_source_pdfs,
     complete_project_staged_pdf_handoff,
     convert_pdf_pages_to_tiff,
@@ -1563,6 +1564,26 @@ def test_scan_conversion_and_project_pdf_combination(tmp_path) -> None:
     assert len(PdfReader(str(scanned_pdf)).pages) == 3
     assert combined_pdf.parent.name == "pdf_combined_src_images"
     assert len(PdfReader(str(combined_pdf)).pages) == 5
+
+
+def test_image_folder_assembly_preserves_natural_order_and_output_mode(tmp_path) -> None:
+    source_dir = tmp_path / "pages"
+    source_dir.mkdir()
+    for filename, shade in (("page_10.png", 192), ("page_2.png", 96), ("page_1.png", 32)):
+        Image.new("L", (8, 8), color=shade).save(source_dir / filename)
+
+    pdf_path = Path(assemble_image_folder(source_dir, tmp_path / "assembled.pdf"))
+    tiff_path = Path(assemble_image_folder(source_dir, tmp_path / "assembled.tif"))
+
+    assert len(PdfReader(str(pdf_path)).pages) == 3
+    with Image.open(tiff_path) as assembled_tiff:
+        assert assembled_tiff.n_frames == 3
+        assert assembled_tiff.mode == "1"
+        observed_order = []
+        for frame_index in range(assembled_tiff.n_frames):
+            assembled_tiff.seek(frame_index)
+            observed_order.append(assembled_tiff.convert("L").getpixel((0, 0)))
+    assert observed_order == [0, 0, 255]
 
 
 def test_pdf_page_range_extraction_preserves_all_selected_page_content(tmp_path) -> None:
