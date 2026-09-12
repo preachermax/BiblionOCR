@@ -1450,6 +1450,7 @@
     </property>
     <addaction name="actionEdit_Image_tb"/>
     <addaction name="actionDB_Browser_for_SQLite"/>
+      <addaction name="actionBiblionScheduler"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -1584,6 +1585,7 @@
    <addaction name="actionMyReader"/>
    <addaction name="actionMyGrounder"/>
    <addaction name="actionMyTrainer"/>
+  <addaction name="actionBiblionScheduler"/>
   </widget>
   <action name="actionpdf_to_tiff">
    <property name="icon">
@@ -2199,6 +2201,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+E</string>
+   </property>
+  </action>
+  <action name="actionBiblionScheduler">
+   <property name="icon">
+    <iconset resource="../../ViewController/0-MainUI/helpers/UI_Icons.qrc">
+     <normaloff>:/Icons/Icons/calendar-day.png</normaloff>:/Icons/Icons/calendar-day.png</iconset>
+   </property>
+   <property name="text">
+    <string>Biblion Scheduler</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Biblion Scheduler</string>
    </property>
   </action>
   <action name="actionNewProject">

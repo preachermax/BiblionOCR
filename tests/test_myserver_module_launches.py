@@ -103,3 +103,14 @@ def test_myserver_sends_current_image_and_caller_to_mypixler(tmp_path) -> None:
     ]
     assert window.pending_pixler_source_path == str(source_path)
     start_monitor.assert_called_once_with()
+
+
+def test_myserver_launches_biblion_scheduler_wrapper() -> None:
+    window = MYSERVER.MainWindow.__new__(MYSERVER.MainWindow)
+
+    with mock.patch.object(MYSERVER.subprocess, "Popen", return_value=mock.Mock(pid=1234)) as popen:
+        window.OpenWithBiblionScheduler()
+
+    launcher = ROOT / "launchers" / "run-biblionscheduler.sh"
+    assert launcher.is_file()
+    popen.assert_called_once_with([str(launcher)])

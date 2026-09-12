@@ -29,6 +29,7 @@ preprocess_dir = os.path.join(viewcontroller_dir, "1-PreProcess")
 training_dir = os.path.join(viewcontroller_dir, "2-TrainTesseract")
 process_dir = os.path.join(viewcontroller_dir, "3-Process")
 postprocess_dir = os.path.join(viewcontroller_dir, "4-PostProcess")
+scheduler_launcher = os.path.join(project_root, "launchers", "run-biblionscheduler.sh")
 
 RUNTIME_MODULE_PATHS = {
     "MyScanner.py": os.path.join(script_dir, "MyScanner.py"),
@@ -524,6 +525,7 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
         self.ui.actionMyReader.triggered.connect(self.OpenWithMyReader)
         self.ui.actionMyGrounder.triggered.connect(self.OpenWithMyGrounder)
         self.ui.actionMyTrainer.triggered.connect(self.OpenWithMyTrainer)
+        self.ui.actionBiblionScheduler.triggered.connect(self.OpenWithBiblionScheduler)
         self.ui.actionStage_Workflow.triggered.connect(self.actionStageSourcePages)
 
         # Button Modules
@@ -4010,6 +4012,20 @@ class MainWindow(LocalFileDropMixin, qtw.QMainWindow):
 
     def OpenWithMyExplorer(self):
         self.run_child_module('MyExplorer.py', self._projects_base_path())
+
+    def OpenWithBiblionScheduler(self):
+        if not os.path.isfile(scheduler_launcher):
+            qtw.QMessageBox.warning(
+                self,
+                "Biblion Scheduler",
+                f"Scheduler launcher was not found:\n{scheduler_launcher}",
+            )
+            return
+        try:
+            process = subprocess.Popen([scheduler_launcher])
+            print(f"[LAUNCH] Biblion Scheduler (PID: {process.pid})")
+        except OSError as error:
+            qtw.QMessageBox.warning(self, "Biblion Scheduler", str(error))
 
     def OpenWithCalc(self):
         lo_cmd = f"libreoffice --calc {self.txtpath or ''}"

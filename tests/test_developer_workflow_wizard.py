@@ -84,7 +84,7 @@ def test_conditional_gate_accepts_not_applicable_only_with_justification():
     assert evaluate_pr_eligibility(results) == (True, [])
     evidence = build_pr_evidence(_record(), results)
     assert "Developer Wizard Gate: PASS" in evidence
-    assert "Developer Wizard Gate Version: 1" in evidence
+    assert "Developer Wizard Gate Version: 2" in evidence
     assert "**NOT APPLICABLE - Designer UI" in evidence
 
 
@@ -104,11 +104,11 @@ def test_generated_pr_evidence_matches_template_and_action_contract():
         assert declaration in template
         assert declaration in action
     assert "Developer Wizard Gate: PASS" in evidence
-    assert "Developer Wizard Gate Version: 1" in evidence
-    assert "Developer Wizard Gate Version:\\s*1" in action
-    assert len(PR_GATE_DEFINITIONS) == 19
-    assert "minimumGateEvidenceCount = 19" in action
-    assert evidence.count("- **PASS - ") == 19
+    assert "Developer Wizard Gate Version: 2" in evidence
+    assert "Developer Wizard Gate Version:\\s*2" in action
+    assert len(PR_GATE_DEFINITIONS) == 20
+    assert "minimumGateEvidenceCount = 20" in action
+    assert evidence.count("- **PASS - ") == 20
 
 
 def test_help_content_covers_workflow_copilot_and_maintenance():
@@ -127,6 +127,21 @@ def test_help_content_covers_workflow_copilot_and_maintenance():
     for gate in PR_GATE_DEFINITIONS:
         assert gate.label in DEVELOPER_HELP["requirements"]
     assert "See the repository LICENSE file" in get_about_html()
+
+
+def test_scheduler_update_schedule_lane_covers_required_progress_fields():
+    checklist = (
+        ROOT / "Developer" / "documentation" / "DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md"
+    ).read_text(encoding="utf-8")
+    gate = next(definition for definition in PR_GATE_DEFINITIONS if definition.key == "scheduler_update_lane")
+
+    assert gate.allow_not_applicable
+    for required_term in ("Start", "Finish", "Progress", "Remaining Duration", "Percent Complete"):
+        assert required_term in checklist
+        assert required_term in gate.guidance
+    assert "Biblion Scheduler Update Schedule Lane" in checklist
+    assert "versioned schema migration" in checklist
+    assert "without overwriting the approved baseline" in checklist
 
 
 def test_nomenclature_defines_canonical_terms_and_is_linked_from_developer_docs():

@@ -184,13 +184,16 @@ class MyExplorerPickerTests(unittest.TestCase):
         )
         self.assertIn("ifnotself.isVisible():", compact_runtime_source)
         self.assertIn(
-            "QtCore.QTimer.singleShot(0,self._size_tree_columns)",
+            "QtCore.QTimer.singleShot(0,self._initialize_browser_geometry)",
             compact_runtime_source,
         )
-        self.assertIn("self.model.directoryLoaded.connect", compact_runtime_source)
-        self.assertIn("QtWidgets.QStyle.PM_ScrollBarExtent", compact_runtime_source)
-        self.assertIn("proportions=(0.48,0.13,0.17)", compact_runtime_source)
-        self.assertIn("available_width-assigned_width", compact_runtime_source)
+        self.assertNotIn("self.model.directoryLoaded.connect", compact_runtime_source)
+        self.assertIn(
+            "self.detailsView.header().setSectionsClickable(True)",
+            compact_runtime_source,
+        )
+        self.assertIn("QtWidgets.QHeaderView.Interactive", compact_runtime_source)
+        self.assertNotIn("defresizeEvent(self,event):", compact_runtime_source)
 
         expected_shortcuts = {
             "actionSelect_Folder": "Ctrl+Return",
@@ -433,6 +436,14 @@ class MyExplorerPickerTests(unittest.TestCase):
             second_file = Path(temporary_directory) / "second.txt"
             first_file.write_text("first", encoding="utf-8")
             second_file.write_text("second", encoding="utf-8")
+            for item_number in range(40):
+                overflow_folder = Path(temporary_directory) / f"folder_{item_number:02d}_with_a_long_name"
+                overflow_folder.mkdir()
+                (overflow_folder / "keep.txt").write_text("keep", encoding="utf-8")
+                (Path(temporary_directory) / f"file_{item_number:02d}.txt").write_text(
+                    "overflow",
+                    encoding="utf-8",
+                )
 
             window = module.MyFileBrowser(
                 start_dir=temporary_directory,
@@ -456,6 +467,46 @@ class MyExplorerPickerTests(unittest.TestCase):
                     window.detailsView.selectionMode(),
                 )
                 self.assertEqual(".", window.relativePathLineEdit.text())
+                window.resize(1000, 650)
+                window.show()
+                self.application.processEvents()
+                self.assertIs(window.browserSplitter, window.treeView.parentWidget())
+                self.assertGreater(window.treeView.height(), 300)
+                self.assertEqual(window.treeView.geometry().top(), window.contentStack.geometry().top())
+                self.assertEqual(window.treeView.height(), window.contentStack.height())
+                self.assertGreaterEqual(window.browserSplitter.sizes()[0], 220)
+                self.assertLess(window.browserSplitter.sizes()[0], window.browserSplitter.sizes()[1])
+                self.assertEqual(qtc.Qt.ScrollBarAsNeeded, window.treeView.verticalScrollBarPolicy())
+                self.assertEqual(qtc.Qt.ScrollBarAsNeeded, window.treeView.horizontalScrollBarPolicy())
+                self.assertEqual(qtc.Qt.ScrollBarAsNeeded, window.detailsView.verticalScrollBarPolicy())
+                self.assertEqual(qtc.Qt.ScrollBarAsNeeded, window.detailsView.horizontalScrollBarPolicy())
+                self.assertEqual(qtc.Qt.ScrollBarAsNeeded, window.itemsView.verticalScrollBarPolicy())
+                self.assertEqual(qtc.Qt.ScrollBarAsNeeded, window.itemsView.horizontalScrollBarPolicy())
+                self.assertEqual(qtw.QSizePolicy.Expanding, window.treeView.sizePolicy().verticalPolicy())
+                self.assertEqual(qtw.QSizePolicy.Expanding, window.detailsView.sizePolicy().verticalPolicy())
+                self.assertEqual(qtw.QSizePolicy.Expanding, window.itemsView.sizePolicy().verticalPolicy())
+
+                window.resize(640, 420)
+                for _ in range(10):
+                    self.application.processEvents(qtc.QEventLoop.AllEvents, 20)
+                self.assertEqual((640, 420), (window.width(), window.height()))
+                self.assertGreater(window.treeView.verticalScrollBar().maximum(), 0)
+                self.assertGreater(window.detailsView.verticalScrollBar().maximum(), 0)
+                self.assertGreater(window.detailsView.horizontalScrollBar().maximum(), 0)
+
+                details_header = window.detailsView.header()
+                self.assertTrue(window.detailsView.isSortingEnabled())
+                self.assertTrue(details_header.sectionsClickable())
+                for column in range(4):
+                    self.assertEqual(
+                        qtw.QHeaderView.Interactive,
+                        details_header.sectionResizeMode(column),
+                    )
+                    self.assertGreaterEqual(window.detailsView.columnWidth(column), 60)
+                window.detailsView.setColumnWidth(0, 245)
+                window.resize(1100, 700)
+                self.application.processEvents()
+                self.assertEqual(245, window.detailsView.columnWidth(0))
 
                 window._set_content_view_mode("list")
                 self.assertIs(window.itemsPage, window.contentStack.currentWidget())

@@ -388,11 +388,17 @@ def test_mypixler_extract_action_populates_all_section_staging_folders(tmp_path,
         },
     )()
     messages = []
+    reports = []
     owner.statusBar = lambda: type(
         "StatusBar",
         (),
         {"showMessage": lambda _self, message, _timeout: messages.append(message)},
     )()
+    monkeypatch.setattr(
+        qtw.QMessageBox,
+        "information",
+        lambda _parent, title, message: reports.append((title, message)),
+    )
     extracted_paths = mypixler.PixlerMain.actionextract_pdf(owner)
 
     assert len(extracted_paths) == 4
@@ -404,7 +410,12 @@ def test_mypixler_extract_action_populates_all_section_staging_folders(tmp_path,
         assert Path(extracted_paths[index - 1]).is_file()
     assert len(completed_steps) == 4
     assert all(kwargs["stage_source"] is True for _step, kwargs in completed_steps)
-    assert messages == ["Extracted source PDF into 4 section staging folders."]
+    assert messages == [
+        "Extracted source PDF into 4 section staging folders.",
+        "Source Section Extraction is complete: SSH1, SSH2, SSH3, SSH4",
+    ]
+    assert reports[0][0] == "Source Section Extraction"
+    assert "Completed milestones" in reports[0][1]
     assert saved_states[-1]["section_index"] == 0
     assert {
         section_state["status"]
@@ -472,10 +483,12 @@ def test_extract_dialog_exposes_workflow_controls_and_persists_state(tmp_path) -
 
     mypixler.PixlerMain._save_extract_dialog_state(owner, str(tmp_path), state)
     restored = mypixler.PixlerMain._load_extract_dialog_state(owner, str(tmp_path))
+    mypixler.PixlerMain._prepare_extract_dialog(dialog, ui)
 
     assert dialog.windowModality() == qtc.Qt.NonModal
     assert ui.MakeDefaultCheckBox.isEnabled() is False
     assert ui.MilestoneOverrideCheckBox.isChecked() is False
+    assert ui.MilestoneOverrideCheckBox.isHidden()
     assert ui.PreviousButton.text() == "Previous"
     assert ui.NextButton.text() == "Next"
     assert ui.SkipButton.text() == "Skip"
@@ -501,52 +514,7 @@ def test_extract_overwrite_warning_can_preserve_existing_output(tmp_path, monkey
     assert existing.read_bytes() == b"keep"
 
 
-def test_extract_skip_override_records_progress_milestone(tmp_path) -> None:
-    mypixler = _load_mypixler_module()
-    recorded = []
-    synchronized = []
-    refreshed = []
-    step = type(
-        "WorkflowStep",
-        (),
-        {"milestone_name": "src_pages_front_matter_staged"},
-    )()
-    owner = type("WorkflowOwner", (), {})()
-    owner.refimgpath = ""
-    owner.current_project_page = 3
-    owner._page_number_from_path = lambda _path, fallback: fallback
-    owner.workflow_tracker = type(
-        "Tracker",
-        (),
-        {
-            "record_page_milestone": lambda _self, *args, **kwargs: recorded.append(
-                (args, kwargs)
-            )
-        },
-    )()
-    owner._sync_project_page_state = lambda *args, **kwargs: synchronized.append(
-        (args, kwargs)
-    )
-    owner._refresh_project_status = lambda root: refreshed.append(root)
-
-    mypixler.PixlerMain._record_extract_skip_override(owner, str(tmp_path), step)
-
-    assert recorded == [
-        (
-            (str(tmp_path), 3, "src_pages_front_matter_staged"),
-            {
-                "module_name": "MyPixler",
-                "details": {"source": "extract_dialog_skip", "override": True},
-            },
-        )
-    ]
-    assert synchronized == [
-        ((str(tmp_path),), {"page_milestone": "src_pages_front_matter_staged"})
-    ]
-    assert refreshed == [str(tmp_path)]
-
-
-def test_single_page_extraction_skip_persists_complete_status(
+def test_single_page_extraction_skip_remains_pending_without_override(
     tmp_path,
     monkeypatch,
 ) -> None:
@@ -570,7 +538,6 @@ def test_single_page_extraction_skip_persists_complete_status(
     source_dir.mkdir(parents=True)
     _create_test_pdf(source_dir / "middle.pdf")
     state = {}
-    recorded = []
     owner = type("WorkflowOwner", (), {})()
     owner.current_project_root = str(tmp_path)
     owner.projecthome = str(ROOT_DIR)
@@ -584,7 +551,6 @@ def test_single_page_extraction_skip_persists_complete_status(
     owner._load_extract_dialog_state = lambda _root: state
     owner._save_extract_dialog_state = lambda _root, _state: None
     owner._install_extract_context_menu = lambda *_args, **_kwargs: None
-    owner._record_extract_skip_override = lambda _root, selected_step: recorded.append(selected_step)
 
     def skip_dialog(dialog):
         ui = dialog.findChild(qtw.QPushButton, "SkipButton")
@@ -603,9 +569,9 @@ def test_single_page_extraction_skip_persists_complete_status(
 
     saved = state["single_page_sections"]["ES2M"]
     assert extracted == []
-    assert saved["status"] == "complete"
-    assert saved["completion_source"] == "skip"
-    assert recorded == [step]
+    assert saved["status"] == "pending"
+    assert "completion_source" not in saved
+    assert "milestone_override" not in saved
     app.processEvents()
 
 
@@ -775,6 +741,60 @@ def test_extract_completion_repaints_dialog_and_project_progress(
     app.processEvents()
 
 
+def test_finish_page_workflow_step_records_context_page_and_refreshes_progress(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    mypixler = _load_mypixler_module()
+    step = type(
+        "WorkflowStep",
+        (),
+        {"milestone_name": "src_pages_front_matter_staged"},
+    )()
+    recorded = []
+    synchronized = []
+    refreshed = []
+    owner = type("WorkflowOwner", (), {})()
+    owner.current_project_root = str(tmp_path)
+    owner.projecthome = str(ROOT_DIR)
+    owner.current_project_page = 1
+    owner._shared_active_project_root = lambda: str(tmp_path)
+    owner.workflow_tracker = type(
+        "Tracker",
+        (),
+        {
+            "_load_project_context": lambda _self, _root: {"CurrentProjectPage": 7},
+            "record_page_milestone": lambda _self, *args, **kwargs: recorded.append(
+                (args, kwargs)
+            ),
+        },
+    )()
+    owner._sync_project_page_state = lambda *args, **kwargs: synchronized.append(
+        (args, kwargs)
+    )
+    owner._refresh_project_status = lambda root: refreshed.append(root)
+    monkeypatch.setattr(mypixler, "advance_page_workflow_files", lambda *_args, **_kwargs: None)
+
+    mypixler.PixlerMain._finish_page_workflow_step(owner, step)
+
+    assert owner.current_project_page == 7
+    assert recorded[0][0] == (
+        str(tmp_path),
+        7,
+        "src_pages_front_matter_staged",
+    )
+    assert synchronized == [
+        (
+            (str(tmp_path),),
+            {
+                "project_milestone": "src_pages_front_matter_staged",
+                "page_milestone": "src_pages_front_matter_staged",
+            },
+        )
+    ]
+    assert refreshed == [str(tmp_path)]
+
+
 def test_section_extraction_restores_saved_sequence_after_complete_steps_are_filtered(
     tmp_path,
 ) -> None:
@@ -869,6 +889,7 @@ def test_mypixler_extracts_staged_section_into_single_page_workflow(
     source_path.parent.mkdir(parents=True)
     _create_test_pdf(source_path)
     messages = []
+    reports = []
     finished = []
     owner = type("WorkflowOwner", (), {})()
     owner.current_project_root = str(tmp_path)
@@ -903,6 +924,11 @@ def test_mypixler_extracts_staged_section_into_single_page_workflow(
         (),
         {"showMessage": lambda _self, message, _timeout: messages.append(message)},
     )()
+    monkeypatch.setattr(
+        qtw.QMessageBox,
+        "information",
+        lambda _parent, title, message: reports.append((title, message)),
+    )
     extracted_paths = mypixler.PixlerMain.actionextract_pdf(owner)
 
     assert len(extracted_paths) == 2
@@ -924,7 +950,11 @@ def test_mypixler_extracts_staged_section_into_single_page_workflow(
             },
         )
     ]
-    assert messages == ["Extracted 2 single-page PDFs for FrontSection."]
+    assert messages == [
+        "Extracted 2 single-page PDFs for FrontSection.",
+        "FrontSection Page Extraction is complete: ES2F",
+    ]
+    assert reports[0][0] == "FrontSection Page Extraction"
     app.processEvents()
 
 
@@ -968,6 +998,7 @@ def test_mypixler_extracts_section_pages_into_each_book_folder(
         (complete_root / book_name).mkdir(parents=True)
     state = {}
     messages = []
+    reports = []
     finished = []
     owner = type("WorkflowOwner", (), {})()
     owner.current_project_root = str(tmp_path)
@@ -1001,6 +1032,11 @@ def test_mypixler_extracts_section_pages_into_each_book_folder(
         (),
         {"showMessage": lambda _self, message, _timeout: messages.append(message)},
     )()
+    monkeypatch.setattr(
+        qtw.QMessageBox,
+        "information",
+        lambda _parent, title, message: reports.append((title, message)),
+    )
 
     extracted_paths = mypixler.PixlerMain.actionextract_pdf(owner)
 
@@ -1016,7 +1052,11 @@ def test_mypixler_extracts_section_pages_into_each_book_folder(
         "book_count": 2,
         "page_count": 2,
     }
-    assert messages == ["Extracted 2 pages into 2 book folders."]
+    assert messages == [
+        "Extracted 2 pages into 2 book folders.",
+        f"{page_section} Book Extraction is complete: {sequence}",
+    ]
+    assert reports[0][0] == f"{page_section} Book Extraction"
     session_items = json.loads(
         (tmp_path / "Model/Project/Data/json/Session.json").read_text(encoding="utf-8")
     )
@@ -1102,18 +1142,18 @@ def test_mypixler_middle_matter_skips_do_not_consume_source_pages(
 
     book_states = state["book_extractions"]["EM2B"]["books"]
     assert len(extracted_paths) == 1
-    assert book_states["book_40_Matthew"]["status"] == "complete"
-    assert book_states["book_40_Matthew"]["completion_source"] == "skip"
-    assert book_states["book_40_Matthew"]["milestone_override"] is True
+    assert book_states["book_40_Matthew"]["status"] == "pending"
+    assert "completion_source" not in book_states["book_40_Matthew"]
+    assert "milestone_override" not in book_states["book_40_Matthew"]
     assert book_states["book_41_Mark"]["status"] == "complete"
     assert book_states["book_41_Mark"]["completion_source"] == "extraction"
     assert book_states["book_41_Mark"]["first_page"] == "1"
     assert book_states["book_41_Mark"]["last_page"] == "1"
-    assert book_states["book_42_Luke"]["status"] == "complete"
-    assert book_states["book_42_Luke"]["completion_source"] == "skip"
-    assert book_states["book_42_Luke"]["milestone_override"] is True
-    assert finished[0][1]["details"]["page_count"] == 1
-    assert not any("paused" in message.lower() for message in messages)
+    assert book_states["book_42_Luke"]["status"] == "pending"
+    assert "completion_source" not in book_states["book_42_Luke"]
+    assert "milestone_override" not in book_states["book_42_Luke"]
+    assert finished == []
+    assert any("paused" in message.lower() for message in messages)
     app.processEvents()
 
 

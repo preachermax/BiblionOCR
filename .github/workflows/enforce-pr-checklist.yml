@@ -62,15 +62,15 @@ jobs:
             }
 
             if (!isAgentManaged) {
-              const gateVersion = /^Developer Wizard Gate Version:\s*1\s*$/mi.test(body);
+              const gateVersion = /^Developer Wizard Gate Version:\s*2\s*$/mi.test(body);
               const evidenceLines = body.match(/^- \*\*(?:PASS|NOT APPLICABLE) - .+:\*\* .+$/gm) || [];
-              const minimumGateEvidenceCount = 19;
+              const minimumGateEvidenceCount = 20;
               if (!wizardGatePassed || !gateVersion || evidenceLines.length < minimumGateEvidenceCount) {
                 core.setFailed(
                   [
                     "Developer PR is missing a valid Developer Workflow Wizard attestation.",
                     "Run .venv/bin/python -m Developer.Developer, satisfy every pre-PR gate, and paste the generated Developer Wizard Evidence block.",
-                    "Required lines: Developer Wizard Gate: PASS and Developer Wizard Gate Version: 1.",
+                    "Required lines: Developer Wizard Gate: PASS and Developer Wizard Gate Version: 2.",
                     `Expected at least ${minimumGateEvidenceCount} generated gate-evidence rows; found ${evidenceLines.length}.`,
                   ].join("\n")
                 );

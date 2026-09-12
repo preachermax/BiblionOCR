@@ -54,6 +54,7 @@ CONDITIONAL GATES - PASS OR JUSTIFIED NOT APPLICABLE
 8. Changed interaction surfaces pass manual UI review
 9. Behavior, help, and development documentation are synchronized
 10. Architecture-normalization evidence is synchronized
+11. Biblion Scheduler Update Schedule contract is complete
 
 Not applicable is valid only when the row offers that status and the contribution truly does not touch the named surface. A written factual reason is mandatory. Convenience, lack of time, unavailable evidence, or a failing check are not valid Not applicable reasons.
 
@@ -145,7 +146,7 @@ Developer/documentation/BIBLIONOCR_NOMENCLATURE.md owns preferred contributor-fa
 
 MAINTENANCE CONTRACT
 
-When DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md changes its workflow phases, validation gates, collaboration policy, or handoff requirements, review both Developer.py and developer_help.py in the same change set.
+When DEVELOPMENT_ROUTINE_CHECKLIST_ONE_PAGE.md changes its workflow phases, validation gates, collaboration policy, or handoff requirements, review both Developer.py and developer_help.py in the same change set. The conditional Biblion Scheduler Update Schedule gate covers Start, Finish, Progress, Remaining Duration, and Percent Complete across the domain, persistence, recalculation, UI, and tests.
 
 Keep help claims aligned with actual behavior. In particular, distinguish actions performed by the wizard from actions performed by a developer or Copilot. The wizard currently stores no automatic session state and writes only through the user-selected Save Draft Report or Save Workflow Report actions.
 

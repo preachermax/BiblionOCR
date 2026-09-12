@@ -27,6 +27,22 @@ def test_myserver_module_toolbar_actions_are_connected() -> None:
     assert toolbar_actions <= connected_actions
 
 
+def test_biblion_scheduler_is_available_from_tools_and_toolbar() -> None:
+    designer_source = (
+        ROOT / "Developer" / "QtDesignerUI" / "MyServerUI.ui"
+    ).read_text(encoding="utf-8")
+    ui_source = (MAIN_UI_DIR / "MyServerUI.py").read_text(encoding="utf-8")
+    runtime_source = (MAIN_UI_DIR / "MyServer.py").read_text(encoding="utf-8")
+
+    assert "self.menuTools.addAction(self.actionBiblionScheduler)" in ui_source
+    assert "self.ModulesToolBar.addAction(self.actionBiblionScheduler)" in ui_source
+    assert ":/Icons/Icons/calendar-day.png" in designer_source
+    assert (
+        "self.ui.actionBiblionScheduler.triggered.connect(self.OpenWithBiblionScheduler)"
+        in runtime_source
+    )
+
+
 def test_myserver_pushbuttons_are_connected() -> None:
     ui_source = (MAIN_UI_DIR / "MyServerUI.py").read_text(encoding="utf-8")
     runtime_source = (MAIN_UI_DIR / "MyServer.py").read_text(encoding="utf-8")

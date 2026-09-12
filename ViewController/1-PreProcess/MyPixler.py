@@ -1100,7 +1100,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             self.current_page_milestone = str(page_milestone or '').strip()
             payload['self.current_page_milestone'] = self.current_page_milestone
 
-        base = os.path.join(self.projecthome, 'Model', 'Project', 'Data', 'json')
+        active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
+        base = os.path.join(active_root, 'Model', 'Project', 'Data', 'json')
         SessionManager(base).update('Session.json', payload)
         SessionManager(base).update('PixlerSession.json', payload)
         return page_number
@@ -1301,7 +1302,36 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             + ", ".join(step.sequence for step in completed_steps),
             10000,
         )
+        PixlerMain._center_next_message_box(self)
         qtw.QMessageBox.information(self, title, message)
+
+    @staticmethod
+    def _prepare_extract_dialog(dialog, ui):
+        ui.MilestoneOverrideCheckBox.setChecked(False)
+        ui.MilestoneOverrideCheckBox.hide()
+
+    @staticmethod
+    def _center_dialog_on_parent_screen(dialog):
+        parent = dialog.parentWidget()
+        screen = parent.screen() if parent is not None else qtw.QApplication.primaryScreen()
+        if screen is None:
+            return
+        available = screen.availableGeometry()
+        target = parent.frameGeometry().center() if parent is not None else available.center()
+        frame = dialog.frameGeometry()
+        frame.moveCenter(target)
+        left = min(max(frame.left(), available.left()), available.right() - frame.width() + 1)
+        top = min(max(frame.top(), available.top()), available.bottom() - frame.height() + 1)
+        dialog.move(left, top)
+
+    @staticmethod
+    def _center_next_message_box(parent):
+        def center_message_box():
+            for widget in qtw.QApplication.topLevelWidgets():
+                if isinstance(widget, qtw.QMessageBox) and widget.isVisible():
+                    PixlerMain._center_dialog_on_parent_screen(widget)
+
+        qtc.QTimer.singleShot(0, center_message_box)
 
     def _refresh_extract_completion_progress(self, active_root, ui=None, label="Complete"):
         refresh_status = getattr(self, "_refresh_project_status", None)
@@ -1383,10 +1413,21 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
     def _finish_page_workflow_step(self, step, details=None, stage_source=False):
         active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
         advance_page_workflow_files(active_root, step, stage_source=stage_source)
-        page_number = self._page_number_from_path(
-            getattr(self, "refimgpath", ""),
-            fallback=getattr(self, "current_project_page", 1),
+        context = self.workflow_tracker._load_project_context(active_root)
+        page_number = max(
+            1,
+            int(
+                context.get(
+                    "CurrentProjectPage",
+                    context.get(
+                        "ProjectPageNumber",
+                        getattr(self, "current_project_page", 1),
+                    ),
+                )
+                or 1
+            ),
         )
+        self.current_project_page = page_number
         self.workflow_tracker.record_page_milestone(
             active_root,
             page_number,
@@ -1395,7 +1436,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             details=details,
         )
         self._sync_project_page_state(
-            getattr(self, "refimgpath", ""),
+            active_root,
             project_milestone=step.milestone_name,
             page_milestone=step.milestone_name,
         )
@@ -1676,6 +1717,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         ui.DestinationButton.clicked.connect(
             lambda: select_directory(ui.DestinationLineEdit, "Select staged PDF destination folder")
         )
+        dialog.adjustSize()
+        PixlerMain._center_dialog_on_parent_screen(dialog)
         if dialog.exec_() != qtw.QDialog.Accepted:
             return
 
@@ -1733,6 +1776,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     override=ui.OverrideCheckBox.isChecked(),
                 )
         except (OSError, ValueError) as exc:
+            PixlerMain._center_next_message_box(self)
             qtw.QMessageBox.warning(
                 self,
                 "Stage Source Document",
@@ -1764,6 +1808,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         event_loop = qtc.QEventLoop(dialog)
         dialog.finished.connect(event_loop.quit)
         dialog.show()
+        PixlerMain._center_dialog_on_parent_screen(dialog)
         dialog.raise_()
         dialog.activateWindow()
         event_loop.exec_()
@@ -1803,6 +1848,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         ]
         if not replaceable:
             return True
+        PixlerMain._center_next_message_box(parent)
         response = qtw.QMessageBox.warning(
             parent,
             "Overwrite Existing Extraction",
@@ -1822,9 +1868,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             redo_action.setEnabled(isinstance(focused, qtw.QLineEdit) and focused.isRedoAvailable())
             menu.addSeparator()
             skip_action = menu.addAction("Skip")
-            override_action = menu.addAction("Milestone override")
-            override_action.setCheckable(True)
-            override_action.setChecked(ui.MilestoneOverrideCheckBox.isChecked())
             selected = menu.exec_(dialog.mapToGlobal(position))
             if selected == undo_action and isinstance(focused, qtw.QLineEdit):
                 focused.undo()
@@ -1835,29 +1878,8 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     dialog.done(skip_result)
                 else:
                     skip_callback()
-            elif selected == override_action:
-                ui.MilestoneOverrideCheckBox.setChecked(override_action.isChecked())
 
         dialog.customContextMenuRequested.connect(show_context_menu)
-
-    def _record_extract_skip_override(self, active_root, step):
-        page_number = self._page_number_from_path(
-            getattr(self, "refimgpath", ""),
-            fallback=getattr(self, "current_project_page", 1),
-        )
-        self.workflow_tracker.record_page_milestone(
-            active_root,
-            page_number,
-            step.milestone_name,
-            module_name="MyPixler",
-            details={"source": "extract_dialog_skip", "override": True},
-        )
-        self._sync_project_page_state(
-            active_root,
-            page_milestone=step.milestone_name,
-        )
-        self._refresh_project_status(active_root)
-        qtw.QApplication.processEvents(qtc.QEventLoop.AllEvents, 50)
 
     @staticmethod
     def _book_stage_root(path):
@@ -1971,6 +1993,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             workflow_source,
         )
         if not PixlerMain._first_workflow_source_document(extraction_source):
+            PixlerMain._center_next_message_box(self)
             qtw.QMessageBox.warning(
                 self,
                 "Extract Book Pages",
@@ -1987,6 +2010,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 reference_root=self.projecthome,
             )
         if not book_destinations:
+            PixlerMain._center_next_message_box(self)
             qtw.QMessageBox.warning(
                 self,
                 "Extract Book Pages",
@@ -2009,7 +2033,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             for saved_state in book_states.values():
                 if isinstance(saved_state, dict):
                     saved_state["status"] = "pending"
-                    saved_state["milestone_override"] = False
                     saved_state.pop("completion_source", None)
             workflow_state["milestone_complete"] = False
 
@@ -2038,6 +2061,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
         ui = Ui_ExtractDialog()
         ui.setupUi(dialog)
+        PixlerMain._prepare_extract_dialog(dialog, ui)
         self._install_extract_context_menu(dialog, ui, skip_result)
         ui.HelpButton.clicked.connect(lambda: show_help(dialog, "MyPixler"))
         ui.PreviousButton.clicked.connect(lambda: dialog.done(previous_result))
@@ -2077,7 +2101,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             ui.DestinationLineEdit.setText(str(saved.get("destination", destination)))
             ui.FirstPageLineEdit.setText(str(saved.get("first_page", prior_end + 1)))
             ui.LastPageLineEdit.setText(str(saved.get("last_page", prior_end + 1)))
-            ui.MilestoneOverrideCheckBox.setChecked(bool(saved.get("milestone_override", False)))
             ui.ProgressLabel.setText(
                 f"Book {current_index + 1} of {len(book_destinations)}: {book_name}"
                 f" ({book_markdown})"
@@ -2091,7 +2114,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 "destination": ui.DestinationLineEdit.text(),
                 "first_page": ui.FirstPageLineEdit.text(),
                 "last_page": ui.LastPageLineEdit.text(),
-                "milestone_override": ui.MilestoneOverrideCheckBox.isChecked(),
             })
             workflow_state["book_index"] = current_index
             self._save_extract_dialog_state(active_root, state)
@@ -2105,18 +2127,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 current_position = min(len(pending_indices) - 1, current_position + 1)
                 continue
             if result == skip_result:
+                PixlerMain._center_next_message_box(dialog)
                 response = qtw.QMessageBox.question(
                     dialog,
-                    "Complete Book Without Extraction",
-                    "Mark this book complete without extracting pages?",
+                    "Skip Book Extraction",
+                    "Skip this book for now? It will remain pending.",
                     qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
                     qtw.QMessageBox.Cancel,
                 )
                 if response == qtw.QMessageBox.Cancel:
                     continue
-                saved["milestone_override"] = True
-                saved["status"] = "complete"
-                saved["completion_source"] = "skip"
+                saved["status"] = "pending"
+                saved.pop("completion_source", None)
                 self._save_extract_dialog_state(active_root, state)
             else:
                 destination_path = ui.DestinationLineEdit.text()
@@ -2142,6 +2164,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                         ui.LastPageLineEdit.text(),
                     )
                 except (OSError, ValueError) as exc:
+                    PixlerMain._center_next_message_box(dialog)
                     qtw.QMessageBox.warning(
                         dialog,
                         "Extract Book Pages",
@@ -2199,14 +2222,17 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     "page_count": len(extracted_paths),
                 },
             )
-        else:
-            self._record_extract_skip_override(active_root, workflow_step)
         workflow_state["milestone_complete"] = True
         workflow_state["book_index"] = 0
         self._save_extract_dialog_state(active_root, state)
         self.statusBar().showMessage(
             f"Extracted {len(extracted_paths)} pages into {len(book_destinations)} book folders.",
             7000,
+        )
+        PixlerMain._report_completed_dialog_loop(
+            self,
+            f"{workflow_step.page_section} Book Extraction",
+            [workflow_step],
         )
         return extracted_paths
 
@@ -2220,6 +2246,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             )
         )
         if len(configured_steps) < 4:
+            PixlerMain._center_next_message_box(self)
             qtw.QMessageBox.warning(
                 self,
                 "Extract Source PDF",
@@ -2238,6 +2265,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             project_staged_pdf_complete_directory(active_root)
         )
         if not source_file:
+            PixlerMain._center_next_message_box(self)
             qtw.QMessageBox.warning(
                 self,
                 "Extract Source PDF",
@@ -2287,6 +2315,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
         ui = Ui_ExtractDialog()
         ui.setupUi(dialog)
+        PixlerMain._prepare_extract_dialog(dialog, ui)
         self._install_extract_context_menu(dialog, ui, skip_result)
         ui.HelpButton.clicked.connect(lambda: show_help(dialog, "MyPixler"))
         ui.PreviousButton.clicked.connect(lambda: dialog.done(previous_result))
@@ -2380,7 +2409,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             ui.FirstPageLineEdit.setText(str(saved.get("first_page", current_defaults["first_page"])))
             ui.LastPageLineEdit.setText(str(saved.get("last_page", current_defaults["last_page"])))
             ui.defaultsrcBox.setChecked(bool(saved.get("use_default", True)))
-            ui.MilestoneOverrideCheckBox.setChecked(bool(saved.get("milestone_override", False)))
             ui.ProgressLabel.setText(
                 f"Section {current_index + 1} of {len(steps)}: {step.page_section}"
                 f" | {saved.get('status', 'pending')}"
@@ -2395,7 +2423,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 "first_page": ui.FirstPageLineEdit.text(),
                 "last_page": ui.LastPageLineEdit.text(),
                 "use_default": ui.defaultsrcBox.isChecked(),
-                "milestone_override": ui.MilestoneOverrideCheckBox.isChecked(),
             })
             if ui.MakeDefaultCheckBox.isChecked():
                 current_state["defaults"] = {
@@ -2417,26 +2444,19 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 current_index = min(len(steps) - 1, current_index + 1)
                 continue
             if result == skip_result:
+                PixlerMain._center_next_message_box(dialog)
                 response = qtw.QMessageBox.question(
                     dialog,
-                    "Complete Section Without Extraction",
-                    "Mark this section complete without extracting pages?",
+                    "Skip Section Extraction",
+                    "Skip this section for now? It will remain pending.",
                     qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
                     qtw.QMessageBox.Cancel,
                 )
                 if response == qtw.QMessageBox.Cancel:
                     continue
-                current_state["milestone_override"] = True
-                current_state["status"] = "complete"
-                current_state["completion_source"] = "skip"
-                self._record_extract_skip_override(active_root, step)
+                current_state["status"] = "pending"
+                current_state.pop("completion_source", None)
                 self._save_extract_dialog_state(active_root, state)
-                PixlerMain._refresh_extract_completion_progress(
-                    self,
-                    active_root,
-                    ui,
-                    f"{step.sequence} - {step.milestone_name} | complete",
-                )
                 current_index += 1
                 if current_index >= len(steps):
                     break
@@ -2467,6 +2487,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                     )
                 )
             except (OSError, ValueError) as exc:
+                PixlerMain._center_next_message_box(dialog)
                 qtw.QMessageBox.warning(
                     dialog,
                     "Extract PDF Pages",
@@ -2491,6 +2512,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
                 current_state.pop("completion_source", None)
                 self._save_extract_dialog_state(active_root, state)
                 extracted_paths.pop()
+                PixlerMain._center_next_message_box(dialog)
                 qtw.QMessageBox.warning(
                     dialog,
                     "Complete Section Extraction",
@@ -2526,6 +2548,12 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             f"Extracted source PDF into {len(extracted_paths)} section staging folders.",
             5000,
         )
+        if len(extracted_paths) == len(steps):
+            PixlerMain._report_completed_dialog_loop(
+                self,
+                "Source Section Extraction",
+                configured_steps,
+            )
         return extracted_paths
 
     def actionextract_staged_pdf_pages(self, workflow_step=None):
@@ -2535,6 +2563,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         workflow_source, complete_folder, _workflow_handshake = self._workflow_step_paths(workflow_step)
         source_file = self._first_workflow_source_document(workflow_source)
         if not source_file:
+            PixlerMain._center_next_message_box(self)
             qtw.QMessageBox.warning(
                 self,
                 "Extract Staged Section PDF",
@@ -2545,6 +2574,7 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         dialog = qtw.QDialog(self if isinstance(self, qtw.QWidget) else None)
         ui = Ui_ExtractDialog()
         ui.setupUi(dialog)
+        PixlerMain._prepare_extract_dialog(dialog, ui)
         active_root = self.current_project_root or self._shared_active_project_root() or self.projecthome
         state = self._load_extract_dialog_state(active_root)
         section_states = state.setdefault("single_page_sections", {})
@@ -2571,20 +2601,18 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         ui.HelpButton.clicked.connect(lambda: show_help(dialog, "MyPixler"))
 
         def skip_extraction():
+            PixlerMain._center_next_message_box(dialog)
             response = qtw.QMessageBox.question(
                 dialog,
-                "Complete Page Extraction Without Output",
-                "Mark this extraction complete without creating pages?",
+                "Skip Page Extraction",
+                "Skip this extraction for now? It will remain pending.",
                 qtw.QMessageBox.Yes | qtw.QMessageBox.Cancel,
                 qtw.QMessageBox.Cancel,
             )
             if response == qtw.QMessageBox.Cancel:
                 return
-            saved["status"] = "complete"
-            saved["completion_source"] = "skip"
-            saved["milestone_override"] = True
-            self._record_extract_skip_override(active_root, workflow_step)
-            ui.MilestoneOverrideCheckBox.setChecked(True)
+            saved["status"] = "pending"
+            saved.pop("completion_source", None)
             dialog.reject()
 
         ui.SkipButton.clicked.connect(skip_extraction)
@@ -2629,7 +2657,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         ui.SourceButton.clicked.connect(select_source)
         ui.DestinationButton.clicked.connect(select_destination)
         ui.defaultsrcBox.setChecked(bool(saved.get("use_default", True)))
-        ui.MilestoneOverrideCheckBox.setChecked(bool(saved.get("milestone_override", False)))
         def mark_custom_value(_text):
             ui.defaultsrcBox.setChecked(False)
             ui.MakeDefaultCheckBox.setEnabled(True)
@@ -2644,7 +2671,6 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             "destination": ui.DestinationLineEdit.text(),
             "first_page": ui.FirstPageLineEdit.text(),
             "last_page": ui.LastPageLineEdit.text(),
-            "milestone_override": ui.MilestoneOverrideCheckBox.isChecked(),
             "use_default": ui.defaultsrcBox.isChecked(),
         })
         if ui.MakeDefaultCheckBox.isChecked():
@@ -2715,7 +2741,14 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
             saved["status"] = "complete"
             saved["completion_source"] = "extraction"
             self._save_extract_dialog_state(active_root, state)
+            PixlerMain._refresh_extract_completion_progress(
+                self,
+                active_root,
+                ui,
+                f"{workflow_step.sequence} - {workflow_step.milestone_name} | complete",
+            )
         except (OSError, ValueError) as exc:
+            PixlerMain._center_next_message_box(dialog)
             qtw.QMessageBox.warning(
                 dialog,
                 "Extract Staged Section PDF",
@@ -2728,6 +2761,11 @@ class PixlerMain(LocalFileDropMixin, qtw.QMainWindow):
         self.statusBar().showMessage(
             f"Extracted {len(extracted_paths)} single-page PDFs for {workflow_step.page_section}.",
             5000,
+        )
+        PixlerMain._report_completed_dialog_loop(
+            self,
+            f"{workflow_step.page_section} Page Extraction",
+            [workflow_step],
         )
         return extracted_paths
 

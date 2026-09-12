@@ -51,7 +51,7 @@ class GateResult:
     evidence: str
 
 
-PR_GATE_VERSION = 1
+PR_GATE_VERSION = 2
 PR_GATE_DEFINITIONS = (
     GateDefinition("scope", "Requirement and scope are explicit", "Record the requirement, intended files, and excluded work."),
     GateDefinition("worktree", "Unrelated worktree changes are preserved", "Cite the final git status review and excluded artifacts."),
@@ -118,6 +118,12 @@ PR_GATE_DEFINITIONS = (
         "architecture_lane",
         "Architecture-normalization evidence is synchronized",
         "Cite task ledger, truth table, spec, and exception updates, or mark this lane not applicable with a reason.",
+        True,
+    ),
+    GateDefinition(
+        "scheduler_update_lane",
+        "Biblion Scheduler Update Schedule contract is complete",
+        "For Update Schedule changes, cite Start, Finish, Progress, Remaining Duration, and Percent Complete coverage across the domain, persistence, recalculation, UI, and tests; otherwise explain why this lane is unaffected.",
         True,
     ),
     GateDefinition("handoff", "Residual risks and next action are recorded", "State remaining risks, deferred work, and the exact next action."),

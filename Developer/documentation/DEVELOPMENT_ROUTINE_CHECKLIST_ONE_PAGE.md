@@ -4,6 +4,8 @@ Use this as a fast, repeatable execution checklist for daily development work.
 
 For architecture-normalization passes, run sections A through M plus the dedicated change-set lane in section N.
 
+For Biblion Scheduler Update Schedule changes, run sections A through M plus the dedicated change-set lane in section O.
+
 Execution ownership policy:
 
 1. Coding agents execute this checklist end-to-end for agent-managed work.
@@ -228,3 +230,18 @@ Run this lane when the active change set is architecture normalization and docum
    - spec/policy documentation.
 9. Confirm runtime/session artifacts remain uncommitted unless explicitly requested.
 10. If Session.json is modified, report it explicitly in handoff as local runtime drift.
+
+## O) Biblion Scheduler Update Schedule Lane
+
+Run this lane when implementing or changing Biblion Scheduler's Update Schedule workflow.
+
+1. Provide one explicit Update Schedule command for activity Start, Finish, Progress, Remaining Duration, and Percent Complete.
+2. Add Remaining Duration to the task domain model with validation and consistent duration-unit semantics.
+3. Persist Remaining Duration through a versioned schema migration, project save/reopen, and schedule-run input hashing.
+4. Keep Start and Finish semantics explicit: distinguish planned/calculated dates from accepted actual-progress dates.
+5. Define and document how Progress, Remaining Duration, and Percent Complete interact for not-started, in-progress, and complete activities.
+6. Recalculate forecast dates and status from accepted updates without overwriting the approved baseline.
+7. Persist each update atomically and refresh the Schedule grid, Gantt, and WBS rollups from the recalculated result.
+8. Reject contradictory updates with clear user-facing validation, including Finish before Start, invalid percentages, negative remaining duration, and completed work with nonzero remaining duration.
+9. Test domain validation, migration/round-trip persistence, schedule-run hashing, forecast recalculation, UI editing, save/reopen, and rollup refresh.
+10. Record focused automated results and manual Update Schedule UI observations in the pre-commit evidence.

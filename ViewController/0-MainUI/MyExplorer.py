@@ -268,12 +268,17 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         original_tree = self.treeView
 
-        self.treeView = ExplorerTreeView(self.frame)
-
-        self.gridLayout_2.replaceWidget(
-            original_tree,
-            self.treeView
+        original_tree.hide()
+        original_tree.setParent(None)
+        self.treeView = ExplorerTreeView(self.browserSplitter)
+        self.treeView.setMinimumWidth(220)
+        self.treeView.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Expanding,
         )
+        self.browserSplitter.insertWidget(0, self.treeView)
+        self.browserSplitter.setStretchFactor(0, 0)
+        self.browserSplitter.setStretchFactor(1, 1)
 
         original_tree.deleteLater()
 
@@ -295,12 +300,20 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         self.treeView.setDragEnabled(True)
         self.treeView.setAcceptDrops(True)
+        self.treeView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.treeView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
         self.treeView.customContextMenuRequested.connect(
             lambda position: self.context_menu(position, self.treeView)
         )
 
         for content_view in (self.detailsView, self.itemsView):
+            content_view.setSizePolicy(
+                QtWidgets.QSizePolicy.Expanding,
+                QtWidgets.QSizePolicy.Expanding,
+            )
+            content_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+            content_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
             content_view.setSelectionMode(
                 QtWidgets.QAbstractItemView.ExtendedSelection
             )
@@ -312,6 +325,8 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         self.detailsView.setRootIsDecorated(False)
         self.detailsView.setItemsExpandable(False)
+        self.detailsView.header().setSectionsClickable(True)
+        self.detailsView.header().setSortIndicatorShown(True)
         self.itemsView.setResizeMode(QtWidgets.QListView.Adjust)
         self.itemsView.setUniformItemSizes(True)
 
@@ -634,14 +649,6 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         self.folder_model.setReadOnly(False)
         self.model = self.folder_model
 
-        self.model.directoryLoaded.connect(
-            lambda _path:
-            QtCore.QTimer.singleShot(
-                0,
-                self._size_tree_columns
-            )
-        )
-
         self.proxy_model = EmptyFolderFilterProxyModel(self)
 
         self.proxy_model.setSourceModel(
@@ -731,10 +738,10 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
 
         QtCore.QTimer.singleShot(
             0,
-            self._size_tree_columns
+            self._initialize_browser_geometry
         )
 
-    def _size_tree_columns(self):
+    def _initialize_browser_geometry(self):
         if (
             not getattr(self, "treeView", None)
             or self.treeView.model() is None
@@ -742,67 +749,26 @@ class MyFileBrowser(MyExplorerUI.Ui_Explorer, QtWidgets.QMainWindow):
         ):
             return
 
-        self.treeView.header().setStretchLastSection(True)
-        self.treeView.setColumnWidth(
-            0,
-            max(1, self.treeView.viewport().width())
+        available_width = max(1, self.browserSplitter.width())
+        left_width = min(260, max(220, available_width // 4))
+        self.browserSplitter.setSizes(
+            [left_width, max(1, available_width - left_width)]
         )
 
         header = self.detailsView.header()
         header.setStretchLastSection(False)
+        header.setMinimumSectionSize(60)
+        header.setDefaultSectionSize(120)
 
         for column in range(4):
             header.setSectionResizeMode(
                 column,
-                QtWidgets.QHeaderView.Fixed
+                QtWidgets.QHeaderView.Interactive
             )
 
-        available_width = self.detailsView.viewport().width()
-
-        if not self.detailsView.verticalScrollBar().isVisible():
-            available_width -= (
-                self.detailsView.style().pixelMetric(
-                    QtWidgets.QStyle.PM_ScrollBarExtent
-                )
-            )
-
-        available_width = max(
-            4,
-            available_width
-        )
-
-        proportions = (
-            0.48,
-            0.13,
-            0.17
-        )
-
-        assigned_width = 0
-
-        for column, proportion in enumerate(proportions):
-            width = max(
-                1,
-                int(available_width * proportion)
-            )
-
-            self.detailsView.setColumnWidth(
-                column,
-                width
-            )
-
-            assigned_width += width
-
-        self.detailsView.setColumnWidth(
-            3,
-            max(
-                1,
-                available_width - assigned_width
-            )
-        )
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self._size_tree_columns()
+        initial_widths = (320, 110, 150, 180)
+        for column, width in enumerate(initial_widths):
+            self.detailsView.setColumnWidth(column, width)
 
     def _toggle_empty_folder_filter(self, enabled):
         self.proxy_model.setExcludeEmptyDirs(enabled)

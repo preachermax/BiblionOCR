@@ -2757,3 +2757,17 @@ Commit/sync:
 Next immediate action:
 
 * Commit and resynchronize the focused MyServer ProjectWorkflow changeset, then begin the separate MyPixler changeset.
+
+### Session Handoff - 2026-09-12 Biblion Scheduler And Pending Desktop Integration
+
+* Scope summary: add the standalone Biblion Scheduler with persisted WBS planning and workflow governance, expose it from MyServer's Tools menu and module toolbar, retain the pending MyExplorer/MyPixler desktop fixes, and synchronize the canonical developer checklist policy.
+* Intended commit scope: `Core/Scheduler`, `Developer/scheduler`, Scheduler launchers, Developer checklist/wizard/help/CI enforcement, MyExplorer Designer/generated/runtime and tests, MyServer Designer/generated/runtime and launch tests, and the pending MyPixler PDF workflow/runtime tests.
+* Problems: full-workspace Problems `0`; in-scope Problems `0`.
+* UI lock-step: `.venv/bin/python Developer/update_ui_resources.py --check` reports `24 unchanged, 0 stale`; the retired `ViewController/0-MainUI/MyPixlerUI.py` remains intentionally absent.
+* Compile: all intended Python runtime, launcher, Scheduler, and test files pass `.venv/bin/python -m py_compile`.
+* Automated tests: Scheduler `70 passed`; Developer workflow policy `9 passed`; MyExplorer `18 passed`; PDF/source workflow `66 passed`; MyServer Scheduler launch/control wiring `7 passed`; launcher contracts `5 passed`.
+* Launcher smoke: all 13 canonical module launchers plus Biblion Scheduler remained stable for eight seconds or exited cleanly. MyGrounder remained open but emitted the documented out-of-scope `IndexError` while restoring an invalid local session page name.
+* Manual/UI evidence: MyServer and Biblion Scheduler each remained open through bounded offscreen startup without missing imports or launcher errors; menu, toolbar, icon, and subprocess wiring are covered by generated-UI and launch tests. Native visual inspection is not available in the headless validation environment.
+* Explicit commit exclusions: runtime-local `Model/Project/Data/json/ReaderSession.json`, runtime-local `Model/Project/Data/json/Session.json`, and untracked unused `ViewController/0-MainUI/helpers/Icons/wizard-hat2.jpeg`.
+* Residual risk: mixed PyQt5/PyQt6 tests can segfault when combined in one process; all affected suites pass in isolated processes. MyGrounder's local-session restore traceback remains outside this change set.
+* Next immediate action: stage only the intended files, validate the staged snapshot, commit on `ubuntu_development`, push it, advance `master` to the same revision, and verify local/remote parity.
